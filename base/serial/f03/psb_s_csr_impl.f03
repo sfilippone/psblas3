@@ -2417,7 +2417,7 @@ subroutine psb_s_mv_csr_to_fmt(a,b,info)
     call a%free()
     
   class default
-    call tmp%mv_from_fmt(a,info)
+    call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
@@ -2456,7 +2456,7 @@ subroutine psb_s_cp_csr_to_fmt(a,b,info)
     b%val = a%val
 
   class default
-    call tmp%cp_from_fmt(a,info)
+    call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
@@ -2495,7 +2495,7 @@ subroutine psb_s_mv_csr_from_fmt(a,b,info)
     call b%free()
 
   class default
-    call tmp%mv_from_fmt(b,info)
+    call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 
@@ -2534,7 +2534,7 @@ subroutine psb_s_cp_csr_from_fmt(a,b,info)
     a%val = b%val
 
   class default
-    call tmp%cp_from_fmt(b,info)
+    call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 end subroutine psb_s_cp_csr_from_fmt

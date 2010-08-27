@@ -2445,7 +2445,7 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
 
    info = psb_success_
    ! This is to have fix_coo called behind the scenes
-   call tmp%cp_from_coo(b,info)
+   call b%cp_to_coo(tmp,info)
    if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
 end subroutine psb_d_cp_csr_from_coo
@@ -2658,7 +2658,7 @@ subroutine psb_d_mv_csr_to_fmt(a,b,info)
     call a%free()
     
   class default
-    call tmp%mv_from_fmt(a,info)
+    call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
@@ -2698,7 +2698,7 @@ subroutine psb_d_cp_csr_to_fmt(a,b,info)
     call psb_safe_cpy( a%val, b%val , info)
 
   class default
-    call tmp%cp_from_fmt(a,info)
+    call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
@@ -2737,7 +2737,7 @@ subroutine psb_d_mv_csr_from_fmt(a,b,info)
     call b%free()
 
   class default
-    call tmp%mv_from_fmt(b,info)
+    call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 
@@ -2777,7 +2777,7 @@ subroutine psb_d_cp_csr_from_fmt(a,b,info)
     call psb_safe_cpy( b%val, a%val , info)
 
   class default
-    call tmp%cp_from_fmt(b,info)
+    call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 end subroutine psb_d_cp_csr_from_fmt
