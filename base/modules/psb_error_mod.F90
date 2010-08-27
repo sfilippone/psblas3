@@ -428,6 +428,9 @@ contains
       write(psb_err_unit,&
            & '("Base class method ",a," called: the class for ",a," is missing an overriding implementation")')&
            &  trim(r_name), trim(a_e_d)
+    case(psb_err_invalid_dynamic_type_)
+      write(psb_err_unit,'("input argument n. ",i0," has a dynamic type not allowed here.")')&
+           & i_e_d(1)
     case (psb_err_invalid_mat_state_)
       write(psb_err_unit,'("Invalid state for sparse matrix")')
     case (psb_err_invalid_cd_state_)

@@ -460,15 +460,15 @@ subroutine psb_c_base_transp_2mat(a,b)
 
   info = psb_success_
   select type(b)
-    class is (psb_c_base_sparse_mat)
+  class is (psb_c_base_sparse_mat)
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call tmp%transp()
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
-    class default
-    info = psb_err_missing_override_method_
+  class default
+    info = psb_err_invalid_dynamic_type_
   end select
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,a_err=b%get_fmt())
+    call psb_errpush(info,name,a_err=b%get_fmt(),i_err=(/1,0,0,0,0/))
     goto 9999
   end if
   call psb_erractionrestore(err_act) 
