@@ -2461,6 +2461,7 @@ subroutine  psb_s_csc_allocate_mnnz(m,n,a,nz)
     call a%set_bld()
     call a%set_triangle(.false.)
     call a%set_unit(.false.)
+    call a%set_dupl(psb_dupl_def_)
   end if
 
   call psb_erractionrestore(err_act)
