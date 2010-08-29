@@ -73,7 +73,7 @@ subroutine psb_crwextd(nr,a,info,b,rowscale)
         call psb_rwextd(nr,aa,info,rowscale=rowscale)
       end if
     class default
-      call a%a%mv_to_coo(actmp,info)
+      call aa%mv_to_coo(actmp,info)
       if (info == psb_success_) then 
         if (present(b)) then 
           call psb_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
@@ -81,7 +81,7 @@ subroutine psb_crwextd(nr,a,info,b,rowscale)
           call psb_rwextd(nr,actmp,info,rowscale=rowscale)
         end if
       end if
-      if (info == psb_success_) call a%a%mv_from_coo(actmp,info)
+      if (info == psb_success_) call aa%mv_from_coo(actmp,info)
     end select
   end if
   if (info /= psb_success_) goto 9999
