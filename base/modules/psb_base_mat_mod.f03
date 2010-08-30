@@ -452,7 +452,7 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    a%aux       = b%aux
+    a%aux(:)    = b%aux(:)
 
   end subroutine psb_base_mv_from
   
