@@ -3090,7 +3090,7 @@ subroutine psb_c_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       enddo
     case default
       write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-
+      info =-7
     end select
 
 
@@ -3174,6 +3174,7 @@ subroutine psb_c_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       enddo
     case default
       write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+      info =-7
     end select
     if (debug_level >= psb_debug_serial_)&
          & write(debug_unit,*)  trim(name),': end second loop'
