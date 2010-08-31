@@ -318,7 +318,7 @@ contains
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      
+
 !!$      call prec%av(psb_l_pr_)%print(30+me)
 !!$      call prec%av(psb_u_pr_)%print(40+me)
 !!$      do i=1,n_row
