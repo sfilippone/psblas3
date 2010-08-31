@@ -521,6 +521,13 @@ PAC_FORTRAN_TEST_CLASS_TBP(
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
  Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6.])]
 )
+
+PAC_FORTRAN_TEST_SOURCE( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SOURCE= allocation. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+)
+
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
@@ -554,6 +561,10 @@ PAC_FORTRAN_TEST_SAME_TYPE(
 
 PAC_FORTRAN_TEST_EXTENDS_TYPE( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"],
+)
+
+PAC_FORTRAN_TEST_MOLD( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"],
 )
 
 ###############################################################################
