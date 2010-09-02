@@ -1,8 +1,8 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$
 !!$     Contributions to this routine:
 !!$                       Daniela di Serafino    Second University of Naples

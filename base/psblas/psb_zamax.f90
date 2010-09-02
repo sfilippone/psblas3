@@ -1,8 +1,8 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -136,10 +136,10 @@ end function psb_zamax
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -263,10 +263,10 @@ function psb_zamaxv (x,desc_a, info)
 end function psb_zamaxv
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -390,10 +390,10 @@ end subroutine psb_zamaxvs
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
