@@ -998,7 +998,7 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
 #if defined(HAVE_MOLD)
     allocate(altmp, mold=mold,stat=info) 
 #else
-    allocate(altmp, source=mold,stat=info) 
+    call mold%mold(altmp,info)
 #endif
 
   else if (present(type)) then 
@@ -1098,7 +1098,7 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
 #if defined(HAVE_MOLD)
     allocate(altmp, mold=mold,stat=info) 
 #else
-    allocate(altmp, source=mold,stat=info) 
+    call mold%mold(altmp,info)
 #endif
 
   else if (present(type)) then 
@@ -1345,7 +1345,7 @@ subroutine psb_d_mv_from(a,b)
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b, stat=info)
 #else
-  allocate(a%a,source=b, stat=info)
+  call b%mold(a%a,info)
 #endif
   call a%a%mv_from_fmt(b,info)
   call b%free()
@@ -1370,10 +1370,10 @@ subroutine psb_d_cp_from(a,b)
 
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b,stat=info)
-#else
-  allocate(a%a,source=b,stat=info)
-#endif
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
+#else
+  call b%mold(a%a,info)
+#endif
   if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
   if (info /= psb_success_) goto 9999 
 
@@ -1459,10 +1459,10 @@ subroutine psb_d_sparse_mat_clone(a,b,info)
 
 #if defined(HAVE_MOLD)
   allocate(b%a,mold=a%a,stat=info)
-#else
-  allocate(b%a,source=a%a,stat=info)
-#endif
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
+#else
+  call a%a%mold(b%a,info)
+#endif
   if (info == psb_success_) call b%a%cp_from_fmt(a%a, info)    
   if (info /= psb_success_) goto 9999 
 
@@ -1540,7 +1540,7 @@ subroutine psb_d_transp_2mat(a,b)
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b%a,stat=info)
 #else
-  allocate(a%a,source=b%a,stat=info)
+  call b%a%mold(a%a,info)
 #endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
@@ -1621,7 +1621,7 @@ subroutine psb_d_transc_2mat(a,b)
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b%a,stat=info)
 #else
-  allocate(a%a,source=b%a,stat=info)
+  call b%a%mold(a%a,info)
 #endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_

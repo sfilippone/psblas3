@@ -17,7 +17,7 @@ EXEDIR=./runs
 all: ppde spde
 
 ppde: ppde.o 
-	$(F90LINK) -pg ppde.o -o ppde $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK)  ppde.o -o ppde $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde $(EXEDIR)
 
 

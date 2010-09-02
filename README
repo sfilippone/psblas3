@@ -10,10 +10,16 @@ FINAL subroutines), but the features we use were sufficient in
 identifying bugs in ALL compilers we tried (all the bugs have been
 reported and mostly fixed by the respective vendors). 
 
-Notes: This code is confirmed to work with NAGware 5.2 and XLF 13.1. 
+Notes: This code is confirmed to work with NAGware 5.2 on an i686 and
+       XLF 13.1 on a POWER6.  
        It does NOT work with GNU Fortran 4.5; it is one of the
-       testbeds for GNU Fortran 4.6, the active development version
-       (as of May 2010), but does not work yet. 
+       testbeds for GNU Fortran 4.6.
+       GNU 4.6.0: as of Sep. 2, 2010 it works; note however that the 
+       configure script will define the HAVE_MOLD compilation flag,
+       and this does not work properly until the fix for PR45451 is
+       available. Until then, you'll need to take out  HAVE_MOLD by
+       hand in Make.inc. 
+        
        If you find it working with other compilers, please let us
        know. 
 
@@ -34,7 +40,7 @@ ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 
 PLATFORMS: 
 
-obsolete... 
+OBSOLETE!!!!!!!! see above ... 
 --The compilation process relies on the choice of an appropriate
 --Make.inc file; we have tested with AIX XLF, Intel ifort/Linux,  Nag
 --f95/Linux, GNU Fortran/Linux, Sun Forte 6.2. If you succeed in

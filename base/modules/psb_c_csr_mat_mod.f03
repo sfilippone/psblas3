@@ -38,6 +38,7 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: trim         => psb_c_csr_trim
     procedure, pass(a) :: print        => psb_c_csr_print
     procedure, pass(a) :: free         => c_csr_free
+    procedure, pass(a) :: mold         => psb_c_csr_mold
     procedure, pass(a) :: psb_c_csr_cp_from
     generic, public    :: cp_from => psb_c_csr_cp_from
     procedure, pass(a) :: psb_c_csr_mv_from
@@ -80,6 +81,15 @@ module psb_c_csr_mat_mod
     end subroutine psb_c_csr_allocate_mnnz
   end interface
   
+  interface 
+    subroutine psb_c_csr_mold(a,b,info) 
+      import psb_c_csr_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
+      class(psb_c_csr_sparse_mat), intent(in)               :: a
+      class(psb_c_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_c_csr_mold
+  end interface
+
   interface
     subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import psb_c_csr_sparse_mat

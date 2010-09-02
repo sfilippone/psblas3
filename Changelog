@@ -1,5 +1,13 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+
+2010/09/02: Fixed inheritance hierarchy of MOLD method. Merged into trunk.	
+	
+2010/09/01: Changed Makefiles to allow for multiple submakes.	
+	
+2010/08/31: Defined the MOLD method. Put under IFDEF in opposition to 
+	    MOLD= in allocation of CLASS variables. 
+	
 2010/07/29: Make the aux component of base_mat a static array; works 
 	    around a problem with gfortran. The library does not fully
             work yet under gfortran.

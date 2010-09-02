@@ -43,6 +43,7 @@ module psb_d_csc_mat_mod
     procedure, pass(a) :: trim         => psb_d_csc_trim
     procedure, pass(a) :: print        => psb_d_csc_print
     procedure, pass(a) :: free         => d_csc_free
+    procedure, pass(a) :: mold         => psb_d_csc_mold
     procedure, pass(a) :: psb_d_csc_cp_from
     generic, public    :: cp_from => psb_d_csc_cp_from
     procedure, pass(a) :: psb_d_csc_mv_from
@@ -84,7 +85,16 @@ module psb_d_csc_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_d_csc_allocate_mnnz
   end interface
-  
+
+  interface 
+    subroutine psb_d_csc_mold(a,b,info) 
+      import psb_d_csc_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
+      class(psb_d_csc_sparse_mat), intent(in)               :: a
+      class(psb_d_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_d_csc_mold
+  end interface
+
   interface
     subroutine psb_d_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import psb_d_csc_sparse_mat

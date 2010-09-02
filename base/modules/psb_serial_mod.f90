@@ -40,7 +40,6 @@ module psb_serial_mod
        & psb_gth => psi_gth,&
        & psb_sct => psi_sct
 
-!!$  use psb_mat_mod
 
   interface psb_symbmm
     subroutine psb_ssymbmm(a,b,c,info)

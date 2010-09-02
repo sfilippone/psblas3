@@ -20,17 +20,17 @@ lib1:	$(FOBJS)
 
 
 auxd: 
-	(cd aux; make lib)
+	(cd aux; $(MAKE) lib)
 
 f77d:
-	(cd f77; make lib)
+	(cd f77; $(MAKE) lib)
 f03d:
-	(cd f03; make lib)
+	(cd f03; $(MAKE) lib)
 
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
-	(cd aux; make clean)
-	(cd f77; make clean)
-	(cd f03; make clean)
+	(cd aux; $(MAKE) clean)
+	(cd f77; $(MAKE) clean)
+	(cd f03; $(MAKE) clean)
 
 veryclean: clean 

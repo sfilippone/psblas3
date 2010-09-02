@@ -24,6 +24,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: z_csgetblk  => psb_z_base_csgetblk
     generic, public    :: csget       => z_csgetrow, z_csgetblk 
     procedure, pass(a) :: csclip      => psb_z_base_csclip 
+    procedure, pass(a) :: mold        => psb_z_base_mold 
     procedure, pass(a) :: cp_to_coo   => psb_z_base_cp_to_coo   
     procedure, pass(a) :: cp_from_coo => psb_z_base_cp_from_coo 
     procedure, pass(a) :: cp_to_fmt   => psb_z_base_cp_to_fmt   
@@ -87,6 +88,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: trim         => psb_z_coo_trim
     procedure, pass(a) :: print        => psb_z_coo_print
     procedure, pass(a) :: free         => z_coo_free
+    procedure, pass(a) :: mold         => psb_z_coo_mold
     procedure, pass(a) :: psb_z_coo_cp_from
     generic, public    :: cp_from => psb_z_coo_cp_from
     procedure, pass(a) :: psb_z_coo_mv_from
@@ -268,6 +270,15 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_csclip
   end interface
   
+  interface 
+    subroutine psb_z_base_mold(a,b,info) 
+      import psb_z_base_sparse_mat, psb_long_int_k_
+      class(psb_z_base_sparse_mat), intent(in)               :: a
+      class(psb_z_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_z_base_mold
+  end interface
+  
   
   interface 
     subroutine psb_z_base_cp_to_coo(a,b,info) 
@@ -410,6 +421,15 @@ module psb_z_base_mat_mod
       class(psb_z_coo_sparse_mat), intent(inout) :: a
       integer, intent(in), optional :: nz
     end subroutine psb_z_coo_allocate_mnnz
+  end interface
+
+  interface 
+    subroutine psb_z_coo_mold(a,b,info) 
+      import psb_z_coo_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
+      class(psb_z_coo_sparse_mat), intent(in)               :: a
+      class(psb_z_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_z_coo_mold
   end interface
   
   interface

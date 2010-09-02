@@ -443,6 +443,30 @@ subroutine psb_s_base_csclip(a,b,info,&
 
 end subroutine psb_s_base_csclip
 
+subroutine psb_s_base_mold(a,b,info) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mold
+  use psb_error_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(in)  :: a
+  class(psb_s_base_sparse_mat), intent(out), allocatable  :: b
+  integer, intent(out)                    :: info
+  Integer :: err_act
+  character(len=20)  :: name='reallocate_nz'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_s_base_mold
 
 subroutine psb_s_base_transp_2mat(a,b)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_transp_2mat

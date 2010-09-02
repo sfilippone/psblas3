@@ -24,6 +24,7 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: s_csgetblk  => psb_s_base_csgetblk
     generic, public    :: csget       => s_csgetrow, s_csgetblk 
     procedure, pass(a) :: csclip      => psb_s_base_csclip 
+    procedure, pass(a) :: mold        => psb_s_base_mold 
     procedure, pass(a) :: cp_to_coo   => psb_s_base_cp_to_coo   
     procedure, pass(a) :: cp_from_coo => psb_s_base_cp_from_coo 
     procedure, pass(a) :: cp_to_fmt   => psb_s_base_cp_to_fmt   
@@ -87,6 +88,7 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: trim         => psb_s_coo_trim
     procedure, pass(a) :: print        => psb_s_coo_print
     procedure, pass(a) :: free         => s_coo_free
+    procedure, pass(a) :: mold         => psb_s_coo_mold
     procedure, pass(a) :: psb_s_coo_cp_from
     generic, public    :: cp_from => psb_s_coo_cp_from
     procedure, pass(a) :: psb_s_coo_mv_from
@@ -268,6 +270,15 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_csclip
   end interface
   
+  interface 
+    subroutine psb_s_base_mold(a,b,info) 
+      import psb_s_base_sparse_mat, psb_long_int_k_
+      class(psb_s_base_sparse_mat), intent(in)               :: a
+      class(psb_s_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_s_base_mold
+  end interface
+  
   
   interface 
     subroutine psb_s_base_cp_to_coo(a,b,info) 
@@ -412,6 +423,15 @@ module psb_s_base_mat_mod
     end subroutine psb_s_coo_allocate_mnnz
   end interface
   
+  interface 
+    subroutine psb_s_coo_mold(a,b,info) 
+      import psb_s_coo_sparse_mat, psb_s_base_sparse_mat, psb_long_int_k_
+      class(psb_s_coo_sparse_mat), intent(in)               :: a
+      class(psb_s_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_s_coo_mold
+  end interface
+
   interface
     subroutine psb_s_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import psb_s_coo_sparse_mat

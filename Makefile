@@ -1,15 +1,23 @@
 include Make.inc
 
-all: library 
-
-library:
-	(if test ! -d lib ; then mkdir lib; fi)
-	(cd base; make lib)
-	(cd prec; make lib )
-	(cd krylov; make lib)
-	(cd util; make lib )
+all: libd based precd kryld utild
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
+
+based: libd
+precd utild: based
+kryld: precd based
+
+libd:
+	(if test ! -d lib ; then mkdir lib; fi)
+based:
+	(cd base; $(MAKE) lib)
+precd:
+	(cd prec; $(MAKE) lib )
+kryld:
+	(cd krylov; $(MAKE) lib)
+utild:
+	(cd util; $(MAKE) lib )
 
 install:
 	(./mkdir.sh  $(INSTALL_DIR) &&\
@@ -21,19 +29,19 @@ install:
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 clean: 
-	(cd base; make clean)
-	(cd prec; make clean )
-	(cd krylov; make clean)
-	(cd util; make clean)
+	(cd base; $(MAKE) clean)
+	(cd prec; $(MAKE) clean )
+	(cd krylov; $(MAKE) clean)
+	(cd util; $(MAKE) clean)
 
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 veryclean: cleanlib
-	(cd base; make veryclean)
-	(cd prec; make veryclean )
-	(cd krylov; make veryclean)
-	(cd util; make veryclean)
-	(cd test/fileread; make clean)
-	(cd test/pargen; make clean)
-	(cd test/util; make clean)
+	(cd base; $(MAKE) veryclean)
+	(cd prec; $(MAKE) veryclean )
+	(cd krylov; $(MAKE) veryclean)
+	(cd util; $(MAKE) veryclean)
+	(cd test/fileread; $(MAKE) clean)
+	(cd test/pargen; $(MAKE) clean)
+	(cd test/util; $(MAKE) clean)
 

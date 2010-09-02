@@ -38,6 +38,7 @@ module psb_z_csc_mat_mod
     procedure, pass(a) :: trim         => psb_z_csc_trim
     procedure, pass(a) :: print        => psb_z_csc_print
     procedure, pass(a) :: free         => z_csc_free
+    procedure, pass(a) :: mold         => psb_z_csc_mold
     procedure, pass(a) :: psb_z_csc_cp_from
     generic, public    :: cp_from => psb_z_csc_cp_from
     procedure, pass(a) :: psb_z_csc_mv_from
@@ -78,6 +79,15 @@ module psb_z_csc_mat_mod
       class(psb_z_csc_sparse_mat), intent(inout) :: a
       integer, intent(in), optional :: nz
     end subroutine psb_z_csc_allocate_mnnz
+  end interface
+
+  interface 
+    subroutine psb_z_csc_mold(a,b,info) 
+      import psb_z_csc_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
+      class(psb_z_csc_sparse_mat), intent(in)               :: a
+      class(psb_z_base_sparse_mat), intent(out), allocatable :: b
+      integer, intent(out)                                 :: info
+    end subroutine psb_z_csc_mold
   end interface
   
   interface
