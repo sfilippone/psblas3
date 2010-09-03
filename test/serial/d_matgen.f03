@@ -371,7 +371,7 @@ contains
     end if
 !!$    call a_n%print(19)
     t1 = psb_wtime()
-    call a_n%cscnv(info,mold=acsr)
+    call a_n%cscnv(info,mold=acxx)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -382,6 +382,10 @@ contains
     tasb = psb_wtime()-t1
     call psb_barrier(ictxt)
     ttot = psb_wtime() - t0 
+
+    if(iam == psb_root_) write(psb_out_unit,&
+         & '("The matrix has been generated and is currently  in ",a3," format.")')&
+         &   a_n%get_fmt()
 
 !!$    call a_n%print(20)
     anorm = a_n%csnmi()
