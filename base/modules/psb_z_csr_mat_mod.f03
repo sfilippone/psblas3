@@ -51,7 +51,7 @@ module psb_z_csr_mat_mod
 
   interface
     subroutine  psb_z_csr_reallocate_nz(nz,a) 
-      import psb_z_csr_sparse_mat
+      import :: psb_z_csr_sparse_mat
       integer, intent(in) :: nz
       class(psb_z_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_z_csr_reallocate_nz
@@ -59,7 +59,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_reinit(a,clear)
-      import psb_z_csr_sparse_mat
+      import :: psb_z_csr_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_z_csr_reinit
@@ -67,14 +67,14 @@ module psb_z_csr_mat_mod
   
   interface
     subroutine  psb_z_csr_trim(a)
-      import psb_z_csr_sparse_mat
+      import :: psb_z_csr_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_z_csr_trim
   end interface
   
   interface
     subroutine  psb_z_csr_allocate_mnnz(m,n,a,nz) 
-      import psb_z_csr_sparse_mat
+      import :: psb_z_csr_sparse_mat
       integer, intent(in) :: m,n
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       integer, intent(in), optional :: nz
@@ -83,7 +83,7 @@ module psb_z_csr_mat_mod
  
   interface 
     subroutine psb_z_csr_mold(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
+      import :: psb_z_csr_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
       class(psb_z_csr_sparse_mat), intent(in)               :: a
       class(psb_z_base_sparse_mat), intent(out), allocatable :: b
       integer, intent(out)                                 :: info
@@ -92,7 +92,7 @@ module psb_z_csr_mat_mod
  
   interface
     subroutine psb_z_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-      import psb_z_csr_sparse_mat
+      import :: psb_z_csr_sparse_mat
       integer, intent(in)               :: iout
       class(psb_z_csr_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
@@ -104,7 +104,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_cp_csr_to_coo(a,b,info) 
-      import psb_z_coo_sparse_mat, psb_z_csr_sparse_mat
+      import :: psb_z_coo_sparse_mat, psb_z_csr_sparse_mat
       class(psb_z_csr_sparse_mat), intent(in) :: a
       class(psb_z_coo_sparse_mat), intent(inout) :: b
       integer, intent(out)            :: info
@@ -113,7 +113,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_cp_csr_from_coo(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(in)    :: b
       integer, intent(out)                        :: info
@@ -122,7 +122,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_cp_csr_to_fmt(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_base_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_base_sparse_mat
       class(psb_z_csr_sparse_mat), intent(in)   :: a
       class(psb_z_base_sparse_mat), intent(inout) :: b
       integer, intent(out)                       :: info
@@ -131,7 +131,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_cp_csr_from_fmt(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_base_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_base_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_base_sparse_mat), intent(in)   :: b
       integer, intent(out)                        :: info
@@ -140,7 +140,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_mv_csr_to_coo(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(inout)   :: b
       integer, intent(out)            :: info
@@ -149,7 +149,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_mv_csr_from_coo(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(inout) :: b
       integer, intent(out)                        :: info
@@ -158,7 +158,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_mv_csr_to_fmt(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_base_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_base_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_base_sparse_mat), intent(inout)  :: b
       integer, intent(out)                        :: info
@@ -167,7 +167,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_mv_csr_from_fmt(a,b,info) 
-      import psb_z_csr_sparse_mat, psb_z_base_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_z_base_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout)  :: a
       class(psb_z_base_sparse_mat), intent(inout) :: b
       integer, intent(out)                         :: info
@@ -176,7 +176,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_cp_from(a,b)
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       type(psb_z_csr_sparse_mat), intent(in)   :: b
     end subroutine psb_z_csr_cp_from
@@ -184,7 +184,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_mv_from(a,b)
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout)  :: a
       type(psb_z_csr_sparse_mat), intent(inout) :: b
     end subroutine psb_z_csr_mv_from
@@ -193,7 +193,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: val(:)
       integer, intent(in)             :: nz,ia(:), ja(:),&
@@ -206,7 +206,7 @@ module psb_z_csr_mat_mod
   interface 
     subroutine psb_z_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
@@ -222,7 +222,7 @@ module psb_z_csr_mat_mod
   interface 
     subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
@@ -239,7 +239,7 @@ module psb_z_csr_mat_mod
   interface 
     subroutine psb_z_csr_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-      import psb_z_csr_sparse_mat, psb_dpk_, psb_z_coo_sparse_mat
+      import :: psb_z_csr_sparse_mat, psb_dpk_, psb_z_coo_sparse_mat
       class(psb_z_csr_sparse_mat), intent(in) :: a
       class(psb_z_coo_sparse_mat), intent(inout) :: b
       integer, intent(in)                  :: imin,imax
@@ -253,7 +253,7 @@ module psb_z_csr_mat_mod
     
   interface 
     subroutine psb_z_csr_cssv(alpha,a,x,beta,y,info,trans) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
@@ -261,7 +261,7 @@ module psb_z_csr_mat_mod
       character, optional, intent(in)     :: trans
     end subroutine psb_z_csr_cssv
     subroutine psb_z_csr_cssm(alpha,a,x,beta,y,info,trans) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
@@ -272,7 +272,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_csmv(alpha,a,x,beta,y,info,trans) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
@@ -280,7 +280,7 @@ module psb_z_csr_mat_mod
       character, optional, intent(in)     :: trans
     end subroutine psb_z_csr_csmv
     subroutine psb_z_csr_csmm(alpha,a,x,beta,y,info,trans) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
@@ -292,7 +292,7 @@ module psb_z_csr_mat_mod
   
   interface 
     function psb_z_csr_csnmi(a) result(res)
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_z_csr_csnmi
@@ -300,7 +300,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_get_diag(a,d,info) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
       complex(psb_dpk_), intent(out)     :: d(:)
       integer, intent(out)            :: info
@@ -309,7 +309,7 @@ module psb_z_csr_mat_mod
   
   interface 
     subroutine psb_z_csr_scal(d,a,info) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: d(:)
       integer, intent(out)            :: info
@@ -318,7 +318,7 @@ module psb_z_csr_mat_mod
   
   interface
     subroutine psb_z_csr_scals(d,a,info) 
-      import psb_z_csr_sparse_mat, psb_dpk_
+      import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: d
       integer, intent(out)            :: info

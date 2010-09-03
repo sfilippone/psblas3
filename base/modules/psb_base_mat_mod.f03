@@ -92,7 +92,7 @@ module psb_base_mat_mod
 
   interface 
     function psb_base_get_nz_row(idx,a) result(res)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       integer, intent(in)                    :: idx
       class(psb_base_sparse_mat), intent(in) :: a
       integer :: res
@@ -101,7 +101,7 @@ module psb_base_mat_mod
   
   interface 
     function psb_base_get_nzeros(a) result(res)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(in) :: a
       integer :: res
     end function psb_base_get_nzeros
@@ -109,7 +109,7 @@ module psb_base_mat_mod
 
   interface 
     function psb_base_get_size(a) result(res)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(in) :: a
       integer :: res
     end function psb_base_get_size
@@ -117,7 +117,7 @@ module psb_base_mat_mod
 
   interface 
     subroutine psb_base_reinit(a,clear)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_base_reinit
@@ -125,7 +125,7 @@ module psb_base_mat_mod
   
   interface 
     subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       integer, intent(in)               :: iout
       class(psb_base_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
@@ -138,7 +138,7 @@ module psb_base_mat_mod
   interface 
     subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
@@ -153,7 +153,7 @@ module psb_base_mat_mod
   
   interface 
     subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(in) :: a   
       integer, intent(in)                :: idx 
       integer, intent(out)               :: n   
@@ -165,7 +165,7 @@ module psb_base_mat_mod
   
   interface 
     subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       integer, intent(in) :: m,n
       class(psb_base_sparse_mat), intent(inout) :: a
       integer, intent(in), optional  :: nz
@@ -174,7 +174,7 @@ module psb_base_mat_mod
 
   interface 
     subroutine psb_base_reallocate_nz(nz,a) 
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       integer, intent(in) :: nz
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_reallocate_nz
@@ -182,14 +182,14 @@ module psb_base_mat_mod
 
   interface 
     subroutine psb_base_free(a) 
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_free
   end interface
   
   interface 
     subroutine psb_base_trim(a) 
-      import psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_base_sparse_mat, psb_long_int_k_
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_trim
   end interface

@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -73,7 +73,7 @@ module psb_d_prec_type
   interface psb_precaply
     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
       use psb_sparse_mod, only  : psb_desc_type, psb_dpk_
-      import psb_dprec_type
+      import :: psb_dprec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_dprec_type), intent(in)  :: prec
       real(psb_dpk_),intent(in)         :: x(:)
@@ -84,7 +84,7 @@ module psb_d_prec_type
     end subroutine psb_dprc_aply
     subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
       use psb_sparse_mod, only  : psb_desc_type, psb_dpk_
-      import psb_dprec_type
+      import :: psb_dprec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_dprec_type), intent(in)  :: prec
       real(psb_dpk_),intent(inout)      :: x(:)

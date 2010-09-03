@@ -60,7 +60,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cp_cxx_to_fmt_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       class(psb_d_base_sparse_mat), intent(out) :: b
       integer, intent(out)            :: info
@@ -71,7 +71,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cp_cxx_from_fmt_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(in) :: b
       integer, intent(out)                        :: info
@@ -83,7 +83,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cp_cxx_to_coo_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer, intent(out)            :: info
@@ -94,7 +94,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cp_cxx_from_coo_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
       integer, intent(out)                        :: info
@@ -105,7 +105,7 @@ module psb_d_cxx_mat_mod
     subroutine d_mv_cxx_to_fmt_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(inout)  :: b
       integer, intent(out)            :: info
@@ -116,7 +116,7 @@ module psb_d_cxx_mat_mod
     subroutine d_mv_cxx_from_fmt_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout)  :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
       integer, intent(out)                         :: info
@@ -128,7 +128,7 @@ module psb_d_cxx_mat_mod
     subroutine d_mv_cxx_to_coo_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout)   :: b
       integer, intent(out)            :: info
@@ -139,7 +139,7 @@ module psb_d_cxx_mat_mod
     subroutine d_mv_cxx_from_coo_impl(a,b,info) 
       use psb_const_mod
       use psb_d_base_mat_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer, intent(out)                        :: info
@@ -149,7 +149,7 @@ module psb_d_cxx_mat_mod
   interface 
     subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
@@ -162,7 +162,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       implicit none
       
       class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -181,7 +181,7 @@ module psb_d_cxx_mat_mod
     subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       implicit none
       
       class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -200,7 +200,7 @@ module psb_d_cxx_mat_mod
   interface d_cxx_cssm_impl
     subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans) 
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
@@ -209,7 +209,7 @@ module psb_d_cxx_mat_mod
     end subroutine d_cxx_cssv_impl
     subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans) 
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -221,7 +221,7 @@ module psb_d_cxx_mat_mod
   interface d_cxx_csmm_impl
     subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans) 
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
@@ -230,7 +230,7 @@ module psb_d_cxx_mat_mod
     end subroutine d_cxx_csmv_impl
     subroutine d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans) 
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -242,7 +242,7 @@ module psb_d_cxx_mat_mod
   interface d_cxx_csnmi_impl
     function d_cxx_csnmi_impl(a) result(res)
       use psb_const_mod
-      import psb_d_cxx_sparse_mat
+      import :: psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
     end function d_cxx_csnmi_impl
