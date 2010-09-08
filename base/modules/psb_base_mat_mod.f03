@@ -1,3 +1,64 @@
+!!$ 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+!
+! package: psb_base_mat_mod
+!
+! This module contains the definition of the very basic object
+! psb_base_sparse_mat holding some information common to all matrix
+! type variants, such as number of rows and columns, whether the
+! matrix is supposed to be triangular (upper or lower) and with a unit
+! (i.e. assumed) diagonal, together with some state variables. This
+! base class is in common among all variants of real/complex,
+! short/long precision; as such, it only contains information that is
+! inherently integer in nature.
+!
+! The methods associated to this class can be grouped into three sets:
+! 1) Fully implemented methods: some methods such as get_nrows or
+!    set_nrows can be fully implemented at this level.
+! 2) Partially implemented methods: Some methods have an
+!    implementation that is split between this level and the leaf
+!    level. For example, the matrix transposition can be partially
+!    done at this level (swapping of the rows and columns dimensions)
+!    but it has to be completed by a method defined at the leaf level
+!    (for actually transposing the row and column indices).
+! 3) Other methods: There are a number of methods that are defined
+!    (i.e their interface is defined) but not implemented at this
+!    level. This methods will be overwritten at the leaf level with
+!    an actual implementation. If it is not the case, the method
+!    defined at this level will raise an error. These methods are
+!    defined in the serial/f03/psb_base_mat_impl.f03 file
+
+
+
 module psb_base_mat_mod
   
   use psb_const_mod 
