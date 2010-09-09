@@ -32,15 +32,22 @@
 !
 ! package: psb_d_base_mat_mod
 !
-! This module contains the implementation of the
-! psb_d_base_sparse_mat, derived from the psb_base_sparse_mat to
-! define a middle level definition of a real, double-precision sparse
-! matrix object.This class object itself does not have any additional
-! members with respect to those of the base class. No methods can be
-! fully implemented at this level, but we can define the interface for
-! the computational methods requiring the knowledge of the underlying
+! This module contains the implementation of the psb_d_base_sparse_mat
+! type, derived from the psb_base_sparse_mat one to define a middle
+! level definition of a real, double-precision sparse matrix
+! object.This class object itself does not have any additional members
+! with respect to those of the base class. No methods can be fully
+! implemented at this level, but we can define the interface for the
+! computational methods requiring the knowledge of the underlying
 ! field, such as the matrix-vector product; this interface is defined,
 ! but is supposed to be overridden at the leaf level.
+!
+! This module also contains the implementation of the
+! psb_d_coo_sparse_mat type and the related methods. This is the
+! reference type for all the format transitions, copies and mv unless
+! methods are implemented that allow the direct transition from one
+! format to another. The psb_d_coo_sparse_mat type extends the
+! psb_d_base_sparse_mat one.
 
 
 module psb_d_base_mat_mod

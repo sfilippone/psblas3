@@ -41,6 +41,13 @@
 ! the computational methods requiring the knowledge of the underlying
 ! field, such as the matrix-vector product; this interface is defined,
 ! but is supposed to be overridden at the leaf level.
+!
+! This module also contains the implementation of the
+! psb_s_coo_sparse_mat type and the related methods. This is the
+! reference type for all the format transitions, copies and mv unless
+! methods are implemented that allow the direct transition from one
+! format to another. The psb_s_coo_sparse_mat type extends the
+! psb_s_base_sparse_mat one.
 
 
 module psb_s_base_mat_mod
