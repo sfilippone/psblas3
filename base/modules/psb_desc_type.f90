@@ -991,7 +991,8 @@ contains
     name = 'psb_cdtransfer'
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-
+    ictxt = psb_cd_get_icontxt(desc_in)
+    call psb_info(ictxt,me,np)
     ! Should not require ictxt to be present: this
     ! function might be called even when desc_in is
     ! empty. 
@@ -1053,7 +1054,7 @@ contains
     integer, intent(out)                :: info
 
     !locals
-    integer             :: np,me,ictxt, err_act
+    integer             :: err_act
     integer              :: debug_level, debug_unit
     character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
 
@@ -1084,8 +1085,6 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': end'
 
     call psb_erractionrestore(err_act)
     return
@@ -1117,7 +1116,7 @@ contains
     integer, intent(out)                 :: info
 
     !locals
-    integer             :: np,me,ictxt, err_act
+    integer             :: err_act
     integer              :: debug_level, debug_unit
     character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
 
@@ -1147,8 +1146,6 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': end'
 
     call psb_erractionrestore(err_act)
     return
