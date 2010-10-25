@@ -991,7 +991,7 @@ contains
     name = 'psb_cdtransfer'
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt = psb_cd_get_icontxt(desc_in)
+    ictxt = psb_cd_get_context(desc_in)
     call psb_info(ictxt,me,np)
     ! Should not require ictxt to be present: this
     ! function might be called even when desc_in is
