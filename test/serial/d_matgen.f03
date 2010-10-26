@@ -156,9 +156,9 @@ contains
     integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:), diag(:)
     type(psb_d_sparse_mat)     :: a_n
-    type(psb_d_coo_sparse_mat) :: acoo
-    type(psb_d_csr_sparse_mat) :: acsr
-    type(psb_d_cxx_sparse_mat) :: acxx
+    class(psb_d_coo_sparse_mat), allocatable :: acoo
+    class(psb_d_csr_sparse_mat), allocatable :: acsr
+    class(psb_d_cxx_sparse_mat), allocatable :: acxx
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah, anorm
@@ -170,6 +170,8 @@ contains
 
     character(len=20)  :: name, ch_err
 
+    allocate(psb_d_cxx_sparse_mat :: acxx)
+    allocate(psb_d_csr_sparse_mat :: acsr)
     info = psb_success_
     name = 'create_matrix'
 !!$    call psb_erractionsave(err_act)
@@ -411,6 +413,7 @@ contains
       call a_n%get_diag(diag,info) 
     end if
 !!$
+    
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acsr)
 

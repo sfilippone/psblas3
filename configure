@@ -4486,6 +4486,9 @@ $as_echo "#define HAVE_MPI 1" >>confdefs.h
         :
 fi
 
+FC="$MPIFC" ;
+F77="$MPIF77";
+CC="$MPICC";
 fi
 
 # We leave a default language for the next checks.
