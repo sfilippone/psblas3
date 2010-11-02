@@ -4,7 +4,7 @@ module psb_d_bjacprec
   
   type, extends(psb_d_base_prec_type) :: psb_d_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
-    type(psb_d_sparse_mat), allocatable :: av(:)
+    type(psb_dspmat_type), allocatable :: av(:)
     real(psb_dpk_), allocatable         :: d(:)
   contains
     procedure, pass(prec) :: apply     => psb_d_bjac_apply
@@ -215,7 +215,7 @@ contains
     use psb_prec_mod
     Implicit None
 
-    type(psb_d_sparse_mat), intent(in), target :: a
+    type(psb_dspmat_type), intent(in), target :: a
     type(psb_desc_type), intent(in), target  :: desc_a
     class(psb_d_bjac_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info

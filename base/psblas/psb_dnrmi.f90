@@ -50,7 +50,7 @@ function psb_dnrmi(a,desc_a,info)
   use psb_mat_mod
   implicit none
 
-  type(psb_d_sparse_mat), intent(in) :: a
+  type(psb_dspmat_type), intent(in) :: a
   integer, intent(out)               :: info
   type(psb_desc_type), intent(in)    :: desc_a
   real(psb_dpk_)                     :: psb_dnrmi

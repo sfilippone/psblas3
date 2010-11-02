@@ -71,7 +71,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(in)             :: alpha, beta
   real(psb_dpk_), intent(inout), target  :: x(:,:)
   real(psb_dpk_), intent(inout), target  :: y(:,:)
-  type(psb_d_sparse_mat), intent(in)        :: a
+  type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout)  :: work(:)
@@ -423,7 +423,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(in)             :: alpha, beta
   real(psb_dpk_), intent(inout), target  :: x(:)
   real(psb_dpk_), intent(inout), target  :: y(:)
-  type(psb_d_sparse_mat), intent(in)        :: a
+  type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout)       :: work(:)

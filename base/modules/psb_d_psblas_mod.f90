@@ -193,9 +193,9 @@ module psb_d_psblas_mod
   interface psb_spnrmi
     function psb_dnrmi(a, desc_a,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_d_sparse_mat
+      use psb_mat_mod, only : psb_dspmat_type
       real(psb_dpk_)                      :: psb_dnrmi
-      type(psb_d_sparse_mat), intent (in) :: a
+      type(psb_dspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_dnrmi
@@ -204,9 +204,9 @@ module psb_d_psblas_mod
   interface psb_spnrm1
     function psb_dspnrm1(a, desc_a,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_d_sparse_mat
+      use psb_mat_mod, only : psb_dspmat_type
       real(psb_dpk_)                      :: psb_dspnrm1
-      type(psb_d_sparse_mat), intent (in) :: a
+      type(psb_dspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_dspnrm1
@@ -216,8 +216,8 @@ module psb_d_psblas_mod
     subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_d_sparse_mat
-      type(psb_d_sparse_mat), intent(in)    :: a
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(in)    :: a
       real(psb_dpk_), intent(inout)        :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
       real(psb_dpk_), intent(in)           :: alpha, beta
@@ -231,8 +231,8 @@ module psb_d_psblas_mod
     subroutine psb_dspmv(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_d_sparse_mat
-      type(psb_d_sparse_mat), intent(in)   :: a
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(in)   :: a
       real(psb_dpk_), intent(inout)       :: x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
       real(psb_dpk_), intent(in)          :: alpha, beta
@@ -249,8 +249,8 @@ module psb_d_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, n, jx, jy, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_d_sparse_mat
-      type(psb_d_sparse_mat), intent(in)    :: t
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(in)    :: t
       real(psb_dpk_), intent(in)           :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
       real(psb_dpk_), intent(in)           :: alpha, beta
@@ -266,8 +266,8 @@ module psb_d_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_ 
-      use psb_mat_mod, only : psb_d_sparse_mat
-      type(psb_d_sparse_mat), intent(in)    :: t
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(in)    :: t
       real(psb_dpk_), intent(in)             :: x(:)
       real(psb_dpk_), intent(inout)          :: y(:)
       real(psb_dpk_), intent(in)             :: alpha, beta

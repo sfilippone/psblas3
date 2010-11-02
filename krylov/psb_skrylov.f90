@@ -46,7 +46,7 @@
   !                                           BICGSTABL
   !                                           RGMRES
   !                                           
-  !    a      -  type(psb_s_sparse_mat)      Input: sparse matrix containing A.
+  !    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
   !    prec   -  class(psb_sprec_type)       Input: preconditioner
   !    b      -  real,dimension(:)            Input: vector containing the
   !                                           right hand side B
@@ -82,7 +82,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
   use psb_krylov_mod, psb_protect_name => psb_skrylov
   character(len=*)                   :: method
-  Type(psb_s_sparse_mat), Intent(in)  :: a
+  Type(psb_sspmat_type), Intent(in)  :: a
   Type(psb_desc_type), Intent(in)    :: desc_a
   class(psb_sprec_type), intent(in)   :: prec 
   Real(psb_spk_), Intent(in)       :: b(:)
@@ -96,9 +96,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   interface 
     subroutine psb_scg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_s_sparse_mat), intent(in)  :: a
+      type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -112,9 +112,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     subroutine psb_sbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_s_sparse_mat), intent(in)  :: a
+      type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -128,9 +128,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     subroutine psb_scgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_s_sparse_mat), intent(in)  :: a
+      type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -144,9 +144,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      Type(psb_s_sparse_mat), Intent(in)  :: a
+      Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_sprec_type), intent(in)   :: prec
       Real(psb_spk_), Intent(in)       :: b(:)
@@ -159,9 +159,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_scgstabl
     Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      Type(psb_s_sparse_mat), Intent(in)  :: a
+      Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_sprec_type), intent(in)   :: prec 
       Real(psb_spk_), Intent(in)       :: b(:)
@@ -174,9 +174,9 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_srgmres
     subroutine psb_scgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_s_sparse_mat), intent(in)  :: a
+      type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       class(psb_sprec_type), intent(in)   :: prec 
       real(psb_spk_), intent(in)       :: b(:)

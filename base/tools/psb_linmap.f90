@@ -37,7 +37,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_clinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_c_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+  type(psb_cspmat_type), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
@@ -113,7 +113,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_dlinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_d_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+  type(psb_dspmat_type), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
@@ -195,7 +195,7 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_slinmap_type)             :: this
   type(psb_desc_type), target        :: desc_X, desc_Y
-  type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+  type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)                :: map_kind
   integer, intent(in), optional      :: iaggr(:), naggr(:)
   !
@@ -274,7 +274,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_zlinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_z_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+  type(psb_zspmat_type), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !

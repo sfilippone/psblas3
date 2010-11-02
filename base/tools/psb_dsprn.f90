@@ -36,7 +36,7 @@
 !    is in the update state.
 ! 
 ! Arguments: 
-!    a        - type(psb_d_sparse_mat).        The sparse matrix to be reinitiated.      
+!    a        - type(psb_dspmat_type).        The sparse matrix to be reinitiated.      
 !    desc_a   - type(psb_desc_type).          The communication descriptor.
 !    info     - integer.                        Return code.
 !    clear    - logical, optional               Whether the coefficients should be zeroed
@@ -47,7 +47,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
   !....Parameters...
   Type(psb_desc_type), intent(in)      :: desc_a
-  Type(psb_d_sparse_mat), intent(inout) :: a
+  Type(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: clear
 

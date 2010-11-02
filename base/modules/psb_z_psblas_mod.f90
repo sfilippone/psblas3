@@ -193,9 +193,9 @@ module psb_z_psblas_mod
   interface psb_spnrmi
     function psb_znrmi(a, desc_a,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       real(psb_dpk_)                    :: psb_znrmi
-      type(psb_z_sparse_mat), intent (in) :: a
+      type(psb_zspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)                :: info
     end function psb_znrmi
@@ -205,8 +205,8 @@ module psb_z_psblas_mod
     subroutine psb_zspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
-      type(psb_z_sparse_mat), intent(in)    :: a
+      use psb_mat_mod, only : psb_zspmat_type
+      type(psb_zspmat_type), intent(in)    :: a
       complex(psb_dpk_), intent(inout)     :: x(:,:)
       complex(psb_dpk_), intent(inout)     :: y(:,:)
       complex(psb_dpk_), intent(in)        :: alpha, beta
@@ -220,8 +220,8 @@ module psb_z_psblas_mod
     subroutine psb_zspmv(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
-      type(psb_z_sparse_mat), intent(in)    :: a
+      use psb_mat_mod, only : psb_zspmat_type
+      type(psb_zspmat_type), intent(in)    :: a
       complex(psb_dpk_), intent(inout)     :: x(:)
       complex(psb_dpk_), intent(inout)     :: y(:)
       complex(psb_dpk_), intent(in)        :: alpha, beta
@@ -238,8 +238,8 @@ module psb_z_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, n, jx, jy, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
-      type(psb_z_sparse_mat), intent(in)      :: t
+      use psb_mat_mod, only : psb_zspmat_type
+      type(psb_zspmat_type), intent(in)      :: t
       complex(psb_dpk_), intent(in)          :: x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
       complex(psb_dpk_), intent(in)          :: alpha, beta
@@ -255,8 +255,8 @@ module psb_z_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_ 
-      use psb_mat_mod, only : psb_z_sparse_mat
-      type(psb_z_sparse_mat), intent(in)      :: t
+      use psb_mat_mod, only : psb_zspmat_type
+      type(psb_zspmat_type), intent(in)      :: t
       complex(psb_dpk_), intent(in)          :: x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
       complex(psb_dpk_), intent(in)          :: alpha, beta

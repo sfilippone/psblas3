@@ -35,7 +35,7 @@
 !    Frees a sparse matrix structure.
 ! 
 ! Arguments: 
-!    a        - type(psb_c_sparse_mat).          The sparse matrix to be freed.      
+!    a        - type(psb_cspmat_type).          The sparse matrix to be freed.      
 !    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                          return code.
 !
@@ -45,7 +45,7 @@ subroutine psb_cspfree(a, desc_a,info)
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_a
-  type(psb_c_sparse_mat), intent(inout) :: a
+  type(psb_cspmat_type), intent(inout) :: a
   integer, intent(out)        :: info
   !...locals....
   integer             :: ictxt, err_act

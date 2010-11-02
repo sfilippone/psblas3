@@ -16,7 +16,7 @@ subroutine  psb_d_set_nrows(m,a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_nrows
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer, intent(in) :: m
   Integer :: err_act, info
   character(len=20)  :: name='set_nrows'
@@ -50,7 +50,7 @@ subroutine  psb_d_set_ncols(n,a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_ncols
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer, intent(in) :: n
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -84,7 +84,7 @@ subroutine  psb_d_set_state(n,a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_state
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer, intent(in) :: n
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -118,7 +118,7 @@ subroutine  psb_d_set_dupl(n,a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_dupl
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer, intent(in) :: n
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -152,7 +152,7 @@ subroutine  psb_d_set_null(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_null
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
@@ -185,7 +185,7 @@ subroutine  psb_d_set_bld(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_bld
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
@@ -217,7 +217,7 @@ subroutine  psb_d_set_upd(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_upd
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
@@ -250,7 +250,7 @@ subroutine  psb_d_set_asb(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_asb
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
   logical, parameter :: debug=.false.
@@ -282,7 +282,7 @@ subroutine psb_d_set_sorted(a,val)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_sorted
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -315,7 +315,7 @@ subroutine psb_d_set_triangle(a,val)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_triangle
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -348,7 +348,7 @@ subroutine psb_d_set_unit(a,val)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_unit
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -381,7 +381,7 @@ subroutine psb_d_set_lower(a,val)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_lower
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -414,7 +414,7 @@ subroutine psb_d_set_upper(a,val)
   use psb_d_mat_mod, psb_protect_name => psb_d_set_upper
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   logical, intent(in), optional :: val
   Integer :: err_act, info
   character(len=20)  :: name='get_nzeros'
@@ -463,7 +463,7 @@ subroutine psb_d_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   implicit none 
 
   integer, intent(in)               :: iout
-  class(psb_d_sparse_mat), intent(in) :: a   
+  class(psb_dspmat_type), intent(in) :: a   
   integer, intent(in), optional     :: iv(:)
   integer, intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
@@ -502,7 +502,7 @@ subroutine psb_d_get_neigh(a,idx,neigh,n,info,lev)
   use psb_d_mat_mod, psb_protect_name => psb_d_get_neigh
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a   
+  class(psb_dspmat_type), intent(in) :: a   
   integer, intent(in)                :: idx 
   integer, intent(out)               :: n   
   integer, allocatable, intent(out)  :: neigh(:)
@@ -546,7 +546,7 @@ subroutine psb_d_csall(nr,nc,a,info,nz)
   use psb_d_base_mat_mod
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(out) :: a
+  class(psb_dspmat_type), intent(out) :: a
   integer, intent(in)             :: nr,nc
   integer, intent(out)            :: info
   integer, intent(in), optional   :: nz
@@ -585,7 +585,7 @@ subroutine  psb_d_reallocate_nz(nz,a)
   use psb_error_mod
   implicit none 
   integer, intent(in) :: nz
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
@@ -617,7 +617,7 @@ subroutine  psb_d_free(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_free
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
 
   if (allocated(a%a)) then 
     call a%a%free()
@@ -631,7 +631,7 @@ subroutine  psb_d_trim(a)
   use psb_d_mat_mod, psb_protect_name => psb_d_trim
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   Integer :: err_act, info
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
@@ -664,7 +664,7 @@ subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   use psb_d_base_mat_mod
   use psb_error_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
   integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer, intent(out)            :: info
@@ -709,7 +709,7 @@ subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
   use psb_d_mat_mod, psb_protect_name => psb_d_csgetptn
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -759,7 +759,7 @@ subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   use psb_d_mat_mod, psb_protect_name => psb_d_csgetrow
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -812,8 +812,8 @@ subroutine psb_d_csgetblk(imin,imax,a,b,info,&
   use psb_d_mat_mod, psb_protect_name => psb_d_csgetblk
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
-  class(psb_d_sparse_mat), intent(out) :: b
+  class(psb_dspmat_type), intent(in) :: a
+  class(psb_dspmat_type), intent(out) :: b
   integer, intent(in)                  :: imin,imax
   integer,intent(out)                  :: info
   logical, intent(in), optional        :: append
@@ -867,8 +867,8 @@ subroutine psb_d_csclip(a,b,info,&
   use psb_d_mat_mod, psb_protect_name => psb_d_csclip
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
-  class(psb_d_sparse_mat), intent(out) :: b
+  class(psb_dspmat_type), intent(in) :: a
+  class(psb_dspmat_type), intent(out) :: b
   integer,intent(out)                  :: info
   integer, intent(in), optional        :: imin,imax,jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
@@ -915,7 +915,7 @@ subroutine psb_d_b_csclip(a,b,info,&
   use psb_d_mat_mod, psb_protect_name => psb_d_b_csclip
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   type(psb_d_coo_sparse_mat), intent(out) :: b
   integer,intent(out)                  :: info
   integer, intent(in), optional        :: imin,imax,jmin,jmax
@@ -958,8 +958,8 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cscnv
   implicit none 
-  class(psb_d_sparse_mat), intent(in)    :: a
-  class(psb_d_sparse_mat), intent(out)   :: b
+  class(psb_dspmat_type), intent(in)    :: a
+  class(psb_dspmat_type), intent(out)   :: b
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl, upd
   character(len=*), optional, intent(in) :: type
@@ -1060,7 +1060,7 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
   use psb_d_mat_mod, psb_protect_name => psb_d_cscnv_ip
   implicit none 
 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl
   character(len=*), optional, intent(in) :: type
@@ -1159,7 +1159,7 @@ subroutine psb_d_cscnv_base(a,b,info,dupl)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cscnv_base
   implicit none 
-  class(psb_d_sparse_mat), intent(in)       :: a
+  class(psb_dspmat_type), intent(in)       :: a
   class(psb_d_base_sparse_mat), intent(out) :: b
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl
@@ -1217,8 +1217,8 @@ subroutine psb_d_clip_d(a,b,info)
   use psb_d_mat_mod, psb_protect_name => psb_d_clip_d
   implicit none
 
-  class(psb_d_sparse_mat), intent(in) :: a
-  class(psb_d_sparse_mat), intent(out) :: b
+  class(psb_dspmat_type), intent(in) :: a
+  class(psb_dspmat_type), intent(out) :: b
   integer,intent(out)                  :: info
 
   Integer :: err_act
@@ -1280,7 +1280,7 @@ subroutine psb_d_clip_d_ip(a,info)
   use psb_d_mat_mod, psb_protect_name => psb_d_clip_d_ip
   implicit none
 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer,intent(out)                  :: info
 
   Integer :: err_act
@@ -1338,7 +1338,7 @@ subroutine psb_d_mv_from(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_mv_from
   implicit none 
-  class(psb_d_sparse_mat), intent(out) :: a
+  class(psb_dspmat_type), intent(out) :: a
   class(psb_d_base_sparse_mat), intent(inout) :: b
   integer :: info
 
@@ -1359,7 +1359,7 @@ subroutine psb_d_cp_from(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cp_from
   implicit none 
-  class(psb_d_sparse_mat), intent(out) :: a
+  class(psb_dspmat_type), intent(out) :: a
   class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
@@ -1395,7 +1395,7 @@ subroutine psb_d_mv_to(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_mv_to
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   class(psb_d_base_sparse_mat), intent(out) :: b
   integer :: info
 
@@ -1410,7 +1410,7 @@ subroutine psb_d_cp_to(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cp_to
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   class(psb_d_base_sparse_mat), intent(out) :: b
   integer :: info
 
@@ -1421,13 +1421,13 @@ end subroutine psb_d_cp_to
 
 
 
-subroutine psb_d_sparse_mat_move(a,b,info)
+subroutine psb_dspmat_type_move(a,b,info)
   use psb_error_mod
   use psb_string_mod
-  use psb_d_mat_mod, psb_protect_name => psb_d_sparse_mat_move
+  use psb_d_mat_mod, psb_protect_name => psb_dspmat_type_move
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
-  class(psb_d_sparse_mat), intent(out)   :: b
+  class(psb_dspmat_type), intent(inout) :: a
+  class(psb_dspmat_type), intent(out)   :: b
   integer, intent(out)                   :: info
 
   Integer :: err_act
@@ -1438,16 +1438,16 @@ subroutine psb_d_sparse_mat_move(a,b,info)
   call move_alloc(a%a,b%a)
 
   return
-end subroutine psb_d_sparse_mat_move
+end subroutine psb_dspmat_type_move
 
 
-subroutine psb_d_sparse_mat_clone(a,b,info)
+subroutine psb_dspmat_type_clone(a,b,info)
   use psb_error_mod
   use psb_string_mod
-  use psb_d_mat_mod, psb_protect_name => psb_d_sparse_mat_clone
+  use psb_d_mat_mod, psb_protect_name => psb_dspmat_type_clone
   implicit none 
-  class(psb_d_sparse_mat), intent(in)  :: a
-  class(psb_d_sparse_mat), intent(out) :: b
+  class(psb_dspmat_type), intent(in)  :: a
+  class(psb_dspmat_type), intent(out) :: b
   integer, intent(out)                 :: info
 
   Integer :: err_act
@@ -1477,7 +1477,7 @@ subroutine psb_d_sparse_mat_clone(a,b,info)
     return
   end if
 
-end subroutine psb_d_sparse_mat_clone
+end subroutine psb_dspmat_type_clone
 
 
 
@@ -1486,7 +1486,7 @@ subroutine psb_d_transp_1mat(a)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_transp_1mat
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
 
   Integer :: err_act, info
   character(len=20)  :: name='transp'
@@ -1522,8 +1522,8 @@ subroutine psb_d_transp_2mat(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_transp_2mat
   implicit none 
-  class(psb_d_sparse_mat), intent(out) :: a
-  class(psb_d_sparse_mat), intent(in)  :: b
+  class(psb_dspmat_type), intent(out) :: a
+  class(psb_dspmat_type), intent(in)  :: b
 
   Integer :: err_act, info
   character(len=20)  :: name='transp'
@@ -1567,7 +1567,7 @@ subroutine psb_d_transc_1mat(a)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_transc_1mat
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
 
   Integer :: err_act, info
   character(len=20)  :: name='transc'
@@ -1603,8 +1603,8 @@ subroutine psb_d_transc_2mat(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_transc_2mat
   implicit none 
-  class(psb_d_sparse_mat), intent(out) :: a
-  class(psb_d_sparse_mat), intent(in)  :: b
+  class(psb_dspmat_type), intent(out) :: a
+  class(psb_dspmat_type), intent(in)  :: b
 
   Integer :: err_act, info
   character(len=20)  :: name='transc'
@@ -1650,7 +1650,7 @@ subroutine psb_d_reinit(a,clear)
   use psb_error_mod
   implicit none 
 
-  class(psb_d_sparse_mat), intent(inout) :: a   
+  class(psb_dspmat_type), intent(inout) :: a   
   logical, intent(in), optional :: clear
   Integer :: err_act, info
   character(len=20)  :: name='reinit'
@@ -1698,7 +1698,7 @@ subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans)
   use psb_error_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_csmm
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_dpk_), intent(inout) :: y(:,:)
   integer, intent(out)            :: info
@@ -1736,7 +1736,7 @@ subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans)
   use psb_error_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_csmv
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
   real(psb_dpk_), intent(inout) :: y(:)
   integer, intent(out)            :: info
@@ -1774,7 +1774,7 @@ subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cssm
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_dpk_), intent(inout) :: y(:,:)
   integer, intent(out)            :: info
@@ -1814,7 +1814,7 @@ subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cssv
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
   real(psb_dpk_), intent(inout) :: y(:)
   integer, intent(out)            :: info
@@ -1857,7 +1857,7 @@ function psb_d_csnmi(a) result(res)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_)         :: res
 
   Integer :: err_act, info
@@ -1890,7 +1890,7 @@ function psb_d_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_)         :: res
 
   Integer :: err_act, info
@@ -1923,7 +1923,7 @@ subroutine psb_d_rowsum(d,a,info)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(out)          :: d(:)
   integer, intent(out)                 :: info
 
@@ -1960,7 +1960,7 @@ subroutine psb_d_arwsum(d,a,info)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(out)          :: d(:)
   integer, intent(out)                 :: info
 
@@ -1997,7 +1997,7 @@ subroutine psb_d_colsum(d,a,info)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(out)          :: d(:)
   integer, intent(out)                 :: info
 
@@ -2034,7 +2034,7 @@ subroutine psb_d_aclsum(d,a,info)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(out)          :: d(:)
   integer, intent(out)                 :: info
 
@@ -2071,7 +2071,7 @@ subroutine psb_d_get_diag(a,d,info)
   use psb_error_mod
   use psb_const_mod
   implicit none 
-  class(psb_d_sparse_mat), intent(in) :: a
+  class(psb_dspmat_type), intent(in) :: a
   real(psb_dpk_), intent(out)          :: d(:)
   integer, intent(out)                 :: info
 
@@ -2109,7 +2109,7 @@ subroutine psb_d_scal(d,a,info)
   use psb_const_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_scal
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   real(psb_dpk_), intent(in)              :: d(:)
   integer, intent(out)                    :: info
 
@@ -2147,7 +2147,7 @@ subroutine psb_d_scals(d,a,info)
   use psb_const_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_scals
   implicit none 
-  class(psb_d_sparse_mat), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   real(psb_dpk_), intent(in)              :: d
   integer, intent(out)                    :: info
 

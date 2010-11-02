@@ -54,7 +54,7 @@ contains
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
-    type(psb_s_sparse_mat), intent(in) :: a
+    type(psb_sspmat_type), intent(in) :: a
     real(psb_spk_), intent(in)        :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat

@@ -63,7 +63,7 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_c_sparse_mat)      Input: sparse matrix containing A.
+!    a      -  type(psb_cspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_cprec_type)       Input: preconditioner
 !    b(:)   -  complex                    Input: vector containing the
 !                                         right hand side B
@@ -103,7 +103,7 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   implicit none
 
 !!$  Parameters 
-  Type(psb_c_sparse_mat), Intent(in)  :: a
+  Type(psb_cspmat_type), Intent(in)  :: a
   class(psb_cprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   complex(psb_spk_), Intent(in)    :: b(:)

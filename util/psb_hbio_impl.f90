@@ -32,7 +32,7 @@
 subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)   
   use psb_sparse_mod
   implicit none
-  type(psb_s_sparse_mat), intent(out)    :: a
+  type(psb_sspmat_type), intent(out)    :: a
   integer, intent(out)                   :: iret
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -190,7 +190,7 @@ end subroutine shb_read
 subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   use psb_sparse_mod
   implicit none
-  type(psb_s_sparse_mat), intent(in), target :: a
+  type(psb_sspmat_type), intent(in), target :: a
   integer, intent(out)        :: iret
   character(len=*), optional, intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -331,7 +331,7 @@ end subroutine shb_write
 subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
   use psb_sparse_mod
   implicit none
-  type(psb_d_sparse_mat), intent(out)    :: a
+  type(psb_dspmat_type), intent(out)    :: a
   integer, intent(out)                   :: iret
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -489,7 +489,7 @@ end subroutine dhb_read
 subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   use psb_sparse_mod
   implicit none
-  type(psb_d_sparse_mat), intent(in), target :: a
+  type(psb_dspmat_type), intent(in), target :: a
   integer, intent(out)        :: iret
   character(len=*), optional, intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -631,7 +631,7 @@ end subroutine dhb_write
 subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)   
   use psb_sparse_mod
   implicit none
-  type(psb_c_sparse_mat), intent(out)    :: a
+  type(psb_cspmat_type), intent(out)    :: a
   integer, intent(out)                   :: iret
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -836,7 +836,7 @@ end subroutine chb_read
 subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   use psb_sparse_mod
   implicit none
-  type(psb_c_sparse_mat), intent(in), target :: a
+  type(psb_cspmat_type), intent(in), target :: a
   integer, intent(out)        :: iret
   character(len=*), optional, intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -977,7 +977,7 @@ end subroutine chb_write
 subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
   use psb_sparse_mod
   implicit none
-  type(psb_z_sparse_mat), intent(out)    :: a
+  type(psb_zspmat_type), intent(out)    :: a
   integer, intent(out)                   :: iret
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -1182,7 +1182,7 @@ end subroutine zhb_read
 subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   use psb_sparse_mod
   implicit none
-  type(psb_z_sparse_mat), intent(in), target :: a
+  type(psb_zspmat_type), intent(in), target :: a
   integer, intent(out)        :: iret
   character(len=*), optional, intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit

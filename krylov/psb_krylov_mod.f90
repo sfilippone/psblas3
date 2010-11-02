@@ -41,11 +41,11 @@ Module psb_krylov_mod
   interface psb_krylov
     
     Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
-      use psb_sparse_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       
       character(len=*)                   :: method
-      Type(psb_s_sparse_mat), Intent(in)  :: a
+      Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_sprec_type), intent(in)   :: prec 
       Real(psb_spk_), Intent(in)       :: b(:)
@@ -57,10 +57,10 @@ Module psb_krylov_mod
       Real(psb_spk_), Optional, Intent(out) :: err,cond
     end Subroutine psb_skrylov
     Subroutine psb_ckrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       character(len=*)                   :: method
-      Type(psb_c_sparse_mat), Intent(in)  :: a
+      Type(psb_cspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_cprec_type), intent(in)   :: prec 
       complex(psb_spk_), Intent(in)      :: b(:)
@@ -73,11 +73,11 @@ Module psb_krylov_mod
     end Subroutine psb_ckrylov
     Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_sparse_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       
       character(len=*)                   :: method
-      Type(psb_d_sparse_mat), Intent(in)  :: a
+      Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_dprec_type), intent(in)   :: prec 
       Real(psb_dpk_), Intent(in)       :: b(:)
@@ -90,10 +90,10 @@ Module psb_krylov_mod
 
     end Subroutine psb_dkrylov
     Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       character(len=*)                   :: method
-      Type(psb_z_sparse_mat), Intent(in)  :: a
+      Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_zprec_type), intent(in)   :: prec 
       complex(psb_dpk_), Intent(in)    :: b(:)

@@ -61,7 +61,7 @@
 !    
 ! Arguments:
 !
-!    a      -  type(psb_z_sparse_mat)      Input: sparse matrix containing A.
+!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_zprec_type)       Input: preconditioner
 !    b      -  complex,dimension(:)       Input: vector containing the
 !                                         right hand side B
@@ -100,7 +100,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   implicit none
 
 !!$  parameters 
-  Type(psb_z_sparse_mat), Intent(in)  :: a
+  Type(psb_zspmat_type), Intent(in)  :: a
   Type(psb_desc_type), Intent(in)    :: desc_a 
   class(psb_zprec_type), Intent(in)   :: prec 
   Complex(psb_dpk_), Intent(in)       :: b(:)

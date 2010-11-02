@@ -779,7 +779,7 @@ end subroutine mm_zvet1_write
 subroutine smm_mat_read(a, info, iunit, filename)   
   use psb_sparse_mod
   implicit none
-  type(psb_s_sparse_mat), intent(out)  :: a
+  type(psb_sspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -884,7 +884,7 @@ end subroutine smm_mat_read
 subroutine smm_mat_write(a,mtitle,info,iunit,filename)
   use psb_sparse_mod
   implicit none
-  type(psb_s_sparse_mat), intent(in)  :: a
+  type(psb_sspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
   character(len=*), intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -929,7 +929,7 @@ end subroutine smm_mat_write
 subroutine dmm_mat_read(a, info, iunit, filename)   
   use psb_sparse_mod
   implicit none
-  type(psb_d_sparse_mat), intent(out)  :: a
+  type(psb_dspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -1032,7 +1032,7 @@ end subroutine dmm_mat_read
 subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
   use psb_sparse_mod
   implicit none
-  type(psb_d_sparse_mat), intent(in)  :: a
+  type(psb_dspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
   character(len=*), intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -1077,7 +1077,7 @@ end subroutine dmm_mat_write
 subroutine cmm_mat_read(a, info, iunit, filename)   
   use psb_sparse_mod
   implicit none
-  type(psb_c_sparse_mat), intent(out)  :: a
+  type(psb_cspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -1205,7 +1205,7 @@ end subroutine cmm_mat_read
 subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
   use psb_sparse_mod
   implicit none
-  type(psb_c_sparse_mat), intent(in)  :: a
+  type(psb_cspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
   character(len=*), intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit
@@ -1250,7 +1250,7 @@ end subroutine cmm_mat_write
 subroutine zmm_mat_read(a, info, iunit, filename)   
   use psb_sparse_mod
   implicit none
-  type(psb_z_sparse_mat), intent(out)  :: a
+  type(psb_zspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
   integer, optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
@@ -1378,7 +1378,7 @@ end subroutine zmm_mat_read
 subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
   use psb_sparse_mod
   implicit none
-  type(psb_z_sparse_mat), intent(in)  :: a
+  type(psb_zspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
   character(len=*), intent(in) :: mtitle
   integer, optional, intent(in)          :: iunit

@@ -37,7 +37,7 @@
 program zmm2hb
   use psb_sparse_mod
   use psb_util_mod
-  type(psb_z_sparse_mat) :: a
+  type(psb_zspmat_type) :: a
   
   integer info
 

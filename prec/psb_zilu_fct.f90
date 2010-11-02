@@ -41,13 +41,13 @@ subroutine psb_zilu_fct(a,l,u,d,info,blck)
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info
   !     .. Array Arguments ..
-  type(psb_z_sparse_mat),intent(in)    :: a
+  type(psb_zspmat_type),intent(in)    :: a
   type(psb_z_csr_sparse_mat),intent(inout) :: l,u
-  type(psb_z_sparse_mat),intent(in), optional, target :: blck
+  type(psb_zspmat_type),intent(in), optional, target :: blck
   complex(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
   integer   ::  l1, l2,m,err_act  
-  type(psb_z_sparse_mat), pointer  :: blck_
+  type(psb_zspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_ilu_fct'
   info = psb_success_
@@ -117,7 +117,7 @@ contains
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
     implicit none 
 
-    type(psb_z_sparse_mat)          :: a,b
+    type(psb_zspmat_type)          :: a,b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
     complex(psb_dpk_), dimension(:) :: laspk,uaspk,d

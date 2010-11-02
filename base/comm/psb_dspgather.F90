@@ -10,8 +10,8 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  type(psb_d_sparse_mat), intent(inout) :: loca
-  type(psb_d_sparse_mat), intent(inout) :: globa
+  type(psb_dspmat_type), intent(inout) :: loca
+  type(psb_dspmat_type), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: root, dupl

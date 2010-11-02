@@ -34,9 +34,9 @@ module psb_hbio_mod
   public hb_read, hb_write
   interface hb_read
     subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_sparse_mod, only : psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only : psb_sspmat_type, psb_spk_
       implicit none
-      type(psb_s_sparse_mat), intent(out)     :: a
+      type(psb_sspmat_type), intent(out)     :: a
       integer, intent(out)                   :: iret
       integer, optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -44,9 +44,9 @@ module psb_hbio_mod
       character(len=72), optional, intent(out) :: mtitle
     end subroutine shb_read
     subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_sparse_mod, only : psb_d_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_
       implicit none
-      type(psb_d_sparse_mat), intent(out)     :: a
+      type(psb_dspmat_type), intent(out)     :: a
       integer, intent(out)                   :: iret
       integer, optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -54,9 +54,9 @@ module psb_hbio_mod
       character(len=72), optional, intent(out) :: mtitle
     end subroutine dhb_read
     subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_sparse_mod, only : psb_c_sparse_mat, psb_spk_
+      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_
       implicit none
-      type(psb_c_sparse_mat), intent(out)     :: a
+      type(psb_cspmat_type), intent(out)     :: a
       integer, intent(out)                   :: iret
       integer, optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -64,9 +64,9 @@ module psb_hbio_mod
       character(len=72), optional, intent(out) :: mtitle
     end subroutine chb_read
     subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_sparse_mod, only : psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_
       implicit none
-      type(psb_z_sparse_mat), intent(out)     :: a
+      type(psb_zspmat_type), intent(out)     :: a
       integer, intent(out)                   :: iret
       integer, optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -77,9 +77,9 @@ module psb_hbio_mod
 
   interface hb_write
     subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_sparse_mod, only : psb_s_sparse_mat, psb_spk_
+      use psb_sparse_mod, only : psb_sspmat_type, psb_spk_
       implicit none
-      type(psb_s_sparse_mat), intent(inout)  :: a
+      type(psb_sspmat_type), intent(inout)  :: a
       integer, intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
       integer, optional, intent(in)          :: iunit
@@ -88,9 +88,9 @@ module psb_hbio_mod
       real(psb_spk_), optional             :: rhs(:), g(:), x(:)
     end subroutine shb_write
     subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_sparse_mod, only : psb_d_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_
       implicit none
-      type(psb_d_sparse_mat), intent(inout)  :: a
+      type(psb_dspmat_type), intent(inout)  :: a
       integer, intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
       integer, optional, intent(in)          :: iunit
@@ -99,9 +99,9 @@ module psb_hbio_mod
       real(psb_dpk_), optional             :: rhs(:), g(:), x(:)
     end subroutine dhb_write
     subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_sparse_mod, only : psb_c_sparse_mat, psb_spk_
+      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_
       implicit none
-      type(psb_c_sparse_mat), intent(inout)  :: a
+      type(psb_cspmat_type), intent(inout)  :: a
       integer, intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
       integer, optional, intent(in)          :: iunit
@@ -110,9 +110,9 @@ module psb_hbio_mod
       complex(psb_spk_), optional             :: rhs(:), g(:), x(:)
     end subroutine chb_write
     subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_sparse_mod, only : psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_
       implicit none
-      type(psb_z_sparse_mat), intent(inout)  :: a
+      type(psb_zspmat_type), intent(inout)  :: a
       integer, intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
       integer, optional, intent(in)          :: iunit

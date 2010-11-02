@@ -73,7 +73,7 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_s_sparse_mat)      Input: sparse matrix containing A.
+!    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_sprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)          Input: vector containing the
 !                                         right hand side B
@@ -114,7 +114,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   implicit none
 
 !!$  Parameters 
-  Type(psb_s_sparse_mat), Intent(in)  :: a
+  Type(psb_sspmat_type), Intent(in)  :: a
   class(psb_sprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   Real(psb_spk_), Intent(in)       :: b(:)

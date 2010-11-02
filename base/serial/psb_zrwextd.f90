@@ -44,9 +44,9 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
   integer, intent(in)                          :: nr
-  type(psb_z_sparse_mat), intent(inout)        :: a
+  type(psb_zspmat_type), intent(inout)        :: a
   integer,intent(out)                          :: info
-  type(psb_z_sparse_mat), intent(in), optional :: b
+  type(psb_zspmat_type), intent(in), optional :: b
   logical,intent(in), optional                 :: rowscale
 
   integer :: i,j,ja,jb,err_act,nza,nzb

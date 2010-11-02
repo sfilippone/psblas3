@@ -52,7 +52,7 @@ function psb_dspnrm1(a,desc_a,info)
   use psb_sparse_mod, psb_protect_name => psb_dspnrm1
   implicit none
 
-  type(psb_d_sparse_mat), intent(in) :: a
+  type(psb_dspmat_type), intent(in) :: a
   integer, intent(out)               :: info
   type(psb_desc_type), intent(in)    :: desc_a
   real(psb_dpk_)                     :: psb_dspnrm1

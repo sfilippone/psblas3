@@ -73,7 +73,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)                     :: novr
-  Type(psb_s_sparse_mat), Intent(in)      ::  a
+  Type(psb_sspmat_type), Intent(in)      ::  a
   Type(psb_desc_type), Intent(in), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer, intent(out)                    :: info

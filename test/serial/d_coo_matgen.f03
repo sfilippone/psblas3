@@ -17,7 +17,7 @@ program d_coo_matgen
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_d_sparse_mat) :: a
+  type(psb_dspmat_type) :: a
 !!$  type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -147,7 +147,7 @@ contains
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
-    type(psb_d_sparse_mat)   :: a
+    type(psb_dspmat_type)   :: a
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner

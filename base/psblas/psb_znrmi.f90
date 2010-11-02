@@ -37,7 +37,7 @@
 !    normi := max(abs(sum(A(i,j))))                                              
 !
 ! Arguments:
-!    a      -  type(psb_d_sparse_mat).   The sparse matrix containing A.
+!    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
@@ -50,7 +50,7 @@ function psb_znrmi(a,desc_a,info)
   use psb_mat_mod
   implicit none
 
-  type(psb_z_sparse_mat), intent(in)   :: a
+  type(psb_zspmat_type), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_dpk_)                    :: psb_znrmi

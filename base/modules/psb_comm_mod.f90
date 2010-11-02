@@ -306,8 +306,8 @@ module psb_comm_mod
       use psb_descriptor_type
       use psb_mat_mod
       implicit none
-      type(psb_d_sparse_mat), intent(inout) :: loca
-      type(psb_d_sparse_mat), intent(out)   :: globa
+      type(psb_dspmat_type), intent(inout) :: loca
+      type(psb_dspmat_type), intent(out)   :: globa
       type(psb_desc_type), intent(in) :: desc_a
       integer, intent(out)            :: info
       integer, intent(in), optional   :: root,dupl

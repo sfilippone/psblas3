@@ -35,7 +35,7 @@
 !    Assemble sparse matrix
 !
 ! Arguments: 
-!    a        - type(psb_s_sparse_mat).     The sparse matrix to be allocated.      
+!    a        - type(psb_sspmat_type).     The sparse matrix to be allocated.      
 !    desc_a   - type(psb_desc_type).       The communication descriptor.
 !    info     - integer.                     return code.
 !    afmt     - character(optional)          The desired output storage format.
@@ -55,7 +55,7 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
 
   !...Parameters....
-  type(psb_s_sparse_mat), intent (inout)  :: a
+  type(psb_sspmat_type), intent (inout)  :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd

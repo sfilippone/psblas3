@@ -92,10 +92,10 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_s_sparse_mat)     :: a_glob
+  type(psb_sspmat_type)     :: a_glob
   real(psb_spk_)             :: b_glob(:)
   integer                    :: ictxt
-  type(psb_s_sparse_mat)      :: a
+  type(psb_sspmat_type)      :: a
   real(psb_spk_), allocatable :: b(:)
   type(psb_desc_type)        :: desc_a
   integer, intent(out)       :: info
@@ -537,10 +537,10 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_d_sparse_mat)     :: a_glob
+  type(psb_dspmat_type)     :: a_glob
   real(psb_dpk_)             :: b_glob(:)
   integer                    :: ictxt
-  type(psb_d_sparse_mat)      :: a
+  type(psb_dspmat_type)      :: a
   real(psb_dpk_), allocatable :: b(:)
   type(psb_desc_type)        :: desc_a
   integer, intent(out)       :: info
@@ -982,10 +982,10 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_c_sparse_mat)     :: a_glob
+  type(psb_cspmat_type)     :: a_glob
   complex(psb_spk_)             :: b_glob(:)
   integer                    :: ictxt
-  type(psb_c_sparse_mat)      :: a
+  type(psb_cspmat_type)      :: a
   complex(psb_spk_), allocatable :: b(:)
   type(psb_desc_type)        :: desc_a
   integer, intent(out)       :: info
@@ -1427,10 +1427,10 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_z_sparse_mat)     :: a_glob
+  type(psb_zspmat_type)     :: a_glob
   complex(psb_dpk_)             :: b_glob(:)
   integer                    :: ictxt
-  type(psb_z_sparse_mat)      :: a
+  type(psb_zspmat_type)      :: a
   complex(psb_dpk_), allocatable :: b(:)
   type(psb_desc_type)        :: desc_a
   integer, intent(out)       :: info

@@ -41,7 +41,7 @@ program df_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_d_sparse_mat) :: a, aux_a
+  type(psb_dspmat_type) :: a, aux_a
 
   ! preconditioner data
   type(psb_dprec_type)  :: prec

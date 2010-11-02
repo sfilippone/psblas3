@@ -62,7 +62,7 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_d_sparse_mat)      Input: sparse matrix containing A.
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_dprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)            Input: vector containing the
 !                                           right hand side B
@@ -100,7 +100,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_inner_krylov_mod
   use psb_krylov_mod
   implicit none
-  type(psb_d_sparse_mat), intent(in)  :: a
+  type(psb_dspmat_type), intent(in)  :: a
   
   class(psb_dprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)     :: desc_a

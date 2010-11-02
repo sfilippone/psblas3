@@ -77,7 +77,7 @@ program ppde
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_d_sparse_mat) :: a
+  type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -348,7 +348,7 @@ contains
     type(psb_desc_type)          :: desc_a
     integer                      :: ictxt, info
     character                    :: afmt*5
-    type(psb_d_sparse_mat)       :: a
+    type(psb_dspmat_type)       :: a
     type(psb_d_csc_sparse_mat)       :: acsc
     type(psb_d_coo_sparse_mat)       :: acoo
     type(psb_d_csr_sparse_mat)       :: acsr

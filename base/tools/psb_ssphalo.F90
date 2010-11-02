@@ -68,8 +68,8 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   include 'mpif.h'
 #endif
 
-  Type(psb_s_sparse_mat),Intent(in)    :: a
-  Type(psb_s_sparse_mat),Intent(inout) :: blk
+  Type(psb_sspmat_type),Intent(in)    :: a
+  Type(psb_sspmat_type),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in), target  :: desc_a
   integer, intent(out)                :: info
   logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale

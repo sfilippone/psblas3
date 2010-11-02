@@ -71,7 +71,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_spk_), intent(in)             :: alpha, beta
   complex(psb_spk_), intent(inout), target  :: x(:,:)
   complex(psb_spk_), intent(inout), target  :: y(:,:)
-  type(psb_c_sparse_mat), intent(in)        :: a
+  type(psb_cspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   complex(psb_spk_), optional, target, intent(inout)  :: work(:)
@@ -404,7 +404,7 @@ end subroutine psb_cspmm
 !
 ! Arguments:   
 !    alpha   -  complex                The scalar alpha.
-!    a       -  type(psb_c_sparse_mat). The sparse matrix containing A.
+!    a       -  type(psb_cspmat_type). The sparse matrix containing A.
 !    x(:)    -  complex                The input vector containing the entries of ( X ).
 !    beta    -  complex                The scalar beta.
 !    y(:)    -  complex                The input vector containing the entries of ( Y ).
@@ -423,7 +423,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_spk_), intent(in)             :: alpha, beta
   complex(psb_spk_), intent(inout), target  :: x(:)
   complex(psb_spk_), intent(inout), target  :: y(:)
-  type(psb_c_sparse_mat), intent(in)        :: a
+  type(psb_cspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   complex(psb_spk_), optional, target, intent(inout) :: work(:)

@@ -47,7 +47,7 @@ module psb_d_mat_mod
   use psb_d_csr_mat_mod, only : psb_d_csr_sparse_mat
   use psb_d_csc_mat_mod, only : psb_d_csc_sparse_mat
 
-  type :: psb_d_sparse_mat
+  type :: psb_dspmat_type
 
     class(psb_d_base_sparse_mat), allocatable  :: a 
 
@@ -145,7 +145,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: d_cssm   => psb_d_cssm
     generic, public    :: cssm     => d_cssm, d_cssv
 
-  end type psb_d_sparse_mat
+  end type psb_dspmat_type
 
   private :: psb_d_get_nrows, psb_d_get_ncols, psb_d_get_nzeros, psb_d_get_size, &
        & psb_d_get_state, psb_d_get_dupl, psb_d_is_null, psb_d_is_bld, psb_d_is_upd, &
@@ -173,100 +173,100 @@ module psb_d_mat_mod
 
   interface 
     subroutine  psb_d_set_nrows(m,a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       integer, intent(in) :: m
     end subroutine psb_d_set_nrows
   end interface
 
   interface 
     subroutine psb_d_set_ncols(n,a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_d_set_ncols
   end interface
 
   interface 
     subroutine  psb_d_set_state(n,a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_d_set_state
   end interface
 
   interface 
     subroutine  psb_d_set_dupl(n,a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_d_set_dupl
   end interface
 
   interface 
     subroutine psb_d_set_null(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_null
   end interface
 
   interface 
     subroutine psb_d_set_bld(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_bld
   end interface
 
   interface 
     subroutine psb_d_set_upd(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_upd
   end interface
 
   interface 
     subroutine psb_d_set_asb(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_asb
   end interface
 
   interface 
     subroutine psb_d_set_sorted(a,val) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_d_set_sorted
   end interface
 
   interface 
     subroutine psb_d_set_triangle(a,val) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_d_set_triangle
   end interface
 
   interface 
     subroutine psb_d_set_unit(a,val) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_d_set_unit
   end interface
 
   interface 
     subroutine psb_d_set_lower(a,val) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_d_set_lower
   end interface
 
   interface 
     subroutine psb_d_set_upper(a,val) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_d_set_upper
   end interface
@@ -274,9 +274,9 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-      import :: psb_d_sparse_mat
+      import :: psb_dspmat_type
       integer, intent(in)               :: iout
-      class(psb_d_sparse_mat), intent(in) :: a   
+      class(psb_dspmat_type), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
       integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
@@ -286,8 +286,8 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_get_neigh(a,idx,neigh,n,info,lev)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(in) :: a   
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(in) :: a   
       integer, intent(in)                :: idx 
       integer, intent(out)               :: n   
       integer, allocatable, intent(out)  :: neigh(:)
@@ -298,8 +298,8 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_csall(nr,nc,a,info,nz) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(out) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(out) :: a
       integer, intent(in)             :: nr,nc
       integer, intent(out)            :: info
       integer, intent(in), optional   :: nz
@@ -308,30 +308,30 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_reallocate_nz(nz,a) 
-      import :: psb_d_sparse_mat
+      import :: psb_dspmat_type
       integer, intent(in) :: nz
-      class(psb_d_sparse_mat), intent(inout) :: a
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_reallocate_nz
   end interface
 
   interface 
     subroutine psb_d_free(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_free
   end interface
 
   interface 
     subroutine psb_d_trim(a) 
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_trim
   end interface
 
   interface 
     subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
@@ -342,8 +342,8 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
       integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -358,8 +358,8 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
       integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -375,9 +375,9 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_csgetblk(imin,imax,a,b,info,&
          & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
-      class(psb_d_sparse_mat), intent(out) :: b
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
+      class(psb_dspmat_type), intent(out) :: b
       integer, intent(in)                  :: imin,imax
       integer,intent(out)                  :: info
       logical, intent(in), optional        :: append
@@ -390,9 +390,9 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_csclip(a,b,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
-      class(psb_d_sparse_mat), intent(out) :: b
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
+      class(psb_dspmat_type), intent(out) :: b
       integer,intent(out)                  :: info
       integer, intent(in), optional        :: imin,imax,jmin,jmax
       logical, intent(in), optional        :: rscale,cscale
@@ -402,8 +402,8 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_b_csclip(a,b,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_coo_sparse_mat
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_coo_sparse_mat
+      class(psb_dspmat_type), intent(in) :: a
       type(psb_d_coo_sparse_mat), intent(out) :: b
       integer,intent(out)                  :: info
       integer, intent(in), optional        :: imin,imax,jmin,jmax
@@ -413,9 +413,9 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(in)    :: a
-      class(psb_d_sparse_mat), intent(out)   :: b
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(in)    :: a
+      class(psb_dspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
       integer,optional, intent(in)           :: dupl, upd
       character(len=*), optional, intent(in) :: type
@@ -426,8 +426,8 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_cscnv_ip(a,iinfo,type,mold,dupl)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
       integer, intent(out)                   :: iinfo
       integer,optional, intent(in)           :: dupl
       character(len=*), optional, intent(in) :: type
@@ -438,8 +438,8 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_cscnv_base(a,b,info,dupl)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(in)       :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(in)       :: a
       class(psb_d_base_sparse_mat), intent(out) :: b
       integer, intent(out)                   :: info
       integer,optional, intent(in)           :: dupl
@@ -448,106 +448,106 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_clip_d(a,b,info)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(in) :: a
-      class(psb_d_sparse_mat), intent(out) :: b
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(in) :: a
+      class(psb_dspmat_type), intent(out) :: b
       integer,intent(out)                  :: info
     end subroutine psb_d_clip_d
   end interface
 
   interface 
     subroutine psb_d_clip_d_ip(a,info)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
       integer,intent(out)                  :: info
     end subroutine psb_d_clip_d_ip
   end interface
 
   interface 
     subroutine psb_d_mv_from(a,b)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(out) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(out) :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
     end subroutine psb_d_mv_from
   end interface
 
   interface 
     subroutine psb_d_cp_from(a,b)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(out) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(out) :: a
       class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
     end subroutine psb_d_cp_from
   end interface
 
   interface 
     subroutine psb_d_mv_to(a,b)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(out) :: b
     end subroutine psb_d_mv_to
   end interface
 
   interface 
     subroutine psb_d_cp_to(a,b)
-      import :: psb_d_sparse_mat, psb_dpk_, psb_d_base_sparse_mat    
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat    
+      class(psb_dspmat_type), intent(in) :: a
       class(psb_d_base_sparse_mat), intent(out) :: b
     end subroutine psb_d_cp_to
   end interface
 
   interface psb_move_alloc 
-    subroutine psb_d_sparse_mat_move(a,b,info)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
-      class(psb_d_sparse_mat), intent(out)   :: b
+    subroutine psb_dspmat_type_move(a,b,info)
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_dspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
-    end subroutine psb_d_sparse_mat_move
+    end subroutine psb_dspmat_type_move
   end interface
 
 
   interface psb_clone
-    subroutine psb_d_sparse_mat_clone(a,b,info)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(in)  :: a
-      class(psb_d_sparse_mat), intent(out) :: b
+    subroutine psb_dspmat_type_clone(a,b,info)
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(in)  :: a
+      class(psb_dspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
-    end subroutine psb_d_sparse_mat_clone
+    end subroutine psb_dspmat_type_clone
   end interface
 
   interface 
     subroutine psb_d_transp_1mat(a)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_transp_1mat
   end interface
 
   interface 
     subroutine psb_d_transp_2mat(a,b)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(out) :: a
-      class(psb_d_sparse_mat), intent(in)  :: b
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(out) :: a
+      class(psb_dspmat_type), intent(in)  :: b
     end subroutine psb_d_transp_2mat
   end interface
 
   interface 
     subroutine psb_d_transc_1mat(a)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_transc_1mat
   end interface
 
   interface 
     subroutine psb_d_transc_2mat(a,b)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(out) :: a
-      class(psb_d_sparse_mat), intent(in)  :: b
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(out) :: a
+      class(psb_dspmat_type), intent(in)  :: b
     end subroutine psb_d_transc_2mat
   end interface
 
   interface 
     subroutine psb_d_reinit(a,clear)
-      import :: psb_d_sparse_mat
-      class(psb_d_sparse_mat), intent(inout) :: a   
+      import :: psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_d_reinit
 
@@ -569,16 +569,16 @@ module psb_d_mat_mod
 
   interface psb_csmm
     subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_csmm
     subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
@@ -588,8 +588,8 @@ module psb_d_mat_mod
 
   interface psb_cssm
     subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
@@ -597,8 +597,8 @@ module psb_d_mat_mod
       real(psb_dpk_), intent(in), optional :: d(:)
     end subroutine psb_d_cssm
     subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
@@ -609,48 +609,48 @@ module psb_d_mat_mod
 
   interface 
     function psb_d_csnmi(a) result(res)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_d_csnmi
   end interface
   
   interface 
     function psb_d_csnm1(a) result(res)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_d_csnm1
   end interface
 
   interface 
     subroutine psb_d_rowsum(d,a) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
     end subroutine psb_d_rowsum
   end interface
 
   interface 
     subroutine psb_d_arwsum(d,a) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
     end subroutine psb_d_arwsum
   end interface
   
   interface 
     subroutine psb_d_colsum(d,a) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
     end subroutine psb_d_colsum
   end interface
 
   interface 
     subroutine psb_d_aclsum(d,a) 
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
     end subroutine psb_d_aclsum
   end interface
@@ -658,8 +658,8 @@ module psb_d_mat_mod
 
   interface 
     subroutine psb_d_get_diag(a,d,info)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(in) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)          :: d(:)
       integer, intent(out)                 :: info
     end subroutine psb_d_get_diag
@@ -667,14 +667,14 @@ module psb_d_mat_mod
 
   interface psb_scal
     subroutine psb_d_scal(d,a,info)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)              :: d(:)
       integer, intent(out)                    :: info
     end subroutine psb_d_scal
     subroutine psb_d_scals(d,a,info)
-      import :: psb_d_sparse_mat, psb_dpk_
-      class(psb_d_sparse_mat), intent(inout) :: a
+      import :: psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)              :: d
       integer, intent(out)                    :: info
     end subroutine psb_d_scals
@@ -701,7 +701,7 @@ contains
 
   function psb_d_sizeof(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer(psb_long_int_k_) :: res
 
     res = 0
@@ -715,7 +715,7 @@ contains
 
   function psb_d_get_fmt(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     character(len=5) :: res
 
     if (allocated(a%a)) then 
@@ -730,7 +730,7 @@ contains
 
   function psb_d_get_dupl(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -743,7 +743,7 @@ contains
 
   function psb_d_get_state(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -755,7 +755,7 @@ contains
 
   function psb_d_get_nrows(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -768,7 +768,7 @@ contains
 
   function psb_d_get_ncols(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -781,7 +781,7 @@ contains
 
   function psb_d_is_triangle(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -794,7 +794,7 @@ contains
 
   function psb_d_is_unit(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -807,7 +807,7 @@ contains
 
   function psb_d_is_upper(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -820,7 +820,7 @@ contains
 
   function psb_d_is_lower(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -833,7 +833,7 @@ contains
 
   function psb_d_is_null(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -846,7 +846,7 @@ contains
 
   function psb_d_is_bld(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -859,7 +859,7 @@ contains
 
   function psb_d_is_upd(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -872,7 +872,7 @@ contains
 
   function psb_d_is_asb(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -885,7 +885,7 @@ contains
 
   function psb_d_is_sorted(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -900,7 +900,7 @@ contains
 
   function psb_d_get_nzeros(a) result(res)
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     res = 0
@@ -913,7 +913,7 @@ contains
   function psb_d_get_size(a) result(res)
 
     implicit none 
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
 
@@ -928,7 +928,7 @@ contains
   function psb_d_get_nz_row(idx,a) result(res)
     implicit none 
     integer, intent(in)               :: idx
-    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
     Integer :: err_act

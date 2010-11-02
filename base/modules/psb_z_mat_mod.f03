@@ -48,7 +48,7 @@ module psb_z_mat_mod
   use psb_z_csr_mat_mod, only : psb_z_csr_sparse_mat
   use psb_z_csc_mat_mod, only : psb_z_csc_sparse_mat
 
-  type :: psb_z_sparse_mat
+  type :: psb_zspmat_type
 
     class(psb_z_base_sparse_mat), allocatable  :: a 
 
@@ -141,7 +141,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: z_cssm   => psb_z_cssm
     generic, public    :: cssm     => z_cssm, z_cssv
 
-  end type psb_z_sparse_mat
+  end type psb_zspmat_type
 
   private :: psb_z_get_nrows, psb_z_get_ncols, psb_z_get_nzeros, psb_z_get_size, &
        & psb_z_get_state, psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, psb_z_is_upd, &
@@ -169,100 +169,100 @@ module psb_z_mat_mod
 
   interface 
     subroutine  psb_z_set_nrows(m,a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       integer, intent(in) :: m
     end subroutine psb_z_set_nrows
   end interface
   
   interface 
     subroutine psb_z_set_ncols(n,a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_z_set_ncols
   end interface
   
   interface 
     subroutine  psb_z_set_state(n,a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_z_set_state
   end interface
   
   interface 
     subroutine  psb_z_set_dupl(n,a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_z_set_dupl
   end interface
   
   interface 
     subroutine psb_z_set_null(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_set_null
   end interface
   
   interface 
     subroutine psb_z_set_bld(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_set_bld
   end interface
   
   interface 
     subroutine psb_z_set_upd(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_set_upd
   end interface
   
   interface 
     subroutine psb_z_set_asb(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_set_asb
   end interface
   
   interface 
     subroutine psb_z_set_sorted(a,val) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_z_set_sorted
   end interface
   
   interface 
     subroutine psb_z_set_triangle(a,val) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_z_set_triangle
   end interface
   
   interface 
     subroutine psb_z_set_unit(a,val) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_z_set_unit
   end interface
   
   interface 
     subroutine psb_z_set_lower(a,val) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_z_set_lower
   end interface
   
   interface 
     subroutine psb_z_set_upper(a,val) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
     end subroutine psb_z_set_upper
   end interface
@@ -270,9 +270,9 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-      import :: psb_z_sparse_mat
+      import :: psb_zspmat_type
       integer, intent(in)               :: iout
-      class(psb_z_sparse_mat), intent(in) :: a   
+      class(psb_zspmat_type), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
       integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
@@ -282,8 +282,8 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_get_neigh(a,idx,neigh,n,info,lev)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(in) :: a   
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(in) :: a   
       integer, intent(in)                :: idx 
       integer, intent(out)               :: n   
       integer, allocatable, intent(out)  :: neigh(:)
@@ -294,8 +294,8 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_csall(nr,nc,a,info,nz) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(out) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(out) :: a
       integer, intent(in)             :: nr,nc
       integer, intent(out)            :: info
       integer, intent(in), optional   :: nz
@@ -304,30 +304,30 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_reallocate_nz(nz,a) 
-      import :: psb_z_sparse_mat
+      import :: psb_zspmat_type
       integer, intent(in) :: nz
-      class(psb_z_sparse_mat), intent(inout) :: a
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_reallocate_nz
   end interface
   
   interface 
     subroutine psb_z_free(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_free
   end interface
   
   interface 
     subroutine psb_z_trim(a) 
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_trim
   end interface
   
   interface 
     subroutine psb_z_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: val(:)
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
@@ -338,8 +338,8 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
       integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -354,8 +354,8 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
       integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -371,9 +371,9 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
-      class(psb_z_sparse_mat), intent(out) :: b
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      class(psb_zspmat_type), intent(out) :: b
       integer, intent(in)                  :: imin,imax
       integer,intent(out)                  :: info
       logical, intent(in), optional        :: append
@@ -386,9 +386,9 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
-      class(psb_z_sparse_mat), intent(out) :: b
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      class(psb_zspmat_type), intent(out) :: b
       integer,intent(out)                  :: info
       integer, intent(in), optional        :: imin,imax,jmin,jmax
       logical, intent(in), optional        :: rscale,cscale
@@ -398,8 +398,8 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_b_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_coo_sparse_mat
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_coo_sparse_mat
+      class(psb_zspmat_type), intent(in) :: a
       type(psb_z_coo_sparse_mat), intent(out) :: b
       integer,intent(out)                  :: info
       integer, intent(in), optional        :: imin,imax,jmin,jmax
@@ -409,9 +409,9 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(in)    :: a
-      class(psb_z_sparse_mat), intent(out)   :: b
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(in)    :: a
+      class(psb_zspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
       integer,optional, intent(in)           :: dupl, upd
       character(len=*), optional, intent(in) :: type
@@ -422,8 +422,8 @@ module psb_z_mat_mod
 
   interface 
     subroutine psb_z_cscnv_ip(a,iinfo,type,mold,dupl)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout) :: a
       integer, intent(out)                   :: iinfo
       integer,optional, intent(in)           :: dupl
       character(len=*), optional, intent(in) :: type
@@ -434,8 +434,8 @@ module psb_z_mat_mod
 
   interface 
     subroutine psb_z_cscnv_base(a,b,info,dupl)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(in)       :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(in)       :: a
       class(psb_z_base_sparse_mat), intent(out) :: b
       integer, intent(out)                   :: info
       integer,optional, intent(in)           :: dupl
@@ -444,106 +444,106 @@ module psb_z_mat_mod
   
   interface 
     subroutine psb_z_clip_d(a,b,info)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(in) :: a
-      class(psb_z_sparse_mat), intent(out) :: b
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(in) :: a
+      class(psb_zspmat_type), intent(out) :: b
       integer,intent(out)                  :: info
     end subroutine psb_z_clip_d
   end interface
   
   interface 
     subroutine psb_z_clip_d_ip(a,info)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
       integer,intent(out)                  :: info
     end subroutine psb_z_clip_d_ip
   end interface
   
   interface 
     subroutine psb_z_mv_from(a,b)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(out) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(out) :: a
       class(psb_z_base_sparse_mat), intent(inout) :: b
     end subroutine psb_z_mv_from
   end interface
   
   interface 
     subroutine psb_z_cp_from(a,b)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(out) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(out) :: a
       class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
     end subroutine psb_z_cp_from
   end interface
   
   interface 
     subroutine psb_z_mv_to(a,b)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout) :: a
       class(psb_z_base_sparse_mat), intent(out) :: b
     end subroutine psb_z_mv_to
   end interface
   
   interface 
     subroutine psb_z_cp_to(a,b)
-      import :: psb_z_sparse_mat, psb_dpk_, psb_z_base_sparse_mat    
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat    
+      class(psb_zspmat_type), intent(in) :: a
       class(psb_z_base_sparse_mat), intent(out) :: b
     end subroutine psb_z_cp_to
   end interface
   
   interface psb_move_alloc 
-    subroutine psb_z_sparse_mat_move(a,b,info)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
-      class(psb_z_sparse_mat), intent(out)   :: b
+    subroutine psb_zspmat_type_move(a,b,info)
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
+      class(psb_zspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
-    end subroutine psb_z_sparse_mat_move
+    end subroutine psb_zspmat_type_move
   end interface
   
 
   interface psb_clone
-    subroutine psb_z_sparse_mat_clone(a,b,info)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(in)  :: a
-      class(psb_z_sparse_mat), intent(out) :: b
+    subroutine psb_zspmat_type_clone(a,b,info)
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(in)  :: a
+      class(psb_zspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
-    end subroutine psb_z_sparse_mat_clone
+    end subroutine psb_zspmat_type_clone
   end interface
   
   interface 
     subroutine psb_z_transp_1mat(a)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_transp_1mat
   end interface
   
   interface 
     subroutine psb_z_transp_2mat(a,b)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(out) :: a
-      class(psb_z_sparse_mat), intent(in)  :: b
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(out) :: a
+      class(psb_zspmat_type), intent(in)  :: b
     end subroutine psb_z_transp_2mat
   end interface
   
   interface 
     subroutine psb_z_transc_1mat(a)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a
     end subroutine psb_z_transc_1mat
   end interface
   
   interface 
     subroutine psb_z_transc_2mat(a,b)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(out) :: a
-      class(psb_z_sparse_mat), intent(in)  :: b
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(out) :: a
+      class(psb_zspmat_type), intent(in)  :: b
     end subroutine psb_z_transc_2mat
   end interface
   
   interface 
     subroutine psb_z_reinit(a,clear)
-      import :: psb_z_sparse_mat
-      class(psb_z_sparse_mat), intent(inout) :: a   
+      import :: psb_zspmat_type
+      class(psb_zspmat_type), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_z_reinit
     
@@ -566,16 +566,16 @@ module psb_z_mat_mod
 
   interface psb_csmm
     subroutine psb_z_csmm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       complex(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_z_csmm
     subroutine psb_z_csmv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
@@ -585,8 +585,8 @@ module psb_z_mat_mod
   
   interface psb_cssm
     subroutine psb_z_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       complex(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
       complex(psb_dpk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
@@ -594,8 +594,8 @@ module psb_z_mat_mod
       complex(psb_dpk_), intent(in), optional :: d(:)
     end subroutine psb_z_cssm
     subroutine psb_z_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
       complex(psb_dpk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
@@ -606,16 +606,16 @@ module psb_z_mat_mod
   
   interface 
     function psb_z_csnmi(a) result(res)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_z_csnmi
   end interface
   
   interface 
     subroutine psb_z_get_diag(a,d,info)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(in) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
       complex(psb_dpk_), intent(out)          :: d(:)
       integer, intent(out)                 :: info
     end subroutine psb_z_get_diag
@@ -623,14 +623,14 @@ module psb_z_mat_mod
   
   interface psb_scal
     subroutine psb_z_scal(d,a,info)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(inout) :: a
       complex(psb_dpk_), intent(in)              :: d(:)
       integer, intent(out)                    :: info
     end subroutine psb_z_scal
     subroutine psb_z_scals(d,a,info)
-      import :: psb_z_sparse_mat, psb_dpk_
-      class(psb_z_sparse_mat), intent(inout) :: a
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(inout) :: a
       complex(psb_dpk_), intent(in)              :: d
       integer, intent(out)                    :: info
     end subroutine psb_z_scals
@@ -657,7 +657,7 @@ contains
   
   function psb_z_sizeof(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer(psb_long_int_k_) :: res
     
     res = 0
@@ -670,7 +670,7 @@ contains
 
   function psb_z_get_fmt(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     character(len=5) :: res
 
     if (allocated(a%a)) then 
@@ -684,7 +684,7 @@ contains
 
   function psb_z_get_dupl(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -697,7 +697,7 @@ contains
 
   function psb_z_get_state(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -709,7 +709,7 @@ contains
 
   function psb_z_get_nrows(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -722,7 +722,7 @@ contains
 
   function psb_z_get_ncols(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
     if (allocated(a%a)) then 
@@ -735,7 +735,7 @@ contains
 
   function psb_z_is_triangle(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -748,7 +748,7 @@ contains
 
   function psb_z_is_unit(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -761,7 +761,7 @@ contains
 
   function psb_z_is_upper(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -774,7 +774,7 @@ contains
 
   function psb_z_is_lower(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -787,7 +787,7 @@ contains
 
   function psb_z_is_null(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -800,7 +800,7 @@ contains
 
   function psb_z_is_bld(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -813,7 +813,7 @@ contains
 
   function psb_z_is_upd(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -826,7 +826,7 @@ contains
 
   function psb_z_is_asb(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -839,7 +839,7 @@ contains
 
   function psb_z_is_sorted(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     logical :: res
 
     if (allocated(a%a)) then 
@@ -854,7 +854,7 @@ contains
 
   function psb_z_get_nzeros(a) result(res)
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
     res = 0
@@ -867,7 +867,7 @@ contains
   function psb_z_get_size(a) result(res)
 
     implicit none 
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
 
 
@@ -882,7 +882,7 @@ contains
   function psb_z_get_nz_row(idx,a) result(res)
     implicit none 
     integer, intent(in)               :: idx
-    class(psb_z_sparse_mat), intent(in) :: a
+    class(psb_zspmat_type), intent(in) :: a
     integer :: res
     
     Integer :: err_act

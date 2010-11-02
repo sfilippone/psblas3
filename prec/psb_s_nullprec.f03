@@ -107,7 +107,7 @@ contains
     use psb_sparse_mod
     Implicit None
     
-    type(psb_s_sparse_mat), intent(in), target :: a
+    type(psb_sspmat_type), intent(in), target :: a
     type(psb_desc_type), intent(in), target  :: desc_a
     class(psb_s_null_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info

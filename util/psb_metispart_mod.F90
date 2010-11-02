@@ -136,7 +136,7 @@ contains
   
   subroutine d_mat_build_mtpart(a,nparts)
     use psb_sparse_mod
-    type(psb_d_sparse_mat), intent(in) :: a
+    type(psb_dspmat_type), intent(in) :: a
     integer       :: nparts
     
 
@@ -153,7 +153,7 @@ contains
   
   subroutine s_mat_build_mtpart(a,nparts)
     use psb_sparse_mod
-    type(psb_s_sparse_mat), intent(in) :: a
+    type(psb_sspmat_type), intent(in) :: a
     integer       :: nparts
     
 
@@ -170,7 +170,7 @@ contains
   
   subroutine z_mat_build_mtpart(a,nparts)
     use psb_sparse_mod
-    type(psb_z_sparse_mat), intent(in) :: a
+    type(psb_zspmat_type), intent(in) :: a
     integer       :: nparts
     
 
@@ -187,7 +187,7 @@ contains
   
   subroutine c_mat_build_mtpart(a,nparts)
     use psb_sparse_mod
-    type(psb_c_sparse_mat), intent(in) :: a
+    type(psb_cspmat_type), intent(in) :: a
     integer       :: nparts
     
 

@@ -41,7 +41,7 @@ program zf_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_z_sparse_mat) :: a, aux_a
+  type(psb_zspmat_type) :: a, aux_a
 
   ! preconditioner data
   type(psb_zprec_type)  :: prec

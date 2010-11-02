@@ -57,7 +57,7 @@
 !
 ! Arguments:   
 !    alpha   -  complex.               The scalar alpha.
-!    a       -  type(psb_z_sparse_mat). The sparse matrix containing A.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
 !    x(:,:)  -  complex                The input vector containing the entries of ( X ).
 !    beta    -  complex                The scalar beta.
 !    y(:,:)  -  complex                The input vector containing the entries of ( Y ).
@@ -82,7 +82,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_dpk_), intent(in)              :: alpha, beta
   complex(psb_dpk_), intent(in), target      :: x(:,:)
   complex(psb_dpk_), intent(inout), target   :: y(:,:)
-  type (psb_z_sparse_mat), intent(in)        :: a
+  type (psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(psb_dpk_), intent(in), optional, target      :: diag(:)
@@ -339,7 +339,7 @@ end subroutine psb_zspsm
 !
 ! Arguments:   
 !    alpha   -  complex.               The scalar alpha.
-!    a       -  type(psb_z_sparse_mat). The sparse matrix containing A.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
 !    x(:)    -  complex                The input vector containing the entries of ( X ).
 !    beta    -  complex                The scalar beta.
 !    y(:)    -  complex                The input vector containing the entries of ( Y ).
@@ -361,7 +361,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_dpk_), intent(in)              :: alpha, beta
   complex(psb_dpk_), intent(in), target      :: x(:)
   complex(psb_dpk_), intent(inout), target   :: y(:)
-  type(psb_z_sparse_mat), intent(in)         :: a
+  type(psb_zspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(psb_dpk_), intent(in), optional, target    :: diag(:)

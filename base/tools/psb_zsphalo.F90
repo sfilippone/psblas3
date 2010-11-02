@@ -38,9 +38,9 @@
 !    
 ! 
 ! Arguments: 
-!    a        - type(psb_z_sparse_mat)   The local part of input matrix A
+!    a        - type(psb_zspmat_type)   The local part of input matrix A
 !    desc_a   - type(psb_desc_type).  The communication descriptor.
-!    blck     - type(psb_z_sparse_mat)   The local part of output matrix BLCK
+!    blck     - type(psb_zspmat_type)   The local part of output matrix BLCK
 !    info     - integer.                Return code
 !    rowcnv   - logical                 Should row/col indices be converted
 !    colcnv   - logical                 to/from global numbering when sent/received?
@@ -67,8 +67,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   include 'mpif.h'
 #endif
 
-  Type(psb_z_sparse_mat),Intent(in)    :: a
-  Type(psb_z_sparse_mat),Intent(inout) :: blk
+  Type(psb_zspmat_type),Intent(in)    :: a
+  Type(psb_zspmat_type),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in), target :: desc_a
   integer, intent(out)                :: info
   logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale

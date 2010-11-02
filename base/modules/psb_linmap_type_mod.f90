@@ -37,7 +37,7 @@
 !
 module psb_linmap_type_mod
   use psb_const_mod
-  use psb_mat_mod, only: psb_d_sparse_mat, psb_s_sparse_mat, psb_z_sparse_mat, psb_c_sparse_mat
+  use psb_mat_mod, only: psb_dspmat_type, psb_sspmat_type, psb_zspmat_type, psb_cspmat_type
   use psb_descriptor_type, only: psb_desc_type
   
 
@@ -57,28 +57,28 @@ module psb_linmap_type_mod
     integer, allocatable   :: itd_data(:), iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)    :: desc_X, desc_Y
-    type(psb_s_sparse_mat) :: map_X2Y, map_Y2X
+    type(psb_sspmat_type) :: map_X2Y, map_Y2X
   end type psb_slinmap_type
 
   type psb_dlinmap_type 
     integer, allocatable   :: itd_data(:), iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)    :: desc_X, desc_Y
-    type(psb_d_sparse_mat) :: map_X2Y, map_Y2X
+    type(psb_dspmat_type) :: map_X2Y, map_Y2X
   end type psb_dlinmap_type
 
   type psb_clinmap_type 
     integer, allocatable  :: itd_data(:), iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
-    type(psb_c_sparse_mat) :: map_X2Y, map_Y2X
+    type(psb_cspmat_type) :: map_X2Y, map_Y2X
   end type psb_clinmap_type
   
   type psb_zlinmap_type 
     integer, allocatable  :: itd_data(:), iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
-    type(psb_z_sparse_mat) :: map_X2Y, map_Y2X
+    type(psb_zspmat_type) :: map_X2Y, map_Y2X
   end type psb_zlinmap_type
 
 end module psb_linmap_type_mod

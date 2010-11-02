@@ -43,8 +43,8 @@ subroutine psb_csymbmm(a,b,c,info)
   use psb_sparse_mod, psb_protect_name => psb_csymbmm
   implicit none 
 
-  type(psb_c_sparse_mat), intent(in)    :: a,b
-  type(psb_c_sparse_mat), intent(out)   :: c
+  type(psb_cspmat_type), intent(in)    :: a,b
+  type(psb_cspmat_type), intent(out)   :: c
   integer, intent(out)                  :: info
   type(psb_c_csr_sparse_mat), allocatable :: ccsr
   integer               :: err_act

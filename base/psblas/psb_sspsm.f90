@@ -83,7 +83,7 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   real(psb_spk_), intent(in)              :: alpha, beta
   real(psb_spk_), intent(in), target      :: x(:,:)
   real(psb_spk_), intent(inout), target   :: y(:,:)
-  type (psb_s_sparse_mat), intent(in)        :: a
+  type (psb_sspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_spk_), intent(in), optional, target      :: diag(:)
@@ -362,7 +362,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   real(psb_spk_), intent(in)              :: alpha, beta
   real(psb_spk_), intent(in), target      :: x(:)
   real(psb_spk_), intent(inout), target   :: y(:)
-  type(psb_s_sparse_mat), intent(in)         :: a
+  type(psb_sspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_spk_), intent(in), optional, target    :: diag(:)

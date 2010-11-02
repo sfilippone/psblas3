@@ -47,7 +47,7 @@
   !                                           BICGSTABL
   !                                           RGMRES
   !                                           
-  !    a      -  type(psb_z_sparse_mat)      Input: sparse matrix containing A.
+  !    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
   !    prec   -  class(psb_zprec_type)       Input: preconditioner
   !    b      -  complex,dimension(:)         Input: vector containing the
   !                                           right hand side B
@@ -83,7 +83,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   use psb_krylov_mod, psb_protect_name => psb_zkrylov 
 
   character(len=*)                   :: method
-  Type(psb_z_sparse_mat), Intent(in)  :: a
+  Type(psb_zspmat_type), Intent(in)  :: a
   Type(psb_desc_type), Intent(in)    :: desc_a
   class(psb_zprec_type), intent(in)   :: prec 
   complex(psb_dpk_), Intent(in)    :: b(:)
@@ -97,9 +97,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   interface 
     subroutine psb_zcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      type(psb_z_sparse_mat), intent(in)  :: a
+      type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)    :: b(:)
       complex(psb_dpk_), intent(inout) :: x(:)
@@ -112,9 +112,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcg
     subroutine psb_zbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      type(psb_z_sparse_mat), intent(in)  :: a
+      type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)      :: b(:)
       complex(psb_dpk_), intent(inout)   :: x(:)
@@ -127,9 +127,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zbicg
     subroutine psb_zcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      type(psb_z_sparse_mat), intent(in)  :: a
+      type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
       complex(psb_dpk_), intent(inout)    :: x(:)
@@ -142,9 +142,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcgstab
     Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      Type(psb_z_sparse_mat), Intent(in)  :: a
+      Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_zprec_type), intent(in)   :: prec 
       complex(psb_dpk_), Intent(in)    :: b(:)
@@ -157,9 +157,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcgstabl
     Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      Type(psb_z_sparse_mat), Intent(in)  :: a
+      Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       class(psb_zprec_type), intent(in)   :: prec 
       complex(psb_dpk_), Intent(in)    :: b(:)
@@ -172,9 +172,9 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zrgmres
     subroutine psb_zcgs(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
-      type(psb_z_sparse_mat), intent(in)  :: a
+      type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
       complex(psb_dpk_), intent(inout)    :: x(:)

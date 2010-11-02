@@ -44,8 +44,8 @@ subroutine psb_znumbmm(a,b,c)
   use psb_sparse_mod, psb_protect_name => psb_znumbmm
   implicit none 
 
-  type(psb_z_sparse_mat), intent(in) :: a,b
-  type(psb_z_sparse_mat), intent(inout)  :: c
+  type(psb_zspmat_type), intent(in) :: a,b
+  type(psb_zspmat_type), intent(inout)  :: c
   integer               :: info
   integer               :: err_act
   character(len=*), parameter ::  name='psb_numbmm'

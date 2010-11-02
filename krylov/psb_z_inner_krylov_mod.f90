@@ -56,7 +56,7 @@ contains
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace, itmax
-    type(psb_z_sparse_mat), intent(in) :: a
+    type(psb_zspmat_type), intent(in) :: a
     complex(psb_dpk_), intent(in)   :: b(:)
     real(psb_dpk_), intent(in)      :: eps
     type(psb_desc_type), intent(in)   :: desc_a

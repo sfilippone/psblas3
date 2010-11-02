@@ -45,7 +45,7 @@ function psb_cnrmi(a,desc_a,info)
   use psb_sparse_mod, psb_protect_name => psb_cnrmi
   implicit none
 
-  type(psb_c_sparse_mat), intent(in)   :: a
+  type(psb_cspmat_type), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_spk_)                    :: psb_cnrmi

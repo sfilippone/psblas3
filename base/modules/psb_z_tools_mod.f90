@@ -69,9 +69,9 @@ Module psb_z_tools_mod
     Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
-      Type(psb_z_sparse_mat),Intent(in)    :: a
-      Type(psb_z_sparse_mat),Intent(inout) :: blk
+      use psb_mat_mod, only : psb_zspmat_type
+      Type(psb_zspmat_type),Intent(in)    :: a
+      Type(psb_zspmat_type),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
       integer, intent(out)                :: info
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -124,9 +124,9 @@ Module psb_z_tools_mod
   interface psb_cdbldext
     Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      Use psb_mat_mod, only : psb_z_sparse_mat
+      Use psb_mat_mod, only : psb_zspmat_type
       integer, intent(in)                     :: novr
-      Type(psb_z_sparse_mat), Intent(in)       :: a
+      Type(psb_zspmat_type), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
@@ -137,9 +137,9 @@ Module psb_z_tools_mod
   interface psb_spall
     subroutine psb_zspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_z_sparse_mat), intent(inout) :: a
+      type(psb_zspmat_type), intent(inout) :: a
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_zspalloc
@@ -148,8 +148,8 @@ Module psb_z_tools_mod
   interface psb_spasb
     subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat, psb_z_base_sparse_mat
-      type(psb_z_sparse_mat), intent (inout)   :: a
+      use psb_mat_mod, only : psb_zspmat_type, psb_z_base_sparse_mat
+      type(psb_zspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
@@ -161,9 +161,9 @@ Module psb_z_tools_mod
   interface psb_spfree
     subroutine psb_zspfree(a, desc_a,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_z_sparse_mat), intent(inout)       ::a
+      type(psb_zspmat_type), intent(inout)       ::a
       integer, intent(out)        :: info
     end subroutine psb_zspfree
   end interface
@@ -172,9 +172,9 @@ Module psb_z_tools_mod
   interface psb_spins
     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       type(psb_desc_type), intent(inout)   :: desc_a
-      type(psb_z_sparse_mat), intent(inout) :: a
+      type(psb_zspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_dpk_), intent(in)      :: val(:)
       integer, intent(out)                 :: info
@@ -182,10 +182,10 @@ Module psb_z_tools_mod
     end subroutine psb_zspins
     subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
-      type(psb_z_sparse_mat), intent(inout) :: a
+      type(psb_zspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_dpk_), intent(in)        :: val(:)
       integer, intent(out)                 :: info
@@ -196,9 +196,9 @@ Module psb_z_tools_mod
   interface psb_sprn
     subroutine psb_zsprn(a, desc_a,info,clear)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_z_sparse_mat
+      use psb_mat_mod, only : psb_zspmat_type
       type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_z_sparse_mat), intent(inout) :: a
+      type(psb_zspmat_type), intent(inout) :: a
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: clear
     end subroutine psb_zsprn
@@ -228,7 +228,7 @@ Module psb_z_tools_mod
 !!$    use psb_penv_mod
 !!$    use psb_error_mod
 !!$    implicit none 
-!!$    type(psb_z_sparse_mat), intent(out) :: a_map
+!!$    type(psb_zspmat_type), intent(out) :: a_map
 !!$    type(psb_desc_type), intent(out)   :: cd_xt
 !!$    type(psb_desc_type), intent(in)    :: descin, descout 
 !!$
@@ -261,7 +261,7 @@ Module psb_z_tools_mod
 !!$    integer, intent(in)                  :: nz
 !!$    integer, intent(in)                  :: ir(:),ic(:)
 !!$    complex(psb_dpk_), intent(in)      :: val(:)
-!!$    type(psb_z_sparse_mat), intent(inout) :: a_map
+!!$    type(psb_zspmat_type), intent(inout) :: a_map
 !!$    type(psb_desc_type), intent(inout)   :: cd_xt
 !!$    type(psb_desc_type), intent(in)      :: descin, descout 
 !!$    integer :: info
@@ -276,7 +276,7 @@ Module psb_z_tools_mod
 !!$    use psb_descriptor_type
 !!$    use psb_serial_mod
 !!$    implicit none 
-!!$    type(psb_z_sparse_mat), intent(inout)   :: a_map
+!!$    type(psb_zspmat_type), intent(inout)   :: a_map
 !!$    type(psb_desc_type), intent(inout)     :: cd_xt
 !!$    type(psb_desc_type), intent(in)        :: descin, descout 
 !!$    character(len=*), optional, intent(in) :: afmt

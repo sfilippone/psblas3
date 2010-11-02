@@ -39,7 +39,7 @@ module psb_c_base_prec_mod
   use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
-       & psb_c_sparse_mat
+       & psb_cspmat_type
 
   use psb_prec_const_mod
 
@@ -137,7 +137,7 @@ contains
     use psb_sparse_mod
     Implicit None
     
-    type(psb_c_sparse_mat), intent(in), target :: a
+    type(psb_cspmat_type), intent(in), target :: a
     type(psb_desc_type), intent(in), target  :: desc_a
     class(psb_c_base_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info

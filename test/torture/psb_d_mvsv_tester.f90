@@ -6,7 +6,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -82,7 +82,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -158,7 +158,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -234,7 +234,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -310,7 +310,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -386,7 +386,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -462,7 +462,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -538,7 +538,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -614,7 +614,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -690,7 +690,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -766,7 +766,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -842,7 +842,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -918,7 +918,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -994,7 +994,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1070,7 +1070,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1146,7 +1146,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1222,7 +1222,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1298,7 +1298,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1374,7 +1374,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1450,7 +1450,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1526,7 +1526,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1602,7 +1602,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1678,7 +1678,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1754,7 +1754,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1830,7 +1830,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1909,7 +1909,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -1988,7 +1988,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2067,7 +2067,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2146,7 +2146,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2225,7 +2225,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2304,7 +2304,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2383,7 +2383,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2462,7 +2462,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2541,7 +2541,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2620,7 +2620,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1
@@ -2699,7 +2699,7 @@ contains
     use psb_sparse_mod
     implicit none
     character(len=*) :: afmt
-    type(psb_d_sparse_mat) :: a
+    type(psb_dspmat_type) :: a
     type(psb_desc_type)   :: desc_a
     integer            :: ictxt, iam=-1, np=-1
     integer            :: info=-1

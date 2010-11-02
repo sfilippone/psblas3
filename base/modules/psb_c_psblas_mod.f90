@@ -193,9 +193,9 @@ module psb_c_psblas_mod
   interface psb_spnrmi
     function psb_cnrmi(a, desc_a,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_c_sparse_mat
+      use psb_mat_mod, only : psb_cspmat_type
       real(psb_spk_)                    :: psb_cnrmi
-      type(psb_c_sparse_mat), intent (in) :: a
+      type(psb_cspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)                :: info
     end function psb_cnrmi
@@ -205,8 +205,8 @@ module psb_c_psblas_mod
     subroutine psb_cspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_c_sparse_mat
-      type(psb_c_sparse_mat), intent(in)    :: a
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(in)    :: a
       complex(psb_spk_), intent(inout)     :: x(:,:)
       complex(psb_spk_), intent(inout)     :: y(:,:)
       complex(psb_spk_), intent(in)        :: alpha, beta
@@ -220,8 +220,8 @@ module psb_c_psblas_mod
     subroutine psb_cspmv(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_c_sparse_mat
-      type(psb_c_sparse_mat), intent(in)    :: a
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(in)    :: a
       complex(psb_spk_), intent(inout)     :: x(:)
       complex(psb_spk_), intent(inout)     :: y(:)
       complex(psb_spk_), intent(in)        :: alpha, beta
@@ -238,8 +238,8 @@ module psb_c_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, n, jx, jy, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      use psb_mat_mod, only : psb_c_sparse_mat
-      type(psb_c_sparse_mat), intent(in)      :: t
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(in)      :: t
       complex(psb_spk_), intent(in)          :: x(:,:)
       complex(psb_spk_), intent(inout)       :: y(:,:)
       complex(psb_spk_), intent(in)          :: alpha, beta
@@ -255,8 +255,8 @@ module psb_c_psblas_mod
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_ 
-      use psb_mat_mod, only : psb_c_sparse_mat
-      type(psb_c_sparse_mat), intent(in)      :: t
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(in)      :: t
       complex(psb_spk_), intent(in)          :: x(:)
       complex(psb_spk_), intent(inout)       :: y(:)
       complex(psb_spk_), intent(in)          :: alpha, beta

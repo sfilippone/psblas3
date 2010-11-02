@@ -98,7 +98,7 @@ module psb_s_linmap_mod
       implicit none 
       type(psb_slinmap_type)         :: psb_s_linmap    
       type(psb_desc_type), target       :: desc_X, desc_Y
-      type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+      type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
       integer, intent(in)               :: map_kind
       integer, intent(in), optional     :: iaggr(:), naggr(:)
     end function psb_s_linmap
@@ -203,7 +203,7 @@ contains
     implicit none 
     type(psb_slinmap_type), intent(out) :: out_map    
     type(psb_desc_type), target       :: desc_X, desc_Y
-    type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+    type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
     integer, intent(in)               :: map_kind
     integer, intent(in), optional     :: iaggr(:), naggr(:)
     out_map = psb_linmap(map_kind,desc_X,desc_Y,map_X2Y,map_Y2X,iaggr,naggr)

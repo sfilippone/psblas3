@@ -90,14 +90,14 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_s_sparse_mat, psb_desc_type, psb_spk_
+      use psb_sparse_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_
       implicit none
 
       ! parameters
-      type(psb_s_sparse_mat)      :: a_glob
+      type(psb_sspmat_type)      :: a_glob
       real(psb_spk_)             :: b_glob(:)
       integer                    :: ictxt
-      type(psb_s_sparse_mat)      :: a
+      type(psb_sspmat_type)      :: a
       real(psb_spk_), allocatable  :: b(:)
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
@@ -174,14 +174,14 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_d_sparse_mat, psb_dpk_, psb_desc_type
+      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type
       implicit none
 
       ! parameters
-      type(psb_d_sparse_mat)      :: a_glob
+      type(psb_dspmat_type)      :: a_glob
       real(psb_dpk_)             :: b_glob(:)
       integer                    :: ictxt
-      type(psb_d_sparse_mat)      :: a
+      type(psb_dspmat_type)      :: a
       real(psb_dpk_), allocatable  :: b(:)
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
@@ -259,14 +259,14 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_c_sparse_mat, psb_spk_, psb_desc_type
+      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type
       implicit none
 
       ! parameters
-      type(psb_c_sparse_mat)      :: a_glob
+      type(psb_cspmat_type)      :: a_glob
       complex(psb_spk_)          :: b_glob(:)
       integer                    :: ictxt
-      type(psb_c_sparse_mat)      :: a
+      type(psb_cspmat_type)      :: a
       complex(psb_spk_), allocatable  :: b(:)
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
@@ -344,14 +344,14 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_z_sparse_mat, psb_dpk_, psb_desc_type
+      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type
       implicit none
 
       ! parameters
-      type(psb_z_sparse_mat)      :: a_glob
+      type(psb_zspmat_type)      :: a_glob
       complex(psb_dpk_)          :: b_glob(:)
       integer                    :: ictxt
-      type(psb_z_sparse_mat)      :: a
+      type(psb_zspmat_type)      :: a
       complex(psb_dpk_), allocatable  :: b(:)
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
