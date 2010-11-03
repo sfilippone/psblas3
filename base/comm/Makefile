@@ -8,7 +8,7 @@ OBJS =  psb_dgather.o psb_dhalo.o psb_dovrl.o \
 
 
 MPFOBJS=psb_dscatter.o psb_zscatter.o psb_iscatter.o psb_cscatter.o psb_sscatter.o\
-	psb_dspgather.o
+	psb_dspgather.o psb_sspgather.o psb_zspgather.o psb_cspgather.o
 LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).

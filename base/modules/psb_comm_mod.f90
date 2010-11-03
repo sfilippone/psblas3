@@ -313,6 +313,39 @@ module psb_comm_mod
       integer, intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_dsp_allgather
+    subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      use psb_descriptor_type
+      use psb_mat_mod
+      implicit none
+      type(psb_sspmat_type), intent(inout) :: loca
+      type(psb_sspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_ssp_allgather
+    subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      use psb_descriptor_type
+      use psb_mat_mod
+      implicit none
+      type(psb_zspmat_type), intent(inout) :: loca
+      type(psb_zspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_zsp_allgather
+    subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      use psb_descriptor_type
+      use psb_mat_mod
+      implicit none
+      type(psb_cspmat_type), intent(inout) :: loca
+      type(psb_cspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_csp_allgather
     subroutine  psb_igatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       integer, intent(in)             :: locx(:,:)

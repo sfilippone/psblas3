@@ -1,11 +1,10 @@
 !
 program d_matgen
   use psb_sparse_mod
-!!$  use psb_prec_mod
-!!$  use psb_krylov_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod
   use psb_d_mat_mod
+  use psb_d_cxx_mat_mod
   implicit none
 
   ! input parameters
@@ -31,6 +30,7 @@ program d_matgen
   integer            :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
+  class(psb_d_cxx_sparse_mat), allocatable :: acxx
 
   ! other variables
   integer            :: info, err_act
@@ -61,7 +61,7 @@ program d_matgen
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info)  
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -121,7 +121,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info)
+  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info,mold)
     !
     !   discretize the partial diferential equation
     ! 
@@ -139,12 +139,12 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_sparse_mod
-    use psb_d_cxx_mat_mod
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
     real(psb_dpk_), allocatable    :: b(:),xv(:)
     type(psb_desc_type)            :: desc_a
+    class(psb_d_base_sparse_mat), allocatable :: mold
     integer                        :: ictxt, info
     character                      :: afmt*5
     type(psb_dspmat_type)    :: a
@@ -158,7 +158,6 @@ contains
     type(psb_dspmat_type)     :: a_n
     class(psb_d_coo_sparse_mat), allocatable :: acoo
     class(psb_d_csr_sparse_mat), allocatable :: acsr
-    class(psb_d_cxx_sparse_mat), allocatable :: acxx
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah, anorm
@@ -170,7 +169,6 @@ contains
 
     character(len=20)  :: name, ch_err
 
-    allocate(psb_d_cxx_sparse_mat :: acxx)
     allocate(psb_d_csr_sparse_mat :: acsr)
     info = psb_success_
     name = 'create_matrix'
@@ -373,7 +371,7 @@ contains
     end if
 !!$    call a_n%print(19)
     t1 = psb_wtime()
-    call a_n%cscnv(info,mold=acxx)
+    call a_n%cscnv(info,mold=mold)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
