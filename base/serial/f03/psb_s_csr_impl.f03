@@ -2533,6 +2533,7 @@ end subroutine psb_s_mv_csr_from_fmt
 
 subroutine psb_s_cp_csr_from_fmt(a,b,info) 
   use psb_const_mod
+  use psb_realloc_mod
   use psb_s_base_mat_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_cp_csr_from_fmt
   implicit none 
@@ -2557,9 +2558,9 @@ subroutine psb_s_cp_csr_from_fmt(a,b,info)
 
   type is (psb_s_csr_sparse_mat) 
     call a%psb_s_base_sparse_mat%cp_from(b%psb_s_base_sparse_mat)
-    a%irp = b%irp
-    a%ja  = b%ja
-    a%val = b%val
+    call psb_safe_cpy( b%irp, a%irp , info)
+    call psb_safe_cpy( b%ja , a%ja  , info)
+    call psb_safe_cpy( b%val, a%val , info)
 
   class default
     call b%cp_to_coo(tmp,info)

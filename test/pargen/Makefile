@@ -25,9 +25,6 @@ spde: spde.o
 	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv spde $(EXEDIR)
 
-.f90.o:
-	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
-
 
 clean: 
 	/bin/rm -f ppde.o spde.o  $(EXEDIR)/ppde 
