@@ -30,8 +30,8 @@ program d_matgen
   integer            :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
-  class(psb_d_cxx_sparse_mat), allocatable :: acxx
-
+  type(psb_d_cxx_sparse_mat) :: acxx
+  
   ! other variables
   integer            :: info, err_act
   character(len=20)  :: name,ch_err
@@ -50,7 +50,7 @@ program d_matgen
   if(psb_get_errstatus() /= 0) goto 9999
 
   call psb_set_errverbosity(2)
-
+  
   !
   !  get parameters
   !
@@ -144,7 +144,7 @@ contains
     integer, parameter             :: nb=20
     real(psb_dpk_), allocatable    :: b(:),xv(:)
     type(psb_desc_type)            :: desc_a
-    class(psb_d_base_sparse_mat), allocatable :: mold
+    class(psb_d_base_sparse_mat)   :: mold
     integer                        :: ictxt, info
     character                      :: afmt*5
     type(psb_dspmat_type)    :: a
