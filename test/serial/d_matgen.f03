@@ -7,6 +7,7 @@ program d_matgen
   use psb_d_cxx_mat_mod
   use psb_d_cyy_mat_mod
   use psb_d_czz_mat_mod
+  use psb_d_rsb_mat_mod
   implicit none
 
   ! input parameters
@@ -32,8 +33,9 @@ program d_matgen
   integer            :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
-  !type(psb_d_cyy_sparse_mat) :: acyy
-  !type(psb_d_czz_sparse_mat) :: aczz
+  type(psb_d_rsb_sparse_mat) :: arsb
+  type(psb_d_cyy_sparse_mat) :: acyy
+  type(psb_d_czz_sparse_mat) :: aczz
   type(psb_d_cxx_sparse_mat) :: acxx
   
   ! other variables
@@ -68,6 +70,7 @@ program d_matgen
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acyy)  
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,aczz)  
   call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
+  !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,arsb)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
