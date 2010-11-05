@@ -21,6 +21,8 @@ d_coo_matgen: d_coo_matgen.o
 	/bin/mv d_coo_matgen $(EXEDIR)	
 psb_d_cxx_impl.o d_matgen.o: psb_d_cxx_mat_mod.o 
 psb_d_cyy_impl.o d_matgen.o: psb_d_cyy_mat_mod.o 
+d_matgen.o: psb_d_czz_mat_mod.o 
+psb_d_rsb_mat_mod.o:  rsb_mod.o 
 psb_d_rsb_impl.o d_matgen.o: psb_d_rsb_mat_mod.o  rsb_mod.o 
 d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  psb_d_czz_mat_mod.o psb_d_rsb_mat_mod.o
 	$(F90LINK) $(LINKOPT) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  psb_d_czz_mat_mod.o  psb_d_rsb_mat_mod.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
