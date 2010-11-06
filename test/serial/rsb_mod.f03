@@ -1,6 +1,7 @@
 module rsb_mod
   use iso_c_binding
 
+! module constants:
 
 interface
 integer(c_int) function &
@@ -35,7 +36,7 @@ type(c_ptr) function &
   &(VAc,IAc,JAc,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_const')
 use iso_c_binding
- real(c_double) :: VAc(*)
+ type(c_ptr), value  :: VAc
  integer(c_int) :: IAc(*)
  integer(c_int) :: JAc(*)
  integer(c_int), value  :: nnz
@@ -206,9 +207,43 @@ integer(c_int) function &
   &bind(c,name='rsb_infinity_norm')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: infinity_norm
+ real(c_double) :: infinity_norm
  integer(c_int), value  :: transa
  end function rsb_infinity_norm
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_one_norm&
+  &(matrix,infinity_norm,transa)&
+  &bind(c,name='rsb_one_norm')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: infinity_norm
+ integer(c_int), value  :: transa
+ end function rsb_one_norm
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_absolute_rows_sums&
+  &(matrix,d)&
+  &bind(c,name='rsb_absolute_rows_sums')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_absolute_rows_sums
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_absolute_columns_sums&
+  &(matrix,d)&
+  &bind(c,name='rsb_absolute_columns_sums')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_absolute_columns_sums
 end interface
 
 interface
@@ -276,8 +311,8 @@ integer(c_int) function &
   &bind(c,name='rsb_spmm_sxsx')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: b
- type(c_ptr), value  :: c
+ real(c_double) :: b(*)
+ real(c_double) :: c(*)
  integer(c_int), value  :: ldb
  integer(c_int), value  :: ldc
  integer(c_int), value  :: nrhs
@@ -290,12 +325,48 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_spmm&
+  &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
+  &bind(c,name='rsb_spmm')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: b(*)
+ real(c_double) :: c(*)
+ integer(c_int), value  :: ldb
+ integer(c_int), value  :: ldc
+ integer(c_int), value  :: nrhs
+ integer(c_int), value  :: transa
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: order
+ end function rsb_spmm
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spsm&
+  &(matrix,b,ldb,nrhs,transt,alphap,betap,order)&
+  &bind(c,name='rsb_spsm')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: b(*)
+ integer(c_int), value  :: ldb
+ integer(c_int), value  :: nrhs
+ integer(c_int), value  :: transt
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: order
+ end function rsb_spsm
+end interface
+
+interface
+integer(c_int) function &
   &rsb_spsm_sxsx&
   &(matrix,b,ldb,nrhs,transt,alphap,betap,order)&
   &bind(c,name='rsb_spsm_sxsx')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: b
+ real(c_double) :: b(*)
  integer(c_int), value  :: ldb
  integer(c_int), value  :: nrhs
  integer(c_int), value  :: transt
@@ -371,9 +442,20 @@ integer(c_int) function &
   &bind(c,name='rsb_scal')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: d
+ real(c_double) :: d(*)
  integer(c_int), value  :: transa
  end function rsb_scal
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_scale_rows&
+  &(matrix,d)&
+  &bind(c,name='rsb_scale_rows')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_scale_rows
 end interface
 
 interface
@@ -446,7 +528,7 @@ integer(c_int) function &
   &bind(c,name='rsb_getdiag')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: diagonal
+ real(c_double) :: diagonal(*)
  end function rsb_getdiag
 end interface
 
@@ -457,7 +539,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_sub_diag')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: diagonal
+ real(c_double) :: diagonal(*)
  integer(c_int), value  :: loffset
  end function rsb_get_sub_diag
 end interface
@@ -469,7 +551,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_supra_diag')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- type(c_ptr), value  :: diagonal
+ real(c_double) :: diagonal(*)
  integer(c_int), value  :: uoffset
  end function rsb_get_supra_diag
 end interface
@@ -615,6 +697,16 @@ use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: alphap
  end function rsb_elemental_pow
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_psblas_trans_to_rsb_trans&
+  &(trans)&
+  &bind(c,name='rsb_psblas_trans_to_rsb_trans')
+use iso_c_binding
+ character(c_char), value  :: trans
+ end function rsb_psblas_trans_to_rsb_trans
 end interface
 
 interface
