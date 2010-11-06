@@ -20,9 +20,9 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: d_scal       => psb_d_rsb_scal
     procedure, pass(a) :: csnmi        => psb_d_rsb_csnmi
     procedure, pass(a) :: csnm1        => psb_d_rsb_csnm1
-!    procedure, pass(a) :: rowsum       => psb_d_rsb_rowsum
+    procedure, pass(a) :: rowsum       => psb_d_rsb_rowsum
     procedure, pass(a) :: arwsum       => psb_d_rsb_arwsum
-!    procedure, pass(a) :: colsum       => psb_d_rsb_colsum
+    procedure, pass(a) :: colsum       => psb_d_rsb_colsum
     procedure, pass(a) :: aclsum       => psb_d_rsb_aclsum
 !    procedure, pass(a) :: reallocate_nz => psb_d_rsb_reallocate_nz ! FIXME
 !    procedure, pass(a) :: allocate_mnnz => psb_d_rsb_allocate_mnnz ! FIXME
@@ -38,12 +38,12 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: get_diag     => psb_d_rsb_get_diag
 !    procedure, pass(a) :: csgetptn     => psb_d_rsb_csgetptn
 !    procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
-!    procedure, pass(a) :: get_nz_row   => d_rsb_get_nz_row
-!    procedure, pass(a) :: reinit       => psb_d_rsb_reinit
+    procedure, pass(a) :: get_nz_row   => d_rsb_get_nz_row
+    procedure, pass(a) :: reinit       => psb_d_rsb_reinit
     procedure, pass(a) :: trim         => psb_d_rsb_trim
     procedure, pass(a) :: print        => psb_d_rsb_print
     procedure, pass(a) :: free         => d_rsb_free
-!    procedure, pass(a) :: mold         => psb_d_rsb_mold
+    procedure, pass(a) :: mold         => psb_d_rsb_mold
 !    procedure, pass(a) :: psb_d_rsb_cp_from
 !    generic, public    :: cp_from => psb_d_rsb_cp_from
 !    procedure, pass(a) :: psb_d_rsb_mv_from
@@ -252,6 +252,71 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   nc=min(size(x,2),size(y,2) )
   info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,order))
 end subroutine
+
+subroutine psb_d_rsb_rowsum(d,a) 
+  use psb_sparse_mod
+  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)             :: d(:)
+  integer :: info
+  info=d_rsb_to_psb_info(rsb_rows_sums(a%rsbmptr,d))
+end subroutine psb_d_rsb_rowsum
+
+subroutine psb_d_rsb_colsum(d,a) 
+  use psb_sparse_mod
+  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)             :: d(:)
+  integer :: info
+  info=d_rsb_to_psb_info(rsb_columns_sums(a%rsbmptr,d))
+end subroutine psb_d_rsb_colsum
+
+subroutine psb_d_rsb_mold(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(in)  :: a
+  class(psb_d_base_sparse_mat), intent(out), allocatable  :: b
+  integer, intent(out)                    :: info
+  Integer :: err_act
+  character(len=20)  :: name='reallocate_nz'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  
+  allocate(psb_d_rsb_sparse_mat :: b, stat=info)
+
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_ 
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+  return
+9999 continue
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+end subroutine psb_d_rsb_mold
+
+subroutine psb_d_rsb_reinit(a,clear)
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a   
+  logical, intent(in), optional :: clear
+  Integer :: info
+  info=d_rsb_to_psb_info(rsb_reinit(a%rsbmptr))
+end subroutine psb_d_rsb_reinit
+
+
+  function  d_rsb_get_nz_row(idx,a) result(res)
+    implicit none
+    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: idx
+    integer                              :: res
+    integer                              :: info
+    res=0
+    res=rsb_get_rows_nnz(a%rsbmptr,idx-1,idx-1,info)
+    info=d_rsb_to_psb_info(info)
+    if(info.ne.0.0)res=0
+  end function d_rsb_get_nz_row
+
 
 #endif
 end module psb_d_rsb_mat_mod

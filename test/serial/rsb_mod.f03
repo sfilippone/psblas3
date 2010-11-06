@@ -46,7 +46,7 @@ use iso_c_binding
  integer(c_int), value  :: Mb
  integer(c_int), value  :: Kb
  integer(c_int), value  :: flags
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_allocate_rsb_sparse_matrix_const
 end interface
 
@@ -226,6 +226,28 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_rows_sums&
+  &(matrix,d)&
+  &bind(c,name='rsb_rows_sums')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_rows_sums
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_columns_sums&
+  &(matrix,d)&
+  &bind(c,name='rsb_columns_sums')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_columns_sums
+end interface
+
+interface
+integer(c_int) function &
   &rsb_absolute_rows_sums&
   &(matrix,d)&
   &bind(c,name='rsb_absolute_rows_sums')
@@ -388,7 +410,7 @@ use iso_c_binding
  type(c_ptr), value  :: matrixb
  real(c_double) :: betap
  integer(c_int), value  :: transb
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_matrix_sum
 end interface
 
@@ -404,7 +426,7 @@ use iso_c_binding
  type(c_ptr), value  :: matrixb
  real(c_double) :: betap
  integer(c_int), value  :: transb
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_matrix_mul
 end interface
 
@@ -577,7 +599,7 @@ use iso_c_binding
  type(c_ptr), value  :: matrix
  integer(c_int), value  :: fr
  integer(c_int), value  :: lr
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_get_rows_nnz
 end interface
 
@@ -736,7 +758,7 @@ type(c_ptr) function &
   &bind(c,name='rsb_load_matrix_file_as_binary')
 use iso_c_binding
  type(c_ptr), value  :: filename
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_load_matrix_file_as_binary
 end interface
 
@@ -771,7 +793,7 @@ use iso_c_binding
  type(c_ptr), value  :: filename
  integer(c_int), value  :: flags
  integer(c_int), value  :: typecode
- type(c_ptr), value  :: errvalp
+ integer(c_int) :: errvalp
  end function rsb_load_matrix_file_as_matrix_market
 end interface
 end module rsb_mod
