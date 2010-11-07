@@ -607,6 +607,22 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_get_block_nnz&
+  &(matrix,fr,lr,fc,lc,flags,errvalp)&
+  &bind(c,name='rsb_get_block_nnz')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: fr
+ integer(c_int), value  :: lr
+ integer(c_int), value  :: fc
+ integer(c_int), value  :: lc
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_get_block_nnz
+end interface
+
+interface
+integer(c_int) function &
   &rsb_get_rows_sparse&
   &(matrix,VA,fr,lr,IA,JA,rnz,flags)&
   &bind(c,name='rsb_get_rows_sparse')
@@ -620,6 +636,47 @@ use iso_c_binding
  integer(c_int) :: rnz
  integer(c_int), value  :: flags
  end function rsb_get_rows_sparse
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_block_sparse_pattern&
+  &(matrix,fr,lr,fc,lc,IA,JA,IREN,JREN,rnz,flags)&
+  &bind(c,name='rsb_get_block_sparse_pattern')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: fr
+ integer(c_int), value  :: lr
+ integer(c_int), value  :: fc
+ integer(c_int), value  :: lc
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ type(c_ptr), value  :: IREN
+ type(c_ptr), value  :: JREN
+ integer(c_int) :: rnz
+ integer(c_int), value  :: flags
+ end function rsb_get_block_sparse_pattern
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_block_sparse&
+  &(matrix,VA,fr,lr,fc,lc,IA,JA,IREN,JREN,rnz,flags)&
+  &bind(c,name='rsb_get_block_sparse')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int), value  :: fr
+ integer(c_int), value  :: lr
+ integer(c_int), value  :: fc
+ integer(c_int), value  :: lc
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ type(c_ptr), value  :: IREN
+ type(c_ptr), value  :: JREN
+ integer(c_int) :: rnz
+ integer(c_int), value  :: flags
+ end function rsb_get_block_sparse
 end interface
 
 interface

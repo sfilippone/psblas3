@@ -49,8 +49,8 @@ module psb_d_rsb_mat_mod
 !    procedure, pass(a) :: mv_from_fmt  => psb_d_mv_rsb_from_fmt
 !    procedure, pass(a) :: csput        => psb_d_rsb_csput
     procedure, pass(a) :: get_diag     => psb_d_rsb_get_diag
-!    procedure, pass(a) :: csgetptn     => psb_d_rsb_csgetptn
-!    procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
+    procedure, pass(a) :: csgetptn     => psb_d_rsb_csgetptn
+    procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
     procedure, pass(a) :: get_nz_row   => d_rsb_get_nz_row
     procedure, pass(a) :: reinit       => psb_d_rsb_reinit
     procedure, pass(a) :: trim         => psb_d_rsb_trim
@@ -508,7 +508,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     goto 9999
   end if
 
-    nzin_=rsb_get_rows_nnz(a%rsbmptr,imin,imax,c_f_index,info)
+    nzin_=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_f_index,info)
     ! FIXME: unfinished; missing error handling ..
 
     call psb_ensure_size(nzin_,ia,info)
@@ -516,7 +516,8 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     if (info == psb_success_) call psb_ensure_size(nzin_,val,info)
     if (info /= psb_success_) return
     
-    info=d_rsb_to_psb_info(rsb_get_rows_sparse(a%rsbmptr,val,imin,imax,ia,ja,nzin_,c_f_index))
+    info=d_rsb_to_psb_info(rsb_get_block_sparse&
+    &(a%rsbmptr,val,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_f_index))
     ! FIXME: unfinished; missing error handling ..
 
 9999 continue
@@ -528,5 +529,53 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   end if
 
   end subroutine psb_d_rsb_csgetrow
+
+subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  use psb_sparse_mod
+  implicit none
+
+  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  integer, intent(in)                  :: imin,imax
+  integer, intent(out)                 :: nz
+  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  integer,intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer, intent(in), optional        :: iren(:)
+  integer, intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer :: nzin_, jmin_, jmax_, err_act, i
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+    if (append) then 
+      nzin_ = nzin
+    else
+      nzin_ = 0
+    endif
+
+    !nzt = ..
+    nz = 0 
+
+    call psb_ensure_size(nzin_,ia,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
+
+    if (info /= psb_success_) return
+    nzin_=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_f_index,info)
+    ! FIXME: unfinished; missing error handling ..
+
+    call psb_ensure_size(nzin_,ia,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
+    if (info /= psb_success_) return
+    
+    info=d_rsb_to_psb_info(rsb_get_block_sparse_pattern&
+    &(a%rsbmptr,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_f_index))
+    ! FIXME: unfinished; missing error handling ..
+end subroutine psb_d_rsb_csgetptn
+
+
+
 #endif
 end module psb_d_rsb_mat_mod
