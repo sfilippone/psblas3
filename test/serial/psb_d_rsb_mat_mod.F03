@@ -1,9 +1,22 @@
+!
+!
+! FIXME:
+! * some RSB constants are used in their value form, and with no explanation
+! * error handling
+! * PSBLAS interface adherence
+! * should test and fix all the problems that for sure will occur
+! * ..
+! 
 module psb_d_rsb_mat_mod
   use psb_d_base_mat_mod
   use rsb_mod
 #ifdef HAVE_LIBRSB
     use iso_c_binding  
 #endif
+  integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
+  integer :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
+  integer :: c_d_typecode=0 ! FIXME: here should use ..
+  integer :: c_def_flags =0 ! FIXME: here should use ..
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr
@@ -26,9 +39,9 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: aclsum       => psb_d_rsb_aclsum
 !    procedure, pass(a) :: reallocate_nz => psb_d_rsb_reallocate_nz ! FIXME
 !    procedure, pass(a) :: allocate_mnnz => psb_d_rsb_allocate_mnnz ! FIXME
-!    procedure, pass(a) :: cp_to_coo    => psb_d_cp_rsb_to_coo
-!    procedure, pass(a) :: cp_from_coo  => psb_d_cp_rsb_from_coo
-!    procedure, pass(a) :: cp_to_fmt    => psb_d_cp_rsb_to_fmt
+    procedure, pass(a) :: cp_to_coo    => psb_d_cp_rsb_to_coo
+    procedure, pass(a) :: cp_from_coo  => psb_d_cp_rsb_from_coo
+    procedure, pass(a) :: cp_to_fmt    => psb_d_cp_rsb_to_fmt
 !    procedure, pass(a) :: cp_from_fmt  => psb_d_cp_rsb_from_fmt
 !    procedure, pass(a) :: mv_to_coo    => psb_d_mv_rsb_to_coo
 !    procedure, pass(a) :: mv_from_coo  => psb_d_mv_rsb_from_coo
@@ -220,7 +233,6 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
 
   character :: trans_
   integer :: ldy,ldx,nc
-  integer :: order=2 ! FIXME
 
   if (present(trans)) then
     trans_ = trans
@@ -229,7 +241,7 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
   end if
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
-  info=d_rsb_to_psb_info(rsb_spmm(a%rsbmptr,x,y,ldx,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,order))
+  info=d_rsb_to_psb_info(rsb_spmm(a%rsbmptr,x,y,ldx,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
 end subroutine psb_d_rsb_csmm
 
 subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans) 
@@ -240,7 +252,6 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), intent(inout)       :: y(:,:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
-  integer :: order=2 ! FIXME
   integer :: ldy,ldx,nc
   character :: trans_
   if (present(trans)) then
@@ -250,7 +261,7 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   end if
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
-  info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,order))
+  info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
 end subroutine
 
 subroutine psb_d_rsb_rowsum(d,a) 
@@ -316,6 +327,91 @@ end subroutine psb_d_rsb_reinit
     info=d_rsb_to_psb_info(info)
     if(info.ne.0.0)res=0
   end function d_rsb_get_nz_row
+
+subroutine psb_d_cp_rsb_to_coo(a,b,info) 
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(in)  :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer, intent(out)                      :: info
+
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+  info = psb_success_
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nza = a%get_nzeros()
+  call b%allocate(nr,nc,nza)
+  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+  info=d_rsb_to_psb_info(rsb_get_coo(a%rsbmptr,b%val,b%ia,b%ja,c_f_index))
+  call b%set_nzeros(a%get_nzeros())
+  call b%fix(info)
+end subroutine psb_d_cp_rsb_to_coo
+
+subroutine psb_d_cp_rsb_to_fmt(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+
+  class(psb_d_rsb_sparse_mat), intent(in)   :: a
+  class(psb_d_base_sparse_mat), intent(inout) :: b
+  integer, intent(out)                       :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%cp_to_coo(b,info)
+
+  type is (psb_d_rsb_sparse_mat) 
+    call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)! FIXME: ?
+    b%rsbmptr=rsb_clone(a%rsbmptr) ! FIXME is thi enough ?
+    ! FIXME: error handling needed here
+
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+end subroutine psb_d_cp_rsb_to_fmt
+
+subroutine psb_d_cp_rsb_from_coo(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(in)    :: b
+  integer, intent(out)                        :: info
+
+  type(psb_d_coo_sparse_mat)   :: tmp
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+
+   info = psb_success_
+   ! This is to have fix_coo called behind the scenes
+   call b%cp_to_coo(tmp,info)
+   if (info == psb_success_) call a%mv_from_coo(tmp,info)
+   a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
+  &(tmp%val,tmp%ia,tmp%ja,tmp%get_nzeros(),c_d_typecode,tmp%get_nrows(),tmp%get_ncols(),1,1,c_def_flags,info)
+    info=d_rsb_to_psb_info(info)
+   ! FIXME: should destroy tmp ?
+end subroutine psb_d_cp_rsb_from_coo
+
 
 
 #endif

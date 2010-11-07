@@ -36,7 +36,7 @@ type(c_ptr) function &
   &(VAc,IAc,JAc,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_const')
 use iso_c_binding
- type(c_ptr), value  :: VAc
+ real(c_double) :: VAc(*)
  integer(c_int) :: IAc(*)
  integer(c_int) :: JAc(*)
  integer(c_int), value  :: nnz
@@ -523,13 +523,14 @@ end interface
 interface
 integer(c_int) function &
   &rsb_get_coo&
-  &(matrix,VA,IA,JA)&
+  &(matrix,VA,IA,JA,flags)&
   &bind(c,name='rsb_get_coo')
 use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
  end function rsb_get_coo
 end interface
 
