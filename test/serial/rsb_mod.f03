@@ -782,6 +782,35 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_set_elements&
+  &(matrix,VA,IA,JA,nnz)&
+  &bind(c,name='rsb_set_elements')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ end function rsb_set_elements
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_update_elements&
+  &(matrix,VA,IA,JA,nnz,flags)&
+  &bind(c,name='rsb_update_elements')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: flags
+ end function rsb_update_elements
+end interface
+
+interface
+integer(c_int) function &
   &rsb_psblas_trans_to_rsb_trans&
   &(trans)&
   &bind(c,name='rsb_psblas_trans_to_rsb_trans')

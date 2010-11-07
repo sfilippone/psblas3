@@ -17,6 +17,7 @@ module psb_d_rsb_mat_mod
   integer :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
   integer :: c_d_typecode=0 ! FIXME: here should use ..
   integer :: c_def_flags =0 ! FIXME: here should use ..
+  integer :: c_upd_flags =0 ! FIXME: here should use ..
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr
@@ -43,11 +44,11 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: cp_from_coo  => psb_d_cp_rsb_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_d_cp_rsb_to_fmt
     procedure, pass(a) :: cp_from_fmt  => psb_d_cp_rsb_from_fmt
-!    procedure, pass(a) :: mv_to_coo    => psb_d_mv_rsb_to_coo
-!    procedure, pass(a) :: mv_from_coo  => psb_d_mv_rsb_from_coo
-!    procedure, pass(a) :: mv_to_fmt    => psb_d_mv_rsb_to_fmt
-!    procedure, pass(a) :: mv_from_fmt  => psb_d_mv_rsb_from_fmt
-!    procedure, pass(a) :: csput        => psb_d_rsb_csput
+    procedure, pass(a) :: mv_to_coo    => psb_d_mv_rsb_to_coo
+    procedure, pass(a) :: mv_from_coo  => psb_d_mv_rsb_from_coo
+    procedure, pass(a) :: mv_to_fmt    => psb_d_mv_rsb_to_fmt
+    procedure, pass(a) :: mv_from_fmt  => psb_d_mv_rsb_from_fmt
+    procedure, pass(a) :: csput        => psb_d_rsb_csput
     procedure, pass(a) :: get_diag     => psb_d_rsb_get_diag
     procedure, pass(a) :: csgetptn     => psb_d_rsb_csgetptn
     procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
@@ -57,10 +58,10 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: print        => psb_d_rsb_print
     procedure, pass(a) :: free         => d_rsb_free
     procedure, pass(a) :: mold         => psb_d_rsb_mold
-!    procedure, pass(a) :: psb_d_rsb_cp_from
-!    generic, public    :: cp_from => psb_d_rsb_cp_from
-!    procedure, pass(a) :: psb_d_rsb_mv_from
-!    generic, public    :: mv_from => psb_d_rsb_mv_from
+    procedure, pass(a) :: psb_d_rsb_cp_from
+    generic, public    :: cp_from => psb_d_rsb_cp_from
+    procedure, pass(a) :: psb_d_rsb_mv_from
+    generic, public    :: mv_from => psb_d_rsb_mv_from
 
 #endif
   end type
@@ -575,6 +576,90 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     ! FIXME: unfinished; missing error handling ..
 end subroutine psb_d_rsb_csgetptn
 
+subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_sparse_mod
+  implicit none 
+
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  real(psb_dpk_), intent(in)      :: val(:)
+  integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer, intent(out)            :: info
+  integer, intent(in), optional   :: gtl(:)
+
+
+  Integer            :: err_act
+  character(len=20)  :: name='d_rsb_csput'
+  logical, parameter :: debug=.false.
+  integer            :: nza, i,j,k, nzl, isza, int_err(5)
+  info=d_rsb_to_psb_info(rsb_update_elements(a%rsbmptr,val,ia,ja,nz,c_upd_flags))
+end subroutine psb_d_rsb_csput
+
+subroutine psb_d_mv_rsb_to_coo(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout)   :: b
+  integer, intent(out)                        :: info
+  call psb_d_cp_rsb_to_coo(a,b,info)
+  call d_rsb_free(a) 
+end subroutine psb_d_mv_rsb_to_coo
+
+    subroutine psb_d_mv_rsb_to_fmt(a,b,info) 
+      class(psb_d_rsb_sparse_mat), intent(inout) :: a
+      class(psb_d_base_sparse_mat), intent(inout)  :: b
+      integer, intent(out)                        :: info
+  call psb_d_cp_rsb_to_fmt(a,b,info)
+  call d_rsb_free(a)
+    end subroutine psb_d_mv_rsb_to_fmt
+  
+subroutine psb_d_mv_rsb_from_fmt(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(inout)  :: a
+  class(psb_d_base_sparse_mat), intent(inout) :: b
+  integer, intent(out)                         :: info
+  type(psb_d_coo_sparse_mat) :: tmp
+  info = psb_success_
+  select type (b)
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+end subroutine psb_d_mv_rsb_from_fmt
+
+subroutine psb_d_mv_rsb_from_coo(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer, intent(out)                        :: info
+  call a%cp_from_coo(b,info)
+  call b%free()
+end subroutine psb_d_mv_rsb_from_coo
+
+subroutine psb_d_rsb_cp_from(a,b)
+  use psb_sparse_mod
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  type(psb_d_rsb_sparse_mat), intent(in)   :: b
+  Integer :: info
+  type(psb_d_coo_sparse_mat) :: tmp
+  call b%cp_to_coo(tmp,info)
+  call a%mv_from_coo(tmp,info)
+  call tmp%free()
+end subroutine psb_d_rsb_cp_from
+
+subroutine psb_d_rsb_mv_from(a,b)
+  use psb_sparse_mod
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  type(psb_d_rsb_sparse_mat), intent(inout)   :: b
+  Integer :: info
+  type(psb_d_coo_sparse_mat) :: tmp
+  call b%mv_to_coo(tmp,info)
+  call a%mv_from_coo(tmp,info)
+end subroutine psb_d_rsb_mv_from
 
 
 #endif
