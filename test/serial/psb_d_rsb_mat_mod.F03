@@ -42,7 +42,7 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: cp_to_coo    => psb_d_cp_rsb_to_coo
     procedure, pass(a) :: cp_from_coo  => psb_d_cp_rsb_from_coo
     procedure, pass(a) :: cp_to_fmt    => psb_d_cp_rsb_to_fmt
-!    procedure, pass(a) :: cp_from_fmt  => psb_d_cp_rsb_from_fmt
+    procedure, pass(a) :: cp_from_fmt  => psb_d_cp_rsb_from_fmt
 !    procedure, pass(a) :: mv_to_coo    => psb_d_mv_rsb_to_coo
 !    procedure, pass(a) :: mv_from_coo  => psb_d_mv_rsb_from_coo
 !    procedure, pass(a) :: mv_to_fmt    => psb_d_mv_rsb_to_fmt
@@ -323,9 +323,9 @@ end subroutine psb_d_rsb_reinit
     integer                              :: res
     integer                              :: info
     res=0
-    res=rsb_get_rows_nnz(a%rsbmptr,idx-1,idx-1,info)
+    res=rsb_get_rows_nnz(a%rsbmptr,idx,idx,c_f_index,info)
     info=d_rsb_to_psb_info(info)
-    if(info.ne.0.0)res=0
+    if(info.ne.0)res=0
   end function d_rsb_get_nz_row
 
 subroutine psb_d_cp_rsb_to_coo(a,b,info) 
@@ -338,7 +338,6 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   !locals
   logical             :: rwshr_
   Integer             :: nza, nr, nc,i,j,irw, idl,err_act
-  Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
   info = psb_success_
@@ -364,7 +363,6 @@ subroutine psb_d_cp_rsb_to_fmt(a,b,info)
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -398,7 +396,6 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
   !locals
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -412,7 +409,124 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
    ! FIXME: should destroy tmp ?
 end subroutine psb_d_cp_rsb_from_coo
 
+subroutine psb_d_cp_rsb_from_fmt(a,b,info) 
+  use psb_sparse_mod
+  implicit none 
+
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_d_base_sparse_mat), intent(in)   :: b
+  integer, intent(out)                        :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nz, nr, i,j,irw, idl,err_act, nc
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%cp_from_coo(b,info)
+
+  type is (psb_d_rsb_sparse_mat) 
+    call b%cp_to_fmt(a,info)  ! FIXME
+    ! FIXME: missing error handling 
+
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+end subroutine psb_d_cp_rsb_from_fmt
 
 
+subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  use psb_sparse_mod
+  implicit none
+
+  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  integer, intent(in)                  :: imin,imax
+  integer, intent(out)                 :: nz
+  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  integer,intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer, intent(in), optional        :: iren(:)
+  integer, intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer :: nzin_, jmin_, jmax_, err_act, i
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+  ! FIXME: MISSING THE HANDLING OF OPTIONS, HERE
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+
+  if ((imax<imin).or.(jmax_<jmin_)) then 
+    nz = 0
+    return
+  end if
+
+  if (present(append)) then
+    append_=append
+  else
+    append_=.false.
+  endif
+  if ((append_).and.(present(nzin))) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = psb_err_many_optional_arg_
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+
+    nzin_=rsb_get_rows_nnz(a%rsbmptr,imin,imax,c_f_index,info)
+    ! FIXME: unfinished; missing error handling ..
+
+    call psb_ensure_size(nzin_,ia,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_,val,info)
+    if (info /= psb_success_) return
+    
+    info=d_rsb_to_psb_info(rsb_get_rows_sparse(a%rsbmptr,val,imin,imax,ia,ja,nzin_,c_f_index))
+    ! FIXME: unfinished; missing error handling ..
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+  end subroutine psb_d_rsb_csgetrow
 #endif
 end module psb_d_rsb_mat_mod
