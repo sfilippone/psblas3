@@ -1406,7 +1406,7 @@ Optional Packages:
   --with-blas=<lib>       use BLAS library <lib>
   --with-lapack=<lib>     use LAPACK library <lib>
   --with-rsb              Specify Recursive Sparse BLAS library linkage (or
-                          the output of librsb-config)
+                          the output of librsb-config --static --ldflags)
   --with-metis=LIB        Specify -lMETISLIBNAME or the absolute library
                           filename.
 
