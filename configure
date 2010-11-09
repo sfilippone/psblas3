@@ -1405,7 +1405,8 @@ Optional Packages:
                           prepend to [MODULE_PATH]
   --with-blas=<lib>       use BLAS library <lib>
   --with-lapack=<lib>     use LAPACK library <lib>
-  --with-rsb              Specify Recursive Sparse BLAS library
+  --with-rsb              Specify Recursive Sparse BLAS library linkage (or
+                          the output of librsb-config)
   --with-metis=LIB        Specify -lMETISLIBNAME or the absolute library
                           filename.
 
@@ -8783,8 +8784,13 @@ else
 fi
 
 if test x$want_rsb_libs != x ; then
+	if test x$want_rsb_libs = xyes ; then
+	want_rsb_libs="`librsb-config --static --ldflags`"
+	else
 	# FIXME ! temporary for OpenMP
-	want_rsb_libs="`/usr/local/bin/librsb-config --static --ldflags` -fopenmp $want_rsb_libs"
+	#want_rsb_libs="`/usr/local/bin/librsb-config --static --ldflags` -fopenmp $want_rsb_libs"
+	true
+	fi
 fi
 RSB_LIBS="$want_rsb_libs"
 LIBS="$RSB_LIBS ${LIBS}"
