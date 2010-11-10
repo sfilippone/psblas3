@@ -652,15 +652,18 @@ PAC_MAKE_IS_GNUMAKE
 # Note : also umfdi_local_search, ...
 #AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
 
-AC_ARG_WITH(rsb, AC_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage (or the output of librsb-config  --static --ldflags)]), [if test x$withval = xno; then
-want_rsb_libs= ; else if test x$withval = xyes ; then want_rsb_libs=-lrsb ; else want_rsb_libs="$withval" ; fi ; FDEFINES="$psblas_cv_define_prepend-DHAVE_LIBRSB $FDEFINES" ; fi], [want_rsb_libs=""])
+AC_ARG_WITH(rsb, AC_HELP_STRING([--with-rsb], [Specify Recursive Sparse BLAS library linkage info (that is, the output of librsb-config  --static --ldflags, or a directory where the usual bin/include/lib subdirs with a regular RSB installation resides, or nothing to make the configure script invoke librsb-config)]), [if test x$withval = xno; then
+want_rsb_libs= ; else if test x$withval = xyes ; then want_rsb_libs=yes ; else want_rsb_libs="$withval" ; fi ; fi], [want_rsb_libs=""])
 if test x$want_rsb_libs != x ; then
 	if test x$want_rsb_libs = xyes ; then
-	want_rsb_libs="`librsb-config --static --ldflags`"
+		want_rsb_libs="`librsb-config --static --ldflags`"
 	else
-	# FIXME ! temporary for OpenMP
-	#want_rsb_libs="`/usr/local/bin/librsb-config --static --ldflags` -fopenmp $want_rsb_libs"
-	true
+		if test -d "$want_rsb_libs" ; then
+			want_rsb_libs="`$want_rsb_libs/bin/librsb-config --static --ldflags`"
+		else
+			true;
+			# we assume want_rsb_libs are linkage parameters
+		fi
 	fi
 fi
 RSB_LIBS="$want_rsb_libs"
