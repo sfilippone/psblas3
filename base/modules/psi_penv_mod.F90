@@ -271,7 +271,11 @@ contains
 ! !$        call psb_error(ictxt)
 ! !$      endif
 ! !$    endif
-#if !defined(SERIAL_MPI)
+#if defined(SERIAL_MPI)
+    ! Under serial mode, CLOSE has no effect, but reclaim
+    ! the used ICTXT number. 
+    nctxt = max(0, nctxt - 1)    
+#else 
     if (close_) then 
       call psb_close_all_context(psb_mesg_queue)
     else
