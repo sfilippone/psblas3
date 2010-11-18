@@ -1241,7 +1241,7 @@ subroutine psb_d_csr_colsum(d,a)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      d(k) = d(k) + (a%val(k))
+      d(k) = d(k) + (a%val(j))
     end do
   end do
 
@@ -1293,7 +1293,7 @@ subroutine psb_d_csr_aclsum(d,a)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      d(k) = d(k) + abs(a%val(k))
+      d(k) = d(k) + abs(a%val(j))
     end do
   end do
 
