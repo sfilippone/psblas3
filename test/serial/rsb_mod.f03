@@ -144,15 +144,15 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_spmv_na&
+  &rsb_spmv_unua&
   &(matrix,x,y,transa)&
-  &bind(c,name='rsb_spmv_na')
+  &bind(c,name='rsb_spmv_unua')
 use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: x(*)
  real(c_double) :: y(*)
  integer(c_int), value  :: transa
- end function rsb_spmv_na
+ end function rsb_spmv_unua
 end interface
 
 interface
@@ -170,9 +170,9 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_spmv_xx&
+  &rsb_spmv_uxux&
   &(matrix,x,y,alphap,betap,transa)&
-  &bind(c,name='rsb_spmv_xx')
+  &bind(c,name='rsb_spmv_uxux')
 use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: x(*)
@@ -180,7 +180,7 @@ use iso_c_binding
  real(c_double) :: alphap
  real(c_double) :: betap
  integer(c_int), value  :: transa
- end function rsb_spmv_xx
+ end function rsb_spmv_uxux
 end interface
 
 interface
@@ -270,48 +270,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_spmm_az&
-  &(matrix,mrhs,mout,bstride,cstride,nrhs,transa)&
-  &bind(c,name='rsb_spmm_az')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- type(c_ptr), value  :: mrhs
- type(c_ptr), value  :: mout
- integer(c_int), value  :: bstride
- integer(c_int), value  :: cstride
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transa
- end function rsb_spmm_az
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spsv_azl&
-  &(matrix,y,transl)&
-  &bind(c,name='rsb_spsv_azl')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: y(*)
- integer(c_int), value  :: transl
- end function rsb_spsv_azl
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spsv_sxsx&
-  &(matrix,y,alphap,incx,transl)&
-  &bind(c,name='rsb_spsv_sxsx')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: y(*)
- real(c_double) :: alphap
- integer(c_int), value  :: incx
- integer(c_int), value  :: transl
- end function rsb_spsv_sxsx
-end interface
-
-interface
-integer(c_int) function &
   &rsb_spsv&
   &(matrix,x,y,alphap,incx,incy,transl)&
   &bind(c,name='rsb_spsv')
@@ -324,6 +282,22 @@ use iso_c_binding
  integer(c_int), value  :: incy
  integer(c_int), value  :: transl
  end function rsb_spsv
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spmm_az&
+  &(matrix,mrhs,mout,bstride,cstride,nrhs,transa)&
+  &bind(c,name='rsb_spmm_az')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ type(c_ptr), value  :: mrhs
+ type(c_ptr), value  :: mout
+ integer(c_int), value  :: bstride
+ integer(c_int), value  :: cstride
+ integer(c_int), value  :: nrhs
+ integer(c_int), value  :: transa
+ end function rsb_spmm_az
 end interface
 
 interface
@@ -379,23 +353,6 @@ use iso_c_binding
  real(c_double) :: betap
  integer(c_int), value  :: order
  end function rsb_spsm
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spsm_sxsx&
-  &(matrix,b,ldb,nrhs,transt,alphap,betap,order)&
-  &bind(c,name='rsb_spsm_sxsx')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: b(*)
- integer(c_int), value  :: ldb
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transt
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: order
- end function rsb_spsm_sxsx
 end interface
 
 interface

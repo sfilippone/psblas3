@@ -44,6 +44,9 @@ program d_matgen
 
   info=psb_success_
 
+  info=rsb_init()
+  if(info/=psb_success_)info=psb_err_from_subroutine_
+  if(info/=psb_success_)goto 9999
 
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
@@ -69,8 +72,8 @@ program d_matgen
   t1 = psb_wtime()
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acyy)  
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,aczz)  
-  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
-  !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,arsb)  
+  !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,arsb)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -381,6 +384,7 @@ contains
 !!$    call a_n%print(19)
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=mold)
+   stop
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
