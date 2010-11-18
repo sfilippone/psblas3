@@ -1100,7 +1100,7 @@ function psb_d_csr_csnm1(a) result(res)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      vt(k) = vt(k) + abs(a%val(k))
+      vt(k) = vt(k) + abs(a%val(j))
     end do
   end do
   res = maxval(vt(1:n))
