@@ -207,7 +207,7 @@ integer(c_int) function &
   &bind(c,name='rsb_infinity_norm')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- real(c_double) :: infinity_norm
+ real(c_double) :: infinity_norm(*)
  integer(c_int), value  :: transa
  end function rsb_infinity_norm
 end interface
@@ -215,11 +215,11 @@ end interface
 interface
 integer(c_int) function &
   &rsb_one_norm&
-  &(matrix,infinity_norm,transa)&
+  &(matrix,one_norm,transa)&
   &bind(c,name='rsb_one_norm')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- real(c_double) :: infinity_norm
+ real(c_double) :: one_norm(*)
  integer(c_int), value  :: transa
  end function rsb_one_norm
 end interface

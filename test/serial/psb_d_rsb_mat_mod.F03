@@ -10,6 +10,7 @@
 module psb_d_rsb_mat_mod
   use psb_d_base_mat_mod
   use rsb_mod
+#define HAVE_LIBRSB 1
 #ifdef HAVE_LIBRSB
     use iso_c_binding  
 #endif
@@ -20,8 +21,8 @@ module psb_d_rsb_mat_mod
 #endif
   integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
   integer :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
-  integer :: c_d_typecode=0 ! FIXME: here should use ..
-  integer :: c_def_flags =0 ! FIXME: here should use ..
+  integer :: c_d_typecode=68 ! FIXME: here should use ..
+  integer :: c_def_flags =-2080358268+4096 ! FIXME: here should use ..
   integer :: c_upd_flags =0 ! FIXME: here should use ..
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
@@ -59,7 +60,7 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
     procedure, pass(a) :: get_nz_row   => d_rsb_get_nz_row
     procedure, pass(a) :: reinit       => psb_d_rsb_reinit
-    procedure, pass(a) :: trim         => psb_d_rsb_trim
+    procedure, pass(a) :: trim         => psb_d_rsb_trim ! evil
     procedure, pass(a) :: print        => psb_d_rsb_print
     procedure, pass(a) :: free         => d_rsb_free
     procedure, pass(a) :: mold         => psb_d_rsb_mold
@@ -79,7 +80,7 @@ module psb_d_rsb_mat_mod
   function d_rsb_to_psb_info(info) result(res)
     implicit none 
     integer :: res,info
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
     res=info
   end function d_rsb_to_psb_info
 
@@ -87,7 +88,7 @@ module psb_d_rsb_mat_mod
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
     integer :: res
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
     res=rsb_get_matrix_nnz(a%rsbmptr)
   end function d_rsb_get_nzeros
 
@@ -95,15 +96,16 @@ module psb_d_rsb_mat_mod
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
     character(len=5) :: res
-    PSBRSB_DEBUG('')
-    res = 'RSB'
+    !the following printout is harmful, here, if happening during a write :) (causes a deadlock)
+    !PSBRSB_DEBUG('')
+    res = 'RSB  '
   end function d_rsb_get_fmt
   
   function d_rsb_get_size(a) result(res)
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
     integer :: res
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
     res = d_rsb_get_nzeros(a)
   end function d_rsb_get_size
 
@@ -111,7 +113,7 @@ module psb_d_rsb_mat_mod
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
     res=rsb_sizeof(a%rsbmptr)
   end function d_rsb_sizeof
 
@@ -179,14 +181,14 @@ end subroutine psb_d_rsb_scal
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(inout) :: a
     type(c_ptr) :: dummy
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('freeing RSB matrix')
     dummy=rsb_free_sparse_matrix(a%rsbmptr)
   end subroutine d_rsb_free
 
 subroutine  psb_d_rsb_trim(a)
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
   ! FIXME: this is supposed to remain empty for RSB
 end subroutine  psb_d_rsb_trim
 
@@ -207,26 +209,31 @@ end subroutine  psb_d_rsb_trim
       class(psb_d_rsb_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)     :: d(:)
       integer, intent(out)            :: info
-    PSBRSB_DEBUG('')
+      !PSBRSB_DEBUG('')
       info=rsb_getdiag(a%rsbmptr,d)
     end subroutine psb_d_rsb_get_diag
   
 function psb_d_rsb_csnmi(a) result(res)
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_)         :: res
+  real(psb_dpk_),target         :: res
+  real(psb_dpk_)         :: resa(1)
   integer             :: info
     PSBRSB_DEBUG('')
-  info=rsb_infinity_norm(a%rsbmptr,res,rsb_psblas_trans_to_rsb_trans('N'))
+  info=rsb_infinity_norm(a%rsbmptr,resa,rsb_psblas_trans_to_rsb_trans('N'))
+  !info=rsb_infinity_norm(a%rsbmptr,c_loc(res),rsb_psblas_trans_to_rsb_trans('N'))
+  res=resa(1)
 end function psb_d_rsb_csnmi
 
 function psb_d_rsb_csnm1(a) result(res)
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
+  real(psb_dpk_)         :: resa(1)
   integer             :: info
     PSBRSB_DEBUG('')
-  info=rsb_one_norm(a%rsbmptr,res,rsb_psblas_trans_to_rsb_trans('N'))
+  info=rsb_one_norm(a%rsbmptr,resa,rsb_psblas_trans_to_rsb_trans('N'))
+  !info=rsb_one_norm(a%rsbmptr,res,rsb_psblas_trans_to_rsb_trans('N'))
 end function psb_d_rsb_csnm1
 
 subroutine psb_d_rsb_aclsum(d,a) 
@@ -423,7 +430,6 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
   class(psb_d_coo_sparse_mat), intent(in)    :: b
   integer, intent(out)                        :: info
 
-  type(psb_d_coo_sparse_mat)   :: tmp
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
@@ -434,10 +440,9 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
 
    info = psb_success_
    ! This is to have fix_coo called behind the scenes
-   call b%cp_to_coo(tmp,info)
-   if (info == psb_success_) call a%mv_from_coo(tmp,info)
+   !write (*,*) b%val
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
-  &(tmp%val,tmp%ia,tmp%ja,tmp%get_nzeros(),c_d_typecode,tmp%get_nrows(),tmp%get_ncols(),1,1,c_def_flags,info)
+  &(b%val,b%ia,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags,info)
     info=d_rsb_to_psb_info(info)
    ! FIXME: should destroy tmp ?
 end subroutine psb_d_cp_rsb_from_coo
@@ -639,7 +644,7 @@ subroutine psb_d_mv_rsb_to_coo(a,b,info)
   integer, intent(out)                        :: info
     PSBRSB_DEBUG('')
   call psb_d_cp_rsb_to_coo(a,b,info)
-  call d_rsb_free(a) 
+  call a%free()
 end subroutine psb_d_mv_rsb_to_coo
 
     subroutine psb_d_mv_rsb_to_fmt(a,b,info) 

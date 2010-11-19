@@ -384,7 +384,7 @@ contains
 !!$    call a_n%print(19)
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=mold)
-   stop
+   
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -424,6 +424,8 @@ contains
       call a_n%get_diag(diag,info) 
     end if
 !!$
+   !write (*,*) acxx%val
+   !write (*,*) diag
     
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acsr)

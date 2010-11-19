@@ -42,7 +42,8 @@ clean:
 	 psb_d_czz_mat_mod.o   \
 	 psb_d_rsb_mat_mod.o   \
 	 psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  \
-	 psb_d_cxx_mat_mod.o psb_d_cxx_impl.o *$(.mod) 
+	 psb_d_cxx_mat_mod.o psb_d_cxx_impl.o *$(.mod)  \
+	 rsb_mod.o
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
