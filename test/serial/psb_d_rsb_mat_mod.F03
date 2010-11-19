@@ -10,7 +10,6 @@
 module psb_d_rsb_mat_mod
   use psb_d_base_mat_mod
   use rsb_mod
-#define HAVE_LIBRSB 1
 #ifdef HAVE_LIBRSB
     use iso_c_binding  
 #endif

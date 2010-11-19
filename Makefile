@@ -34,6 +34,9 @@ clean:
 	(cd krylov; $(MAKE) clean)
 	(cd util; $(MAKE) clean)
 
+check: all
+	make check -C test/serial
+
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 veryclean: cleanlib

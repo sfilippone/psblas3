@@ -22,6 +22,9 @@ clean:
 	(cd krylov; make clean)
 	(cd util; make clean)
 
+check: library
+	make check -C test/serial
+
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 veryclean: cleanlib

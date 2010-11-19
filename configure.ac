@@ -665,6 +665,7 @@ if test x$want_rsb_libs != x ; then
 			# we assume want_rsb_libs are linkage parameters
 		fi
 	fi
+	FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_LIBRSB"
 fi
 RSB_LIBS="$want_rsb_libs"
 LIBS="$RSB_LIBS ${LIBS}"
