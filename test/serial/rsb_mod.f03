@@ -706,6 +706,26 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_get_matrix_n_rows&
+  &(matrix)&
+  &bind(c,name='rsb_get_matrix_n_rows')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_get_matrix_n_rows
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_matrix_n_columns&
+  &(matrix)&
+  &bind(c,name='rsb_get_matrix_n_columns')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_get_matrix_n_columns
+end interface
+
+interface
+integer(c_int) function &
   &rsb_elemental_scale&
   &(matrix,alphap)&
   &bind(c,name='rsb_elemental_scale')

@@ -19,9 +19,9 @@ module psb_d_rsb_mat_mod
 #define PSBRSB_DEBUG(MSG)
 #endif
   integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-  integer :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
-  integer :: c_d_typecode=68 ! FIXME: here should use ..
-  integer :: c_def_flags =-2080358268+4096 ! FIXME: here should use ..
+  integer,parameter :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
+  integer,parameter  :: c_d_typecode=68 ! FIXME: here should use ..
+  integer,parameter  :: c_def_flags =-2080358268+c_f_index ! FIXME: here should use ..
   integer :: c_upd_flags =0 ! FIXME: here should use ..
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
@@ -29,6 +29,8 @@ module psb_d_rsb_mat_mod
     contains 
     procedure, pass(a) :: get_size     => d_rsb_get_size
     procedure, pass(a) :: get_nzeros   => d_rsb_get_nzeros
+    procedure, pass(a) :: get_ncols   => d_rsb_get_ncols
+    procedure, pass(a) :: get_nrows   => d_rsb_get_nrows
     procedure, pass(a) :: get_fmt      => d_rsb_get_fmt
     procedure, pass(a) :: sizeof       => d_rsb_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_rsb_csmm
@@ -76,7 +78,17 @@ module psb_d_rsb_mat_mod
 #ifdef HAVE_LIBRSB
   contains 
 
-  function d_rsb_to_psb_info(info) result(res)
+  function psv_rsb_mat_init() result(res)
+    implicit none 
+    integer :: res
+    !PSBRSB_DEBUG('')
+    res=-1 ! FIXME
+#ifdef HAVE_LIBRSB
+    res=d_rsb_to_psb_info(rsb_init())
+#endif
+  end function psv_rsb_mat_init
+
+ function d_rsb_to_psb_info(info) result(res)
     implicit none 
     integer :: res,info
     !PSBRSB_DEBUG('')
@@ -91,13 +103,29 @@ module psb_d_rsb_mat_mod
     res=rsb_get_matrix_nnz(a%rsbmptr)
   end function d_rsb_get_nzeros
 
+  function d_rsb_get_nrows(a) result(res)
+    implicit none 
+    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    integer :: res
+    !PSBRSB_DEBUG('')
+    res=rsb_get_matrix_n_rows(a%rsbmptr)
+  end function d_rsb_get_nrows
+
+  function d_rsb_get_ncols(a) result(res)
+    implicit none 
+    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    integer :: res
+    !PSBRSB_DEBUG('')
+    res=rsb_get_matrix_n_columns(a%rsbmptr)
+  end function d_rsb_get_ncols
+
   function d_rsb_get_fmt(a) result(res)
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
     character(len=5) :: res
     !the following printout is harmful, here, if happening during a write :) (causes a deadlock)
     !PSBRSB_DEBUG('')
-    res = 'RSB  '
+    res = 'RSB'
   end function d_rsb_get_fmt
   
   function d_rsb_get_size(a) result(res)
@@ -385,7 +413,18 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
   info=d_rsb_to_psb_info(rsb_get_coo(a%rsbmptr,b%val,b%ia,b%ja,c_f_index))
   call b%set_nzeros(a%get_nzeros())
+  call b%set_nrows(a%get_nrows())
+  call b%set_ncols(a%get_ncols())
   call b%fix(info)
+  !write(*,*)b%val
+  !write(*,*)b%ia
+  !write(*,*)b%ja
+  !write(*,*)b%get_nrows()
+  !write(*,*)b%get_ncols()
+  !write(*,*)b%get_nzeros()
+  !write(*,*)a%get_nrows()
+  !write(*,*)a%get_ncols()
+  !write(*,*)a%get_nzeros()
 end subroutine psb_d_cp_rsb_to_coo
 
 subroutine psb_d_cp_rsb_to_fmt(a,b,info) 
