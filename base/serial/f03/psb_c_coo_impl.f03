@@ -21,15 +21,18 @@ subroutine psb_c_coo_get_diag(a,d,info)
     call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
     goto 9999
   end if
-  d(:) = zzero
+  d(:) = czero
 
-  do i=1,a%get_nzeros()
-    j=a%ia(i)
-    if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then 
-      d(j) = a%val(i)
-    endif
-  enddo
-
+  if (a%is_triangle().and.a%is_unit()) then 
+    d(1:mnm) = cone 
+  else
+    do i=1,a%get_nzeros()
+      j=a%ia(i)
+      if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then 
+        d(j) = a%val(i)
+      endif
+    enddo
+  end if
   call psb_erractionrestore(err_act)
   return
 

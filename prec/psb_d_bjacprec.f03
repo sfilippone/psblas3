@@ -1,11 +1,10 @@
 module psb_d_bjacprec
   use psb_d_base_prec_mod
-
   
-  type, extends(psb_d_base_prec_type) :: psb_d_bjac_prec_type
-    integer, allocatable                :: iprcparm(:)
+  type, extends(psb_d_base_prec_type)  :: psb_d_bjac_prec_type
+    integer, allocatable               :: iprcparm(:)
     type(psb_dspmat_type), allocatable :: av(:)
-    real(psb_dpk_), allocatable         :: d(:)
+    real(psb_dpk_), allocatable        :: d(:)
   contains
     procedure, pass(prec) :: apply     => psb_d_bjac_apply
     procedure, pass(prec) :: precbld   => psb_d_bjac_precbld
@@ -15,12 +14,14 @@ module psb_d_bjacprec
     procedure, pass(prec) :: precsetc  => psb_d_bjac_precsetc
     procedure, pass(prec) :: precfree  => psb_d_bjac_precfree
     procedure, pass(prec) :: precdescr => psb_d_bjac_precdescr
+    procedure, pass(prec) :: dump      => psb_d_bjac_dump
     procedure, pass(prec) :: sizeof    => psb_d_bjac_sizeof
   end type psb_d_bjac_prec_type
 
   private :: psb_d_bjac_apply, psb_d_bjac_precbld, psb_d_bjac_precseti,&
        & psb_d_bjac_precsetr, psb_d_bjac_precsetc, psb_d_bjac_sizeof,&
-       & psb_d_bjac_precinit, psb_d_bjac_precfree, psb_d_bjac_precdescr
+       & psb_d_bjac_precinit, psb_d_bjac_precfree, psb_d_bjac_precdescr,&
+       & psb_d_bjac_dump
   
 
   character(len=15), parameter, private :: &
@@ -240,6 +241,8 @@ contains
     ictxt=psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
 
+    call prec%set_ctxt(ictxt)
+
     m = a%get_nrows()
     if (m < 0) then
       info = psb_err_iarg_neg_
@@ -288,7 +291,8 @@ contains
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-
+      write(0,*) allocated(lf%irp),allocated(lf%ja),allocated(lf%val)
+      write(0,*) allocated(uf%irp),allocated(uf%ja),allocated(uf%val)
       if (allocated(prec%d)) then 
         if (size(prec%d) < n_row) then 
           deallocate(prec%d)
@@ -547,6 +551,46 @@ contains
     return
     
   end subroutine psb_d_bjac_precdescr
+
+
+  subroutine psb_d_bjac_dump(prec,info,prefix,head)
+    use psb_sparse_mod
+    implicit none 
+    class(psb_d_bjac_prec_type), intent(in) :: prec
+    integer, intent(out)                    :: info
+    character(len=*), intent(in), optional  :: prefix,head
+    integer :: i, j, il1, iln, lname, lev
+    integer :: ictxt,iam, np
+    character(len=80)  :: prefix_
+    character(len=120) :: fname ! len should be at least 20 more than
+
+    !  len of prefix_ 
+
+    info = 0
+    ictxt = prec%get_ctxt()
+    call psb_info(ictxt,iam,np)
+
+    if (present(prefix)) then 
+      prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
+    else
+      prefix_ = "dump_fact_d"
+    end if
+
+    lname = len_trim(prefix_)
+    fname = trim(prefix_)
+    write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
+    lname = lname + 5
+    write(fname(lname+1:),'(a)')'_lower.mtx'
+    if (prec%av(psb_l_pr_)%is_asb())  &
+         & call prec%av(psb_l_pr_)%print(fname,head=head)
+    write(fname(lname+1:),'(a,a)')'_diag.mtx'
+    if (allocated(prec%d)) &
+         & call psb_geprt(fname,prec%d,head=head)
+    write(fname(lname+1:),'(a)')'_upper.mtx'
+    if (prec%av(psb_u_pr_)%is_asb()) &
+         & call prec%av(psb_u_pr_)%print(fname,head=head)
+    
+  end subroutine psb_d_bjac_dump
 
   function psb_d_bjac_sizeof(prec) result(val)
     use psb_sparse_mod

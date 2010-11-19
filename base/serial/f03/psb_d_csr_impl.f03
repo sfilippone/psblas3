@@ -1337,14 +1337,19 @@ subroutine psb_d_csr_get_diag(a,d,info)
   end if
 
 
-  do i=1, mnm
-    do k=a%irp(i),a%irp(i+1)-1
-      j=a%ja(k)
-      if ((j == i) .and.(j <= mnm )) then 
-        d(i) = a%val(k)
-      endif
-    enddo
-  end do
+  if (a%is_triangle().and.a%is_unit()) then 
+    d(1:mnm) = done 
+  else
+    do i=1, mnm
+      d(i) = dzero
+      do k=a%irp(i),a%irp(i+1)-1
+        j=a%ja(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  end if
   do i=mnm+1,size(d) 
     d(i) = dzero
   end do
@@ -1559,7 +1564,7 @@ subroutine  psb_d_csr_allocate_mnnz(m,n,a,nz)
   if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
   if (info == psb_success_) call psb_realloc(nz_,a%val,info)
   if (info == psb_success_) then 
-    a%irp=0
+    a%irp = 0
     call a%set_nrows(m)
     call a%set_ncols(n)
     call a%set_bld()

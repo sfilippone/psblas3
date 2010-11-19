@@ -66,6 +66,10 @@ module psb_d_prec_type
     module procedure psb_file_prec_descr
   end interface
 
+  interface psb_precdump
+    module procedure psb_d_prec_dump
+  end interface
+
   interface psb_sizeof
     module procedure psb_dprec_sizeof
   end interface
@@ -117,6 +121,29 @@ contains
     call p%prec%precdescr(iout)
 
   end subroutine psb_file_prec_descr
+
+
+  subroutine psb_d_prec_dump(prec,info,prefix,head)
+    use psb_sparse_mod
+    implicit none 
+    type(psb_dprec_type), intent(in) :: prec
+    integer, intent(out)             :: info
+    character(len=*), intent(in), optional :: prefix,head
+    !  len of prefix_ 
+
+    info = 0
+
+    if (.not.allocated(prec%prec)) then 
+      info = -1
+      write(psb_err_unit,*) 'Trying to dump a non-built preconditioner'
+      return
+    end if
+    
+    call prec%prec%dump(info,prefix,head)
+    
+    
+  end subroutine psb_d_prec_dump
+
 
   subroutine psb_d_precfree(p,info)
     use psb_sparse_mod

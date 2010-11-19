@@ -47,7 +47,7 @@
 ! methods are implemented that allow the direct transition from one
 ! format to another. The psb_c_coo_sparse_mat type extends the
 ! psb_c_base_sparse_mat one.
-! but is supposed to be overridden at the leaf level.
+
 
 
 module psb_c_base_mat_mod

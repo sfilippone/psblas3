@@ -1321,14 +1321,19 @@ subroutine psb_d_csc_get_diag(a,d,info)
   end if
 
 
-  do i=1, mnm
-    do k=a%icp(i),a%icp(i+1)-1
-      j=a%ia(k)
-      if ((j == i) .and.(j <= mnm )) then 
-        d(i) = a%val(k)
-      endif
-    enddo
-  end do
+  if (a%is_triangle().and.a%is_unit()) then 
+    d(1:mnm) = done 
+  else
+    do i=1, mnm
+      d(i) = dzero
+      do k=a%icp(i),a%icp(i+1)-1
+        j=a%ia(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  endif
   do i=mnm+1,size(d) 
     d(i) = dzero
   end do

@@ -45,7 +45,10 @@ module psb_d_base_prec_mod
   use psb_prec_const_mod
 
   type psb_d_base_prec_type
+    integer :: ictxt
   contains
+    procedure, pass(prec) :: set_ctxt  => psb_d_base_set_ctxt
+    procedure, pass(prec) :: get_ctxt  => psb_d_base_get_ctxt
     procedure, pass(prec) :: apply     => psb_d_base_apply
     procedure, pass(prec) :: precbld   => psb_d_base_precbld
     procedure, pass(prec) :: precseti  => psb_d_base_precseti
@@ -56,11 +59,13 @@ module psb_d_base_prec_mod
     procedure, pass(prec) :: precinit  => psb_d_base_precinit
     procedure, pass(prec) :: precfree  => psb_d_base_precfree
     procedure, pass(prec) :: precdescr => psb_d_base_precdescr
+    procedure, pass(prec) :: dump      => psb_d_base_precdump
   end type psb_d_base_prec_type
 
   private :: psb_d_base_apply, psb_d_base_precbld, psb_d_base_precseti,&
        & psb_d_base_precsetr, psb_d_base_precsetc, psb_d_base_sizeof,&
-       & psb_d_base_precinit, psb_d_base_precfree, psb_d_base_precdescr
+       & psb_d_base_precinit, psb_d_base_precfree, psb_d_base_precdescr,&
+       & psb_d_base_precdump, psb_d_base_set_ctxt
   
 
 contains
@@ -339,6 +344,47 @@ contains
     
   end subroutine psb_d_base_precdescr
   
+  subroutine psb_d_base_precdump(prec,info,prefix,head)
+    use psb_sparse_mod
+    implicit none 
+    class(psb_d_base_prec_type), intent(in) :: prec
+    integer, intent(out)             :: info
+    character(len=*), intent(in), optional :: prefix,head
+    Integer :: err_act, nrow
+    character(len=20)  :: name='d_base_precdump'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psb_d_base_precdump
+
+  subroutine psb_d_base_set_ctxt(prec,ictxt)
+    use psb_sparse_mod
+    implicit none 
+    class(psb_d_base_prec_type), intent(inout) :: prec
+    integer, intent(in)  :: ictxt
+
+    prec%ictxt = ictxt
+
+  end subroutine psb_d_base_set_ctxt
 
   function psb_d_base_sizeof(prec) result(val)
     use psb_sparse_mod
@@ -348,5 +394,14 @@ contains
     val = 0
     return
   end function psb_d_base_sizeof
+
+  function psb_d_base_get_ctxt(prec) result(val)
+    use psb_sparse_mod
+    class(psb_d_base_prec_type), intent(in) :: prec
+    integer :: val
+    
+    val = prec%ictxt
+    return
+  end function psb_d_base_get_ctxt
 
 end module psb_d_base_prec_mod

@@ -37,7 +37,8 @@
 !
 module psb_linmap_type_mod
   use psb_const_mod
-  use psb_mat_mod, only: psb_dspmat_type, psb_sspmat_type, psb_zspmat_type, psb_cspmat_type
+  use psb_mat_mod, only: psb_dspmat_type, psb_sspmat_type,&
+       & psb_zspmat_type, psb_cspmat_type
   use psb_descriptor_type, only: psb_desc_type
   
 

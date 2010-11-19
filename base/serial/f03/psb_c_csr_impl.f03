@@ -1287,17 +1287,23 @@ subroutine psb_c_csr_get_diag(a,d,info)
   end if
 
 
-  do i=1, mnm
-    do k=a%irp(i),a%irp(i+1)-1
-      j=a%ja(k)
-      if ((j == i) .and.(j <= mnm )) then 
-        d(i) = a%val(k)
-      endif
-    enddo
-  end do
+  if (a%is_triangle().and.a%is_unit()) then 
+    d(1:mnm) = cone 
+  else
+    do i=1, mnm
+      d(i) = czero
+      do k=a%irp(i),a%irp(i+1)-1
+        j=a%ja(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  end if
   do i=mnm+1,size(d) 
-    d(i) = dzero
+    d(i) = czero
   end do
+
   call psb_erractionrestore(err_act)
   return
 

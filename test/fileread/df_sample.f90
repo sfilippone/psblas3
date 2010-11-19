@@ -272,6 +272,7 @@ program df_sample
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
   end if
+  call psb_precdump(prec,info,prefix=mtrx_file//'_')
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr /= 0) then 

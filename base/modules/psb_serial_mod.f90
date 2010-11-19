@@ -225,6 +225,34 @@ module psb_serial_mod
       logical,intent(in), optional                       :: rowscale
     end subroutine psb_zbase_rwextd
   end interface
+
+
+  interface psb_geprt
+    subroutine psb_dgeprtn2(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      real(psb_dpk_), intent(in)    :: a(:,:)
+      character(len=*), optional    :: head
+    end subroutine psb_dgeprtn2
+    subroutine psb_dgeprtn1(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      real(psb_dpk_), intent(in)    :: a(:)
+      character(len=*), optional    :: head
+    end subroutine psb_dgeprtn1
+    subroutine psb_dgeprt2(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      real(psb_dpk_), intent(in)     :: a(:,:)
+      character(len=*), optional     :: head
+    end subroutine psb_dgeprt2
+    subroutine psb_dgeprt1(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      real(psb_dpk_), intent(in)     :: a(:)
+      character(len=*), optional     :: head
+    end subroutine psb_dgeprt1
+  end interface
   
   
 end module psb_serial_mod

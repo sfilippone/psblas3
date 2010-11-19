@@ -11,7 +11,7 @@ module psb_d_rsb_mat_mod
   use psb_d_base_mat_mod
   use rsb_mod
 #ifdef HAVE_LIBRSB
-    use iso_c_binding  
+  use iso_c_binding  
 #endif
 #if 1
 #define PSBRSB_DEBUG(MSG) write(*,*) __FILE__,':',__LINE__,':',MSG
@@ -26,7 +26,7 @@ module psb_d_rsb_mat_mod
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr
-    contains 
+  contains 
     procedure, pass(a) :: get_size     => d_rsb_get_size
     procedure, pass(a) :: get_nzeros   => d_rsb_get_nzeros
     procedure, pass(a) :: get_ncols   => d_rsb_get_ncols

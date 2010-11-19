@@ -427,17 +427,17 @@ contains
    !write (*,*) acxx%val
    !write (*,*) diag
     
-    t1 = psb_wtime()
-    call a_n%cscnv(info,mold=acsr)
-
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='asb rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    tmov = psb_wtime()-t1
-!!$    call a_n%print(21)
+!!$    t1 = psb_wtime()
+!!$    call a_n%cscnv(info,mold=acsr)
+!!$
+!!$    if(info /= psb_success_) then
+!!$      info=psb_err_from_subroutine_
+!!$      ch_err='asb rout.'
+!!$      call psb_errpush(info,name,a_err=ch_err)
+!!$      goto 9999
+!!$    end if
+!!$    tmov = psb_wtime()-t1
+! !$    call a_n%print(21)
     anorm = a_n%csnmi()
     write(psb_err_unit,*) 'Nrm infinity ',anorm
 

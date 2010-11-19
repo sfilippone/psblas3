@@ -1095,14 +1095,19 @@ subroutine psb_s_csr_get_diag(a,d,info)
   end if
 
 
-  do i=1, mnm
-    do k=a%irp(i),a%irp(i+1)-1
-      j=a%ja(k)
-      if ((j == i) .and.(j <= mnm )) then 
-        d(i) = a%val(k)
-      endif
-    enddo
-  end do
+  if (a%is_triangle().and.a%is_unit()) then 
+    d(1:mnm) = sone 
+  else
+    do i=1, mnm
+      d(i) = szero
+      do k=a%irp(i),a%irp(i+1)-1
+        j=a%ja(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  end if
   do i=mnm+1,size(d) 
     d(i) = dzero
   end do
