@@ -2581,10 +2581,13 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act, nc
   Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
 
   call b%fix(info)
   if (info /= psb_success_) return

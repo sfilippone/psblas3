@@ -2535,6 +2535,9 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
 
   call b%fix(info)
   if (info /= psb_success_) return
