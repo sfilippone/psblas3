@@ -2518,6 +2518,7 @@ end subroutine psb_c_mv_csr_to_coo
 subroutine psb_c_mv_csr_from_coo(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
+  use psb_error_mod
   use psb_c_base_mat_mod
   use psb_c_csr_mat_mod, psb_protect_name => psb_c_mv_csr_from_coo
   implicit none 
