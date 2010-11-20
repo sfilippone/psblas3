@@ -15,7 +15,9 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: psb_d_ell_impl.o psb_d_ell_mat_mod.o
+all: libopt.a
+libopt.a: psb_d_ell_impl.o psb_d_ell_mat_mod.o
+	ar cur libopt.a psb_d_ell_impl.o psb_d_ell_mat_mod.o
 psb_d_ell_impl.o: psb_d_ell_mat_mod.o
 
 clean: 

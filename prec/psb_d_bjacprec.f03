@@ -291,8 +291,7 @@ contains
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      write(0,*) allocated(lf%irp),allocated(lf%ja),allocated(lf%val)
-      write(0,*) allocated(uf%irp),allocated(uf%ja),allocated(uf%val)
+
       if (allocated(prec%d)) then 
         if (size(prec%d) < n_row) then 
           deallocate(prec%d)

@@ -99,6 +99,7 @@ contains
     integer   :: i,j,k, ir, jc, m4
     real(psb_dpk_) :: acc(4) 
 
+
     if (alpha == dzero) then
       if (beta == dzero) then
         do i = 1, m
@@ -161,6 +162,7 @@ contains
 
 
       else if (beta == done) then 
+        
 
         m4 = mod(m,4) 
         do i=1,m4
@@ -187,7 +189,7 @@ contains
             do j=1,nc
               acc(1:4) = acc(1:4) - val(i:i+3,j) * x(ja(i:i+3,j))          
             enddo
-            y(i:i+3) = acc(1:4)
+            y(i:i+3) = y(i:i+3) + acc(1:4)
           end do
 
         else 
@@ -2410,592 +2412,620 @@ contains
 
 end subroutine psb_d_ell_csput
 
-!!$
-!!$
-!!$subroutine psb_d_ell_reinit(a,clear)
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_reinit
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a   
-!!$  logical, intent(in), optional :: clear
-!!$
-!!$  Integer :: err_act, info
-!!$  character(len=20)  :: name='reinit'
-!!$  logical  :: clear_
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$  info = psb_success_
-!!$
-!!$
-!!$  if (present(clear)) then 
-!!$    clear_ = clear
-!!$  else
-!!$    clear_ = .true.
-!!$  end if
-!!$
-!!$  if (a%is_bld() .or. a%is_upd()) then 
-!!$    ! do nothing
-!!$    return
-!!$  else if (a%is_asb()) then 
-!!$    if (clear_) a%val(:) = dzero
-!!$    call a%set_upd()
-!!$  else
-!!$    info = psb_err_invalid_mat_state_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  end if
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  if (err_act == psb_act_abort_) then
-!!$    call psb_error()
-!!$    return
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_d_ell_reinit
-!!$
-!!$subroutine  psb_d_ell_trim(a)
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_trim
-!!$  implicit none 
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  Integer :: err_act, info, nz, m 
-!!$  character(len=20)  :: name='trim'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$  info = psb_success_
-!!$  m   = a%get_nrows()
-!!$  nz  = a%get_nzeros()
-!!$  if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
-!!$
-!!$  if (info == psb_success_) call psb_realloc(nz,a%ja,info)
-!!$  if (info == psb_success_) call psb_realloc(nz,a%val,info)
-!!$
-!!$  if (info /= psb_success_) goto 9999 
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  if (err_act == psb_act_abort_) then
-!!$    call psb_error()
-!!$    return
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_d_ell_trim
-!!$
-!!$subroutine psb_d_ell_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_print
-!!$  implicit none 
-!!$
-!!$  integer, intent(in)               :: iout
-!!$  class(psb_d_ell_sparse_mat), intent(in) :: a   
-!!$  integer, intent(in), optional     :: iv(:)
-!!$  integer, intent(in), optional     :: eirs,eics
-!!$  character(len=*), optional        :: head
-!!$  integer, intent(in), optional     :: ivr(:), ivc(:)
-!!$
-!!$  Integer :: err_act
-!!$  character(len=20)  :: name='d_ell_print'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  character(len=80)                 :: frmtv 
-!!$  integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
-!!$
-!!$  if (present(eirs)) then 
-!!$    irs = eirs
-!!$  else
-!!$    irs = 0
-!!$  endif
-!!$  if (present(eics)) then 
-!!$    ics = eics
-!!$  else
-!!$    ics = 0
-!!$  endif
-!!$
-!!$  if (present(head)) then 
-!!$    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
-!!$    write(iout,'(a,a)') '% ',head 
-!!$    write(iout,'(a)') '%'    
-!!$    write(iout,'(a,a)') '% COO'
-!!$  endif
-!!$
-!!$  nr = a%get_nrows()
-!!$  nc = a%get_ncols()
-!!$  nz = a%get_nzeros()
-!!$  nmx = max(nr,nc,1)
-!!$  ni  = floor(log10(1.0*nmx)) + 1
-!!$
-!!$  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
-!!$  write(iout,*) nr, nc, nz 
-!!$  if(present(iv)) then 
-!!$    do i=1, nr
-!!$      do j=a%irp(i),a%irp(i+1)-1 
-!!$        write(iout,frmtv) iv(i),iv(a%ja(j)),a%val(j)
-!!$      end do
-!!$    enddo
-!!$  else      
-!!$    if (present(ivr).and..not.present(ivc)) then 
-!!$      do i=1, nr
-!!$        do j=a%irp(i),a%irp(i+1)-1 
-!!$          write(iout,frmtv) ivr(i),(a%ja(j)),a%val(j)
-!!$        end do
-!!$      enddo
-!!$    else if (present(ivr).and.present(ivc)) then 
-!!$      do i=1, nr
-!!$        do j=a%irp(i),a%irp(i+1)-1 
-!!$          write(iout,frmtv) ivr(i),ivc(a%ja(j)),a%val(j)
-!!$        end do
-!!$      enddo
-!!$    else if (.not.present(ivr).and.present(ivc)) then 
-!!$      do i=1, nr
-!!$        do j=a%irp(i),a%irp(i+1)-1 
-!!$          write(iout,frmtv) (i),ivc(a%ja(j)),a%val(j)
-!!$        end do
-!!$      enddo
-!!$    else if (.not.present(ivr).and..not.present(ivc)) then 
-!!$      do i=1, nr
-!!$        do j=a%irp(i),a%irp(i+1)-1 
-!!$          write(iout,frmtv) (i),(a%ja(j)),a%val(j)
-!!$        end do
-!!$      enddo
-!!$    endif
-!!$  endif
-!!$
-!!$end subroutine psb_d_ell_print
-!!$
-!!$
-!!$subroutine psb_d_cp_ell_from_coo(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_coo
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  class(psb_d_coo_sparse_mat), intent(in)    :: b
-!!$  integer, intent(out)                        :: info
-!!$
-!!$  type(psb_d_coo_sparse_mat)   :: tmp
-!!$  integer, allocatable :: itemp(:)
-!!$  !locals
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer             :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$   info = psb_success_
-!!$   ! This is to have fix_coo called behind the scenes
-!!$   call b%cp_to_coo(tmp,info)
-!!$   if (info == psb_success_) call a%mv_from_coo(tmp,info)
-!!$
-!!$end subroutine psb_d_cp_ell_from_coo
-!!$
-!!$
-!!$
-!!$subroutine psb_d_cp_ell_to_coo(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_coo
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(in)  :: a
-!!$  class(psb_d_coo_sparse_mat), intent(inout) :: b
-!!$  integer, intent(out)                      :: info
-!!$
-!!$  integer, allocatable :: itemp(:)
-!!$  !locals
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer             :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  nr  = a%get_nrows()
-!!$  nc  = a%get_ncols()
-!!$  nza = a%get_nzeros()
-!!$
-!!$  call b%allocate(nr,nc,nza)
-!!$  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
-!!$
-!!$  do i=1, nr
-!!$    do j=a%irp(i),a%irp(i+1)-1
-!!$      b%ia(j)  = i
-!!$      b%ja(j)  = a%ja(j)
-!!$      b%val(j) = a%val(j)
-!!$    end do
-!!$  end do
-!!$  call b%set_nzeros(a%get_nzeros())
-!!$  call b%fix(info)
-!!$
-!!$
-!!$end subroutine psb_d_cp_ell_to_coo
-!!$
-!!$
-!!$subroutine psb_d_mv_ell_to_coo(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_coo
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  class(psb_d_coo_sparse_mat), intent(inout)   :: b
-!!$  integer, intent(out)                        :: info
-!!$
-!!$  integer, allocatable :: itemp(:)
-!!$  !locals
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer             :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  nr  = a%get_nrows()
-!!$  nc  = a%get_ncols()
-!!$  nza = a%get_nzeros()
-!!$
-!!$  call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
-!!$  call b%set_nzeros(a%get_nzeros())
-!!$  call move_alloc(a%ja,b%ja)
-!!$  call move_alloc(a%val,b%val)
-!!$  call psb_realloc(nza,b%ia,info)
-!!$  if (info /= psb_success_) return
-!!$  do i=1, nr
-!!$    do j=a%irp(i),a%irp(i+1)-1
-!!$      b%ia(j)  = i
-!!$    end do
-!!$  end do
-!!$  call a%free()
-!!$  call b%fix(info)
-!!$
-!!$
-!!$end subroutine psb_d_mv_ell_to_coo
-!!$
-!!$
-!!$
-!!$subroutine psb_d_mv_ell_from_coo(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_coo
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  class(psb_d_coo_sparse_mat), intent(inout) :: b
-!!$  integer, intent(out)                        :: info
-!!$
-!!$  integer, allocatable :: itemp(:)
-!!$  !locals
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer              :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  call b%fix(info)
-!!$  if (info /= psb_success_) return
-!!$  nr  = b%get_nrows()
-!!$  nc  = b%get_ncols()
-!!$  nza = b%get_nzeros()
-!!$  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-!!$
-!!$  ! Dirty trick: call move_alloc to have the new data allocated just once.
-!!$  call move_alloc(b%ia,itemp)
-!!$  call move_alloc(b%ja,a%ja)
-!!$  call move_alloc(b%val,a%val)
-!!$  call psb_realloc(max(nr+1,nc+1),a%irp,info)
-!!$  
-!!$  call b%free()
-!!$  if (info /= psb_success_) return
-!!$  if (nza <= 0) then 
-!!$    a%irp(:) = 1
-!!$  else
-!!$    a%irp(1) = 1
-!!$    if (nr < itemp(nza)) then 
-!!$      write(debug_unit,*) trim(name),': RWSHR=.false. : ',&
-!!$           &nr,itemp(nza),' Expect trouble!'
-!!$      info = 12
-!!$    end if
-!!$
-!!$    j = 1 
-!!$    i = 1
-!!$    irw = itemp(j) 
-!!$
-!!$    outer: do 
-!!$      inner: do 
-!!$        if (i >= irw) exit inner
-!!$        if (i>nr) then 
-!!$          write(debug_unit,*) trim(name),&
-!!$               & 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
-!!$          exit outer
-!!$        end if
-!!$        a%irp(i+1) = a%irp(i) 
-!!$        i = i + 1
-!!$      end do inner
-!!$      j = j + 1
-!!$      if (j > nza) exit
-!!$      if (itemp(j) /= irw) then 
-!!$        a%irp(i+1) = j
-!!$        irw = itemp(j) 
-!!$        i = i + 1
-!!$      endif
-!!$      if (i>nr) exit
-!!$    enddo outer
-!!$    !
-!!$    ! Cleanup empty rows at the end
-!!$    !
-!!$    if (j /= (nza+1)) then 
-!!$      write(debug_unit,*) trim(name),': Problem from loop :',j,nza
-!!$      info = 13
-!!$    endif
-!!$    do 
-!!$      if (i>nr) exit
-!!$      a%irp(i+1) = j
-!!$      i = i + 1
-!!$    end do
-!!$
-!!$  endif
-!!$
-!!$
-!!$end subroutine psb_d_mv_ell_from_coo
-!!$
-!!$
-!!$subroutine psb_d_mv_ell_to_fmt(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_fmt
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  class(psb_d_base_sparse_mat), intent(inout)  :: b
-!!$  integer, intent(out)                        :: info
-!!$
-!!$  !locals
-!!$  type(psb_d_coo_sparse_mat) :: tmp
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer              :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  select type (b)
-!!$  type is (psb_d_coo_sparse_mat) 
-!!$    call a%mv_to_coo(b,info)
-!!$    ! Need to fix trivial copies! 
-!!$  type is (psb_d_ell_sparse_mat) 
-!!$    call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
-!!$    call move_alloc(a%irp, b%irp)
-!!$    call move_alloc(a%ja,  b%ja)
-!!$    call move_alloc(a%val, b%val)
-!!$    call a%free()
-!!$    
-!!$  class default
-!!$    call a%mv_to_coo(tmp,info)
-!!$    if (info == psb_success_) call b%mv_from_coo(tmp,info)
-!!$  end select
-!!$
-!!$end subroutine psb_d_mv_ell_to_fmt
-!!$
-!!$
-!!$subroutine psb_d_cp_ell_to_fmt(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_fmt
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(in)   :: a
-!!$  class(psb_d_base_sparse_mat), intent(inout) :: b
-!!$  integer, intent(out)                       :: info
-!!$
-!!$  !locals
-!!$  type(psb_d_coo_sparse_mat) :: tmp
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer              :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$
-!!$  select type (b)
-!!$  type is (psb_d_coo_sparse_mat) 
-!!$    call a%cp_to_coo(b,info)
-!!$
-!!$  type is (psb_d_ell_sparse_mat) 
-!!$    call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
-!!$    call psb_safe_cpy( a%irp, b%irp , info)
-!!$    call psb_safe_cpy( a%ja , b%ja  , info)
-!!$    call psb_safe_cpy( a%val, b%val , info)
-!!$
-!!$  class default
-!!$    call a%cp_to_coo(tmp,info)
-!!$    if (info == psb_success_) call b%mv_from_coo(tmp,info)
-!!$  end select
-!!$
-!!$end subroutine psb_d_cp_ell_to_fmt
-!!$
-!!$
-!!$subroutine psb_d_mv_ell_from_fmt(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_fmt
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout)  :: a
-!!$  class(psb_d_base_sparse_mat), intent(inout) :: b
-!!$  integer, intent(out)                         :: info
-!!$
-!!$  !locals
-!!$  type(psb_d_coo_sparse_mat) :: tmp
-!!$  logical             :: rwshr_
-!!$  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer              :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  select type (b)
-!!$  type is (psb_d_coo_sparse_mat) 
-!!$    call a%mv_from_coo(b,info)
-!!$
-!!$  type is (psb_d_ell_sparse_mat) 
-!!$    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-!!$    call move_alloc(b%irp, a%irp)
-!!$    call move_alloc(b%ja,  a%ja)
-!!$    call move_alloc(b%val, a%val)
-!!$    call b%free()
-!!$
-!!$  class default
-!!$    call b%mv_to_coo(tmp,info)
-!!$    if (info == psb_success_) call a%mv_from_coo(tmp,info)
-!!$  end select
-!!$
-!!$end subroutine psb_d_mv_ell_from_fmt
-!!$
-!!$
-!!$
-!!$subroutine psb_d_cp_ell_from_fmt(a,b,info) 
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_fmt
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  class(psb_d_base_sparse_mat), intent(in)   :: b
-!!$  integer, intent(out)                        :: info
-!!$
-!!$  !locals
-!!$  type(psb_d_coo_sparse_mat) :: tmp
-!!$  logical             :: rwshr_
-!!$  Integer             :: nz, nr, i,j,irw, idl,err_act, nc
-!!$  Integer, Parameter  :: maxtry=8
-!!$  integer              :: debug_level, debug_unit
-!!$  character(len=20)   :: name
-!!$
-!!$  info = psb_success_
-!!$
-!!$  select type (b)
-!!$  type is (psb_d_coo_sparse_mat) 
-!!$    call a%cp_from_coo(b,info)
-!!$
-!!$  type is (psb_d_ell_sparse_mat) 
-!!$    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-!!$    call psb_safe_cpy( b%irp, a%irp , info)
-!!$    call psb_safe_cpy( b%ja , a%ja  , info)
-!!$    call psb_safe_cpy( b%val, a%val , info)
-!!$
-!!$  class default
-!!$    call b%cp_to_coo(tmp,info)
-!!$    if (info == psb_success_) call a%mv_from_coo(tmp,info)
-!!$  end select
-!!$end subroutine psb_d_cp_ell_from_fmt
-!!$
-!!$
-!!$subroutine psb_d_ell_cp_from(a,b)
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_cp_from
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout) :: a
-!!$  type(psb_d_ell_sparse_mat), intent(in)   :: b
-!!$
-!!$
-!!$  Integer :: err_act, info
-!!$  character(len=20)  :: name='cp_from'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$
-!!$  info = psb_success_
-!!$
-!!$  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
-!!$  call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-!!$  a%irp = b%irp 
-!!$  a%ja  = b%ja
-!!$  a%val = b%val 
-!!$
-!!$  if (info /= psb_success_) goto 9999
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  call psb_errpush(info,name)
-!!$
-!!$  if (err_act /= psb_act_ret_) then
-!!$    call psb_error()
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_d_ell_cp_from
-!!$
-!!$subroutine psb_d_ell_mv_from(a,b)
-!!$  use psb_sparse_mod
-!!$  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_mv_from
-!!$  implicit none 
-!!$
-!!$  class(psb_d_ell_sparse_mat), intent(inout)  :: a
-!!$  type(psb_d_ell_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$  Integer :: err_act, info
-!!$  character(len=20)  :: name='mv_from'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$  info = psb_success_
-!!$  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-!!$  call move_alloc(b%irp, a%irp)
-!!$  call move_alloc(b%ja,  a%ja)
-!!$  call move_alloc(b%val, a%val)
-!!$  call b%free()
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  call psb_errpush(info,name)
-!!$
-!!$  if (err_act /= psb_act_ret_) then
-!!$    call psb_error()
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_d_ell_mv_from
-!!$
+
+
+subroutine psb_d_ell_reinit(a,clear)
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_reinit
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a   
+  logical, intent(in), optional :: clear
+
+  Integer :: err_act, info
+  character(len=20)  :: name='reinit'
+  logical  :: clear_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+
+  if (present(clear)) then 
+    clear_ = clear
+  else
+    clear_ = .true.
+  end if
+
+  if (a%is_bld() .or. a%is_upd()) then 
+    ! do nothing
+    return
+  else if (a%is_asb()) then 
+    if (clear_) a%val(:,:) = dzero
+    call a%set_upd()
+  else
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_ell_reinit
+
+subroutine  psb_d_ell_trim(a)
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_trim
+  implicit none 
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  Integer :: err_act, info, nz, m, nzm
+  character(len=20)  :: name='trim'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  m   = a%get_nrows()
+  nzm = maxval(a%irn(1:m))
+  
+  call psb_realloc(m,a%irn,info)
+  if (info == psb_success_) call psb_realloc(m,a%idiag,info)
+  if (info == psb_success_) call psb_realloc(m,nzm,a%ja,info)
+  if (info == psb_success_) call psb_realloc(m,nzm,a%val,info)
+
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_ell_trim
+
+subroutine psb_d_ell_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_print
+  implicit none 
+
+  integer, intent(in)               :: iout
+  class(psb_d_ell_sparse_mat), intent(in) :: a   
+  integer, intent(in), optional     :: iv(:)
+  integer, intent(in), optional     :: eirs,eics
+  character(len=*), optional        :: head
+  integer, intent(in), optional     :: ivr(:), ivc(:)
+
+  Integer :: err_act
+  character(len=20)  :: name='d_ell_print'
+  logical, parameter :: debug=.false.
+
+  character(len=80)                 :: frmtv 
+  integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
+
+  if (present(eirs)) then 
+    irs = eirs
+  else
+    irs = 0
+  endif
+  if (present(eics)) then 
+    ics = eics
+  else
+    ics = 0
+  endif
+
+  if (present(head)) then 
+    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+    write(iout,'(a,a)') '% ',head 
+    write(iout,'(a)') '%'    
+    write(iout,'(a,a)') '% COO'
+  endif
+
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nz  = a%get_nzeros()
+  nmx = max(nr,nc,1)
+  ni  = floor(log10(1.0*nmx)) + 1
+
+  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  write(iout,*) nr, nc, nz 
+  if(present(iv)) then 
+    do i=1, nr
+      do j=1,a%irn(i)
+        write(iout,frmtv) iv(i),iv(a%ja(i,j)),a%val(i,j)
+      end do
+    enddo
+  else      
+    if (present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=1,a%irn(i)
+          write(iout,frmtv) ivr(i),(a%ja(i,j)),a%val(i,j)
+        end do
+      enddo
+    else if (present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=1,a%irn(i)
+          write(iout,frmtv) ivr(i),ivc(a%ja(i,j)),a%val(i,j)
+        end do
+      enddo
+    else if (.not.present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=1,a%irn(i)
+          write(iout,frmtv) (i),ivc(a%ja(i,j)),a%val(i,j)
+        end do
+      enddo
+    else if (.not.present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=1,a%irn(i)
+          write(iout,frmtv) (i),(a%ja(i,j)),a%val(i,j)
+        end do
+      enddo
+    endif
+  endif
+
+end subroutine psb_d_ell_print
+
+
+subroutine psb_d_cp_ell_from_coo(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_coo
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(in)    :: b
+  integer, intent(out)                        :: info
+
+  type(psb_d_coo_sparse_mat)   :: tmp
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+
+   info = psb_success_
+   ! This is to have fix_coo called behind the scenes
+   call b%cp_to_coo(tmp,info)
+   if (info == psb_success_) call a%mv_from_coo(tmp,info)
+
+end subroutine psb_d_cp_ell_from_coo
+
+
+
+subroutine psb_d_cp_ell_to_coo(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_coo
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(in)  :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer, intent(out)                      :: info
+
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, nc,i,j,k,irw, idl,err_act
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nza = a%get_nzeros()
+
+  call b%allocate(nr,nc,nza)
+  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+
+  k=0
+  do i=1, nr
+    do j=1,a%irn(i)
+      k = k + 1
+      b%ia(k)  = i
+      b%ja(k)  = a%ja(i,j)
+      b%val(k) = a%val(i,j)
+    end do
+  end do
+  call b%set_nzeros(a%get_nzeros())
+  call b%fix(info)
+
+end subroutine psb_d_cp_ell_to_coo
+
+subroutine psb_d_mv_ell_to_coo(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_coo
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer, intent(out)                       :: info
+
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, nc,i,j,k,irw, idl,err_act
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nza = a%get_nzeros()
+
+  ! Taking  a path slightly slower but with less memory footprint
+  deallocate(a%idiag)
+  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+
+  call psb_realloc(nza,b%ia,info)
+  if (info == 0)   call psb_realloc(nza,b%ja,info)
+  if (info /= 0) goto 9999
+  k=0
+  do i=1, nr
+    do j=1,a%irn(i)
+      k = k + 1
+      b%ia(k)  = i
+      b%ja(k)  = a%ja(i,j)
+    end do
+  end do
+  deallocate(a%ja, stat=info)
+
+  if (info == 0) call psb_realloc(nza,b%val,info)
+  if (info /= 0) goto 9999
+
+  k=0
+  do i=1, nr
+    do j=1,a%irn(i)
+      k = k + 1
+      b%val(k)  = a%val(i,j)
+    end do
+  end do
+  call a%free()
+  call b%set_nzeros(nza)
+  call b%fix(info)
+  return
+
+9999 continue
+  info = psb_err_alloc_dealloc_
+  return
+end subroutine psb_d_mv_ell_to_coo
+
+
+subroutine psb_d_mv_ell_from_coo(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_coo
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  integer, intent(out)                        :: info
+
+  integer, allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,k, idl,err_act, nc, nzm, ir, ic
+  Integer, Parameter  :: maxtry=8
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  call b%fix(info)
+  if (info /= psb_success_) return
+
+  nr  = b%get_nrows()
+  nc  = b%get_ncols()
+  nza = b%get_nzeros()
+  if (b%is_sorted()) then 
+    ! If it is sorted then we can lessen memory impact 
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+
+    ! First compute the number of nonzeros in each row.
+    call psb_realloc(nr,a%irn,info) 
+    if (info /= 0) goto 9999
+    a%irn = 0
+    do i=1, nza
+      a%irn(b%ia(i)) = a%irn(b%ia(i)) + 1
+    end do
+    nzm = 0 
+    do i=1, nr
+      nzm = max(nzm,a%irn(i))
+      a%irn(i) = 0
+    end do
+    ! Second: copy the column indices.
+    call psb_realloc(nr,a%idiag,info) 
+    if (info == 0) call psb_realloc(nr,nzm,a%ja,info) 
+    if (info /= 0) goto 9999
+    do i=1, nza
+      ir = b%ia(i)
+      ic = b%ja(i)
+      j  = a%irn(ir) + 1 
+      a%ja(ir,j) = ic
+      a%irn(ir)  = j
+    end do
+    ! Third copy the other stuff
+    deallocate(b%ia,b%ja,stat=info) 
+    if (info == 0) call psb_realloc(nr,a%idiag,info)
+    if (info == 0) call psb_realloc(nr,nzm,a%val,info)
+    if (info /= 0) goto 9999
+    k = 0 
+    do i=1, nr
+      a%idiag(i) = 0 
+      do j=1, a%irn(i)
+        k = k + 1 
+        a%val(i,j) = b%val(k)
+        if (i==a%ja(i,j)) a%idiag(i)=j
+      end do
+      do j=a%irn(i)+1, nzm
+        a%ja(i,j) = i
+        a%val(i,j) = dzero
+      end do
+    end do
+
+  else 
+    ! If b is not sorted, the only way is to copy. 
+    call a%cp_from_coo(b,info)
+    if (info /= 0) goto 9999
+  end if
+
+  call b%free()
+
+  return
+
+9999 continue
+  info = psb_err_alloc_dealloc_
+  return
+
+
+end subroutine psb_d_mv_ell_from_coo
+
+
+subroutine psb_d_mv_ell_to_fmt(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_fmt
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  class(psb_d_base_sparse_mat), intent(inout)  :: b
+  integer, intent(out)                        :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%mv_to_coo(b,info)
+    ! Need to fix trivial copies! 
+  type is (psb_d_ell_sparse_mat) 
+    call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
+    call move_alloc(a%irn,   b%irn)
+    call move_alloc(a%idiag, b%idiag)
+    call move_alloc(a%ja,    b%ja)
+    call move_alloc(a%val,   b%val)
+    call a%free()
+    
+  class default
+    call a%mv_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_d_mv_ell_to_fmt
+
+
+subroutine psb_d_cp_ell_to_fmt(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_fmt
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(in)   :: a
+  class(psb_d_base_sparse_mat), intent(inout) :: b
+  integer, intent(out)                       :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%cp_to_coo(b,info)
+
+  type is (psb_d_ell_sparse_mat) 
+    call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+    call psb_safe_cpy( a%idiag, b%idiag , info)
+    call psb_safe_cpy( a%irn,   b%irn , info)
+    call psb_safe_cpy( a%ja ,   b%ja  , info)
+    call psb_safe_cpy( a%val,   b%val , info)
+
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_d_cp_ell_to_fmt
+
+
+subroutine psb_d_mv_ell_from_fmt(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_fmt
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout)  :: a
+  class(psb_d_base_sparse_mat), intent(inout) :: b
+  integer, intent(out)                         :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%mv_from_coo(b,info)
+
+  type is (psb_d_ell_sparse_mat) 
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    call move_alloc(b%irn,   a%irn)
+    call move_alloc(b%idiag, a%idiag)
+    call move_alloc(b%ja,    a%ja)
+    call move_alloc(b%val,   a%val)
+    call b%free()
+
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_d_mv_ell_from_fmt
+
+
+
+subroutine psb_d_cp_ell_from_fmt(a,b,info) 
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_fmt
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  class(psb_d_base_sparse_mat), intent(in)   :: b
+  integer, intent(out)                        :: info
+
+  !locals
+  type(psb_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nz, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_d_coo_sparse_mat) 
+    call a%cp_from_coo(b,info)
+
+  type is (psb_d_ell_sparse_mat) 
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    call psb_safe_cpy( b%irn,   a%irn ,  info)
+    call psb_safe_cpy( b%idiag, a%idiag, info)
+    call psb_safe_cpy( b%ja ,   a%ja  ,  info)
+    call psb_safe_cpy( b%val,   a%val ,  info)
+
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+end subroutine psb_d_cp_ell_from_fmt
+
+
+subroutine psb_d_ell_cp_from(a,b)
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_cp_from
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout) :: a
+  type(psb_d_ell_sparse_mat), intent(in)   :: b
+
+
+  Integer :: err_act, info
+  character(len=20)  :: name='cp_from'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+
+  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+  call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+  call psb_safe_cpy( b%irn,   a%irn ,  info)
+  call psb_safe_cpy( b%idiag, a%idiag, info)
+  call psb_safe_cpy( b%ja ,   a%ja  ,  info)
+  call psb_safe_cpy( b%val,   a%val ,  info)
+
+  if (info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  call psb_errpush(info,name)
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_d_ell_cp_from
+
+subroutine psb_d_ell_mv_from(a,b)
+  use psb_sparse_mod
+  use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_mv_from
+  implicit none 
+
+  class(psb_d_ell_sparse_mat), intent(inout)  :: a
+  type(psb_d_ell_sparse_mat), intent(inout) :: b
+
+
+  Integer :: err_act, info
+  character(len=20)  :: name='mv_from'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+  call move_alloc(b%idiag, a%idiag)
+  call move_alloc(b%irn,   a%irn)
+  call move_alloc(b%ja,    a%ja)
+  call move_alloc(b%val,   a%val)
+  call b%free()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  call psb_errpush(info,name)
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_d_ell_mv_from
+
 
