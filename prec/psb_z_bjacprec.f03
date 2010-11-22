@@ -4,8 +4,8 @@ module psb_z_bjacprec
   
   type, extends(psb_z_base_prec_type) :: psb_z_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
-    type(psb_zspmat_type), allocatable :: av(:)
-    complex(psb_dpk_), allocatable         :: d(:)
+    type(psb_zspmat_type), allocatable  :: av(:)
+    complex(psb_dpk_), allocatable      :: d(:)
   contains
     procedure, pass(prec) :: apply     => psb_z_bjac_apply
     procedure, pass(prec) :: precbld   => psb_z_bjac_precbld
@@ -215,17 +215,19 @@ contains
   end subroutine psb_z_bjac_precinit
 
 
-  subroutine psb_z_bjac_precbld(a,desc_a,prec,info,upd)
+  subroutine psb_z_bjac_precbld(a,desc_a,prec,info,upd,mold,afmt)
 
     use psb_sparse_mod
     use psb_prec_mod
     Implicit None
 
     type(psb_zspmat_type), intent(in), target :: a
-    type(psb_desc_type), intent(in), target  :: desc_a
+    type(psb_desc_type), intent(in), target   :: desc_a
     class(psb_z_bjac_prec_type),intent(inout) :: prec
-    integer, intent(out)                     :: info
-    character, intent(in), optional          :: upd
+    integer, intent(out)                      :: info
+    character, intent(in), optional           :: upd
+    character(len=*), intent(in), optional    :: afmt
+    class(psb_z_base_sparse_mat), intent(in), optional :: mold
 
     !     .. Local Scalars ..                                                       
     integer  ::    i, m
@@ -325,12 +327,6 @@ contains
         goto 9999
       end if
       
-!!$      call prec%av(psb_l_pr_)%print(30+me)
-!!$      call prec%av(psb_u_pr_)%print(40+me)
-!!$      do i=1,n_row
-!!$        write(50+me,*) i,prec%d(i)
-!!$      end do
-
     case(psb_f_none_) 
       info=psb_err_from_subroutine_
       ch_err='Inconsistent prec  psb_f_none_'
@@ -343,6 +339,14 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end select
+
+    if (present(mold)) then 
+      call prec%av(psb_l_pr_)%cscnv(info,mold=mold)
+      call prec%av(psb_u_pr_)%cscnv(info,mold=mold)
+    else if (present(afmt)) then 
+      call prec%av(psb_l_pr_)%cscnv(info,type=afmt)
+      call prec%av(psb_u_pr_)%cscnv(info,type=afmt)
+    end if
 
 
     call psb_erractionrestore(err_act)

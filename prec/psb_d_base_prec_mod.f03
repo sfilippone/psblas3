@@ -138,16 +138,18 @@ contains
     return
   end subroutine psb_d_base_precinit
 
-  subroutine psb_d_base_precbld(a,desc_a,prec,info,upd)
+  subroutine psb_d_base_precbld(a,desc_a,prec,info,upd,mold,afmt)
     
     use psb_sparse_mod
     Implicit None
     
     type(psb_dspmat_type), intent(in), target :: a
-    type(psb_desc_type), intent(in), target  :: desc_a
+    type(psb_desc_type), intent(in), target   :: desc_a
     class(psb_d_base_prec_type),intent(inout) :: prec
-    integer, intent(out)                     :: info
-    character, intent(in), optional          :: upd
+    integer, intent(out)                      :: info
+    character, intent(in), optional           :: upd
+    character(len=*), intent(in), optional    :: afmt
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
     Integer :: err_act, nrow
     character(len=20)  :: name='d_base_precbld'
 

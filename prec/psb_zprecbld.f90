@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zprecbld(a,desc_a,p,info,upd)
+subroutine psb_zprecbld(a,desc_a,p,info,upd,mold,afmt)
 
   use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_zprecbld
@@ -40,6 +40,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   type(psb_zprec_type),intent(inout)         :: p
   integer, intent(out)                       :: info
   character, intent(in), optional            :: upd
+  character(len=*), intent(in), optional    :: afmt
+  class(psb_z_base_sparse_mat), intent(in), optional :: mold
 
 
   ! Local scalars
@@ -63,16 +65,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   call psb_info(ictxt, me, np)
 
-  if (present(upd)) then 
-    upd_ = psb_toupper(upd)
-  else
-    upd_='F'
-  endif
-  if ((upd_ == 'F').or.(upd_ == 'T')) then
-    ! ok
-  else
-    upd_='F'
-  endif
   n_row   = psb_cd_get_local_rows(desc_a)
   n_col   = psb_cd_get_local_cols(desc_a)
   mglob   = psb_cd_get_global_rows(desc_a)
@@ -88,7 +80,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
     goto 9999
   end if
 
-  call p%prec%precbld(a,desc_a,info,upd)
+  call p%prec%precbld(a,desc_a,info,upd=upd,afmt=afmt,mold=mold)
+
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)

@@ -34,8 +34,9 @@ module psb_prec_mod
   use psb_prec_type
 
   interface psb_precbld
-    subroutine psb_sprecbld(a,desc_a,prec,info,upd)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+    subroutine psb_sprecbld(a,desc_a,prec,info,upd,mold,afmt)
+      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type,&
+           & psb_s_base_sparse_mat, psb_spk_
       use psb_prec_type, only : psb_sprec_type
       implicit none
       type(psb_sspmat_type), intent(in), target  :: a
@@ -43,9 +44,12 @@ module psb_prec_mod
       type(psb_sprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
+      character(len=*), intent(in), optional    :: afmt
+      class(psb_s_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_sprecbld
-    subroutine psb_dprecbld(a,desc_a,prec,info,upd)
-      use psb_sparse_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+    subroutine psb_dprecbld(a,desc_a,prec,info,upd,mold,afmt)
+      use psb_sparse_mod, only  : psb_desc_type, psb_dspmat_type,&
+           & psb_d_base_sparse_mat, psb_dpk_
       use psb_prec_type, only : psb_dprec_type
       implicit none
       type(psb_dspmat_type), intent(in), target  :: a
@@ -53,9 +57,12 @@ module psb_prec_mod
       type(psb_dprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
+      character(len=*), intent(in), optional    :: afmt
+      class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_dprecbld
-    subroutine psb_cprecbld(a,desc_a,prec,info,upd)
-      use psb_sparse_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
+    subroutine psb_cprecbld(a,desc_a,prec,info,upd,mold,afmt)
+      use psb_sparse_mod, only  : psb_desc_type, psb_cspmat_type,&
+           & psb_c_base_sparse_mat, psb_spk_
       use psb_prec_type, only : psb_cprec_type
       implicit none
       type(psb_cspmat_type), intent(in), target  :: a
@@ -63,9 +70,12 @@ module psb_prec_mod
       type(psb_cprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
+      character(len=*), intent(in), optional    :: afmt
+      class(psb_c_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_cprecbld
-    subroutine psb_zprecbld(a,desc_a,prec,info,upd)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+    subroutine psb_zprecbld(a,desc_a,prec,info,upd,mold,afmt)
+      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type,&
+           & psb_z_base_sparse_mat, psb_dpk_
       use psb_prec_type, only : psb_zprec_type
       implicit none
       type(psb_zspmat_type), intent(in), target  :: a
@@ -73,6 +83,8 @@ module psb_prec_mod
       type(psb_zprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
+      character(len=*), intent(in), optional    :: afmt
+      class(psb_z_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_zprecbld
   end interface
 
