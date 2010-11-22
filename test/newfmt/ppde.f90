@@ -80,7 +80,7 @@ program ppde
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
-  type(psb_d_ell_sparse_mat)       :: aell
+  type(psb_d_ell_sparse_mat) :: aell
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -121,7 +121,7 @@ program ppde
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info)  
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,mold=aell)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -324,7 +324,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info)
+  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info,mold)
     !
     !   discretize the partial diferential equation
     ! 
@@ -351,10 +351,8 @@ contains
     integer                      :: ictxt, info
     character                    :: afmt*5
     type(psb_dspmat_type)       :: a
-    type(psb_d_csc_sparse_mat)       :: acsc
-    type(psb_d_coo_sparse_mat)       :: acoo
-    type(psb_d_csr_sparse_mat)       :: acsr
-    type(psb_d_ell_sparse_mat)       :: aell
+    class(psb_d_base_sparse_mat), optional   :: mold
+    ! Local 
     real(psb_dpk_)           :: zt(nb),x,y,z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: ix,iy,iz,ia,indx_owner
@@ -573,10 +571,13 @@ contains
     call psb_barrier(ictxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
-    if (info == psb_success_) &
-         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=aell)
-!!$    if (info == psb_success_) &
-!!$         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    if (present(mold)) then 
+      if (info == psb_success_) &
+           & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=mold)
+    else
+      if (info == psb_success_) &
+           & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    end if
     call psb_barrier(ictxt)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
