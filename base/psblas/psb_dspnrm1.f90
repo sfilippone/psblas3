@@ -112,8 +112,8 @@ function psb_dspnrm1(a,desc_a,info)
   end if
   
   if ((m /= 0).and.(n /= 0)) then
-    call a%aclsum(v)
-    call psb_halo(v,desc_a,info,tran='T')
+    call a%aclsum(v,info)
+    if (info == psb_success_) call psb_halo(v,desc_a,info,tran='T')
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_halo'

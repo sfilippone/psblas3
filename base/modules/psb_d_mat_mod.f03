@@ -638,34 +638,38 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    subroutine psb_d_rowsum(d,a) 
+    subroutine psb_d_rowsum(d,a,info) 
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
+      integer, intent(out)                 :: info
     end subroutine psb_d_rowsum
   end interface
 
   interface 
-    subroutine psb_d_arwsum(d,a) 
+    subroutine psb_d_arwsum(d,a,info) 
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
+      integer, intent(out)                 :: info
     end subroutine psb_d_arwsum
   end interface
   
   interface 
-    subroutine psb_d_colsum(d,a) 
+    subroutine psb_d_colsum(d,a,info) 
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
+      integer, intent(out)                 :: info
     end subroutine psb_d_colsum
   end interface
 
   interface 
-    subroutine psb_d_aclsum(d,a) 
+    subroutine psb_d_aclsum(d,a,info) 
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)         :: d(:)
+      integer, intent(out)                 :: info
     end subroutine psb_d_aclsum
   end interface
   
