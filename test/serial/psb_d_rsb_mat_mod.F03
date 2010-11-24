@@ -19,9 +19,11 @@ module psb_d_rsb_mat_mod
 #define PSBRSB_DEBUG(MSG)
 #endif
   integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-  integer,parameter :: c_f_index=256*16 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
+  integer,parameter :: c_f_index=1 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
   integer,parameter  :: c_d_typecode=68 ! FIXME: here should use ..
-  integer,parameter  :: c_def_flags =-2080358268+c_f_index ! FIXME: here should use ..
+  integer,parameter  :: c_def_flags =c_f_index ! FIXME: here should use ..
+  integer :: c_srt_flags =4 ! FIXME: here should use ..
+  integer :: c_own_flags =2 ! FIXME: here should use ..
   integer :: c_upd_flags =0 ! FIXME: here should use ..
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
@@ -246,7 +248,7 @@ function psb_d_rsb_csnmi(a) result(res)
   real(psb_dpk_),target         :: res
   real(psb_dpk_)         :: resa(1)
   integer             :: info
-    PSBRSB_DEBUG('')
+    !PSBRSB_DEBUG('')
   info=rsb_infinity_norm(a%rsbmptr,resa,rsb_psblas_trans_to_rsb_trans('N'))
   !info=rsb_infinity_norm(a%rsbmptr,c_loc(res),rsb_psblas_trans_to_rsb_trans('N'))
   res=resa(1)
@@ -479,6 +481,7 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
    info = psb_success_
    ! This is to have fix_coo called behind the scenes
    !write (*,*) b%val
+   ! FIXME: and if sorted ? the process could be speeded up !
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
   &(b%val,b%ia,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags,info)
     info=d_rsb_to_psb_info(info)
@@ -506,6 +509,11 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
   select type (b)
   type is (psb_d_coo_sparse_mat) 
     call a%cp_from_coo(b,info)
+
+  type is (psb_d_csr_sparse_mat) 
+  a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
+  &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags+c_srt_flags,info)
+    info=d_rsb_to_psb_info(info)
 
   type is (psb_d_rsb_sparse_mat) 
     call b%cp_to_fmt(a,info)  ! FIXME
@@ -681,6 +689,7 @@ subroutine psb_d_mv_rsb_to_coo(a,b,info)
   class(psb_d_coo_sparse_mat), intent(inout)   :: b
   integer, intent(out)                        :: info
     PSBRSB_DEBUG('')
+  ! FIXME: use rsb_switch_rsb_matrix_to_coo_sorted !
   call psb_d_cp_rsb_to_coo(a,b,info)
   call a%free()
 end subroutine psb_d_mv_rsb_to_coo
@@ -690,8 +699,10 @@ end subroutine psb_d_mv_rsb_to_coo
       class(psb_d_base_sparse_mat), intent(inout)  :: b
       integer, intent(out)                        :: info
     PSBRSB_DEBUG('')
+  ! FIXME: could use here rsb_switch_rsb_matrix_to_csr_sorted
   call psb_d_cp_rsb_to_fmt(a,b,info)
   call d_rsb_free(a)
+  a%rsbmptr=c_null_ptr
     end subroutine psb_d_mv_rsb_to_fmt
   
 subroutine psb_d_mv_rsb_from_fmt(a,b,info) 
@@ -700,6 +711,7 @@ subroutine psb_d_mv_rsb_from_fmt(a,b,info)
   class(psb_d_rsb_sparse_mat), intent(inout)  :: a
   class(psb_d_base_sparse_mat), intent(inout) :: b
   integer, intent(out)                         :: info
+  ! FIXME: could use here rsb_allocate_rsb_sparse_matrix_from_csr_inplace
   type(psb_d_coo_sparse_mat) :: tmp
     PSBRSB_DEBUG('')
   info = psb_success_
@@ -717,6 +729,7 @@ subroutine psb_d_mv_rsb_from_coo(a,b,info)
   class(psb_d_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                        :: info
     PSBRSB_DEBUG('')
+  ! FIXME: should use rsb_allocate_rsb_sparse_matrix_inplace
   call a%cp_from_coo(b,info)
   call b%free()
 end subroutine psb_d_mv_rsb_from_coo

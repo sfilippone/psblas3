@@ -32,6 +32,46 @@ end interface
 
 interface
 type(c_ptr) function &
+  &rsb_allocate_rsb_sparse_matrix_from_csr_const&
+  &(VAc,IAc,JAc,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
+  &bind(c,name='rsb_allocate_rsb_sparse_matrix_from_csr_const')
+use iso_c_binding
+ real(c_double) :: VAc(*)
+ integer(c_int) :: IAc(*)
+ integer(c_int) :: JAc(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: Mb
+ integer(c_int), value  :: Kb
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_allocate_rsb_sparse_matrix_from_csr_const
+end interface
+
+interface
+type(c_ptr) function &
+  &rsb_allocate_rsb_sparse_matrix_from_csr_inplace&
+  &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
+  &bind(c,name='rsb_allocate_rsb_sparse_matrix_from_csr_inplace')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: Mb
+ integer(c_int), value  :: Kb
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_allocate_rsb_sparse_matrix_from_csr_inplace
+end interface
+
+interface
+type(c_ptr) function &
   &rsb_allocate_rsb_sparse_matrix_const&
   &(VAc,IAc,JAc,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_const')
@@ -48,6 +88,46 @@ use iso_c_binding
  integer(c_int), value  :: flags
  integer(c_int) :: errvalp
  end function rsb_allocate_rsb_sparse_matrix_const
+end interface
+
+interface
+type(c_ptr) function &
+  &rsb_allocate_rsb_sparse_matrix_inplace&
+  &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
+  &bind(c,name='rsb_allocate_rsb_sparse_matrix_inplace')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: Mb
+ integer(c_int), value  :: Kb
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_allocate_rsb_sparse_matrix_inplace
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_do_cleanup_nnz&
+  &(VA,IA,JA,nnz,roff,coff,m,k,onnzp,typecode,flags)&
+  &bind(c,name='rsb_do_cleanup_nnz')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: roff
+ integer(c_int), value  :: coff
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ type(c_ptr), value  :: onnzp
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: flags
+ end function rsb_do_cleanup_nnz
 end interface
 
 interface
@@ -439,6 +519,78 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_util_sort_row_major&
+  &(VA,IA,JA,nnz,m,k,typecode,flags)&
+  &bind(c,name='rsb_util_sort_row_major')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: flags
+ end function rsb_util_sort_row_major
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_util_sort_row_major_buffered&
+  &(VA,IA,JA,nnz,m,k,typecode,flags,WA,wb)&
+  &bind(c,name='rsb_util_sort_row_major_buffered')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: flags
+ type(c_ptr), value  :: WA
+ integer(c_int), value  :: wb
+ end function rsb_util_sort_row_major_buffered
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_util_sort_csc&
+  &(VA,IA,JA,nnz,m,k,typecode,flags)&
+  &bind(c,name='rsb_util_sort_csc')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: m
+ integer(c_int), value  :: k
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: flags
+ end function rsb_util_sort_csc
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_util_sortcoo&
+  &(VA,IA,JA,nnz,typecode,M_b,K_b,rpntr,cpntr,flags)&
+  &bind(c,name='rsb_util_sortcoo')
+use iso_c_binding
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: nnz
+ integer(c_int), value  :: typecode
+ integer(c_int), value  :: M_b
+ integer(c_int), value  :: K_b
+ type(c_ptr), value  :: rpntr
+ type(c_ptr), value  :: cpntr
+ integer(c_int), value  :: flags
+ end function rsb_util_sortcoo
+end interface
+
+interface
+integer(c_int) function &
   &rsb_cest&
   &(IA,JA,nnz,typecode,m,k,p_r,p_c,M_b,K_b,flags)&
   &bind(c,name='rsb_cest')
@@ -493,6 +645,20 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_get_csr&
+  &(matrix,VA,RP,JA,flags)&
+  &bind(c,name='rsb_get_csr')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ type(c_ptr), value  :: RP
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_get_csr
+end interface
+
+interface
+integer(c_int) function &
   &rsb_reinit&
   &(matrix)&
   &bind(c,name='rsb_reinit')
@@ -510,42 +676,6 @@ use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: diagonal(*)
  end function rsb_getdiag
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_sub_diag&
-  &(matrix,diagonal,loffset)&
-  &bind(c,name='rsb_get_sub_diag')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: diagonal(*)
- integer(c_int), value  :: loffset
- end function rsb_get_sub_diag
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_supra_diag&
-  &(matrix,diagonal,uoffset)&
-  &bind(c,name='rsb_get_supra_diag')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: diagonal(*)
- integer(c_int), value  :: uoffset
- end function rsb_get_supra_diag
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_row_dense&
-  &(matrix,row,i)&
-  &bind(c,name='rsb_get_row_dense')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- type(c_ptr), value  :: row
- integer(c_int), value  :: i
- end function rsb_get_row_dense
 end interface
 
 interface
@@ -666,31 +796,21 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_sym_transpose&
-  &(matrix)&
-  &bind(c,name='rsb_sym_transpose')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_sym_transpose
-end interface
-
-interface
-integer(c_int) function &
   &rsb_transpose&
-  &(matrix)&
+  &(matrixp)&
   &bind(c,name='rsb_transpose')
 use iso_c_binding
- type(c_ptr), value  :: matrix
+ type(c_ptr), value  :: matrixp
  end function rsb_transpose
 end interface
 
 interface
 integer(c_int) function &
   &rsb_htranspose&
-  &(matrix)&
+  &(matrixp)&
   &bind(c,name='rsb_htranspose')
 use iso_c_binding
- type(c_ptr), value  :: matrix
+ type(c_ptr), value  :: matrixp
  end function rsb_htranspose
 end interface
 
@@ -759,20 +879,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_set_elements&
-  &(matrix,VA,IA,JA,nnz)&
-  &bind(c,name='rsb_set_elements')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: VA(*)
- integer(c_int) :: IA(*)
- integer(c_int) :: JA(*)
- integer(c_int), value  :: nnz
- end function rsb_set_elements
-end interface
-
-interface
-integer(c_int) function &
   &rsb_update_elements&
   &(matrix,VA,IA,JA,nnz,flags)&
   &bind(c,name='rsb_update_elements')
@@ -784,6 +890,34 @@ use iso_c_binding
  integer(c_int), value  :: nnz
  integer(c_int), value  :: flags
  end function rsb_update_elements
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_switch_rsb_matrix_to_coo_sorted&
+  &(matrix,VA,IA,JA,flags)&
+  &bind(c,name='rsb_switch_rsb_matrix_to_coo_sorted')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_switch_rsb_matrix_to_coo_sorted
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_switch_rsb_matrix_to_csr_sorted&
+  &(matrix,VA,IA,JA,flags)&
+  &bind(c,name='rsb_switch_rsb_matrix_to_csr_sorted')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_switch_rsb_matrix_to_csr_sorted
 end interface
 
 interface
