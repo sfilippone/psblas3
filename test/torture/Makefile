@@ -29,11 +29,6 @@ psbtf: $(PSBTOBJS)
 psbtf.o: psb_mvsv_tester.o 
 
 
-psbt1:  psbt1.o
-	$(F90LINK) psbt1.o  -o psbt1 $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv psbt1 $(EXEDIR)
-
-
 .f90.o:
 	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
