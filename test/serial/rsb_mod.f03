@@ -5,11 +5,32 @@ module rsb_mod
 
 interface
 integer(c_int) function &
+  &rsb_perror&
+  &(errval)&
+  &bind(c,name='rsb_perror')
+use iso_c_binding
+ integer(c_int), value  :: errval
+ end function rsb_perror
+end interface
+
+interface
+integer(c_int) function &
   &rsb_init&
-  &()&
+  &(io)&
   &bind(c,name='rsb_init')
 use iso_c_binding
+ type(c_ptr), value  :: io
  end function rsb_init
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_reinit&
+  &(io)&
+  &bind(c,name='rsb_reinit')
+use iso_c_binding
+ type(c_ptr), value  :: io
+ end function rsb_reinit
 end interface
 
 interface
@@ -28,6 +49,24 @@ integer(c_int) function &
   &bind(c,name='rsb_exit')
 use iso_c_binding
  end function rsb_exit
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_meminfo&
+  &()&
+  &bind(c,name='rsb_meminfo')
+use iso_c_binding
+ end function rsb_meminfo
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_check_leak&
+  &()&
+  &bind(c,name='rsb_check_leak')
+use iso_c_binding
+ end function rsb_check_leak
 end interface
 
 interface
@@ -111,26 +150,6 @@ use iso_c_binding
 end interface
 
 interface
-integer(c_int) function &
-  &rsb_do_cleanup_nnz&
-  &(VA,IA,JA,nnz,roff,coff,m,k,onnzp,typecode,flags)&
-  &bind(c,name='rsb_do_cleanup_nnz')
-use iso_c_binding
- real(c_double) :: VA(*)
- integer(c_int) :: IA(*)
- integer(c_int) :: JA(*)
- integer(c_int), value  :: nnz
- integer(c_int), value  :: roff
- integer(c_int), value  :: coff
- integer(c_int), value  :: m
- integer(c_int), value  :: k
- type(c_ptr), value  :: onnzp
- integer(c_int), value  :: typecode
- integer(c_int), value  :: flags
- end function rsb_do_cleanup_nnz
-end interface
-
-interface
 type(c_ptr) function &
   &rsb_free_sparse_matrix&
   &(matrix)&
@@ -152,34 +171,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_mark_matrix_with_type_flags&
-  &(matrix)&
-  &bind(c,name='rsb_mark_matrix_with_type_flags')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_mark_matrix_with_type_flags
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_meminfo&
-  &()&
-  &bind(c,name='rsb_meminfo')
-use iso_c_binding
- end function rsb_meminfo
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_check_leak&
-  &()&
-  &bind(c,name='rsb_check_leak')
-use iso_c_binding
- end function rsb_check_leak
-end interface
-
-interface
-integer(c_int) function &
   &rsb_spmv&
   &(matrix,x,y,alphap,betap,incx,incy,transa)&
   &bind(c,name='rsb_spmv')
@@ -193,91 +184,6 @@ use iso_c_binding
  integer(c_int), value  :: incy
  integer(c_int), value  :: transa
  end function rsb_spmv
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_aa&
-  &(matrix,x,y,transa)&
-  &bind(c,name='rsb_spmv_aa')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- integer(c_int), value  :: transa
- end function rsb_spmv_aa
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_sa&
-  &(matrix,x,y,alphap,transa)&
-  &bind(c,name='rsb_spmv_sa')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- integer(c_int), value  :: transa
- end function rsb_spmv_sa
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_unua&
-  &(matrix,x,y,transa)&
-  &bind(c,name='rsb_spmv_unua')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- integer(c_int), value  :: transa
- end function rsb_spmv_unua
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_az&
-  &(matrix,x,y,transa)&
-  &bind(c,name='rsb_spmv_az')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- integer(c_int), value  :: transa
- end function rsb_spmv_az
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_uxux&
-  &(matrix,x,y,alphap,betap,transa)&
-  &bind(c,name='rsb_spmv_uxux')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: transa
- end function rsb_spmv_uxux
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmv_sxsx&
-  &(matrix,x,y,alphap,betap,transa,incx,incy)&
-  &bind(c,name='rsb_spmv_sxsx')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: transa
- integer(c_int), value  :: incx
- integer(c_int), value  :: incy
- end function rsb_spmv_sxsx
 end interface
 
 interface
@@ -366,60 +272,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_spmm_az&
-  &(matrix,mrhs,mout,bstride,cstride,nrhs,transa)&
-  &bind(c,name='rsb_spmm_az')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- type(c_ptr), value  :: mrhs
- type(c_ptr), value  :: mout
- integer(c_int), value  :: bstride
- integer(c_int), value  :: cstride
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transa
- end function rsb_spmm_az
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmm_sxsx&
-  &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
-  &bind(c,name='rsb_spmm_sxsx')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: b(*)
- real(c_double) :: c(*)
- integer(c_int), value  :: ldb
- integer(c_int), value  :: ldc
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transa
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: order
- end function rsb_spmm_sxsx
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spmm&
-  &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
-  &bind(c,name='rsb_spmm')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: b(*)
- real(c_double) :: c(*)
- integer(c_int), value  :: ldb
- integer(c_int), value  :: ldc
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transa
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: order
- end function rsb_spmm
-end interface
-
-interface
-integer(c_int) function &
   &rsb_spsm&
   &(matrix,b,ldb,nrhs,transt,alphap,betap,order)&
   &bind(c,name='rsb_spsm')
@@ -433,38 +285,6 @@ use iso_c_binding
  real(c_double) :: betap
  integer(c_int), value  :: order
  end function rsb_spsm
-end interface
-
-interface
-type(c_ptr) function &
-  &rsb_matrix_sum&
-  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
-  &bind(c,name='rsb_matrix_sum')
-use iso_c_binding
- type(c_ptr), value  :: matrixa
- real(c_double) :: alphap
- integer(c_int), value  :: transa
- type(c_ptr), value  :: matrixb
- real(c_double) :: betap
- integer(c_int), value  :: transb
- integer(c_int) :: errvalp
- end function rsb_matrix_sum
-end interface
-
-interface
-type(c_ptr) function &
-  &rsb_matrix_mul&
-  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
-  &bind(c,name='rsb_matrix_mul')
-use iso_c_binding
- type(c_ptr), value  :: matrixa
- real(c_double) :: alphap
- integer(c_int), value  :: transa
- type(c_ptr), value  :: matrixb
- real(c_double) :: betap
- integer(c_int), value  :: transb
- integer(c_int) :: errvalp
- end function rsb_matrix_mul
 end interface
 
 interface
@@ -482,39 +302,6 @@ use iso_c_binding
  integer(c_int), value  :: nc
  integer(c_int), value  :: rowmajor
  end function rsb_matrix_add_to_dense
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_negation&
-  &(matrix)&
-  &bind(c,name='rsb_negation')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_negation
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_scal&
-  &(matrix,d,transa)&
-  &bind(c,name='rsb_scal')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: d(*)
- integer(c_int), value  :: transa
- end function rsb_scal
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_scale_rows&
-  &(matrix,d)&
-  &bind(c,name='rsb_scale_rows')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: d(*)
- end function rsb_scale_rows
 end interface
 
 interface
@@ -555,9 +342,9 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_util_sort_csc&
+  &rsb_util_sort_column_major&
   &(VA,IA,JA,nnz,m,k,typecode,flags)&
-  &bind(c,name='rsb_util_sort_csc')
+  &bind(c,name='rsb_util_sort_column_major')
 use iso_c_binding
  real(c_double) :: VA(*)
  integer(c_int) :: IA(*)
@@ -567,7 +354,7 @@ use iso_c_binding
  integer(c_int), value  :: k
  integer(c_int), value  :: typecode
  integer(c_int), value  :: flags
- end function rsb_util_sort_csc
+ end function rsb_util_sort_column_major
 end interface
 
 interface
@@ -591,42 +378,44 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_cest&
-  &(IA,JA,nnz,typecode,m,k,p_r,p_c,M_b,K_b,flags)&
-  &bind(c,name='rsb_cest')
-use iso_c_binding
- integer(c_int) :: IA(*)
- integer(c_int) :: JA(*)
- integer(c_int), value  :: nnz
- integer(c_int), value  :: typecode
- integer(c_int), value  :: m
- integer(c_int), value  :: k
- type(c_ptr), value  :: p_r
- type(c_ptr), value  :: p_c
- integer(c_int), value  :: M_b
- integer(c_int), value  :: K_b
- integer(c_int), value  :: flags
- end function rsb_cest
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_perror&
-  &(errval)&
-  &bind(c,name='rsb_perror')
-use iso_c_binding
- integer(c_int), value  :: errval
- end function rsb_perror
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_sizeof&
-  &(matrix)&
-  &bind(c,name='rsb_sizeof')
+  &rsb_switch_rsb_matrix_to_coo_unsorted&
+  &(matrix,VA,IA,JA,flags)&
+  &bind(c,name='rsb_switch_rsb_matrix_to_coo_unsorted')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- end function rsb_sizeof
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_switch_rsb_matrix_to_coo_unsorted
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_switch_rsb_matrix_to_coo_sorted&
+  &(matrix,VA,IA,JA,flags)&
+  &bind(c,name='rsb_switch_rsb_matrix_to_coo_sorted')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_switch_rsb_matrix_to_coo_sorted
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_switch_rsb_matrix_to_csr_sorted&
+  &(matrix,VA,IA,JA,flags)&
+  &bind(c,name='rsb_switch_rsb_matrix_to_csr_sorted')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: VA(*)
+ integer(c_int) :: IA(*)
+ integer(c_int) :: JA(*)
+ integer(c_int), value  :: flags
+ end function rsb_switch_rsb_matrix_to_csr_sorted
 end interface
 
 interface
@@ -659,16 +448,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_reinit&
-  &(matrix)&
-  &bind(c,name='rsb_reinit')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_reinit
-end interface
-
-interface
-integer(c_int) function &
   &rsb_getdiag&
   &(matrix,diagonal)&
   &bind(c,name='rsb_getdiag')
@@ -676,36 +455,6 @@ use iso_c_binding
  type(c_ptr), value  :: matrix
  real(c_double) :: diagonal(*)
  end function rsb_getdiag
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_rows_nnz&
-  &(matrix,fr,lr,flags,errvalp)&
-  &bind(c,name='rsb_get_rows_nnz')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- integer(c_int), value  :: fr
- integer(c_int), value  :: lr
- integer(c_int), value  :: flags
- integer(c_int) :: errvalp
- end function rsb_get_rows_nnz
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_block_nnz&
-  &(matrix,fr,lr,fc,lc,flags,errvalp)&
-  &bind(c,name='rsb_get_block_nnz')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- integer(c_int), value  :: fr
- integer(c_int), value  :: lr
- integer(c_int), value  :: fc
- integer(c_int), value  :: lc
- integer(c_int), value  :: flags
- integer(c_int) :: errvalp
- end function rsb_get_block_nnz
 end interface
 
 interface
@@ -785,6 +534,76 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_get_matrix_nnz&
+  &(matrix)&
+  &bind(c,name='rsb_get_matrix_nnz')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_get_matrix_nnz
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_matrix_n_rows&
+  &(matrix)&
+  &bind(c,name='rsb_get_matrix_n_rows')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_get_matrix_n_rows
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_matrix_n_columns&
+  &(matrix)&
+  &bind(c,name='rsb_get_matrix_n_columns')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_get_matrix_n_columns
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_sizeof&
+  &(matrix)&
+  &bind(c,name='rsb_sizeof')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_sizeof
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_block_nnz&
+  &(matrix,fr,lr,fc,lc,flags,errvalp)&
+  &bind(c,name='rsb_get_block_nnz')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: fr
+ integer(c_int), value  :: lr
+ integer(c_int), value  :: fc
+ integer(c_int), value  :: lc
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_get_block_nnz
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_get_rows_nnz&
+  &(matrix,fr,lr,flags,errvalp)&
+  &bind(c,name='rsb_get_rows_nnz')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: fr
+ integer(c_int), value  :: lr
+ integer(c_int), value  :: flags
+ integer(c_int) :: errvalp
+ end function rsb_get_rows_nnz
+end interface
+
+interface
+integer(c_int) function &
   &rsb_assign&
   &(new_matrix,matrix)&
   &bind(c,name='rsb_assign')
@@ -812,36 +631,6 @@ integer(c_int) function &
 use iso_c_binding
  type(c_ptr), value  :: matrixp
  end function rsb_htranspose
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_matrix_nnz&
-  &(matrix)&
-  &bind(c,name='rsb_get_matrix_nnz')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_get_matrix_nnz
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_matrix_n_rows&
-  &(matrix)&
-  &bind(c,name='rsb_get_matrix_n_rows')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_get_matrix_n_rows
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_get_matrix_n_columns&
-  &(matrix)&
-  &bind(c,name='rsb_get_matrix_n_columns')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_get_matrix_n_columns
 end interface
 
 interface
@@ -893,31 +682,78 @@ use iso_c_binding
 end interface
 
 interface
-integer(c_int) function &
-  &rsb_switch_rsb_matrix_to_coo_sorted&
-  &(matrix,VA,IA,JA,flags)&
-  &bind(c,name='rsb_switch_rsb_matrix_to_coo_sorted')
+type(c_ptr) function &
+  &rsb_matrix_sum&
+  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
+  &bind(c,name='rsb_matrix_sum')
 use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: VA(*)
- integer(c_int) :: IA(*)
- integer(c_int) :: JA(*)
- integer(c_int), value  :: flags
- end function rsb_switch_rsb_matrix_to_coo_sorted
+ type(c_ptr), value  :: matrixa
+ real(c_double) :: alphap
+ integer(c_int), value  :: transa
+ type(c_ptr), value  :: matrixb
+ real(c_double) :: betap
+ integer(c_int), value  :: transb
+ integer(c_int) :: errvalp
+ end function rsb_matrix_sum
+end interface
+
+interface
+type(c_ptr) function &
+  &rsb_matrix_mul&
+  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
+  &bind(c,name='rsb_matrix_mul')
+use iso_c_binding
+ type(c_ptr), value  :: matrixa
+ real(c_double) :: alphap
+ integer(c_int), value  :: transa
+ type(c_ptr), value  :: matrixb
+ real(c_double) :: betap
+ integer(c_int), value  :: transb
+ integer(c_int) :: errvalp
+ end function rsb_matrix_mul
 end interface
 
 interface
 integer(c_int) function &
-  &rsb_switch_rsb_matrix_to_csr_sorted&
-  &(matrix,VA,IA,JA,flags)&
-  &bind(c,name='rsb_switch_rsb_matrix_to_csr_sorted')
+  &rsb_negation&
+  &(matrix)&
+  &bind(c,name='rsb_negation')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- real(c_double) :: VA(*)
- integer(c_int) :: IA(*)
- integer(c_int) :: JA(*)
- integer(c_int), value  :: flags
- end function rsb_switch_rsb_matrix_to_csr_sorted
+ end function rsb_negation
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_scal&
+  &(matrix,d,transa)&
+  &bind(c,name='rsb_scal')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ integer(c_int), value  :: transa
+ end function rsb_scal
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_scale_rows&
+  &(matrix,d)&
+  &bind(c,name='rsb_scale_rows')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: d(*)
+ end function rsb_scale_rows
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_reinit_matrix&
+  &(matrix)&
+  &bind(c,name='rsb_reinit_matrix')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ end function rsb_reinit_matrix
 end interface
 
 interface
@@ -948,28 +784,6 @@ integer(c_int) function &
 use iso_c_binding
  type(c_ptr), value  :: matrix
  end function rsb_print_matrix_unsorted_coo
-end interface
-
-interface
-type(c_ptr) function &
-  &rsb_load_matrix_file_as_binary&
-  &(filename,errvalp)&
-  &bind(c,name='rsb_load_matrix_file_as_binary')
-use iso_c_binding
- type(c_ptr), value  :: filename
- integer(c_int) :: errvalp
- end function rsb_load_matrix_file_as_binary
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_save_matrix_file_as_binary&
-  &(matrix,filename)&
-  &bind(c,name='rsb_save_matrix_file_as_binary')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- type(c_ptr), value  :: filename
- end function rsb_save_matrix_file_as_binary
 end interface
 
 interface
