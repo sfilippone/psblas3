@@ -607,9 +607,11 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   info=d_rsb_to_psb_info(rsb_get_block_sparse(a%rsbmptr,&
        & val(nzin_+1:),imin,imax,jmin_,jmax_,&
        & ia(nzin_+1:),ja(nzin_+1:),&
-       & c_null_ptr,c_null_ptr,nzrsb,c_f_index))
+       & c_null_ptr,c_null_ptr,nz,c_f_index))
     ! FIXME: unfinished; missing error handling ..
-
+  if (nz /= nzrsb) then 
+    write(0,*) 'Mismatch in output from rsb_getblk: ',nz,nzrsb
+  end if
 9999 continue
   call psb_erractionrestore(err_act)
 
