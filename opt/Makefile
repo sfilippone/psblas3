@@ -15,14 +15,15 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
+OBJS=psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
 all: libopt.a
-libopt.a: psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
-	ar cur libopt.a psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
+libopt.a: $(OBJS)
+	ar cur libopt.a $(OBJS)
 psb_d_ell_impl.o: psb_d_ell_mat_mod.o
 psb_d_rsb_mat_mod.o:  rsb_mod.o
 
 clean: 
-	/bin/rm -f  psb_d_ell_impl.o psb_d_ell_mat_mod.o *$(.mod)
+	/bin/rm -f  $(OBJS) *$(.mod) 
 
 verycleanlib: 
 	(cd ../..; make veryclean)
