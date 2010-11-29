@@ -31,9 +31,6 @@ d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o ps
 	$(F90LINK) $(LINKOPT) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  psb_d_czz_mat_mod.o  psb_d_rsb_mat_mod.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS) $(RSB_EXTRA)
 	/bin/mv d_matgen $(EXEDIR)	
 
-.f90.o:
-	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
-
 check: all
 	cd runs && echo 5 | ./d_matgen
 
