@@ -19,9 +19,9 @@ module psb_d_rsb_mat_mod
 #define PSBRSB_DEBUG(MSG)
 #endif
   integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-  integer,parameter :: c_f_index=1 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
-  integer,parameter  :: c_d_typecode=68 ! FIXME: here should use ..
-  integer,parameter  :: c_def_flags =c_f_index ! FIXME: here should use ..
+  integer, parameter :: c_f_index=1 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
+  integer, parameter :: c_d_typecode=68 ! FIXME: here should use ..
+  integer, parameter :: c_def_flags =c_f_index ! FIXME: here should use ..
   integer :: c_srt_flags =4 ! flags if rsb input is row major sorted ..
   integer :: c_own_flags =2 ! flags if rsb input shall not be freed by rsb
   integer :: c_upd_flags =c_f_index ! flags for when updating the assembled rsb matrix
@@ -545,7 +545,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: rscale,cscale
 
   logical :: append_, rscale_, cscale_ 
-  integer :: nzin_, jmin_, jmax_, err_act, i
+  integer :: nzin_, jmin_, jmax_, err_act, i, nzrsb 
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
   ! FIXME: MISSING THE HANDLING OF OPTIONS, HERE
@@ -596,16 +596,18 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     goto 9999
   end if
 
-    nzin_=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_f_index,info)
-    ! FIXME: unfinished; missing error handling ..
-
-    call psb_ensure_size(nzin_,ia,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_,val,info)
-    if (info /= psb_success_) return
-    
-    info=d_rsb_to_psb_info(rsb_get_block_sparse&
-    &(a%rsbmptr,val,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_f_index))
+  nzrsb = rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_f_index,info)
+  ! FIXME: unfinished; missing error handling ..
+  
+  call psb_ensure_size(nzin_+nzrsb,ia,info)
+  if (info == psb_success_) call psb_ensure_size(nzin_+nzrsb,ja,info)
+  if (info == psb_success_) call psb_ensure_size(nzin_+nzrsb,val,info)
+  if (info /= psb_success_) return
+  
+  info=d_rsb_to_psb_info(rsb_get_block_sparse(a%rsbmptr,&
+       & val(nzin_+1:),imin,imax,jmin_,jmax_,&
+       & ia(nzin_+1:),ja(nzin_+1:),&
+       & c_null_ptr,c_null_ptr,nzrsb,c_f_index))
     ! FIXME: unfinished; missing error handling ..
 
 9999 continue
@@ -616,7 +618,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     return
   end if
 
-  end subroutine psb_d_rsb_csgetrow
+end subroutine psb_d_rsb_csgetrow
 
 subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
