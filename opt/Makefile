@@ -16,9 +16,10 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 EXEDIR=./runs
 
 all: libopt.a
-libopt.a: psb_d_ell_impl.o psb_d_ell_mat_mod.o
-	ar cur libopt.a psb_d_ell_impl.o psb_d_ell_mat_mod.o
+libopt.a: psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
+	ar cur libopt.a psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
 psb_d_ell_impl.o: psb_d_ell_mat_mod.o
+psb_d_rsb_mat_mod.o:  rsb_mod.o
 
 clean: 
 	/bin/rm -f  psb_d_ell_impl.o psb_d_ell_mat_mod.o *$(.mod)

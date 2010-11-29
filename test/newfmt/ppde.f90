@@ -66,6 +66,7 @@ program ppde
   use psb_prec_mod
   use psb_krylov_mod
   use psb_d_ell_mat_mod
+  use psb_d_rsb_mat_mod
   implicit none
 
   ! input parameters
@@ -78,9 +79,10 @@ program ppde
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_dspmat_type) :: a,bm
   type(psb_dprec_type)  :: prec
   type(psb_d_ell_sparse_mat) :: aell
+  type(psb_d_rsb_sparse_mat) :: arsb
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -95,7 +97,7 @@ program ppde
 
   ! other variables
   integer            :: info, i
-  character(len=20)  :: name,ch_err
+  character(len=20)  :: name,ch_err, fname
 
   info=psb_success_
 
@@ -121,7 +123,7 @@ program ppde
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,mold=aell)  
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,mold=arsb)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -130,6 +132,10 @@ program ppde
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+
+  call a%cscnv(bm,info,type='CSR')
+  write(fname,'(a,i2.2,a,i2.2,a)') 'mat',iam,'-',np,'.mtx'
+  call bm%print(fname,head='%Test sparse gen RSB')
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   !
