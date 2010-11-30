@@ -480,7 +480,8 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
     PSBRSB_DEBUG('')
 
    info = psb_success_
-   ! This is to have fix_coo called behind the scenes
+   call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+
    if(b%is_sorted()) flags=flags+c_srt_flags 
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
@@ -513,8 +514,9 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_d_csr_sparse_mat) 
-  a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
-  &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags+c_srt_flags,info)
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
+        &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags+c_srt_flags,info)
     info=d_rsb_to_psb_info(info)
 
   type is (psb_d_rsb_sparse_mat) 
@@ -683,7 +685,7 @@ subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   character(len=20)  :: name='d_rsb_csput'
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
-    PSBRSB_DEBUG('')
+  PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_update_elements(a%rsbmptr,val,ia,ja,nz,c_upd_flags))
 end subroutine psb_d_rsb_csput
 
@@ -700,16 +702,16 @@ subroutine psb_d_mv_rsb_to_coo(a,b,info)
   call a%free()
 end subroutine psb_d_mv_rsb_to_coo
 
-    subroutine psb_d_mv_rsb_to_fmt(a,b,info) 
-      class(psb_d_rsb_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout)  :: b
-      integer, intent(out)                        :: info
-    PSBRSB_DEBUG('')
+subroutine psb_d_mv_rsb_to_fmt(a,b,info) 
+  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_d_base_sparse_mat), intent(inout)  :: b
+  integer, intent(out)                        :: info
+  PSBRSB_DEBUG('')
   ! FIXME: could use here rsb_switch_rsb_matrix_to_csr_sorted
   call psb_d_cp_rsb_to_fmt(a,b,info)
   call d_rsb_free(a)
   a%rsbmptr=c_null_ptr
-    end subroutine psb_d_mv_rsb_to_fmt
+end subroutine psb_d_mv_rsb_to_fmt
   
 subroutine psb_d_mv_rsb_from_fmt(a,b,info) 
   use psb_sparse_mod
