@@ -1,10 +1,12 @@
 !
 !
-! FIXME:
+! FIXME/TODO:
 ! * some RSB constants are used in their value form, and with no explanation
 ! * error handling
 ! * PSBLAS interface adherence
 ! * should test and fix all the problems that for sure will occur
+! * duplicate handling is not defined
+! * the printing function is not complete
 ! * ..
 ! 
 module psb_d_rsb_mat_mod
@@ -18,17 +20,17 @@ module psb_d_rsb_mat_mod
 #else
 #define PSBRSB_DEBUG(MSG)
 #endif
-  integer :: c_f_order=2        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-  integer, parameter :: c_f_index=1 ! 0x001000 ! FIXME: here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
-  integer, parameter :: c_d_typecode=68 ! FIXME: here should use ..
-  integer, parameter :: c_def_flags =c_f_index ! FIXME: here should use ..
-  integer :: c_srt_flags =4 ! flags if rsb input is row major sorted ..
-  integer :: c_own_flags =2 ! flags if rsb input shall not be freed by rsb
-  integer :: c_upd_flags =c_f_index ! flags for when updating the assembled rsb matrix
-  integer :: c_tri_flags =16777216 ! flags for specifying a triangle
-  integer :: c_low_flags =16384 ! flags for specifying a lower triangle/symmetry
-  integer :: c_upp_flags =33554432 ! flags for specifying a lower triangle/symmetry
-  integer :: c_idi_flags =262144 ! flags for specifying diagonal implicit
+  integer, parameter :: c_d_typecode=68 ! FIXME: this is only valid for 'double'
+  integer, parameter :: c_for_flags=1 ! : here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
+  integer, parameter :: c_srt_flags =4 ! flags if rsb input is row major sorted ..
+  !integer, parameter :: c_own_flags =-1 ! flags if rsb input shall not be freed by rsb
+  integer, parameter :: c_tri_flags =8 ! flags for specifying a triangle
+  integer, parameter :: c_low_flags =16 ! flags for specifying a lower triangle/symmetry
+  integer, parameter :: c_upp_flags =32 ! flags for specifying a lower triangle/symmetry
+  integer, parameter :: c_idi_flags =64 ! flags for specifying diagonal implicit
+  integer, parameter :: c_def_flags =c_for_flags ! FIXME: here should use ..
+  integer :: c_f_order=c_for_flags        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
+  integer, parameter :: c_upd_flags =c_for_flags ! flags for when updating the assembled rsb matrix
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr=c_null_ptr
@@ -336,6 +338,7 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer :: ldy,ldx,nc
     PSBRSB_DEBUG('')
+    PSBRSB_DEBUG('ERROR: UNIMPLEMENTED')
 
   if (present(trans)) then
     trans_ = trans
@@ -344,7 +347,8 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
   end if
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
-!!$  info=d_rsb_to_psb_info(rsb_spmm(a%rsbmptr,x,y,ldx,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
+  info=-1
+  info=d_rsb_to_psb_info(rsb_spmm(a%rsbmptr,x,y,ldx,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
 end subroutine psb_d_rsb_csmm
 
 subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans) 
@@ -358,6 +362,7 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   integer :: ldy,ldx,nc
   character :: trans_
     PSBRSB_DEBUG('')
+    PSBRSB_DEBUG('ERROR: UNIMPLEMENTED')
   if (present(trans)) then
     trans_ = trans
   else
@@ -365,7 +370,8 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   end if
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
-!!$  info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
+  info=-1
+  info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
 end subroutine
 
 subroutine psb_d_rsb_rowsum(d,a) 
@@ -432,7 +438,7 @@ end subroutine psb_d_rsb_reinit
     integer                              :: info
     PSBRSB_DEBUG('')
     res=0
-    res=rsb_get_rows_nnz(a%rsbmptr,idx,idx,c_f_index,info)
+    res=rsb_get_rows_nnz(a%rsbmptr,idx,idx,c_for_flags,info)
     info=d_rsb_to_psb_info(info)
     if(info.ne.0)res=0
   end function d_rsb_get_nz_row
@@ -456,7 +462,7 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   nza = a%get_nzeros()
   call b%allocate(nr,nc,nza)
   call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
-  info=d_rsb_to_psb_info(rsb_get_coo(a%rsbmptr,b%val,b%ia,b%ja,c_f_index))
+  info=d_rsb_to_psb_info(rsb_get_coo(a%rsbmptr,b%val,b%ia,b%ja,c_for_flags))
   call b%set_nzeros(a%get_nzeros())
   call b%set_nrows(a%get_nrows())
   call b%set_ncols(a%get_ncols())
@@ -644,7 +650,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     goto 9999
   end if
 
-  nzrsb = rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_f_index,info)
+  nzrsb = rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_for_flags,info)
   ! FIXME: unfinished; missing error handling ..
   
   call psb_ensure_size(nzin_+nzrsb,ia,info)
@@ -655,7 +661,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   info=d_rsb_to_psb_info(rsb_get_block_sparse(a%rsbmptr,&
        & val(nzin_+1:),imin,imax,jmin_,jmax_,&
        & ia(nzin_+1:),ja(nzin_+1:),&
-       & c_null_ptr,c_null_ptr,nz,c_f_index))
+       & c_null_ptr,c_null_ptr,nz,c_for_flags))
     ! FIXME: unfinished; missing error handling ..
   if (nz /= nzrsb) then 
     write(0,*) 'Mismatch in output from rsb_getblk: ',nz,nzrsb
@@ -704,7 +710,7 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
 
     if (info /= psb_success_) return
-    nzin_=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_f_index,info)
+    nzin_=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_for_flags,info)
     ! FIXME: unfinished; missing error handling ..
 
     call psb_ensure_size(nzin_,ia,info)
@@ -712,7 +718,7 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     if (info /= psb_success_) return
     
     info=d_rsb_to_psb_info(rsb_get_block_sparse_pattern&
-    &(a%rsbmptr,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_f_index))
+    &(a%rsbmptr,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
     ! FIXME: unfinished; missing error handling ..
 end subroutine psb_d_rsb_csgetptn
 

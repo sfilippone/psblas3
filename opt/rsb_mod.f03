@@ -188,6 +188,25 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_spmm&
+  &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
+  &bind(c,name='rsb_spmm')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: b(*)
+ real(c_double) :: c(*)
+ integer(c_int), value  :: ldb
+ integer(c_int), value  :: ldc
+ integer(c_int), value  :: nrhs
+ integer(c_int), value  :: transa
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: order
+ end function rsb_spmm
+end interface
+
+interface
+integer(c_int) function &
   &rsb_infinity_norm&
   &(matrix,infinity_norm,transa)&
   &bind(c,name='rsb_infinity_norm')
@@ -774,16 +793,6 @@ integer(c_int) function &
 use iso_c_binding
  type(c_ptr), value  :: matrix
  end function rsb_print_matrix_t
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_print_matrix_unsorted_coo&
-  &(matrix)&
-  &bind(c,name='rsb_print_matrix_unsorted_coo')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- end function rsb_print_matrix_unsorted_coo
 end interface
 
 interface
