@@ -104,6 +104,12 @@ program ppde
   
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
+  info=psb_rsb_matmod_init()
+  if(info.ne.psb_success_)then
+    info=psb_err_from_subroutine_
+    ch_err='create_matrix: rsb module initialization failed'
+    call psb_errpush(info,name,a_err=ch_err)
+  endif
 
   if (iam < 0) then 
     ! This should not happen, but just in case
@@ -133,6 +139,7 @@ program ppde
     goto 9999
   end if
 
+  fname=''! added by martone
   call a%cscnv(bm,info,type='CSR')
   write(fname,'(a,i2.2,a,i2.2,a)') 'mat',iam,'-',np,'.mtx'
   call bm%print(fname,head='%Test sparse gen RSB')
@@ -219,6 +226,14 @@ program ppde
   if(info /= psb_success_) then
     call psb_error(ictxt)
   end if
+
+  info=psb_rsb_matmod_exit()
+  if(info.ne.psb_success_)then
+    info=psb_err_from_subroutine_
+    ch_err='create_matrix: rsb module finalization failed'
+    call psb_errpush(info,name,a_err=ch_err)
+  endif
+
   call psb_exit(ictxt)
   stop
 

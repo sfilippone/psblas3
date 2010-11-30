@@ -7,6 +7,7 @@
 ! * should test and fix all the problems that for sure will occur
 ! * duplicate handling is not defined
 ! * the printing function is not complete
+! * should substitute -1 with another valid PSBLAS error code
 ! * ..
 ! 
 module psb_d_rsb_mat_mod
@@ -86,7 +87,7 @@ module psb_d_rsb_mat_mod
 #ifdef HAVE_LIBRSB
   contains 
 
-  function psv_rsb_mat_init() result(res)
+  function psb_rsb_matmod_init() result(res)
     implicit none 
     integer :: res
     !PSBRSB_DEBUG('')
@@ -94,13 +95,28 @@ module psb_d_rsb_mat_mod
 #ifdef HAVE_LIBRSB
     res=d_rsb_to_psb_info(rsb_init(c_null_ptr))
 #endif
-  end function psv_rsb_mat_init
+  end function psb_rsb_matmod_init
+
+  function psb_rsb_matmod_exit() result(res)
+    implicit none 
+    integer :: res
+    !PSBRSB_DEBUG('')
+    res=-1 ! FIXME
+#ifdef HAVE_LIBRSB
+    res=d_rsb_to_psb_info(rsb_exit())
+#endif
+  end function psb_rsb_matmod_exit
 
  function d_rsb_to_psb_info(info) result(res)
     implicit none 
-    integer :: res,info
+    integer , intent(in) :: info
+    integer :: res
     !PSBRSB_DEBUG('')
-    res=info
+    if(info.ne.0)then
+      res=-1
+    else
+      res=psb_success_
+    end if
   end function d_rsb_to_psb_info
 
  function d_rsb_get_flags(a) result(flags)
