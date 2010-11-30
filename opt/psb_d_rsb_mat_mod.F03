@@ -26,6 +26,9 @@ module psb_d_rsb_mat_mod
   integer :: c_own_flags =2 ! flags if rsb input shall not be freed by rsb
   integer :: c_upd_flags =c_f_index ! flags for when updating the assembled rsb matrix
   integer :: c_tri_flags =16777216 ! flags for specifying a triangle
+  integer :: c_low_flags =16384 ! flags for specifying a lower triangle/symmetry
+  integer :: c_upp_flags =33554432 ! flags for specifying a lower triangle/symmetry
+  integer :: c_idi_flags =262144 ! flags for specifying diagonal implicit
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr=c_null_ptr
@@ -98,6 +101,19 @@ module psb_d_rsb_mat_mod
     res=info
   end function d_rsb_to_psb_info
 
+ function d_rsb_get_flags(a) result(flags)
+    implicit none 
+    integer :: flags
+    class(psb_d_base_sparse_mat), intent(in) :: a
+    !PSBRSB_DEBUG('')
+    flags=c_def_flags 
+    if(a%is_sorted()) flags=flags+c_srt_flags 
+    if(a%is_triangle()) flags=flags+c_tri_flags 
+    if(a%is_upper()) flags=flags+c_upp_flags 
+    if(a%is_unit()) flags=flags+c_idi_flags 
+    if(a%is_lower()) flags=flags+c_low_flags 
+  end function d_rsb_get_flags
+
   function d_rsb_get_nzeros(a) result(res)
     implicit none 
     class(psb_d_rsb_sparse_mat), intent(in) :: a
@@ -155,7 +171,7 @@ subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
   character :: trans_
-    PSBRSB_DEBUG('')
+!    PSBRSB_DEBUG('')
   info = psb_success_
 
   if (present(trans)) then
@@ -184,7 +200,7 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-    PSBRSB_DEBUG('')
+!    PSBRSB_DEBUG('')
 
   if (present(trans)) then
     trans_ = trans
@@ -433,7 +449,7 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   Integer             :: nza, nr, nc,i,j,irw, idl,err_act
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
-    PSBRSB_DEBUG('')
+   ! PSBRSB_DEBUG('')
   info = psb_success_
   nr  = a%get_nrows()
   nc  = a%get_ncols()
@@ -504,17 +520,13 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
   integer             :: debug_level, debug_unit
   integer             :: flags
   character(len=20)   :: name
-    PSBRSB_DEBUG('')
+   ! PSBRSB_DEBUG('')
 
-   flags=c_def_flags
+   flags=d_rsb_get_flags(b)
+  
    info = psb_success_
    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
 
-   if(b%is_sorted()) flags=flags+c_srt_flags 
-   if(b%is_triangle()) flags=flags+c_tri_flags 
-   if(b%is_lower()) write (*,*) 'LOWER'
-   if(b%is_triangle()) write (*,*) 'TRIANGLE'
-   if(b%is_upper()) write (*,*) 'UPPER'
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
@@ -541,9 +553,7 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
     PSBRSB_DEBUG('')
 
   info = psb_success_
-  flags=c_def_flags
-  if(b%is_sorted()) flags=flags+c_srt_flags 
-  if(b%is_triangle()) flags=flags+c_tri_flags 
+  flags=d_rsb_get_flags(b)
 
   select type (b)
   type is (psb_d_coo_sparse_mat) 
@@ -551,7 +561,6 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
 
   type is (psb_d_csr_sparse_mat) 
     call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-    flags=flags+c_srt_flags
     a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
         &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
@@ -588,7 +597,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
   ! FIXME: MISSING THE HANDLING OF OPTIONS, HERE
-    PSBRSB_DEBUG('')
+  !  PSBRSB_DEBUG('')
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -759,7 +768,7 @@ subroutine psb_d_mv_rsb_from_fmt(a,b,info)
   ! FIXME: could use here rsb_allocate_rsb_sparse_matrix_from_csr_inplace
   !if(b%is_sorted()) flags=flags+c_srt_flags 
   type(psb_d_coo_sparse_mat) :: tmp
-    PSBRSB_DEBUG('')
+  !  PSBRSB_DEBUG('')
   info = psb_success_
   select type (b)
   class default
@@ -774,7 +783,7 @@ subroutine psb_d_mv_rsb_from_coo(a,b,info)
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                        :: info
-    PSBRSB_DEBUG('')
+  !  PSBRSB_DEBUG('')
   ! FIXME: should use rsb_allocate_rsb_sparse_matrix_inplace
   !if(b%is_sorted()) flags=flags+c_srt_flags 
   !if(b%is_triangle()) flags=flags+c_tri_flags 
