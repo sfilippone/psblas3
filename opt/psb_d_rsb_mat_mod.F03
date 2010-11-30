@@ -502,15 +502,19 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act, nc
   integer             :: debug_level, debug_unit
-  integer             :: flags=c_def_flags
+  integer             :: flags
   character(len=20)   :: name
     PSBRSB_DEBUG('')
 
+   flags=c_def_flags
    info = psb_success_
    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
 
    if(b%is_sorted()) flags=flags+c_srt_flags 
    if(b%is_triangle()) flags=flags+c_tri_flags 
+   if(b%is_lower()) write (*,*) 'LOWER'
+   if(b%is_triangle()) write (*,*) 'TRIANGLE'
+   if(b%is_upper()) write (*,*) 'UPPER'
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
@@ -547,7 +551,7 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
 
   type is (psb_d_csr_sparse_mat) 
     call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-    flags=c_srt_flags
+    flags=flags+c_srt_flags
     a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
         &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
