@@ -25,6 +25,7 @@ module psb_d_rsb_mat_mod
   integer :: c_srt_flags =4 ! flags if rsb input is row major sorted ..
   integer :: c_own_flags =2 ! flags if rsb input shall not be freed by rsb
   integer :: c_upd_flags =c_f_index ! flags for when updating the assembled rsb matrix
+  integer :: c_tri_flags =16777216 ! flags for specifying a triangle
   type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr=c_null_ptr
@@ -509,6 +510,7 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
 
    if(b%is_sorted()) flags=flags+c_srt_flags 
+   if(b%is_triangle()) flags=flags+c_tri_flags 
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
@@ -530,10 +532,14 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
   logical             :: rwshr_
   Integer             :: nz, nr, i,j,irw, idl,err_act, nc
   integer              :: debug_level, debug_unit
+  integer             :: flags
   character(len=20)   :: name
     PSBRSB_DEBUG('')
 
   info = psb_success_
+  flags=c_def_flags
+  if(b%is_sorted()) flags=flags+c_srt_flags 
+  if(b%is_triangle()) flags=flags+c_tri_flags 
 
   select type (b)
   type is (psb_d_coo_sparse_mat) 
@@ -541,8 +547,9 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
 
   type is (psb_d_csr_sparse_mat) 
     call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    flags=c_srt_flags
     a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
-        &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,c_def_flags+c_srt_flags,info)
+        &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
 
   type is (psb_d_rsb_sparse_mat) 
@@ -766,6 +773,7 @@ subroutine psb_d_mv_rsb_from_coo(a,b,info)
     PSBRSB_DEBUG('')
   ! FIXME: should use rsb_allocate_rsb_sparse_matrix_inplace
   !if(b%is_sorted()) flags=flags+c_srt_flags 
+  !if(b%is_triangle()) flags=flags+c_tri_flags 
   call a%cp_from_coo(b,info)
   call b%free()
 end subroutine psb_d_mv_rsb_from_coo
