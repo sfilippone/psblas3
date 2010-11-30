@@ -166,6 +166,7 @@ subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_rsb_csmv
 
 subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
   ! FIXME: and what when x is an alias of y ?
   ! FIXME: ignoring beta
   implicit none 
@@ -175,8 +176,14 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
   character :: trans_
-    PSBRSB_DEBUG('')
+  Integer :: err_act, i
+  character(len=20)  :: name='rsb_cssv'
+  logical, parameter :: debug=.false.
+
   info = psb_success_
+  call psb_erractionsave(err_act)
+
+    PSBRSB_DEBUG('')
 
   if (present(trans)) then
     trans_ = trans
@@ -184,6 +191,25 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   info=d_rsb_to_psb_info(rsb_spsv(a%rsbmptr,x,y,alpha,1,1,rsb_psblas_trans_to_rsb_trans(trans_)))
+  if (info /= 0) then 
+    i = info
+    info = psb_err_from_subroutine_ai_
+    call psb_errpush(info,name,&
+         & i_err=(/i,0,0,0,0/),a_err="rsb_spsv")
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+    
 end subroutine psb_d_rsb_cssv
 
 subroutine psb_d_rsb_scals(d,a,info) 
