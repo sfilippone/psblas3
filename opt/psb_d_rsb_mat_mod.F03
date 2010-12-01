@@ -43,6 +43,7 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: get_fmt      => d_rsb_get_fmt
     procedure, pass(a) :: sizeof       => d_rsb_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_rsb_csmm
+    !procedure, pass(a) :: d_csmv_nt       => psb_d_rsb_csmv_nt ! FIXME: a placeholder for future memory
     procedure, pass(a) :: d_csmv       => psb_d_rsb_csmv
     procedure, pass(a) :: d_inner_cssm => psb_d_rsb_cssm
     procedure, pass(a) :: d_inner_cssv => psb_d_rsb_cssv
@@ -199,6 +200,24 @@ subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans)
   end if
   info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x,y,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(trans_)))
 end subroutine psb_d_rsb_csmv
+
+subroutine psb_d_rsb_csmv_nt(alpha,a,x1,x2,beta,y1,y2,info) 
+  ! FIXME: this routine is here as a placeholder for a specialized implementation of 
+  ! joint spmv and spmv transposed.
+  implicit none 
+  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in) :: alpha, beta, x1(:), x2(:)
+  real(psb_dpk_), intent(inout)       :: y1(:), y2(:)
+  integer, intent(out)                :: info
+  character, parameter  :: transn='N',transt='T'
+!    PSBRSB_DEBUG('')
+  info = psb_success_
+  info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x1,y1,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(transn)))
+  if(info.ne.psb_success_) goto 9999
+  info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x2,y2,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(transt)))
+9999 continue
+  return
+end subroutine psb_d_rsb_csmv_nt
 
 subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
