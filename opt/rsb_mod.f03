@@ -188,6 +188,58 @@ end interface
 
 interface
 integer(c_int) function &
+  &rsb_spmv_nt&
+  &(matrix,x1,x2,y1,y2,alphap,betap,incx,incy)&
+  &bind(c,name='rsb_spmv_nt')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ type(c_ptr), value  :: x1
+ type(c_ptr), value  :: x2
+ type(c_ptr), value  :: y1
+ type(c_ptr), value  :: y2
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: incx
+ integer(c_int), value  :: incy
+ end function rsb_spmv_nt
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spmv_ata&
+  &(matrix,x,y,alphap,betap,incx,incy)&
+  &bind(c,name='rsb_spmv_ata')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: x(*)
+ real(c_double) :: y(*)
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: incx
+ integer(c_int), value  :: incy
+ end function rsb_spmv_ata
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spmv_power&
+  &(matrix,x,y,alphap,betap,incx,incy,transa,exp)&
+  &bind(c,name='rsb_spmv_power')
+use iso_c_binding
+ type(c_ptr), value  :: matrix
+ real(c_double) :: x(*)
+ real(c_double) :: y(*)
+ real(c_double) :: alphap
+ real(c_double) :: betap
+ integer(c_int), value  :: incx
+ integer(c_int), value  :: incy
+ integer(c_int), value  :: transa
+ integer(c_int), value  :: exp
+ end function rsb_spmv_power
+end interface
+
+interface
+integer(c_int) function &
   &rsb_spmm&
   &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
   &bind(c,name='rsb_spmm')
@@ -479,7 +531,7 @@ end interface
 interface
 integer(c_int) function &
   &rsb_get_rows_sparse&
-  &(matrix,VA,fr,lr,IA,JA,rnz,flags)&
+  &(matrix,VA,fr,lr,IA,JA,rnz,alphap,trans,flags)&
   &bind(c,name='rsb_get_rows_sparse')
 use iso_c_binding
  type(c_ptr), value  :: matrix
@@ -489,6 +541,8 @@ use iso_c_binding
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int) :: rnz
+ real(c_double) :: alphap
+ integer(c_int), value  :: trans
  integer(c_int), value  :: flags
  end function rsb_get_rows_sparse
 end interface
