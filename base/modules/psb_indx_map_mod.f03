@@ -1,7 +1,82 @@
+!!$ 
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+!
+!
+! package: psb_indx_map_mod
+!    Defines the PSB_INDX_MAP class.
+!
+!  In particular, besides the communicator, it contains the data relevant
+!  to the following queries:
+!  1. How many global rows/columns?
+!  2. How many local  rows/columns?
+!  3. Convert between local and global indices
+!  4. Add to local indices.
+!  5. Find (one of) the owner(s) of a given index
+!  6. Query the indx state.
+!  7. Does the dynamic class support extensions of the rows? I.e., can
+!     it have overlap? for instance, the BLOCK cannot, it would run afoul
+!     of the glob_to_loc translation. 
+!  
+!  Checking for the existence of overlap is very expensive, thus
+!  it is done at build time (for extended-halo cases it can be inferred from
+!  the construction process).
+!  
+!  1. Each global index I is owned by at least one process;
+!
+!  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
+!     are locally owned; the value of N_ROW can be determined upon allocation 
+!     based on the index distribution (see also the interface to CDALL).
+!
+!  3. If a global index is owned by more than one process, we have an OVERLAP
+!     in which case the sum of all the N_ROW values is greater than the total 
+!     size of the index space; 
+!
+!  4. During the buildup of the descriptor, according to the user specified 
+!     stencil, we also take notice of indices that are not owned by the current
+!     process, but whose value is needed to proceed with the computation; these 
+!     form the HALO of the current process. Halo indices are assigned local indices
+!     from N_ROW+1 to N_COL (inclusive).
+!
+!  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
+!
+!
+!
+!
+!
+!
 module psb_indx_map_mod
   use psb_const_mod
   use psb_desc_const_mod
-  
+
   type      :: psb_indx_map
 
     integer :: state          = psb_desc_null_
@@ -39,7 +114,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: set_lc    => base_set_lc
     procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
     procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
-    
+
     procedure, pass(idxmap)  :: get_fmt   => base_get_fmt
 
     procedure, pass(idxmap)  :: asb   => base_asb
@@ -91,84 +166,84 @@ module psb_indx_map_mod
       integer, intent(out) :: info
     end subroutine psb_indx_map_fnd_owner
   end interface
-  
+
 contains
 
   function base_get_state(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%state
 
   end function base_get_state
-  
+
 
   function base_get_gr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%global_rows
 
   end function base_get_gr
-  
+
 
   function base_get_gc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%global_cols
 
   end function base_get_gc
-  
+
 
   function base_get_lr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%local_rows
 
   end function base_get_lr
-  
+
 
   function base_get_lc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%local_cols
 
   end function base_get_lc
-  
+
 
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%ictxt
 
   end function base_get_ctxt
-  
+
 
   function base_get_mpic(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer :: val
-    
+
     val = idxmap%mpic
 
   end function base_get_mpic
-  
+
 
   subroutine base_set_state(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%state = val
   end subroutine base_set_state
 
@@ -176,15 +251,15 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%ictxt = val
   end subroutine base_set_ctxt
-  
+
   subroutine base_set_gr(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%global_rows = val
   end subroutine base_set_gr
 
@@ -192,7 +267,7 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%global_cols = val
   end subroutine base_set_gc
 
@@ -200,7 +275,7 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%local_rows = val
   end subroutine base_set_lr
 
@@ -208,7 +283,7 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%local_cols = val
   end subroutine base_set_lc
 
@@ -216,11 +291,11 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(in)  :: val
-    
+
     idxmap%mpic = val
   end subroutine base_set_mpic
 
-  
+
   function base_row_extendable(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -234,15 +309,15 @@ contains
     logical :: val
     val = .false.
   end function base_is_repl
-    
+
   function base_is_null(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     logical :: val
     val =  (idxmap%state == psb_desc_null_)
   end function base_is_null
-  
-  
+
+
   function base_is_bld(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -250,14 +325,14 @@ contains
     val = (idxmap%state == psb_desc_bld_).or.&
          & (idxmap%state == psb_desc_ovl_bld_)
   end function base_is_bld
-    
+
   function base_is_upd(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     logical :: val
     val = (idxmap%state == psb_desc_upd_)
   end function base_is_upd
-    
+
   function base_is_asb(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -265,7 +340,7 @@ contains
     val = (idxmap%state == psb_desc_asb_).or.&
          & (idxmap%state == psb_desc_ovl_asb_)
   end function base_is_asb
-    
+
   function base_is_valid(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -273,7 +348,7 @@ contains
     val = idxmap%is_bld().or.idxmap%is_upd().or.idxmap%is_asb()
   end function base_is_valid
 
-    
+
   function base_is_ovl(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -281,12 +356,12 @@ contains
     val = (idxmap%state == psb_desc_ovl_bld_).or.&
          & (idxmap%state == psb_desc_ovl_asb_)
   end function base_is_ovl
-  
+
   function base_sizeof(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer(psb_long_int_k_) :: val
-    
+
     val = 8 * psb_sizeof_int
   end function base_sizeof
 
@@ -333,19 +408,19 @@ contains
     Integer :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
-    
+
     call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
-    
+
     if (err_act /= psb_act_ret_) then
       call psb_error()
     end if
     return
-    
+
   end subroutine base_l2gs2
 
 
@@ -360,14 +435,14 @@ contains
     Integer :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
-    
+
     call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
-    
+
     if (err_act /= psb_act_ret_) then
       call psb_error()
     end if
@@ -453,7 +528,7 @@ contains
       call psb_error()
     end if
     return
-    
+
   end subroutine base_g2ls2
 
 
@@ -547,7 +622,7 @@ contains
     integer, intent(out)   :: idxout
     integer, intent(out)   :: info 
     logical, intent(in), optional :: mask
-    
+
     Integer :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
@@ -563,7 +638,7 @@ contains
       call psb_error()
     end if
     return
-    
+
   end subroutine base_g2ls2_ins
 
 
@@ -625,7 +700,7 @@ contains
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer, intent(out) :: info
-    
+
     Integer :: err_act
     character(len=20)  :: name='base_asb'
     logical, parameter :: debug=.false.
@@ -641,14 +716,14 @@ contains
       call psb_error()
     end if
     return
-    
+
   end subroutine base_asb
 
   subroutine base_free(idxmap)
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    
+
     Integer :: err_act
     character(len=20)  :: name='base_free'
     logical, parameter :: debug=.false.
@@ -712,7 +787,7 @@ contains
     end if
     return
   end subroutine base_init_vl
-    
+
 
 
 end module psb_indx_map_mod

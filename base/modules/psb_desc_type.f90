@@ -47,17 +47,9 @@ module psb_descriptor_type
   !  type: psb_desc_type
   !  
   !  Communication Descriptor data structure.
-  !| type psb_idxmap_type
-  !|   integer              :: state 
-  !|   integer, allocatable :: loc_to_glob(:)
-  !|   integer, allocatable :: glob_to_loc(:)
-  !|   integer              :: hashvsize, hashvmask
-  !|   integer, allocatable :: hashv(:), glb_lc(:,:)
-  !|   type(psb_hash_type)  :: hash
-  !| end type psb_idxmap_type
-  !
   !
   !|  type psb_desc_type
+  !|     class(psb_indx_map), allocatable :: indxmap
   !|     integer, allocatable  :: matrix_data(:)
   !|     integer, allocatable  :: halo_index(:), ext_index(:)
   !|     integer, allocatable  :: bnd_elem(:)
@@ -77,25 +69,30 @@ module psb_descriptor_type
   !  mesh discretization pattern. Thus building a communication descriptor is
   !  very much linked to building a sparse matrix (since the matrix sparsity 
   !  pattern embodies the topology of the discretization graph).
-  !  
-  !  Most general info about the descriptor is stored in the matrix_data
-  !  component, including the STATE which can be  PSB_DESC_BLD_, 
-  !  PSB_DESC_ASB_ or PSB_DESC_REPL_. 
-  !  Upon allocation with PSB_CDALL the descriptor enters the BLD state;
-  !  then the user can specify the discretization pattern with PSB_CDINS;
-  !  the call to PSB_CDASB puts the descriptor in the PSB_ASB_ state. 
   !
-  !  PSB_DESC_REPL_ is a special value that specifies a replicated index space,
-  !  and is only entered by the psb_cdrep call. Currently it is only 
-  !  used in the last level of some multilevel preconditioners. 
-  ! 
-  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and HASH  data structures
-  !  inside IDXMAP  implement the  mapping between local and global indices,
-  !  according to the following   guidelines:
+  !  This is a two-level data structure: it combines an INDX_MAP with
+  !  a set of auxiliary lists.
+  !  For a complete description of INDX_MAP see its own file, but the
+  !  idea here is the following: the INDX_MAP contains information about
+  !  the index space and its allocation to the various processors.
+  !  In particular, besides the communicator, it contains the data relevant
+  !  to the following queries:
+  !  1. How many global rows/columns?
+  !  2. How many local  rows/columns?
+  !  3. Convert between local and global indices
+  !  4. Add to local indices.
+  !  5. Find (one of) the owner(s) of a given index
+  !  Checking for the existence of overlap is very expensive, thus
+  !  it is done at build time (for extended-halo cases it can be inferred from
+  !  the construction process).
+  !  There are multiple ways to represent an INDX_MAP internally, hence it is
+  !  a CLASS variable, which can take different forms, more or less memory hungry. 
+  !
+  !  Guidelines
   !
   !  1. Each global index I is owned by at least one process;
   !
-  !  2. On each process, indices from 1 to N_ROW (desc%matrix_dat(psb_n_row_))
+  !  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
   !     are locally owned; the value of N_ROW can be determined upon allocation 
   !     based on the index distribution (see also the interface to CDALL).
   !
@@ -109,36 +106,9 @@ module psb_descriptor_type
   !     form the HALO of the current process. Halo indices are assigned local indices
   !     from N_ROW+1 to N_COL (inclusive).
   !
-  !  5. Regardless of the descriptor state, LOC_TO_GLOB(I), I=1:N_COL always 
-  !     contains the global index corresponding to local index I; the upper bound 
-  !     N_COL moves during the descriptor build process (see CDINS). 
+  !  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
   !
-  !  6. The descriptor also contains the inverse global-to-local mapping. This 
-  !     mapping can take two forms according to the value returned by 
-  !     psb_cd_choose_large_state:
-  !     i. If the global index space size is not too large, it is possible to store 
-  !        a complete mapping  in GLOB_TO_LOC: each entry contains the corresponding 
-  !        local index (if there is one), or an encoded value identifying the process 
-  !        owning that index. This array is filled in at initialization time CDALL, 
-  !        and thus it is available throughout the insertion phase. The local storage 
-  !        will thus be N_COL + N_GLOB
-  !   ii.  If the global index space is very large (larger than the threshold value
-  !        which may be set by the user), then it is not advisable to have such an 
-  !        array.
-  !        In this case we only record the global indices that do have a 
-  !        local counterpart, so that the local storage will be proportional to 
-  !        N_COL.
-  !        The idea is that  glb_lc(:,1) will hold sorted global indices, and
-  !        glb_lc(:,2) the corresponding local indices, so that we may do a binary search.
-  !        To cut down  the search time we partition glb_lc into a set of lists
-  !        addressed by  hashv(:) based on the value of the lowest
-  !        PSB_HASH_BITS bits of the  global index. 
-  !        During the build phase glb_lc() will store the indices of the internal points,
-  !        i.e. local indices 1:NROW, since those are known ad CDALL time.
-  !        The halo indices that we encounter during the build phase are put in
-  !        a PSB_HASH_TYPE data structure, which implements a very simple hash; this
-  !        hash  will nonetheless be quite fast at low occupancy rates.
-  !        At assembly time, we move everything into hashv(:) and glb_lc(:,:).
+  !  6. The descriptor also contains the inverse global-to-local mapping.
   !
   !  7. The data exchange is based on lists of local indices to be exchanged; all the 
   !     lists have the same format, as follows:
@@ -181,10 +151,10 @@ module psb_descriptor_type
   !     phase to be loosely synchronized. Thus we record the indices we have to ask 
   !     for, and at the time we call PSB_CDASB we match all the requests to figure 
   !     out who should be sending what to whom.
-  !     However this implies that we know who owns the indices; if we are in the 
-  !     LARGE case (as described above) this is actually only true for the OVERLAP list 
-  !     that is filled in at CDALL time, and not for the HALO (remember: we do not have 
-  !     the space to encode the owning process index in the GLOB_TO_LOC mapping); thus 
+  !     However this implies that we know who owns the indices; 
+  !     this is actually only true for the OVERLAP list 
+  !     that is filled in at CDALL time, and not for the HALO (remember: we do not
+  !     necessarily have the space to encode the owning process index); thus 
   !     the HALO list is rebuilt during the CDASB process 
   !     (in the psi_ldsc_pre_halo subroutine). 
   !  
@@ -219,9 +189,8 @@ module psb_descriptor_type
   ! It is complex, but it does the following:
   !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
   !     one synch point at the end (CDASB)
-  !  2. Takes shortcuts when the problem size is not too large (the default threshold
-  !     assumes that you are willing to spend up to 4 MB on each process for the 
-  !     glob_to_loc mapping)
+  !  2. Takes shortcuts when the problem size is not too large
+  !  
   !  3. Supports restriction/prolongation operators with the same routines 
   !     just choosing (in the swapdata/swaptran internals) on which index list 
   !     they should work. 
@@ -434,59 +403,11 @@ contains
 
   end function psb_is_asb_desc
 
-
-  logical function psb_is_ok_dec(dectype)
-    integer :: dectype
-
-    psb_is_ok_dec = ((dectype == psb_desc_asb_).or.(dectype == psb_desc_bld_).or.&
-         &(dectype == psb_cd_ovl_asb_).or.(dectype == psb_cd_ovl_bld_).or.&
-         &(dectype == psb_desc_upd_).or.&
-         &(dectype == psb_desc_repl_))
-  end function psb_is_ok_dec
-
-  logical function psb_is_bld_dec(dectype)
-    integer :: dectype
-
-    psb_is_bld_dec = (dectype == psb_desc_bld_).or.(dectype == psb_cd_ovl_bld_)
-  end function psb_is_bld_dec
-
-  logical function psb_is_upd_dec(dectype)          
-    integer :: dectype
-
-    psb_is_upd_dec = (dectype == psb_desc_upd_)
-
-  end function psb_is_upd_dec
-
-  logical function psb_is_repl_dec(dectype)          
-    integer :: dectype
-
-    psb_is_repl_dec = (dectype == psb_desc_repl_)
-
-  end function psb_is_repl_dec
-
-
-  logical function psb_is_asb_dec(dectype)          
-    integer :: dectype
-
-    psb_is_asb_dec = (dectype == psb_desc_asb_).or.&
-         & (dectype == psb_desc_repl_).or.(dectype == psb_cd_ovl_asb_)
-
-  end function psb_is_asb_dec
-
-  logical function psb_is_ovl_dec(dectype)          
-    integer :: dectype
-
-    psb_is_ovl_dec = (dectype == psb_cd_ovl_bld_).or.&
-         & (dectype == psb_cd_ovl_asb_)
-
-  end function psb_is_ovl_dec
-
-
   integer function psb_cd_get_local_rows(desc)
     type(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_local_rows = desc%matrix_data(psb_n_row_)
+      psb_cd_get_local_rows = desc%indxmap%get_lr()
     else
       psb_cd_get_local_rows = -1
     endif
@@ -496,7 +417,7 @@ contains
     type(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_local_cols = desc%matrix_data(psb_n_col_)
+      psb_cd_get_local_cols = desc%indxmap%get_lc()
     else
       psb_cd_get_local_cols = -1
     endif
@@ -506,7 +427,7 @@ contains
     type(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_global_rows = desc%matrix_data(psb_m_)
+      psb_cd_get_global_rows = desc%indxmap%get_gr()
     else
       psb_cd_get_global_rows = -1
     endif
@@ -517,7 +438,7 @@ contains
     type(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_global_cols = desc%matrix_data(psb_n_)
+      psb_cd_get_global_cols = desc%indxmap%get_gc()
     else
       psb_cd_get_global_cols = -1
     endif

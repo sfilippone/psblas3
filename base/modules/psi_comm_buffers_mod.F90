@@ -13,6 +13,7 @@ module mpi
   integer, parameter :: mpi_double_complex   = 6 
   integer, parameter :: mpi_character        = 7
   integer, parameter :: mpi_logical          = 8
+  integer, parameter :: mpi_integer2         = 9
   integer, parameter :: mpi_comm_null        = -1
   integer, parameter :: mpi_comm_world       = 1
   
@@ -31,6 +32,7 @@ module psi_comm_buffers_mod
   integer, private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
   integer, private, parameter:: psb_char_type     = psb_logical_type  + 1
   integer, private, parameter:: psb_int8_type     = psb_char_type     + 1
+  integer, private, parameter:: psb_int2_type     = psb_int8_type     + 1
 
 
   type psb_buffer_node
@@ -39,6 +41,7 @@ module psi_comm_buffers_mod
     integer :: buffer_type
     integer(psb_int_k_), allocatable      :: intbuf(:)
     integer(psb_long_int_k_), allocatable :: int8buf(:)
+    integer(2), allocatable               :: int2buf(:)
     real(psb_spk_), allocatable           :: realbuf(:)
     real(psb_dpk_), allocatable           :: doublebuf(:)
     complex(psb_spk_), allocatable        :: complexbuf(:)
@@ -62,6 +65,11 @@ module psi_comm_buffers_mod
 #if !defined(LONG_INTEGERS)
   interface psi_snd
     module procedure psi_i8snd
+  end interface
+#endif
+#if defined(SHORT_INTEGERS)
+  interface psi_snd
+    module procedure psi_i2snd
   end interface
 #endif
   
@@ -286,6 +294,42 @@ contains
     call psb_test_nodes(mesg_queue)
 
   end subroutine psi_i8snd
+#endif
+
+#if defined(SHORT_INTEGERS)
+  subroutine psi_i2snd(icontxt,tag,dest,buffer,mesg_queue)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer :: icontxt, tag, dest
+    integer(2), allocatable, intent(inout) :: buffer(:)
+    type(psb_buffer_queue) :: mesg_queue
+    type(psb_buffer_node), pointer :: node
+    integer :: info
+    
+    allocate(node, stat=info)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    node%icontxt     = icontxt
+    node%buffer_type = psb_int2_type
+    call move_alloc(buffer,node%int2buf)
+    if (info /= 0) then 
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
+      return
+    end if
+    call mpi_isend(node%int2buf,size(node%int2buf),mpi_integer2,&
+         & dest,tag,icontxt,node%request,info)
+    call psb_insert_node(mesg_queue,node)
+    
+    call psb_test_nodes(mesg_queue)
+
+  end subroutine psi_i2snd
 #endif
 
 

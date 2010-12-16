@@ -57,6 +57,11 @@ module psi_reduce_mod
          & psb_dsums, psb_dsumv, psb_dsumm,&
          & psb_zsums, psb_zsumv, psb_zsumm
   end interface
+#if defined(SHORT_INTEGERS)
+  interface psb_sum
+    module procedure psb_i2sums, psb_i2sumv, psb_i2summ
+  end interface psb_sum
+#endif
 #if !defined(LONG_INTEGERS)
   interface psb_sum
     module procedure psb_i8sums, psb_i8sumv, psb_i8summ
@@ -2672,6 +2677,130 @@ contains
     endif
 #endif    
   end subroutine psb_isumm
+
+
+#if defined(SHORT_INTEGERS)
+  subroutine psb_i2sums(ictxt,dat,root)
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(2), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(2) :: dat_
+    integer :: iam, np, info
+
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer2,mpi_sum,ictxt,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer2,mpi_sum,root_,ictxt,info)
+      dat = dat_
+    endif
+
+#endif    
+  end subroutine psb_i2sums
+
+  subroutine psb_i2sumv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(2), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(2), allocatable :: dat_(:)
+    integer :: iam, np,  info
+
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      dat_=dat
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+           & mpi_integer2,mpi_sum,ictxt,info)
+    else
+      if (iam == root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer2,mpi_sum,root_,ictxt,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer2,mpi_sum,root_,ictxt,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_i2sumv
+
+  subroutine psb_i2summ(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(2), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(2), allocatable :: dat_(:,:)
+    integer :: iam, np,  info
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      dat_=dat
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+           & mpi_integer2,mpi_sum,ictxt,info)
+    else
+      if (iam == root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer2,mpi_sum,root_,ictxt,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer2,mpi_sum,root_,ictxt,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_i2summ
+
+#endif
 
 
 #if !defined(LONG_INTEGERS)
