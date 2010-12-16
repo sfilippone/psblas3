@@ -422,7 +422,6 @@ contains
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
     
-    write(0,*) iam, ' REPL fnd_owner'
     nv = size(idx)
     allocate(iprc(nv),stat=info) 
     if (info /= 0) then 
