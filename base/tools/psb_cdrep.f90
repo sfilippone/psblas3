@@ -104,6 +104,7 @@
 subroutine psb_cdrep(m, ictxt, desc, info)
   use psb_sparse_mod
   use psi_mod
+  use psb_repl_map_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: m,ictxt
@@ -173,8 +174,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-       &   desc%idxmap%loc_to_glob(m),desc%lprm(1),&
+  allocate(desc%matrix_data(psb_mdata_size_),&
        &   desc%ovrlap_elem(0,3),stat=info)
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -184,8 +184,6 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   endif
   ! If the index space is replicated there's no point in not having 
   ! the full map on the current process. 
-  desc%idxmap%state = psb_desc_normal_
-  
 
   desc%matrix_data(psb_m_)        = m
   desc%matrix_data(psb_n_)        = n
@@ -195,23 +193,23 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
   desc%matrix_data(psb_dec_type_) = psb_desc_bld_
 
-  do i=1,m
-    desc%idxmap%glob_to_loc(i) = i
-    desc%idxmap%loc_to_glob(i) = i
-  enddo
+
+  allocate(psb_repl_map :: desc%indxmap, stat=info)
+  select type(aa => desc%indxmap) 
+  type is (psb_repl_map) 
+    call aa%repl_map_init(ictxt,m,info)
+  class default 
+    ! This cannot happen 
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    Goto 9999
+  end select
+   
 
   tovr  = -1 
-  thalo = -1
-  text  = -1
-  desc%lprm(:)         = 0
-
-  call psi_cnv_dsc(thalo,tovr,text,desc,info)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cvn_dsc')
-    goto 9999
-  end if
+  call psi_bld_tmpovrl(tovr,desc,info)
+  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
   
-  desc%matrix_data(psb_dec_type_) = psb_desc_repl_
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

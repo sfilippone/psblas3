@@ -80,7 +80,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_bld_desc(desc_a)) then 
-    info = psb_err_input_matrix_unassembled_
+    info = psb_err_invalid_cd_state_  
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -137,7 +137,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
          & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
     deallocate(ila_)
   end if
-
+  if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -205,7 +205,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_bld_desc(desc)) then 
-    info = psb_err_input_matrix_unassembled_
+    info = psb_err_invalid_cd_state_  
     call psb_errpush(info,name)
     goto 9999
   endif

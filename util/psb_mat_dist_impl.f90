@@ -620,13 +620,14 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   endif
   if (iam == root) then
     write (*, fmt = *) 'start matdist',root, size(iwork),&
-         &nrow, ncol, nnzero,nrhs
+         &nrow, ncol, nnzero,nrhs, use_parts, use_v
   endif
   if (use_parts) then 
     call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
   else 
     call psb_cdall(ictxt,desc_a,info,vg=v)
   end if
+
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_cdall'
@@ -709,7 +710,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
           end if
           ll = ll + nz
         end do
-
+!!$        write(0,*) 'mat_dist: sending rows ',i_count,j_count-1,' to proc',iproc, ll
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
           if(info /= psb_success_) then

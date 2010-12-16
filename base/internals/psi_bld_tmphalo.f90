@@ -81,7 +81,7 @@ subroutine psi_bld_tmphalo(desc,info)
     goto 9999
   endif
 
-  if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
+  if (.not.(psb_is_bld_desc(desc).and.allocated(desc%indxmap))) then 
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -100,10 +100,9 @@ subroutine psi_bld_tmphalo(desc,info)
     helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
   end do
 
-  call psb_map_l2g(helem(1:nh),desc%idxmap,info)
-  if (info == psb_success_) &
-       & call psi_fnd_owner(nh,helem,hproc,desc,info)
-
+  call desc%indxmap%l2g(helem(1:nh),info)
+  call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
+      
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='fnd_owner')
     goto 9999      

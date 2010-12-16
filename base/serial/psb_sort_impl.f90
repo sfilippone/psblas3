@@ -97,6 +97,48 @@ logical function psb_isaperm(n,eip)
   return                                                                    
 end function psb_isaperm
 
+function  psb_iblsrch(key,n,v) result(ipos)
+  use psb_sort_mod, psb_protect_name => psb_iblsrch
+  implicit none
+  integer ipos, key, n
+  integer v(n)
+
+  integer lb, ub, m
+
+  if (n < 5) then 
+    ! don't bother with binary search for very
+    ! small vectors
+    ipos = 0
+    do
+      if (ipos == n) return
+      if (key < v(ipos+1)) return 
+      ipos = ipos + 1 
+    end do
+  else
+    lb = 1 
+    ub = n
+    ipos = -1 
+    
+    do while (lb <= ub) 
+      m = (lb+ub)/2
+      if (key==v(m))  then
+        ipos = m 
+        return
+      else if (key < v(m))  then
+        ub = m-1
+      else 
+        lb = m + 1
+      end if
+    enddo
+    if (v(ub) > key) then
+!!$      write(0,*) 'Check: ',ub,v(ub),key
+      ub = ub - 1 
+    end if
+    ipos = ub 
+  endif
+  return
+end function psb_iblsrch
+
 function  psb_ibsrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_ibsrch
   implicit none
@@ -138,6 +180,7 @@ function psb_issrch(key,n,v) result(ipos)
       return
     end if
   enddo
+  
   return
 end function psb_issrch
 

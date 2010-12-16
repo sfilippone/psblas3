@@ -46,6 +46,9 @@
 subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_sparse_mod
   use psi_mod
+  use psb_repl_map_mod
+  use psb_glist_map_mod
+  use psb_hash_map_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)
@@ -72,7 +75,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np,me
-  
+
   m = size(v)
   n = m
   !... check m and n parameters....
@@ -134,20 +137,10 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   ! count local rows number
   loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
-  if (psb_cd_choose_large_state(ictxt,m)) then 
-    allocate(desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(max(1,2*loc_row)),stat=info)
-    if (info == psb_success_) then 
-      desc%matrix_data(:) = 0
-      desc%idxmap%state = psb_desc_large_
-    end if
-  else
-    allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(max(1,2*loc_row)),stat=info)
-    if (info == psb_success_) then 
-      desc%matrix_data(:) = 0
-      desc%idxmap%state = psb_desc_normal_
-    end if
+  allocate(desc%matrix_data(psb_mdata_size_),&
+       &temp_ovrlap(max(1,2*loc_row)),stat=info)
+  if (info == psb_success_) then 
+    desc%matrix_data(:) = 0
   end if
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -167,140 +160,52 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   itmpov  = 0
   temp_ovrlap(:) = -1
 
+  do i=1,m
+
+    if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
+      info=psb_err_partfunc_wrong_pid_
+      int_err(1)=3
+      int_err(2)=v(i) - flag_
+      int_err(3)=i
+      exit
+    end if
+
+    if ((v(i)-flag_) == me) then
+      ! this point belongs to me
+      counter=counter+1
+    end if
+  enddo
+  loc_row=counter
+
   !
   ! We have to decide whether we have a "large" index space.
   !
-  if (psb_cd_choose_large_state(ictxt,m)) then 
-    !
-    ! Yes, we do have a large index space. Therefore we are 
-    ! keeping on the local process a map of only the global 
-    ! indices ending up here; this map is stored in an AVL
-    ! tree during the build stage, so as to guarantee log-time
-    ! serch and insertion of new items. At assembly time it 
-    ! is transferred to a series of ordered linear lists, 
-    ! hashed by the low order bits of the entries.
-    !
-
-    do i=1,m
-
-      if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
-        info=psb_err_partfunc_wrong_pid_
-        int_err(1)=3
-        int_err(2)=v(i) - flag_
-        int_err(3)=i
-        exit
-      end if
-
-      if ((v(i)-flag_) == me) then
-        ! this point belongs to me
-        counter=counter+1
-      end if
-    enddo
-
-
-    loc_row=counter
-    ! check on parts function
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
-
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
+  if (np == 1) then 
+    allocate(psb_repl_map :: desc%indxmap, stat=info)
+  else
+    if (psb_cd_choose_large_state(ictxt,m)) then 
+      allocate(psb_hash_map :: desc%indxmap, stat=info)
+    else 
+      allocate(psb_glist_map :: desc%indxmap, stat=info)
     end if
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
-
-    ! estimate local cols number 
-    loc_col = min(2*loc_row,m)
-
-    allocate(desc%idxmap%loc_to_glob(loc_col), desc%lprm(1),&
-         & stat=info)  
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err,a_err='integer')
-      goto 9999
-    end if
-
-    ! set LOC_TO_GLOB array to all "-1" values
-    desc%lprm(1) = 0
-    desc%idxmap%loc_to_glob(:) = -1
-    k = 0
-    do i=1,m
-      if ((v(i)-flag_) == me) then
-        k = k + 1 
-        desc%idxmap%loc_to_glob(k) = i
-      endif
-    enddo
-
-  else 
-
-
-    !
-    ! No, we don't have a large index space. Therefore we can  
-    ! afford to keep on the local process a map of all global 
-    ! indices; for those we know are here we immediately store 
-    ! the corresponding local index, for the others we encode 
-    ! the index of the process owning them, so that during the 
-    ! insertion phase we can use the information to build the 
-    ! data exchange lists "on-the-fly".
-    !
-    do i=1,m
-
-      if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
-        info=psb_err_partfunc_wrong_pid_
-        int_err(1)=3
-        int_err(2)=v(i) - flag_
-        int_err(3)=i
-        exit
-      end if
-
-      if ((v(i)-flag_) == me) then
-        ! this point belongs to me
-        counter=counter+1
-        desc%idxmap%glob_to_loc(i) = counter
-      else
-        desc%idxmap%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
-      end if
-    enddo
-
-
-    loc_row=counter
-    ! check on parts function
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
-
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
-
-    ! estimate local cols number 
-    loc_col = min(2*loc_row,m)
-
-    allocate(desc%idxmap%loc_to_glob(loc_col),&
-         &desc%lprm(1),stat=info)  
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err,a_err='integer')
-      goto 9999
-    end if
-
-    ! set LOC_TO_GLOB array to all "-1" values
-    desc%lprm(1) = 0
-    desc%idxmap%loc_to_glob(:) = -1
-    do i=1,m
-      k = desc%idxmap%glob_to_loc(i) 
-      if (k > 0) then 
-        desc%idxmap%loc_to_glob(k) = i
-      endif
-    enddo
-
   end if
-  
+
+
+  select type(aa => desc%indxmap) 
+  type is (psb_repl_map) 
+    call aa%repl_map_init(ictxt,m,info)
+  type is (psb_hash_map) 
+    call aa%hash_map_init(ictxt,v,info)
+  type is (psb_glist_map) 
+    call aa%glist_map_init(ictxt,v,info)
+  class default 
+      ! This cannot happen 
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    Goto 9999
+  end select
+
+
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   deallocate(temp_ovrlap,stat=info)
@@ -313,24 +218,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   ! set fields in desc%MATRIX_DATA....
   desc%matrix_data(psb_n_row_)  = loc_row
   desc%matrix_data(psb_n_col_)  = loc_row
-
-  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_realloc')
-    Goto 9999
-  end if
-  desc%matrix_data(psb_pnt_h_) = 1
-  desc%halo_index(:)           = -1
-  desc%ext_index(:)            = -1
-
-  call psb_cd_set_bld(desc,info)
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_cd_set_bld')
-    Goto 9999
-  end if
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

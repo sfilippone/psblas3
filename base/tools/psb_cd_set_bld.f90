@@ -36,8 +36,15 @@ subroutine psb_cd_set_ovl_bld(desc,info)
   integer                            :: info
 
   call psb_cd_set_bld(desc,info) 
-  if (info == psb_success_) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
-
+  if (info == psb_success_) then 
+    if (desc%indxmap%row_extendable()) then 
+      call desc%indxmap%set_state(psb_desc_ovl_bld_)
+      desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+  end if
+    
 end subroutine psb_cd_set_ovl_bld
 
 subroutine psb_cd_set_bld(desc,info)
@@ -62,38 +69,12 @@ subroutine psb_cd_set_bld(desc,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (debug) write(psb_err_unit,*) me,'Entered CDSETBLD'
+
   if (psb_is_asb_desc(desc)) then 
   end if
-
-  desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
   
-  if (psb_is_large_desc(desc)) then 
-    !
-    ! The idea: first build glb_lc with the info on
-    ! rows we already have, then leave space in
-    ! hash for newcomers (halo indices).
-    ! The policy is to allocate for as many entries
-    ! as there are rows; if we ever fill them up, we can
-    ! try and enlarge again, but by the time the hash
-    ! fills up it means we have as many halo as internals,
-    ! therefore there are much worse problems ahead than
-    ! the hash occupancy.
-    !
-    nc = psb_cd_get_local_cols(desc)
-    if (info == psb_success_)&
-         & call psb_hash_init(nc,desc%idxmap%hash,info)
-    if (info == HashDuplicate) then 
-      info = psb_err_dupl_cd_vl
-      call psb_errpush(info,name,a_err='hashInit')
-      goto 9999
-    end if
-    if (info == psb_success_) call psi_bld_g2lmap(desc,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='hashInit')
-      goto 9999      
-    end if
-
-  end if
+  desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
+  call desc%indxmap%set_state(psb_desc_bld_)
 
   if (debug) write(psb_err_unit,*) me,'SET_BLD: done'
   call psb_erractionrestore(err_act)

@@ -44,6 +44,9 @@
 subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   use psb_sparse_mod
   use psi_mod
+  use psb_repl_map_mod
+  use psb_list_map_mod
+  use psb_hash_map_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)
@@ -141,7 +144,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
-  
+
   !
   ! Checks for valid input:
   !  1. legal range
@@ -208,7 +211,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       endif
       vl(i) = v(i) 
     end do
-    
+
     if ((m /= nrt).and.(me == psb_root_))  then 
       write(psb_err_unit,*) trim(name),' Warning: globalcheck=.false., but there is a mismatch'
       write(psb_err_unit,*) trim(name),'        : in the global sizes!',m,nrt
@@ -230,7 +233,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   call psb_nullify_desc(desc)
 
   !
@@ -282,24 +285,12 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   end if
 
   ! allocate work vector
-  if (islarge) then 
-    allocate(desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
-         & stat=info)
-    if (info == psb_success_) then 
-      desc%lprm(1)        = 0   
-      desc%matrix_data(:) = 0
-      desc%idxmap%state   = psb_desc_large_
-    end if
-  else
-    allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
-         & stat=info)
-    if (info == psb_success_) then 
-      desc%lprm(1)        = 0   
-      desc%matrix_data(:) = 0
-      desc%idxmap%state   = psb_desc_normal_
-    end if
+  allocate(desc%matrix_data(psb_mdata_size_),&
+       &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
+       & stat=info)
+  if (info == psb_success_) then 
+    desc%lprm(1)        = 0   
+    desc%matrix_data(:) = 0
   end if
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -308,17 +299,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     goto 9999
   endif
 
-  ! estimate local cols number 
-  loc_col = min(2*loc_row,m)
-
-  allocate(desc%idxmap%loc_to_glob(loc_col),stat=info)  
-  if (info /= psb_success_) then
-    info=psb_err_alloc_request_
-    int_err(1)=loc_col
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
-    goto 9999
-  end if
-  desc%idxmap%loc_to_glob(:) = -1
   temp_ovrlap(:) = -1
   desc%matrix_data(psb_m_)        = m
   desc%matrix_data(psb_n_)        = n
@@ -330,117 +310,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
 
-  !
-  ! We have to decide whether we have a "large" index space.
-  ! Note: in what follows, we use the original V, not the sorted VL
-  ! to make sure indices are processed in the order the user expects
-  ! them. 
-  !
-  if (islarge) then 
-    !
-    ! Yes, we do have a large index space. Therefore we are 
-    ! keeping on the local process a map of only the global 
-    ! indices ending up here; this map is stored in an AVL
-    ! tree during the build stage, so as to guarantee log-time
-    ! serch and insertion of new items. At assembly time it 
-    ! is transferred to a series of ordered linear lists, 
-    ! hashed by the low order bits of the entries.
-    !
-
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err,a_err='integer')
-      goto 9999
-    end if
-
-    ! Use sorted indices to fill in loc_to_glob
-    j      = 1
-    itmpov = 0
+  j      = 1
+  itmpov = 0
+  if (check_) then 
     do k=1, loc_row
       i = v(k)
-      desc%idxmap%loc_to_glob(k) = i
-
-      if (check_) then 
-        nprocs = tmpgidx(i,2) 
-        if (nprocs > 1) then 
-          do 
-            if (j > size(ov_idx,dim=1)) then 
-              info=psb_err_internal_error_
-              call psb_errpush(info,name,a_err='search ov_idx')
-              goto 9999
-            end if
-            if (ov_idx(j,1) == i) exit
-            j = j + 1 
-          end do
-          call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
-          if (info /= psb_success_) then
-            info=psb_err_from_subroutine_
-            call psb_errpush(info,name,a_err='psb_ensure_size')
-            goto 9999
-          end if
-          itmpov = itmpov + 1
-          temp_ovrlap(itmpov) = i
-          itmpov = itmpov + 1
-          temp_ovrlap(itmpov) = nprocs
-          temp_ovrlap(itmpov+1:itmpov+nprocs) = ov_idx(j:j+nprocs-1,2)
-          itmpov = itmpov + nprocs
-        end if
-      end if
-
-    enddo
-
-    if (info /= psb_success_) then 
-      info=psb_err_internal_error_
-      call psb_errpush(info,name,a_err='insert loop')
-      goto 9999
-    endif
-
-  else 
-
-    !
-    ! No, we don't have a large index space. Therefore we can  
-    ! afford to keep on the local process a map of all global 
-    ! indices; for those we know are here we immediately store 
-    ! the corresponding local index, for the others we encode 
-    ! the index of the process owning them, so that during the 
-    ! insertion phase we can use the information to build the 
-    ! data exchange lists "on-the-fly".
-    !
-
-    do i=1,m
-
-      if (((tmpgidx(i,1)-flag_) > np-1).or.((tmpgidx(i,1)-flag_) < 0)) then
-        info=psb_err_partfunc_wrong_pid_
-        int_err(1)=3
-        int_err(2)=tmpgidx(i,1) - flag_
-        int_err(3)=i
-        exit
-      end if
-
-      desc%idxmap%glob_to_loc(i) = -(np+(tmpgidx(i,1)-flag_)+1)
-    enddo
-
-    if (info /= psb_success_) then 
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
-
-    ! Use sorted indices to fill in loc_to_glob
-    j      = 1
-    itmpov = 0
-    do k=1, loc_row
-      i = v(k)
-
-      if (desc%idxmap%glob_to_loc(i) > 0) then 
-        info = psb_err_dupl_cd_vl
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-
-      desc%idxmap%loc_to_glob(k) = i
-      desc%idxmap%glob_to_loc(i) = k
-
       nprocs = tmpgidx(i,2) 
       if (nprocs > 1) then 
         do 
@@ -465,12 +339,28 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
         temp_ovrlap(itmpov+1:itmpov+nprocs) = ov_idx(j:j+nprocs-1,2)
         itmpov = itmpov + nprocs
       end if
-    enddo
 
+    end do
+  end if
+  if (np == 1) then 
+    allocate(psb_repl_map :: desc%indxmap, stat=info)
+  else
+    if (islarge) then 
+      allocate(psb_hash_map :: desc%indxmap, stat=info)
+    else
+      allocate(psb_list_map :: desc%indxmap, stat=info)
+    end if
   end if
 
+  select type(aa => desc%indxmap) 
+  type is (psb_repl_map) 
+    call aa%repl_map_init(ictxt,m,info)
+  class default 
+    call aa%init(ictxt,vl(1:nlu),info)
+  end select
+
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
-  
+
   if (info == psb_success_) deallocate(temp_ovrlap,vl,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&
        &  deallocate(tmpgidx,stat=info)
@@ -486,26 +376,26 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   desc%matrix_data(psb_n_row_)  = loc_row
   desc%matrix_data(psb_n_col_)  = loc_row
 
-  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_realloc')
-    Goto 9999
-  end if
-  desc%matrix_data(psb_pnt_h_) = 1
-  desc%halo_index(:)           = -1
-  desc%ext_index(:)            = -1
-
-  if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': end'
-
-  call psb_cd_set_bld(desc,info)
-  if (info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_cd_set_bld')
-    Goto 9999
-  end if
+!!$  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
+!!$  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
+!!$  if (info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    call psb_errpush(info,name,a_err='psb_realloc')
+!!$    Goto 9999
+!!$  end if
+!!$  desc%matrix_data(psb_pnt_h_) = 1
+!!$  desc%halo_index(:)           = -1
+!!$  desc%ext_index(:)            = -1
+!!$
+!!$  if (debug_level >= psb_debug_ext_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),': end'
+!!$
+!!$  call psb_cd_set_bld(desc,info)
+!!$  if (info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    call psb_errpush(info,name,a_err='psb_cd_set_bld')
+!!$    Goto 9999
+!!$  end if
 
   call psb_erractionrestore(err_act)
   return

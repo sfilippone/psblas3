@@ -3044,7 +3044,7 @@ subroutine psb_z_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
   case(0) !  Row major order
 
-    call msort_up(nzin,ia(1),iaux(1),iret)
+    call msort_up(nzin,ia(1:),iaux(1:),iret)
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
     i    = 1
@@ -3055,7 +3055,7 @@ subroutine psb_z_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
         if (j > nzin) exit
       enddo
       nzl = j - i
-      call msort_up(nzl,ja(i),iaux(1),iret)
+      call msort_up(nzl,ja(i:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzl,val(i:i+nzl-1),&
            & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
@@ -3129,7 +3129,7 @@ subroutine psb_z_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
   case(1) !  Col major order
 
-    call msort_up(nzin,ja(1),iaux(1),iret)
+    call msort_up(nzin,ja(1:),iaux(1:),iret)
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
     i    = 1
@@ -3140,7 +3140,7 @@ subroutine psb_z_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
         if (j > nzin) exit
       enddo
       nzl = j - i
-      call msort_up(nzl,ia(i),iaux(1),iret)
+      call msort_up(nzl,ia(i:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzl,val(i:i+nzl-1),&
            & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)

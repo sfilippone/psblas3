@@ -142,8 +142,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc)
-  icomm = psb_cd_get_mpic(desc)
+  ictxt = desc%indxmap%get_ctxt()
+  icomm = desc%indxmap%get_mpic()
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = psb_err_context_error_
@@ -257,11 +257,13 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
         sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
       end do
     else
-      call psb_map_l2g(index_in(i+1:i+nerv),&
+      
+      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
            & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-           & desc%idxmap,info) 
+           & info) 
+
       if (info /= psb_success_) then
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_map_l2g')
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
         goto 9999
       end if
 
@@ -307,6 +309,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     desc_index(i) = nerv
     call psi_idx_cnv(nerv,sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          &  desc_index(i+1:i+nerv),desc,info)
+      
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd

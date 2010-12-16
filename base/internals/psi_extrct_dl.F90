@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
+subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
      & length_dl,np,dl_lda,mode,info)
 
   !    internal routine
@@ -131,17 +131,18 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   include 'mpif.h'
 #endif
   !     ....scalar parameters...
-  integer np,dl_lda,mode, info
+  logical :: is_bld, is_upd
+  integer np,dl_lda,mode, info, ictxt
 
   !     ....array parameters....
-  integer ::  desc_str(*),desc_data(*),dep_list(dl_lda,0:np),length_dl(0:np)
+  integer ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
   integer, allocatable :: itmp(:)
   !     .....local arrays....
   integer int_err(5)
 
   !     .....local scalars...
   integer i,me,nprow,pointer_dep_list,proc,j,err_act
-  integer ictxt, err, icomm
+  integer err, icomm
   integer              :: debug_level, debug_unit
   character  name*20
   name='psi_extrct_dl'
@@ -151,8 +152,6 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   debug_level = psb_get_debug_level()
 
   info = psb_success_
-  ictxt = desc_data(psb_ctxt_)
-
 
   call psb_info(ictxt,me,nprow)
   do i=0,np 
@@ -160,10 +159,10 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   enddo
   i=1
   if (debug_level >= psb_debug_inner_)&
-       & write(debug_unit,*) me,' ',trim(name),': start ',info,desc_data(psb_dec_type_)
+       & write(debug_unit,*) me,' ',trim(name),': start ',info
 
   pointer_dep_list=1
-  if (psb_is_bld_dec(desc_data(psb_dec_type_))) then 
+  if (is_bld) then 
     do while (desc_str(i) /= -1)
       if (debug_level >= psb_debug_inner_)&
            & write(debug_unit,*) me,' ',trim(name),' : looping ',i,&
@@ -208,7 +207,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
       endif
       i=i+desc_str(i+1)+2
     enddo
-  else if (psb_is_upd_dec(desc_data(psb_dec_type_))) then
+  else if (is_upd) then
     do while (desc_str(i) /= -1)
       if (debug_level >= psb_debug_inner_) &
            & write(debug_unit,*) me,' ',trim(name),': looping ',i,desc_str(i)

@@ -67,7 +67,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
   real(psb_dpk_), allocatable  :: scatterv(:)
-  integer, allocatable           :: displ(:), l_t_g_all(:), all_dim(:)
+  integer, allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -149,7 +149,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     ! extract my chunk
     do j=1,k
       do i=1, nrow
-        idx = desc_a%idxmap%loc_to_glob(i)
+        call psb_loc_to_glob(i,idx,desc_a,info)
         locx(i,jlocx+j-1)=globx(idx,jglobx+j-1)
       end do
     end do
@@ -157,13 +157,18 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     call psb_get_rank(rootrank,ictxt,root)
 
     ! root has to gather size information
-    allocate(displ(np),all_dim(np),stat=info)
+    allocate(displ(np),all_dim(np),ltg(nrow),stat=info)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='Allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    do i=1, nrow
+      ltg(i) = i
+    end do
+    call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
+
     call mpi_gather(nrow,1,mpi_integer,all_dim,&
          & 1,mpi_integer,rootrank,icomm,info)
 
@@ -184,7 +189,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
     end if
 
-    call mpi_gatherv(desc_a%idxmap%loc_to_glob,nrow,&
+    call mpi_gatherv(ltg,nrow,&
          & mpi_integer,l_t_g_all,all_dim,&
          & displ,mpi_integer,rootrank,icomm,info)
 
@@ -296,7 +301,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
   real(psb_dpk_), allocatable  :: scatterv(:)
-  integer, allocatable         :: displ(:), l_t_g_all(:), all_dim(:)
+  integer, allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
   integer                  :: debug_level, debug_unit
 
@@ -366,14 +371,19 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   if ((root == -1).or.(np == 1)) then
     ! extract my chunk
     do i=1, nrow
-      idx=desc_a%idxmap%loc_to_glob(i)
+      call psb_loc_to_glob(i,idx,desc_a,info)
       locx(i)=globx(idx)
     end do
   else
     call psb_get_rank(rootrank,ictxt,root)
 
     ! root has to gather size information
-    allocate(displ(np),all_dim(np))
+    allocate(displ(np),all_dim(np),ltg(nrow))
+    do i=1, nrow
+      ltg(i) = i
+    end do
+    call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
+
 
     call mpi_gather(nrow,1,mpi_integer,all_dim,&
          & 1,mpi_integer,rootrank,icomm,info)
@@ -392,7 +402,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
     end if
 
-    call mpi_gatherv(desc_a%idxmap%loc_to_glob,nrow,&
+    call mpi_gatherv(ltg,nrow,&
          & mpi_integer,l_t_g_all,all_dim,&
          & displ,mpi_integer,rootrank,icomm,info)
 

@@ -81,7 +81,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%indxmap%get_ctxt()
+
   call psb_info(ictxt,me,np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -106,9 +107,10 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
        & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
   mode = 1
 
-  call psi_extract_dep_list(desc_a%matrix_data,index_in,&
-       & dep_list,length_dl,np,max(1,dl_lda),mode,info)
-  if(info /= psb_success_) then
+  call psi_extract_dep_list(desc_a%indxmap%get_ctxt(),&
+       & desc_a%indxmap%is_bld(), desc_a%indxmap%is_upd(),&
+       & index_in, dep_list,length_dl,np,max(1,dl_lda),mode,info)
+  if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
     goto 9999
   end if

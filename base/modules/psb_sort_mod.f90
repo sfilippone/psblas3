@@ -86,6 +86,13 @@ module psb_sort_mod
   end type psb_dcomplex_idx_heap
 
 
+  interface psb_iblsrch
+    function  psb_iblsrch(key,n,v) result(ipos)
+      integer ipos, key, n
+      integer v(n)
+    end function psb_iblsrch
+  end interface
+
   interface psb_ibsrch
     function  psb_ibsrch(key,n,v) result(ipos)
       integer ipos, key, n

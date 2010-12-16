@@ -76,6 +76,7 @@ program df_sample
        &scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
   integer, allocatable :: ivg(:), ipv(:)
+  character(len=40)  :: fname, fnout
 
 
   call psb_init(ictxt)
@@ -177,6 +178,9 @@ program df_sample
     enddo
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-vgb-',iam,'-',np,'.mtx'
+!!$    call a%print(fname)
+    
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
@@ -190,10 +194,16 @@ program df_sample
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-vgp-',iam,'-',np,'.mtx'
+!!$    call a%print(fname)
+
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
+!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-pbl-',iam,'-',np,'.mtx'
+!!$    call a%print(fname)
+
   end if
 
   call psb_geall(x_col,desc_a,info)
@@ -269,10 +279,12 @@ program df_sample
     write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
     write(psb_out_unit,*)"Condition number         : ",cond
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
-    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
+    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+    write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
+         &  desc_a%indxmap%get_fmt()
   end if
-  call psb_precdump(prec,info,prefix=mtrx_file//'_')
+!!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr /= 0) then 

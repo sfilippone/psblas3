@@ -116,7 +116,8 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
-  call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
+  if (info == psb_success_) &
+       & call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -134,16 +135,17 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
 
   do j=1,k
     do i=1,psb_cd_get_local_rows(desc_a)
-      idx                   = desc_a%idxmap%loc_to_glob(i)
+      call psb_loc_to_glob(i,idx,desc_a,info)
       globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
     end do
   end do
+
   do j=1,k
     ! adjust overlapped elements
     do i=1, size(desc_a%ovrlap_elem,1)
       if (me /= desc_a%ovrlap_elem(i,3)) then 
         idx = desc_a%ovrlap_elem(i,1)
-        idx = desc_a%idxmap%loc_to_glob(idx)
+        call psb_loc_to_glob(idx,desc_a,info)
         globx(idx,jglobx+j-1) = szero
       end if
     end do
@@ -249,15 +251,15 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   endif
 
   if (present(iroot)) then
-     root = iroot
-     if((root < -1).or.(root > np)) then
-        info=psb_err_input_value_invalid_i_
-        int_err(1:2)=(/5,root/)
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     end if
+    root = iroot
+    if((root < -1).or.(root > np)) then
+      info=psb_err_input_value_invalid_i_
+      int_err(1:2)=(/5,root/)
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
   else
-     root = -1
+    root = -1
   end if
 
   jglobx=1
@@ -277,35 +279,37 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  if (info == psb_success_) &
+       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     ch_err='psb_chk(glob)vect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=psb_err_from_subroutine_
+    ch_err='psb_chk(glob)vect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-     info=psb_err_ix_n1_iy_n1_unsupported_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
   end if
   
   globx(:)=0.d0
 
   do i=1,psb_cd_get_local_rows(desc_a)
-     idx = desc_a%idxmap%loc_to_glob(i)
-     globx(idx) = locx(i)
+    call psb_loc_to_glob(i,idx,desc_a,info)
+    globx(idx) = locx(i)
   end do
   
   ! adjust overlapped elements
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
       idx = desc_a%ovrlap_elem(i,1)
-      idx = desc_a%idxmap%loc_to_glob(idx)
+      call psb_loc_to_glob(idx,desc_a,info)
       globx(idx) = szero
     end if
   end do
+  
   call psb_sum(ictxt,globx(1:m),root=root)
 
   call psb_erractionrestore(err_act)
@@ -315,8 +319,8 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 

@@ -125,7 +125,6 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     ! fix glob_to_loc/loc_to_glob  mappings, then indices lists
     ! hmm, maybe we should just move all of this onto a different level,
     ! have a specialized subroutine, and do it in the solver context???? 
-    call psi_renum_idxmap(n_col,desc_a%lprm,desc_a%idxmap,info)
     if (allocated(desc_a%halo_index)) &
          & call psi_renum_index(desc_a%lprm,desc_a%halo_index,info)
     if (allocated(desc_a%ovrlap_index)) &

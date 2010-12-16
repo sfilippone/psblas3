@@ -45,7 +45,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   !....parameters...
 
   type(psb_desc_type), intent(in)  :: desc_in
-  type(psb_desc_type), intent(out) :: desc_out
+  type(psb_desc_type), intent(inout) :: desc_out
   integer, intent(out)             :: info
 
   !locals
@@ -76,20 +76,22 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_index,&
+       & desc_out%ovrlap_index,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
-  if (info == psb_success_) call psb_idxmap_copy(desc_in%idxmap,desc_out%idxmap, info)
-!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
-!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
-!!$  desc_out%hashvsize =   desc_in%hashvsize 
-!!$  desc_out%hashvmask =   desc_in%hashvmask
-!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
-!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
-!!$  if (info == psb_success_)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
+
+  if (allocated(desc_in%indxmap)) then 
+    if (allocated(desc_out%indxmap)) then 
+      call desc_out%indxmap%free()
+      deallocate(desc_out%indxmap)
+    end if
+    if (info == psb_success_)&
+         & allocate(desc_out%indxmap, source=desc_in%indxmap, stat=info) 
+  end if
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_

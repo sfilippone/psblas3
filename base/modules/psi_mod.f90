@@ -447,12 +447,14 @@ module psi_mod
   end interface
 
   interface
-    subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
+    subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
          & length_dl,np,dl_lda,mode,info)
-      integer :: np,dl_lda,mode, info
-      integer :: desc_str(*),desc_data(*),dep_list(dl_lda,0:np),length_dl(0:np)
+      logical :: is_bld, is_upd
+      integer :: ictxt,np,dl_lda,mode, info
+      integer :: desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
     end subroutine psi_extract_dep_list
   end interface
+
   interface psi_fnd_owner
     subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
@@ -471,14 +473,6 @@ module psi_mod
       logical, intent(in)  :: ext_hv
       integer, intent(out) :: info
     end subroutine psi_ldsc_pre_halo
-  end interface
-
-  interface psi_bld_g2lmap
-    subroutine psi_bld_g2lmap(desc,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      type(psb_desc_type), intent(inout) :: desc
-      integer, intent(out) :: info
-    end subroutine psi_bld_g2lmap
   end interface
 
   interface psi_bld_tmphalo
@@ -588,16 +582,6 @@ module psi_mod
       integer, intent(inout) :: idx(:)
     end subroutine psi_renum_index
   end interface
-
-  interface psi_renum_idxmap
-    subroutine psi_renum_idxmap(nc,iperm,idxmap,info)
-      use psb_descriptor_type, only: psb_idxmap_type
-      integer, intent(out)   :: info
-      integer, intent(in)    :: nc,iperm(:)
-      type(psb_idxmap_type), intent(inout) :: idxmap
-    end subroutine psi_renum_idxmap
-  end interface
-  
 
   interface psi_inner_cnv
     subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)

@@ -109,7 +109,6 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-
   k = maxk
 
   call psb_bcast(ictxt,k,root=iiroot)
@@ -136,7 +135,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
 
   do j=1,k
     do i=1,psb_cd_get_local_rows(desc_a)
-      idx = desc_a%idxmap%loc_to_glob(i)
+      call psb_loc_to_glob(i,idx,desc_a,info)
       globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
     end do
   end do
@@ -146,11 +145,12 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
     do i=1, size(desc_a%ovrlap_elem,1)
       if (me /= desc_a%ovrlap_elem(i,3)) then 
         idx = desc_a%ovrlap_elem(i,1)
-        idx = desc_a%idxmap%loc_to_glob(idx)
+        call psb_loc_to_glob(idx,desc_a,info)
         globx(idx,jglobx+j-1) = zzero
       end if
     end do
   end do
+
   call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
 
   call psb_erractionrestore(err_act)
@@ -298,19 +298,20 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   globx(:)=0.d0
 
   do i=1,psb_cd_get_local_rows(desc_a)
-    idx = desc_a%idxmap%loc_to_glob(i)
+    call psb_loc_to_glob(i,idx,desc_a,info)
     globx(idx) = locx(i)
   end do
+  
   ! adjust overlapped elements
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
       idx = desc_a%ovrlap_elem(i,1)
-      idx = desc_a%idxmap%loc_to_glob(idx)
-      globx(idx) = dzero
+      call psb_loc_to_glob(idx,desc_a,info)
+      globx(idx) = zzero
     end if
   end do
-  call psb_sum(ictxt,globx(1:m),root=root)
   
+  call psb_sum(ictxt,globx(1:m),root=root)
 
   call psb_erractionrestore(err_act)
   return  

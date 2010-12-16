@@ -80,7 +80,7 @@ program ppde
   type(psb_sspmat_type) :: a
   type(psb_sprec_type)  :: prec
   ! descriptor
-  type(psb_desc_type)   :: desc_a
+  type(psb_desc_type)   :: desc_a, desc_b
   ! dense matrices
   real(psb_spk_), allocatable :: b(:), x(:)
   ! blacs parameters
@@ -94,6 +94,7 @@ program ppde
   ! other variables
   integer            :: info, i
   character(len=20)  :: name,ch_err
+  character(len=40)  :: fname
 
   info=psb_success_
 
@@ -109,6 +110,7 @@ program ppde
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
   call psb_set_errverbosity(2)
+  call psb_cd_set_large_threshold(2)
   !
   !  get parameters
   !
@@ -130,6 +132,17 @@ program ppde
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+!!$  write(fname,'(a,i2.2,a,i2.2,a)') 'amat-',iam,'-',np,'.mtx'
+!!$  call a%print(fname)
+!!$  call psb_cdprt(20+iam,desc_a,short=.false.)
+!!$  call psb_cdcpy(desc_a,desc_b,info)
+!!$  call psb_set_debug_level(9999)
+
+  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
+  if (info /= 0) then 
+    write(0,*) 'Error from bldext'
+    call psb_abort(ictxt)
+  end if
   !
   !  prepare the preconditioner.
   !  
@@ -188,8 +201,10 @@ program ppde
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
     write(psb_out_unit,'("Info  on exit                 : ",i0)')info
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
+    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
+    write(psb_out_unit,'("Storage type for DESC_B: ",a)') desc_b%indxmap%get_fmt()
   end if
 
   !  
@@ -569,7 +584,7 @@ contains
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
     if (info == psb_success_) &
-         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=acsr)
+         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

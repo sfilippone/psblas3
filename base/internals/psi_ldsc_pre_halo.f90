@@ -81,26 +81,12 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   endif
 
 
-  if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
+  if (.not.(psb_is_bld_desc(desc))) then 
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  call psi_bld_g2lmap(desc,info)
-  if (info /= psb_success_) then 
-    ch_err='psi_bld_hash'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  ! We no longer need the inner hash structure.
-  call psb_free(desc%idxmap%hash,info)
-  if (info /= psb_success_) then 
-    ch_err='psi_bld_tmphalo'
-    info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
   if (.not.ext_hv) then
     call psi_bld_tmphalo(desc,info)
     if (info /= psb_success_) then 

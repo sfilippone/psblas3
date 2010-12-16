@@ -74,7 +74,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)                     :: novr
-  Type(psb_dspmat_type), Intent(in)      ::  a
+  Type(psb_dspmat_type), Intent(in)       ::  a
   Type(psb_desc_type), Intent(in), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer, intent(out)                    :: info
@@ -82,7 +82,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Local Scalars ..
   Integer ::  i, j, np, me,m,&
-       &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
+       &  ictxt, lovr, lworks,lworkr, n_row,n_col, n_col_prev, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
@@ -130,9 +130,18 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     goto 9999
   endif
 
+  select case(extype_) 
+  case(psb_ovt_xhal_,psb_ovt_asov_)
+  case default
+    call psb_errpush(psb_err_input_value_invalid_i_,&
+         & name,i_err=(/5,extype_,0,0,0/))
+    goto 9999
+  end select
+
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ':Calling desccpy'
+       & ': Calling desccpy'
+
   call psb_cdcpy(desc_a,desc_ov,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -140,25 +149,35 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ':From desccpy'
+       & ': From desccpy'
 
-  if (novr == 0) then 
+  if ((novr == 0).or.(np==1)) then 
     !
     ! Just copy the input.  
+    ! Should we return also when is_repl() ? 
     !
     return
   endif
 
 
+  if ((extype_ == psb_ovt_asov_).and.&
+       & (.not.desc_ov%indxmap%row_extendable())) then 
+    ! Need to switch to a format that can support overlap,
+    ! so far: LIST or HASH. Encapsulate choice
+    ! in a separate method. 
+    call psb_cd_switch_ovl_indxmap(desc_ov,info) 
+  end if
+
+  call psb_cd_set_ovl_bld(desc_ov,info)
 
   If (debug_level >= psb_debug_outer_)then 
     Write(debug_unit,*) me,' ',trim(name),&
-         & ':BEGIN ',nhalo
+         & ': BEGIN ',nhalo, desc_ov%indxmap%get_state()
     call psb_barrier(ictxt)
   endif
-
   !
   ! Ok, since we are only estimating, do it as follows: 
   ! LOVR= (NNZ/NROW)*N_HALO*NOVR  This assumes that the local average 
@@ -183,11 +202,11 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
-  call psb_cd_set_ovl_bld(desc_ov,info)
   desc_ov%base_desc => desc_a
 
   If (debug_level >= psb_debug_outer_) then
-    Write(debug_unit,*) me,' ',trim(name),':Start',lworks,lworkr
+    Write(debug_unit,*) me,' ',trim(name),':Start',&
+         & lworks,lworkr, desc_ov%indxmap%get_state()
     call psb_barrier(ictxt)
   endif
 
@@ -231,7 +250,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     Do j=0,n_elem_recv-1
 
       idx = desc_a%ovrlap_index(counter+psb_elem_recv_+j)
-      call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+      call desc_ov%indxmap%l2g(idx,gidx,info) 
       If (gidx < 0) then 
         info=-3
         call psb_errpush(info,name)
@@ -297,7 +316,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     counter    = 1
     counter_t  = 1
 
-    desc_ov%matrix_data(psb_n_row_)=desc_ov%matrix_data(psb_n_col_)
+    n_col_prev = psb_cd_get_local_cols(desc_ov) 
 
     Do While (halo(counter) /= -1)
       tot_elem=0
@@ -325,14 +344,14 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! add recv elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_recv-1
-        If((counter+psb_elem_recv_+j)>Size(halo)) then 
+        If ((counter+psb_elem_recv_+j)>Size(halo)) then 
           info=-2
           call psb_errpush(info,name)
           goto 9999
         end If
 
         idx = halo(counter+psb_elem_recv_+j)
-        call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+        call desc_ov%indxmap%l2g(idx,gidx,info) 
         If (gidx < 0) then 
           info=-3
           call psb_errpush(info,name)
@@ -376,7 +395,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       Do j=0,n_elem_send-1
 
         idx = halo(counter+psb_elem_send_+j)
-        call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+        call desc_ov%indxmap%l2g(idx,gidx,info) 
         If (gidx < 0) then 
           info=-3
           call psb_errpush(info,name)
@@ -412,9 +431,10 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-          call psb_map_l2g(icol(1:n_elem),&
+          call desc_ov%indxmap%l2g(icol(1:n_elem),&
                & works(idxs+tot_elem+1:idxs+tot_elem+n_elem),&
-               & desc_ov%idxmap,info) 
+               & info) 
+
           tot_elem=tot_elem+n_elem
         End If
 
@@ -491,114 +511,73 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),': ISZR :',iszr
 
-      if (psb_is_large_desc(desc_ov)) then 
-        call psb_ensure_size(iszr,maskr,info)
-        if (info /= psb_success_) then
-          info=psb_err_from_subroutine_
-          call psb_errpush(info,name,a_err='psb_ensure_size')
-          goto 9999
-        end if
-        call psi_idx_cnv(iszr,workr,maskr,desc_ov,info)
-        iszs = count(maskr(1:iszr)<=0)
-        if (iszs > size(works)) call psb_realloc(iszs,works,info)
-        j = 0
-        do i=1,iszr
-          if (maskr(i) < 0) then 
-            j=j+1
-            works(j) = workr(i)
-          end if
-        end do
-        ! Eliminate duplicates from request
-        call psb_msort_unique(works(1:j),iszs)
-
-        !
-        ! fnd_owner on desc_a because we want the procs who
-        ! owned the rows from the beginning!
-        !
-        call psi_fnd_owner(iszs,works,temp,desc_a,info)
-        n_col = psb_cd_get_local_cols(desc_ov)
-
-        do i=1,iszs
-          idx = works(i)
-          n_col   = psb_cd_get_local_cols(desc_ov)
-          call psi_idx_ins_cnv(idx,lidx,desc_ov,info)
-          if (psb_cd_get_local_cols(desc_ov) >  n_col ) then
-            !
-            ! This is a new index. Assigning a local index as
-            ! we receive them guarantees that all indices for HALO(I)
-            ! will be less than those for HALO(J) whenever I<J
-            !
-            proc_id = temp(i) 
-
-            call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
-            if (info /= psb_success_) then
-              info=psb_err_from_subroutine_
-              call psb_errpush(info,name,a_err='psb_ensure_size')
-              goto 9999
-            end if
-
-            t_halo_in(counter_t)   = proc_id
-            t_halo_in(counter_t+1) = 1
-            t_halo_in(counter_t+2) = lidx
-            t_halo_in(counter_t+3) = -1
-            counter_t              = counter_t+3
-          endif
-        end Do
-        n_col   = psb_cd_get_local_cols(desc_ov)
-
-      else
-
-        Do i=1,iszr
-          idx=workr(i)
-          if (idx <1) then 
-            write(psb_err_unit,*) me,'Error in CDBLDEXTBLD level',i_ovr,' : ',idx,i,iszr
-          else  If (desc_ov%idxmap%glob_to_loc(idx) < -np) Then
-            !
-            ! This is a new index. Assigning a local index as
-            ! we receive them guarantees that all indices for HALO(I)
-            ! will be less than those for HALO(J) whenever I<J
-            !
-            n_col   = n_col+1
-            proc_id = -desc_ov%idxmap%glob_to_loc(idx)-np-1
-            call psb_ensure_size(n_col,desc_ov%idxmap%loc_to_glob,info,pad=-1)
-            if (info /= psb_success_) then
-              info=psb_err_from_subroutine_
-              call psb_errpush(info,name,a_err='psb_ensure_size')
-              goto 9999
-            end if
-
-            desc_ov%idxmap%glob_to_loc(idx)   = n_col
-            desc_ov%idxmap%loc_to_glob(n_col) = idx
-
-            call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
-            if (info /= psb_success_) then
-              info=psb_err_from_subroutine_
-              call psb_errpush(info,name,a_err='psb_ensure_size')
-              goto 9999
-            end if
-
-            t_halo_in(counter_t)   = proc_id
-            t_halo_in(counter_t+1) = 1
-            t_halo_in(counter_t+2) = n_col
-            t_halo_in(counter_t+3) = -1
-            counter_t=counter_t+3
-            if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,' ',trim(name),&
-                 & ': Added into t_halo_in from recv',&
-                 & proc_id,n_col,idx
-          else if (desc_ov%idxmap%glob_to_loc(idx) < 0) Then
-
-            if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,' ',trim(name),&
-                 & ':Wrong input to cdbldextbld?',&
-                 & idx,desc_ov%idxmap%glob_to_loc(idx)
-          End If
-        End Do
-        desc_ov%matrix_data(psb_n_col_) = n_col
-
+      call psb_ensure_size(iszr,maskr,info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_ensure_size')
+        goto 9999
       end if
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+         & ': going for first idx_cnv', desc_ov%indxmap%get_state()
+
+      call psi_idx_cnv(iszr,workr,maskr,desc_ov,info)
+      iszs = count(maskr(1:iszr)<=0)
+      if (iszs > size(works)) call psb_realloc(iszs,works,info)
+      j = 0
+      do i=1,iszr
+        if (maskr(i) < 0) then 
+          j=j+1
+          works(j) = workr(i)
+        end if
+      end do
+      ! Eliminate duplicates from request
+      call psb_msort_unique(works(1:j),iszs)
+      
+      !
+      ! fnd_owner on desc_a because we want the procs who
+      ! owned the rows from the beginning!
+      !
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+         & ': going for fnd_owner', desc_ov%indxmap%get_state()
+      call psi_fnd_owner(iszs,works,temp,desc_a,info)
+      n_col = psb_cd_get_local_cols(desc_ov)
+
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+         & ': Done fnd_owner', desc_ov%indxmap%get_state()
+      
+      do i=1,iszs
+        idx = works(i)
+        n_col   = psb_cd_get_local_cols(desc_ov)
+        call psi_idx_ins_cnv(idx,lidx,desc_ov,info)
+        if (psb_cd_get_local_cols(desc_ov) >  n_col ) then
+          !
+          ! This is a new index. Assigning a local index as
+          ! we receive them guarantees that all indices for HALO(I)
+          ! will be less than those for HALO(J) whenever I<J
+          !
+          proc_id = temp(i) 
+          
+          call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
+          if (info /= psb_success_) then
+            info=psb_err_from_subroutine_
+            call psb_errpush(info,name,a_err='psb_ensure_size')
+            goto 9999
+          end if
+          
+          t_halo_in(counter_t)   = proc_id
+          t_halo_in(counter_t+1) = 1
+          t_halo_in(counter_t+2) = lidx
+          t_halo_in(counter_t+3) = -1
+          counter_t              = counter_t+3
+        endif
+      end Do
+      n_col   = psb_cd_get_local_cols(desc_ov)
 
     end if
+
     !
     ! Ok, now we have a temporary halo with all the info for the
     ! next round. If we need to keep going, convert the halo format
@@ -641,7 +620,6 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     !               4. n_row(ov) = n_row(a)
     !               5. n_col(ov)  current. 
     !
-    desc_ov%matrix_data(psb_n_row_) = desc_a%matrix_data(psb_n_row_)
     call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
     call psb_ensure_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
     if (info /= psb_success_) then
@@ -669,6 +647,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     !               4. n_row(ov)  current.
     !               5. n_col(ov)  current. 
     ! 
+    call desc_ov%indxmap%set_lr(n_col_prev)
     call psb_ensure_size((cntov_o+counter_o+1),orig_ovr,info,pad=-1)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_ensure_size')
@@ -715,7 +694,8 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     if (allocated(irow)) deallocate(irow,stat=info)
     if ((info == psb_success_).and.allocated(icol)) deallocate(icol,stat=info)
     if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_ai_,name,a_err='deallocate',i_err=(/info,0,0,0,0/))
+      call psb_errpush(psb_err_from_subroutine_ai_,name,&
+           & a_err='deallocate',i_err=(/info,0,0,0,0/))
       goto 9999
     end if
   end if

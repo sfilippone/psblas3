@@ -81,8 +81,9 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
 
   call psb_info(ictxt, me, np)
 
-  if (.not.psb_is_bld_desc(desc)) then 
-    info = psb_err_input_matrix_unassembled_
+  if ((.not.allocated(desc%indxmap)).or.&
+       & (.not.psb_is_bld_desc(desc))) then 
+    info =  psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -110,234 +111,15 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
     end if
   endif
 
-  if (psb_is_large_desc(desc)) then 
 
-    if (present(mask)) then 
-      do i = 1, nv
-        if (mask(i)) then 
-          ip = idxin(i) 
-          if ((ip < 1 ).or.(ip>mglob)) then 
-            idxin(i) = -1
-            cycle
-          endif
-          nxt = ncol + 1
-
-          call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
-          if (lip < 0) &
-               & call psb_hash_searchinskey(ip,lip,nxt,desc%idxmap%hash,info)        
-          if (info >=0) then 
-            if (nxt == lip) then 
-              ncol = nxt
-              isize = size(desc%idxmap%loc_to_glob)
-              if (ncol > isize) then 
-                nh = ncol + max(nv,relocsz)
-                call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-                if (info /= psb_success_) then
-                  info=1
-                  ch_err='psb_realloc'
-                  call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-                  goto 9999
-                end if
-                isize = nh
-              endif
-              desc%idxmap%loc_to_glob(nxt)  = ip
-            endif
-            info = psb_success_
-          else
-            ch_err='SearchInsKeyVal'
-            call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-            goto 9999
-          end if
-          idxin(i) = lip
-          info = psb_success_
-        else
-          idxin(i) = -1
-        end if
-      enddo
-
-    else
-
-      do i = 1, nv
-        ip = idxin(i) 
-        if ((ip < 1 ).or.(ip>mglob)) then 
-          idxin(i) = -1
-          cycle
-        endif
-        nxt = ncol + 1
-
-        call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
-        if (lip < 0) &
-             & call psb_hash_searchinskey(ip,lip,nxt,desc%idxmap%hash,info)        
-        if (info >=0) then 
-          if (nxt == lip) then 
-            ncol = nxt
-            isize = size(desc%idxmap%loc_to_glob)
-            if (ncol > isize) then 
-              nh = ncol + max(nv,relocsz)
-              call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-              if (info /= psb_success_) then
-                info=1
-                ch_err='psb_realloc'
-                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-                goto 9999
-              end if
-              isize = nh
-            endif
-            desc%idxmap%loc_to_glob(nxt)  = ip
-          endif
-          info = psb_success_
-        else
-          ch_err='SearchInsKeyVal'
-          call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-          goto 9999
-        end if
-        idxin(i) = lip
-        info = psb_success_
-      enddo
-    endif
-
-  else
-
-    if (.not.allocated(desc%halo_index)) then
-      allocate(desc%halo_index(relocsz))
-      desc%halo_index(:) = -1
-      desc%matrix_data(psb_pnt_h_) = 1 
-    endif
-    pnt_halo = desc%matrix_data(psb_pnt_h_)
-
-    pnt_h_ok = .false.
-    isize    = size(desc%halo_index)
-    if ((1 <= pnt_halo).and.(pnt_halo <= isize)) then 
-      if (desc%halo_index(pnt_halo)  ==   -1 ) then 
-        if (pnt_halo == 1) then 
-          pnt_h_ok = .true.
-        else if (desc%halo_index(pnt_halo-1) /=   -1 ) then 
-          pnt_h_ok = .true.
-        end if
-      end if
-    end if
-
-    if (.not.pnt_h_ok) then 
-      pnt_halo = 1
-      do
-        if (desc%halo_index(pnt_halo) ==  -1) exit
-        if (pnt_halo == isize) exit
-        pnt_halo = pnt_halo + 1
-      end do
-      if (desc%halo_index(pnt_halo) /=  -1) then
-        call psb_realloc(isize+relocsz,desc%halo_index,info,pad=-1) 
-        pnt_halo = pnt_halo + 1 
-      end if
-    end if
-
-    if (present(mask)) then 
-      do i = 1, nv
-        if (mask(i)) then 
-          ip = idxin(i) 
-          if ((ip < 1 ).or.(ip>mglob)) then 
-            idxin(i) = -1
-            cycle
-          endif
-          k  = desc%idxmap%glob_to_loc(ip)
-          if (k < -np) then
-            k    = k + np
-            k    = - k - 1
-            ncol = ncol + 1      
-            lip  = ncol
-            desc%idxmap%glob_to_loc(ip)   = ncol
-            isize = size(desc%idxmap%loc_to_glob)
-            if (ncol > isize) then 
-              nh = ncol + max(nv,relocsz)
-              call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-              if (info /= psb_success_) then
-                info=psb_err_invalid_ovr_num_
-                ch_err='psb_realloc'
-                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-                goto 9999
-              end if
-              isize = nh
-            endif
-            desc%idxmap%loc_to_glob(ncol) = ip
-            isize = size(desc%halo_index)
-            if ((pnt_halo+3) > isize) then
-              nh = isize + max(nv,relocsz)
-              call psb_realloc(nh,desc%halo_index,info,pad=-1)
-              if (info /= psb_success_) then
-                info=4
-                ch_err='psb_realloc'
-                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-                goto 9999
-              end if
-              isize = nh 
-            endif
-            desc%halo_index(pnt_halo)   = k
-            desc%halo_index(pnt_halo+1) = 1
-            desc%halo_index(pnt_halo+2) = ncol
-            pnt_halo                    = pnt_halo + 3
-          else
-            lip = k
-          endif
-          idxin(i) = lip
-        else
-          idxin(i) = -1
-        end if
-      enddo
-
-    else
-
-      do i = 1, nv
-        ip = idxin(i) 
-        if ((ip < 1 ).or.(ip>mglob)) then 
-          idxin(i) = -1
-          cycle
-        endif
-        k  = desc%idxmap%glob_to_loc(ip)
-        if (k < -np) then
-          k    = k + np
-          k    = - k - 1
-          ncol = ncol + 1      
-          lip  = ncol
-          desc%idxmap%glob_to_loc(ip)   = ncol
-          isize = size(desc%idxmap%loc_to_glob)
-          if (ncol > isize) then 
-            nh = ncol + max(nv,relocsz)
-            call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-            if (info /= psb_success_) then
-              info=psb_err_invalid_ovr_num_
-              ch_err='psb_realloc'
-              call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-              goto 9999
-            end if
-            isize = nh
-          endif
-          desc%idxmap%loc_to_glob(ncol) = ip
-          isize = size(desc%halo_index)
-          if ((pnt_halo+3) > isize) then
-            nh = isize + max(nv,relocsz)
-            call psb_realloc(nh,desc%halo_index,info,pad=-1)
-            if (info /= psb_success_) then
-              info=4
-              ch_err='psb_realloc'
-              call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-              goto 9999
-            end if
-            isize = nh 
-          endif
-          desc%halo_index(pnt_halo)   = k
-          desc%halo_index(pnt_halo+1) = 1
-          desc%halo_index(pnt_halo+2) = ncol
-          pnt_halo                    = pnt_halo + 3
-        else
-          lip = k
-        endif
-        idxin(i) = lip
-      enddo
-    end if
-    desc%matrix_data(psb_pnt_h_) = pnt_halo 
-
+  call desc%indxmap%g2l_ins(idxin(1:nv),info,mask)
+  
+  if (info /= 0) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='g2l_ins') 
+    goto 9999      
   end if
-
-  desc%matrix_data(psb_n_col_) = ncol
+    
+  desc%matrix_data(psb_n_col_) = desc%indxmap%get_lc()
 
   call psb_erractionrestore(err_act)
   return

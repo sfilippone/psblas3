@@ -95,7 +95,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   info = psb_get_errstatus()
   if (info /= psb_success_) then 
     ! Something went wrong in cdins/spins
@@ -104,7 +104,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   if (present(ext_hv)) then 
     ext_hv_ = ext_hv
   else
@@ -113,40 +113,11 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit, *) me,' ',trim(name),': start'
 
-  if (psb_is_bld_desc(desc_a)) then 
-    
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Checking rows insertion'
-    !
-    ! check if all local row are inserted
-    ! Note: this may still be useful for the case of 
-    !       cdall(..., vl=vl, globalcheck=.false.)
-    !       
-    do i=1,psb_cd_get_local_cols(desc_a)
-      if (desc_a%idxmap%loc_to_glob(i) < 0) then
-        info=3100
-        exit
-      endif
-    enddo
-
-    if (info /= psb_no_err_) then    
-      call psb_errpush(info,name,i_err=int_err)
+  if (allocated(desc_a%indxmap)) then 
+    call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='ldsc_pre_halo')
       goto 9999
-    endif
-    ! Trim size of loc_to_glob component.
-    call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%idxmap%loc_to_glob,info)
-
-    ! If large index space, we have to pre-process and rebuild
-    ! the list of halo indices as if it was in small index space    
-    if (psb_is_large_desc(desc_a)) then 
-      if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ': Large descriptor, calling ldsc_pre_halo'
-      call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='ldsc_pre_halo')
-        goto 9999
-      end if      
     end if
 
     ! Take out the lists for ovrlap, halo and ext...
@@ -158,6 +129,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
          & write(debug_unit,*) me,' ',trim(name),': Final conversion'
     ! Then convert and put them back where they belong.    
     call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
+
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cnv_dsc')
       goto 9999
@@ -170,8 +142,17 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       goto 9999
     end if
 
+    call desc_a%indxmap%asb(info)
+    if (info /= psb_success_) then 
+      write(0,*) 'Error from internal indxmap asb ',info
+      info = psb_success_
+    end if
+
+    desc_a%matrix_data(psb_n_row_) = desc_a%indxmap%get_lr()    
+    desc_a%matrix_data(psb_n_col_) = desc_a%indxmap%get_lc()
     ! Ok, register into MATRIX_DATA 
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
+
   else
     info = psb_err_spmat_invalid_state_
     call psb_errpush(info,name)
