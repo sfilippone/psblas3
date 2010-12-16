@@ -60,55 +60,6 @@ subroutine psi_renum_index(iperm,idx,info)
 
 end subroutine psi_renum_index
 
-subroutine psi_renum_idxmap(nc,iperm,idxmap,info)
-  use psi_mod, psi_protect_name =>  psi_renum_idxmap
-  use psb_serial_mod 
-  implicit none 
-
-  integer, intent(out)   :: info
-  integer, intent(in)    :: nc,iperm(:)
-  type(psb_idxmap_type), intent(inout) :: idxmap
-
-  integer, allocatable :: itmp(:)
-  integer :: i,j,k,nh
-
-  if (nc > size(iperm)) then 
-    info = psb_err_pivot_too_small_ 
-    return
-  endif
-
-  if (idxmap%state == psb_desc_large_) then 
-
-    allocate(itmp(size(idxmap%loc_to_glob)), stat=i)
-    if (i /= 0) then
-      info = psb_err_internal_error_
-      return
-    end if
-    do i=1,nc
-      itmp(i) = idxmap%loc_to_glob(iperm(i))
-    end do
-    do i=1, size(idxmap%glb_lc,1)
-      idxmap%glb_lc(i,2) = iperm(idxmap%glb_lc(i,2))
-    end do
-    do i=1, nc 
-      idxmap%loc_to_glob(i) = itmp(i)
-    end do
-
-  else
-
-    do i=1, nc
-      idxmap%glob_to_loc(idxmap%loc_to_glob(iperm(i))) = i  
-    enddo
-    do i=1,size(idxmap%glob_to_loc)
-      j = idxmap%glob_to_loc(i)
-      if (j>0) then 
-        idxmap%loc_to_glob(j) = i
-      endif
-    enddo
-  end if
-
-end subroutine psi_renum_idxmap
-
 subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
 
   use psi_mod, psi_protect_name =>  psi_cnv_dsc
