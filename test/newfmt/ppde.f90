@@ -139,10 +139,10 @@ program ppde
     goto 9999
   end if
 
-  fname=''! added by martone
+  !fname=''! added by martone
   call a%cscnv(bm,info,type='CSR')
-  write(fname,'(a,i2.2,a,i2.2,a)') 'mat',iam,'-',np,'.mtx'
-  call bm%print(fname,head='%Test sparse gen RSB')
+  !write(fname,'(a,i2.2,a,i2.2,a)') 'mat',iam,'-',np,'.mtx'
+  !call bm%print(fname,head='%Test sparse gen RSB')
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   !

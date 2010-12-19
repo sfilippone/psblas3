@@ -198,7 +198,7 @@ subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x,y,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(trans_)))
+  info=d_rsb_to_psb_info(rsb_spmv(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,x,1,beta,y,1))
 end subroutine psb_d_rsb_csmv
 
 subroutine psb_d_rsb_csmv_nt(alpha,a,x1,x2,beta,y1,y2,info) 
@@ -209,13 +209,9 @@ subroutine psb_d_rsb_csmv_nt(alpha,a,x1,x2,beta,y1,y2,info)
   real(psb_dpk_), intent(in) :: alpha, beta, x1(:), x2(:)
   real(psb_dpk_), intent(inout)       :: y1(:), y2(:)
   integer, intent(out)                :: info
-  character, parameter  :: transn='N',transt='T'
 !    PSBRSB_DEBUG('')
   info = psb_success_
-  info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x1,y1,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(transn)))
-  if(info.ne.psb_success_) goto 9999
-  info=d_rsb_to_psb_info(rsb_spmv(a%rsbmptr,x2,y2,alpha,beta,1,1,rsb_psblas_trans_to_rsb_trans(transt)))
-9999 continue
+  info=d_rsb_to_psb_info(rsb_spmv_nt(alpha,a%rsbmptr,x1,x2,1,beta,y1,y2,1))
   return
 end subroutine psb_d_rsb_csmv_nt
 
@@ -244,7 +240,7 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  info=d_rsb_to_psb_info(rsb_spsv(a%rsbmptr,x,y,alpha,1,1,rsb_psblas_trans_to_rsb_trans(trans_)))
+  info=d_rsb_to_psb_info(rsb_spsv(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,x,1,y,1))
   if (info /= 0) then 
     i = info
     info = psb_err_from_subroutine_ai_
@@ -383,7 +379,7 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
   info=-1
-  info=d_rsb_to_psb_info(rsb_spmm(a%rsbmptr,x,y,ldx,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
+  info=d_rsb_to_psb_info(rsb_spmm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,x,ldx,beta,y,ldy))
 end subroutine psb_d_rsb_csmm
 
 subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans) 
@@ -406,7 +402,7 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
   info=-1
-  info=d_rsb_to_psb_info(rsb_spsm(a%rsbmptr,y,ldy,nc,rsb_psblas_trans_to_rsb_trans(trans_),alpha,beta,c_f_order))
+  info=d_rsb_to_psb_info(rsb_spsm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,beta,y,ldy))
 end subroutine
 
 subroutine psb_d_rsb_rowsum(d,a) 

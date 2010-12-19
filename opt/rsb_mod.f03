@@ -172,34 +172,34 @@ end interface
 interface
 integer(c_int) function &
   &rsb_spmv&
-  &(matrix,x,y,alphap,betap,incx,incy,transa)&
+  &(transa,alphap,matrix,x,incx,betap,y,incy)&
   &bind(c,name='rsb_spmv')
 use iso_c_binding
+ integer(c_int), value  :: transa
+ real(c_double) :: alphap
  type(c_ptr), value  :: matrix
  real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- real(c_double) :: betap
  integer(c_int), value  :: incx
+ real(c_double) :: betap
+ real(c_double) :: y(*)
  integer(c_int), value  :: incy
- integer(c_int), value  :: transa
  end function rsb_spmv
 end interface
 
 interface
 integer(c_int) function &
   &rsb_spmv_nt&
-  &(matrix,x1,x2,y1,y2,alphap,betap,incx,incy)&
+  &(alphap,matrix,x1,x2,incx,betap,y1,y2,incy)&
   &bind(c,name='rsb_spmv_nt')
 use iso_c_binding
- type(c_ptr), value  :: matrix
- type(c_ptr), value  :: x1
- type(c_ptr), value  :: x2
- type(c_ptr), value  :: y1
- type(c_ptr), value  :: y2
  real(c_double) :: alphap
- real(c_double) :: betap
+ type(c_ptr), value  :: matrix
+ real(c_double) :: x1(*)
+ real(c_double) :: x2(*)
  integer(c_int), value  :: incx
+ real(c_double) :: betap
+ real(c_double) :: y1(*)
+ real(c_double) :: y2(*)
  integer(c_int), value  :: incy
  end function rsb_spmv_nt
 end interface
@@ -207,15 +207,15 @@ end interface
 interface
 integer(c_int) function &
   &rsb_spmv_ata&
-  &(matrix,x,y,alphap,betap,incx,incy)&
+  &(alphap,matrix,x,incx,betap,y,incy)&
   &bind(c,name='rsb_spmv_ata')
 use iso_c_binding
+ real(c_double) :: alphap
  type(c_ptr), value  :: matrix
  real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- real(c_double) :: betap
  integer(c_int), value  :: incx
+ real(c_double) :: betap
+ real(c_double) :: y(*)
  integer(c_int), value  :: incy
  end function rsb_spmv_ata
 end interface
@@ -223,38 +223,71 @@ end interface
 interface
 integer(c_int) function &
   &rsb_spmv_power&
-  &(matrix,x,y,alphap,betap,incx,incy,transa,exp)&
+  &(transa,alphap,matrix,exp,x,incx,betap,y,incy)&
   &bind(c,name='rsb_spmv_power')
 use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: incx
- integer(c_int), value  :: incy
  integer(c_int), value  :: transa
+ real(c_double) :: alphap
+ type(c_ptr), value  :: matrix
  integer(c_int), value  :: exp
+ real(c_double) :: x(*)
+ integer(c_int), value  :: incx
+ real(c_double) :: betap
+ real(c_double) :: y(*)
+ integer(c_int), value  :: incy
  end function rsb_spmv_power
 end interface
 
 interface
 integer(c_int) function &
   &rsb_spmm&
-  &(matrix,b,c,ldb,ldc,nrhs,transa,alphap,betap,order)&
+  &(transa,alphap,matrix,nrhs,order,b,ldb,betap,c,ldc)&
   &bind(c,name='rsb_spmm')
 use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: b(*)
- real(c_double) :: c(*)
- integer(c_int), value  :: ldb
- integer(c_int), value  :: ldc
- integer(c_int), value  :: nrhs
  integer(c_int), value  :: transa
  real(c_double) :: alphap
- real(c_double) :: betap
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: nrhs
  integer(c_int), value  :: order
+ real(c_double) :: b(*)
+ integer(c_int), value  :: ldb
+ real(c_double) :: betap
+ real(c_double) :: c(*)
+ integer(c_int), value  :: ldc
  end function rsb_spmm
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spsv&
+  &(transl,alphap,matrix,x,incx,y,incy)&
+  &bind(c,name='rsb_spsv')
+use iso_c_binding
+ integer(c_int), value  :: transl
+ real(c_double) :: alphap
+ type(c_ptr), value  :: matrix
+ real(c_double) :: x(*)
+ integer(c_int), value  :: incx
+ real(c_double) :: y(*)
+ integer(c_int), value  :: incy
+ end function rsb_spsv
+end interface
+
+interface
+integer(c_int) function &
+  &rsb_spsm&
+  &(transt,alphap,matrix,nrhs,order,betap,b,ldb)&
+  &bind(c,name='rsb_spsm')
+use iso_c_binding
+ integer(c_int), value  :: transt
+ real(c_double) :: alphap
+ type(c_ptr), value  :: matrix
+ integer(c_int), value  :: nrhs
+ integer(c_int), value  :: order
+ real(c_double) :: betap
+ real(c_double) :: b(*)
+ integer(c_int), value  :: ldb
+ end function rsb_spsm
 end interface
 
 interface
@@ -327,39 +360,6 @@ end interface
 
 interface
 integer(c_int) function &
-  &rsb_spsv&
-  &(matrix,x,y,alphap,incx,incy,transl)&
-  &bind(c,name='rsb_spsv')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: x(*)
- real(c_double) :: y(*)
- real(c_double) :: alphap
- integer(c_int), value  :: incx
- integer(c_int), value  :: incy
- integer(c_int), value  :: transl
- end function rsb_spsv
-end interface
-
-interface
-integer(c_int) function &
-  &rsb_spsm&
-  &(matrix,b,ldb,nrhs,transt,alphap,betap,order)&
-  &bind(c,name='rsb_spsm')
-use iso_c_binding
- type(c_ptr), value  :: matrix
- real(c_double) :: b(*)
- integer(c_int), value  :: ldb
- integer(c_int), value  :: nrhs
- integer(c_int), value  :: transt
- real(c_double) :: alphap
- real(c_double) :: betap
- integer(c_int), value  :: order
- end function rsb_spsm
-end interface
-
-interface
-integer(c_int) function &
   &rsb_matrix_add_to_dense&
   &(matrixa,alphap,transa,matrixb,ldb,nr,nc,rowmajor)&
   &bind(c,name='rsb_matrix_add_to_dense')
@@ -373,6 +373,38 @@ use iso_c_binding
  integer(c_int), value  :: nc
  integer(c_int), value  :: rowmajor
  end function rsb_matrix_add_to_dense
+end interface
+
+interface
+type(c_ptr) function &
+  &rsb_matrix_sum&
+  &(transa,alphap,matrixa,transb,betap,matrixb,errvalp)&
+  &bind(c,name='rsb_matrix_sum')
+use iso_c_binding
+ integer(c_int), value  :: transa
+ real(c_double) :: alphap
+ type(c_ptr), value  :: matrixa
+ integer(c_int), value  :: transb
+ real(c_double) :: betap
+ type(c_ptr), value  :: matrixb
+ integer(c_int) :: errvalp
+ end function rsb_matrix_sum
+end interface
+
+interface
+type(c_ptr) function &
+  &rsb_matrix_mul&
+  &(transa,alphap,matrixa,transb,betap,matrixb,errvalp)&
+  &bind(c,name='rsb_matrix_mul')
+use iso_c_binding
+ integer(c_int), value  :: transa
+ real(c_double) :: alphap
+ type(c_ptr), value  :: matrixa
+ integer(c_int), value  :: transb
+ real(c_double) :: betap
+ type(c_ptr), value  :: matrixb
+ integer(c_int) :: errvalp
+ end function rsb_matrix_mul
 end interface
 
 interface
@@ -752,38 +784,6 @@ use iso_c_binding
  integer(c_int), value  :: nnz
  integer(c_int), value  :: flags
  end function rsb_update_elements
-end interface
-
-interface
-type(c_ptr) function &
-  &rsb_matrix_sum&
-  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
-  &bind(c,name='rsb_matrix_sum')
-use iso_c_binding
- type(c_ptr), value  :: matrixa
- real(c_double) :: alphap
- integer(c_int), value  :: transa
- type(c_ptr), value  :: matrixb
- real(c_double) :: betap
- integer(c_int), value  :: transb
- integer(c_int) :: errvalp
- end function rsb_matrix_sum
-end interface
-
-interface
-type(c_ptr) function &
-  &rsb_matrix_mul&
-  &(matrixa,alphap,transa,matrixb,betap,transb,errvalp)&
-  &bind(c,name='rsb_matrix_mul')
-use iso_c_binding
- type(c_ptr), value  :: matrixa
- real(c_double) :: alphap
- integer(c_int), value  :: transa
- type(c_ptr), value  :: matrixb
- real(c_double) :: betap
- integer(c_int), value  :: transb
- integer(c_int) :: errvalp
- end function rsb_matrix_mul
 end interface
 
 interface
