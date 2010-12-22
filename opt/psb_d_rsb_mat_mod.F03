@@ -402,7 +402,7 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   ldx=size(x,1); ldy=size(y,1)
   nc=min(size(x,2),size(y,2) )
   info=-1
-  info=d_rsb_to_psb_info(rsb_spsm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,beta,y,ldy))
+  info=d_rsb_to_psb_info(rsb_spsm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,beta,x,ldx,y,ldy))
 end subroutine
 
 subroutine psb_d_rsb_rowsum(d,a) 
