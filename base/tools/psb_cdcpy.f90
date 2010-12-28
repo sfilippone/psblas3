@@ -45,7 +45,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   !....parameters...
 
   type(psb_desc_type), intent(in)  :: desc_in
-  type(psb_desc_type), intent(inout) :: desc_out
+  type(psb_desc_type), intent(out) :: desc_out
   integer, intent(out)             :: info
 
   !locals

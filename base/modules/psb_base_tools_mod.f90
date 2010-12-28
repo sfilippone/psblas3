@@ -341,7 +341,7 @@ module psb_cd_if_tools_mod
       !....parameters...
 
       type(psb_desc_type), intent(in)  :: desc_in
-      type(psb_desc_type), intent(inout) :: desc_out
+      type(psb_desc_type), intent(out) :: desc_out
       integer, intent(out)             :: info
     end subroutine psb_cdcpy
   end interface
