@@ -198,7 +198,8 @@ contains
   end function psb_slinmap_sizeof
 
 
-  subroutine psb_s_linmap_sub(out_map,map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
+  subroutine psb_s_linmap_sub(out_map,map_kind,desc_X, desc_Y,&
+       & map_X2Y, map_Y2X,iaggr,naggr)
     use psb_linmap_type_mod
     implicit none 
     type(psb_slinmap_type), intent(out) :: out_map    

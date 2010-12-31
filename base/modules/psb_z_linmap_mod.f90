@@ -176,8 +176,8 @@ contains
   end function psb_is_ok_zlinmap
 
   function psb_zlinmap_sizeof(map) result(val)
-    use psb_mat_mod, only : psb_sizeof
     use psb_descriptor_type
+    use psb_mat_mod, only : psb_sizeof
     implicit none 
     type(psb_zlinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -196,7 +196,8 @@ contains
 
   end function psb_zlinmap_sizeof
 
-  subroutine psb_z_linmap_sub(out_map,map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
+  subroutine psb_z_linmap_sub(out_map,map_kind,desc_X, desc_Y,&
+       & map_X2Y, map_Y2X,iaggr,naggr)
     use psb_linmap_type_mod
     implicit none 
     type(psb_zlinmap_type), intent(out) :: out_map    
@@ -209,8 +210,8 @@ contains
 
   subroutine  psb_zlinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_mat_mod, only : psb_move_alloc
     use psb_descriptor_type
+    use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_zlinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 

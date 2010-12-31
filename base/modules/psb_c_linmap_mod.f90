@@ -195,7 +195,8 @@ contains
 
   end function psb_clinmap_sizeof
 
-  subroutine psb_c_linmap_sub(out_map,map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
+  subroutine psb_c_linmap_sub(out_map,map_kind,desc_X, desc_Y,&
+       & map_X2Y, map_Y2X,iaggr,naggr)
     use psb_linmap_type_mod
     implicit none 
     type(psb_clinmap_type), intent(out) :: out_map    
@@ -208,8 +209,8 @@ contains
 
   subroutine  psb_clinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_mat_mod, only : psb_move_alloc
     use psb_descriptor_type
+    use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_clinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 
