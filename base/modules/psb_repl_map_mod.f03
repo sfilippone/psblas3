@@ -54,6 +54,7 @@ module psb_repl_map_mod
     procedure, pass(idxmap)  :: is_repl   => repl_is_repl
     procedure, pass(idxmap)  :: asb       => repl_asb
     procedure, pass(idxmap)  :: free      => repl_free
+    procedure, pass(idxmap)  :: clone     => repl_clone
     procedure, pass(idxmap)  :: get_fmt   => repl_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => repl_l2gs1
@@ -540,4 +541,55 @@ contains
     res = 'REPL'
   end function repl_get_fmt
 
+
+  subroutine repl_clone(idxmap,outmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_repl_map), intent(in)    :: idxmap
+    class(psb_indx_map), allocatable, intent(out) :: outmap
+    integer, intent(out) :: info
+    Integer :: err_act
+    character(len=20)  :: name='repl_clone'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+    call psb_get_erraction(err_act)
+    if (allocated(outmap)) then 
+      write(0,*) 'Error: should not be allocated on input'
+      info = -87
+      goto 9999
+    end if
+    
+    allocate(psb_repl_map :: outmap, stat=info) 
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    select type (outmap)
+    type is (psb_repl_map) 
+        outmap%psb_indx_map = idxmap%psb_indx_map
+    class default
+      ! This should be impossible 
+      info = -1
+    end select
+      
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine repl_clone
 end module psb_repl_map_mod

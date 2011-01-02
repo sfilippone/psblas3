@@ -119,6 +119,7 @@ module psb_indx_map_mod
 
     procedure, pass(idxmap)  :: asb   => base_asb
     procedure, pass(idxmap)  :: free  => base_free
+    procedure, pass(idxmap)  :: clone => base_clone
 
     procedure, pass(idxmap)  :: l2gs1  => base_l2gs1
     procedure, pass(idxmap)  :: l2gs2  => base_l2gs2
@@ -154,7 +155,8 @@ module psb_indx_map_mod
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
        & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins,&
-       & base_g2lv2_ins, base_init_vl, base_is_null, base_row_extendable
+       & base_g2lv2_ins, base_init_vl, base_is_null,&
+       & base_row_extendable, base_clone
 
   interface 
     subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
@@ -788,6 +790,30 @@ contains
     return
   end subroutine base_init_vl
 
+  subroutine base_clone(idxmap,outmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(in)    :: idxmap
+    class(psb_indx_map), allocatable, intent(out) :: outmap
+    integer, intent(out) :: info
+    Integer :: err_act
+    character(len=20)  :: name='base_clone'
+    logical, parameter :: debug=.false.
 
+    info = psb_success_
+        
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine base_clone
 
 end module psb_indx_map_mod

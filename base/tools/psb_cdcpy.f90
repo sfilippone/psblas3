@@ -85,12 +85,18 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
 
   if (allocated(desc_in%indxmap)) then 
-    if (allocated(desc_out%indxmap)) then 
-      call desc_out%indxmap%free()
-      deallocate(desc_out%indxmap)
-    end if
-    if (info == psb_success_)&
-         & allocate(desc_out%indxmap, source=desc_in%indxmap, stat=info) 
+!!$    if (allocated(desc_out%indxmap)) then 
+!!$      ! This should never happen
+!!$      call desc_out%indxmap%free()
+!!$      deallocate(desc_out%indxmap)
+!!$    end if
+!!$    write(debug_unit,*) me,' ',trim(name),': Calling allocate(SOURCE = )'
+!!$    if (info == psb_success_)&
+!!$         & allocate(desc_out%indxmap, source=desc_in%indxmap, stat=info) 
+    
+    call desc_in%indxmap%clone(desc_out%indxmap,info)
+    
+    
   end if
 
   if (info /= psb_success_) then

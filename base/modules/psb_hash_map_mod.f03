@@ -72,6 +72,7 @@ contains
   procedure, pass(idxmap)  :: sizeof    => hash_sizeof
   procedure, pass(idxmap)  :: asb       => hash_asb
   procedure, pass(idxmap)  :: free      => hash_free
+  procedure, pass(idxmap)  :: clone     => hash_clone
   procedure, pass(idxmap)  :: get_fmt   => hash_get_fmt
 
   procedure, pass(idxmap)  :: row_extendable => hash_row_extendable
@@ -1239,6 +1240,71 @@ subroutine hash_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask,nrm)
     end do
   end if
 end subroutine hash_inner_cnv2
+
+
+  subroutine hash_clone(idxmap,outmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_hash_map), intent(in)    :: idxmap
+    class(psb_indx_map), allocatable, intent(out) :: outmap
+    integer, intent(out) :: info
+    Integer :: err_act
+    character(len=20)  :: name='hash_clone'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+    call psb_get_erraction(err_act)
+    if (allocated(outmap)) then 
+      write(0,*) 'Error: should not be allocated on input'
+      info = -87
+      goto 9999
+    end if
+
+    allocate(psb_hash_map :: outmap, stat=info )
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    select type (outmap)
+    type is (psb_hash_map) 
+      if (info == psb_success_) then 
+        outmap%psb_indx_map = idxmap%psb_indx_map
+        outmap%hashvsize    = idxmap%hashvsize
+        outmap%hashvmask    = idxmap%hashvmask
+        allocate(outmap%hash, stat=info) 
+      end if
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%hashv,outmap%hashv,info)
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%glb_lc,outmap%glb_lc,info)
+      if (info == psb_success_)&
+           &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
+      class default
+        ! This should be impossible 
+      info = -1
+    end select
+
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine hash_clone
 
 
 end module psb_hash_map_mod

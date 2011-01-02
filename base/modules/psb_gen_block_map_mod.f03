@@ -61,6 +61,7 @@ module psb_gen_block_map_mod
     procedure, pass(idxmap)  :: sizeof    => block_sizeof
     procedure, pass(idxmap)  :: asb       => block_asb
     procedure, pass(idxmap)  :: free      => block_free
+    procedure, pass(idxmap)  :: clone     => block_clone
     procedure, pass(idxmap)  :: get_fmt   => block_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => block_l2gs1
@@ -86,7 +87,7 @@ module psb_gen_block_map_mod
        & block_get_fmt, block_l2gs1, block_l2gs2, block_l2gv1,&
        & block_l2gv2, block_g2ls1, block_g2ls2, block_g2lv1,&
        & block_g2lv2, block_g2ls1_ins, block_g2ls2_ins,&
-       & block_g2lv1_ins, block_g2lv2_ins
+       & block_g2lv1_ins, block_g2lv2_ins, block_clone
 
 
 contains
@@ -668,5 +669,67 @@ contains
     character(len=5) :: res
     res = 'BLOCK'
   end function block_get_fmt
+
+
+  subroutine block_clone(idxmap,outmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_gen_block_map), intent(in)    :: idxmap
+    class(psb_indx_map), allocatable, intent(out) :: outmap
+    integer, intent(out) :: info
+    Integer :: err_act
+    character(len=20)  :: name='block_clone'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+    call psb_get_erraction(err_act)
+    if (allocated(outmap)) then 
+      write(0,*) 'Error: should not be allocated on input'
+      info = -87
+      goto 9999
+    end if
+    
+    allocate(psb_gen_block_map :: outmap, stat=info) 
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    select type (outmap)
+    type is (psb_gen_block_map) 
+      if (info == psb_success_) then 
+        outmap%psb_indx_map = idxmap%psb_indx_map
+        outmap%min_glob_row = idxmap%min_glob_row
+        outmap%max_glob_row = idxmap%max_glob_row
+      end if
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%loc_to_glob,outmap%loc_to_glob,info)
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%vnl,outmap%vnl,info)
+      if (info == psb_success_)&
+           &  call psb_safe_ab_cpy(idxmap%srt_l2g,outmap%srt_l2g,info)
+    class default
+      ! This should be impossible 
+      info = -1
+    end select
+      
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine block_clone
 
 end module psb_gen_block_map_mod
