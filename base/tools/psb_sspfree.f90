@@ -56,7 +56,7 @@ subroutine psb_sspfree(a, desc_a,info)
   name = 'psb_sspfree'
   call psb_erractionsave(err_act)
 
-  if (.not.allocated(desc_a%matrix_data)) then 
+  if (.not.psb_is_ok_desc(desc_a)) then
     info=psb_err_forgot_spall_
     call psb_errpush(info,name)
     return

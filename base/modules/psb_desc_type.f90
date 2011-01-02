@@ -200,7 +200,7 @@ module psb_descriptor_type
 
 
   type psb_desc_type
-    integer, allocatable  :: matrix_data(:)
+!!$    integer, allocatable  :: matrix_data(:)
     integer, allocatable  :: halo_index(:)
     integer, allocatable  :: ext_index(:)
     integer, allocatable  :: ovrlap_index(:)
@@ -241,15 +241,10 @@ module psb_descriptor_type
     module procedure psb_is_bld_desc
   end interface psb_is_bld_desc
 
-  interface psb_is_large_desc
-    module procedure psb_is_large_desc
-  end interface psb_is_large_desc
-
 
   interface psb_move_alloc
     module procedure psb_cdtransfer
   end interface psb_move_alloc
-
 
   interface psb_free
     module procedure psb_cdfree
@@ -269,7 +264,7 @@ contains
     integer(psb_long_int_k_) :: val
 
     val = 0 
-    if (allocated(desc%matrix_data))  val = val + psb_sizeof_int*size(desc%matrix_data)
+!!$    if (allocated(desc%matrix_data))  val = val + psb_sizeof_int*size(desc%matrix_data)
     if (allocated(desc%halo_index))   val = val + psb_sizeof_int*size(desc%halo_index)
     if (allocated(desc%ext_index))    val = val + psb_sizeof_int*size(desc%ext_index)
     if (allocated(desc%bnd_elem))     val = val + psb_sizeof_int*size(desc%bnd_elem)
@@ -353,14 +348,6 @@ contains
          & val = desc%indxmap%is_bld()
 
   end function psb_is_bld_desc
-
-  function psb_is_large_desc(desc) result(val)
-    type(psb_desc_type), intent(in) :: desc
-    logical                         :: val 
-
-    val = .false.
-
-  end function psb_is_large_desc
 
   function psb_is_upd_desc(desc)  result(val)
     type(psb_desc_type), intent(in) :: desc
@@ -625,11 +612,11 @@ contains
     name = 'psb_cdfree'
 
 
-    if (.not.allocated(desc_a%matrix_data)) then
-      info=psb_err_forgot_spall_
-      call psb_errpush(info,name)
-      return
-    end if
+!!$    if (.not.allocated(desc_a%matrix_data)) then
+!!$      info=psb_err_forgot_spall_
+!!$      call psb_errpush(info,name)
+!!$      return
+!!$    end if
 
     ictxt=psb_cd_get_context(desc_a)
 
@@ -723,7 +710,7 @@ contains
       end if
     end if
 
-    deallocate(desc_a%matrix_data)
+!!$    deallocate(desc_a%matrix_data)
 
     call psb_nullify_desc(desc_a)
 
@@ -783,7 +770,7 @@ contains
     ! function might be called even when desc_in is
     ! empty. 
 
-    call psb_move_alloc( desc_in%matrix_data ,    desc_out%matrix_data  , info)
+!!$    call psb_move_alloc( desc_in%matrix_data ,    desc_out%matrix_data  , info)
     if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
     if (info == psb_success_)  &

@@ -11,7 +11,7 @@ LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
 
-lib: auxd  f77d f03d lib1
+lib: auxd  f77d impld lib1
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
@@ -25,13 +25,13 @@ auxd:
 
 f77d:
 	(cd f77; $(MAKE) lib)
-f03d:
-	(cd f03; $(MAKE) lib)
+impld:
+	(cd impl; $(MAKE) lib)
 
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
 	(cd aux; $(MAKE) clean)
 	(cd f77; $(MAKE) clean)
-	(cd f03; $(MAKE) clean)
+	(cd impl; $(MAKE) clean)
 
 veryclean: clean 

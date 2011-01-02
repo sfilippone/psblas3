@@ -61,12 +61,15 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
   else
     lshort = .true.
   endif
+  write(0,*) 'To be reimplemented ye'
+  return
 
   if (.not.lglob) then
-    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
-    m=desc_p%matrix_data(psb_m_)
-    n_row=desc_p%matrix_data(psb_n_row_)
-    n_col=desc_p%matrix_data(psb_n_col_)
+!!$    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
+!!$    m=desc_p%matrix_data(psb_m_)
+!!$    n_row=desc_p%matrix_data(psb_n_row_)
+!!$    n_col=desc_p%matrix_data(psb_n_col_)
+
 !!$    if (.not.lshort) &
 !!$         & write(iout,*) 'Loc_to_glob ',desc_p%idxmap%loc_to_glob(1:n_row), ': ',&
 !!$         & desc_p%idxmap%loc_to_glob(n_row+1:n_col)
@@ -139,10 +142,10 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
 
   else if (lglob) then 
 
-    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
-    m=desc_p%matrix_data(psb_m_)
-    n_row=desc_p%matrix_data(psb_n_row_)
-    n_col=desc_p%matrix_data(psb_n_col_)
+!!$    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
+!!$    m=desc_p%matrix_data(psb_m_)
+!!$    n_row=desc_p%matrix_data(psb_n_row_)
+!!$    n_col=desc_p%matrix_data(psb_n_col_)
     if (.not.lshort) then 
 !!$      write(iout,*) 'Loc_to_glob '
 !!$      do i=1, n_row

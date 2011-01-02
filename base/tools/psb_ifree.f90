@@ -57,7 +57,7 @@ subroutine psb_ifree(x, desc_a, info)
   call psb_erractionsave(err_act)
   name = 'psb_ifree'
   
-  if (.not.allocated(desc_a%matrix_data)) then
+  if (.not.psb_is_ok_desc(desc_a)) then
      info=psb_err_forgot_spall_
      call psb_errpush(info,name)
      return
@@ -157,11 +157,11 @@ subroutine psb_ifreev(x, desc_a,info)
   call psb_erractionsave(err_act)
   name = 'psb_ifreev'
 
-  
-  if (.not.allocated(desc_a%matrix_data)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     return
+
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    return
   end if
   ictxt=psb_cd_get_context(desc_a)
 
@@ -174,26 +174,26 @@ subroutine psb_ifreev(x, desc_a,info)
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_geall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_geall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  
+
   !deallocate x
   deallocate(x,stat=info)
   if (info /= psb_no_err_) then
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
   endif
-  
+
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 

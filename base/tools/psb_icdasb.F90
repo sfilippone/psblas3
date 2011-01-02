@@ -148,10 +148,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       info = psb_success_
     end if
 
-    desc_a%matrix_data(psb_n_row_) = desc_a%indxmap%get_lr()    
-    desc_a%matrix_data(psb_n_col_) = desc_a%indxmap%get_lc()
-    ! Ok, register into MATRIX_DATA 
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
+!!$    desc_a%matrix_data(psb_n_row_) = desc_a%indxmap%get_lr()    
+!!$    desc_a%matrix_data(psb_n_col_) = desc_a%indxmap%get_lc()
+!!$    ! Ok, register into MATRIX_DATA 
+!!$    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
   else
     info = psb_err_spmat_invalid_state_

@@ -180,7 +180,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   !....locals....
   integer                          :: n
   character                        :: act
-  integer                          :: err_act, dectype
+  integer                          :: err_act
   logical                          :: owned_
   integer, parameter               :: zero=0
   character(len=20)   :: name
@@ -189,11 +189,10 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   name = 'glob_to_loc'
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt,iam,np)
   call psb_erractionsave(err_act)
 
-  dectype  = desc_a%matrix_data(psb_dec_type_)
   if (present(iact)) then
     act=iact
   else

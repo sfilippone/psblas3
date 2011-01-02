@@ -174,24 +174,24 @@ subroutine psb_cdrep(m, ictxt, desc, info)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc%matrix_data(psb_mdata_size_),&
-       &   desc%ovrlap_elem(0,3),stat=info)
-  if (info /= psb_success_) then     
-    info=psb_err_alloc_request_
-    int_err(1)=2*m+psb_mdata_size_+1
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
-    goto 9999
-  endif
-  ! If the index space is replicated there's no point in not having 
-  ! the full map on the current process. 
-
-  desc%matrix_data(psb_m_)        = m
-  desc%matrix_data(psb_n_)        = n
-  desc%matrix_data(psb_n_row_)    = m
-  desc%matrix_data(psb_n_col_)    = n
-  desc%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
-  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
+!!$  allocate(desc%matrix_data(psb_mdata_size_),&
+!!$       &   desc%ovrlap_elem(0,3),stat=info)
+!!$  if (info /= psb_success_) then     
+!!$    info=psb_err_alloc_request_
+!!$    int_err(1)=2*m+psb_mdata_size_+1
+!!$    call psb_errpush(info,name,i_err=int_err,a_err='integer')
+!!$    goto 9999
+!!$  endif
+!!$  ! If the index space is replicated there's no point in not having 
+!!$  ! the full map on the current process. 
+!!$
+!!$  desc%matrix_data(psb_m_)        = m
+!!$  desc%matrix_data(psb_n_)        = n
+!!$  desc%matrix_data(psb_n_row_)    = m
+!!$  desc%matrix_data(psb_n_col_)    = n
+!!$  desc%matrix_data(psb_ctxt_)     = ictxt
+!!$  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
+!!$  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
 
 
   allocate(psb_repl_map :: desc%indxmap, stat=info)
@@ -208,7 +208,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
 
   tovr  = -1 
   call psi_bld_tmpovrl(tovr,desc,info)
-  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
+!!$  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
   
 
   if (debug_level >= psb_debug_ext_) &

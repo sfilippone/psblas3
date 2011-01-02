@@ -75,7 +75,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_insvi'
 
-  if ((.not.allocated(desc_a%matrix_data))) then
+  if (.not.psb_is_ok_desc(desc_a)) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return
@@ -256,7 +256,7 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_iinsi'
 
-  if ((.not.allocated(desc_a%matrix_data))) then
+  if (.not.psb_is_ok_desc(desc_a)) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return

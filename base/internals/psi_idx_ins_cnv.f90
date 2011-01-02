@@ -119,7 +119,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
     goto 9999      
   end if
     
-  desc%matrix_data(psb_n_col_) = desc%indxmap%get_lc()
+!!$  desc%matrix_data(psb_n_col_) = desc%indxmap%get_lc()
 
   call psb_erractionrestore(err_act)
   return

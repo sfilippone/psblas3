@@ -56,10 +56,10 @@ subroutine psb_zfree(x, desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
   name='psb_zfree'
- if (.not.allocated(desc_a%matrix_data)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     return
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    return
   end if
 
   ictxt=psb_cd_get_context(desc_a)
@@ -73,9 +73,9 @@ subroutine psb_zfree(x, desc_a, info)
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
@@ -85,7 +85,7 @@ subroutine psb_zfree(x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
 
   call psb_erractionrestore(err_act)
   return
@@ -93,8 +93,8 @@ subroutine psb_zfree(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 
@@ -128,34 +128,34 @@ subroutine psb_zfreev(x, desc_a, info)
   name='psb_zfreev'
 
 
-  if (.not.allocated(desc_a%matrix_data)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-     info = psb_err_context_error_
-     call psb_errpush(info,name)
-     goto 9999
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
 
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
   deallocate(x,stat=info)
   if (info /= psb_no_err_) then
-     info=psb_err_alloc_dealloc_
-     call psb_errpush(info,name)
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
   endif
-  
+
   call psb_erractionrestore(err_act)
   return
 
@@ -163,9 +163,9 @@ subroutine psb_zfreev(x, desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_ret_) then
-     return
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

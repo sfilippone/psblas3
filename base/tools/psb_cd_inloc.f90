@@ -285,12 +285,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   end if
 
   ! allocate work vector
-  allocate(desc%matrix_data(psb_mdata_size_),&
-       &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
+  allocate(temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
        & stat=info)
   if (info == psb_success_) then 
     desc%lprm(1)        = 0   
-    desc%matrix_data(:) = 0
+!!$    desc%matrix_data(:) = 0
   end if
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -300,11 +299,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   endif
 
   temp_ovrlap(:) = -1
-  desc%matrix_data(psb_m_)        = m
-  desc%matrix_data(psb_n_)        = n
-  ! This has to be set BEFORE any call to SET_BLD
-  desc%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
+!!$  desc%matrix_data(psb_m_)        = m
+!!$  desc%matrix_data(psb_n_)        = n
+!!$  ! This has to be set BEFORE any call to SET_BLD
+!!$  desc%matrix_data(psb_ctxt_)     = ictxt
+!!$  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
 
   if (debug_level >= psb_debug_ext_) &
@@ -372,9 +371,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     goto 9999
   endif
 
-  ! set fields in desc%MATRIX_DATA....
-  desc%matrix_data(psb_n_row_)  = loc_row
-  desc%matrix_data(psb_n_col_)  = loc_row
+!!$  ! set fields in desc%MATRIX_DATA....
+!!$  desc%matrix_data(psb_n_row_)  = loc_row
+!!$  desc%matrix_data(psb_n_col_)  = loc_row
 
 !!$  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
 !!$  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)

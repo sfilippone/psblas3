@@ -63,7 +63,7 @@ subroutine psb_dasb(x, desc_a, info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  if ((.not.allocated(desc_a%matrix_data))) then
+  if (.not.psb_is_ok_desc(desc_a)) then
     info=psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999

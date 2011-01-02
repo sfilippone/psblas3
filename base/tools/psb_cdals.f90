@@ -125,9 +125,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   ! count local rows number
   loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
-  allocate(desc%matrix_data(psb_mdata_size_),&
-       & temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
-  desc%matrix_data(:) = 0
+!!$  allocate(desc%matrix_data(psb_mdata_size_),&
+!!$       & temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
+!!$  desc%matrix_data(:) = 0
+  allocate(temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
 
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -136,11 +137,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     call psb_errpush(err,name,int_err,a_err='integer')
     goto 9999
   endif
-  desc%matrix_data(psb_m_)        = m
-  desc%matrix_data(psb_n_)        = n
-  ! This has to be set BEFORE any call to SET_BLD
-  desc%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
+!!$  desc%matrix_data(psb_m_)        = m
+!!$  desc%matrix_data(psb_n_)        = n
+!!$  ! This has to be set BEFORE any call to SET_BLD
+!!$  desc%matrix_data(psb_ctxt_)     = ictxt
+!!$  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
 
   if (debug_level >= psb_debug_ext_) &
@@ -288,9 +289,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     Goto 9999
   endif
 
-  ! set fields in desc%MATRIX_DATA....
-  desc%matrix_data(psb_n_row_)  = loc_row
-  desc%matrix_data(psb_n_col_)  = loc_row
+!!$  ! set fields in desc%MATRIX_DATA....
+!!$  desc%matrix_data(psb_n_row_)  = loc_row
+!!$  desc%matrix_data(psb_n_col_)  = loc_row
 
 !!$  write(0,*) me,'CDALS: after init ', &
 !!$       & desc%indxmap%get_gr(), &

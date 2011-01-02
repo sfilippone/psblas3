@@ -76,7 +76,7 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_cinsvi'
 
-  if ((.not.allocated(desc_a%matrix_data))) then
+  if (.not.psb_is_ok_desc(desc_a)) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return
@@ -122,13 +122,13 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
     dupl_ = psb_dupl_ovwrt_
   endif
-  
+
   call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
 
   select case(dupl_) 
@@ -150,8 +150,8 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
       !loop over all val's rows
 
       if (irl(i) > 0) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
+        ! this row belongs to me
+        ! copy i-th row of block val in x
         x(irl(i)) = x(irl(i)) +  val(i)
       end if
     enddo
@@ -257,7 +257,7 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_cinsi'
 
-  if ((.not.allocated(desc_a%matrix_data))) then
+  if (.not.psb_is_ok_desc(desc_a)) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return

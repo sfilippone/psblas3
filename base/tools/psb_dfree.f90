@@ -56,7 +56,7 @@ subroutine psb_dfree(x, desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
   name='psb_dfree'
-  if (.not.allocated(desc_a%matrix_data)) then
+  if (.not.psb_is_ok_desc(desc_a)) then
      info=psb_err_forgot_spall_
      call psb_errpush(info,name)
      goto 9999
@@ -126,7 +126,7 @@ subroutine psb_dfreev(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_dfreev'
 
-  if (.not.allocated(desc_a%matrix_data)) then
+  if (.not.psb_is_ok_desc(desc_a)) then
      info=psb_err_forgot_spall_
      call psb_errpush(info,name)
      return

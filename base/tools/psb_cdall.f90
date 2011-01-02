@@ -128,12 +128,12 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   else if (present(nl)) then 
     
-    allocate(desc%matrix_data(psb_mdata_size_))
-    desc%matrix_data(psb_m_)        = nl
-    call psb_sum(ictxt,desc%matrix_data(psb_m_))
-    desc%matrix_data(psb_n_)        = desc%matrix_data(psb_m_)
-    desc%matrix_data(psb_ctxt_)     = ictxt
-    call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
+!!$    allocate(desc%matrix_data(psb_mdata_size_))
+!!$    desc%matrix_data(psb_m_)        = nl
+!!$    call psb_sum(ictxt,desc%matrix_data(psb_m_))
+!!$    desc%matrix_data(psb_n_)        = desc%matrix_data(psb_m_)
+!!$    desc%matrix_data(psb_ctxt_)     = ictxt
+!!$    call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
 
 
@@ -176,12 +176,12 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 999
   end if
-  desc%matrix_data(psb_pnt_h_) = 1
+!!$  desc%matrix_data(psb_pnt_h_) = 1
   desc%halo_index(:)           = -1
   desc%ext_index(:)            = -1
   call psb_cd_set_bld(desc,info)
-  desc%matrix_data(psb_n_row_) = desc%indxmap%get_lr()
-  desc%matrix_data(psb_n_col_) = desc%indxmap%get_lc()
+!!$  desc%matrix_data(psb_n_row_) = desc%indxmap%get_lr()
+!!$  desc%matrix_data(psb_n_col_) = desc%indxmap%get_lc()
   if (info /= psb_success_) goto 999
 
   call psb_erractionrestore(err_act)
