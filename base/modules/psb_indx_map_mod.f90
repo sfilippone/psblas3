@@ -69,8 +69,17 @@
 !  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
 !
 !
+!  This is the base version of the class; as such, it only contains
+!  methods for getting/setting the common attributes, whereas
+!  the index translation methods are only implemented at the derived
+!  class level.
+!  Note that the INIT method is defined in the derived methods, and
+!  is specialized for them; a better solution would have to have
+!  a constructor for each specific class, with the name of the class,
+!  but this is not yet working on many compilers, most notably GNU. 
 !
-!
+!  Note: the CLONE method was implemented as a workaround for a problem
+!  with SOURCE= allocation on GNU. Might be removed later on. 
 !
 !
 module psb_indx_map_mod
