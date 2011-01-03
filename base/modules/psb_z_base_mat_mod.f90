@@ -49,6 +49,11 @@
 ! methods are implemented that allow the direct transition from one
 ! format to another. The psb_z_coo_sparse_mat type extends the
 ! psb_z_base_sparse_mat one.
+!
+! About the method MOLD: this has been defined for those compilers
+! not yet supporting ALLOCATE( ...MOLD=...); it's otherwise silly to
+! duplicate "by hand" what is specified in the language (in this case F2008)
+!
 
 
 module psb_z_base_mat_mod
