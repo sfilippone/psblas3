@@ -91,9 +91,7 @@ esac
 AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR])
 
 # Note that the following line won't save from troubles.
-# AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
 AC_PROG_FC([xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
-#AC_PROG_FC
 AC_PROG_F77([xlf pgf77 ifort ifc nagfor gfortran])
 AC_PROG_CC([xlc pgcc icc gcc ])
 dnl AC_PROG_CXX
@@ -429,14 +427,6 @@ if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
      F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
-     F03COPT="${F90COPT}"
-     F03="${MPIFC}"		
-elif test "X$psblas_cv_fc" == X"xlf" ; then
-     F03="xlf2003_r"	   
-     F03COPT="-O3 -qarch=auto -qsuffix=f=f03:cpp=F03 $F03COPT"	
-else
-     F03=${FC}
-     F03COPT="${F90COPT}"
 fi
 
 #FCFLAGS="${F90COPT}"
@@ -447,7 +437,6 @@ fi
 # Compilers variables selection 
 ##############################################################################
 F90=${FC}
-F03=${F03}
 MPF90=${MPIFC}
 FC=${FC}
 MPF77=${MPIFC}
@@ -717,8 +706,6 @@ AC_SUBST(CDEFINES)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(F90)
 AC_SUBST(F90COPT)
-AC_SUBST(F03)
-AC_SUBST(F03COPT)
 AC_SUBST(MPF90)
 AC_SUBST(MPF77)
 AC_SUBST(MPCC)
@@ -767,14 +754,10 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
-.f03.o:
-	$(F03) $(F03COPT) $(FINCLUDES) -c $<
 .F.o:
 	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
-.F03.o:
-	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 
 AC_SUBST(PSBLASRULES)
@@ -809,7 +792,6 @@ dnl	FFLAGS                : ${FFLAGS}
 dnl	FCFLAGS               : ${FCFLAGS}
 	MODEXT                : ${MODEXT}
 	FMFLAG                : ${FMFLAG}
-   	F03COPT               : ${F03COPT}
    	F90COPT               : ${F90COPT}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}

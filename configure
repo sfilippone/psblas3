@@ -625,8 +625,6 @@ FCOPT
 MPCC
 MPF77
 MPF90
-F03COPT
-F03
 F90COPT
 F90
 BASELIBNAME
@@ -2652,7 +2650,6 @@ esac
 $as_echo "$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR" >&6; }
 
 # Note that the following line won't save from troubles.
-# AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
 ac_ext=${ac_fc_srcext-f}
 ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
@@ -3092,7 +3089,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-#AC_PROG_FC
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
 ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -6219,14 +6215,6 @@ if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options
      F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
-     F03COPT="${F90COPT}"
-     F03="${MPIFC}"
-elif test "X$psblas_cv_fc" == X"xlf" ; then
-     F03="xlf2003_r"
-     F03COPT="-O3 -qarch=auto -qsuffix=f=f03:cpp=F03 $F03COPT"
-else
-     F03=${FC}
-     F03COPT="${F90COPT}"
 fi
 
 #FCFLAGS="${F90COPT}"
@@ -6237,7 +6225,6 @@ fi
 # Compilers variables selection
 ##############################################################################
 F90=${FC}
-F03=${F03}
 MPF90=${MPIFC}
 FC=${FC}
 MPF77=${MPIFC}
@@ -8979,8 +8966,6 @@ UTILLIBNAME=libpsb_util.a
 
 
 
-
-
 #AC_SUBST(BLACS_LIBS)
 
 
@@ -9002,14 +8987,10 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
-.f03.o:
-	$(F03) $(F03COPT) $(FINCLUDES) -c $<
 .F.o:
 	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
-.F03.o:
-	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 
 
@@ -10318,7 +10299,6 @@ fi
 	CDEFINES              : ${CDEFINES}
 	MODEXT                : ${MODEXT}
 	FMFLAG                : ${FMFLAG}
-   	F03COPT               : ${F03COPT}
    	F90COPT               : ${F90COPT}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
@@ -10351,7 +10331,6 @@ $as_echo "$as_me:
 	CDEFINES              : ${CDEFINES}
 	MODEXT                : ${MODEXT}
 	FMFLAG                : ${FMFLAG}
-   	F03COPT               : ${F03COPT}
    	F90COPT               : ${F90COPT}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}

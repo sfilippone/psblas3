@@ -6,17 +6,14 @@
 .mod=@MODEXT@
 .fh=.fh
 .SUFFIXES: 
-.SUFFIXES: .f90 .F90 .f .F .f03 .F03 .c .o
+.SUFFIXES: .f90 .F90 .f .F .c .o
 
 
 # The following ones are the variables used by the PSBLAS make scripts.
 
-F03=@F03@
 F90=@F90@
 FC=@FC@
 CC=@CC@
-#F77=@F77@
-F03COPT=@F03COPT@
 F90COPT=@F90COPT@
 FCOPT=@FCOPT@
 CCOPT=@CCOPT@
