@@ -2519,9 +2519,9 @@ subroutine psb_c_cp_csc_to_fmt(a,b,info)
 
   type is (psb_c_csc_sparse_mat) 
     call b%psb_c_base_sparse_mat%cp_from(a%psb_c_base_sparse_mat)
-    b%icp = a%icp
-    b%ia  = a%ia
-    b%val = a%val
+    call psb_safe_cpy( a%icp, b%icp , info)
+    call psb_safe_cpy( a%ia , b%ia  , info)
+    call psb_safe_cpy( a%val, b%val , info)
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2599,9 +2599,9 @@ subroutine psb_c_cp_csc_from_fmt(a,b,info)
 
   type is (psb_c_csc_sparse_mat) 
     call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
-    a%icp = b%icp
-    a%ia  = b%ia
-    a%val = b%val
+    call psb_safe_cpy( b%icp, a%icp , info)
+    call psb_safe_cpy( b%ia , a%ia  , info)
+    call psb_safe_cpy( b%val, a%val , info)
 
   class default
     call b%cp_to_coo(tmp,info)
@@ -2961,6 +2961,7 @@ end subroutine psb_c_csc_print
 
 subroutine psb_c_csc_cp_from(a,b)
   use psb_error_mod
+  use psb_realloc_mod
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cp_from
   implicit none 
 
@@ -2978,9 +2979,9 @@ subroutine psb_c_csc_cp_from(a,b)
 
   call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
   call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
-  a%icp = b%icp 
-  a%ia  = b%ia
-  a%val = b%val 
+  call psb_safe_cpy( b%icp, a%icp , info)
+  call psb_safe_cpy( b%ia , a%ia  , info)
+  call psb_safe_cpy( b%val, a%val , info)
 
   if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)

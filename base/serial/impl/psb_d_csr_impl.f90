@@ -2822,6 +2822,7 @@ end subroutine psb_d_cp_csr_from_fmt
 
 subroutine psb_d_csr_cp_from(a,b)
   use psb_error_mod
+  use psb_realloc_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_cp_from
   implicit none 
 
@@ -2839,9 +2840,9 @@ subroutine psb_d_csr_cp_from(a,b)
 
   call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
   call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-  a%irp = b%irp 
-  a%ja  = b%ja
-  a%val = b%val 
+  call psb_safe_cpy( b%irp, a%irp , info)
+  call psb_safe_cpy( b%ja , a%ja  , info)
+  call psb_safe_cpy( b%val, a%val , info)
 
   if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)

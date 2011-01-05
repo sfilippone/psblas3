@@ -65,8 +65,8 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
         if (info == psb_success_) then 
-          this%iaggr = iaggr
-          this%naggr = naggr
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
         end if
       end if
     else
@@ -143,8 +143,8 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
         if (info == psb_success_) then 
-          this%iaggr = iaggr
-          this%naggr = naggr
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
         end if
       end if
     else
@@ -225,8 +225,8 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
         if (info == psb_success_) then 
-          this%iaggr = iaggr
-          this%naggr = naggr
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
         end if
       end if
     else
@@ -303,8 +303,8 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
         if (info == psb_success_) then 
-          this%iaggr = iaggr
-          this%naggr = naggr
+          this%iaggr(:) = iaggr(:)
+          this%naggr(:) = naggr(:)
         end if
       end if
     else
