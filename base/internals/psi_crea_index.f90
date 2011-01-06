@@ -132,8 +132,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   end if
 
   if(debug_level >= psb_debug_inner_)&
-       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index',&
-       & size(index_out)
+       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
   ! Do the actual format conversion. 
   call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
        & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
