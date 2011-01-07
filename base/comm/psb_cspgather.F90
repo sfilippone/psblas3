@@ -70,7 +70,7 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     ndx = nzbr(me+1) 
     call mpi_allgatherv(loc_coo%val,ndx,mpi_complex,&
          & glob_coo%val,nzbr,idisp,&
-         & mpi_double_precision,icomm,info)
+         & mpi_complex,icomm,info)
     if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,mpi_integer,&
          & glob_coo%ia,nzbr,idisp,&
          & mpi_integer,icomm,info)

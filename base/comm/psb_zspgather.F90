@@ -23,7 +23,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   logical :: keepnum_, keeploc_
   integer, allocatable :: nzbr(:), idisp(:)
   character(len=20) :: name
-  integer            :: debug_level, debug_unit
+  integer           :: debug_level, debug_unit
 
   name='psb_gather'
   if (psb_get_errstatus().ne.0) return 
@@ -58,7 +58,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       goto 9999      
     end if
     call loca%mv_to(loc_coo)
-    nzbr(:) = 0
+    nzbr(:)    = 0
     nzbr(me+1) = loc_coo%get_nzeros()
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
@@ -70,7 +70,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     ndx = nzbr(me+1) 
     call mpi_allgatherv(loc_coo%val,ndx,mpi_double_complex,&
          & glob_coo%val,nzbr,idisp,&
-         & mpi_double_precision,icomm,info)
+         & mpi_double_complex,icomm,info)
     if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,mpi_integer,&
          & glob_coo%ia,nzbr,idisp,&
          & mpi_integer,icomm,info)
