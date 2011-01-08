@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2011/01/07: Silly bugs in spgather. 	
 2010/10/26: Fixed configure to use MPI wrappers. Fixed example in CXX: the
 	    MOLD actual argument should be polymorphic.
 	
