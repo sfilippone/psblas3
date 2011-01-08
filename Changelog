@@ -1,6 +1,18 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
-2011/01/07: Silly bugs in spgather. 	
+2011/01/07: Silly bugs in spgather MPI data types and in z_nubmm calling
+	    cnumbmm. Also, don't use allocate on assignment with GNU. 
+
+2011/01/02: Finish descriptor reform by eliminating matrix_data. Switch 
+	    all f03 extensions into f90. 
+
+2010/12/16: Merge new descriptors with CLASS(PSB_INDX_MAP) internal maps. 
+	    Updated various descriptor-related routines.
+	
+2010/11/29: opt subdir containing ELL and RSB. test/newfmt. 
+
+2010/11/22: PRECBLD now takes a MOLD argument for its matrices. 
+ 	
 2010/10/26: Fixed configure to use MPI wrappers. Fixed example in CXX: the
 	    MOLD actual argument should be polymorphic.
 	
