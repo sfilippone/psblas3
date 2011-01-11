@@ -67,6 +67,7 @@ program ppde
   use psb_krylov_mod
   use psb_d_ell_mat_mod
   use psb_d_rsb_mat_mod
+  use psb_d_elg_mat_mod
   implicit none
 
   ! input parameters

@@ -4,7 +4,8 @@ include ../../Make.inc
 #
 LIBDIR=../../lib/
 OPTDIR=../../opt
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base -L$(OPTDIR) -lopt
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base -L$(OPTDIR) -lopt\
+	-lspgpu -L/usr/local/spgpu/lib -lcudart -lcublas -L/usr/local/cuda/lib64
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such
