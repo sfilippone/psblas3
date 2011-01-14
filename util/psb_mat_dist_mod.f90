@@ -33,7 +33,7 @@ module psb_mat_dist_mod
 
   interface psb_matdist
     subroutine smatdist(a_glob, a, ictxt, desc_a,&
-         & b_glob, b, info, parts, v, inroot,fmt)
+         & b_glob, b, info, parts, v, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -90,7 +90,8 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_
+      use psb_sparse_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_,&
+           & psb_s_base_sparse_mat
       implicit none
 
       ! parameters
@@ -103,7 +104,8 @@ module psb_mat_dist_mod
       integer, intent(out)       :: info
       integer, optional          :: inroot
       character(len=*), optional :: fmt
-
+      class(psb_s_base_sparse_mat), optional :: mold
+ 
       integer                    :: v(:)
       interface 
         subroutine parts(global_indx,n,np,pv,nv)
@@ -117,7 +119,7 @@ module psb_mat_dist_mod
 
     end subroutine smatdist
     subroutine dmatdist(a_glob, a, ictxt, desc_a,&
-         & b_glob, b, info, parts, v, inroot,fmt)
+         & b_glob, b, info, parts, v, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -174,7 +176,8 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type
+      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type,&
+           & psb_d_base_sparse_mat
       implicit none
 
       ! parameters
@@ -187,6 +190,7 @@ module psb_mat_dist_mod
       integer, intent(out)       :: info
       integer, optional          :: inroot
       character(len=*), optional :: fmt
+      class(psb_d_base_sparse_mat), optional :: mold
 
       integer                    :: v(:)
       interface 
@@ -202,7 +206,7 @@ module psb_mat_dist_mod
     end subroutine dmatdist
 
     subroutine cmatdist(a_glob, a, ictxt, desc_a,&
-         & b_glob, b, info, parts, v, inroot,fmt)
+         & b_glob, b, info, parts, v, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -259,7 +263,8 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type
+      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type,&
+           & psb_c_base_sparse_mat
       implicit none
 
       ! parameters
@@ -272,6 +277,7 @@ module psb_mat_dist_mod
       integer, intent(out)       :: info
       integer, optional          :: inroot
       character(len=*), optional :: fmt
+      class(psb_c_base_sparse_mat), optional :: mold
 
       integer                    :: v(:)
       interface 
@@ -287,7 +293,7 @@ module psb_mat_dist_mod
     end subroutine cmatdist
 
     subroutine zmatdist(a_glob, a, ictxt, desc_a,&
-         & b_glob, b, info, parts, v, inroot,fmt)
+         & b_glob, b, info, parts, v, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -344,7 +350,8 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type
+      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type,&
+           & psb_z_base_sparse_mat
       implicit none
 
       ! parameters
@@ -357,6 +364,7 @@ module psb_mat_dist_mod
       integer, intent(out)       :: info
       integer, optional          :: inroot
       character(len=*), optional :: fmt
+      class(psb_z_base_sparse_mat), optional :: mold
 
       integer                    :: v(:)
       interface 

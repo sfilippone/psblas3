@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 subroutine smatdist(a_glob, a, ictxt, desc_a,&
-     & b_glob, b, info, parts, v, inroot,fmt)
+     & b_glob, b, info, parts, v, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -101,6 +101,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   integer, intent(out)       :: info
   integer, optional          :: inroot
   character(len=5), optional :: fmt
+  class(psb_s_base_sparse_mat), optional :: mold
 
   integer                    :: v(:)
   interface 
@@ -120,7 +121,6 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
   integer, allocatable          :: iwork(:)
-  character                     :: afmt*5
   integer, allocatable          :: irow(:),icol(:)
   real(psb_spk_), allocatable :: val(:)
   integer, parameter          :: nb=30
@@ -408,12 +408,6 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
     endif
   end do
 
-  if (present(fmt)) then 
-    afmt=fmt
-  else
-    afmt = 'CSR'
-  endif
-
   call psb_barrier(ictxt)
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
@@ -427,7 +421,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
 
   call psb_barrier(ictxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -475,7 +469,7 @@ end subroutine smatdist
 
 
 subroutine dmatdist(a_glob, a, ictxt, desc_a,&
-     & b_glob, b, info, parts, v, inroot,fmt)
+     & b_glob, b, info, parts, v, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -546,6 +540,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   integer, intent(out)       :: info
   integer, optional          :: inroot
   character(len=5), optional :: fmt
+  class(psb_d_base_sparse_mat), optional :: mold
 
   integer                    :: v(:)
   interface 
@@ -565,7 +560,6 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
   integer, allocatable          :: iwork(:)
-  character                     :: afmt*5
   integer, allocatable          :: irow(:),icol(:)
   real(psb_dpk_), allocatable :: val(:)
   integer, parameter          :: nb=30
@@ -854,11 +848,6 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
     endif
   end do
 
-  if (present(fmt)) then 
-    afmt=fmt
-  else
-    afmt = 'CSR'
-  endif
 
   call psb_barrier(ictxt)
   t0 = psb_wtime()
@@ -873,7 +862,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
 
   call psb_barrier(ictxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -921,7 +910,7 @@ end subroutine dmatdist
 
 
 subroutine cmatdist(a_glob, a, ictxt, desc_a,&
-     & b_glob, b, info, parts, v, inroot,fmt)
+     & b_glob, b, info, parts, v, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -992,6 +981,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   integer, intent(out)       :: info
   integer, optional          :: inroot
   character(len=5), optional :: fmt
+  class(psb_c_base_sparse_mat), optional :: mold
 
   integer                    :: v(:)
   interface 
@@ -1011,7 +1001,6 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
   integer, allocatable          :: iwork(:)
-  character                     :: afmt*5
   integer, allocatable          :: irow(:),icol(:)
   complex(psb_spk_), allocatable :: val(:)
   integer, parameter          :: nb=30
@@ -1299,12 +1288,6 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
     endif
   end do
 
-  if (present(fmt)) then 
-    afmt=fmt
-  else
-    afmt = 'CSR'
-  endif
-
   call psb_barrier(ictxt)
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
@@ -1318,7 +1301,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
 
   call psb_barrier(ictxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
@@ -1366,7 +1349,7 @@ end subroutine cmatdist
 
 
 subroutine zmatdist(a_glob, a, ictxt, desc_a,&
-     & b_glob, b, info, parts, v, inroot,fmt)
+     & b_glob, b, info, parts, v, inroot,fmt,mold)
   !
   ! an utility subroutine to distribute a matrix among processors
   ! according to a user defined data distribution, using
@@ -1437,6 +1420,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   integer, intent(out)       :: info
   integer, optional          :: inroot
   character(len=5), optional :: fmt
+  class(psb_z_base_sparse_mat), optional :: mold
 
   integer                    :: v(:)
   interface 
@@ -1456,7 +1440,6 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
   integer, allocatable          :: iwork(:)
-  character                     :: afmt*5
   integer, allocatable          :: irow(:),icol(:)
   complex(psb_dpk_), allocatable :: val(:)
   integer, parameter          :: nb=30
@@ -1744,12 +1727,6 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
     endif
   end do
 
-  if (present(fmt)) then 
-    afmt=fmt
-  else
-    afmt = 'CSR'
-  endif
-
   call psb_barrier(ictxt)
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
@@ -1763,7 +1740,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
 
   call psb_barrier(ictxt)
   t2 = psb_wtime()
-  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+  call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=fmt,mold=mold)     
   t3 = psb_wtime()
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
