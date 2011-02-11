@@ -180,6 +180,15 @@ module psb_indx_map_mod
 
 contains
 
+
+  function base_get_fmt(idxmap) result(res)
+    implicit none 
+    class(psb_indx_map), intent(in) :: idxmap
+    character(len=5) :: res
+    res = 'NULL'
+  end function base_get_fmt
+
+
   function base_get_state(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
@@ -765,15 +774,6 @@ contains
     idxmap%local_cols     = -1
 
   end subroutine base_set_null
-
-
-  function base_get_fmt(idxmap) result(res)
-    implicit none 
-    class(psb_indx_map), intent(in) :: idxmap
-    character(len=5) :: res
-    res = 'NULL'
-  end function base_get_fmt
-
 
   subroutine base_init_vl(idxmap,ictxt,vl,info)
     use psb_penv_mod
