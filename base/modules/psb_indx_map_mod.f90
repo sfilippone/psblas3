@@ -124,7 +124,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
     procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
 
-    procedure, pass(idxmap)  :: get_fmt   => base_get_fmt
+    procedure, nopass        :: get_fmt   => base_get_fmt
 
     procedure, pass(idxmap)  :: asb   => base_asb
     procedure, pass(idxmap)  :: free  => base_free
@@ -181,9 +181,8 @@ module psb_indx_map_mod
 contains
 
 
-  function base_get_fmt(idxmap) result(res)
+  function base_get_fmt() result(res)
     implicit none 
-    class(psb_indx_map), intent(in) :: idxmap
     character(len=5) :: res
     res = 'NULL'
   end function base_get_fmt

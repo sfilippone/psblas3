@@ -54,7 +54,7 @@ module psb_list_map_mod
     procedure, pass(idxmap)  :: asb       => list_asb
     procedure, pass(idxmap)  :: free      => list_free
     procedure, pass(idxmap)  :: clone     => list_clone
-    procedure, pass(idxmap)  :: get_fmt   => list_get_fmt
+    procedure, nopass        :: get_fmt   => list_get_fmt
     procedure, pass(idxmap)  :: row_extendable => list_row_extendable
 
     procedure, pass(idxmap)  :: l2gs1 => list_l2gs1
@@ -624,9 +624,8 @@ contains
     
   end subroutine list_asb
 
-  function list_get_fmt(idxmap) result(res)
+  function list_get_fmt() result(res)
     implicit none 
-    class(psb_list_map), intent(in) :: idxmap
     character(len=5) :: res
     res = 'LIST'
   end function list_get_fmt

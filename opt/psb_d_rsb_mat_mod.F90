@@ -40,7 +40,7 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: get_nzeros   => d_rsb_get_nzeros
     procedure, pass(a) :: get_ncols   => d_rsb_get_ncols
     procedure, pass(a) :: get_nrows   => d_rsb_get_nrows
-    procedure, pass(a) :: get_fmt      => d_rsb_get_fmt
+    procedure, nopass  :: get_fmt      => d_rsb_get_fmt
     procedure, pass(a) :: sizeof       => d_rsb_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_rsb_csmm
     !procedure, pass(a) :: d_csmv_nt       => psb_d_rsb_csmv_nt ! FIXME: a placeholder for future memory
@@ -157,9 +157,8 @@ module psb_d_rsb_mat_mod
     res=rsb_get_matrix_n_columns(a%rsbmptr)
   end function d_rsb_get_ncols
 
-  function d_rsb_get_fmt(a) result(res)
+  function d_rsb_get_fmt() result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
     character(len=5) :: res
     !the following printout is harmful, here, if happening during a write :) (causes a deadlock)
     !PSBRSB_DEBUG('')

@@ -25,7 +25,7 @@ module psb_d_ell_mat_mod
   contains
     procedure, pass(a) :: get_size     => d_ell_get_size
     procedure, pass(a) :: get_nzeros   => d_ell_get_nzeros
-    procedure, pass(a) :: get_fmt      => d_ell_get_fmt
+    procedure, nopass  :: get_fmt      => d_ell_get_fmt
     procedure, pass(a) :: sizeof       => d_ell_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_ell_csmm
     procedure, pass(a) :: d_csmv       => psb_d_ell_csmv
@@ -414,9 +414,8 @@ contains
       
   end function d_ell_sizeof
 
-  function d_ell_get_fmt(a) result(res)
+  function d_ell_get_fmt() result(res)
     implicit none 
-    class(psb_d_ell_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'ELL'
   end function d_ell_get_fmt

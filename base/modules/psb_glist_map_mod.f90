@@ -53,7 +53,7 @@ module psb_glist_map_mod
     procedure, pass(idxmap)  :: sizeof  => glist_sizeof
     procedure, pass(idxmap)  :: free    => glist_free
     procedure, pass(idxmap)  :: clone   => glist_clone
-    procedure, pass(idxmap)  :: get_fmt => glist_get_fmt
+    procedure, nopass        :: get_fmt => glist_get_fmt
     procedure, pass(idxmap)  :: fnd_owner => glist_fnd_owner
 
   end type psb_glist_map
@@ -177,9 +177,8 @@ contains
 
   end subroutine glist_fnd_owner
 
-  function glist_get_fmt(idxmap) result(res)
+  function glist_get_fmt() result(res)
     implicit none 
-    class(psb_glist_map), intent(in) :: idxmap
     character(len=5) :: res
     res = 'GLIST'
   end function glist_get_fmt

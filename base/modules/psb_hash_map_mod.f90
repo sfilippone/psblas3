@@ -73,7 +73,7 @@ contains
   procedure, pass(idxmap)  :: asb       => hash_asb
   procedure, pass(idxmap)  :: free      => hash_free
   procedure, pass(idxmap)  :: clone     => hash_clone
-  procedure, pass(idxmap)  :: get_fmt   => hash_get_fmt
+  procedure, nopass        :: get_fmt   => hash_get_fmt
 
   procedure, pass(idxmap)  :: row_extendable => hash_row_extendable
 
@@ -947,9 +947,8 @@ subroutine hash_asb(idxmap,info)
 
 end subroutine hash_asb
 
-function hash_get_fmt(idxmap) result(res)
+function hash_get_fmt() result(res)
   implicit none 
-  class(psb_hash_map), intent(in) :: idxmap
   character(len=5) :: res
   res = 'HASH'
 end function hash_get_fmt

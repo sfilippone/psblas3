@@ -62,7 +62,7 @@ module psb_gen_block_map_mod
     procedure, pass(idxmap)  :: asb       => block_asb
     procedure, pass(idxmap)  :: free      => block_free
     procedure, pass(idxmap)  :: clone     => block_clone
-    procedure, pass(idxmap)  :: get_fmt   => block_get_fmt
+    procedure, nopass        :: get_fmt   => block_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => block_l2gs1
     procedure, pass(idxmap)  :: l2gs2 => block_l2gs2
@@ -663,9 +663,8 @@ contains
     
   end subroutine block_asb
 
-  function block_get_fmt(idxmap) result(res)
+  function block_get_fmt() result(res)
     implicit none 
-    class(psb_gen_block_map), intent(in) :: idxmap
     character(len=5) :: res
     res = 'BLOCK'
   end function block_get_fmt

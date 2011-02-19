@@ -121,7 +121,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: get_size     => d_coo_get_size
     procedure, pass(a) :: get_nzeros   => d_coo_get_nzeros
     procedure, pass(a) :: set_nzeros   => d_coo_set_nzeros
-    procedure, pass(a) :: get_fmt      => d_coo_get_fmt
+    procedure, nopass  :: get_fmt      => d_coo_get_fmt
     procedure, pass(a) :: sizeof       => d_coo_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_coo_csmm
     procedure, pass(a) :: d_csmv       => psb_d_coo_csmv
@@ -892,9 +892,8 @@ contains
   end function d_coo_sizeof
   
   
-  function d_coo_get_fmt(a) result(res)
+  function d_coo_get_fmt() result(res)
     implicit none 
-    class(psb_d_coo_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'COO'
   end function d_coo_get_fmt

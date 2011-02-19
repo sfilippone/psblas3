@@ -51,7 +51,7 @@ module psb_c_csc_mat_mod
   contains
     procedure, pass(a) :: get_size     => c_csc_get_size
     procedure, pass(a) :: get_nzeros   => c_csc_get_nzeros
-    procedure, pass(a) :: get_fmt      => c_csc_get_fmt
+    procedure, nopass  :: get_fmt      => c_csc_get_fmt
     procedure, pass(a) :: sizeof       => c_csc_sizeof
     procedure, pass(a) :: c_csmm       => psb_c_csc_csmm
     procedure, pass(a) :: c_csmv       => psb_c_csc_csmv
@@ -393,9 +393,8 @@ contains
       
   end function c_csc_sizeof
 
-  function c_csc_get_fmt(a) result(res)
+  function c_csc_get_fmt() result(res)
     implicit none 
-    class(psb_c_csc_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'CSC'
   end function c_csc_get_fmt

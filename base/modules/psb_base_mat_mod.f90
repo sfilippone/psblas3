@@ -87,7 +87,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_size => psb_base_get_size
     procedure, pass(a) :: get_state => psb_base_get_state
     procedure, pass(a) :: get_dupl => psb_base_get_dupl
-    procedure, pass(a) :: get_fmt => psb_base_get_fmt
+    procedure, nopass  :: get_fmt => psb_base_get_fmt
     procedure, pass(a) :: get_aux => psb_base_get_aux
     procedure, pass(a) :: is_null => psb_base_is_null
     procedure, pass(a) :: is_bld => psb_base_is_bld
@@ -265,9 +265,8 @@ contains
     res = 8
   end function psb_base_sizeof
  
-  function psb_base_get_fmt(a) result(res)
+  function psb_base_get_fmt() result(res)
     implicit none 
-    class(psb_base_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'NULL'
   end function psb_base_get_fmt

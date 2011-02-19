@@ -55,7 +55,7 @@ module psb_repl_map_mod
     procedure, pass(idxmap)  :: asb       => repl_asb
     procedure, pass(idxmap)  :: free      => repl_free
     procedure, pass(idxmap)  :: clone     => repl_clone
-    procedure, pass(idxmap)  :: get_fmt   => repl_get_fmt
+    procedure, nopass        :: get_fmt   => repl_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => repl_l2gs1
     procedure, pass(idxmap)  :: l2gs2 => repl_l2gs2
@@ -534,9 +534,8 @@ contains
   end subroutine repl_free
 
 
-  function repl_get_fmt(idxmap) result(res)
+  function repl_get_fmt() result(res)
     implicit none 
-    class(psb_repl_map), intent(in) :: idxmap
     character(len=5) :: res
     res = 'REPL'
   end function repl_get_fmt

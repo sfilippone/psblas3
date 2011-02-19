@@ -50,7 +50,7 @@ module psb_s_csr_mat_mod
   contains
     procedure, pass(a) :: get_size     => s_csr_get_size
     procedure, pass(a) :: get_nzeros   => s_csr_get_nzeros
-    procedure, pass(a) :: get_fmt      => s_csr_get_fmt
+    procedure, nopass  :: get_fmt      => s_csr_get_fmt
     procedure, pass(a) :: sizeof       => s_csr_sizeof
     procedure, pass(a) :: s_csmm       => psb_s_csr_csmm
     procedure, pass(a) :: s_csmv       => psb_s_csr_csmv
@@ -393,9 +393,8 @@ contains
       
   end function s_csr_sizeof
 
-  function s_csr_get_fmt(a) result(res)
+  function s_csr_get_fmt() result(res)
     implicit none 
-    class(psb_s_csr_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'CSR'
   end function s_csr_get_fmt
