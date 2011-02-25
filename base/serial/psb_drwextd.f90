@@ -144,19 +144,16 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
         do i=1, min(nr-ma,mb)
           a%irp(ma+i+1) =  a%irp(ma+i) + b%irp(i+1) - b%irp(i)
           ja = a%irp(ma+i)
-          jb = b%irp(i)
-          do 
-            if (jb >=  b%irp(i+1)) exit
+          do jb = b%irp(i), b%irp(i+1)-1
             a%val(ja) = b%val(jb)
             a%ja(ja)  = b%ja(jb)
             ja = ja + 1
-            jb = jb + 1
           end do
         end do
         do j=i,nr-ma
           a%irp(ma+i+1) = a%irp(ma+i)
         end do
-        class default 
+      class default 
 
         write(psb_err_unit,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
       end select
@@ -177,8 +174,8 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
     nza = a%get_nzeros()
 
     if (present(b)) then 
-      mb = b%get_nrows()
-      nb = b%get_ncols()
+      mb  = b%get_nrows()
+      nb  = b%get_ncols()
       nzb = b%get_nzeros()
       call a%reallocate(nza+nzb)
 
@@ -209,14 +206,11 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
       type is (psb_d_csr_sparse_mat) 
         
         do i=1, min(nr-ma,mb)
-          do 
-            jb = b%irp(i)
-            if (jb >=  b%irp(i+1)) exit
+          do jb = b%irp(i), b%irp(i+1)-1
             nza = nza + 1 
             a%val(nza) = b%val(jb)
             a%ia(nza)  = ma + i
             a%ja(nza)  = b%ja(jb)
-            jb = jb + 1
           end do
         end do
         call a%set_nzeros(nza)
