@@ -110,7 +110,9 @@ module psb_z_mat_mod
     procedure, pass(a) :: z_cscnv_base  => psb_z_cscnv_base
     generic, public    :: cscnv         => z_cscnv, z_cscnv_ip, z_cscnv_base
     procedure, pass(a) :: reinit        => psb_z_reinit
-    procedure, pass(a) :: print         => psb_z_sparse_print
+    procedure, pass(a) :: print_i       => psb_z_sparse_print
+    procedure, pass(a) :: print_n       => psb_z_n_sparse_print
+    generic, public    :: print         => print_i, print_n
     procedure, pass(a) :: z_mv_from     => psb_z_mv_from
     generic, public    :: mv_from       => z_mv_from
     procedure, pass(a) :: z_mv_to       => psb_z_mv_to
@@ -267,7 +269,6 @@ module psb_z_mat_mod
     end subroutine psb_z_set_upper
   end interface
   
-  
   interface 
     subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_zspmat_type
@@ -278,6 +279,18 @@ module psb_z_mat_mod
       character(len=*), optional        :: head
       integer, intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_z_sparse_print
+  end interface
+
+  interface 
+    subroutine psb_z_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
+      import :: psb_zspmat_type
+      character(len=*), intent(in)      :: fname
+      class(psb_zspmat_type), intent(in) :: a   
+      integer, intent(in), optional     :: iv(:)
+      integer, intent(in), optional     :: eirs,eics
+      character(len=*), optional        :: head
+      integer, intent(in), optional     :: ivr(:), ivc(:)
+    end subroutine psb_z_n_sparse_print
   end interface
   
   interface 

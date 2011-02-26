@@ -496,6 +496,60 @@ subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
 end subroutine psb_z_sparse_print
 
 
+subroutine psb_z_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
+  use psb_z_mat_mod, psb_protect_name => psb_z_n_sparse_print
+  use psb_error_mod
+  implicit none 
+
+  character(len=*), intent(in)  :: fname   
+  class(psb_zspmat_type), intent(in) :: a   
+  integer, intent(in), optional     :: iv(:)
+  integer, intent(in), optional     :: eirs,eics
+  character(len=*), optional        :: head
+  integer, intent(in), optional     :: ivr(:), ivc(:)
+
+  Integer :: err_act, info, iout
+  logical :: isopen
+  character(len=20)  :: name='sparse_print'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_get_erraction(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  iout = max(psb_inp_unit,psb_err_unit,psb_out_unit) + 1
+  do 
+    inquire(unit=iout, opened=isopen)
+    if (.not.isopen) exit
+    iout = iout + 1
+    if (iout > 99) exit
+  end do
+  if (iout > 99) then 
+    write(psb_err_unit,*) 'Error: could not find a free unit for I/O'
+    return
+  end if
+  open(iout,file=fname,iostat=info)
+  if (info == psb_success_) then 
+    call a%a%print(iout,iv,eirs,eics,head,ivr,ivc)
+    close(iout)
+  else
+    write(psb_err_unit,*) 'Error: could not open ',fname,' for output'
+  end if
+
+  return
+
+9999 continue
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_z_n_sparse_print
 
 
 subroutine psb_z_get_neigh(a,idx,neigh,n,info,lev)

@@ -110,7 +110,9 @@ module psb_s_mat_mod
     procedure, pass(a) :: s_cscnv_base  => psb_s_cscnv_base
     generic, public    :: cscnv         => s_cscnv, s_cscnv_ip, s_cscnv_base
     procedure, pass(a) :: reinit        => psb_s_reinit
-    procedure, pass(a) :: print         => psb_s_sparse_print
+    procedure, pass(a) :: print_i       => psb_s_sparse_print
+    procedure, pass(a) :: print_n       => psb_s_n_sparse_print
+    generic, public    :: print         => print_i, print_n
     procedure, pass(a) :: s_mv_from     => psb_s_mv_from
     generic, public    :: mv_from       => s_mv_from
     procedure, pass(a) :: s_mv_to       => psb_s_mv_to
@@ -278,6 +280,18 @@ module psb_s_mat_mod
       character(len=*), optional        :: head
       integer, intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_s_sparse_print
+  end interface
+
+  interface 
+    subroutine psb_s_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
+      import :: psb_sspmat_type
+      character(len=*), intent(in)      :: fname
+      class(psb_sspmat_type), intent(in) :: a   
+      integer, intent(in), optional     :: iv(:)
+      integer, intent(in), optional     :: eirs,eics
+      character(len=*), optional        :: head
+      integer, intent(in), optional     :: ivr(:), ivc(:)
+    end subroutine psb_s_n_sparse_print
   end interface
 
   interface 
