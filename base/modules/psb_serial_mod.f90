@@ -228,6 +228,30 @@ module psb_serial_mod
 
 
   interface psb_geprt
+    subroutine psb_sgeprtn2(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      real(psb_spk_), intent(in)    :: a(:,:)
+      character(len=*), optional    :: head
+    end subroutine psb_sgeprtn2
+    subroutine psb_sgeprtn1(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      real(psb_spk_), intent(in)    :: a(:)
+      character(len=*), optional    :: head
+    end subroutine psb_sgeprtn1
+    subroutine psb_sgeprt2(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      real(psb_spk_), intent(in)     :: a(:,:)
+      character(len=*), optional     :: head
+    end subroutine psb_sgeprt2
+    subroutine psb_sgeprt1(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      real(psb_spk_), intent(in)     :: a(:)
+      character(len=*), optional     :: head
+    end subroutine psb_sgeprt1
     subroutine psb_dgeprtn2(fname,a,head)
       use psb_const_mod, only : psb_spk_, psb_dpk_
       character(len=*), intent(in)  :: fname   
@@ -252,6 +276,54 @@ module psb_serial_mod
       real(psb_dpk_), intent(in)     :: a(:)
       character(len=*), optional     :: head
     end subroutine psb_dgeprt1
+    subroutine psb_cgeprtn2(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      complex(psb_spk_), intent(in) :: a(:,:)
+      character(len=*), optional    :: head
+    end subroutine psb_cgeprtn2
+    subroutine psb_cgeprtn1(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      complex(psb_spk_), intent(in) :: a(:)
+      character(len=*), optional    :: head
+    end subroutine psb_cgeprtn1
+    subroutine psb_cgeprt2(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      complex(psb_spk_), intent(in)  :: a(:,:)
+      character(len=*), optional     :: head
+    end subroutine psb_cgeprt2
+    subroutine psb_cgeprt1(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      complex(psb_spk_), intent(in)  :: a(:)
+      character(len=*), optional     :: head
+    end subroutine psb_cgeprt1
+    subroutine psb_zgeprtn2(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      complex(psb_dpk_), intent(in) :: a(:,:)
+      character(len=*), optional    :: head
+    end subroutine psb_zgeprtn2
+    subroutine psb_zgeprtn1(fname,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      character(len=*), intent(in)  :: fname   
+      complex(psb_dpk_), intent(in) :: a(:)
+      character(len=*), optional    :: head
+    end subroutine psb_zgeprtn1
+    subroutine psb_zgeprt2(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      complex(psb_dpk_), intent(in)  :: a(:,:)
+      character(len=*), optional     :: head
+    end subroutine psb_zgeprt2
+    subroutine psb_zgeprt1(iout,a,head)
+      use psb_const_mod, only : psb_spk_, psb_dpk_
+      integer, intent(in)            :: iout
+      complex(psb_dpk_), intent(in)  :: a(:)
+      character(len=*), optional     :: head
+    end subroutine psb_zgeprt1
   end interface
   
   

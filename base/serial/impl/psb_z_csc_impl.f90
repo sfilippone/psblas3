@@ -2909,7 +2909,7 @@ subroutine psb_z_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   endif
 
   if (present(head)) then 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+    write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
     write(iout,'(a,a)') '% ',head 
     write(iout,'(a)') '%'    
     write(iout,'(a,a)') '% COO'
@@ -2921,7 +2921,7 @@ subroutine psb_z_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nr
