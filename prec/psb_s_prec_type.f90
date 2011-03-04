@@ -172,9 +172,9 @@ contains
   subroutine s_apply2v(prec,x,y,desc_data,info,trans,work)
     use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_sprec_type), intent(in)  :: prec
-    real(psb_spk_),intent(in)       :: x(:)
-    real(psb_spk_),intent(inout)    :: y(:)
+    class(psb_sprec_type), intent(in) :: prec
+    real(psb_spk_),intent(inout)      :: x(:)
+    real(psb_spk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
     real(psb_spk_),intent(inout), optional, target :: work(:)
@@ -241,8 +241,8 @@ contains
   subroutine s_apply1v(prec,x,desc_data,info,trans)
     use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_sprec_type), intent(in)  :: prec
-    real(psb_spk_),intent(inout)    :: x(:)
+    class(psb_sprec_type), intent(in) :: prec
+    real(psb_spk_),intent(inout)      :: x(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
 
