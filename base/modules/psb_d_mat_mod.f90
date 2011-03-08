@@ -949,8 +949,6 @@ contains
     class(psb_dspmat_type), intent(in) :: a
     integer :: res
 
-    Integer :: err_act
-
     res = 0
 
     if (allocated(a%a)) res = a%a%get_nz_row(idx)

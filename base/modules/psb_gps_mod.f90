@@ -743,7 +743,7 @@ CONTAINS
     ! PERFORM ON FLY REALLOCATION OF POINTER VET INCREASING
     ! ITS SIZE FROM SZ1 TO SZ2
     IMPLICIT NONE
-    INTEGER,allocatable  :: VET(:),TMP(:)
+    INTEGER,allocatable  :: VET(:)
     INTEGER :: SZ1,SZ2,INFO
     
     call psb_realloc(sz2,vet,info)

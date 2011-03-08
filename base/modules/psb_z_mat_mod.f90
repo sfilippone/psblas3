@@ -897,8 +897,6 @@ contains
     integer, intent(in)               :: idx
     class(psb_zspmat_type), intent(in) :: a
     integer :: res
-    
-    Integer :: err_act
 
     res = 0
     

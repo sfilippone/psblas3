@@ -51,7 +51,7 @@ module psb_repl_map_mod
 
     procedure, pass(idxmap)  :: repl_map_init => repl_init
 
-    procedure, pass(idxmap)  :: is_repl   => repl_is_repl
+    procedure, nopass        :: is_repl   => repl_is_repl
     procedure, pass(idxmap)  :: asb       => repl_asb
     procedure, pass(idxmap)  :: free      => repl_free
     procedure, pass(idxmap)  :: clone     => repl_clone
@@ -85,9 +85,8 @@ module psb_repl_map_mod
 
 contains
 
-  function repl_is_repl(idxmap) result(val)
+  function repl_is_repl() result(val)
     implicit none 
-    class(psb_repl_map), intent(in) :: idxmap
     logical :: val
     val = .true.
   end function repl_is_repl
@@ -248,7 +247,7 @@ contains
     integer, intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i, nv, is
+    integer :: i, is
     logical :: owned_
 
     info = 0
@@ -373,7 +372,7 @@ contains
     logical, intent(in), optional :: mask
     
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info)
+    call idxmap%g2l_ins(idxout,info,mask=mask)
     
   end subroutine repl_g2ls2_ins
 
@@ -386,7 +385,7 @@ contains
     integer, intent(inout) :: idx(:)
     integer, intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: i, nv, is, ix
+    integer :: i, is
 
     info = 0
     is = size(idx)
@@ -484,8 +483,7 @@ contains
     integer, intent(in)  :: ictxt, nl
     integer, intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, j, ntot
-    integer, allocatable :: vnl(:)
+    integer :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 

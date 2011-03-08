@@ -101,7 +101,7 @@ module psb_c_base_mat_mod
     
   end type psb_c_base_sparse_mat
   
-  private :: c_base_cssv, c_base_cssm, c_base_cp_from, c_base_mv_from
+  private :: c_base_cp_from, c_base_mv_from
   
   
   type, extends(psb_c_base_sparse_mat) :: psb_c_coo_sparse_mat

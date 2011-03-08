@@ -55,7 +55,7 @@ module psb_list_map_mod
     procedure, pass(idxmap)  :: free      => list_free
     procedure, pass(idxmap)  :: clone     => list_clone
     procedure, nopass        :: get_fmt   => list_get_fmt
-    procedure, pass(idxmap)  :: row_extendable => list_row_extendable
+    procedure, nopass        :: row_extendable => list_row_extendable
 
     procedure, pass(idxmap)  :: l2gs1 => list_l2gs1
     procedure, pass(idxmap)  :: l2gs2 => list_l2gs2
@@ -82,9 +82,8 @@ module psb_list_map_mod
 
 contains
     
-  function list_row_extendable(idxmap) result(val)
+  function list_row_extendable() result(val)
     implicit none 
-    class(psb_list_map), intent(in) :: idxmap
     logical :: val
     val = .true.
   end function list_row_extendable
@@ -269,7 +268,7 @@ contains
     integer, intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i, nv, is, ix
+    integer :: i, is, ix
     logical :: owned_
 
     info = 0
@@ -322,7 +321,7 @@ contains
         idx(1:is) = -1
         info = -1
       end if
-
+ 
     end if
 
   end subroutine list_g2lv1
@@ -378,7 +377,7 @@ contains
     logical, intent(in), optional :: mask
     
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info)
+    call idxmap%g2l_ins(idxout,info,mask=mask)
     
   end subroutine list_g2ls2_ins
 
@@ -391,7 +390,7 @@ contains
     integer, intent(inout) :: idx(:)
     integer, intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: i, nv, is, ix
+    integer :: i, is, ix
 
     info = 0
     is = size(idx)

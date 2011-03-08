@@ -75,7 +75,7 @@ contains
   procedure, pass(idxmap)  :: clone     => hash_clone
   procedure, nopass        :: get_fmt   => hash_get_fmt
 
-  procedure, pass(idxmap)  :: row_extendable => hash_row_extendable
+  procedure, nopass        :: row_extendable => hash_row_extendable
 
   procedure, pass(idxmap)  :: l2gs1     => hash_l2gs1
   procedure, pass(idxmap)  :: l2gs2     => hash_l2gs2
@@ -113,9 +113,8 @@ private :: hash_inner_cnv
 
 contains
 
-function hash_row_extendable(idxmap) result(val)
+function hash_row_extendable() result(val)
   implicit none 
-  class(psb_hash_map), intent(in) :: idxmap
   logical :: val
   val = .true.
 end function hash_row_extendable
@@ -312,7 +311,7 @@ subroutine hash_g2lv1(idx,idxmap,info,mask,owned)
   integer, intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i, nv, is, mglob, ip, lip, nrow, ncol, nrm 
+  integer :: i, is, mglob, ip, lip, nrow, ncol, nrm 
   integer :: ictxt, iam, np
   logical :: owned_
 
@@ -473,7 +472,7 @@ subroutine hash_g2ls2_ins(idxin,idxout,idxmap,info,mask)
   logical, intent(in), optional :: mask
 
   idxout = idxin
-  call idxmap%g2l_ins(idxout,info)
+  call idxmap%g2l_ins(idxout,info,mask=mask)
 
 end subroutine hash_g2ls2_ins
 
@@ -488,8 +487,8 @@ subroutine hash_g2lv1_ins(idx,idxmap,info,mask)
   integer, intent(inout) :: idx(:)
   integer, intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
-  integer :: i, nv, is, ix, mglob, ip, lip, nrow, ncol, &
-       & nrm, nxt, err_act, ictxt, me, np
+  integer :: i, is, mglob, ip, lip, nrow, ncol, &
+       & nxt, err_act, ictxt, me, np
   character(len=20)      :: name,ch_err
 
   info = psb_success_
@@ -646,7 +645,7 @@ subroutine hash_init_vl(idxmap,ictxt,vl,info)
   integer, intent(in)  :: ictxt, vl(:)
   integer, intent(out) :: info
   !  To be implemented
-  integer :: iam, np, i, j,  nlu, nl, m, nrt,int_err(5)
+  integer :: iam, np, i,  nlu, nl, m, nrt,int_err(5)
   integer, allocatable :: vlu(:)
   character(len=20), parameter :: name='hash_map_init_vl'
 
@@ -710,8 +709,7 @@ subroutine hash_init_vg(idxmap,ictxt,vg,info)
   integer, intent(in)  :: ictxt, vg(:)
   integer, intent(out) :: info
   !  To be implemented
-  integer :: iam, np, i, j, lc2, nl, nlu, n, nrt,int_err(5)
-  integer :: key, ih, ik, nh, idx, nbits, hsize, hmask
+  integer :: iam, np, i, j, nl, n, int_err(5)
   integer, allocatable :: vlu(:)
 
   info = 0
@@ -767,7 +765,6 @@ subroutine hash_init_vlu(idxmap,ictxt,ntot,nl,vlu,info)
   integer, intent(out) :: info
   !  To be implemented
   integer :: iam, np, i, j, lc2, nlu, m, nrt,int_err(5)
-  integer :: key, ih, ik, nh, idx, nbits, hsize, hmask
   character(len=20), parameter :: name='hash_map_init_vlu'
 
   info = 0
@@ -820,8 +817,8 @@ subroutine hash_bld_g2l_map(idxmap,info)
   class(psb_hash_map), intent(inout) :: idxmap
   integer, intent(out) :: info
   !  To be implemented
-  integer :: ictxt, iam, np, i, j, lc2, nlu, m, nrt,int_err(5), nl
-  integer :: key, ih, ik, nh, idx, nbits, hsize, hmask
+  integer :: ictxt, iam, np, i, j, m, nl
+  integer :: key, ih, nh, idx, nbits, hsize, hmask
   character(len=20), parameter :: name='hash_map_init_vlu'
 
   info = 0
@@ -959,7 +956,7 @@ subroutine hash_inner_cnvs1(x,hashmask,hashv,glb_lc,nrm)
   integer, intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
   integer, intent(inout) :: x
   integer, intent(in)    :: nrm
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer :: ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -1006,7 +1003,7 @@ subroutine hash_inner_cnvs2(x,y,hashmask,hashv,glb_lc,nrm)
   integer, intent(in)  :: x
   integer, intent(out) :: y
   integer, intent(in)  :: nrm
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer :: ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 

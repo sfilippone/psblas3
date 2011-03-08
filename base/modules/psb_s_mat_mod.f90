@@ -145,7 +145,7 @@ module psb_s_mat_mod
 
   end type psb_sspmat_type
 
-  private :: psb_s_get_nrows, psb_s_get_ncols, get_nzeros, psb_s_get_size, &
+  private :: psb_s_get_nrows, psb_s_get_ncols, psb_s_get_nzeros, psb_s_get_size, &
        & psb_s_get_state, psb_s_get_dupl, psb_s_is_null, psb_s_is_bld, psb_s_is_upd, &
        & psb_s_is_asb, psb_s_is_sorted, psb_s_is_upper, psb_s_is_lower, psb_s_is_triangle,&
        & psb_s_get_nz_row
@@ -898,8 +898,6 @@ contains
     integer, intent(in)               :: idx
     class(psb_sspmat_type), intent(in) :: a
     integer :: res
-
-    Integer :: err_act
 
     res = 0
 

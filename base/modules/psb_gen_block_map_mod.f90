@@ -585,7 +585,7 @@ contains
     integer, intent(in)  :: ictxt, nl
     integer, intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, j, ntot
+    integer :: iam, np, i, ntot
     integer, allocatable :: vnl(:)
 
     info = 0

@@ -112,7 +112,6 @@ module psb_sort_mod
     logical function psb_isaperm(n,eip)               
       integer, intent(in) :: n                                                      
       integer, intent(in) :: eip(n)
-      integer, allocatable :: ip(:)
     end function psb_isaperm
   end interface
 
@@ -459,8 +458,6 @@ module psb_sort_mod
       real(psb_spk_), intent(inout) :: heap(:)
       integer, intent(inout)        :: last
       integer, intent(out)          :: info
-      integer                       :: i, i2
-      real(psb_spk_)                :: temp
     end subroutine psi_insert_real_heap
   end interface
   
@@ -483,8 +480,6 @@ module psb_sort_mod
       real(psb_dpk_), intent(inout) :: heap(:)
       integer, intent(inout)          :: last
       integer, intent(out)            :: info
-      integer                         :: i, i2
-      real(psb_dpk_)                :: temp
     end subroutine psi_insert_double_heap
   end interface
   

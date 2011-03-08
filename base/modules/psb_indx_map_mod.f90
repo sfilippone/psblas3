@@ -101,7 +101,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: get_state => base_get_state
     procedure, pass(idxmap)  :: set_state => base_set_state
     procedure, pass(idxmap)  :: is_null   => base_is_null
-    procedure, pass(idxmap)  :: is_repl   => base_is_repl
+    procedure, nopass        :: is_repl   => base_is_repl
     procedure, pass(idxmap)  :: is_bld    => base_is_bld
     procedure, pass(idxmap)  :: is_upd    => base_is_upd
     procedure, pass(idxmap)  :: is_asb    => base_is_asb
@@ -115,7 +115,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: get_mpic  => base_get_mpic
     procedure, pass(idxmap)  :: sizeof    => base_sizeof
     procedure, pass(idxmap)  :: set_null  => base_set_null
-    procedure, pass(idxmap)  :: row_extendable => base_row_extendable
+    procedure, nopass        :: row_extendable => base_row_extendable
 
     procedure, pass(idxmap)  :: set_gr    => base_set_gr
     procedure, pass(idxmap)  :: set_gc    => base_set_gc
@@ -315,16 +315,14 @@ contains
   end subroutine base_set_mpic
 
 
-  function base_row_extendable(idxmap) result(val)
+  function base_row_extendable() result(val)
     implicit none 
-    class(psb_indx_map), intent(in) :: idxmap
     logical :: val
     val = .false.
   end function base_row_extendable
 
-  function base_is_repl(idxmap) result(val)
+  function base_is_repl() result(val)
     implicit none 
-    class(psb_indx_map), intent(in) :: idxmap
     logical :: val
     val = .false.
   end function base_is_repl
@@ -742,10 +740,6 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-
-    Integer :: err_act
-    character(len=20)  :: name='base_free'
-    logical, parameter :: debug=.false.
 
     ! almost nothing to be done here
     idxmap%state          = -1 

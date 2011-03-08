@@ -193,7 +193,7 @@ contains
     type(psb_hash_type), intent(out) :: hash
     integer, intent(out)    :: info 
 
-    integer :: i,j,k,hsize,nbits, nv
+    integer :: i,j,nbits, nv
 
     info  = psb_success_
     nv    = size(v)
@@ -214,7 +214,7 @@ contains
     type(psb_hash_type), intent(out) :: hash
     integer, intent(out)    :: info 
 
-    integer :: i,j,k,hsize,nbits
+    integer :: hsize,nbits
 
     info  = psb_success_
     nbits = 12
@@ -253,7 +253,7 @@ contains
     type(psb_hash_type), intent(inout) :: hash
     integer, intent(out)   :: info 
     type(psb_hash_type)    :: nhash
-    integer :: nk, key, val, nextval,i
+    integer :: key, val, nextval,i
 
     info = HashOk
     
@@ -282,7 +282,7 @@ contains
     type(psb_hash_type)   :: hash
     integer, intent(out)  :: val, info 
 
-    integer :: i,j,k,hsize,hmask, hk, hd
+    integer :: hsize,hmask, hk, hd
 
     info  = HashOK
     hsize = hash%hsize
@@ -338,7 +338,7 @@ contains
     type(psb_hash_type)   :: hash
     integer, intent(out)  :: val, info 
 
-    integer :: i,j,k,hsize,hmask, hk, hd
+    integer :: hsize,hmask, hk, hd
 
     info  = HashOK
     if (.not.allocated(hash%table) ) then 

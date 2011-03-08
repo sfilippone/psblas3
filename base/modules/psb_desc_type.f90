@@ -477,7 +477,7 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     integer                            :: info
 
-    
+    info = 0
     if (psb_is_asb_desc(desc)) &
          & call desc%indxmap%set_state(psb_desc_ovl_asb_)
 

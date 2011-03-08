@@ -164,7 +164,7 @@ module psb_c_psblas_mod
   interface psb_genrm2
     function psb_cnrm2(x, desc_a, info, jx)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      real(psb_spk_)   psb_snrm2
+      real(psb_spk_)   psb_cnrm2
       complex(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, optional, intent (in)      :: jx

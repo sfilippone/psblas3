@@ -99,7 +99,7 @@ contains
     integer, intent(in)  :: ictxt, vg(:)
     integer, intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, j, n, nl
+    integer :: iam, np, i, n, nl
     
 
     info = 0
@@ -155,7 +155,7 @@ contains
     integer, allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(in) :: idxmap
     integer, intent(out) :: info
-    integer :: ictxt, iam, np, nv, ip, i, ngp
+    integer :: ictxt, iam, np, nv, i, ngp
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)

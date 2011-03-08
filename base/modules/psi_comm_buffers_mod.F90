@@ -76,8 +76,9 @@ module psi_comm_buffers_mod
 contains
 
   subroutine psb_init_queue(mesg_queue,info)
+    implicit none 
     type(psb_buffer_queue), intent(inout) :: mesg_queue
-    type(psb_buffer_node), pointer :: item
+    integer, intent(out)                  :: info
 
     info = 0
     if ((.not.associated(mesg_queue%head)).and.&
