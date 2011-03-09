@@ -862,7 +862,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer   :: i,j,k,m,n, nnz, ir, jc
+  integer   :: i,j,k,m, nnz, ir, jc
   complex(psb_spk_) :: acc
   complex(psb_spk_), allocatable :: tmp(:)
   logical   :: tra, ctra
@@ -896,7 +896,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<m) then 
     info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
     goto 9999
   end if
 
@@ -2258,7 +2258,7 @@ subroutine psb_c_cp_csc_from_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2285,7 +2285,7 @@ subroutine psb_c_cp_csc_to_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
+  Integer             :: nza, nr, nc,i,j,irw, err_act
   Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2328,7 +2328,7 @@ subroutine psb_c_mv_csc_to_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
+  Integer             :: nza, nr, nc,i,j,irw, err_act
   Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2372,7 +2372,7 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc, icl
+  Integer             :: nza, nr, i,j,irw, err_act, nc, icl
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2417,7 +2417,7 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
         if (i >= icl) exit inner
         if (i > nc) then 
           write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nc,j,nza,icl,idl
+               & 'Strange situation: i>nr ',i,nc,j,nza,icl
           exit outer
         end if
         a%icp(i+1) = a%icp(i) 
@@ -2465,7 +2465,7 @@ subroutine psb_c_mv_csc_to_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2505,7 +2505,7 @@ subroutine psb_c_cp_csc_to_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2545,7 +2545,7 @@ subroutine psb_c_mv_csc_from_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2586,7 +2586,7 @@ subroutine psb_c_cp_csc_from_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name

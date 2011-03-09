@@ -2422,7 +2422,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2449,7 +2449,7 @@ subroutine psb_c_cp_csr_to_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
+  Integer             :: nza, nr, nc,i,j,irw, err_act
   Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2491,7 +2491,7 @@ subroutine psb_c_mv_csr_to_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
+  Integer             :: nza, nr, nc,i,j,irw, err_act
   Integer, Parameter  :: maxtry=8
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2536,7 +2536,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
   integer, allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2581,7 +2581,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
         if (i >= irw) exit inner
         if (i>nr) then 
           write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
+               & 'Strange situation: i>nr ',i,nr,j,nza,irw
           exit outer
         end if
         a%irp(i+1) = a%irp(i) 
@@ -2628,7 +2628,7 @@ subroutine psb_c_mv_csr_to_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2668,7 +2668,7 @@ subroutine psb_c_cp_csr_to_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2707,7 +2707,7 @@ subroutine psb_c_mv_csr_from_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2748,7 +2748,7 @@ subroutine psb_c_cp_csr_from_fmt(a,b,info)
   !locals
   type(psb_c_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nz, nr, i,j,irw, idl,err_act, nc
+  Integer             :: nz, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
   character(len=20)   :: name

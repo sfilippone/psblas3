@@ -33,14 +33,14 @@ module psb_s_psblas_mod
 
   interface psb_gedot
     function psb_sdotv(x, y, desc_a,info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)                   :: psb_sdotv
       real(psb_spk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end function psb_sdotv
     function psb_sdot(x, y, desc_a, info, jx, jy) 
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)                   :: psb_sdot
       real(psb_spk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -52,14 +52,14 @@ module psb_s_psblas_mod
 
   interface psb_gedots
     subroutine  psb_sdotvs(res,x, y, desc_a, info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent(out)      :: res
       real(psb_spk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_sdotvs
     subroutine  psb_smdots(res,x, y, desc_a,info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent(out)      :: res(:)
       real(psb_spk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
@@ -70,7 +70,7 @@ module psb_s_psblas_mod
   interface psb_geaxpby
     subroutine psb_saxpbyv(alpha, x, beta, y,&
          & desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (in)       ::  x(:)
       real(psb_spk_), intent (inout)    ::  y(:)
       real(psb_spk_), intent (in)       :: alpha, beta
@@ -79,7 +79,7 @@ module psb_s_psblas_mod
     end subroutine psb_saxpbyv
     subroutine psb_saxpby(alpha, x, beta, y,&
          & desc_a, info, n, jx, jy)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (in)       ::  x(:,:)
       real(psb_spk_), intent (inout)    ::  y(:,:)
       real(psb_spk_), intent (in)       ::  alpha, beta
@@ -91,7 +91,7 @@ module psb_s_psblas_mod
 
   interface psb_geamax
     function psb_samax(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)   psb_samax
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -99,7 +99,7 @@ module psb_s_psblas_mod
       integer, intent(out)                :: info
     end function psb_samax
     function psb_samaxv(x, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_) psb_samaxv
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -109,14 +109,14 @@ module psb_s_psblas_mod
 
   interface psb_geamaxs
     subroutine  psb_samaxvs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (out)      :: res
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in) :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_samaxvs
     subroutine  psb_smamaxs(res,x,desc_a,info,jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (out)      :: res(:)
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -127,7 +127,7 @@ module psb_s_psblas_mod
 
   interface psb_geasum
     function psb_sasum(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)   psb_sasum
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -135,7 +135,7 @@ module psb_s_psblas_mod
       integer, intent(out)                :: info
     end function psb_sasum
     function psb_sasumv(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_) psb_sasumv
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -145,14 +145,14 @@ module psb_s_psblas_mod
 
   interface psb_geasums
     subroutine  psb_sasumvs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (out)      :: res
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end subroutine psb_sasumvs
     subroutine  psb_smasum(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (out)      :: res(:)
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -163,7 +163,7 @@ module psb_s_psblas_mod
 
   interface psb_genrm2
     function psb_snrm2(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)   psb_snrm2
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -171,7 +171,7 @@ module psb_s_psblas_mod
       integer, intent(out)                :: info
     end function psb_snrm2
     function psb_snrm2v(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_) psb_snrm2v
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -181,7 +181,7 @@ module psb_s_psblas_mod
 
   interface psb_genrm2s
     subroutine  psb_snrm2vs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_), intent (out)      :: res
       real(psb_spk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
@@ -192,7 +192,7 @@ module psb_s_psblas_mod
 
   interface psb_spnrmi
     function psb_snrmi(a, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_sspmat_type
       real(psb_spk_)                      :: psb_snrmi
       type(psb_sspmat_type), intent (in) :: a
@@ -204,7 +204,7 @@ module psb_s_psblas_mod
   interface psb_spmm
     subroutine psb_sspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_sspmat_type
       type(psb_sspmat_type), intent(in)   :: a
       real(psb_spk_), intent(inout)      :: x(:,:)
@@ -219,7 +219,7 @@ module psb_s_psblas_mod
     end subroutine psb_sspmm
     subroutine psb_sspmv(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_sspmat_type
       type(psb_sspmat_type), intent(in)   :: a
       real(psb_spk_), intent(inout)      :: x(:)
@@ -237,7 +237,7 @@ module psb_s_psblas_mod
     subroutine psb_sspsm(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,& 
          & diag, n, jx, jy, work)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_sspmat_type
       type(psb_sspmat_type), intent(in)   :: t
       real(psb_spk_), intent(in)           :: x(:,:)
@@ -254,7 +254,7 @@ module psb_s_psblas_mod
     subroutine psb_sspsv(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_   
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_   
       use psb_mat_mod, only : psb_sspmat_type
       type(psb_sspmat_type), intent(in)   :: t
       real(psb_spk_), intent(in)           :: x(:)
