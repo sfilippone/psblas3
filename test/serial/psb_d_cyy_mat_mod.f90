@@ -10,7 +10,7 @@ module psb_d_cyy_mat_mod
   contains
     procedure, pass(a) :: get_size     => d_cyy_get_size
     procedure, pass(a) :: get_nzeros   => d_cyy_get_nzeros
-    procedure, pass(a) :: get_fmt      => d_cyy_get_fmt
+    procedure, nopass  :: get_fmt      => d_cyy_get_fmt
     procedure, pass(a) :: sizeof       => d_cyy_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_cyy_csmm
     procedure, pass(a) :: d_csmv       => psb_d_cyy_csmv
@@ -381,9 +381,8 @@ contains
     res = 0
   end function d_cyy_sizeof
 
-  function d_cyy_get_fmt(a) result(res)
+  function d_cyy_get_fmt() result(res)
     implicit none 
-    class(psb_d_cyy_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'CYY'
   end function d_cyy_get_fmt

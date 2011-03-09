@@ -10,7 +10,7 @@ module psb_d_cxx_mat_mod
   contains
     procedure, pass(a) :: get_size     => d_cxx_get_size
     procedure, pass(a) :: get_nzeros   => d_cxx_get_nzeros
-    procedure, pass(a) :: get_fmt      => d_cxx_get_fmt
+    procedure, nopass  :: get_fmt      => d_cxx_get_fmt
     procedure, pass(a) :: sizeof       => d_cxx_sizeof
     procedure, pass(a) :: d_csmm       => psb_d_cxx_csmm
     procedure, pass(a) :: d_csmv       => psb_d_cxx_csmv
@@ -398,9 +398,8 @@ contains
       
   end function d_cxx_sizeof
 
-  function d_cxx_get_fmt(a) result(res)
+  function d_cxx_get_fmt() result(res)
     implicit none 
-    class(psb_d_cxx_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'CXX'
   end function d_cxx_get_fmt
