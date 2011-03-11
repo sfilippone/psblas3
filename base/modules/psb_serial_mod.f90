@@ -326,6 +326,131 @@ module psb_serial_mod
     end subroutine psb_zgeprt1
   end interface
   
+
+  
+  interface psb_spdot_srtd
+    function psb_s_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1,nv2
+      integer, intent(in) :: iv1(*), iv2(*)
+      real(psb_spk_), intent(in) :: v1(*),v2(*)
+      real(psb_spk_)      :: dot
+    end function psb_s_spdot_srtd
+
+    function psb_d_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1,nv2
+      integer, intent(in) :: iv1(*), iv2(*)
+      real(psb_dpk_), intent(in) :: v1(*),v2(*)
+      real(psb_dpk_)      :: dot
+    end function psb_d_spdot_srtd
+
+    function psb_c_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1,nv2
+      integer, intent(in) :: iv1(*), iv2(*)
+      complex(psb_spk_), intent(in) :: v1(*),v2(*)
+      complex(psb_spk_)      :: dot
+    end function psb_c_spdot_srtd
+
+    function psb_z_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1,nv2
+      integer, intent(in) :: iv1(*), iv2(*)
+      complex(psb_dpk_), intent(in) :: v1(*),v2(*)
+      complex(psb_dpk_)      :: dot
+    end function psb_z_spdot_srtd
+  end interface
+
+
+  interface psb_spge_dot
+    function psb_s_spge_dot(nv1,iv1,v1,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1
+      integer, intent(in) :: iv1(*)
+      real(psb_spk_), intent(in) :: v1(*),v2(*)
+      real(psb_spk_)      :: dot
+    end function psb_s_spge_dot
+
+    function psb_d_spge_dot(nv1,iv1,v1,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1
+      integer, intent(in) :: iv1(*)
+      real(psb_dpk_), intent(in) :: v1(*),v2(*)
+      real(psb_dpk_)      :: dot
+    end function psb_d_spge_dot
+
+    function psb_c_spge_dot(nv1,iv1,v1,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1
+      integer, intent(in) :: iv1(*)
+      complex(psb_spk_), intent(in) :: v1(*),v2(*)
+      complex(psb_spk_)      :: dot
+    end function psb_c_spge_dot
+
+    function psb_z_spge_dot(nv1,iv1,v1,v2) result(dot) 
+      use psb_const_mod
+      integer, intent(in) :: nv1
+      integer, intent(in) :: iv1(*)
+      complex(psb_dpk_), intent(in) :: v1(*),v2(*)
+      complex(psb_dpk_)      :: dot
+    end function psb_z_spge_dot
+  end interface
+
+
+  interface psb_nspaxpby
+    subroutine psb_d_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
+      use psb_const_mod
+      integer, intent(out)              :: nz
+      integer, intent(out)              :: iz(:)
+      real(psb_dpk_), intent (out)      :: z(:)
+      integer, intent(in)               :: nx, ny
+      integer, intent(in)               :: ix(:), iy(:)
+      real(psb_dpk_), intent (in)       :: x(:), y(:)
+      real(psb_dpk_), intent (in)       :: alpha, beta
+      integer, intent(out)              :: info
+    end subroutine psb_d_nspaxpby
+  end interface
+
+  interface psb_aspxpby
+    subroutine psb_s_aspxpby(alpha, nx, ix, x, beta, y, info)
+      use psb_const_mod
+      integer, intent(in)               :: nx
+      integer, intent(in)               :: ix(:)
+      real(psb_spk_), intent (in)       :: x(:)
+      real(psb_spk_), intent (inout)    :: y(:)
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer, intent(out)              :: info
+    end subroutine psb_s_aspxpby
+    subroutine psb_d_aspxpby(alpha, nx, ix, x, beta, y, info)
+      use psb_const_mod
+      integer, intent(in)               :: nx
+      integer, intent(in)               :: ix(:)
+      real(psb_dpk_), intent (in)       :: x(:)
+      real(psb_dpk_), intent (inout)    :: y(:)
+      real(psb_dpk_), intent (in)       :: alpha, beta
+      integer, intent(out)              :: info
+    end subroutine psb_d_aspxpby
+    subroutine psb_c_aspxpby(alpha, nx, ix, x, beta, y, info)
+      use psb_const_mod
+      integer, intent(in)               :: nx
+      integer, intent(in)               :: ix(:)
+      complex(psb_spk_), intent (in)    :: x(:)
+      complex(psb_spk_), intent (inout) :: y(:)
+      complex(psb_spk_), intent (in)    :: alpha, beta
+      integer, intent(out)              :: info
+    end subroutine psb_c_aspxpby
+    subroutine psb_z_aspxpby(alpha, nx, ix, x, beta, y, info)
+      use psb_const_mod
+      integer, intent(in)               :: nx
+      integer, intent(in)               :: ix(:)
+      complex(psb_dpk_), intent (in)    :: x(:)
+      complex(psb_dpk_), intent (inout) :: y(:)
+      complex(psb_dpk_), intent (in)    :: alpha, beta
+      integer, intent(out)              :: info
+    end subroutine psb_z_aspxpby
+  end interface
+
   
 end module psb_serial_mod
 
