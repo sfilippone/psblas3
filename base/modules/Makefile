@@ -26,7 +26,7 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
 
 LIBMOD=psb_base_mod$(.mod)
-OBJS = error.o psb_sparse_mod.o $(EXTRA_COBJS) cutil.o
+OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
 LIBDIR=..
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
@@ -90,7 +90,7 @@ psb_s_psblas_mod.o psb_c_psblas_mod.o psb_d_psblas_mod.o psb_z_psblas_mod.o: psb
 psb_gps_mod.o:	psb_realloc_mod.o
 psb_hash_mod.o: psb_const_mod.o psb_realloc_mod.o
 
-psb_sparse_mod.o: $(MODULES)
+psb_base_mod.o: $(MODULES)
 
 
 penvmod: $(BASIC_MODS)

@@ -33,7 +33,7 @@ lib: $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 # A bit excessive, but safe
-$(OBJS): $(MODDIR)/psb_sparse_mod.o
+$(OBJS): $(MODDIR)/psb_base_mod.o
 
 clean: cleanobjs
 
