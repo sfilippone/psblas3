@@ -23,7 +23,7 @@ contains
   
 
   subroutine psb_s_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_s_null_prec_type), intent(in)  :: prec
     real(psb_spk_),intent(in)         :: x(:)
@@ -77,7 +77,7 @@ contains
 
   subroutine psb_s_null_precinit(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_null_prec_type),intent(inout) :: prec
@@ -104,7 +104,7 @@ contains
 
   subroutine psb_s_null_precbld(a,desc_a,prec,info,upd,mold,afmt)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     type(psb_sspmat_type), intent(in), target :: a
@@ -136,7 +136,7 @@ contains
 
   subroutine psb_s_null_precseti(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_null_prec_type),intent(inout) :: prec
@@ -164,7 +164,7 @@ contains
 
   subroutine psb_s_null_precsetr(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_null_prec_type),intent(inout) :: prec
@@ -192,7 +192,7 @@ contains
 
   subroutine psb_s_null_precsetc(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_null_prec_type),intent(inout) :: prec
@@ -220,7 +220,7 @@ contains
 
   subroutine psb_s_null_precfree(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_s_null_prec_type), intent(inout) :: prec
@@ -249,7 +249,7 @@ contains
 
   subroutine psb_s_null_precdescr(prec,iout)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_s_null_prec_type), intent(in) :: prec
@@ -285,7 +285,7 @@ contains
   end subroutine psb_s_null_precdescr
 
   function psb_s_null_sizeof(prec) result(val)
-    use psb_sparse_mod
+    use psb_base_mod
     class(psb_s_null_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

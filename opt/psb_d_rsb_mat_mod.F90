@@ -262,7 +262,7 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_rsb_cssv
 
 subroutine psb_d_rsb_scals(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d
@@ -272,7 +272,7 @@ subroutine psb_d_rsb_scals(d,a,info)
 end subroutine psb_d_rsb_scals
 
 subroutine psb_d_rsb_scal(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
@@ -341,7 +341,7 @@ function psb_d_rsb_csnm1(a) result(res)
 end function psb_d_rsb_csnm1
 
 subroutine psb_d_rsb_aclsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
     PSBRSB_DEBUG('')
@@ -349,7 +349,7 @@ subroutine psb_d_rsb_aclsum(d,a)
 end subroutine psb_d_rsb_aclsum
 
 subroutine psb_d_rsb_arwsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
     PSBRSB_DEBUG('')
@@ -357,7 +357,7 @@ subroutine psb_d_rsb_arwsum(d,a)
 end subroutine psb_d_rsb_arwsum
 
 subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
@@ -382,7 +382,7 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_rsb_csmm
 
 subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
@@ -405,7 +405,7 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
 end subroutine
 
 subroutine psb_d_rsb_rowsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
   integer :: info
@@ -414,7 +414,7 @@ subroutine psb_d_rsb_rowsum(d,a)
 end subroutine psb_d_rsb_rowsum
 
 subroutine psb_d_rsb_colsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   class(psb_d_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
   integer :: info
@@ -423,7 +423,7 @@ subroutine psb_d_rsb_colsum(d,a)
 end subroutine psb_d_rsb_colsum
 
 subroutine psb_d_rsb_mold(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(in)  :: a
   class(psb_d_base_sparse_mat), intent(out), allocatable  :: b
@@ -509,7 +509,7 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
 end subroutine psb_d_cp_rsb_to_coo
 
 subroutine psb_d_cp_rsb_to_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
 
   class(psb_d_rsb_sparse_mat), intent(in)   :: a
@@ -542,7 +542,7 @@ subroutine psb_d_cp_rsb_to_fmt(a,b,info)
 end subroutine psb_d_cp_rsb_to_fmt
 
 subroutine psb_d_cp_rsb_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
@@ -572,7 +572,7 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
 end subroutine psb_d_cp_rsb_from_coo
 
 subroutine psb_d_cp_rsb_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
@@ -614,7 +614,7 @@ end subroutine psb_d_cp_rsb_from_fmt
 
 subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
@@ -708,7 +708,7 @@ end subroutine psb_d_rsb_csgetrow
 
 subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
 
   class(psb_d_rsb_sparse_mat), intent(in) :: a
@@ -753,7 +753,7 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
 end subroutine psb_d_rsb_csgetptn
 
 subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
@@ -772,7 +772,7 @@ subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 end subroutine psb_d_rsb_csput
 
 subroutine psb_d_mv_rsb_to_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
@@ -796,7 +796,7 @@ subroutine psb_d_mv_rsb_to_fmt(a,b,info)
 end subroutine psb_d_mv_rsb_to_fmt
   
 subroutine psb_d_mv_rsb_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout)  :: a
   class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -814,7 +814,7 @@ subroutine psb_d_mv_rsb_from_fmt(a,b,info)
 end subroutine psb_d_mv_rsb_from_fmt
 
 subroutine psb_d_mv_rsb_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(inout) :: b
@@ -828,7 +828,7 @@ subroutine psb_d_mv_rsb_from_coo(a,b,info)
 end subroutine psb_d_mv_rsb_from_coo
 
 subroutine psb_d_rsb_cp_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   type(psb_d_rsb_sparse_mat), intent(in)   :: b
@@ -841,7 +841,7 @@ subroutine psb_d_rsb_cp_from(a,b)
 end subroutine psb_d_rsb_cp_from
 
 subroutine psb_d_rsb_mv_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none 
   class(psb_d_rsb_sparse_mat), intent(inout) :: a
   type(psb_d_rsb_sparse_mat), intent(inout)   :: b

@@ -31,7 +31,7 @@
 !!$  
 Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
-  use psb_sparse_mod, psb_protect_name => psb_cd_lstext
+  use psb_base_mod, psb_protect_name => psb_cd_lstext
 !!$  use psi_mod
 
   Implicit None

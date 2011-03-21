@@ -43,7 +43,7 @@
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                return code
 subroutine psb_casb(x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_casb
+  use psb_base_mod, psb_protect_name => psb_casb
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
@@ -176,7 +176,7 @@ end subroutine psb_casb
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                Return  code
 subroutine psb_casbv(x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_casbv
+  use psb_base_mod, psb_protect_name => psb_casbv
   implicit none
 
   type(psb_desc_type), intent(in)                 ::  desc_a

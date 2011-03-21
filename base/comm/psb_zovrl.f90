@@ -65,7 +65,7 @@
 !
 !
 subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_zovrlm
+  use psb_base_mod, psb_protect_name => psb_zovrlm
   use psi_mod
   implicit none
 
@@ -264,7 +264,7 @@ end subroutine psb_zovrlm
 !
 !
 subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_zovrlv
+  use psb_base_mod, psb_protect_name => psb_zovrlv
   use psi_mod
   implicit none
 

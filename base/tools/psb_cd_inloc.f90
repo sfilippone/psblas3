@@ -42,7 +42,7 @@
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
-  use psb_sparse_mod
+  use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_list_map_mod

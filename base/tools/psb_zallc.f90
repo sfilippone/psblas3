@@ -43,7 +43,7 @@
 !    n      - optional number of columns.
 !    lb     - optional lower bound on column indices
 subroutine psb_zalloc(x, desc_a, info, n, lb)
-  use psb_sparse_mod, psb_protect_name => psb_zalloc
+  use psb_base_mod, psb_protect_name => psb_zalloc
   use psi_mod
   implicit none
 
@@ -176,7 +176,7 @@ end subroutine psb_zalloc
 !    desc_a - the communication descriptor.
 !    info   - return code
 subroutine psb_zallocv(x, desc_a,info,n)
-  use psb_sparse_mod, psb_protect_name => psb_zallocv
+  use psb_base_mod, psb_protect_name => psb_zallocv
   use psi_mod
   implicit none
 

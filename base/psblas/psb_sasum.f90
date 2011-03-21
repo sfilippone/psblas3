@@ -327,7 +327,7 @@ end function psb_sasumv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_sasumvs(res,x,desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_sasumvs
+  use psb_base_mod, psb_protect_name => psb_sasumvs
   implicit none
 
   real(psb_spk_), intent(in)      :: x(:)

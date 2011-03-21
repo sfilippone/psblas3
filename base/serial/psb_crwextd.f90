@@ -39,7 +39,7 @@
 !
 !
 subroutine psb_crwextd(nr,a,info,b,rowscale)
-  use psb_sparse_mod, psb_protect_name => psb_crwextd
+  use psb_base_mod, psb_protect_name => psb_crwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -99,7 +99,7 @@ subroutine psb_crwextd(nr,a,info,b,rowscale)
 
 end subroutine psb_crwextd
 subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
-  use psb_sparse_mod, psb_protect_name => psb_cbase_rwextd
+  use psb_base_mod, psb_protect_name => psb_cbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)

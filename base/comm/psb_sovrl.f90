@@ -64,7 +64,7 @@
 !
 !
 subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_sovrlm
+  use psb_base_mod, psb_protect_name => psb_sovrlm
   use psi_mod
   implicit none
 
@@ -266,7 +266,7 @@ end subroutine psb_sovrlm
 !
 !
 subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_sovrlv
+  use psb_base_mod, psb_protect_name => psb_sovrlv
   use psi_mod
   implicit none
 

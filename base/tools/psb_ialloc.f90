@@ -42,7 +42,7 @@
 !    n      - optional number of columns.
 !    lb     - optional lower bound on column indices
 subroutine psb_ialloc(x, desc_a, info, n, lb)
-  use psb_sparse_mod, psb_protect_name => psb_ialloc
+  use psb_base_mod, psb_protect_name => psb_ialloc
   implicit none
   
   !....parameters...
@@ -175,7 +175,7 @@ end subroutine psb_ialloc
 !    desc_a - the communication descriptor.
 !    info   - return code
 subroutine psb_iallocv(x, desc_a, info,n)
-  use psb_sparse_mod, psb_protect_name => psb_iallocv
+  use psb_base_mod, psb_protect_name => psb_iallocv
   implicit none
 
   !....parameters...

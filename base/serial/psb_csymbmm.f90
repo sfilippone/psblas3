@@ -40,7 +40,7 @@
 !
 
 subroutine psb_csymbmm(a,b,c,info)
-  use psb_sparse_mod, psb_protect_name => psb_csymbmm
+  use psb_base_mod, psb_protect_name => psb_csymbmm
   implicit none 
 
   type(psb_cspmat_type), intent(in)    :: a,b

@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 subroutine mm_svet_read(b, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_spk_), allocatable, intent(out)  :: b(:,:)
   integer, intent(out)        :: info
@@ -102,7 +102,7 @@ end subroutine mm_svet_read
 
 
 subroutine mm_dvet_read(b, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
   integer, intent(out)        :: info
@@ -173,7 +173,7 @@ end subroutine mm_dvet_read
 
 
 subroutine mm_cvet_read(b, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
   integer, intent(out)        :: info
@@ -250,7 +250,7 @@ end subroutine mm_cvet_read
 
 
 subroutine mm_zvet_read(b, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
   integer, intent(out)        :: info
@@ -326,7 +326,7 @@ subroutine mm_zvet_read(b, info, iunit, filename)
 end subroutine mm_zvet_read
 
 subroutine mm_svet2_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_spk_), intent(in)  :: b(:,:)
   character(len=*), intent(in) :: header
@@ -382,7 +382,7 @@ subroutine mm_svet2_write(b, header, info, iunit, filename)
 end subroutine mm_svet2_write
 
 subroutine mm_svet1_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_spk_), intent(in)  :: b(:)
   character(len=*), intent(in) :: header
@@ -439,7 +439,7 @@ end subroutine mm_svet1_write
 
 
 subroutine mm_dvet2_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_dpk_), intent(in)  :: b(:,:)
   character(len=*), intent(in) :: header
@@ -495,7 +495,7 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
 end subroutine mm_dvet2_write
 
 subroutine mm_dvet1_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   real(psb_dpk_), intent(in)  :: b(:)
   character(len=*), intent(in) :: header
@@ -552,7 +552,7 @@ end subroutine mm_dvet1_write
 
 
 subroutine mm_cvet2_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_spk_), intent(in)  :: b(:,:)
   character(len=*), intent(in) :: header
@@ -608,7 +608,7 @@ subroutine mm_cvet2_write(b, header, info, iunit, filename)
 end subroutine mm_cvet2_write
 
 subroutine mm_cvet1_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_spk_), intent(in)  :: b(:)
   character(len=*), intent(in) :: header
@@ -664,7 +664,7 @@ subroutine mm_cvet1_write(b, header, info, iunit, filename)
 end subroutine mm_cvet1_write
 
 subroutine mm_zvet2_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_dpk_), intent(in)  :: b(:,:)
   character(len=*), intent(in) :: header
@@ -720,7 +720,7 @@ subroutine mm_zvet2_write(b, header, info, iunit, filename)
 end subroutine mm_zvet2_write
 
 subroutine mm_zvet1_write(b, header, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   complex(psb_dpk_), intent(in)  :: b(:)
   character(len=*), intent(in) :: header
@@ -777,7 +777,7 @@ end subroutine mm_zvet1_write
 
 
 subroutine smm_mat_read(a, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_sspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
@@ -882,7 +882,7 @@ end subroutine smm_mat_read
 
 
 subroutine smm_mat_write(a,mtitle,info,iunit,filename)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_sspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
@@ -927,7 +927,7 @@ subroutine smm_mat_write(a,mtitle,info,iunit,filename)
 end subroutine smm_mat_write
 
 subroutine dmm_mat_read(a, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_dspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
@@ -1030,7 +1030,7 @@ end subroutine dmm_mat_read
 
 
 subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_dspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
@@ -1075,7 +1075,7 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
 end subroutine dmm_mat_write
 
 subroutine cmm_mat_read(a, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_cspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
@@ -1203,7 +1203,7 @@ end subroutine cmm_mat_read
 
 
 subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_cspmat_type), intent(in)  :: a
   integer, intent(out)        :: info
@@ -1248,7 +1248,7 @@ subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
 end subroutine cmm_mat_write
 
 subroutine zmm_mat_read(a, info, iunit, filename)   
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_zspmat_type), intent(out)  :: a
   integer, intent(out)        :: info
@@ -1376,7 +1376,7 @@ end subroutine zmm_mat_read
 
 
 subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
-  use psb_sparse_mod
+  use psb_base_mod
   implicit none
   type(psb_zspmat_type), intent(in)  :: a
   integer, intent(out)        :: info

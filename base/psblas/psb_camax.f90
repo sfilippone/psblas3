@@ -45,7 +45,7 @@
 !    jx     -  integer(optional).    The column offset.
 !
 function psb_camax(x,desc_a, info, jx)
-  use psb_sparse_mod, psb_protect_name => psb_camax
+  use psb_base_mod, psb_protect_name => psb_camax
 
   implicit none
 
@@ -175,7 +175,7 @@ end function psb_camax
 !    info   -  integer.              Return code
 !
 function psb_camaxv (x,desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_camaxv
+  use psb_base_mod, psb_protect_name => psb_camaxv
 
   implicit none
 
@@ -303,7 +303,7 @@ end function psb_camaxv
 !    jx     -  integer(optional).   The column offset.
 !
 subroutine psb_camaxvs(res,x,desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_camaxvs
+  use psb_base_mod, psb_protect_name => psb_camaxvs
 
   implicit none
 
@@ -428,7 +428,7 @@ end subroutine psb_camaxvs
 !    info   -  integer.             Return code
 !
 subroutine psb_cmamaxs(res,x,desc_a, info,jx)
-  use psb_sparse_mod, psb_protect_name => psb_cmamaxs
+  use psb_base_mod, psb_protect_name => psb_cmamaxs
 
   implicit none
 

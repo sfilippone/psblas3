@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_sprecbld(a,desc_a,p,info,upd,mold,afmt)
 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_sprecbld
   Implicit None
 

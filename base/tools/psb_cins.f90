@@ -46,7 +46,7 @@
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
-  use psb_sparse_mod, psb_protect_name => psb_cinsvi
+  use psb_base_mod, psb_protect_name => psb_cinsvi
   use psi_mod
   implicit none
 
@@ -227,7 +227,7 @@ end subroutine psb_cinsvi
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
-  use psb_sparse_mod, psb_protect_name => psb_cinsi
+  use psb_base_mod, psb_protect_name => psb_cinsi
   use psi_mod
   implicit none
 

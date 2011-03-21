@@ -49,7 +49,7 @@
 !    jy     -  integer(optional).    The column offset for sub( Y ).
 !
 function psb_cdot(x, y,desc_a, info, jx, jy)  
-  use psb_sparse_mod, psb_protect_name => psb_cdot
+  use psb_base_mod, psb_protect_name => psb_cdot
   implicit none
 
   complex(psb_spk_), intent(in)     :: x(:,:), y(:,:)
@@ -199,7 +199,7 @@ end function psb_cdot
 !    info   -  integer.              Return code
 !
 function psb_cdotv(x, y,desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_cdotv
+  use psb_base_mod, psb_protect_name => psb_cdotv
   implicit none
 
   complex(psb_spk_), intent(in)  :: x(:), y(:)
@@ -333,7 +333,7 @@ end function psb_cdotv
 !    info   -  integer.             Return code
 !
 subroutine psb_cdotvs(res, x, y,desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_cdotvs
+  use psb_base_mod, psb_protect_name => psb_cdotvs
   implicit none
 
   complex(psb_spk_), intent(in)     :: x(:), y(:)
@@ -465,7 +465,7 @@ end subroutine psb_cdotvs
 !    info   -  integer.             Return code
 !
 subroutine psb_cmdots(res, x, y, desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_cmdots
+  use psb_base_mod, psb_protect_name => psb_cmdots
   implicit none
 
   complex(psb_spk_), intent(in)     :: x(:,:), y(:,:)

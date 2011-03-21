@@ -360,7 +360,7 @@ end function sxdot
 !    info   -  integer.                 Return code
 !
 subroutine psb_sxdotvs(res, x, y,desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_sxdotvs
+  use psb_base_mod, psb_protect_name => psb_sxdotvs
   implicit none
 
   real(psb_spk_), intent(in)     :: x(:), y(:)
@@ -492,7 +492,7 @@ end subroutine psb_sxdotvs
 !    info   -  integer.             Return code
 !
 subroutine psb_sxmdots(res, x, y, desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_sxmdots
+  use psb_base_mod, psb_protect_name => psb_sxmdots
   implicit none
 
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)

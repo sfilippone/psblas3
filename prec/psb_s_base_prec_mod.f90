@@ -36,7 +36,7 @@
 module psb_s_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
+  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
        & psb_sspmat_type
@@ -65,7 +65,7 @@ contains
 
 
   subroutine psb_s_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_s_base_prec_type), intent(in)  :: prec
     real(psb_spk_),intent(in)         :: alpha, beta
@@ -102,7 +102,7 @@ contains
 
   subroutine psb_s_base_precinit(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_base_prec_type),intent(inout) :: prec
@@ -134,7 +134,7 @@ contains
 
   subroutine psb_s_base_precbld(a,desc_a,prec,info,upd,mold,afmt)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     type(psb_sspmat_type), intent(in), target :: a
@@ -171,7 +171,7 @@ contains
 
   subroutine psb_s_base_precseti(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_base_prec_type),intent(inout) :: prec
@@ -205,7 +205,7 @@ contains
 
   subroutine psb_s_base_precsetr(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_base_prec_type),intent(inout) :: prec
@@ -239,7 +239,7 @@ contains
 
   subroutine psb_s_base_precsetc(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_s_base_prec_type),intent(inout) :: prec
@@ -273,7 +273,7 @@ contains
 
   subroutine psb_s_base_precfree(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_s_base_prec_type), intent(inout) :: prec
@@ -308,7 +308,7 @@ contains
 
   subroutine psb_s_base_precdescr(prec,iout)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_s_base_prec_type), intent(in) :: prec
@@ -342,7 +342,7 @@ contains
   
 
   function psb_s_base_sizeof(prec) result(val)
-    use psb_sparse_mod
+    use psb_base_mod
     class(psb_s_base_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

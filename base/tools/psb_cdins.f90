@@ -46,7 +46,7 @@
 !    jla(:)   - integer, optional              The col indices in local numbering
 !
 subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
-  use psb_sparse_mod, psb_protect_name => psb_cdinsrc
+  use psb_base_mod, psb_protect_name => psb_cdinsrc
   use psi_mod
   implicit none
 
@@ -168,7 +168,7 @@ end subroutine psb_cdinsrc
 !    mask(:)  - logical, optional, target
 !
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
-  use psb_sparse_mod, psb_protect_name => psb_cdinsc
+  use psb_base_mod, psb_protect_name => psb_cdinsc
   use psi_mod
   implicit none
 

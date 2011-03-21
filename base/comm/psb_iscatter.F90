@@ -44,7 +44,7 @@
 !                                              the processes have a copy.
 !
 subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_iscatterm
+  use psb_base_mod, psb_protect_name => psb_iscatterm
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -276,7 +276,7 @@ end subroutine psb_iscatterm
 !                                              the processes have a copy.
 !
 subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_iscatterv
+  use psb_base_mod, psb_protect_name => psb_iscatterv
 #ifdef MPI_MOD
   use mpi
 #endif

@@ -51,7 +51,7 @@
 !    jy     -  integer(optional).   The column offset for sub( Y ).
 !
 subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
-  use psb_sparse_mod, psb_protect_name => psb_daxpby
+  use psb_base_mod, psb_protect_name => psb_daxpby
   implicit none                    
 
   integer, intent(in), optional   :: n, jx, jy
@@ -202,7 +202,7 @@ end subroutine psb_daxpby
 !
 !
 subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
-  use psb_sparse_mod, psb_protect_name => psb_daxpbyv
+  use psb_base_mod, psb_protect_name => psb_daxpbyv
   implicit none                    
 
   integer, intent(out)            :: info

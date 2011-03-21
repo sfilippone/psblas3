@@ -55,7 +55,7 @@
 !
 !
 subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
-  use psb_sparse_mod, psb_protect_name => psb_ihalom
+  use psb_base_mod, psb_protect_name => psb_ihalom
   use psi_mod
   implicit none
 
@@ -279,7 +279,7 @@ end subroutine psb_ihalom
 !
 !
 subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
-  use psb_sparse_mod, psb_protect_name => psb_ihalov
+  use psb_base_mod, psb_protect_name => psb_ihalov
   use psi_mod
   implicit none
 

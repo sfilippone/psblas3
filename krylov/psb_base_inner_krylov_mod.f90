@@ -131,7 +131,7 @@ contains
 
   
   subroutine psb_d_end_conv(methdname,it,desc_a,stopdat,info,err,iter)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer, intent(in)             :: it

@@ -50,7 +50,7 @@ Module psb_d_inner_krylov_mod
 contains
 
   subroutine psb_d_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
@@ -117,7 +117,7 @@ contains
   end subroutine psb_d_init_conv
 
   function psb_d_check_conv(methdname,it,x,r,desc_a,stopdat,info)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer, intent(in)             :: it

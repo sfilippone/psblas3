@@ -47,7 +47,7 @@
 !                                              Default: -1. 
 !
 subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_sgatherm
+  use psb_base_mod, psb_protect_name => psb_sgatherm
   implicit none
 
   real(psb_spk_), intent(in)    :: locx(:,:)
@@ -218,7 +218,7 @@ end subroutine psb_sgatherm
 !                                              the processes will have a copy.
 !
 subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_sgatherv
+  use psb_base_mod, psb_protect_name => psb_sgatherv
   implicit none
 
   real(psb_spk_), intent(in)    :: locx(:)

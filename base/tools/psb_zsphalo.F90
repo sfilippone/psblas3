@@ -57,7 +57,7 @@
 !
 Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
-  use psb_sparse_mod, psb_protect_name => psb_zsphalo
+  use psb_base_mod, psb_protect_name => psb_zsphalo
   
 #ifdef MPI_MOD
   use mpi

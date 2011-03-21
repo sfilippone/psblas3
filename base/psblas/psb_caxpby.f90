@@ -51,7 +51,7 @@
 !    jy     -  integer(optional)    The column offset for Y 
 !
 subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
-  use psb_sparse_mod, psb_protect_name => psb_caxpby
+  use psb_base_mod, psb_protect_name => psb_caxpby
 
   implicit none                    
 
@@ -202,7 +202,7 @@ end subroutine psb_caxpby
 !
 !
 subroutine  psb_caxpbyv(alpha, x, beta,y,desc_a,info)
-  use psb_sparse_mod, psb_protect_name => psb_caxpbyv
+  use psb_base_mod, psb_protect_name => psb_caxpbyv
   implicit none                    
 
   integer, intent(out)            :: info

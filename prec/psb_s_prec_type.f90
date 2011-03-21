@@ -36,7 +36,7 @@
 module psb_s_prec_type
 
   ! Reduces size of .mod file.
-  use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
+  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
        & psb_sspmat_type
@@ -71,7 +71,7 @@ module psb_s_prec_type
 
   interface psb_precaply
     subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_sparse_mod, only  : psb_desc_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
       import :: psb_sprec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_sprec_type), intent(in)  :: prec
@@ -82,7 +82,7 @@ module psb_s_prec_type
       real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_sprc_aply
     subroutine psb_sprc_aply1(prec,x,desc_data,info,trans)
-      use psb_sparse_mod, only  : psb_desc_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
       import :: psb_sprec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_sprec_type), intent(in)  :: prec
@@ -97,7 +97,7 @@ contains
 
   
   subroutine psb_sfile_prec_descr(p,iout)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_sprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
     integer :: iout_,info
@@ -119,7 +119,7 @@ contains
 
 
   subroutine psb_s_precfree(p,info)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_sprec_type), intent(inout) :: p 
     integer, intent(out) ::  info
     integer :: me, err_act,i 
@@ -156,7 +156,7 @@ contains
   end subroutine psb_nullify_sprec
 
   function psb_sprec_sizeof(prec) result(val)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_sprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i
@@ -170,7 +170,7 @@ contains
   end function psb_sprec_sizeof
  
   subroutine s_apply2v(prec,x,y,desc_data,info,trans,work)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_sprec_type), intent(in) :: prec
     real(psb_spk_),intent(inout)      :: x(:)
@@ -239,7 +239,7 @@ contains
   end subroutine s_apply2v
 
   subroutine s_apply1v(prec,x,desc_data,info,trans)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_sprec_type), intent(in) :: prec
     real(psb_spk_),intent(inout)      :: x(:)

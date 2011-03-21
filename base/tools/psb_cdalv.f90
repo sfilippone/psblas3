@@ -44,7 +44,7 @@
 !    info    - integer.                       Return code
 !    flag    - integer.                       Are V's contents 0- or 1-based?
 subroutine psb_cdalv(v, ictxt, desc, info, flag)
-  use psb_sparse_mod
+  use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_glist_map_mod

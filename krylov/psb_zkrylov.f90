@@ -78,7 +78,7 @@
   !                                           estimate of) residual 
   ! 
 Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
   use psb_krylov_mod, psb_protect_name => psb_zkrylov 
 
@@ -97,7 +97,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   interface 
     subroutine psb_zcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -112,7 +112,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcg
     subroutine psb_zbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -127,7 +127,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zbicg
     subroutine psb_zcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -142,7 +142,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcgstab
     Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -157,7 +157,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zcgstabl
     Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -172,7 +172,7 @@ Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_zrgmres
     subroutine psb_zcgs(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a

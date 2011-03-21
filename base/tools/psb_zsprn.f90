@@ -43,7 +43,7 @@
 !                                               default .true.          
 !
 Subroutine psb_zsprn(a, desc_a,info,clear)
-  use psb_sparse_mod, psb_protect_name => psb_zsprn
+  use psb_base_mod, psb_protect_name => psb_zsprn
   Implicit None
 
   !....Parameters...

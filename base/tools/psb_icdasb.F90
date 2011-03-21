@@ -43,7 +43,7 @@
 !                                      halo descriptor with respect to a normal call. 
 !
 subroutine psb_icdasb(desc_a,info,ext_hv)
-  use psb_sparse_mod, psb_protect_name => psb_icdasb
+  use psb_base_mod, psb_protect_name => psb_icdasb
   use psi_mod
 #ifdef MPI_MOD
   use mpi

@@ -58,7 +58,7 @@
 Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
 
-  use psb_sparse_mod, psb_protect_name => psb_csphalo
+  use psb_base_mod, psb_protect_name => psb_csphalo
 
 #ifdef MPI_MOD
   use mpi

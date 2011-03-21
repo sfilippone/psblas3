@@ -46,7 +46,7 @@
 !                                              the processes will have a copy.
 !
 subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_zgatherm
+  use psb_base_mod, psb_protect_name => psb_zgatherm
   implicit none
 
   complex(psb_dpk_), intent(in)    :: locx(:,:)
@@ -219,7 +219,7 @@ end subroutine psb_zgatherm
 !                                              default: -1
 !
 subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_zgatherv
+  use psb_base_mod, psb_protect_name => psb_zgatherv
   implicit none
 
   complex(psb_dpk_), intent(in)    :: locx(:)

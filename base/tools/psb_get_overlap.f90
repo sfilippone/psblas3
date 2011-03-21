@@ -43,7 +43,7 @@
 !    info     - integer.                  return code.
 !
 subroutine psb_get_ovrlap(ovrel,desc,info)
-  use psb_sparse_mod, psb_protect_name => psb_get_ovrlap
+  use psb_base_mod, psb_protect_name => psb_get_ovrlap
   implicit none 
   integer, allocatable, intent(out) :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc

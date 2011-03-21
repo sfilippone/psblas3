@@ -339,7 +339,7 @@ end function psb_sdotv
 !    info   -  integer.                 Return code
 !
 subroutine psb_sdotvs(res, x, y,desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_sdotvs
+  use psb_base_mod, psb_protect_name => psb_sdotvs
   implicit none
 
   real(psb_spk_), intent(in)     :: x(:), y(:)
@@ -471,7 +471,7 @@ end subroutine psb_sdotvs
 !    info   -  integer.             Return code
 !
 subroutine psb_smdots(res, x, y, desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_smdots
+  use psb_base_mod, psb_protect_name => psb_smdots
   implicit none
 
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)

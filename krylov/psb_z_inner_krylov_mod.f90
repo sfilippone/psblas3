@@ -52,7 +52,7 @@ contains
 
 
   subroutine psb_z_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace, itmax
@@ -121,7 +121,7 @@ contains
 
 
   function psb_z_check_conv(methdname,it,x,r,desc_a,stopdat,info)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer, intent(in)             :: it

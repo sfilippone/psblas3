@@ -339,7 +339,7 @@ end function psb_zdotv
 !    info   -  integer.             Return code
 !
 subroutine psb_zdotvs(res, x, y,desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_zdotvs
+  use psb_base_mod, psb_protect_name => psb_zdotvs
   implicit none
 
   complex(psb_dpk_), intent(in)     :: x(:), y(:)
@@ -471,7 +471,7 @@ end subroutine psb_zdotvs
 !    info   -  integer.             Return code
 !
 subroutine psb_zmdots(res, x, y, desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_zmdots
+  use psb_base_mod, psb_protect_name => psb_zmdots
   implicit none
 
   complex(psb_dpk_), intent(in)     :: x(:,:), y(:,:)

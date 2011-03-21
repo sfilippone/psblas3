@@ -54,7 +54,7 @@
 !
 !
 subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
-  use psb_sparse_mod, psb_protect_name => psb_zhalom
+  use psb_base_mod, psb_protect_name => psb_zhalom
   use psi_mod
   implicit none
 
@@ -276,7 +276,7 @@ end subroutine psb_zhalom
 !
 !
 subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
-  use psb_sparse_mod, psb_protect_name => psb_zhalov
+  use psb_base_mod, psb_protect_name => psb_zhalov
   use psi_mod
   implicit none
 

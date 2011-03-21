@@ -2,7 +2,7 @@
 ! A minimal, non functional implementation of a matrix type module. 
 !  
 subroutine psb_d_cyy_csmv(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csmv
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -25,7 +25,7 @@ subroutine psb_d_cyy_csmv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_cyy_csmv
 
 subroutine psb_d_cyy_csmm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csmm
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -46,7 +46,7 @@ subroutine psb_d_cyy_csmm(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_cyy_csmm
 
 subroutine psb_d_cyy_cssv(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_cssv
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -68,7 +68,7 @@ subroutine psb_d_cyy_cssv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_cyy_cssv
 
 subroutine psb_d_cyy_cssm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_cssm
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -91,7 +91,7 @@ subroutine psb_d_cyy_cssm(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_cyy_cssm
 
 function psb_d_cyy_csnmi(a) result(res)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csnmi
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -107,7 +107,7 @@ function psb_d_cyy_csnmi(a) result(res)
 end function psb_d_cyy_csnmi
 
 function psb_d_cyy_csnm1(a) result(res)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csnm1
 
   implicit none 
@@ -126,7 +126,7 @@ function psb_d_cyy_csnm1(a) result(res)
 end function psb_d_cyy_csnm1
 
 subroutine psb_d_cyy_rowsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_rowsum
   class(psb_d_cyy_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
@@ -142,7 +142,7 @@ subroutine psb_d_cyy_rowsum(d,a)
 end subroutine psb_d_cyy_rowsum
 
 subroutine psb_d_cyy_arwsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_arwsum
   class(psb_d_cyy_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -157,7 +157,7 @@ subroutine psb_d_cyy_arwsum(d,a)
 end subroutine psb_d_cyy_arwsum
 
 subroutine psb_d_cyy_colsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_colsum
   class(psb_d_cyy_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -172,7 +172,7 @@ subroutine psb_d_cyy_colsum(d,a)
 end subroutine psb_d_cyy_colsum
 
 subroutine psb_d_cyy_aclsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_aclsum
   class(psb_d_cyy_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -187,7 +187,7 @@ subroutine psb_d_cyy_aclsum(d,a)
 end subroutine psb_d_cyy_aclsum
 
 subroutine psb_d_cyy_get_diag(a,d,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_get_diag
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in) :: a
@@ -201,7 +201,7 @@ subroutine psb_d_cyy_get_diag(a,d,info)
 end subroutine psb_d_cyy_get_diag
 
 subroutine psb_d_cyy_scal(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_scal
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(inout) :: a
@@ -215,7 +215,7 @@ subroutine psb_d_cyy_scal(d,a,info)
 end subroutine psb_d_cyy_scal
 
 subroutine psb_d_cyy_scals(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_scals
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(inout) :: a
@@ -229,7 +229,7 @@ subroutine psb_d_cyy_scals(d,a,info)
 end subroutine psb_d_cyy_scals
 
 subroutine  psb_d_cyy_reallocate_nz(nz,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_reallocate_nz
   implicit none 
   integer, intent(in) :: nz
@@ -241,7 +241,7 @@ subroutine  psb_d_cyy_reallocate_nz(nz,a)
 end subroutine psb_d_cyy_reallocate_nz
 
 subroutine psb_d_cyy_mold(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_mold
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(in)  :: a
@@ -253,7 +253,7 @@ subroutine psb_d_cyy_mold(a,b,info)
 end subroutine psb_d_cyy_mold
 
 subroutine  psb_d_cyy_allocate_mnnz(m,n,a,nz) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_allocate_mnnz
   implicit none 
   integer, intent(in) :: m,n
@@ -266,7 +266,7 @@ end subroutine psb_d_cyy_allocate_mnnz
 
 subroutine psb_d_cyy_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csgetptn
   implicit none
 
@@ -289,7 +289,7 @@ end subroutine psb_d_cyy_csgetptn
 
 subroutine psb_d_cyy_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csgetrow
   implicit none
 
@@ -315,7 +315,7 @@ end subroutine psb_d_cyy_csgetrow
 
 subroutine psb_d_cyy_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csgetblk
   implicit none
 
@@ -336,7 +336,7 @@ subroutine psb_d_cyy_csgetblk(imin,imax,a,b,info,&
 end subroutine psb_d_cyy_csgetblk
 
 subroutine psb_d_cyy_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_csput
   implicit none 
 
@@ -355,7 +355,7 @@ subroutine psb_d_cyy_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 end subroutine psb_d_cyy_csput
 
 subroutine psb_d_cyy_reinit(a,clear)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_reinit
   implicit none 
 
@@ -371,7 +371,7 @@ subroutine psb_d_cyy_reinit(a,clear)
 end subroutine psb_d_cyy_reinit
 
 subroutine  psb_d_cyy_trim(a)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_trim
   implicit none 
   class(psb_d_cyy_sparse_mat), intent(inout) :: a
@@ -383,7 +383,7 @@ subroutine  psb_d_cyy_trim(a)
 end subroutine psb_d_cyy_trim
 
 subroutine psb_d_cyy_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_print
   implicit none 
 
@@ -402,7 +402,7 @@ subroutine psb_d_cyy_print(iout,a,iv,eirs,eics,head,ivr,ivc)
 end subroutine psb_d_cyy_print
 
 subroutine psb_d_cp_cyy_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cp_cyy_from_coo
   implicit none 
 
@@ -423,7 +423,7 @@ subroutine psb_d_cp_cyy_from_coo(a,b,info)
 end subroutine psb_d_cp_cyy_from_coo
 
 subroutine psb_d_cp_cyy_to_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cp_cyy_to_coo
   implicit none 
 
@@ -443,7 +443,7 @@ subroutine psb_d_cp_cyy_to_coo(a,b,info)
 end subroutine psb_d_cp_cyy_to_coo
 
 subroutine psb_d_mv_cyy_to_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_mv_cyy_to_coo
   implicit none 
 
@@ -463,7 +463,7 @@ subroutine psb_d_mv_cyy_to_coo(a,b,info)
 end subroutine psb_d_mv_cyy_to_coo
 
 subroutine psb_d_mv_cyy_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_mv_cyy_from_coo
   implicit none 
 
@@ -483,7 +483,7 @@ subroutine psb_d_mv_cyy_from_coo(a,b,info)
 end subroutine psb_d_mv_cyy_from_coo
 
 subroutine psb_d_mv_cyy_to_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_mv_cyy_to_fmt
   implicit none 
 
@@ -504,7 +504,7 @@ subroutine psb_d_mv_cyy_to_fmt(a,b,info)
 end subroutine psb_d_mv_cyy_to_fmt
 
 subroutine psb_d_cp_cyy_to_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cp_cyy_to_fmt
   implicit none 
 
@@ -524,7 +524,7 @@ subroutine psb_d_cp_cyy_to_fmt(a,b,info)
 end subroutine psb_d_cp_cyy_to_fmt
 
 subroutine psb_d_mv_cyy_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_mv_cyy_from_fmt
   implicit none 
 
@@ -545,7 +545,7 @@ subroutine psb_d_mv_cyy_from_fmt(a,b,info)
 end subroutine psb_d_mv_cyy_from_fmt
 
 subroutine psb_d_cp_cyy_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cp_cyy_from_fmt
   implicit none 
 
@@ -565,7 +565,7 @@ subroutine psb_d_cp_cyy_from_fmt(a,b,info)
 end subroutine psb_d_cp_cyy_from_fmt
 
 subroutine psb_d_cyy_cp_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_cp_from
   implicit none 
 
@@ -580,7 +580,7 @@ subroutine psb_d_cyy_cp_from(a,b)
 end subroutine psb_d_cyy_cp_from
 
 subroutine psb_d_cyy_mv_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_mv_from
   implicit none 
 

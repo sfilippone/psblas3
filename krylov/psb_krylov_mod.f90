@@ -41,7 +41,7 @@ Module psb_krylov_mod
   interface psb_krylov
     
     Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       
       character(len=*)                   :: method
@@ -57,7 +57,7 @@ Module psb_krylov_mod
       Real(psb_spk_), Optional, Intent(out) :: err,cond
     end Subroutine psb_skrylov
     Subroutine psb_ckrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       character(len=*)                   :: method
       Type(psb_cspmat_type), Intent(in)  :: a
@@ -73,7 +73,7 @@ Module psb_krylov_mod
     end Subroutine psb_ckrylov
     Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_sparse_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       
       character(len=*)                   :: method
@@ -90,7 +90,7 @@ Module psb_krylov_mod
 
     end Subroutine psb_dkrylov
     Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
       use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
       character(len=*)                   :: method
       Type(psb_zspmat_type), Intent(in)  :: a

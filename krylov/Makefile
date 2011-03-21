@@ -33,7 +33,7 @@ lib:  $(OBJS)
 psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o:  psb_base_inner_krylov_mod.o
 psb_inner_krylov_mod.o: psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o 
 $(F90OBJS): $(MODOBJS)
-$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)  $(LIBDIR)/psb_sparse_mod$(.mod)
+$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)  $(LIBDIR)/psb_base_mod$(.mod)
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

@@ -66,7 +66,7 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    use psb_sparse_mod
+    use psb_base_mod
     integer, intent(in)  :: global_indx, n, np
     integer, intent(out) :: nv
     integer, intent(out) :: pv(*)
@@ -88,7 +88,7 @@ contains
 
 
   subroutine distr_mtpart(root, ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     integer    :: root, ictxt
     integer    :: n, me, np
 
@@ -135,7 +135,7 @@ contains
   end subroutine getv_mtpart
   
   subroutine d_mat_build_mtpart(a,nparts)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_dspmat_type), intent(in) :: a
     integer       :: nparts
     
@@ -152,7 +152,7 @@ contains
 
   
   subroutine s_mat_build_mtpart(a,nparts)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_sspmat_type), intent(in) :: a
     integer       :: nparts
     
@@ -169,7 +169,7 @@ contains
 
   
   subroutine z_mat_build_mtpart(a,nparts)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_zspmat_type), intent(in) :: a
     integer       :: nparts
     
@@ -186,7 +186,7 @@ contains
 
   
   subroutine c_mat_build_mtpart(a,nparts)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_cspmat_type), intent(in) :: a
     integer       :: nparts
     
@@ -203,7 +203,7 @@ contains
 
 
   subroutine build_mtpart(n,fida,ia1,ia2,nparts)
-    use psb_sparse_mod
+    use psb_base_mod
     integer       :: nparts
     integer       :: ia1(:), ia2(:)
     integer       :: n, i,numflag,nedc,wgflag

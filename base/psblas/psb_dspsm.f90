@@ -76,7 +76,7 @@
 ! 
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, k, jx, jy, work)   
-  use psb_sparse_mod, psb_protect_name => psb_dspsm
+  use psb_base_mod, psb_protect_name => psb_dspsm
   use psi_mod
   implicit none
 
@@ -355,7 +355,7 @@ end subroutine psb_dspsm
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
-  use psb_sparse_mod, psb_protect_name => psb_dspsv
+  use psb_base_mod, psb_protect_name => psb_dspsv
   use psi_mod
   implicit none 
 

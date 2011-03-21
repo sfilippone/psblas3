@@ -31,7 +31,7 @@ contains
   
 
   subroutine psb_z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_z_bjac_prec_type), intent(in)  :: prec
     complex(psb_dpk_),intent(in)         :: alpha,beta
@@ -178,7 +178,7 @@ contains
 
   subroutine psb_z_bjac_precinit(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_z_bjac_prec_type),intent(inout) :: prec
@@ -217,7 +217,7 @@ contains
 
   subroutine psb_z_bjac_precbld(a,desc_a,prec,info,upd,mold,afmt)
 
-    use psb_sparse_mod
+    use psb_base_mod
     use psb_prec_mod
     Implicit None
 
@@ -364,7 +364,7 @@ contains
 
   subroutine psb_z_bjac_precseti(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_z_bjac_prec_type),intent(inout) :: prec
@@ -419,7 +419,7 @@ contains
 
   subroutine psb_z_bjac_precsetr(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_z_bjac_prec_type),intent(inout) :: prec
@@ -447,7 +447,7 @@ contains
 
   subroutine psb_z_bjac_precsetc(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_z_bjac_prec_type),intent(inout) :: prec
@@ -475,7 +475,7 @@ contains
 
   subroutine psb_z_bjac_precfree(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_z_bjac_prec_type), intent(inout) :: prec
@@ -512,7 +512,7 @@ contains
 
   subroutine psb_z_bjac_precdescr(prec,iout)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_z_bjac_prec_type), intent(in) :: prec
@@ -559,7 +559,7 @@ contains
   end subroutine psb_z_bjac_precdescr
 
   function psb_z_bjac_sizeof(prec) result(val)
-    use psb_sparse_mod
+    use psb_base_mod
     class(psb_z_bjac_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

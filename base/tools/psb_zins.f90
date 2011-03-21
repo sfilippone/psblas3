@@ -46,7 +46,7 @@
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
-  use psb_sparse_mod, psb_protect_name => psb_zinsvi
+  use psb_base_mod, psb_protect_name => psb_zinsvi
   use psi_mod
   implicit none
 
@@ -227,7 +227,7 @@ end subroutine psb_zinsvi
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_zinsi(m, irw, val, x, desc_a, info, dupl)
-  use psb_sparse_mod, psb_protect_name => psb_zinsi
+  use psb_base_mod, psb_protect_name => psb_zinsi
   use psi_mod
   implicit none
 

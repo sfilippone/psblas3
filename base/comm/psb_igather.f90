@@ -47,7 +47,7 @@
 !                                              Default: -1. 
 !
 subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_igatherm
+  use psb_base_mod, psb_protect_name => psb_igatherm
   implicit none
 
   integer, intent(in)    :: locx(:,:)
@@ -218,7 +218,7 @@ end subroutine psb_igatherm
 !                                              the processes will have a copy.
 !
 subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_igatherv
+  use psb_base_mod, psb_protect_name => psb_igatherv
   implicit none
 
   integer, intent(in)    :: locx(:)

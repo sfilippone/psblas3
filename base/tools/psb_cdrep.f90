@@ -102,7 +102,7 @@
   !
   !
 subroutine psb_cdrep(m, ictxt, desc, info)
-  use psb_sparse_mod
+  use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
   implicit None

@@ -61,7 +61,7 @@
 !
 Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
-  use psb_sparse_mod, psb_protect_name => psb_zcdbldext
+  use psb_base_mod, psb_protect_name => psb_zcdbldext
   use psi_mod
 
 #ifdef MPI_MOD

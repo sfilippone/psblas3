@@ -45,7 +45,7 @@
 !                                         'I'gnore, 'W'arning, 'A'bort
 !
 subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
-  use psb_sparse_mod, psb_protect_name => psb_loc_to_glob2
+  use psb_base_mod, psb_protect_name => psb_loc_to_glob2
   implicit none
 
   !...parameters....
@@ -151,7 +151,7 @@ end subroutine psb_loc_to_glob2
 !                                         'I'gnore, 'W'arning, 'A'bort
 !
 subroutine psb_loc_to_glob(x,desc_a,info,iact)
-  use psb_sparse_mod, psb_protect_name => psb_loc_to_glob
+  use psb_base_mod, psb_protect_name => psb_loc_to_glob
   implicit none
 
   !...parameters....

@@ -45,7 +45,7 @@
 !    info     - integer.                       Return code
 !
 subroutine psb_cdren(trans,iperm,desc_a,info)
-  use psb_sparse_mod, psb_protect_name => psb_cdren
+  use psb_base_mod, psb_protect_name => psb_cdren
   use psi_mod
   implicit none
 

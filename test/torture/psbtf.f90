@@ -6,7 +6,7 @@
 
 program main
 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_mvsv_tester
   implicit none
   integer, parameter :: psb_fidasize_=16

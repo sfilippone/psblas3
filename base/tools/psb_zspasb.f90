@@ -49,7 +49,7 @@
 ! 
 !
 subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
-  use psb_sparse_mod, psb_protect_name => psb_zspasb
+  use psb_base_mod, psb_protect_name => psb_zspasb
   use psi_mod
   implicit none
 

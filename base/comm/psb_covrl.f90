@@ -65,7 +65,7 @@
 !
 !
 subroutine  psb_covrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_covrlm
+  use psb_base_mod, psb_protect_name => psb_covrlm
   use psi_mod
   implicit none
 
@@ -264,7 +264,7 @@ end subroutine psb_covrlm
 !
 !
 subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
-  use psb_sparse_mod, psb_protect_name => psb_covrlv
+  use psb_base_mod, psb_protect_name => psb_covrlv
   use psi_mod
   implicit none
 

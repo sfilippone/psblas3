@@ -78,7 +78,7 @@
 
 Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
   use psb_krylov_mod, psb_protect_name => psb_skrylov
   character(len=*)                   :: method
@@ -96,7 +96,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
   interface 
     subroutine psb_scg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -112,7 +112,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     subroutine psb_sbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -128,7 +128,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     subroutine psb_scgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
@@ -144,7 +144,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
 
     Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -159,7 +159,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_scgstabl
     Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -174,7 +174,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     end subroutine psb_srgmres
     subroutine psb_scgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-      use psb_sparse_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 

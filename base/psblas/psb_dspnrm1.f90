@@ -49,7 +49,7 @@ function psb_dspnrm1(a,desc_a,info)
 !!$  use psb_penv_mod
 !!$  use psb_mat_mod
 !!$  use psb_tools_mod
-  use psb_sparse_mod, psb_protect_name => psb_dspnrm1
+  use psb_base_mod, psb_protect_name => psb_dspnrm1
   implicit none
 
   type(psb_dspmat_type), intent(in) :: a

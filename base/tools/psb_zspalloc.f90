@@ -42,7 +42,7 @@
 !                                              (local, user estimate)
 !
 subroutine psb_zspalloc(a, desc_a, info, nnz)
-  use psb_sparse_mod, psb_protect_name => psb_zspalloc
+  use psb_base_mod, psb_protect_name => psb_zspalloc
   implicit none
 
   !....parameters...

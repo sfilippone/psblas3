@@ -90,7 +90,7 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_,&
+      use psb_base_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_,&
            & psb_s_base_sparse_mat
       implicit none
 
@@ -176,7 +176,7 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type,&
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type,&
            & psb_d_base_sparse_mat
       implicit none
 
@@ -263,7 +263,7 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type,&
+      use psb_base_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type,&
            & psb_c_base_sparse_mat
       implicit none
 
@@ -350,7 +350,7 @@ module psb_mat_dist_mod
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_sparse_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type,&
+      use psb_base_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type,&
            & psb_z_base_sparse_mat
       implicit none
 

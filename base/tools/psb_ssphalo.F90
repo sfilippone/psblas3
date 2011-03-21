@@ -58,7 +58,7 @@
 !
 Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
-  use psb_sparse_mod, psb_protect_name => psb_ssphalo
+  use psb_base_mod, psb_protect_name => psb_ssphalo
 
 #ifdef MPI_MOD
   use mpi

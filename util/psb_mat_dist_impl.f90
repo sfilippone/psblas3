@@ -87,7 +87,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   !     on entry: specifies processor holding a_glob. default: 0
   !     on exit : unchanged.
   !
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_mat_mod
   implicit none
 
@@ -526,7 +526,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   !     on entry: specifies processor holding a_glob. default: 0
   !     on exit : unchanged.
   !
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_mat_mod
   implicit none
 
@@ -967,7 +967,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   !     on entry: specifies processor holding a_glob. default: 0
   !     on exit : unchanged.
   !
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_mat_mod
   implicit none
 
@@ -1406,7 +1406,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   !     on entry: specifies processor holding a_glob. default: 0
   !     on exit : unchanged.
   !
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_mat_mod
   implicit none
 

@@ -32,7 +32,7 @@
 
 Subroutine psb_cd_reinit(desc,info)
 
-  use psb_sparse_mod, psb_protect_name => psb_cd_reinit
+  use psb_base_mod, psb_protect_name => psb_cd_reinit
   use psi_mod
 
   Implicit None

@@ -93,7 +93,7 @@
 !                                         estimate of) residual. 
 !
 Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod
   use psb_inner_krylov_mod
   use psb_krylov_mod

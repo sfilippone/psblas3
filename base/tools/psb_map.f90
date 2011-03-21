@@ -33,7 +33,7 @@
 !
 !
 subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_s_map_X2Y
+  use psb_base_mod, psb_protect_name => psb_s_map_X2Y
   implicit none 
   type(psb_slinmap_type), intent(in) :: map
   real(psb_spk_), intent(in)     :: alpha,beta
@@ -111,7 +111,7 @@ end subroutine psb_s_map_X2Y
 ! due to exch_bk_idx
 !
 subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_s_map_Y2X
+  use psb_base_mod, psb_protect_name => psb_s_map_Y2X
 
   implicit none 
   type(psb_slinmap_type), intent(in) :: map
@@ -190,7 +190,7 @@ end subroutine psb_s_map_Y2X
 ! due to exch_fw_idx
 !
 subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_d_map_X2Y
+  use psb_base_mod, psb_protect_name => psb_d_map_X2Y
   implicit none 
   type(psb_dlinmap_type), intent(in) :: map
   real(psb_dpk_), intent(in)     :: alpha,beta
@@ -269,7 +269,7 @@ end subroutine psb_d_map_X2Y
 ! due to exch_bk_idx
 !
 subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_d_map_Y2X
+  use psb_base_mod, psb_protect_name => psb_d_map_Y2X
 
   implicit none 
   type(psb_dlinmap_type), intent(in) :: map
@@ -348,7 +348,7 @@ end subroutine psb_d_map_Y2X
 ! due to exch_fw_idx
 !
 subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_c_map_X2Y
+  use psb_base_mod, psb_protect_name => psb_c_map_X2Y
 
   implicit none 
   type(psb_clinmap_type), intent(in) :: map
@@ -427,7 +427,7 @@ end subroutine psb_c_map_X2Y
 ! due to exch_bk_idx
 !
 subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_c_map_Y2X
+  use psb_base_mod, psb_protect_name => psb_c_map_Y2X
 
   implicit none 
   type(psb_clinmap_type), intent(in) :: map
@@ -506,7 +506,7 @@ end subroutine psb_c_map_Y2X
 ! due to exch_fw_idx
 !
 subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_z_map_X2Y
+  use psb_base_mod, psb_protect_name => psb_z_map_X2Y
 
   implicit none 
   type(psb_zlinmap_type), intent(in) :: map
@@ -585,7 +585,7 @@ end subroutine psb_z_map_X2Y
 ! due to exch_bk_idx
 !
 subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
-  use psb_sparse_mod, psb_protect_name => psb_z_map_Y2X
+  use psb_base_mod, psb_protect_name => psb_z_map_Y2X
 
   implicit none 
   type(psb_zlinmap_type), intent(in) :: map

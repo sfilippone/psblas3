@@ -40,7 +40,7 @@
 !    info     - integer.                          return code.
 !
 subroutine psb_cspfree(a, desc_a,info)
-  use psb_sparse_mod, psb_protect_name => psb_cspfree
+  use psb_base_mod, psb_protect_name => psb_cspfree
   implicit none
 
   !....parameters...

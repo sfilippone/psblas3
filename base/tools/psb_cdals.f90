@@ -44,7 +44,7 @@
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Error code (if any).
 subroutine psb_cdals(m, n, parts, ictxt, desc, info)
-  use psb_sparse_mod
+  use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
   use psb_list_map_mod

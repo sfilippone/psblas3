@@ -49,7 +49,7 @@
 !                                           certain circumstances.
 !
 subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
-  use psb_sparse_mod, psb_protect_name => psb_dspins
+  use psb_base_mod, psb_protect_name => psb_dspins
   implicit none
 
   !....parameters...
@@ -195,7 +195,7 @@ end subroutine psb_dspins
 
 
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
-  use psb_sparse_mod, psb_protect_name => psb_dspins_2desc
+  use psb_base_mod, psb_protect_name => psb_dspins_2desc
   implicit none
 
   !....parameters...

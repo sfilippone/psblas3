@@ -98,7 +98,7 @@ module psb_serial_mod
       type(psb_z_csr_sparse_mat), intent(out)  :: c
       integer, intent(out)                     :: info
     end subroutine psb_zbase_symbmm
-  end interface
+  end interface psb_symbmm
 
   interface psb_numbmm
     subroutine psb_snumbmm(a,b,c)
@@ -149,7 +149,7 @@ module psb_serial_mod
       class(psb_z_base_sparse_mat), intent(in) :: a,b
       type(psb_z_csr_sparse_mat), intent(inout)  :: c
     end subroutine psb_zbase_numbmm
-  end interface
+  end interface psb_numbmm
 
   interface psb_rwextd
     subroutine psb_srwextd(nr,a,info,b,rowscale)
@@ -224,7 +224,7 @@ module psb_serial_mod
       class(psb_z_base_sparse_mat), intent(in), optional :: b
       logical,intent(in), optional                       :: rowscale
     end subroutine psb_zbase_rwextd
-  end interface
+  end interface psb_rwextd
 
 
   interface psb_geprt
@@ -324,10 +324,13 @@ module psb_serial_mod
       complex(psb_dpk_), intent(in)  :: a(:)
       character(len=*), optional     :: head
     end subroutine psb_zgeprt1
-  end interface
-  
+  end interface psb_geprt
 
-  
+  interface psb_csprt
+    module procedure psb_scsprt, psb_scsprtn, psb_dcsprt, psb_dcsprtn, &
+         & psb_ccsprt, psb_ccsprtn, psb_zcsprt, psb_zcsprtn
+  end interface psb_csprt
+
   interface psb_spdot_srtd
     function psb_s_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
       use psb_const_mod
@@ -360,7 +363,7 @@ module psb_serial_mod
       complex(psb_dpk_), intent(in) :: v1(*),v2(*)
       complex(psb_dpk_)      :: dot
     end function psb_z_spdot_srtd
-  end interface
+  end interface psb_spdot_srtd
 
 
   interface psb_spge_dot
@@ -395,7 +398,7 @@ module psb_serial_mod
       complex(psb_dpk_), intent(in) :: v1(*),v2(*)
       complex(psb_dpk_)      :: dot
     end function psb_z_spge_dot
-  end interface
+  end interface psb_spge_dot
 
 
   interface psb_nspaxpby
@@ -410,7 +413,7 @@ module psb_serial_mod
       real(psb_dpk_), intent (in)       :: alpha, beta
       integer, intent(out)              :: info
     end subroutine psb_d_nspaxpby
-  end interface
+  end interface psb_nspaxpby
 
   interface psb_aspxpby
     subroutine psb_s_aspxpby(alpha, nx, ix, x, beta, y, info)
@@ -449,8 +452,113 @@ module psb_serial_mod
       complex(psb_dpk_), intent (in)    :: alpha, beta
       integer, intent(out)              :: info
     end subroutine psb_z_aspxpby
-  end interface
+  end interface psb_aspxpby
 
-  
+contains
+
+  subroutine psb_scsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    integer, intent(in)       :: iout
+    type(psb_sspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_scsprt
+
+  subroutine psb_scsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    character(len=*), intent(in)  :: fname   
+    type(psb_sspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_scsprtn
+
+  subroutine psb_dcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    integer, intent(in)       :: iout
+    type(psb_dspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_dcsprt
+
+  subroutine psb_dcsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    character(len=*), intent(in)  :: fname   
+    type(psb_dspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_dcsprtn
+
+  subroutine psb_ccsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    integer, intent(in)       :: iout
+    type(psb_cspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_ccsprt
+
+  subroutine psb_ccsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    character(len=*), intent(in)  :: fname   
+    type(psb_cspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_ccsprtn
+
+  subroutine psb_zcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    integer, intent(in)       :: iout
+    type(psb_zspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_zcsprt
+
+  subroutine psb_zcsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+    use psb_mat_mod
+    character(len=*), intent(in)  :: fname   
+    type(psb_zspmat_type), intent(in) :: a
+    integer, intent(in), optional :: iv(:)
+    integer, intent(in), optional :: irs,ics
+    character(len=*), optional    :: head
+    integer, intent(in), optional :: ivr(:),ivc(:)
+
+    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+
+  end subroutine psb_zcsprtn
+
 end module psb_serial_mod
 

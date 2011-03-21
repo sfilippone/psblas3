@@ -32,7 +32,7 @@ contains
   
 
   subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_sparse_mod
+    use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_d_bjac_prec_type), intent(in)  :: prec
     real(psb_dpk_),intent(in)         :: alpha,beta
@@ -173,7 +173,7 @@ contains
 
   subroutine psb_d_bjac_precinit(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_d_bjac_prec_type),intent(inout) :: prec
@@ -212,7 +212,7 @@ contains
 
   subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,mold,afmt)
 
-    use psb_sparse_mod
+    use psb_base_mod
     use psb_prec_mod
     Implicit None
 
@@ -360,7 +360,7 @@ contains
 
   subroutine psb_d_bjac_precseti(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_d_bjac_prec_type),intent(inout) :: prec
@@ -415,7 +415,7 @@ contains
 
   subroutine psb_d_bjac_precsetr(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_d_bjac_prec_type),intent(inout) :: prec
@@ -443,7 +443,7 @@ contains
 
   subroutine psb_d_bjac_precsetc(prec,what,val,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
     
     class(psb_d_bjac_prec_type),intent(inout) :: prec
@@ -471,7 +471,7 @@ contains
 
   subroutine psb_d_bjac_precfree(prec,info)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_d_bjac_prec_type), intent(inout) :: prec
@@ -508,7 +508,7 @@ contains
 
   subroutine psb_d_bjac_precdescr(prec,iout)
     
-    use psb_sparse_mod
+    use psb_base_mod
     Implicit None
 
     class(psb_d_bjac_prec_type), intent(in) :: prec
@@ -556,7 +556,7 @@ contains
 
 
   subroutine psb_d_bjac_dump(prec,info,prefix,head)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none 
     class(psb_d_bjac_prec_type), intent(in) :: prec
     integer, intent(out)                    :: info
@@ -595,7 +595,7 @@ contains
   end subroutine psb_d_bjac_dump
 
   function psb_d_bjac_sizeof(prec) result(val)
-    use psb_sparse_mod
+    use psb_base_mod
     class(psb_d_bjac_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

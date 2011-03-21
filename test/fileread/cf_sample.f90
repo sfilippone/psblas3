@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 program cf_sample
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   use psb_util_mod

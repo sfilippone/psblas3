@@ -39,7 +39,7 @@
 !
 !
 subroutine psb_srwextd(nr,a,info,b,rowscale)
-  use psb_sparse_mod, psb_protect_name => psb_srwextd
+  use psb_base_mod, psb_protect_name => psb_srwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -99,7 +99,7 @@ subroutine psb_srwextd(nr,a,info,b,rowscale)
 
 end subroutine psb_srwextd
 subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
-  use psb_sparse_mod, psb_protect_name => psb_sbase_rwextd
+  use psb_base_mod, psb_protect_name => psb_sbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)

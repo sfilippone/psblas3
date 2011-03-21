@@ -41,7 +41,7 @@
 !
 
 subroutine psb_znumbmm(a,b,c)
-  use psb_sparse_mod, psb_protect_name => psb_znumbmm
+  use psb_base_mod, psb_protect_name => psb_znumbmm
   implicit none 
 
   type(psb_zspmat_type), intent(in) :: a,b

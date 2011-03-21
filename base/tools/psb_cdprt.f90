@@ -41,7 +41,7 @@
 !    short         - logical(optional).      Used to choose a verbose output.
 !
 subroutine psb_cdprt(iout,desc_p,glob,short)
-  use psb_sparse_mod, psb_protect_name => psb_cdprt
+  use psb_base_mod, psb_protect_name => psb_cdprt
   implicit none 
   type(psb_desc_type), intent(in)    :: desc_p
   integer, intent(in)                :: iout

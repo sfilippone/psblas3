@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 subroutine psb_cd_set_ovl_bld(desc,info)
-  use psb_sparse_mod, psb_protect_name => psb_cd_set_ovl_bld
+  use psb_base_mod, psb_protect_name => psb_cd_set_ovl_bld
   implicit none
   type(psb_desc_type), intent(inout) :: desc
   integer                            :: info
@@ -48,7 +48,7 @@ subroutine psb_cd_set_ovl_bld(desc,info)
 end subroutine psb_cd_set_ovl_bld
 
 subroutine psb_cd_set_bld(desc,info)
-  use psb_sparse_mod, psb_protect_name => psb_cd_set_bld
+  use psb_base_mod, psb_protect_name => psb_cd_set_bld
   use psi_mod
   implicit none
   type(psb_desc_type), intent(inout) :: desc

@@ -301,7 +301,7 @@ end function psb_samaxv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_samaxvs (res,x,desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_samaxvs 
+  use psb_base_mod, psb_protect_name => psb_samaxvs 
   implicit none
 
   real(psb_spk_), intent(in)      :: x(:)
@@ -421,7 +421,7 @@ end subroutine psb_samaxvs
 !    info   -  integer.                 Return code
 !
 subroutine psb_smamaxs (res,x,desc_a, info,jx)
-  use psb_sparse_mod, psb_protect_name => psb_smamaxs 
+  use psb_base_mod, psb_protect_name => psb_smamaxs 
   implicit none
 
   real(psb_spk_), intent(in)      :: x(:,:)

@@ -35,7 +35,7 @@
 ! format
 !
 program zhb2mm
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_util_mod
   type(psb_zspmat_type) :: a
   

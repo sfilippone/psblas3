@@ -64,7 +64,7 @@
 ! 
 subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
-  use psb_sparse_mod, psb_protect_name => psb_dspmm
+  use psb_base_mod, psb_protect_name => psb_dspmm
   use psi_mod
   implicit none
 
@@ -416,7 +416,7 @@ end subroutine psb_dspmm
 ! 
 subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
-  use psb_sparse_mod, psb_protect_name => psb_dspmv
+  use psb_base_mod, psb_protect_name => psb_dspmv
   use psi_mod
   implicit none
 

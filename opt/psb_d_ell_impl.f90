@@ -13,7 +13,7 @@
 ! == ===================================
 
 subroutine psb_d_ell_csmv(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csmv
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -358,7 +358,7 @@ contains
 end subroutine psb_d_ell_csmv
 
 subroutine psb_d_ell_csmm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csmm
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -661,7 +661,7 @@ end subroutine psb_d_ell_csmm
 
 
 subroutine psb_d_ell_cssv(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_cssv
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -935,7 +935,7 @@ end subroutine psb_d_ell_cssv
 
 
 subroutine psb_d_ell_cssm(alpha,a,x,beta,y,info,trans) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_cssm
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -1215,7 +1215,7 @@ end subroutine psb_d_ell_cssm
 
 
 function psb_d_ell_csnmi(a) result(res)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csnmi
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -1240,7 +1240,7 @@ end function psb_d_ell_csnmi
 
 
 function psb_d_ell_csnm1(a) result(res)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csnm1
 
   implicit none 
@@ -1278,7 +1278,7 @@ end function psb_d_ell_csnm1
 
 
 subroutine psb_d_ell_rowsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_rowsum
   class(psb_d_ell_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
@@ -1326,7 +1326,7 @@ subroutine psb_d_ell_rowsum(d,a)
 end subroutine psb_d_ell_rowsum
 
 subroutine psb_d_ell_arwsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_arwsum
   class(psb_d_ell_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1374,7 +1374,7 @@ subroutine psb_d_ell_arwsum(d,a)
 end subroutine psb_d_ell_arwsum
 
 subroutine psb_d_ell_colsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_colsum
   class(psb_d_ell_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1425,7 +1425,7 @@ subroutine psb_d_ell_colsum(d,a)
 end subroutine psb_d_ell_colsum
 
 subroutine psb_d_ell_aclsum(d,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_aclsum
   class(psb_d_ell_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1477,7 +1477,7 @@ end subroutine psb_d_ell_aclsum
 
 
 subroutine psb_d_ell_get_diag(a,d,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_get_diag
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in) :: a
@@ -1525,7 +1525,7 @@ end subroutine psb_d_ell_get_diag
 
 
 subroutine psb_d_ell_scal(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_scal
   implicit none 
   class(psb_d_ell_sparse_mat), intent(inout) :: a
@@ -1565,7 +1565,7 @@ end subroutine psb_d_ell_scal
 
 
 subroutine psb_d_ell_scals(d,a,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_scals
   implicit none 
   class(psb_d_ell_sparse_mat), intent(inout) :: a
@@ -1612,7 +1612,7 @@ end subroutine psb_d_ell_scals
 
 
 subroutine  psb_d_ell_reallocate_nz(nz,a) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_reallocate_nz
   implicit none 
   integer, intent(in) :: nz
@@ -1651,7 +1651,7 @@ subroutine  psb_d_ell_reallocate_nz(nz,a)
 end subroutine psb_d_ell_reallocate_nz
 
 subroutine psb_d_ell_mold(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_mold
   implicit none 
   class(psb_d_ell_sparse_mat), intent(in)  :: a
@@ -1680,7 +1680,7 @@ subroutine psb_d_ell_mold(a,b,info)
 end subroutine psb_d_ell_mold
 
 subroutine  psb_d_ell_allocate_mnnz(m,n,a,nz) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_allocate_mnnz
   implicit none 
   integer, intent(in) :: m,n
@@ -1745,7 +1745,7 @@ end subroutine psb_d_ell_allocate_mnnz
 
 subroutine psb_d_ell_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csgetptn
   implicit none
 
@@ -1912,7 +1912,7 @@ end subroutine psb_d_ell_csgetptn
 
 subroutine psb_d_ell_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csgetrow
   implicit none
 
@@ -2084,7 +2084,7 @@ end subroutine psb_d_ell_csgetrow
 
 subroutine psb_d_ell_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csgetblk
   implicit none
 
@@ -2142,7 +2142,7 @@ end subroutine psb_d_ell_csgetblk
 
 
 subroutine psb_d_ell_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_csput
   implicit none 
 
@@ -2415,7 +2415,7 @@ end subroutine psb_d_ell_csput
 
 
 subroutine psb_d_ell_reinit(a,clear)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_reinit
   implicit none 
 
@@ -2464,7 +2464,7 @@ subroutine psb_d_ell_reinit(a,clear)
 end subroutine psb_d_ell_reinit
 
 subroutine  psb_d_ell_trim(a)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_trim
   implicit none 
   class(psb_d_ell_sparse_mat), intent(inout) :: a
@@ -2498,7 +2498,7 @@ subroutine  psb_d_ell_trim(a)
 end subroutine psb_d_ell_trim
 
 subroutine psb_d_ell_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_print
   implicit none 
 
@@ -2580,7 +2580,7 @@ end subroutine psb_d_ell_print
 
 
 subroutine psb_d_cp_ell_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_coo
   implicit none 
 
@@ -2607,7 +2607,7 @@ end subroutine psb_d_cp_ell_from_coo
 
 
 subroutine psb_d_cp_ell_to_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_coo
   implicit none 
 
@@ -2647,7 +2647,7 @@ subroutine psb_d_cp_ell_to_coo(a,b,info)
 end subroutine psb_d_cp_ell_to_coo
 
 subroutine psb_d_mv_ell_to_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_coo
   implicit none 
 
@@ -2708,7 +2708,7 @@ end subroutine psb_d_mv_ell_to_coo
 
 
 subroutine psb_d_mv_ell_from_coo(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_coo
   implicit none 
 
@@ -2797,7 +2797,7 @@ end subroutine psb_d_mv_ell_from_coo
 
 
 subroutine psb_d_mv_ell_to_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_to_fmt
   implicit none 
 
@@ -2836,7 +2836,7 @@ end subroutine psb_d_mv_ell_to_fmt
 
 
 subroutine psb_d_cp_ell_to_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_to_fmt
   implicit none 
 
@@ -2875,7 +2875,7 @@ end subroutine psb_d_cp_ell_to_fmt
 
 
 subroutine psb_d_mv_ell_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_mv_ell_from_fmt
   implicit none 
 
@@ -2915,7 +2915,7 @@ end subroutine psb_d_mv_ell_from_fmt
 
 
 subroutine psb_d_cp_ell_from_fmt(a,b,info) 
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_cp_ell_from_fmt
   implicit none 
 
@@ -2952,7 +2952,7 @@ end subroutine psb_d_cp_ell_from_fmt
 
 
 subroutine psb_d_ell_cp_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_cp_from
   implicit none 
 
@@ -2992,7 +2992,7 @@ subroutine psb_d_ell_cp_from(a,b)
 end subroutine psb_d_ell_cp_from
 
 subroutine psb_d_ell_mv_from(a,b)
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_d_ell_mat_mod, psb_protect_name => psb_d_ell_mv_from
   implicit none 
 

@@ -1,7 +1,7 @@
 module psb_s_mvsv_tester
 contains
   subroutine s_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -77,7 +77,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -153,7 +153,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -229,7 +229,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -305,7 +305,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -381,7 +381,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -457,7 +457,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -533,7 +533,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -609,7 +609,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -685,7 +685,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -761,7 +761,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -837,7 +837,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -913,7 +913,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -989,7 +989,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1065,7 +1065,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1141,7 +1141,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1217,7 +1217,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1293,7 +1293,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1369,7 +1369,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1445,7 +1445,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1521,7 +1521,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1597,7 +1597,7 @@ contains
   ! 
 
   subroutine s_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1673,7 +1673,7 @@ contains
   ! 
 
   subroutine s_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1749,7 +1749,7 @@ contains
   ! 
 
   subroutine s_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1825,7 +1825,7 @@ contains
   ! 
 
   subroutine s_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1903,7 +1903,7 @@ contains
   ! 
 
   subroutine s_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -1982,7 +1982,7 @@ contains
   ! 
 
   subroutine s_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2061,7 +2061,7 @@ contains
   ! 
 
   subroutine s_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2140,7 +2140,7 @@ contains
   ! 
 
   subroutine s_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2219,7 +2219,7 @@ contains
   ! 
 
   subroutine s_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2298,7 +2298,7 @@ contains
   ! 
 
   subroutine s_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2377,7 +2377,7 @@ contains
   ! 
 
   subroutine s_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2456,7 +2456,7 @@ contains
   ! 
 
   subroutine s_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2535,7 +2535,7 @@ contains
   ! 
 
   subroutine s_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2614,7 +2614,7 @@ contains
   ! 
 
   subroutine s_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a
@@ -2693,7 +2693,7 @@ contains
   ! 
 
   subroutine s_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     character(len=*) :: afmt
     type(psb_sspmat_type) :: a

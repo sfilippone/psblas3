@@ -34,7 +34,7 @@
 !
 Subroutine psb_cd_switch_ovl_indxmap(desc,info)
 
-  use psb_sparse_mod, psb_protect_name => psb_cd_switch_ovl_indxmap
+  use psb_base_mod, psb_protect_name => psb_cd_switch_ovl_indxmap
   use psi_mod
 
 

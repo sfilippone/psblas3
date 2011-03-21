@@ -44,7 +44,7 @@
 !                                              the processes have a copy. Default -1.
 !
 subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot) 
-  use psb_sparse_mod, psb_protect_name => psb_sscatterm
+  use psb_base_mod, psb_protect_name => psb_sscatterm
 
 #ifdef MPI_MOD
   use mpi
@@ -278,7 +278,7 @@ end subroutine psb_sscatterm
 !                                              the processes have a copy.
 !
 subroutine  psb_sscatterv(globx, locx, desc_a, info, iroot)
-  use psb_sparse_mod, psb_protect_name => psb_sscatterv
+  use psb_base_mod, psb_protect_name => psb_sscatterv
 #ifdef MPI_MOD
   use mpi
 #endif

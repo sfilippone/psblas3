@@ -62,7 +62,7 @@
 ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
 !
 program ppde
-  use psb_sparse_mod
+  use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   implicit none
@@ -339,7 +339,7 @@ contains
     !
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
-    use psb_sparse_mod
+    use psb_base_mod
     use psb_mat_mod
     implicit none
     integer                        :: idim
@@ -619,43 +619,43 @@ end program ppde
 ! functions parametrizing the differential equation 
 !  
 function a1(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) :: a1
   real(psb_spk_) :: x,y,z
   a1=1.e0
 end function a1
 function a2(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a2
   real(psb_spk_) :: x,y,z
   a2=2.e1*y
 end function a2
 function a3(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a3
   real(psb_spk_) :: x,y,z      
   a3=1.e0
 end function a3
 function a4(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a4
   real(psb_spk_) :: x,y,z      
   a4=1.e0
 end function a4
 function b1(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b1   
   real(psb_spk_) :: x,y,z
   b1=1.e0
 end function b1
 function b2(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b2
   real(psb_spk_) :: x,y,z
   b2=1.e0
 end function b2
 function b3(x,y,z)
-  use psb_sparse_mod, only : psb_spk_
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b3
   real(psb_spk_) :: x,y,z
   b3=1.e0

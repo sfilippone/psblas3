@@ -301,7 +301,7 @@ end function psb_damaxv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_damaxvs (res,x,desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_damaxvs 
+  use psb_base_mod, psb_protect_name => psb_damaxvs 
   implicit none
 
   real(psb_dpk_), intent(in)      :: x(:)
@@ -421,7 +421,7 @@ end subroutine psb_damaxvs
 !    info   -  integer.                 Return code
 !
 subroutine psb_dmamaxs (res,x,desc_a, info,jx)
-  use psb_sparse_mod, psb_protect_name => psb_dmamaxs 
+  use psb_base_mod, psb_protect_name => psb_dmamaxs 
   implicit none
 
   real(psb_dpk_), intent(in)      :: x(:,:)

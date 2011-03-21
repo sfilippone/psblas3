@@ -39,7 +39,7 @@
 !    desc_a   - type(psb_desc_type).      The communication descriptor.
 !    info     - integer.                    Return code
 subroutine psb_sfree(x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_sfree
+  use psb_base_mod, psb_protect_name => psb_sfree
   implicit none
 
   !....parameters...
@@ -110,7 +110,7 @@ end subroutine psb_sfree
 !    desc_a   - type(psb_desc_type).         The communication descriptor.
 !    info     - integer.                       Return code
 subroutine psb_sfreev(x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_sfreev
+  use psb_base_mod, psb_protect_name => psb_sfreev
   implicit none
   !....parameters...
   real(psb_spk_),allocatable, intent(inout)    :: x(:)
