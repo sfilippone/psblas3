@@ -4,7 +4,7 @@ include ../../Make.inc
 #
 LIBDIR=../../lib/
 OPTDIR=../../opt
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_base -lopt -L$(OPTDIR)
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_base  -L$(OPTDIR)
 #-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
