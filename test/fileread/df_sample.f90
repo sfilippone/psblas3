@@ -94,6 +94,13 @@ program df_sample
   info=psb_success_
   call psb_set_errverbosity(2)
   !
+  ! Hello world
+  !
+  if (iam == psb_root_) then 
+    write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
+    write(*,*) 'This is the ',name,' sample program'
+  end if
+  !
   !  get parameters
   !
   call get_parms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,&

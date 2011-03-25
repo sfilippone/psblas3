@@ -63,7 +63,7 @@ pattern. As an example, consider a cell-centered finite-volume
 discretization of  the Navier-Stokes equations on a simulation domain;
 the index space <IMG
  WIDTH="45" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img14.png"
+ SRC="img15.png"
  ALT="$1\dots n$"> is isomorphic to the set of cell centers,
 whereas the pattern of the associated linear system matrix is
 isomorphic to the adjacency graph imposed on the discretization mesh
@@ -74,7 +74,7 @@ Thus the first order of business is to establish an index space, and
 this is done with a call to  <code>psb_cdall</code> in which we specify the
 size of the index space <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img15.png"
+ SRC="img16.png"
  ALT="$n$"> and the allocation of the elements of the
 index space to the various processes making up the MPI (virtual)
 parallel machine. 
@@ -83,7 +83,7 @@ parallel machine.
 The index space is partitioned among processes, and this creates a
 mapping from the ``global'' numbering <IMG
  WIDTH="45" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img14.png"
+ SRC="img15.png"
  ALT="$1\dots n$"> to a numbering
 ``local'' to each process; each process <IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
@@ -94,11 +94,11 @@ mapping from the ``global'' numbering <IMG
  -->
 <IMG
  WIDTH="76" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img16.png"
+ SRC="img17.png"
  ALT="$1\dots n_{\hbox{row}_i}$">, each element of which corresponds to a certain
 element of <IMG
  WIDTH="45" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img14.png"
+ SRC="img15.png"
  ALT="$1\dots n$">. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
 space a certain item is related, such as the row and column index of a
@@ -108,7 +108,7 @@ library will translate into the appropriate ``local'' numbering.
 <P>
 For  a given index space <IMG
  WIDTH="45" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img14.png"
+ SRC="img15.png"
  ALT="$1\dots n$"> there are many possible associated
 topologies, i.e. many different discretization stencils; thus the
 description of the index space is not completed until the user has
@@ -125,7 +125,7 @@ defined a set of ``halo'' (or ``ghost'') indices
  -->
 <IMG
  WIDTH="131" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img17.png"
+ SRC="img18.png"
  ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$">, denoting elements of the index
 space that are <I>not</I> assigned to process <IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"

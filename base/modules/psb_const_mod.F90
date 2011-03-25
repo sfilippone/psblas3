@@ -53,6 +53,13 @@ module psb_const_mod
   integer, save       :: psb_sizeof_dp, psb_sizeof_sp
   integer, save       :: psb_sizeof_int, psb_sizeof_long_int
   integer, save       :: psb_mpi_integer
+  ! 
+  ! Version
+  !
+  character(len=*), parameter :: psb_version_string = "3.0.0"
+  integer, parameter          :: psb_version_major  = 3
+  integer, parameter          :: psb_version_minor  = 0
+  integer, parameter          :: psb_patchlevel     = 0
 
   !
   !     Handy & miscellaneous constants

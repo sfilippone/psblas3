@@ -129,7 +129,7 @@ figure&nbsp;<A HREF="#fig:spmattype">4</A>. The definitions for single precision
 complex data are identical except for the <code>real</code> declaration and
 for the kind type parameter.
 
-<DIV ALIGN="CENTER"><A NAME="fig:spmattype"></A><A NAME="622"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:spmattype"></A><A NAME="624"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 4:</STRONG>
     The PSBLAS defined data type that
@@ -143,7 +143,7 @@ for the kind type parameter.
  -->
 <IMG
  WIDTH="536" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img19.png"
+ SRC="img20.png"
  ALT="\fbox{\TheSbox}">
 </DIV></TD></TR>
 </TABLE>
@@ -161,7 +161,7 @@ following should hold:
 <code>i</code>; the last element of the sparse matrix is thus stored at
 index <IMG
  WIDTH="107" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
+ SRC="img22.png"
  ALT="$ia2(m+1)-1$">. It should contain <code>m+1</code> entries in
 nondecreasing order (strictly increasing, if there are no empty rows).
 </LI>
@@ -172,7 +172,7 @@ contains the corresponding coefficient value, for all <!-- MATH
  -->
 <IMG
  WIDTH="199" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img22.png"
+ SRC="img23.png"
  ALT="$ia2(1) \le j
 \le ia2(m+1)-1$">.
 </LI>
@@ -191,7 +191,7 @@ matrix;
  -->
 <IMG
  WIDTH="123" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img23.png"
+ SRC="img24.png"
  ALT="$1 \le j \le infoa(1)$">, the coefficient, row index and
 column index are stored into <code>apsk(j)</code>, <code>ia1(j)</code> and
 <code>ia2(j)</code> respectively. 

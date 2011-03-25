@@ -75,7 +75,7 @@ y &\leftarrow& \alpha P_r T^{-H} P_c D x + \beta y\\
  -->
 <IMG
  WIDTH="194" HEIGHT="239" BORDER="0"
- SRC="img56.png"
+ SRC="img57.png"
  ALT="\begin{eqnarray*}
 y &amp;\leftarrow&amp; \alpha P_r T^{-1} P_c x + \beta y\\
 y &amp;\leftar...
@@ -89,40 +89,40 @@ where:
 <DL>
 <DT><STRONG><IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
  WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img52.png"
+ SRC="img53.png"
  ALT="$x_{:, :}$">
 </DD>
 <DT><STRONG><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
  WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img53.png"
+ SRC="img54.png"
  ALT="$y_{:, :}$">
 </DD>
 <DT><STRONG><IMG
  WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img57.png"
+ SRC="img58.png"
  ALT="$T$"></STRONG></DT>
 <DD>is the global sparse block triangular submatrix <IMG
  WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img57.png"
+ SRC="img58.png"
  ALT="$T$">
 </DD>
 <DT><STRONG><IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img58.png"
+ SRC="img59.png"
  ALT="$D$"></STRONG></DT>
 <DD>is the scaling diagonal matrix.
 </DD>
 <DT><STRONG><IMG
  WIDTH="45" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img54.png"
+ SRC="img55.png"
  ALT="$P_r, P_c$"></STRONG></DT>
 <DD>are the permutation matrices.
 </DD>
@@ -137,7 +137,7 @@ call psb_spsm(alpha, t, x, beta, y, desc_a, info,&amp;
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1427"></A>
+<DIV ALIGN="CENTER"><A NAME="1429"></A>
 <TABLE>
 <CAPTION><STRONG>Table 12:</STRONG>
 Data types</CAPTION>
@@ -146,22 +146,22 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img57.png"
+ SRC="img58.png"
  ALT="$T$">, <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$">, <IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img58.png"
+ SRC="img59.png"
  ALT="$D$">, <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img29.png"
  ALT="$\alpha$">, <IMG
  WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img30.png"
  ALT="$\beta$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -195,7 +195,7 @@ Data types</CAPTION>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img29.png"
  ALT="$\alpha$">.
 <BR>
 Scope: <B>global</B> 
@@ -211,7 +211,7 @@ Table&nbsp;<A HREF="#tab:f90spsm">12</A>.
 <DD>the global portion of the sparse matrix
 <IMG
  WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img57.png"
+ SRC="img58.png"
  ALT="$T$">.  
 <BR>
 Scope: <B>local</B> 
@@ -227,7 +227,7 @@ Specified as: a structured data type specified in
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$">. 
 
 <BR>
@@ -241,16 +241,16 @@ Specified as:  a rank one or two array
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spsm">12</A>.  The rank of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>beta</STRONG></DT>
 <DD>the scalar <IMG
  WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img30.png"
  ALT="$\beta$">.
 <BR>
 Scope: <B>global</B> 
@@ -265,7 +265,7 @@ Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f9
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$">. 
 
 <BR>
@@ -279,10 +279,10 @@ Specified as:  a rank one or two array
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spsm">12</A>. The rank of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$"> must be the same of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$">. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -317,7 +317,7 @@ Intent: <B>in</B>.
 <BR>
 Default: <IMG
  WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img55.png"
+ SRC="img56.png"
  ALT="$trans = N$">
 <BR>
 Specified as: a character variable.
@@ -343,7 +343,7 @@ Intent: <B>in</B>.
 <BR>
 Default: <IMG
  WIDTH="76" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img59.png"
+ SRC="img60.png"
  ALT="$unitd = U$">
 <BR>
 Specified as: a character variable.
@@ -389,7 +389,7 @@ Default: <!-- MATH
  -->
 <IMG
  WIDTH="165" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img60.png"
+ SRC="img61.png"
  ALT="$diag(1) = 1 (no scaling)$">
 <BR>
 Specified as: a rank one  array containing numbers of the type
@@ -406,7 +406,7 @@ Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img27.png"
  ALT="$x$"> with the
 TARGET attribute. 
 
@@ -419,7 +419,7 @@ TARGET attribute.
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img28.png"
  ALT="$y$">. 
 
 <BR>
