@@ -56,10 +56,10 @@ module psb_const_mod
   ! 
   ! Version
   !
-  character(len=*), parameter :: psb_version_string = "3.0.0"
-  integer, parameter          :: psb_version_major  = 3
-  integer, parameter          :: psb_version_minor  = 0
-  integer, parameter          :: psb_patchlevel     = 0
+  character(len=*), parameter :: psb_version_string_ = "3.0.0"
+  integer, parameter          :: psb_version_major_  = 3
+  integer, parameter          :: psb_version_minor_  = 0
+  integer, parameter          :: psb_patchlevel_     = 0
 
   !
   !     Handy & miscellaneous constants

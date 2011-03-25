@@ -98,7 +98,7 @@ program df_sample
   !
   if (iam == psb_root_) then 
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
-    write(*,*) 'This is the ',name,' sample program'
+    write(*,*) 'This is the ',trim(name),' sample program'
   end if
   !
   !  get parameters
