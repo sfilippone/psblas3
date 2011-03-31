@@ -335,7 +335,7 @@ ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext
 dnl Warning : square brackets are EVIL!
 [cat > conftest.$ac_ext <<EOF
            program test
-	       use psb_sparse_mod
+	       use psb_base_mod
            end program test
 EOF
 if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then

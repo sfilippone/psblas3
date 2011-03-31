@@ -106,9 +106,9 @@ end subroutine psb_dfree
 !    frees a dense matrix structure
 ! 
 ! Arguments: 
-!    x():)    - real, allocatable              The dense matrix to be freed.
-!    desc_a   - type(psb_desc_type).         The communication descriptor.
-!    info     - integer.                       Return code
+!    x(:)     - real, allocatable         The dense matrix to be freed.
+!    desc_a   - type(psb_desc_type).      The communication descriptor.
+!    info     - integer.                    Return code
 subroutine psb_dfreev(x, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_dfreev
   implicit none
