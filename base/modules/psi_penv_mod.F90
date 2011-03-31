@@ -146,7 +146,7 @@ contains
 #else    
     call mpi_initialized(initialized,info)
     if ((.not.initialized).or.(info /= mpi_success)) then 
-      call mpi_init(info) 
+      if (info == mpi_success) call mpi_init(info) 
       if (info /= mpi_success) then
         write(psb_err_unit,*) 'Error in initalizing MPI, bailing out',info 
         stop 

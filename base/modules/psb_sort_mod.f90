@@ -647,4 +647,77 @@ module psb_sort_mod
   end interface
   
 
+  interface psb_free_heap
+    module procedure psb_free_int_heap, psb_free_int_idx_heap,&
+         & psb_free_real_idx_heap, psb_free_scomplex_idx_heap, &
+         & psb_free_double_idx_heap, psb_free_dcomplex_idx_heap
+  end interface
+
+contains
+
+  subroutine psb_free_int_heap(heap,info)
+    implicit none 
+    type(psb_int_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+
+  end subroutine psb_free_int_heap
+
+  subroutine psb_free_real_idx_heap(heap,info)
+    implicit none 
+    type(psb_real_idx_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+    if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
+
+  end subroutine psb_free_real_idx_heap
+
+  subroutine psb_free_double_idx_heap(heap,info)
+    implicit none 
+    type(psb_double_idx_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+    if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
+
+  end subroutine psb_free_double_idx_heap
+
+  subroutine psb_free_int_idx_heap(heap,info)
+    implicit none 
+    type(psb_int_idx_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+    if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
+
+  end subroutine psb_free_int_idx_heap
+
+  subroutine psb_free_scomplex_idx_heap(heap,info)
+    implicit none 
+    type(psb_scomplex_idx_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+    if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
+
+  end subroutine psb_free_scomplex_idx_heap
+
+  subroutine psb_free_dcomplex_idx_heap(heap,info)
+    implicit none 
+    type(psb_dcomplex_idx_heap), intent(inout) :: heap
+    integer, intent(out)           :: info
+
+    info=psb_success_
+    if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
+    if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
+
+  end subroutine psb_free_dcomplex_idx_heap
+
 end module psb_sort_mod

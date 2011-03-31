@@ -1,5 +1,5 @@
 11                  Number of inputs
-thm1000x600.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+thm200x120.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
 NONE                sherman3_rhs1.mtx                     http://www.cise.ufl.edu/research/sparse/matrices/index.html
 MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
 BICGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
