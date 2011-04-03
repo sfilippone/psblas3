@@ -1,6 +1,7 @@
 include Make.inc
 
 all: libd based precd kryld utild
+	(cd opt; $(MAKE) lib)
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -33,6 +34,7 @@ clean:
 	(cd prec; $(MAKE) clean )
 	(cd krylov; $(MAKE) clean)
 	(cd util; $(MAKE) clean)
+	(cd opt; $(MAKE) clean)
 
 check: all
 	make check -C test/serial
