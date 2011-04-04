@@ -1,0 +1,4 @@
+A proposed list of problems.
+
+20110404	shall set up a fallback (./configure-backed) scheme when the mangling scheme does not get guessed by ./configure;  
+

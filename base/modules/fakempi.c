@@ -2,6 +2,22 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef LowerUnderscore
+#ifndef LowerDoubleUnderscore
+#ifndef LowerCase
+#ifndef UpperUnderscore
+#ifndef UpperDoubleUnderscore 
+#ifndef UpperCase
+#define LowerUnderscore 1  /* 20110404 the default */
+/* #error "should specify a default mangling scheme" */
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+
+
 #ifdef LowerUnderscore
 #define mpi_wtime       mpi_wtime_
 #define mpi_send        mpi_send_
