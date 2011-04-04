@@ -7,7 +7,9 @@ program d_matgen
   use psb_d_cxx_mat_mod
   use psb_d_cyy_mat_mod
   use psb_d_czz_mat_mod
+#ifdef HAVE_LIBRSB
   use psb_d_rsb_mat_mod
+#endif
   implicit none
 
   ! input parameters
@@ -33,8 +35,11 @@ program d_matgen
   integer            :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
+#ifdef HAVE_LIBRSB
   type(psb_d_rsb_sparse_mat) :: arsb
+#endif
   type(psb_d_cyy_sparse_mat) :: acyy
+  type(psb_d_csr_sparse_mat) :: acsr
   type(psb_d_czz_sparse_mat) :: aczz
   type(psb_d_cxx_sparse_mat) :: acxx
   
@@ -44,9 +49,11 @@ program d_matgen
 
   info=psb_success_
 
-  info=psv_rsb_mat_init()
+#ifdef HAVE_LIBRSB
+  info=psb_rsb_matmod_init()
   if(info/=psb_success_)info=psb_err_from_subroutine_
   if(info/=psb_success_)goto 9999
+#endif
 
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
@@ -73,7 +80,12 @@ program d_matgen
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acyy)  
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,aczz)  
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
+#ifdef HAVE_LIBRSB
   call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,arsb)  
+  !call psb_d_rsb_print(-1,arsb)! FIXME: is there a default for the integer arg ?
+#else
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acsr)
+#endif
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
