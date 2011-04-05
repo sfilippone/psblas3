@@ -21,13 +21,12 @@ lib:  $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
 $(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 
-$(LIBDIR)/$(LIBMOD):
+$(LIBDIR)/$(LIBMOD): $(LIBMOD)
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
-$(HERE)/$(LIBNAME):
+$(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-
 
 psb_util_mod.o: $(BASEOBJS)
 
