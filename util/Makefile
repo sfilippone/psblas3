@@ -16,11 +16,17 @@ LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 
-lib:  $(OBJS) 
+lib:  $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
+
+$(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
+	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
+
+$(LIBDIR)/$(LIBMOD):
+	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
+
+$(HERE)/$(LIBNAME):
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
 
 psb_util_mod.o: $(BASEOBJS)

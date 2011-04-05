@@ -13,7 +13,9 @@ LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
 
-lib: mpfobjs $(OBJS)
+lib: mpfobjs $(OBJS) $(LIBDIR)/$(LIBNAME)
+
+$(LIBDIR)/$(LIBNAME): $(MPFOBJS) $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 

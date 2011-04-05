@@ -32,12 +32,13 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  penvmod  $(UTIL_MODS)  $(OBJS)  
-	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
-	$(RANLIB) $(LIBDIR)/$(LIBNAME)
+lib:  penvmod  $(UTIL_MODS)  $(OBJS)  $(LIBDIR)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
+$(LIBDIR)/$(LIBNAME): $(MODULES) $(OBJS) $(MPFOBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 psi_comm_buffers_mod.o: psb_const_mod.o 
 psi_penv_mod.o: psi_comm_buffers_mod.o psb_const_mod.o psb_realloc_mod.o 

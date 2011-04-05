@@ -31,9 +31,12 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(SPARKERDIR)  $(FMFLAG
 
 default: lib
 
-lib: $(OBJS)
+lib: $(LIBDIR)/$(LIBNAME)
+
+$(LIBDIR)/$(LIBNAME): $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
+
 zlsr.o  zlsrx.o:  zlcmp_mod.o
 zalsr.o zalsrx.o: zalcmp_mod.o
 zasr.o  zasrx.o:  zacmp_mod.o
