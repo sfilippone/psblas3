@@ -35,8 +35,8 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 lib:  penvmod  $(UTIL_MODS)  $(OBJS)  
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
-	/bin/cp -p $(LIBMOD) $(LIBDIR)
-	/bin/cp -p *$(.mod) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 
 psi_comm_buffers_mod.o: psb_const_mod.o 

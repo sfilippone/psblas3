@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <string.h>
+#include "psb_internals.h"
 
 #ifdef LowerUnderscore
 #define psi_c_diffadd   psi_c_diffadd_
