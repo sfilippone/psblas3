@@ -18,8 +18,10 @@ module psb_d_rsb_mat_mod
 #endif
 #if 1
 #define PSBRSB_DEBUG(MSG) write(*,*) __FILE__,':',__LINE__,':',MSG
+#define PSBRSB_ERROR(MSG) write(*,*) __FILE__,':',__LINE__,':'," ERROR: ",MSG
 #else
 #define PSBRSB_DEBUG(MSG)
+#define PSBRSB_ERROR(MSG)
 #endif
   integer, parameter :: c_d_typecode=68 ! FIXME: this is only valid for 'double'
   integer, parameter :: c_for_flags=1 ! : here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
@@ -254,6 +256,7 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
+    PSBRSB_ERROR("!")
     call psb_error()
     return
   end if
@@ -445,6 +448,7 @@ subroutine psb_d_rsb_mold(a,b,info)
   return
 9999 continue
   if (err_act /= psb_act_ret_) then
+    PSBRSB_ERROR("!")
     call psb_error()
   end if
   return
@@ -633,7 +637,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
   ! FIXME: MISSING THE HANDLING OF OPTIONS, HERE
-  !  PSBRSB_DEBUG('')
+  PSBRSB_DEBUG('')
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -675,6 +679,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     cscale_ = .false.
   endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
+    PSBRSB_ERROR("!")
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
@@ -700,6 +705,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
+    PSBRSB_ERROR("!")
     call psb_error()
     return
   end if
@@ -727,10 +733,28 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
   logical, parameter :: debug=.false.
     PSBRSB_DEBUG('')
 
-    if (append) then 
+    if (present(iren).or.present(rscale).or.present(cscale)) then 
+      ! FIXME: error condition
+      PSBRSB_ERROR("unsupported optional arguments!")
+      call psb_error()
+    endif
+
+    if (present(append).and.append.and.present(nzin)) then 
       nzin_ = nzin
     else
       nzin_ = 0
+    endif
+
+    if (present(jmin)) then 
+      jmin_ = jmin
+    else
+      jmin_ = 1
+    endif
+
+    if (present(jmax)) then 
+      jmax_ = jmax
+    else
+      jmax_ = a%get_nrows()
     endif
 
     !nzt = ..
@@ -745,10 +769,13 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
     call psb_ensure_size(nzin_,ia,info)
     if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
-    if (info /= psb_success_) return
+    if (info /= psb_success_)then
+      PSBRSB_ERROR("!")
+      return
+    endif
     
     info=d_rsb_to_psb_info(rsb_get_block_sparse_pattern&
-    &(a%rsbmptr,imin,imax,jmin,jmax,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
+    &(a%rsbmptr,imin,imax,jmin_,jmax_,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
     ! FIXME: unfinished; missing error handling ..
 end subroutine psb_d_rsb_csgetptn
 
@@ -768,6 +795,9 @@ subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
   PSBRSB_DEBUG('')
+  if(present(gtl))then
+    PSBRSB_ERROR("!")
+  endif
   info=d_rsb_to_psb_info(rsb_update_elements(a%rsbmptr,val,ia,ja,nz,c_upd_flags))
 end subroutine psb_d_rsb_csput
 
