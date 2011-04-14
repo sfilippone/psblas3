@@ -80,6 +80,10 @@ module psb_d_linmap_mod
     module procedure psb_set_dmap_kind
   end interface
 
+  interface psb_map_cscnv
+    module procedure psb_d_map_cscnv
+  end interface
+
   interface psb_is_asb_map
     module procedure psb_is_asb_dlinmap
   end interface
@@ -130,6 +134,19 @@ contains
     map%itd_data(psb_map_kind_) = map_kind
 
   end subroutine psb_set_dmap_kind
+
+  subroutine psb_d_map_cscnv(map,info,type,mold)    
+    use psb_mat_mod
+    implicit none
+    type(psb_dlinmap_type), intent(inout)  :: map
+    integer, intent(out)                   :: info
+    character(len=*), intent(in), optional :: type
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+
+    call map%map_X2Y%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_) call map%map_Y2X%cscnv(info,type=type,mold=mold)
+
+  end subroutine psb_d_map_cscnv
 
   function psb_is_asb_dlinmap(map) result(this)
     use psb_descriptor_type

@@ -1013,8 +1013,8 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cscnv
   implicit none 
-  class(psb_dspmat_type), intent(in)    :: a
-  class(psb_dspmat_type), intent(out)   :: b
+  class(psb_dspmat_type), intent(in)     :: a
+  class(psb_dspmat_type), intent(out)    :: b
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl, upd
   character(len=*), optional, intent(in) :: type
@@ -1115,7 +1115,7 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
   use psb_d_mat_mod, psb_protect_name => psb_d_cscnv_ip
   implicit none 
 
-  class(psb_dspmat_type), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout)  :: a
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl
   character(len=*), optional, intent(in) :: type
