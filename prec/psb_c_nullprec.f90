@@ -26,7 +26,7 @@ contains
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_c_null_prec_type), intent(in)  :: prec
-    complex(psb_spk_),intent(in)         :: x(:)
+    complex(psb_spk_),intent(inout)      :: x(:)
     complex(psb_spk_),intent(in)         :: alpha, beta
     complex(psb_spk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info

@@ -28,7 +28,7 @@ contains
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_s_diag_prec_type), intent(in)  :: prec
-    real(psb_spk_),intent(in)         :: x(:)
+    real(psb_spk_),intent(inout)      :: x(:)
     real(psb_spk_),intent(in)         :: alpha, beta
     real(psb_spk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info

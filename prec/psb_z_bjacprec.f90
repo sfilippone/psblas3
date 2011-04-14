@@ -35,7 +35,7 @@ contains
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_z_bjac_prec_type), intent(in)  :: prec
     complex(psb_dpk_),intent(in)         :: alpha,beta
-    complex(psb_dpk_),intent(in)         :: x(:)
+    complex(psb_dpk_),intent(inout)      :: x(:)
     complex(psb_dpk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans

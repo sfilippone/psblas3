@@ -4,7 +4,7 @@ module psb_s_bjacprec
   
   type, extends(psb_s_base_prec_type) :: psb_s_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
-    type(psb_sspmat_type), allocatable :: av(:)
+    type(psb_sspmat_type), allocatable  :: av(:)
     real(psb_spk_), allocatable         :: d(:)
   contains
     procedure, pass(prec) :: apply     => psb_s_bjac_apply
@@ -35,7 +35,7 @@ contains
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_s_bjac_prec_type), intent(in)  :: prec
     real(psb_spk_),intent(in)         :: alpha,beta
-    real(psb_spk_),intent(in)         :: x(:)
+    real(psb_spk_),intent(inout)      :: x(:)
     real(psb_spk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans

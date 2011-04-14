@@ -74,29 +74,6 @@ module psb_d_prec_type
     module procedure psb_dprec_sizeof
   end interface
 
-  interface psb_precaply
-    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_dpk_
-      import :: psb_dprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_dprec_type), intent(in)  :: prec
-      real(psb_dpk_),intent(in)         :: x(:)
-      real(psb_dpk_),intent(inout)      :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_dprc_aply
-    subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_dpk_
-      import :: psb_dprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_dprec_type), intent(in)  :: prec
-      real(psb_dpk_),intent(inout)      :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_dprc_aply1
-  end interface
-
 
 contains
 
@@ -220,7 +197,7 @@ contains
     call psb_info(ictxt, me, np)
     
     if (present(trans)) then 
-      trans_=trans
+      trans_=psb_toupper(trans)
     else
       trans_='N'
     end if
@@ -242,7 +219,7 @@ contains
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
     end if
-    call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
+    call prec%prec%apply(done,x,dzero,y,desc_data,info,trans=trans_,work=work_)
     if (present(work)) then 
     else
       deallocate(work_,stat=info)
@@ -302,7 +279,7 @@ contains
       call psb_errpush(info,name,a_err='Allocate')
       goto 9999      
     end if
-    call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
+    call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans=trans_,work=w1)
     if(info /= psb_success_) goto 9999
     x(:) = ww(:)
     deallocate(ww,W1,stat=info)

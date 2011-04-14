@@ -68,30 +68,6 @@ module psb_c_prec_type
     module procedure psb_cprec_sizeof
   end interface
 
-  interface psb_precaply
-    subroutine psb_cprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_spk_
-      import :: psb_cprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_cprec_type), intent(in)  :: prec
-      complex(psb_spk_),intent(in)      :: x(:)
-      complex(psb_spk_),intent(inout)   :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_cprc_aply
-    subroutine psb_cprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_spk_
-      import :: psb_cprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_cprec_type), intent(in)  :: prec
-      complex(psb_spk_),intent(inout)   :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_cprc_aply1
-  end interface
-
-
 contains
 
   
