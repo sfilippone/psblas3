@@ -22,9 +22,13 @@ OBJS=psb_d_ell_impl.o psb_d_ell_mat_mod.o rsb_mod.o psb_d_rsb_mat_mod.o
 
 LIBNAME=libpsb_opt.a
 
-lib: $(HERE)/$(LIBNAME)
+lib: $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
+
+$(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
+
+$(LIBDIR)/$(LIBMOD): $(LIBMOD)
+	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) *$(.mod) $(LIBDIR)
 
 $(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
