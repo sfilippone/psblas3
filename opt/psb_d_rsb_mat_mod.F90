@@ -764,6 +764,11 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
       call psb_error()
     endif
 
+    if (present(append)) then 
+      append_ = append
+    else
+      append_ = .false.
+    endif
     if (present(append).and.append.and.present(nzin)) then 
       nzin_ = nzin
     else
@@ -782,6 +787,28 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
       jmax_ = a%get_nrows()
     endif
 
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = psb_err_many_optional_arg_
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+  if (present(iren)) then 
+    info = c_psbrsb_err_ 
+      PSBRSB_ERROR("ERROR: the RSB pattern get needs iren support !!")
+    goto 9999
+  end if
+
+
     !nzt = ..
     nz = 0 
 
@@ -789,7 +816,8 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
 
     if (info /= psb_success_) return
-    nz=rsb_get_block_nnz(a%rsbmptr,imin,imax,imin,imax,c_for_flags,info)
+    nz=rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_for_flags,info)
+    !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
     ! FIXME: unfinished; missing error handling ..
 
     call psb_ensure_size(nzin_+nz,ia,info)
@@ -803,6 +831,7 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     &(a%rsbmptr,imin,imax,jmin_,jmax_,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
     ! FIXME: unfinished; missing error handling ..
 
+    !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
   if (rscale_) then 
     do i=nzin_+1, nzin_+nz
       ia(i) = ia(i) - imin + 1
@@ -814,6 +843,14 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     end do
   end if
 
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    PSBRSB_ERROR("!")
+    call psb_error()
+    return
+  endif
 
 end subroutine psb_d_rsb_csgetptn
 
