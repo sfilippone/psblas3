@@ -16,7 +16,7 @@ module psb_d_rsb_mat_mod
 #ifdef HAVE_LIBRSB
   use iso_c_binding  
 #endif
-#if 1
+#if 0
 #define PSBRSB_DEBUG(MSG) write(*,*) __FILE__,':',__LINE__,':',MSG
 #define PSBRSB_ERROR(MSG) write(*,*) __FILE__,':',__LINE__,':'," ERROR: ",MSG
 #define PSBRSB_WARNING(MSG) write(*,*) __FILE__,':',__LINE__,':'," WARNING: ",MSG
@@ -710,7 +710,7 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   if (nz /= nzrsb) then 
     info=c_psbrsb_err_ 
     PSBRSB_ERROR("Mismatch in output from rsb_getblk")
-    write(*,*) 'Mismatch in output from rsb_getblk: ',nz,nzrsb
+    !write(*,*) 'Mismatch in output from rsb_getblk: ',nz,nzrsb
  end if
 
   if (rscale_) then 
