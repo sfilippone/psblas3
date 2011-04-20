@@ -1,4 +1,4 @@
-module rsb_mod
+module rsb_d_mod
   use iso_c_binding
 
 ! module constants:
@@ -836,4 +836,4 @@ use iso_c_binding
  integer(c_int) :: errvalp
  end function rsb_load_matrix_file_as_matrix_market
 end interface
-end module rsb_mod
+end module rsb_d_mod

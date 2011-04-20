@@ -10,9 +10,9 @@
 ! * should substitute -1 with another valid PSBLAS error code
 ! * ..
 ! 
-module psb_d_rsb_mat_mod
-  use psb_d_base_mat_mod
-  use rsb_d_mod
+module psb_z_rsb_mat_mod
+  use psb_z_base_mat_mod
+  use rsb_z_mod
 #ifdef HAVE_LIBRSB
   use iso_c_binding  
 #endif
@@ -37,7 +37,7 @@ module psb_d_rsb_mat_mod
   integer :: c_f_order=c_for_flags        ! FIXME: here should use RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
   integer, parameter :: c_upd_flags =c_for_flags ! flags for when updating the assembled rsb matrix
   integer, parameter :: c_psbrsb_err_ =psb_err_internal_error_
-  type, extends(psb_d_base_sparse_mat) :: psb_d_rsb_sparse_mat
+  type, extends(psb_z_base_sparse_mat) :: psb_z_rsb_sparse_mat
 #ifdef HAVE_LIBRSB
     type(c_ptr) :: rsbmptr=c_null_ptr
   contains 
@@ -47,46 +47,46 @@ module psb_d_rsb_mat_mod
     procedure, pass(a) :: get_nrows   => d_rsb_get_nrows
     procedure, nopass  :: get_fmt      => d_rsb_get_fmt
     procedure, pass(a) :: sizeof       => d_rsb_sizeof
-    procedure, pass(a) :: d_csmm       => psb_d_rsb_csmm
-    !procedure, pass(a) :: d_csmv_nt       => psb_d_rsb_csmv_nt ! FIXME: a placeholder for future memory
-    procedure, pass(a) :: d_csmv       => psb_d_rsb_csmv
-    procedure, pass(a) :: d_inner_cssm => psb_d_rsb_cssm
-    procedure, pass(a) :: d_inner_cssv => psb_d_rsb_cssv
-    procedure, pass(a) :: d_scals      => psb_d_rsb_scals
-    procedure, pass(a) :: d_scal       => psb_d_rsb_scal
-    procedure, pass(a) :: csnmi        => psb_d_rsb_csnmi
-    procedure, pass(a) :: csnm1        => psb_d_rsb_csnm1
-    procedure, pass(a) :: rowsum       => psb_d_rsb_rowsum
-    procedure, pass(a) :: arwsum       => psb_d_rsb_arwsum
-    procedure, pass(a) :: colsum       => psb_d_rsb_colsum
-    procedure, pass(a) :: aclsum       => psb_d_rsb_aclsum
-!    procedure, pass(a) :: reallocate_nz => psb_d_rsb_reallocate_nz ! FIXME
-!    procedure, pass(a) :: allocate_mnnz => psb_d_rsb_allocate_mnnz ! FIXME
-    procedure, pass(a) :: cp_to_coo    => psb_d_cp_rsb_to_coo
-    procedure, pass(a) :: cp_from_coo  => psb_d_cp_rsb_from_coo
-    procedure, pass(a) :: cp_to_fmt    => psb_d_cp_rsb_to_fmt
-    procedure, pass(a) :: cp_from_fmt  => psb_d_cp_rsb_from_fmt
-    procedure, pass(a) :: mv_to_coo    => psb_d_mv_rsb_to_coo
-    procedure, pass(a) :: mv_from_coo  => psb_d_mv_rsb_from_coo
-    procedure, pass(a) :: mv_to_fmt    => psb_d_mv_rsb_to_fmt
-    procedure, pass(a) :: mv_from_fmt  => psb_d_mv_rsb_from_fmt
-    procedure, pass(a) :: csput        => psb_d_rsb_csput
-    procedure, pass(a) :: get_diag     => psb_d_rsb_get_diag
-    procedure, pass(a) :: csgetptn     => psb_d_rsb_csgetptn
-    procedure, pass(a) :: d_csgetrow   => psb_d_rsb_csgetrow
+    procedure, pass(a) :: d_csmm       => psb_z_rsb_csmm
+    !procedure, pass(a) :: d_csmv_nt       => psb_z_rsb_csmv_nt ! FIXME: a placeholder for future memory
+    procedure, pass(a) :: d_csmv       => psb_z_rsb_csmv
+    procedure, pass(a) :: d_inner_cssm => psb_z_rsb_cssm
+    procedure, pass(a) :: d_inner_cssv => psb_z_rsb_cssv
+    procedure, pass(a) :: d_scals      => psb_z_rsb_scals
+    procedure, pass(a) :: d_scal       => psb_z_rsb_scal
+    procedure, pass(a) :: csnmi        => psb_z_rsb_csnmi
+    procedure, pass(a) :: csnm1        => psb_z_rsb_csnm1
+    procedure, pass(a) :: rowsum       => psb_z_rsb_rowsum
+    procedure, pass(a) :: arwsum       => psb_z_rsb_arwsum
+    procedure, pass(a) :: colsum       => psb_z_rsb_colsum
+    procedure, pass(a) :: aclsum       => psb_z_rsb_aclsum
+!    procedure, pass(a) :: reallocate_nz => psb_z_rsb_reallocate_nz ! FIXME
+!    procedure, pass(a) :: allocate_mnnz => psb_z_rsb_allocate_mnnz ! FIXME
+    procedure, pass(a) :: cp_to_coo    => psb_z_cp_rsb_to_coo
+    procedure, pass(a) :: cp_from_coo  => psb_z_cp_rsb_from_coo
+    procedure, pass(a) :: cp_to_fmt    => psb_z_cp_rsb_to_fmt
+    procedure, pass(a) :: cp_from_fmt  => psb_z_cp_rsb_from_fmt
+    procedure, pass(a) :: mv_to_coo    => psb_z_mv_rsb_to_coo
+    procedure, pass(a) :: mv_from_coo  => psb_z_mv_rsb_from_coo
+    procedure, pass(a) :: mv_to_fmt    => psb_z_mv_rsb_to_fmt
+    procedure, pass(a) :: mv_from_fmt  => psb_z_mv_rsb_from_fmt
+    procedure, pass(a) :: csput        => psb_z_rsb_csput
+    procedure, pass(a) :: get_diag     => psb_z_rsb_get_diag
+    procedure, pass(a) :: csgetptn     => psb_z_rsb_csgetptn
+    procedure, pass(a) :: d_csgetrow   => psb_z_rsb_csgetrow
     procedure, pass(a) :: get_nz_row   => d_rsb_get_nz_row
-    procedure, pass(a) :: reinit       => psb_d_rsb_reinit
-    procedure, pass(a) :: trim         => psb_d_rsb_trim ! evil
-    procedure, pass(a) :: print        => psb_d_rsb_print
+    procedure, pass(a) :: reinit       => psb_z_rsb_reinit
+    procedure, pass(a) :: trim         => psb_z_rsb_trim ! evil
+    procedure, pass(a) :: print        => psb_z_rsb_print
     procedure, pass(a) :: free         => d_rsb_free
-    procedure, pass(a) :: mold         => psb_d_rsb_mold
-    procedure, pass(a) :: psb_d_rsb_cp_from
-    generic, public    :: cp_from => psb_d_rsb_cp_from
-    procedure, pass(a) :: psb_d_rsb_mv_from
-    generic, public    :: mv_from => psb_d_rsb_mv_from
+    procedure, pass(a) :: mold         => psb_z_rsb_mold
+    procedure, pass(a) :: psb_z_rsb_cp_from
+    generic, public    :: cp_from => psb_z_rsb_cp_from
+    procedure, pass(a) :: psb_z_rsb_mv_from
+    generic, public    :: mv_from => psb_z_rsb_mv_from
 
 #endif
-  end type psb_d_rsb_sparse_mat
+  end type psb_z_rsb_sparse_mat
   ! FIXME: complete the following
   !private :: d_rsb_get_nzeros, d_rsb_get_fmt
   private :: d_rsb_to_psb_info
@@ -128,7 +128,7 @@ module psb_d_rsb_mat_mod
  function d_rsb_get_flags(a) result(flags)
     implicit none 
     integer :: flags
-    class(psb_d_base_sparse_mat), intent(in) :: a
+    class(psb_z_base_sparse_mat), intent(in) :: a
     !PSBRSB_DEBUG('')
     flags=c_def_flags 
     if(a%is_sorted()) flags=flags+c_srt_flags 
@@ -140,7 +140,7 @@ module psb_d_rsb_mat_mod
 
   function d_rsb_get_nzeros(a) result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer :: res
     !PSBRSB_DEBUG('')
     res=rsb_get_matrix_nnz(a%rsbmptr)
@@ -148,7 +148,7 @@ module psb_d_rsb_mat_mod
 
   function d_rsb_get_nrows(a) result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer :: res
     !PSBRSB_DEBUG('')
     res=rsb_get_matrix_n_rows(a%rsbmptr)
@@ -156,7 +156,7 @@ module psb_d_rsb_mat_mod
 
   function d_rsb_get_ncols(a) result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer :: res
     !PSBRSB_DEBUG('')
     res=rsb_get_matrix_n_columns(a%rsbmptr)
@@ -172,7 +172,7 @@ module psb_d_rsb_mat_mod
   
   function d_rsb_get_size(a) result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer :: res
     !PSBRSB_DEBUG('')
     res = d_rsb_get_nzeros(a)
@@ -180,17 +180,17 @@ module psb_d_rsb_mat_mod
 
   function d_rsb_sizeof(a) result(res)
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     !PSBRSB_DEBUG('')
     res=rsb_sizeof(a%rsbmptr)
   end function d_rsb_sizeof
 
-subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_rsb_csmv(alpha,a,x,beta,y,info,trans) 
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in) :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in) :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout)       :: y(:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
   character :: trans_
@@ -203,30 +203,30 @@ subroutine psb_d_rsb_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   info=d_rsb_to_psb_info(rsb_spmv(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,x,1,beta,y,1))
-end subroutine psb_d_rsb_csmv
+end subroutine psb_z_rsb_csmv
 
-subroutine psb_d_rsb_csmv_nt(alpha,a,x1,x2,beta,y1,y2,info) 
+subroutine psb_z_rsb_csmv_nt(alpha,a,x1,x2,beta,y1,y2,info) 
   ! FIXME: this routine is here as a placeholder for a specialized implementation of 
   ! joint spmv and spmv transposed.
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in) :: alpha, beta, x1(:), x2(:)
-  real(psb_dpk_), intent(inout)       :: y1(:), y2(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in) :: alpha, beta, x1(:), x2(:)
+  complex(psb_dpk_), intent(inout)       :: y1(:), y2(:)
   integer, intent(out)                :: info
 !    PSBRSB_DEBUG('')
   info = psb_success_
   info=d_rsb_to_psb_info(rsb_spmv_nt(alpha,a%rsbmptr,x1,x2,1,beta,y1,y2,1))
   return
-end subroutine psb_d_rsb_csmv_nt
+end subroutine psb_z_rsb_csmv_nt
 
-subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_rsb_cssv(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   ! FIXME: and what when x is an alias of y ?
   ! FIXME: ignoring beta
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in) :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in) :: alpha, beta, x(:)
+  complex(psb_dpk_), intent(inout)       :: y(:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
   character :: trans_
@@ -265,46 +265,46 @@ subroutine psb_d_rsb_cssv(alpha,a,x,beta,y,info,trans)
   end if
   return
     
-end subroutine psb_d_rsb_cssv
+end subroutine psb_z_rsb_cssv
 
-subroutine psb_d_rsb_scals(d,a,info) 
+subroutine psb_z_rsb_scals(d,a,info) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d
   integer, intent(out)            :: info
     PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_elemental_scale(a%rsbmptr,d))
-end subroutine psb_d_rsb_scals
+end subroutine psb_z_rsb_scals
 
-subroutine psb_d_rsb_scal(d,a,info) 
+subroutine psb_z_rsb_scal(d,a,info) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d(:)
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: d(:)
   integer, intent(out)            :: info
     PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_scale_rows(a%rsbmptr,d))
-end subroutine psb_d_rsb_scal
+end subroutine psb_z_rsb_scal
 
   subroutine  d_rsb_free(a) 
     implicit none 
-    class(psb_d_rsb_sparse_mat), intent(inout) :: a
+    class(psb_z_rsb_sparse_mat), intent(inout) :: a
     type(c_ptr) :: dummy
     !PSBRSB_DEBUG('freeing RSB matrix')
     dummy=rsb_free_sparse_matrix(a%rsbmptr)
   end subroutine d_rsb_free
 
-subroutine  psb_d_rsb_trim(a)
+subroutine  psb_z_rsb_trim(a)
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
     !PSBRSB_DEBUG('')
   ! FIXME: this is supposed to remain empty for RSB
-end subroutine  psb_d_rsb_trim
+end subroutine  psb_z_rsb_trim
 
-    subroutine psb_d_rsb_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    subroutine psb_z_rsb_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       integer, intent(in)               :: iout
-      class(psb_d_rsb_sparse_mat), intent(in) :: a   
+      class(psb_z_rsb_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
       integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
@@ -313,61 +313,61 @@ end subroutine  psb_d_rsb_trim
     PSBRSB_DEBUG('')
       ! FIXME: UNFINISHED
       info=rsb_print_matrix_t(a%rsbmptr)
-    end subroutine psb_d_rsb_print
+    end subroutine psb_z_rsb_print
 
-    subroutine psb_d_rsb_get_diag(a,d,info) 
-      class(psb_d_rsb_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)     :: d(:)
+    subroutine psb_z_rsb_get_diag(a,d,info) 
+      class(psb_z_rsb_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(out)     :: d(:)
       integer, intent(out)            :: info
       !PSBRSB_DEBUG('')
       info=rsb_getdiag(a%rsbmptr,d)
-    end subroutine psb_d_rsb_get_diag
+    end subroutine psb_z_rsb_get_diag
   
-function psb_d_rsb_csnmi(a) result(csnmi_res)
+function psb_z_rsb_csnmi(a) result(csnmi_res)
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
   real(psb_dpk_),target         :: csnmi_res ! please DO NOT rename this variable (see the Makefile)
-  real(psb_dpk_)         :: resa(1)
+  complex(psb_dpk_)         :: resa(1)
   integer             :: info
     !PSBRSB_DEBUG('')
   info=rsb_infinity_norm(a%rsbmptr,resa,rsb_psblas_trans_to_rsb_trans('N'))
   !info=rsb_infinity_norm(a%rsbmptr,c_loc(res),rsb_psblas_trans_to_rsb_trans('N'))
   csnmi_res=resa(1)
-end function psb_d_rsb_csnmi
+end function psb_z_rsb_csnmi
 
-function psb_d_rsb_csnm1(a) result(res)
+function psb_z_rsb_csnm1(a) result(res)
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_)         :: res
-  real(psb_dpk_)         :: resa(1)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_)         :: res
+  complex(psb_dpk_)         :: resa(1)
   integer             :: info
     PSBRSB_DEBUG('')
   info=rsb_one_norm(a%rsbmptr,resa,rsb_psblas_trans_to_rsb_trans('N'))
   !info=rsb_one_norm(a%rsbmptr,res,rsb_psblas_trans_to_rsb_trans('N'))
-end function psb_d_rsb_csnm1
+end function psb_z_rsb_csnm1
 
-subroutine psb_d_rsb_aclsum(d,a) 
+subroutine psb_z_rsb_aclsum(d,a) 
   use psb_base_mod
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)              :: d(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)              :: d(:)
     PSBRSB_DEBUG('')
   info=rsb_absolute_columns_sums(a%rsbmptr,d)
-end subroutine psb_d_rsb_aclsum
+end subroutine psb_z_rsb_aclsum
 
-subroutine psb_d_rsb_arwsum(d,a) 
+subroutine psb_z_rsb_arwsum(d,a) 
   use psb_base_mod
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)              :: d(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)              :: d(:)
     PSBRSB_DEBUG('')
   info=rsb_absolute_rows_sums(a%rsbmptr,d)
-end subroutine psb_d_rsb_arwsum
+end subroutine psb_z_rsb_arwsum
 
-subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_rsb_csmm(alpha,a,x,beta,y,info,trans) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_dpk_), intent(inout)       :: y(:,:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
 
@@ -385,14 +385,14 @@ subroutine psb_d_rsb_csmm(alpha,a,x,beta,y,info,trans)
   nc=min(size(x,2),size(y,2) )
   info=-1
   info=d_rsb_to_psb_info(rsb_spmm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,x,ldx,beta,y,ldy))
-end subroutine psb_d_rsb_csmm
+end subroutine psb_z_rsb_csmm
 
-subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans) 
+subroutine psb_z_rsb_cssm(alpha,a,x,beta,y,info,trans) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_dpk_), intent(inout)       :: y(:,:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
   integer :: ldy,ldx,nc
@@ -410,29 +410,29 @@ subroutine psb_d_rsb_cssm(alpha,a,x,beta,y,info,trans)
   info=d_rsb_to_psb_info(rsb_spsm(rsb_psblas_trans_to_rsb_trans(trans_),alpha,a%rsbmptr,nc,c_f_order,beta,x,ldx,y,ldy))
 end subroutine
 
-subroutine psb_d_rsb_rowsum(d,a) 
+subroutine psb_z_rsb_rowsum(d,a) 
   use psb_base_mod
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)             :: d(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)             :: d(:)
   integer :: info
     PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_rows_sums(a%rsbmptr,d))
-end subroutine psb_d_rsb_rowsum
+end subroutine psb_z_rsb_rowsum
 
-subroutine psb_d_rsb_colsum(d,a) 
+subroutine psb_z_rsb_colsum(d,a) 
   use psb_base_mod
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)             :: d(:)
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(out)             :: d(:)
   integer :: info
     PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_columns_sums(a%rsbmptr,d))
-end subroutine psb_d_rsb_colsum
+end subroutine psb_z_rsb_colsum
 
-subroutine psb_d_rsb_mold(a,b,info) 
+subroutine psb_z_rsb_mold(a,b,info) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in)  :: a
-  class(psb_d_base_sparse_mat), intent(out), allocatable  :: b
+  class(psb_z_rsb_sparse_mat), intent(in)  :: a
+  class(psb_z_base_sparse_mat), intent(out), allocatable  :: b
   integer, intent(out)                    :: info
   Integer :: err_act
   character(len=20)  :: name='reallocate_nz'
@@ -441,7 +441,7 @@ subroutine psb_d_rsb_mold(a,b,info)
 
   call psb_get_erraction(err_act)
   
-  allocate(psb_d_rsb_sparse_mat :: b, stat=info)
+  allocate(psb_z_rsb_sparse_mat :: b, stat=info)
 
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_ 
@@ -455,21 +455,21 @@ subroutine psb_d_rsb_mold(a,b,info)
     call psb_error()
   end if
   return
-end subroutine psb_d_rsb_mold
+end subroutine psb_z_rsb_mold
 
-subroutine psb_d_rsb_reinit(a,clear)
+subroutine psb_z_rsb_reinit(a,clear)
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a   
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a   
   logical, intent(in), optional :: clear
   Integer :: info
     PSBRSB_DEBUG('')
   info=d_rsb_to_psb_info(rsb_reinit_matrix(a%rsbmptr))
-end subroutine psb_d_rsb_reinit
+end subroutine psb_z_rsb_reinit
 
 
   function  d_rsb_get_nz_row(idx,a) result(res)
     implicit none
-    class(psb_d_rsb_sparse_mat), intent(in) :: a
+    class(psb_z_rsb_sparse_mat), intent(in) :: a
     integer, intent(in)                  :: idx
     integer                              :: res
     integer                              :: info
@@ -480,10 +480,10 @@ end subroutine psb_d_rsb_reinit
     if(info.ne.0)res=0
   end function d_rsb_get_nz_row
 
-subroutine psb_d_cp_rsb_to_coo(a,b,info) 
+subroutine psb_z_cp_rsb_to_coo(a,b,info) 
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(in)  :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_rsb_sparse_mat), intent(in)  :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                      :: info
 
   integer, allocatable :: itemp(:)
@@ -498,7 +498,7 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
   call b%allocate(nr,nc,nza)
-  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+  call b%psb_z_base_sparse_mat%cp_from(a%psb_z_base_sparse_mat)
   info=d_rsb_to_psb_info(rsb_get_coo(a%rsbmptr,b%val,b%ia,b%ja,c_for_flags))
   call b%set_nzeros(a%get_nzeros())
   call b%set_nrows(a%get_nrows())
@@ -513,18 +513,18 @@ subroutine psb_d_cp_rsb_to_coo(a,b,info)
   !write(*,*)a%get_nrows()
   !write(*,*)a%get_ncols()
   !write(*,*)a%get_nzeros()
-end subroutine psb_d_cp_rsb_to_coo
+end subroutine psb_z_cp_rsb_to_coo
 
-subroutine psb_d_cp_rsb_to_fmt(a,b,info) 
+subroutine psb_z_cp_rsb_to_fmt(a,b,info) 
   use psb_base_mod
   implicit none 
 
-  class(psb_d_rsb_sparse_mat), intent(in)   :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_z_rsb_sparse_mat), intent(in)   :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer, intent(out)                       :: info
 
   !locals
-  type(psb_d_coo_sparse_mat) :: tmp
+  type(psb_z_coo_sparse_mat) :: tmp
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act, nc
   integer              :: debug_level, debug_unit
@@ -534,11 +534,11 @@ subroutine psb_d_cp_rsb_to_fmt(a,b,info)
   info = psb_success_
 
   select type (b)
-  type is (psb_d_coo_sparse_mat) 
+  type is (psb_z_coo_sparse_mat) 
     call a%cp_to_coo(b,info)
 
-  type is (psb_d_rsb_sparse_mat) 
-    call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)! FIXME: ?
+  type is (psb_z_rsb_sparse_mat) 
+    call b%psb_z_base_sparse_mat%cp_from(a%psb_z_base_sparse_mat)! FIXME: ?
     b%rsbmptr=rsb_clone(a%rsbmptr) ! FIXME is thi enough ?
     ! FIXME: error handling needed here
 
@@ -546,14 +546,14 @@ subroutine psb_d_cp_rsb_to_fmt(a,b,info)
     call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
-end subroutine psb_d_cp_rsb_to_fmt
+end subroutine psb_z_cp_rsb_to_fmt
 
-subroutine psb_d_cp_rsb_from_coo(a,b,info) 
+subroutine psb_z_cp_rsb_from_coo(a,b,info) 
   use psb_base_mod
   implicit none 
 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(in)    :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(in)    :: b
   integer, intent(out)                        :: info
 
   integer, allocatable :: itemp(:)
@@ -568,7 +568,7 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
    flags=d_rsb_get_flags(b)
   
    info = psb_success_
-   call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+   call a%psb_z_base_sparse_mat%cp_from(b%psb_z_base_sparse_mat)
 
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
@@ -576,18 +576,18 @@ subroutine psb_d_cp_rsb_from_coo(a,b,info)
   &(b%val,b%ia,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
    ! FIXME: should destroy tmp ?
-end subroutine psb_d_cp_rsb_from_coo
+end subroutine psb_z_cp_rsb_from_coo
 
-subroutine psb_d_cp_rsb_from_fmt(a,b,info) 
+subroutine psb_z_cp_rsb_from_fmt(a,b,info) 
   use psb_base_mod
   implicit none 
 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(in)   :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(in)   :: b
   integer, intent(out)                        :: info
 
   !locals
-  type(psb_d_coo_sparse_mat) :: tmp
+  type(psb_z_coo_sparse_mat) :: tmp
   logical             :: rwshr_
   Integer             :: nz, nr, i,j,irw, idl,err_act, nc
   integer              :: debug_level, debug_unit
@@ -599,16 +599,16 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
   flags=d_rsb_get_flags(b)
 
   select type (b)
-  type is (psb_d_coo_sparse_mat) 
+  type is (psb_z_coo_sparse_mat) 
     call a%cp_from_coo(b,info)
 
-  type is (psb_d_csr_sparse_mat) 
-    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+  type is (psb_z_csr_sparse_mat) 
+    call a%psb_z_base_sparse_mat%cp_from(b%psb_z_base_sparse_mat)
     a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
         &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
 
-  type is (psb_d_rsb_sparse_mat) 
+  type is (psb_z_rsb_sparse_mat) 
     call b%cp_to_fmt(a,info)  ! FIXME
     ! FIXME: missing error handling 
 
@@ -616,19 +616,19 @@ subroutine psb_d_cp_rsb_from_fmt(a,b,info)
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
-end subroutine psb_d_cp_rsb_from_fmt
+end subroutine psb_z_cp_rsb_from_fmt
 
 
-subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+subroutine psb_z_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   use psb_base_mod
   implicit none
 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
-  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
   integer,intent(out)                  :: info
   logical, intent(in), optional        :: append
   integer, intent(in), optional        :: iren(:)
@@ -735,14 +735,14 @@ subroutine psb_d_rsb_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     return
   end if
 
-end subroutine psb_d_rsb_csgetrow
+end subroutine psb_z_rsb_csgetrow
 
-subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
+subroutine psb_z_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   use psb_base_mod
   implicit none
 
-  class(psb_d_rsb_sparse_mat), intent(in) :: a
+  class(psb_z_rsb_sparse_mat), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -852,14 +852,14 @@ subroutine psb_d_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
     return
   endif
 
-end subroutine psb_d_rsb_csgetptn
+end subroutine psb_z_rsb_csgetptn
 
-subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_z_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_base_mod
   implicit none 
 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: val(:)
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  complex(psb_dpk_), intent(in)      :: val(:)
   integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer, intent(out)            :: info
   integer, intent(in), optional   :: gtl(:)
@@ -874,41 +874,41 @@ subroutine psb_d_rsb_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     PSBRSB_ERROR("!")
   endif
   info=d_rsb_to_psb_info(rsb_update_elements(a%rsbmptr,val,ia,ja,nz,c_upd_flags))
-end subroutine psb_d_rsb_csput
+end subroutine psb_z_rsb_csput
 
-subroutine psb_d_mv_rsb_to_coo(a,b,info) 
+subroutine psb_z_mv_rsb_to_coo(a,b,info) 
   use psb_base_mod
   implicit none 
 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout)   :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout)   :: b
   integer, intent(out)                        :: info
     PSBRSB_DEBUG('')
   ! FIXME: use rsb_switch_rsb_matrix_to_coo_sorted !
-  call psb_d_cp_rsb_to_coo(a,b,info)
+  call psb_z_cp_rsb_to_coo(a,b,info)
   call a%free()
-end subroutine psb_d_mv_rsb_to_coo
+end subroutine psb_z_mv_rsb_to_coo
 
-subroutine psb_d_mv_rsb_to_fmt(a,b,info) 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(inout)  :: b
+subroutine psb_z_mv_rsb_to_fmt(a,b,info) 
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_base_sparse_mat), intent(inout)  :: b
   integer, intent(out)                        :: info
   PSBRSB_DEBUG('')
   ! FIXME: could use here rsb_switch_rsb_matrix_to_csr_sorted
-  call psb_d_cp_rsb_to_fmt(a,b,info)
+  call psb_z_cp_rsb_to_fmt(a,b,info)
   call d_rsb_free(a)
   a%rsbmptr=c_null_ptr
-end subroutine psb_d_mv_rsb_to_fmt
+end subroutine psb_z_mv_rsb_to_fmt
   
-subroutine psb_d_mv_rsb_from_fmt(a,b,info) 
+subroutine psb_z_mv_rsb_from_fmt(a,b,info) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout)  :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_z_rsb_sparse_mat), intent(inout)  :: a
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer, intent(out)                         :: info
   ! FIXME: could use here rsb_allocate_rsb_sparse_matrix_from_csr_inplace
   !if(b%is_sorted()) flags=flags+c_srt_flags 
-  type(psb_d_coo_sparse_mat) :: tmp
+  type(psb_z_coo_sparse_mat) :: tmp
   !  PSBRSB_DEBUG('')
   info = psb_success_
   select type (b)
@@ -916,13 +916,13 @@ subroutine psb_d_mv_rsb_from_fmt(a,b,info)
     call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
-end subroutine psb_d_mv_rsb_from_fmt
+end subroutine psb_z_mv_rsb_from_fmt
 
-subroutine psb_d_mv_rsb_from_coo(a,b,info) 
+subroutine psb_z_mv_rsb_from_coo(a,b,info) 
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                        :: info
   !  PSBRSB_DEBUG('')
   ! FIXME: should use rsb_allocate_rsb_sparse_matrix_inplace
@@ -930,33 +930,33 @@ subroutine psb_d_mv_rsb_from_coo(a,b,info)
   !if(b%is_triangle()) flags=flags+c_tri_flags 
   call a%cp_from_coo(b,info)
   call b%free()
-end subroutine psb_d_mv_rsb_from_coo
+end subroutine psb_z_mv_rsb_from_coo
 
-subroutine psb_d_rsb_cp_from(a,b)
+subroutine psb_z_rsb_cp_from(a,b)
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  type(psb_d_rsb_sparse_mat), intent(in)   :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  type(psb_z_rsb_sparse_mat), intent(in)   :: b
   Integer :: info
-  type(psb_d_coo_sparse_mat) :: tmp
+  type(psb_z_coo_sparse_mat) :: tmp
     PSBRSB_DEBUG('')
   call b%cp_to_coo(tmp,info)
   call a%mv_from_coo(tmp,info)
   call tmp%free()
-end subroutine psb_d_rsb_cp_from
+end subroutine psb_z_rsb_cp_from
 
-subroutine psb_d_rsb_mv_from(a,b)
+subroutine psb_z_rsb_mv_from(a,b)
   use psb_base_mod
   implicit none 
-  class(psb_d_rsb_sparse_mat), intent(inout) :: a
-  type(psb_d_rsb_sparse_mat), intent(inout)   :: b
+  class(psb_z_rsb_sparse_mat), intent(inout) :: a
+  type(psb_z_rsb_sparse_mat), intent(inout)   :: b
   Integer :: info
-  type(psb_d_coo_sparse_mat) :: tmp
+  type(psb_z_coo_sparse_mat) :: tmp
     PSBRSB_DEBUG('')
   call b%mv_to_coo(tmp,info)
   call a%mv_from_coo(tmp,info)
-end subroutine psb_d_rsb_mv_from
+end subroutine psb_z_rsb_mv_from
 
 
 #endif
-end module psb_d_rsb_mat_mod
+end module psb_z_rsb_mat_mod
