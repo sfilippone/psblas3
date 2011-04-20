@@ -1,4 +1,4 @@
-module rsb_c_mod
+module rsb_s_mod
   use iso_c_binding
 
 ! module constants:
@@ -75,7 +75,7 @@ type(c_ptr) function &
   &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_from_csr_const')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -95,7 +95,7 @@ type(c_ptr) function &
   &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_from_csr_inplace')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -115,7 +115,7 @@ type(c_ptr) function &
   &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_const')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -135,7 +135,7 @@ type(c_ptr) function &
   &(VA,IA,JA,nnz,typecode,m,k,Mb,Kb,flags,errvalp)&
   &bind(c,name='rsb_allocate_rsb_sparse_matrix_inplace')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -176,12 +176,12 @@ integer(c_int) function &
   &bind(c,name='rsb_spmv')
 use iso_c_binding
  integer(c_int), value  :: transa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
- complex(c_float) :: x(*)
+ real(c_float) :: x(*)
  integer(c_int), value  :: incx
- complex(c_float) :: betap
- complex(c_float) :: y(*)
+ real(c_float) :: betap
+ real(c_float) :: y(*)
  integer(c_int), value  :: incy
  end function rsb_spmv
 end interface
@@ -192,14 +192,14 @@ integer(c_int) function &
   &(alphap,matrix,x1,x2,incx,betap,y1,y2,incy)&
   &bind(c,name='rsb_spmv_nt')
 use iso_c_binding
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
- complex(c_float) :: x1(*)
- complex(c_float) :: x2(*)
+ real(c_float) :: x1(*)
+ real(c_float) :: x2(*)
  integer(c_int), value  :: incx
- complex(c_float) :: betap
- complex(c_float) :: y1(*)
- complex(c_float) :: y2(*)
+ real(c_float) :: betap
+ real(c_float) :: y1(*)
+ real(c_float) :: y2(*)
  integer(c_int), value  :: incy
  end function rsb_spmv_nt
 end interface
@@ -210,12 +210,12 @@ integer(c_int) function &
   &(alphap,matrix,x,incx,betap,y,incy)&
   &bind(c,name='rsb_spmv_ata')
 use iso_c_binding
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
- complex(c_float) :: x(*)
+ real(c_float) :: x(*)
  integer(c_int), value  :: incx
- complex(c_float) :: betap
- complex(c_float) :: y(*)
+ real(c_float) :: betap
+ real(c_float) :: y(*)
  integer(c_int), value  :: incy
  end function rsb_spmv_ata
 end interface
@@ -227,13 +227,13 @@ integer(c_int) function &
   &bind(c,name='rsb_spmv_power')
 use iso_c_binding
  integer(c_int), value  :: transa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
  integer(c_int), value  :: exp
- complex(c_float) :: x(*)
+ real(c_float) :: x(*)
  integer(c_int), value  :: incx
- complex(c_float) :: betap
- complex(c_float) :: y(*)
+ real(c_float) :: betap
+ real(c_float) :: y(*)
  integer(c_int), value  :: incy
  end function rsb_spmv_power
 end interface
@@ -245,14 +245,14 @@ integer(c_int) function &
   &bind(c,name='rsb_spmm')
 use iso_c_binding
  integer(c_int), value  :: transa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
  integer(c_int), value  :: nrhs
  integer(c_int), value  :: order
- complex(c_float) :: b(*)
+ real(c_float) :: b(*)
  integer(c_int), value  :: ldb
- complex(c_float) :: betap
- complex(c_float) :: c(*)
+ real(c_float) :: betap
+ real(c_float) :: c(*)
  integer(c_int), value  :: ldc
  end function rsb_spmm
 end interface
@@ -264,11 +264,11 @@ integer(c_int) function &
   &bind(c,name='rsb_spsv')
 use iso_c_binding
  integer(c_int), value  :: trans
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
- complex(c_float) :: x(*)
+ real(c_float) :: x(*)
  integer(c_int), value  :: incx
- complex(c_float) :: y(*)
+ real(c_float) :: y(*)
  integer(c_int), value  :: incy
  end function rsb_spsv
 end interface
@@ -280,14 +280,14 @@ integer(c_int) function &
   &bind(c,name='rsb_spsm')
 use iso_c_binding
  integer(c_int), value  :: trans
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrix
  integer(c_int), value  :: nrhs
  integer(c_int), value  :: order
- complex(c_float) :: betap
- complex(c_float) :: b(*)
+ real(c_float) :: betap
+ real(c_float) :: b(*)
  integer(c_int), value  :: ldb
- complex(c_float) :: c(*)
+ real(c_float) :: c(*)
  integer(c_int), value  :: ldc
  end function rsb_spsm
 end interface
@@ -299,7 +299,7 @@ integer(c_int) function &
   &bind(c,name='rsb_infinity_norm')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: infinity_norm(*)
+ real(c_float) :: infinity_norm(*)
  integer(c_int), value  :: transa
  end function rsb_infinity_norm
 end interface
@@ -311,7 +311,7 @@ integer(c_int) function &
   &bind(c,name='rsb_one_norm')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: one_norm(*)
+ real(c_float) :: one_norm(*)
  integer(c_int), value  :: transa
  end function rsb_one_norm
 end interface
@@ -323,7 +323,7 @@ integer(c_int) function &
   &bind(c,name='rsb_rows_sums')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  end function rsb_rows_sums
 end interface
 
@@ -334,7 +334,7 @@ integer(c_int) function &
   &bind(c,name='rsb_columns_sums')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  end function rsb_columns_sums
 end interface
 
@@ -345,7 +345,7 @@ integer(c_int) function &
   &bind(c,name='rsb_absolute_rows_sums')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  end function rsb_absolute_rows_sums
 end interface
 
@@ -356,7 +356,7 @@ integer(c_int) function &
   &bind(c,name='rsb_absolute_columns_sums')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  end function rsb_absolute_columns_sums
 end interface
 
@@ -367,7 +367,7 @@ integer(c_int) function &
   &bind(c,name='rsb_matrix_add_to_dense')
 use iso_c_binding
  type(c_ptr), value  :: matrixa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  integer(c_int), value  :: transa
  type(c_ptr), value  :: matrixb
  integer(c_int), value  :: ldb
@@ -384,10 +384,10 @@ type(c_ptr) function &
   &bind(c,name='rsb_matrix_sum')
 use iso_c_binding
  integer(c_int), value  :: transa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrixa
  integer(c_int), value  :: transb
- complex(c_float) :: betap
+ real(c_float) :: betap
  type(c_ptr), value  :: matrixb
  integer(c_int) :: errvalp
  end function rsb_matrix_sum
@@ -400,10 +400,10 @@ type(c_ptr) function &
   &bind(c,name='rsb_matrix_mul')
 use iso_c_binding
  integer(c_int), value  :: transa
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  type(c_ptr), value  :: matrixa
  integer(c_int), value  :: transb
- complex(c_float) :: betap
+ real(c_float) :: betap
  type(c_ptr), value  :: matrixb
  integer(c_int) :: errvalp
  end function rsb_matrix_mul
@@ -415,7 +415,7 @@ integer(c_int) function &
   &(VA,IA,JA,nnz,m,k,typecode,flags)&
   &bind(c,name='rsb_util_sort_row_major')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -432,7 +432,7 @@ integer(c_int) function &
   &(VA,IA,JA,nnz,m,k,typecode,flags)&
   &bind(c,name='rsb_util_sort_column_major')
 use iso_c_binding
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -492,7 +492,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_coo')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: flags
@@ -506,7 +506,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_csr')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  type(c_ptr), value  :: RP
  integer(c_int) :: JA(*)
  integer(c_int), value  :: flags
@@ -520,7 +520,7 @@ integer(c_int) function &
   &bind(c,name='rsb_getdiag')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: diagonal(*)
+ real(c_float) :: diagonal(*)
  end function rsb_getdiag
 end interface
 
@@ -531,13 +531,13 @@ integer(c_int) function &
   &bind(c,name='rsb_get_rows_sparse')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int), value  :: fr
  integer(c_int), value  :: lr
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int) :: rnz
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  integer(c_int), value  :: trans
  integer(c_int), value  :: flags
  end function rsb_get_rows_sparse
@@ -570,7 +570,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_block_sparse')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int), value  :: fr
  integer(c_int), value  :: lr
  integer(c_int), value  :: fc
@@ -591,7 +591,7 @@ integer(c_int) function &
   &bind(c,name='rsb_get_columns_sparse')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int), value  :: fc
  integer(c_int), value  :: lc
  integer(c_int) :: IA(*)
@@ -709,7 +709,7 @@ integer(c_int) function &
   &bind(c,name='rsb_elemental_scale')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  end function rsb_elemental_scale
 end interface
 
@@ -720,7 +720,7 @@ integer(c_int) function &
   &bind(c,name='rsb_elemental_scale_inv')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  end function rsb_elemental_scale_inv
 end interface
 
@@ -731,7 +731,7 @@ integer(c_int) function &
   &bind(c,name='rsb_elemental_pow')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: alphap
+ real(c_float) :: alphap
  end function rsb_elemental_pow
 end interface
 
@@ -742,7 +742,7 @@ integer(c_int) function &
   &bind(c,name='rsb_update_elements')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: VA(*)
+ real(c_float) :: VA(*)
  integer(c_int) :: IA(*)
  integer(c_int) :: JA(*)
  integer(c_int), value  :: nnz
@@ -767,7 +767,7 @@ integer(c_int) function &
   &bind(c,name='rsb_scal')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  integer(c_int), value  :: trans
  end function rsb_scal
 end interface
@@ -779,7 +779,7 @@ integer(c_int) function &
   &bind(c,name='rsb_scale_rows')
 use iso_c_binding
  type(c_ptr), value  :: matrix
- complex(c_float) :: d(*)
+ real(c_float) :: d(*)
  end function rsb_scale_rows
 end interface
 
@@ -836,4 +836,4 @@ use iso_c_binding
  integer(c_int) :: errvalp
  end function rsb_load_matrix_file_as_matrix_market
 end interface
-end module rsb_c_mod
+end module rsb_s_mod

@@ -59,10 +59,10 @@ rsb_c_mod.f90: rsb_d_mod.f90 Makefile
 	$(RSBD2C) $< > $@
 
 psb_s_rsb_mat_mod.F90: psb_d_rsb_mat_mod.F90 Makefile
-	$(RSBD2C) $< > $@
+	$(RSBD2S) $< > $@
 
 rsb_s_mod.f90: rsb_d_mod.f90 Makefile
-	$(RSBD2C) $< > $@
+	$(RSBD2S) $< > $@
 
 
 clean: 
