@@ -1,4 +1,13 @@
-A proposed list of problems.
+A proposed list of fixes/improvements.
+As we update PSBLAS, we shall update this file accordingly.
 
+20110421	separate testing directories for RSB/ELL/PSB* implementations
+20110421	set up a policy for error handling in interactive environments (e.g.: not aborting, but returning instead)
+20110421	complete the C interfacing of Z/C/S implementations.
+20110421	provide separate vanilla-PSB and RSB-PSB testers, backed up by a generic testing support + specific tests for each custom type peculiarity.
+20110421	a matrix generator to couple to the testers (accepting a matrix)
+20110421	psblas may accept callback functions and/or mechanisms for early abortion of operation; this is useful for interactive environments
+20110421	psblas may have an option for disabling *any* write to stderr/stdout
+20110421	psblas may output error strings pointers (useful in an interactive environment)  
 20110404	shall set up a fallback (./configure-backed) scheme when the mangling scheme does not get guessed by ./configure;  
 
