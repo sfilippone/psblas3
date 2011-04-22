@@ -25,7 +25,7 @@ module psb_c_rsb_mat_mod
 #define PSBRSB_ERROR(MSG)
 #define PSBRSB_WARNING(MSG)
 #endif
-  integer, parameter :: c_d_typecode=68 ! FIXME: this is only valid for 'double'
+  integer, parameter :: c_typecode=67 ! this is module specific 
   integer, parameter :: c_for_flags=1 ! : here should use RSB_FLAG_FORTRAN_INDICES_INTERFACE
   integer, parameter :: c_srt_flags =4 ! flags if rsb input is row major sorted ..
   !integer, parameter :: c_own_flags =-1 ! flags if rsb input shall not be freed by rsb
@@ -573,7 +573,7 @@ subroutine psb_c_cp_rsb_from_coo(a,b,info)
    !write (*,*) b%val
    ! FIXME: and if sorted ? the process could be speeded up !
    a%rsbmptr=rsb_allocate_rsb_sparse_matrix_const&
-  &(b%val,b%ia,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
+  &(b%val,b%ia,b%ja,b%get_nzeros(),c_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
    ! FIXME: should destroy tmp ?
 end subroutine psb_c_cp_rsb_from_coo
@@ -605,7 +605,7 @@ subroutine psb_c_cp_rsb_from_fmt(a,b,info)
   type is (psb_c_csr_sparse_mat) 
     call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
     a%rsbmptr=rsb_allocate_rsb_sparse_matrix_from_csr_const&
-        &(b%val,b%irp,b%ja,b%get_nzeros(),c_d_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
+        &(b%val,b%irp,b%ja,b%get_nzeros(),c_typecode,b%get_nrows(),b%get_ncols(),1,1,flags,info)
     info=d_rsb_to_psb_info(info)
 
   type is (psb_c_rsb_sparse_mat) 

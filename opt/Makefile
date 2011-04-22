@@ -42,9 +42,9 @@ psb_z_rsb_mat_mod.o:  rsb_z_mod.o
 psb_c_rsb_mat_mod.o:  rsb_c_mod.o
 psb_s_rsb_mat_mod.o:  rsb_s_mod.o
 
-RSBD2Z=sed 's/rsb_d_/rsb_z_/g;s/psb_d_/psb_z_/g;s/real(psb_dpk_)/complex(psb_dpk_)/g;s/real(c_double)/complex(c_double)/g;s/complex(psb_dpk_)\(.*\)csnmi_res/real(psb_dpk_)\1csnmi_res/g' 
-RSBD2S=sed 's/rsb_d_/rsb_s_/g;s/psb_d_/psb_s_/g;s/real(psb_dpk_)/real(psb_spk_)/g;s/real(c_double)/real(c_float)/g;s/real(psb_dpk_)\(.*\)csnmi_res/real(psb_spk_)\1csnmi_res/g' 
-RSBD2C=sed 's/rsb_d_/rsb_c_/g;s/psb_d_/psb_c_/g;s/real(psb_dpk_)/complex(psb_spk_)/g;s/real(c_double)/complex(c_float)/g;s/complex(psb_spk_)\(.*\)csnmi_res/real(psb_spk_)\1csnmi_res/g' 
+RSBD2Z=sed 's/c_typecode=68/c_typecode=90/g;s/rsb_d_/rsb_z_/g;s/psb_d_/psb_z_/g;s/real(psb_dpk_)/complex(psb_dpk_)/g;s/real(c_double)/complex(c_double)/g;s/complex(psb_dpk_)\(.*\)csnmi_res/real(psb_dpk_)\1csnmi_res/g' 
+RSBD2S=sed 's/c_typecode=68/c_typecode=83/g;s/rsb_d_/rsb_s_/g;s/psb_d_/psb_s_/g;s/real(psb_dpk_)/real(psb_spk_)/g;s/real(c_double)/real(c_float)/g;s/real(psb_dpk_)\(.*\)csnmi_res/real(psb_spk_)\1csnmi_res/g' 
+RSBD2C=sed 's/c_typecode=68/c_typecode=67/g;s/rsb_d_/rsb_c_/g;s/psb_d_/psb_c_/g;s/real(psb_dpk_)/complex(psb_spk_)/g;s/real(c_double)/complex(c_float)/g;s/complex(psb_spk_)\(.*\)csnmi_res/real(psb_spk_)\1csnmi_res/g' 
 
 psb_z_rsb_mat_mod.F90: psb_d_rsb_mat_mod.F90 Makefile
 	$(RSBD2Z) $< > $@
