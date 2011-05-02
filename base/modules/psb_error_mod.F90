@@ -314,7 +314,8 @@ contains
       write(psb_err_unit,'("input argument n. ",i0," has an invalid value")')i_e_d(1)
       write(psb_err_unit,'("current value is ",a)')a_e_d(2:2)
     case(psb_err_iarg_not_gtia_ii_)
-      write(psb_err_unit,'("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') &
+      write(psb_err_unit,&
+           & '("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') &
            & i_e_d(1), i_e_d(3)
       write(psb_err_unit,'("current values are ",i0," < ",i0)')&
            & i_e_d(2),i_e_d(5)

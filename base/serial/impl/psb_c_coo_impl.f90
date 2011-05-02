@@ -2971,12 +2971,13 @@ subroutine psb_c_fix_coo(a,info,idir)
   endif
 
   nza = a%get_nzeros()
-  if (nza < 2) return
-
-  dupl_ = a%get_dupl()
-
-  call psb_c_fix_coo_inner(nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
-  if (info /= psb_success_) goto 9999
+  if (nza >= 2) then 
+    dupl_ = a%get_dupl()
+    call psb_c_fix_coo_inner(nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
+    if (info /= psb_success_) goto 9999
+  else
+    i = nza
+  end if
   call a%set_sorted()
   call a%set_nzeros(i)
   call a%set_asb()
