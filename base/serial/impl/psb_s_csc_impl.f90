@@ -2561,32 +2561,32 @@ subroutine psb_s_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
-    do i=1, nr
+    do i=1, nc
       do j=a%icp(i),a%icp(i+1)-1 
         write(iout,frmtv) iv(a%ia(j)),iv(i),a%val(j)
       end do
     enddo
   else      
     if (present(ivr).and..not.present(ivc)) then 
-      do i=1, nr
+      do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
           write(iout,frmtv) ivr(a%ia(j)),i,a%val(j)
         end do
       enddo
     else if (present(ivr).and.present(ivc)) then 
-      do i=1, nr
+      do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
           write(iout,frmtv) ivr(a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
-      do i=1, nr
+      do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
           write(iout,frmtv) (a%ia(j)),ivc(i),a%val(j)
         end do
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
-      do i=1, nr
+      do i=1, nc
         do j=a%icp(i),a%icp(i+1)-1 
           write(iout,frmtv) (a%ia(j)),(i),a%val(j)
         end do

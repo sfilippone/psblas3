@@ -73,7 +73,8 @@ contains
     else
       allocate(ww(size(x)),stat=info)
       if (info /= psb_success_) then 
-        call psb_errpush(psb_err_alloc_request_,name,i_err=(/size(x),0,0,0,0/),a_err='real(psb_dpk_)')
+        call psb_errpush(psb_err_alloc_request_,name,&
+             & i_err=(/size(x),0,0,0,0/),a_err='real(psb_dpk_)')
         goto 9999      
       end if
     end if
