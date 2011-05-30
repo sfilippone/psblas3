@@ -209,6 +209,19 @@ module psb_descriptor_type
     integer, allocatable  :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer, allocatable  :: idx_space(:)
+  contains
+    procedure, pass(desc) :: is_ok           => psb_is_ok_desc
+    procedure, pass(desc) :: is_valid        => psb_is_valid_desc
+    procedure, pass(desc) :: is_upd          => psb_is_upd_desc
+    procedure, pass(desc) :: is_bld          => psb_is_bld_desc
+    procedure, pass(desc) :: is_asb          => psb_is_asb_desc
+    procedure, pass(desc) :: is_ovl          => psb_is_ovl_desc
+    procedure, pass(desc) :: is_repl         => psb_is_repl_desc
+    procedure, pass(desc) :: get_context     => psb_cd_get_context
+    procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
+    procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
+    procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
+    procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
   end type psb_desc_type
 
   interface psb_sizeof
@@ -316,7 +329,7 @@ contains
 
   function psb_is_ok_desc(desc) result(val)
 
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
     
     val = .false.
@@ -327,7 +340,7 @@ contains
 
   function psb_is_valid_desc(desc) result(val)
 
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
     
     val = .false.
@@ -337,7 +350,7 @@ contains
   end function psb_is_valid_desc
 
   function psb_is_bld_desc(desc) result(val)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
     val = .false.
@@ -347,7 +360,7 @@ contains
   end function psb_is_bld_desc
 
   function psb_is_upd_desc(desc)  result(val)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
     val = .false.
@@ -357,7 +370,7 @@ contains
   end function psb_is_upd_desc
 
   function psb_is_repl_desc(desc) result(val)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
     val = .false.
@@ -367,7 +380,7 @@ contains
   end function psb_is_repl_desc
 
   function psb_is_ovl_desc(desc) result(val)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
     val = .false.
@@ -378,7 +391,7 @@ contains
 
 
   function psb_is_asb_desc(desc) result(val)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
     val = .false.
@@ -388,7 +401,7 @@ contains
   end function psb_is_asb_desc
 
   integer function psb_cd_get_local_rows(desc)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_local_rows = desc%indxmap%get_lr()
@@ -398,7 +411,7 @@ contains
   end function psb_cd_get_local_rows
 
   integer function psb_cd_get_local_cols(desc)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_local_cols = desc%indxmap%get_lc()
@@ -408,8 +421,8 @@ contains
   end function psb_cd_get_local_cols
 
   integer function psb_cd_get_global_rows(desc)
-    type(psb_desc_type), intent(in) :: desc
-
+    class(psb_desc_type), intent(in) :: desc
+    
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_global_rows = desc%indxmap%get_gr()
     else
@@ -419,7 +432,7 @@ contains
   end function psb_cd_get_global_rows
 
   integer function psb_cd_get_global_cols(desc)
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_global_cols = desc%indxmap%get_gc()
@@ -431,7 +444,7 @@ contains
 
   integer function psb_cd_get_context(desc)
     use psb_error_mod
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     if (allocated(desc%indxmap)) then
       psb_cd_get_context = desc%indxmap%get_ctxt()    
     else
