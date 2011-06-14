@@ -100,9 +100,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_inner_krylov_mod
   use psb_krylov_mod
   implicit none
-  type(psb_dspmat_type), intent(in)  :: a
-  
 
+  type(psb_dspmat_type), intent(in)  :: a
   class(psb_dprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   Real(psb_dpk_), Intent(in)       :: b(:)
@@ -127,8 +126,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   type(psb_itconv_type) :: stopdat
 
 #ifdef MPE_KRYLOV
+  include "mpe_logf.h"
   Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
-  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
 #endif
   character(len=20)           :: name
   character(len=*), parameter :: methdname='BiCGStab'
@@ -144,19 +143,19 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
        & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
 #ifdef MPE_KRYLOV
-  call psb_get_mpicomm(ictxt,icomm)
-  call psb_get_rank(irank,ictxt,me)
-  istpb = mpe_log_get_event_number()
-  istpe = mpe_log_get_event_number()
-  ifctb  = mpe_log_get_event_number()
-  ifcte  = mpe_log_get_event_number()
-  immb  = mpe_log_get_event_number()
-  imme  = mpe_log_get_event_number()
-  if (irank == 0) then 
+!!$  call psb_get_mpicomm(ictxt,icomm)
+!!$  call psb_get_rank(irank,icomm,me)
+  imerr = MPE_Log_get_state_eventIDs(istpb,istpe)
+  imerr = MPE_Log_get_state_eventIDs(ifctb,ifcte)
+  imerr = MPE_Log_get_state_eventIDs(immb,imme)
+
+  if (me == 0) then 
     info = mpe_describe_state(istpb,istpe,"Solver","WhiteSmoke")
     info = mpe_describe_state(ifctb,ifcte,"PREC","SteelBlue")
     info = mpe_describe_state(immb,imme,"SPMM","DarkOrange")
   endif
+  call psb_barrier(ictxt)
+  call mpi_Pcontrol(1,info)
 #endif
 
   mglob = psb_cd_get_global_rows(desc_a)
@@ -384,6 +383,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   end if
 #ifdef MPE_KRYLOV
   imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
+  call mpi_Pcontrol(2,info)
+  call mpi_Pcontrol(0,info)
 #endif
   ! restore external global coherence behaviour
   call psb_restore_coher(ictxt,isvch)
