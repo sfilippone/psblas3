@@ -273,10 +273,10 @@ program d_file_spmv
     ! This computation is valid for CSR
     !
     nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+ annz*(psb_sizeof_dp + psb_sizeof_int)
-    bdwdth = nbytes/(t2*1.d6)
+    bdwdth = times*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth
-    bdwdth = nbytes/(tt2*1.d6)
+    bdwdth = times*nbytes/(tt2*1.d6)
     write(psb_out_unit,'("MBYTES/S                  (trans): ",F20.3)') bdwdth
     
   end if
