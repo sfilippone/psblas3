@@ -810,7 +810,6 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   end if
 
 
-  return
   call psb_erractionrestore(err_act)
   return
 
@@ -941,7 +940,6 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   end if
 
 
-  return
   call psb_erractionrestore(err_act)
   return
 
