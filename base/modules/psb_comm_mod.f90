@@ -117,7 +117,7 @@ module psb_comm_mod
   interface psb_halo
     subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      real(psb_spk_), intent(inout)           :: x(:,:)
+      real(psb_spk_), intent(inout),target    :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_spk_), intent(in), optional    :: alpha
@@ -137,7 +137,7 @@ module psb_comm_mod
     end subroutine psb_shalov
     subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      real(psb_dpk_), intent(inout)           :: x(:,:)
+      real(psb_dpk_), intent(inout),target    :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
@@ -157,7 +157,7 @@ module psb_comm_mod
     end subroutine psb_dhalov
     subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      integer, intent(inout) :: x(:,:)
+      integer, intent(inout), target         :: x(:,:)
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)                   :: info
       real(psb_dpk_), intent(in), optional   :: alpha
@@ -177,10 +177,10 @@ module psb_comm_mod
     end subroutine psb_ihalov
     subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      complex(psb_spk_), intent(inout)        :: x(:,:)
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
-      complex(psb_spk_), intent(in), optional :: alpha
+      complex(psb_spk_), intent(inout), target :: x(:,:)
+      type(psb_desc_type), intent(in)          :: desc_a
+      integer, intent(out)                     :: info
+      complex(psb_spk_), intent(in), optional  :: alpha
       complex(psb_spk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
@@ -197,10 +197,10 @@ module psb_comm_mod
     end subroutine psb_chalov
     subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      complex(psb_dpk_), intent(inout)        :: x(:,:)
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
-      complex(psb_dpk_), intent(in), optional :: alpha
+      complex(psb_dpk_), intent(inout), target :: x(:,:)
+      type(psb_desc_type), intent(in)          :: desc_a
+      integer, intent(out)                     :: info
+      complex(psb_dpk_), intent(in), optional  :: alpha
       complex(psb_dpk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran

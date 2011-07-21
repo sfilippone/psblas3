@@ -1921,6 +1921,7 @@ function psb_c_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -1955,6 +1956,7 @@ subroutine psb_c_get_diag(a,d,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -1993,6 +1995,7 @@ subroutine psb_c_scal(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2030,6 +2033,7 @@ subroutine psb_c_scals(d,a,info)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_

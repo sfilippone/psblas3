@@ -1920,6 +1920,7 @@ function psb_d_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -1953,6 +1954,7 @@ function psb_d_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -1987,6 +1989,7 @@ subroutine psb_d_rowsum(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2024,6 +2027,7 @@ subroutine psb_d_arwsum(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2061,6 +2065,7 @@ subroutine psb_d_colsum(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2098,6 +2103,7 @@ subroutine psb_d_aclsum(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2135,6 +2141,7 @@ subroutine psb_d_get_diag(a,d,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2173,6 +2180,7 @@ subroutine psb_d_scal(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2211,6 +2219,7 @@ subroutine psb_d_scals(d,a,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  info = psb_success_
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
