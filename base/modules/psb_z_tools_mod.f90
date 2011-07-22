@@ -70,13 +70,13 @@ Module psb_z_tools_mod
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_mat_mod, only : psb_zspmat_type
-      Type(psb_zspmat_type),Intent(in)    :: a
-      Type(psb_zspmat_type),Intent(inout) :: blk
-      Type(psb_desc_type),Intent(in)      :: desc_a
-      integer, intent(out)                :: info
-      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
-      character(len=5), optional          :: outfmt 
-      integer, intent(in), optional       :: data
+      Type(psb_zspmat_type),Intent(in)       :: a
+      Type(psb_zspmat_type),Intent(inout)    :: blk
+      Type(psb_desc_type),Intent(in), target :: desc_a
+      integer, intent(out)                   :: info
+      logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional             :: outfmt 
+      integer, intent(in), optional          :: data
     end Subroutine psb_zsphalo
   end interface
 
