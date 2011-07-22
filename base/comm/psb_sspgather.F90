@@ -30,8 +30,8 @@ subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   info=psb_success_
 
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_cd_get_mpic(desc_a)
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
   call psb_info(ictxt, me, np)
 
   if (present(keepnum)) then 
@@ -47,8 +47,8 @@ subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   call globa%free()
 
   if (keepnum_) then 
-    nrg = psb_cd_get_global_rows(desc_a)
-    ncg = psb_cd_get_global_rows(desc_a)
+    nrg = desc_a%get_global_rows()
+    ncg = desc_a%get_global_rows()
 
     allocate(nzbr(np), idisp(np),stat=info)
     if (info /= psb_success_) then 

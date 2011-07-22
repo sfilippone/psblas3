@@ -44,7 +44,7 @@ contains
     !
     info = psb_success_
     
-    nrow = psb_cd_get_local_rows(desc_data)
+    nrow = desc_data%get_local_rows()
     if (size(x) < nrow) then 
       info = 36
       call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))

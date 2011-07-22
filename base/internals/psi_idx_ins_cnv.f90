@@ -73,11 +73,11 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   name = 'psb_idx_ins_cnv'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_cd_get_context(desc)
-  mglob = psb_cd_get_global_rows(desc)
-  nglob = psb_cd_get_global_cols(desc)
-  nrow  = psb_cd_get_local_rows(desc)
-  ncol  = psb_cd_get_local_cols(desc)
+  ictxt = desc%get_context()
+  mglob = desc%get_global_rows()
+  nglob = desc%get_global_cols()
+  nrow  = desc%get_local_rows()
+  ncol  = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
 
@@ -209,11 +209,11 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   name = 'psb_idx_ins_cnv'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_cd_get_context(desc)
-  mglob = psb_cd_get_global_rows(desc)
-  nglob = psb_cd_get_global_cols(desc)
-  nrow  = psb_cd_get_local_rows(desc)
-  ncol  = psb_cd_get_local_cols(desc)
+  ictxt = desc%get_context()
+  mglob = desc%get_global_rows()
+  nglob = desc%get_global_cols()
+  nrow  = desc%get_local_rows()
+  ncol  = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
 

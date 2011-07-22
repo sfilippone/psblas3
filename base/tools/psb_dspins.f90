@@ -74,7 +74,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   call psb_erractionsave(err_act)
 
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
 
@@ -130,8 +130,8 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
              & a_err=ch_err,i_err=(/info,0,0,0,0/))
         goto 9999
       end if
-      nrow = psb_cd_get_local_rows(desc_a)
-      ncol = psb_cd_get_local_cols(desc_a)
+      nrow = desc_a%get_local_rows()
+      ncol = desc_a%get_local_cols()
 
 !!$      write(0,*) me,' Into csput valid row entries',count(ila(1:nz)>0),count(jla(1:nz)>0)
       if (a%is_bld()) then 
@@ -163,8 +163,8 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       jla(1:nz) = ja(1:nz)
       call psb_glob_to_loc(ila(1:nz),desc_a,info,iact='I')
       call psb_glob_to_loc(jla(1:nz),desc_a,info,iact='I')
-      nrow = psb_cd_get_local_rows(desc_a)
-      ncol = psb_cd_get_local_cols(desc_a)
+      nrow = desc_a%get_local_rows()
+      ncol = desc_a%get_local_cols()
 
       call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
       if (info /= psb_success_) then
@@ -219,7 +219,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   call psb_erractionsave(err_act)
 
 
-  ictxt = psb_cd_get_context(desc_ar)
+  ictxt = desc_ar%get_context()
 
   call psb_info(ictxt, me, np)
 
@@ -279,8 +279,8 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       goto 9999
     end if
 
-    nrow = psb_cd_get_local_rows(desc_ar)
-    ncol = psb_cd_get_local_cols(desc_ac)
+    nrow = desc_ar%get_local_rows()
+    ncol = desc_ac%get_local_cols()
 
     call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
     if (info /= psb_success_) then

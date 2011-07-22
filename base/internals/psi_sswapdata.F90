@@ -112,8 +112,8 @@ subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_cd_get_mpic(desc_a)
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -601,7 +601,7 @@ subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -615,7 +615,7 @@ subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  icomm = psb_cd_get_mpic(desc_a)
+  icomm = desc_a%get_mpic()
 
   if(present(data)) then
     data_ = data

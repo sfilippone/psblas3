@@ -132,8 +132,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     outfmt_ = 'CSR'
   endif
 
-  ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_cd_get_mpic(desc_a)
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
 
   Call psb_info(ictxt, me, np)
 

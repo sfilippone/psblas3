@@ -66,8 +66,8 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
+  ictxt   = desc_a%get_context()
+  dectype = desc_a%get_dectype()
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -78,10 +78,10 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   endif
 
 
-  loc_row = psb_cd_get_local_rows(desc_a)
-  loc_col = psb_cd_get_local_cols(desc_a)
-  m       = psb_cd_get_global_rows(desc_a)
-  n       = psb_cd_get_global_cols(desc_a)
+  loc_row = desc_a%get_local_rows()
+  loc_col = desc_a%get_local_cols()
+  m       = desc_a%get_global_rows()
+  n       = desc_a%get_global_cols()
 
   !...allocate matrix data...
   if (present(nnz))then 
@@ -112,7 +112,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',  &
-       & psb_cd_get_dectype(desc_a),psb_desc_bld_
+       & desc_a%get_dectype(),psb_desc_bld_
 
   return
 

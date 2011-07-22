@@ -48,7 +48,7 @@ subroutine  psi_sovrl_updr1(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -118,7 +118,7 @@ subroutine  psi_sovrl_updr2(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -187,7 +187,7 @@ subroutine  psi_dovrl_updr1(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -257,7 +257,7 @@ subroutine  psi_dovrl_updr2(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -326,7 +326,7 @@ subroutine  psi_covrl_updr1(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -396,7 +396,7 @@ subroutine  psi_covrl_updr2(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -465,7 +465,7 @@ subroutine  psi_zovrl_updr1(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -535,7 +535,7 @@ subroutine  psi_zovrl_updr2(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -604,7 +604,7 @@ subroutine  psi_iovrl_updr1(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -675,7 +675,7 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_

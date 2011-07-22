@@ -61,7 +61,7 @@ function psb_cnrmi(a,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -72,8 +72,8 @@ function psb_cnrmi(a,desc_a,info)
 
   ia = 1
   ja = 1
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
 
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= psb_success_) then

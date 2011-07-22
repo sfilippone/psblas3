@@ -109,7 +109,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -168,9 +168,9 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
     itrans = 'N'
   endif
 
-  m    = psb_cd_get_global_rows(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   lldx = size(x,1)
   lldy = size(y,1)
 
@@ -387,7 +387,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -430,9 +430,9 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
     itrans = 'N'
   endif
 
-  m    = psb_cd_get_global_rows(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   lldx = size(x)
   lldy = size(y)
 

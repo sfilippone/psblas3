@@ -70,12 +70,12 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  ictxt   = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
-  mglob   = psb_cd_get_global_rows(desc_a)
-  nglob   = psb_cd_get_global_cols(desc_a)
-  nrow    = psb_cd_get_local_rows(desc_a)
-  ncol    = psb_cd_get_local_cols(desc_a)
+  ictxt   = desc_a%get_context()
+  dectype = desc_a%get_dectype()
+  mglob   = desc_a%get_global_rows()
+  nglob   = desc_a%get_global_cols()
+  nrow    = desc_a%get_local_rows()
+  ncol    = desc_a%get_local_cols()
 
   call psb_info(ictxt, me, np)
 
@@ -195,12 +195,12 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  ictxt   = psb_cd_get_context(desc)
-  dectype = psb_cd_get_dectype(desc)
-  mglob   = psb_cd_get_global_rows(desc)
-  nglob   = psb_cd_get_global_cols(desc)
-  nrow    = psb_cd_get_local_rows(desc)
-  ncol    = psb_cd_get_local_cols(desc)
+  ictxt   = desc%get_context()
+  dectype = desc%get_dectype()
+  mglob   = desc%get_global_rows()
+  nglob   = desc%get_global_cols()
+  nrow    = desc%get_local_rows()
+  ncol    = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
 

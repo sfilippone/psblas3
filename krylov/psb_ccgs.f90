@@ -130,14 +130,14 @@ Subroutine psb_ccgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   Call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
-  mglob = psb_cd_get_global_rows(desc_a)
-  n_row = psb_cd_get_local_rows(desc_a)
-  n_col = psb_cd_get_local_cols(desc_a)
+  mglob = desc_a%get_global_rows()
+  n_row = desc_a%get_local_rows()
+  n_col = desc_a%get_local_cols()
 
   If (Present(istop)) Then 
     istop_ = istop 

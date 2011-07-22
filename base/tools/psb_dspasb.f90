@@ -76,9 +76,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt    = psb_cd_get_context(desc_a)
-  n_row    = psb_cd_get_local_rows(desc_a)
-  n_col    = psb_cd_get_local_cols(desc_a)
+  ictxt    = desc_a%get_context()
+  n_row    = desc_a%get_local_rows()
+  n_col    = desc_a%get_local_cols()
 
   ! check on BLACS grid 
   call psb_info(ictxt, me, np)
@@ -90,7 +90,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
   if (.not.psb_is_asb_desc(desc_a)) then 
     info = psb_err_spmat_invalid_state_
-    int_err(1) = psb_cd_get_dectype(desc_a)
+    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -107,8 +107,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
     ! First case: we come from a fresh build. 
     ! 
 
-    n_row = psb_cd_get_local_rows(desc_a)
-    n_col = psb_cd_get_local_cols(desc_a)
+    n_row = desc_a%get_local_rows()
+    n_col = desc_a%get_local_cols()
     call a%set_nrows(n_row)
     call a%set_ncols(n_col)
   end if

@@ -66,7 +66,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start '

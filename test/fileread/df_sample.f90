@@ -185,8 +185,6 @@ program df_sample
     enddo
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
-!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-vgb-',iam,'-',np,'.mtx'
-!!$    call a%print(fname)
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
@@ -201,16 +199,11 @@ program df_sample
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
-!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-vgp-',iam,'-',np,'.mtx'
-!!$    call a%print(fname)
 
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
-!!$    write(fname,'(a,i2.2,a,i2.2,a)') 'amat-pbl-',iam,'-',np,'.mtx'
-!!$    call a%print(fname)
-
   end if
 
   call psb_geall(x_col,desc_a,info)

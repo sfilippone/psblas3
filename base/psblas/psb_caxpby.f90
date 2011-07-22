@@ -72,7 +72,7 @@ subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
@@ -111,7 +111,7 @@ subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
     goto 9999
   end if
 
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -131,8 +131,8 @@ subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   if ((in /= 0)) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      call caxpby(psb_cd_get_local_cols(desc_a),in,&
+    if(desc_a%get_local_rows() > 0) then
+      call caxpby(desc_a%get_local_cols(),in,&
            & alpha,x(iix:,jjx),size(x,1),beta,&
            & y(iiy:,jjy),size(y,1),info)
     end if
@@ -222,7 +222,7 @@ subroutine  psb_caxpbyv(alpha, x, beta,y,desc_a,info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -234,7 +234,7 @@ subroutine  psb_caxpbyv(alpha, x, beta,y,desc_a,info)
   ix = ione
   iy = ione
 
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
@@ -257,8 +257,8 @@ subroutine  psb_caxpbyv(alpha, x, beta,y,desc_a,info)
     call psb_errpush(info,name)
   end if
 
-  if(psb_cd_get_local_rows(desc_a) > 0) then
-    call caxpby(psb_cd_get_local_cols(desc_a),ione,&
+  if(desc_a%get_local_rows() > 0) then
+    call caxpby(desc_a%get_local_cols(),ione,&
          & alpha,x,size(x),beta,&
          & y,size(y),info)
   end if

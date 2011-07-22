@@ -66,7 +66,7 @@ subroutine psb_zalloc(x, desc_a, info, n, lb)
   int_err(1)=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -103,9 +103,9 @@ subroutine psb_zalloc(x, desc_a, info, n, lb)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    nr = max(1,psb_cd_get_local_cols(desc_a))
+    nr = max(1,desc_a%get_local_cols())
   else if (psb_is_bld_desc(desc_a)) then
-    nr = max(1,psb_cd_get_local_rows(desc_a))
+    nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
@@ -199,7 +199,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -220,9 +220,9 @@ subroutine psb_zallocv(x, desc_a,info,n)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    nr = max(1,psb_cd_get_local_cols(desc_a))
+    nr = max(1,desc_a%get_local_cols())
   else if (psb_is_bld_desc(desc_a)) then
-    nr = max(1,psb_cd_get_local_rows(desc_a))
+    nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')

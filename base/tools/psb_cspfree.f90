@@ -61,7 +61,7 @@ subroutine psb_cspfree(a, desc_a,info)
     call psb_errpush(info,name)
     return
   else
-    ictxt = psb_cd_get_context(desc_a)
+    ictxt = desc_a%get_context()
   end if
 
   !...deallocate a....

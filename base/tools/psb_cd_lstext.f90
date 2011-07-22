@@ -69,8 +69,8 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_cd_get_mpic(desc_a)
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
@@ -78,9 +78,9 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
 
 
-  m      = psb_cd_get_local_rows(desc_a)
-  n_row  = psb_cd_get_local_rows(desc_a)
-  n_col  = psb_cd_get_local_cols(desc_a)
+  m      = desc_a%get_local_rows()
+  n_row  = desc_a%get_local_rows()
+  n_col  = desc_a%get_local_cols()
   nhalo  = n_col-n_row
 
   nl = size(in_list)

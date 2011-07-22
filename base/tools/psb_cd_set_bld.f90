@@ -63,7 +63,7 @@ subroutine psb_cd_set_bld(desc,info)
   call psb_erractionsave(err_act)
   name = 'psb_cd_set_bld'
 
-  ictxt = psb_cd_get_context(desc)
+  ictxt = desc%get_context()
 
   if (debug) write(psb_err_unit,*)'Entered CDSETBLD',ictxt
   ! check on blacs grid 

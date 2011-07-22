@@ -75,7 +75,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -107,8 +107,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
 
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
@@ -121,8 +121,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
 
   call psb_bcast(ictxt,k,root=iiroot)
 
@@ -143,7 +143,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
 
-  nrow=psb_cd_get_local_rows(desc_a)
+  nrow=desc_a%get_local_rows()
 
   if ((root == -1).or.(np == 1)) then
     ! extract my chunk
@@ -309,7 +309,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   if (psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -344,8 +344,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
 
   k = 1
   !  there should be a global check on k here!!!
@@ -366,7 +366,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
      goto 9999
   end if
 
-  nrow = psb_cd_get_local_rows(desc_a)
+  nrow = desc_a%get_local_rows()
 
   if ((root == -1).or.(np == 1)) then
     ! extract my chunk

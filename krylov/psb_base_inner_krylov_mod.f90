@@ -148,7 +148,7 @@ contains
     info = psb_success_
     name = 'psb_end_conv'
 
-    ictxt = psb_cd_get_context(desc_a)
+    ictxt = desc_a%get_context()
     call psb_info(ictxt,me,np)
 
     errnum = stopdat%values(psb_ik_errnum_) 

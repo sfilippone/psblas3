@@ -69,7 +69,7 @@ function psb_snrm2(x, desc_a, info, jx)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -85,7 +85,7 @@ function psb_snrm2(x, desc_a, info, jx)
     ijx = 1
   endif
 
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -100,8 +100,8 @@ function psb_snrm2(x, desc_a, info, jx)
   end if
 
   if(m /= 0) then
-    if (psb_cd_get_local_rows(desc_a) > 0) then 
-      ndim = psb_cd_get_local_rows(desc_a)
+    if (desc_a%get_local_rows() > 0) then 
+      ndim = desc_a%get_local_rows()
       nrm2 = snrm2( ndim, x(iix:,jjx), ione )
 
       ! adjust  because overlapped elements are computed more than once
@@ -204,7 +204,7 @@ function psb_snrm2v(x, desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -215,7 +215,7 @@ function psb_snrm2v(x, desc_a, info)
 
   ix = 1
   jx=1
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
@@ -231,8 +231,8 @@ function psb_snrm2v(x, desc_a, info)
   end if
 
   if(m /= 0) then
-    if (psb_cd_get_local_rows(desc_a) > 0) then 
-      ndim = psb_cd_get_local_rows(desc_a)
+    if (desc_a%get_local_rows() > 0) then 
+      ndim = desc_a%get_local_rows()
       nrm2 = snrm2( ndim, x, ione )
       ! adjust  because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
@@ -336,7 +336,7 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -347,7 +347,7 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
 
   ix = 1
   jx = 1
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
@@ -363,8 +363,8 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
   end if
 
   if(m /= 0) then
-    if (psb_cd_get_local_rows(desc_a) > 0) then 
-      ndim = psb_cd_get_local_rows(desc_a)
+    if (desc_a%get_local_rows() > 0) then 
+      ndim = desc_a%get_local_rows()
       nrm2 = snrm2( ndim, x, ione )
       ! adjust  because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)

@@ -42,7 +42,7 @@ module psb_comm_mod
     end subroutine psb_sovrlm
     subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      real(psb_spk_), intent(inout)           :: x(:)
+      real(psb_spk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_spk_), intent(inout), optional, target :: work(:)
@@ -58,7 +58,7 @@ module psb_comm_mod
     end subroutine psb_dovrlm
     subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      real(psb_dpk_), intent(inout)           :: x(:)
+      real(psb_dpk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional, target :: work(:)
@@ -74,7 +74,7 @@ module psb_comm_mod
     end subroutine psb_iovrlm
     subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      integer, intent(inout)                  :: x(:)
+      integer, intent(inout), target          :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer, intent(inout), optional, target :: work(:)
@@ -90,7 +90,7 @@ module psb_comm_mod
     end subroutine psb_covrlm
     subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      complex(psb_spk_), intent(inout)           :: x(:)
+      complex(psb_spk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
       complex(psb_spk_), intent(inout), optional, target :: work(:)
@@ -106,7 +106,7 @@ module psb_comm_mod
     end subroutine psb_zovrlm
     subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      complex(psb_dpk_), intent(inout)           :: x(:)
+      complex(psb_dpk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
       complex(psb_dpk_), intent(inout), optional, target :: work(:)

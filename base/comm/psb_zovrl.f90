@@ -89,7 +89,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -106,10 +106,10 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
     ijx = 1
   endif
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
 
   maxk=size(x,2)-ijx+1
 
@@ -288,7 +288,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -301,10 +301,10 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   ix = 1
   ijx = 1
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
 
   k = 1
 

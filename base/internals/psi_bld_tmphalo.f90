@@ -68,10 +68,10 @@ subroutine psi_bld_tmphalo(desc,info)
   name = 'psi_bld_tmphalo'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_cd_get_context(desc)
-  icomm = psb_cd_get_mpic(desc)
-  n_row = psb_cd_get_local_rows(desc)
-  n_col = psb_cd_get_local_cols(desc)
+  ictxt = desc%get_context()
+  icomm = desc%get_mpic()
+  n_row = desc%get_local_rows()
+  n_col = desc%get_local_cols()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)

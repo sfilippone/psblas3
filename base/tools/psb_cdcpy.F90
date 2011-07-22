@@ -61,7 +61,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
-  ictxt = psb_cd_get_context(desc_in)
+  ictxt = desc_in%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)

@@ -68,14 +68,14 @@ subroutine psb_dasb(x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-  ictxt   = psb_cd_get_context(desc_a)
+  ictxt   = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
 
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start: ',np,&
-       & psb_cd_get_dectype(desc_a)
+       & desc_a%get_dectype()
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
@@ -84,16 +84,16 @@ subroutine psb_dasb(x, desc_a, info)
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),' error ',&
-         & psb_cd_get_dectype(desc_a)
+         & desc_a%get_dectype()
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   ! check size
-  ictxt = psb_cd_get_context(desc_a)
-  nrow  = psb_cd_get_local_rows(desc_a)
-  ncol  = psb_cd_get_local_cols(desc_a)
+  ictxt = desc_a%get_context()
+  nrow  = desc_a%get_local_rows()
+  ncol  = desc_a%get_local_cols()
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
   if (debug_level >= psb_debug_ext_) &
@@ -193,7 +193,7 @@ subroutine psb_dasbv(x, desc_a, info)
   int_err(1) = 0
   name = 'psb_dgeasb_v'
 
-  ictxt   = psb_cd_get_context(desc_a)
+  ictxt   = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -210,8 +210,8 @@ subroutine psb_dasbv(x, desc_a, info)
     goto 9999
   endif
 
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
   i1sz = size(x)

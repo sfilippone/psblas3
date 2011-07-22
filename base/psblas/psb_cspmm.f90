@@ -99,7 +99,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -151,10 +151,10 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  m    = psb_cd_get_global_rows(desc_a)
-  n    = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   lldx = size(x,1)
   lldy = size(y,1)
 
@@ -450,7 +450,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -486,10 +486,10 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  m    = psb_cd_get_global_rows(desc_a)
-  n    = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  ncol = psb_cd_get_local_cols(desc_a)
+  m    = desc_a%get_global_rows()
+  n    = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
   lldx = size(x)
   lldy = size(y)
 

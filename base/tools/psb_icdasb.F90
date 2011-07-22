@@ -75,10 +75,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
-  n_row   = psb_cd_get_local_rows(desc_a)
-  n_col   = psb_cd_get_local_cols(desc_a)
+  ictxt   = desc_a%get_context()
+  dectype = desc_a%get_dectype()
+  n_row   = desc_a%get_local_rows()
+  n_col   = desc_a%get_local_cols()
   call psb_get_mpicomm(ictxt,icomm )
 
   ! check on blacs grid 

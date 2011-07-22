@@ -161,7 +161,7 @@ contains
     info = psb_success_
     call psb_erractionsave(err_act)
     
-    ictxt = psb_cd_get_context(desc_data)
+    ictxt = desc_data%get_context()
     call psb_info(ictxt, me, np)
     
     if (present(trans)) then 
@@ -173,7 +173,7 @@ contains
     if (present(work)) then 
       work_ => work
     else
-      allocate(work_(4*psb_cd_get_local_cols(desc_data)),stat=info)
+      allocate(work_(4*desc_data%get_local_cols()),stat=info)
       if (info /= psb_success_) then 
         info = psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='Allocate')
@@ -228,7 +228,7 @@ contains
     call psb_erractionsave(err_act)
     
     
-    ictxt=psb_cd_get_context(desc_data)
+    ictxt=desc_data%get_context()
     call psb_info(ictxt, me, np)
     if (present(trans)) then 
       trans_=psb_toupper(trans)

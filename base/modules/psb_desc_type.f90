@@ -217,6 +217,8 @@ module psb_descriptor_type
     procedure, pass(desc) :: is_asb          => psb_is_asb_desc
     procedure, pass(desc) :: is_ovl          => psb_is_ovl_desc
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
+    procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
+    procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
     procedure, pass(desc) :: get_context     => psb_cd_get_context
     procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
@@ -456,7 +458,7 @@ contains
 
   integer function psb_cd_get_dectype(desc)
     use psb_error_mod
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
       psb_cd_get_dectype = desc%indxmap%get_state()    
@@ -470,7 +472,7 @@ contains
 
   integer function psb_cd_get_mpic(desc)
     use psb_error_mod
-    type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
       psb_cd_get_mpic = desc%indxmap%get_mpic()    

@@ -81,7 +81,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -98,9 +98,9 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     ijx = 1
   endif
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
 
   maxk=size(x,2)-ijx+1
 
@@ -305,7 +305,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -318,10 +318,10 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   ix = 1
   ijx = 1
 
-  m = psb_cd_get_global_rows(desc_a)
-  n = psb_cd_get_global_cols(desc_a)
-  nrow = psb_cd_get_local_rows(desc_a)
-  !  ncol = psb_cd_get_local_cols(desc_a)
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  !  ncol = desc_a%get_local_cols()
 
 
   if (present(tran)) then     

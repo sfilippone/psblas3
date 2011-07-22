@@ -105,8 +105,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_cd_get_mpic(desc_a)
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
@@ -118,9 +118,9 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   else
     extype_ = psb_ovt_xhal_  
   endif
-  m      = psb_cd_get_local_rows(desc_a)
-  n_row  = psb_cd_get_local_rows(desc_a)
-  n_col  = psb_cd_get_local_cols(desc_a)
+  m      = desc_a%get_local_rows()
+  n_row  = desc_a%get_local_rows()
+  n_col  = desc_a%get_local_cols()
   nhalo  = n_col-m
 
   if (novr<0) then
@@ -317,7 +317,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     counter    = 1
     counter_t  = 1
 
-    n_col_prev = psb_cd_get_local_cols(desc_ov) 
+    n_col_prev = desc_ov%get_local_cols() 
 
     Do While (halo(counter) /= -1)
       tot_elem=0
@@ -543,7 +543,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for fnd_owner', desc_ov%indxmap%get_state()
       call psi_fnd_owner(iszs,works,temp,desc_a,info)
-      n_col = psb_cd_get_local_cols(desc_ov)
+      n_col = desc_ov%get_local_cols()
 
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
@@ -551,9 +551,9 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       
       do i=1,iszs
         idx = works(i)
-        n_col   = psb_cd_get_local_cols(desc_ov)
+        n_col   = desc_ov%get_local_cols()
         call psi_idx_ins_cnv(idx,lidx,desc_ov,info)
-        if (psb_cd_get_local_cols(desc_ov) >  n_col ) then
+        if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as
           ! we receive them guarantees that all indices for HALO(I)
@@ -575,7 +575,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           counter_t              = counter_t+3
         endif
       end Do
-      n_col   = psb_cd_get_local_cols(desc_ov)
+      n_col   = desc_ov%get_local_cols()
 
     end if
 

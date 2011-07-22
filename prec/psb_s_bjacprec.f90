@@ -54,7 +54,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt       = psb_cd_get_context(desc_data)
+    ictxt       = desc_data%get_context()
     call psb_info(ictxt, me, np)
     
     
@@ -68,8 +68,8 @@ contains
     end select
     
     
-    n_row = psb_cd_get_local_rows(desc_data)
-    n_col = psb_cd_get_local_cols(desc_data)
+    n_row = desc_data%get_local_rows()
+    n_col = desc_data%get_local_cols()
 
     if (size(x) < n_row) then 
       info = 36
@@ -239,7 +239,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    ictxt=psb_cd_get_context(desc_a)
+    ictxt=desc_a%get_context()
     call psb_info(ictxt, me, np)
 
     m = a%get_nrows()
@@ -273,10 +273,10 @@ contains
         end if
       endif
 
-      nrow_a = psb_cd_get_local_rows(desc_a)
+      nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
 
-      n_col  = psb_cd_get_local_cols(desc_a)
+      n_col  = desc_a%get_local_cols()
       nhalo  = n_col-nrow_a
       n_row  = nrow_a
 

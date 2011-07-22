@@ -88,7 +88,7 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
   debug_unit  = psb_get_debug_unit()
 
   info = psb_success_
-  ictxt = psb_cd_get_context(cdesc)
+  ictxt = cdesc%get_context()
 
   call psb_info(ictxt,me,np)
   if (np == -1) then

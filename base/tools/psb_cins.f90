@@ -82,7 +82,7 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -100,10 +100,10 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
     info = psb_err_input_matrix_unassembled_
-    int_err(1) = psb_cd_get_dectype(desc_a)
+    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < psb_cd_get_local_rows(desc_a)) then
+  else if (size(x, dim=1) < desc_a%get_local_rows()) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -112,9 +112,9 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
   endif
 
   if (m == 0) return
-  loc_rows = psb_cd_get_local_rows(desc_a)
-  loc_cols = psb_cd_get_local_cols(desc_a)
-  mglob    = psb_cd_get_global_rows(desc_a)
+  loc_rows = desc_a%get_local_rows()
+  loc_cols = desc_a%get_local_cols()
+  mglob    = desc_a%get_global_rows()
 
   allocate(irl(m),stat=info) 
   if (info /= psb_success_) then 
@@ -263,7 +263,7 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -281,10 +281,10 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
     info = psb_err_input_matrix_unassembled_
-    int_err(1) = psb_cd_get_dectype(desc_a)
+    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < psb_cd_get_local_rows(desc_a)) then
+  else if (size(x, dim=1) < desc_a%get_local_rows()) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -293,9 +293,9 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
   endif
   if (m == 0) return 
 
-  loc_rows = psb_cd_get_local_rows(desc_a)
-  loc_cols = psb_cd_get_local_cols(desc_a)
-  mglob    = psb_cd_get_global_rows(desc_a)
+  loc_rows = desc_a%get_local_rows()
+  loc_cols = desc_a%get_local_cols()
+  mglob    = desc_a%get_global_rows()
 
   n = min(size(val,2),size(x,2))
 

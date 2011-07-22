@@ -73,7 +73,7 @@ function psb_sdot(x, y,desc_a, info, jx, jy)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
@@ -101,7 +101,7 @@ function psb_sdot(x, y,desc_a, info, jx, jy)
     goto 9999
   end if
 
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -121,8 +121,8 @@ function psb_sdot(x, y,desc_a, info, jx, jy)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = sdot(psb_cd_get_local_rows(desc_a),&
+    if(desc_a%get_local_rows() > 0) then
+      dot_local = sdot(desc_a%get_local_rows(),&
            & x(iix:,jjx),ione,y(iiy:,jjy),ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
@@ -225,7 +225,7 @@ function psb_sdotv(x, y,desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -238,7 +238,7 @@ function psb_sdotv(x, y,desc_a, info)
   iy = ione
   jx = ione
   jy = ione
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,jx,desc_a,info,iix,jjx)
@@ -258,8 +258,8 @@ function psb_sdotv(x, y,desc_a, info)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = sdot(psb_cd_get_local_rows(desc_a),&
+    if(desc_a%get_local_rows() > 0) then
+      dot_local = sdot(desc_a%get_local_rows(),&
            & x,ione,y,ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
@@ -359,7 +359,7 @@ subroutine psb_sdotvs(res, x, y,desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -370,7 +370,7 @@ subroutine psb_sdotvs(res, x, y,desc_a, info)
 
   ix = ione
   iy = ione
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
   if (info == psb_success_) &
@@ -389,8 +389,8 @@ subroutine psb_sdotvs(res, x, y,desc_a, info)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = sdot(psb_cd_get_local_rows(desc_a),&
+    if(desc_a%get_local_rows() > 0) then
+      dot_local = sdot(desc_a%get_local_rows(),&
            & x,ione,y,ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
@@ -491,7 +491,7 @@ subroutine psb_smdots(res, x, y, desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -503,7 +503,7 @@ subroutine psb_smdots(res, x, y, desc_a, info)
   ix = ione
   iy = ione
 
-  m = psb_cd_get_global_rows(desc_a)
+  m = desc_a%get_global_rows()
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
@@ -531,9 +531,9 @@ subroutine psb_smdots(res, x, y, desc_a, info)
   allocate(dot_local(k))
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
+    if(desc_a%get_local_rows() > 0) then
       do j=1,k
-        dot_local(j) = sdot(psb_cd_get_local_rows(desc_a),&
+        dot_local(j) = sdot(desc_a%get_local_rows(),&
              & x(1:,j),ione,y(1:,j),ione)
         ! adjust dot_local because overlapped elements are computed more than once
       end do

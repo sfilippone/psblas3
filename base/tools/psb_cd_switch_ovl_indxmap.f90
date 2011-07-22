@@ -58,17 +58,17 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = psb_cd_get_context(desc)
-  icomm = psb_cd_get_mpic(desc)
+  ictxt = desc%get_context()
+  icomm = desc%get_mpic()
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),&
        & ': start'
 
-  mglob  = psb_cd_get_global_rows(desc) 
-  n_row  = psb_cd_get_local_rows(desc)
-  n_col  = psb_cd_get_local_cols(desc)
+  mglob  = desc%get_global_rows() 
+  n_row  = desc%get_local_rows()
+  n_col  = desc%get_local_cols()
 
   Allocate(vl(n_col),stat=info)
   if (info /= psb_success_) then 

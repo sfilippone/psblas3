@@ -61,13 +61,13 @@ subroutine psb_cprecbld(a,desc_a,p,info,upd,mold,afmt)
 
   info = psb_success_
   int_err(1) = 0
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
 
-  n_row   = psb_cd_get_local_rows(desc_a)
-  n_col   = psb_cd_get_local_cols(desc_a)
-  mglob   = psb_cd_get_global_rows(desc_a)
+  n_row   = desc_a%get_local_rows()
+  n_col   = desc_a%get_local_cols()
+  mglob   = desc_a%get_global_rows()
   !
   ! Should add check to ensure all procs have the same... 
   !

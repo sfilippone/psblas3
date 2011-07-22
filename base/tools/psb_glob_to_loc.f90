@@ -189,7 +189,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   name = 'glob_to_loc'
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt = desc_a%get_context()
   call psb_info(ictxt,iam,np)
   call psb_erractionsave(err_act)
 
