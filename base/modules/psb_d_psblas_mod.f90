@@ -217,12 +217,12 @@ module psb_d_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_mat_mod, only : psb_dspmat_type
-      type(psb_dspmat_type), intent(in)    :: a
-      real(psb_dpk_), intent(inout)        :: x(:,:)
-      real(psb_dpk_), intent(inout)        :: y(:,:)
-      real(psb_dpk_), intent(in)           :: alpha, beta
-      type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans
+      type(psb_dspmat_type), intent(in)     :: a
+      real(psb_dpk_), intent(inout), target :: x(:,:)
+      real(psb_dpk_), intent(inout), target :: y(:,:)
+      real(psb_dpk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)       :: desc_a
+      character, optional, intent(in)       :: trans
       real(psb_dpk_), optional, intent(inout),target :: work(:)
       integer, optional, intent(in)        :: k, jx, jy
       logical, optional, intent(in)        :: doswap
@@ -233,8 +233,8 @@ module psb_d_psblas_mod
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_mat_mod, only : psb_dspmat_type
       type(psb_dspmat_type), intent(in)   :: a
-      real(psb_dpk_), intent(inout)       :: x(:)
-      real(psb_dpk_), intent(inout)       :: y(:)
+      real(psb_dpk_), intent(inout), target :: x(:)
+      real(psb_dpk_), intent(inout), target :: y(:)
       real(psb_dpk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)     :: desc_a
       character, optional, intent(in)     :: trans
@@ -250,14 +250,14 @@ module psb_d_psblas_mod
          & diag, n, jx, jy, work)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_mat_mod, only : psb_dspmat_type
-      type(psb_dspmat_type), intent(in)    :: t
-      real(psb_dpk_), intent(in)           :: x(:,:)
-      real(psb_dpk_), intent(inout)        :: y(:,:)
-      real(psb_dpk_), intent(in)           :: alpha, beta
-      type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans, scale
-      integer, optional, intent(in)        :: n, jx, jy
-      integer, optional, intent(in)        :: choice
+      type(psb_dspmat_type), intent(in)     :: t
+      real(psb_dpk_), intent(in), target    :: x(:,:)
+      real(psb_dpk_), intent(inout), target :: y(:,:)
+      real(psb_dpk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)       :: desc_a
+      character, optional, intent(in)       :: trans, scale
+      integer, optional, intent(in)         :: n, jx, jy
+      integer, optional, intent(in)         :: choice
       real(psb_dpk_), optional, intent(in), target :: diag(:)
       real(psb_dpk_), optional, intent(inout), target :: work(:)
       integer, intent(out)               :: info
@@ -267,9 +267,9 @@ module psb_d_psblas_mod
          & diag, work)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_ 
       use psb_mat_mod, only : psb_dspmat_type
-      type(psb_dspmat_type), intent(in)    :: t
-      real(psb_dpk_), intent(in)             :: x(:)
-      real(psb_dpk_), intent(inout)          :: y(:)
+      type(psb_dspmat_type), intent(in)      :: t
+      real(psb_dpk_), intent(in), target     :: x(:)
+      real(psb_dpk_), intent(inout), target  :: y(:)
       real(psb_dpk_), intent(in)             :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
       character, optional, intent(in)        :: trans, scale

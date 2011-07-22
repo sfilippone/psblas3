@@ -206,12 +206,12 @@ module psb_c_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_cspmat_type
-      type(psb_cspmat_type), intent(in)    :: a
-      complex(psb_spk_), intent(inout)     :: x(:,:)
-      complex(psb_spk_), intent(inout)     :: y(:,:)
-      complex(psb_spk_), intent(in)        :: alpha, beta
-      type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans
+      type(psb_cspmat_type), intent(in)        :: a
+      complex(psb_spk_), intent(inout), target :: x(:,:)
+      complex(psb_spk_), intent(inout), target :: y(:,:)
+      complex(psb_spk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)          :: desc_a
+      character, optional, intent(in)          :: trans
       complex(psb_spk_), optional, intent(inout),target :: work(:)
       integer, optional, intent(in)        :: k, jx, jy
       logical, optional, intent(in)        :: doswap
@@ -221,12 +221,12 @@ module psb_c_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_cspmat_type
-      type(psb_cspmat_type), intent(in)    :: a
-      complex(psb_spk_), intent(inout)     :: x(:)
-      complex(psb_spk_), intent(inout)     :: y(:)
-      complex(psb_spk_), intent(in)        :: alpha, beta
-      type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans
+      type(psb_cspmat_type), intent(in)        :: a
+      complex(psb_spk_), intent(inout), target :: x(:)
+      complex(psb_spk_), intent(inout), target :: y(:)
+      complex(psb_spk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)          :: desc_a
+      character, optional, intent(in)          :: trans
       complex(psb_spk_), optional, intent(inout),target :: work(:)
       logical, optional, intent(in)        :: doswap
       integer, intent(out)                 :: info
@@ -239,14 +239,14 @@ module psb_c_psblas_mod
          & diag, n, jx, jy, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
       use psb_mat_mod, only : psb_cspmat_type
-      type(psb_cspmat_type), intent(in)      :: t
-      complex(psb_spk_), intent(in)          :: x(:,:)
-      complex(psb_spk_), intent(inout)       :: y(:,:)
-      complex(psb_spk_), intent(in)          :: alpha, beta
-      type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, scale
-      integer, optional, intent(in)          :: n, jx, jy
-      integer, optional, intent(in)          :: choice
+      type(psb_cspmat_type), intent(in)        :: t
+      complex(psb_spk_), intent(in), target    :: x(:,:)
+      complex(psb_spk_), intent(inout), target :: y(:,:)
+      complex(psb_spk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)          :: desc_a
+      character, optional, intent(in)          :: trans, scale
+      integer, optional, intent(in)            :: n, jx, jy
+      integer, optional, intent(in)            :: choice
       complex(psb_spk_), optional, intent(in), target :: diag(:)
       complex(psb_spk_), optional, intent(inout), target :: work(:)
       integer, intent(out)               :: info
@@ -256,13 +256,13 @@ module psb_c_psblas_mod
          & diag, work)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_ 
       use psb_mat_mod, only : psb_cspmat_type
-      type(psb_cspmat_type), intent(in)      :: t
-      complex(psb_spk_), intent(in)          :: x(:)
-      complex(psb_spk_), intent(inout)       :: y(:)
-      complex(psb_spk_), intent(in)          :: alpha, beta
-      type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, scale
-      integer, optional, intent(in)          :: choice
+      type(psb_cspmat_type), intent(in)        :: t
+      complex(psb_spk_), intent(in), target    :: x(:)
+      complex(psb_spk_), intent(inout), target :: y(:)
+      complex(psb_spk_), intent(in)            :: alpha, beta
+      type(psb_desc_type), intent(in)          :: desc_a
+      character, optional, intent(in)          :: trans, scale
+      integer, optional, intent(in)            :: choice
       complex(psb_spk_), optional, intent(in), target :: diag(:)
       complex(psb_spk_), optional, intent(inout), target :: work(:)
       integer, intent(out)                   :: info
