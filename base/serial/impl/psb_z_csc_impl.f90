@@ -1259,18 +1259,18 @@ contains
         if (unit) then 
           do i=1, nr
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-1
-              acc = acc + a%val(j)*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-1
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=1, nr
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-2
-              acc = acc + a%val(j)*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-2
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%icp(i+1)-1)
+            y(i,1:nc) = (x(i,1:nc) - acc)/val(icp(i+1)-1)
           end do
         end if
       else if (.not.lower) then 
@@ -1278,18 +1278,18 @@ contains
         if (unit) then 
           do i=nr, 1, -1 
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-1
-              acc = acc + a%val(j)*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-1
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
             acc = zzero 
-            do j=a%icp(i)+1, a%icp(i+1)-1
-              acc = acc + a%val(j)*y(a%ia(j),1:nc)
+            do j=icp(i)+1, icp(i+1)-1
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%icp(i))
+            y(i,1:nc) = (x(i,1:nc) - acc)/val(icp(i))
           end do
         end if
 
@@ -1301,18 +1301,18 @@ contains
         if (unit) then 
           do i=1, nr
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-1
-              acc = acc + conjg(a%val(j))*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-1
+              acc = acc + conjg(val(j))*y(ia(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=1, nr
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-2
-              acc = acc + conjg(a%val(j))*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-2
+              acc = acc + conjg(val(j))*y(ia(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(a%val(a%icp(i+1)-1))
+            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(val(icp(i+1)-1))
           end do
         end if
       else if (.not.lower) then 
@@ -1320,18 +1320,18 @@ contains
         if (unit) then 
           do i=nr, 1, -1 
             acc = zzero 
-            do j=a%icp(i), a%icp(i+1)-1
-              acc = acc + conjg(a%val(j))*y(a%ia(j),1:nc)
+            do j=icp(i), icp(i+1)-1
+              acc = acc + conjg(val(j))*y(ia(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
             acc = zzero 
-            do j=a%icp(i)+1, a%icp(i+1)-1
-              acc = acc + conjg(a%val(j))*y(a%ia(j),1:nc)
+            do j=icp(i)+1, icp(i+1)-1
+              acc = acc + conjg(val(j))*y(ia(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(a%val(a%icp(i)))
+            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(val(icp(i)))
           end do
         end if
 
@@ -1347,18 +1347,18 @@ contains
         if (unit) then 
           do i=nr, 1, -1
             acc = y(i,1:nc) 
-            do j=a%icp(i), a%icp(i+1)-1
-              jc    = a%ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=icp(i), icp(i+1)-1
+              jc    = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1
-            y(i,1:nc) = y(i,1:nc)/a%val(a%icp(i+1)-1)
+            y(i,1:nc) = y(i,1:nc)/val(icp(i+1)-1)
             acc  = y(i,1:nc) 
-            do j=a%icp(i), a%icp(i+1)-2
-              jc    = a%ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=icp(i), icp(i+1)-2
+              jc    = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         end if
@@ -1367,18 +1367,18 @@ contains
         if (unit) then 
           do i=1, nr
             acc  = y(i,1:nc) 
-            do j=a%icp(i), a%icp(i+1)-1
-              jc    = a%ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=icp(i), icp(i+1)-1
+              jc    = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         else if (.not.unit) then 
           do i=1, nr
-            y(i,1:nc) = y(i,1:nc)/a%val(a%icp(i))
+            y(i,1:nc) = y(i,1:nc)/val(icp(i))
             acc    = y(i,1:nc) 
-            do j=a%icp(i)+1, a%icp(i+1)-1
-              jc      = a%ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=icp(i)+1, icp(i+1)-1
+              jc      = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         end if
