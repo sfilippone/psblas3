@@ -37,7 +37,7 @@
 ! Further revised and ported into the PSBLAS environment. 
 !
 module psb_gps_mod
-  use psb_realloc_mod
+  use psb_base_mod
   !
   public psb_gps_reduce
   !
