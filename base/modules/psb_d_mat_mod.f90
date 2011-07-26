@@ -120,6 +120,7 @@ module psb_d_mat_mod
     generic, public    :: cp_from       => d_cp_from
     procedure, pass(a) :: d_cp_to       => psb_d_cp_to
     generic, public    :: cp_to         => d_cp_to
+    procedure, pass(a) :: extract       => psb_d_extract
     procedure, pass(a) :: d_transp_1mat => psb_d_transp_1mat
     procedure, pass(a) :: d_transp_2mat => psb_d_transp_2mat
     generic, public    :: transp        => d_transp_1mat, d_transp_2mat
@@ -955,5 +956,12 @@ contains
 
   end function psb_d_get_nz_row
 
-
+  subroutine psb_d_extract(a,b)
+    implicit none 
+    class(psb_dspmat_type), intent(inout)     :: a
+    class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
+    
+    call move_alloc(a%a,b)
+  end subroutine psb_d_extract
+  
 end module psb_d_mat_mod

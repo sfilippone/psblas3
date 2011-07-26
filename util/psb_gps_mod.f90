@@ -37,7 +37,6 @@
 ! Further revised and ported into the PSBLAS environment. 
 !
 module psb_gps_mod
-  use psb_base_mod
   !
   public psb_gps_reduce
   !
@@ -108,6 +107,7 @@ CONTAINS
     !    COMMON/LVLW/-SUBROUTINES SETUP AND PIKLVL ASSUME THAT THERE
     !               ARE AT MOST 100 LEVELS.
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
+    use psb_base_mod
     INTEGER NDSTK
     INTEGER STNODE, RVNODE, RENUM, STNUM, CCSTOR, SBNUM
     ! COMMON /GRA/ N, IDPTH, IDEG
@@ -400,6 +400,7 @@ CONTAINS
     !      COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THERE ARE AT MOST 100 LEVELS.
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
+    use psb_base_mod
     DIMENSION LVL(N), LVLS1(N), LVLS2(N)
     INTEGER :: SZ
     !-----------------------------------------------------
@@ -455,6 +456,7 @@ CONTAINS
   END FUNCTION SORT2
   !
   SUBROUTINE PIKLVL(LVLS1, LVLS2, CCSTOR, IDFLT, ISDIR)
+    use psb_base_mod
     ! PIKLVL CHOOSES THE LEVEL STRUCTURE  USED IN NUMBERING GRAPH
     ! LVLS1-       ON INPUT CONTAINS FORWARD LEVELING INFO
     ! LVLS2-       ON INPUT CONTAINS REVERSE LEVELING INFO
@@ -541,6 +543,7 @@ CONTAINS
   !
   SUBROUTINE NUMBER(SND, NUM, NDSTK, LVLS2, NDEG, RENUM, LVLST,LSTPT,&
        & NR, NFLG, IBW2, IPF2, IPFA, ISDIR)
+    use psb_base_mod
     !  NUMBER PRODUCES THE NUMBERING OF THE GRAPH FOR MIN BANDWIDTH
     !  SND-         ON INPUT THE NODE TO BEGIN NUMBERING ON
     !  NUM-         ON INPUT AND OUTPUT, THE NEXT AVAILABLE NUMBER
@@ -740,6 +743,7 @@ CONTAINS
   !
   ! ---------------------------------------------------------
   SUBROUTINE REALLOC(VET,SZ1,SZ2)
+    use psb_base_mod  
     ! PERFORM ON FLY REALLOCATION OF POINTER VET INCREASING
     ! ITS SIZE FROM SZ1 TO SZ2
     IMPLICIT NONE

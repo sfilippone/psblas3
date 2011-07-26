@@ -37,6 +37,6 @@ module psb_util_mod
   use psb_hbio_mod
   use psb_mmio_mod
   use psb_mat_dist_mod
-  use psb_gps_mod
+  use psb_renum_mod
 end module psb_util_mod
 
