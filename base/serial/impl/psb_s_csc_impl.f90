@@ -834,7 +834,7 @@ subroutine psb_s_csc_cssm(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<m) then 
     info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
     goto 9999
   end if
 
