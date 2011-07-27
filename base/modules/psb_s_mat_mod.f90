@@ -121,6 +121,7 @@ module psb_s_mat_mod
     generic, public    :: cp_from       => s_cp_from
     procedure, pass(a) :: s_cp_to       => psb_s_cp_to
     generic, public    :: cp_to         => s_cp_to
+    procedure, pass(a) :: mold          => psb_s_mold
     procedure, pass(a) :: s_transp_1mat => psb_s_transp_1mat
     procedure, pass(a) :: s_transp_2mat => psb_s_transp_2mat
     generic, public    :: transp        => s_transp_1mat, s_transp_2mat
@@ -512,8 +513,7 @@ module psb_s_mat_mod
       class(psb_sspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
     end subroutine psb_sspmat_type_move
-  end interface
-
+  end interface psb_move_alloc
 
   interface psb_clone
     subroutine psb_sspmat_type_clone(a,b,info)
@@ -522,6 +522,14 @@ module psb_s_mat_mod
       class(psb_sspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
     end subroutine psb_sspmat_type_clone
+  end interface
+
+  interface 
+    subroutine psb_s_mold(a,b)
+      import :: psb_sspmat_type, psb_s_base_sparse_mat
+      class(psb_sspmat_type), intent(inout)     :: a
+      class(psb_s_base_sparse_mat), allocatable, intent(out) :: b
+    end subroutine psb_s_mold
   end interface
 
   interface 

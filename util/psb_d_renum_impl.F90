@@ -65,7 +65,8 @@ contains
 
     info = psb_success_
 
-    call a%extract(aa)
+    call a%mold(aa)
+    call a%mv_to(aa)
     call aa%mv_to_fmt(acsr,info)
     ! Insert call to gps_reduce
     

@@ -121,6 +121,7 @@ module psb_c_mat_mod
     generic, public    :: cp_from       => c_cp_from
     procedure, pass(a) :: c_cp_to       => psb_c_cp_to
     generic, public    :: cp_to         => c_cp_to
+    procedure, pass(a) :: mold          => psb_c_mold
     procedure, pass(a) :: c_transp_1mat => psb_c_transp_1mat
     procedure, pass(a) :: c_transp_2mat => psb_c_transp_2mat
     generic, public    :: transp        => c_transp_1mat, c_transp_2mat
@@ -514,7 +515,6 @@ module psb_c_mat_mod
     end subroutine psb_cspmat_type_move
   end interface
   
-
   interface psb_clone
     subroutine psb_cspmat_type_clone(a,b,info)
       import :: psb_cspmat_type
@@ -523,7 +523,15 @@ module psb_c_mat_mod
       integer, intent(out)                 :: info
     end subroutine psb_cspmat_type_clone
   end interface
-  
+
+  interface 
+    subroutine psb_c_mold(a,b)
+      import :: psb_cspmat_type, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(inout)     :: a
+      class(psb_c_base_sparse_mat), allocatable, intent(out) :: b
+    end subroutine psb_c_mold
+  end interface
+
   interface 
     subroutine psb_c_transp_1mat(a)
       import :: psb_cspmat_type

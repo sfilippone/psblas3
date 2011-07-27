@@ -1474,7 +1474,18 @@ subroutine psb_c_cp_to(a,b)
   return
 end subroutine psb_c_cp_to
 
-
+subroutine psb_c_mold(a,b)
+  use psb_c_mat_mod, psb_protect_name => psb_c_mold
+  class(psb_cspmat_type), intent(inout)     :: a
+  class(psb_c_base_sparse_mat), allocatable, intent(out) :: b
+  integer :: info
+#if defined(HAVE_MOLD) 
+  allocate(b,mold=a%a, stat=info)
+#else
+  call a%a%mold(b,info)
+#endif
+  
+end subroutine psb_c_mold
 
 subroutine psb_cspmat_type_move(a,b,info)
   use psb_error_mod

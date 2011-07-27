@@ -13,5 +13,4 @@ module psb_renum_mod
     end subroutine psb_d_mat_renum
   end interface psb_mat_renum
 
-
 end module psb_renum_mod

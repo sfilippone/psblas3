@@ -120,7 +120,7 @@ module psb_d_mat_mod
     generic, public    :: cp_from       => d_cp_from
     procedure, pass(a) :: d_cp_to       => psb_d_cp_to
     generic, public    :: cp_to         => d_cp_to
-    procedure, pass(a) :: extract       => psb_d_extract
+    procedure, pass(a) :: mold          => psb_d_mold
     procedure, pass(a) :: d_transp_1mat => psb_d_transp_1mat
     procedure, pass(a) :: d_transp_2mat => psb_d_transp_2mat
     generic, public    :: transp        => d_transp_1mat, d_transp_2mat
@@ -519,7 +519,6 @@ module psb_d_mat_mod
     end subroutine psb_dspmat_type_move
   end interface
 
-
   interface psb_clone
     subroutine psb_dspmat_type_clone(a,b,info)
       import :: psb_dspmat_type
@@ -527,6 +526,14 @@ module psb_d_mat_mod
       class(psb_dspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
     end subroutine psb_dspmat_type_clone
+  end interface
+
+  interface 
+    subroutine psb_d_mold(a,b)
+      import :: psb_dspmat_type, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(inout)     :: a
+      class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
+    end subroutine psb_d_mold
   end interface
 
   interface 
@@ -698,8 +705,6 @@ module psb_d_mat_mod
       integer, intent(out)                    :: info
     end subroutine psb_d_scals
   end interface
-
-
 
 
 contains 
@@ -956,12 +961,4 @@ contains
 
   end function psb_d_get_nz_row
 
-  subroutine psb_d_extract(a,b)
-    implicit none 
-    class(psb_dspmat_type), intent(inout)     :: a
-    class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
-    
-    call move_alloc(a%a,b)
-  end subroutine psb_d_extract
-  
 end module psb_d_mat_mod

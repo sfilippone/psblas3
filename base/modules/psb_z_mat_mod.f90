@@ -121,6 +121,7 @@ module psb_z_mat_mod
     generic, public    :: cp_from       => z_cp_from
     procedure, pass(a) :: z_cp_to       => psb_z_cp_to
     generic, public    :: cp_to         => z_cp_to
+    procedure, pass(a) :: mold          => psb_z_mold
     procedure, pass(a) :: z_transp_1mat => psb_z_transp_1mat
     procedure, pass(a) :: z_transp_2mat => psb_z_transp_2mat
     generic, public    :: transp        => z_transp_1mat, z_transp_2mat
@@ -513,7 +514,6 @@ module psb_z_mat_mod
     end subroutine psb_zspmat_type_move
   end interface
   
-
   interface psb_clone
     subroutine psb_zspmat_type_clone(a,b,info)
       import :: psb_zspmat_type
@@ -521,6 +521,14 @@ module psb_z_mat_mod
       class(psb_zspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
     end subroutine psb_zspmat_type_clone
+  end interface
+
+  interface 
+    subroutine psb_z_mold(a,b)
+      import :: psb_zspmat_type, psb_z_base_sparse_mat
+      class(psb_zspmat_type), intent(inout)     :: a
+      class(psb_z_base_sparse_mat), allocatable, intent(out) :: b
+    end subroutine psb_z_mold
   end interface
   
   interface 
