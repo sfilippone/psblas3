@@ -230,30 +230,30 @@ module psb_descriptor_type
     module procedure psb_cd_sizeof
   end interface psb_sizeof
 
-  interface psb_is_ok_desc
-    module procedure psb_is_ok_desc
-  end interface psb_is_ok_desc
-
-  interface psb_is_valid_desc
-    module procedure psb_is_valid_desc
-  end interface psb_is_valid_desc
-
-  interface psb_is_asb_desc
-    module procedure psb_is_asb_desc
-  end interface psb_is_asb_desc
-
-  interface psb_is_upd_desc
-    module procedure psb_is_upd_desc
-  end interface psb_is_upd_desc
-
-  interface psb_is_ovl_desc
-    module procedure psb_is_ovl_desc
-  end interface psb_is_ovl_desc
-
-  interface psb_is_bld_desc
-    module procedure psb_is_bld_desc
-  end interface psb_is_bld_desc
-
+!!$  interface psb_is_ok_desc
+!!$    module procedure psb_is_ok_desc
+!!$  end interface psb_is_ok_desc
+!!$
+!!$  interface psb_is_valid_desc
+!!$    module procedure psb_is_valid_desc
+!!$  end interface psb_is_valid_desc
+!!$
+!!$  interface psb_is_asb_desc
+!!$    module procedure psb_is_asb_desc
+!!$  end interface psb_is_asb_desc
+!!$
+!!$  interface psb_is_upd_desc
+!!$    module procedure psb_is_upd_desc
+!!$  end interface psb_is_upd_desc
+!!$
+!!$  interface psb_is_ovl_desc
+!!$    module procedure psb_is_ovl_desc
+!!$  end interface psb_is_ovl_desc
+!!$
+!!$  interface psb_is_bld_desc
+!!$    module procedure psb_is_bld_desc
+!!$  end interface psb_is_bld_desc
+!!$
 
   interface psb_move_alloc
     module procedure psb_cdtransfer

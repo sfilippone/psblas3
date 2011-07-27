@@ -243,14 +243,13 @@ contains
 
   end subroutine d_apply2v
 
-  subroutine d_apply1v(prec,x,desc_data,info,trans,work)
+  subroutine d_apply1v(prec,x,desc_data,info,trans)
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_dprec_type), intent(in) :: prec
     real(psb_dpk_),intent(inout)      :: x(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
 
     character     :: trans_
     integer :: ictxt,np,me, err_act
