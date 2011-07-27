@@ -44,6 +44,7 @@ subroutine psb_d_mat_renum(alg,mat,info)
   return
 
 contains
+
   subroutine psb_mat_renum_gps(a,info)
     use psb_base_mod
     use psb_gps_mod
@@ -58,6 +59,8 @@ contains
     
     integer :: err_act
     character(len=20)           :: name
+    integer, allocatable :: ndstk(:,:), iold(:), ndeg(:), perm(:) 
+    integer :: i, j, k, ideg, nr, ibw, ipf, idpth
 
     info = psb_success_
     name = 'mat_renum'
@@ -69,11 +72,37 @@ contains
     call a%mv_to(aa)
     call aa%mv_to_fmt(acsr,info)
     ! Insert call to gps_reduce
+    nr   = acsr%get_nrows()
+    ideg = 0
+    do i=1, nr
+      ideg = max(ideg,acsr%irp(i+1)-acsr%irp(i))
+    end do
+    allocate(ndstk(nr,ideg), iold(nr), perm(nr+1), ndeg(nr),stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, name) 
+      goto 9999
+    end if
+    do i=1, nr
+      iold(i) = i 
+    end do
+    perm = 0
+
+    call psb_gps_reduce(ndstk,nr,ideg,iold,perm,ndeg,ibw,ipf,idpth)
     
-    
+    if (.not.psb_isaperm(nr,perm)) then 
+      write(0,*) 'Something wrong: bad perm from gps_reduce'
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name) 
+      goto 9999
+    end if
     ! Move to coordinate to apply renumbering
     call acsr%mv_to_coo(acoo,info)
-    
+    do i=1, acoo%get_nzeros()
+      acoo%ia(i) = perm(acoo%ia(i))
+      acoo%ja(i) = perm(acoo%ja(i))
+    end do
+    call acoo%fix(info) 
 
     ! Get back to where we started from
     call aa%mv_from_coo(acoo,info)

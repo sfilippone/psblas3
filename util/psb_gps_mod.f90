@@ -53,8 +53,9 @@ module psb_gps_mod
   !
 CONTAINS
   !
-  SUBROUTINE psb_gps_reduce(NDSTK, NR, IOLD, RENUM, NDEG, LVL, LVLS1, LVLS2,&
-       & CCSTOR, IBW2, IPF2,NE,IDPTHE,IDEGE)
+!!$  SUBROUTINE psb_gps_reduce(NDSTK, NR, IOLD, RENUM, NDEG, LVL, LVLS1, LVLS2,&
+!!$       & CCSTOR, IBW2, IPF2,NE,IDPTHE,IDEGE)
+  SUBROUTINE psb_gps_reduce(NDSTK, NR, IDEGE, IOLD, RENUM, NDEG,ibw2,ipf2,IDPTHE)
     !  SUBROUTINE REDUCE DETERMINES A ROW AND COLUMN PERMUTATION WHICH,
     !  WHEN APPLIED TO A GIVEN SPARSE MATRIX, PRODUCES A PERMUTED
     !  MATRIX WITH A SMALLER BANDWIDTH AND PROFILE.
@@ -114,10 +115,13 @@ CONTAINS
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 CONNECTED COMPONENTS.
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
-    DIMENSION CCSTOR(1), IOLD(NE)
-    DIMENSION NDSTK(NR,IDEGE), LVL(NE), LVLS1(1), LVLS2(1), RENUM(NE+1), NDEG(NE)
+    DIMENSION CCSTOR(NR), IOLD(NR)
+    DIMENSION NDSTK(NR,IDEGE), LVL(NR), LVLS1(1), LVLS2(1), RENUM(NR+1), NDEG(NR)
+!!$    integer :: stnode, rvnode, stnum, sbnum
+!!$    integer :: ndstk(nr,iedge), iold(nr), renum(nr+1), ndeg(nr) 
+!!$    integer :: lvl(nr), lvls1(nr), lvls2(nr), ccstor(nr)    
 
-    n     = ne
+    n     = nr
     ideg  = idege
     idpth = 0
 
