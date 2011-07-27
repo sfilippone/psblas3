@@ -425,7 +425,7 @@ else
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
-     F90COPT="$F90COPT -dcfuns -f2003 -mismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
+     F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
 fi
 
