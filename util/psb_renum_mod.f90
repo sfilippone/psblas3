@@ -1,7 +1,7 @@
 module psb_renum_mod
   use psb_base_mod
 
-  integer, parameter :: psb_renum_gps_ = 456
+  integer, parameter :: psb_mat_renum_gps_ = 456
 
   
   interface psb_mat_renum

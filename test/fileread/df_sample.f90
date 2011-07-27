@@ -174,6 +174,8 @@ program df_sample
 
   end if
 
+  call psb_mat_renum(psb_mat_renum_gps_,aux_a,info) 
+  
   ! switch over different partition types
   if (ipart == 0) then 
     call psb_barrier(ictxt)

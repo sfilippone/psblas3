@@ -116,7 +116,7 @@ CONTAINS
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
     DIMENSION CCSTOR(NR), IOLD(NR)
-    DIMENSION NDSTK(NR,IDEGE), LVL(NR), LVLS1(1), LVLS2(1), RENUM(NR+1), NDEG(NR)
+    DIMENSION NDSTK(NR,IDEGE), LVL(NR), LVLS1(NR), LVLS2(NR), RENUM(NR+1), NDEG(NR)
 !!$    integer :: stnode, rvnode, stnum, sbnum
 !!$    integer :: ndstk(nr,iedge), iold(nr), renum(nr+1), ndeg(nr) 
 !!$    integer :: lvl(nr), lvls1(nr), lvls2(nr), ccstor(nr)    

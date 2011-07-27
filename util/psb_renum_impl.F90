@@ -16,7 +16,7 @@ subroutine psb_d_mat_renum(alg,mat,info)
   info = psb_success_
 
   select case (alg)
-  case(psb_renum_gps_) 
+  case(psb_mat_renum_gps_) 
 
     call psb_mat_renum_gps(mat,info)
 
@@ -85,11 +85,17 @@ contains
     end if
     do i=1, nr
       iold(i) = i 
+      ndstk(i,:) = 0
+      k  = 0
+      do j=acsr%irp(i),acsr%irp(i+1)-1
+        k = k + 1
+        ndstk(i,k) = acsr%ja(j)
+      end do
     end do
     perm = 0
 
     call psb_gps_reduce(ndstk,nr,ideg,iold,perm,ndeg,ibw,ipf,idpth)
-    
+
     if (.not.psb_isaperm(nr,perm)) then 
       write(0,*) 'Something wrong: bad perm from gps_reduce'
       info = psb_err_from_subroutine_
