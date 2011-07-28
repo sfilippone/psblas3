@@ -86,10 +86,10 @@
 !                                         iterations
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/|b|; here the iteration is
-!                                            stopped when  |r| <= eps * |b|
-!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                         1: err =  |r|/(|a||x|+|b|);  here the iteration is
 !                                            stopped when  |r| <= eps * (|a||x|+|b|)
+!                                         2: err =  |r|/|b|; here the iteration is
+!                                            stopped when  |r| <= eps * |b|
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !

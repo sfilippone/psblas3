@@ -756,36 +756,36 @@ subroutine psb_c_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
   integer :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
-    PSBRSB_DEBUG('')
+  PSBRSB_DEBUG('')
 
-    if (present(iren).or.present(rscale).or.present(cscale)) then 
-      ! FIXME: error condition
-      PSBRSB_ERROR("unsupported optional arguments!")
-      call psb_error()
-    endif
+  if (present(iren).or.present(rscale).or.present(cscale)) then 
+    ! FIXME: error condition
+    PSBRSB_ERROR("unsupported optional arguments!")
+    call psb_error()
+  endif
 
-    if (present(append)) then 
-      append_ = append
-    else
-      append_ = .false.
-    endif
-    if (present(append).and.append.and.present(nzin)) then 
-      nzin_ = nzin
-    else
-      nzin_ = 0
-    endif
+  if (present(append)) then 
+    append_ = append
+  else
+    append_ = .false.
+  endif
+  if (present(append).and.append.and.present(nzin)) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
 
-    if (present(jmin)) then 
-      jmin_ = jmin
-    else
-      jmin_ = 1
-    endif
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
 
-    if (present(jmax)) then 
-      jmax_ = jmax
-    else
-      jmax_ = a%get_nrows()
-    endif
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_nrows()
+  endif
 
   if (present(rscale)) then 
     rscale_ = rscale
@@ -804,34 +804,34 @@ subroutine psb_c_rsb_csgetptn(imin,imax,a,nz,ia,ja,info,&
   end if
   if (present(iren)) then 
     info = c_psbrsb_err_ 
-      PSBRSB_ERROR("ERROR: the RSB pattern get needs iren support !!")
+    PSBRSB_ERROR("ERROR: the RSB pattern get needs iren support !!")
     goto 9999
   end if
 
 
-    !nzt = ..
-    nz = 0 
+  !nzt = ..
+  nz = 0 
 
-    call psb_ensure_size(nzin_,ia,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
+  call psb_ensure_size(nzin_,ia,info)
+  if (info == psb_success_) call psb_ensure_size(nzin_,ja,info)
 
-    if (info /= psb_success_) return
-    nz=rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_for_flags,info)
-    !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
-    ! FIXME: unfinished; missing error handling ..
+  if (info /= psb_success_) return
+  nz=rsb_get_block_nnz(a%rsbmptr,imin,imax,jmin_,jmax_,c_for_flags,info)
+  !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
+  ! FIXME: unfinished; missing error handling ..
 
-    call psb_ensure_size(nzin_+nz,ia,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_+nz,ja,info)
-    if (info /= psb_success_)then
-      PSBRSB_ERROR("!")
-      return
-    endif
-    
-    info=d_rsb_to_psb_info(rsb_get_block_sparse_pattern&
-    &(a%rsbmptr,imin,imax,jmin_,jmax_,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
-    ! FIXME: unfinished; missing error handling ..
+  call psb_ensure_size(nzin_+nz,ia,info)
+  if (info == psb_success_) call psb_ensure_size(nzin_+nz,ja,info)
+  if (info /= psb_success_)then
+    PSBRSB_ERROR("!")
+    return
+  endif
 
-    !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
+  info=d_rsb_to_psb_info(rsb_get_block_sparse_pattern&
+       &(a%rsbmptr,imin,imax,jmin_,jmax_,ia,ja,c_null_ptr,c_null_ptr,nzin_,c_for_flags))
+  ! FIXME: unfinished; missing error handling ..
+
+  !write(*,*) 'debug:',nzin_,nz,imin,imax,jmin_,jmax_
   if (rscale_) then 
     do i=nzin_+1, nzin_+nz
       ia(i) = ia(i) - imin + 1

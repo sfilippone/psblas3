@@ -72,8 +72,8 @@
   !                                           BICGSTAB(L) methods
   !    istop  -  integer(optional)            Input: stopping criterion, or how
   !                                           to estimate the error. 
-  !                                           1: err =  |r|/|b|
-  !                                           2: err =  |r|/(|a||x|+|b|)
+  !                                           1: err =  |r|/(|a||x|+|b|)
+  !                                           2: err =  |r|/|b|
   !                                           where r is the (preconditioned, recursive
   !                                           estimate of) residual 
   ! 

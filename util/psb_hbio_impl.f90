@@ -255,7 +255,7 @@ subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
     acpnt => aa
 
-    class default
+  class default
 
     call acsc%cp_from_fmt(aa, iret)
     if (iret /= 0) return

@@ -37,6 +37,7 @@
 ! type variants, such as number of rows and columns, whether the
 ! matrix is supposed to be triangular (upper or lower) and with a unit
 ! (i.e. assumed) diagonal, together with some state variables. This
+
 ! base class is in common among all variants of real/complex,
 ! short/long precision; as such, it only contains information that is
 ! inherently integer in nature.
