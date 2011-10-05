@@ -92,7 +92,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_sspmat_type)     :: a_glob
+  type(psb_sspmat_type)      :: a_glob
   real(psb_spk_)             :: b_glob(:)
   integer                    :: ictxt
   type(psb_sspmat_type)      :: a
@@ -120,8 +120,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   integer                     :: length_row, i_count, j_count,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-  integer, allocatable          :: iwork(:)
-  integer, allocatable          :: irow(:),icol(:)
+  integer, allocatable        :: iwork(:)
+  integer, allocatable        :: irow(:),icol(:)
   real(psb_spk_), allocatable :: val(:)
   integer, parameter          :: nb=30
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
@@ -533,7 +533,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   implicit none
 
   ! parameters
-  type(psb_dspmat_type)     :: a_glob
+  type(psb_dspmat_type)      :: a_glob
   real(psb_dpk_)             :: b_glob(:)
   integer                    :: ictxt
   type(psb_dspmat_type)      :: a
