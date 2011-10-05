@@ -179,8 +179,10 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   endif
   if (use_parts) then 
     call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
-  else 
+  else if (use_v) then 
     call psb_cdall(ictxt,desc_a,info,vg=v)
+  else
+    info = -1
   end if
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -1062,8 +1064,10 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   endif
   if (use_parts) then 
     call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
-  else 
+  else if (use_v) then 
     call psb_cdall(ictxt,desc_a,info,vg=v)
+  else
+    info = -1
   end if
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -1501,8 +1505,10 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   endif
   if (use_parts) then 
     call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
-  else 
+  else if (use_v) then 
     call psb_cdall(ictxt,desc_a,info,vg=v)
+  else
+    info = -1
   end if
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
