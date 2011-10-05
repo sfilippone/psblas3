@@ -33,9 +33,9 @@ subroutine psb_dprecinit(p,ptype,info)
 
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_dprecinit
-  use psb_d_nullprec
-  use psb_d_diagprec
-  use psb_d_bjacprec
+  use psb_d_nullprec, only : psb_d_null_prec_type
+  use psb_d_diagprec, only : psb_d_diag_prec_type
+  use psb_d_bjacprec, only : psb_d_bjac_prec_type
   implicit none
   type(psb_dprec_type), intent(inout)    :: p
   character(len=*), intent(in)           :: ptype

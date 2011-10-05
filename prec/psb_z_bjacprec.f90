@@ -218,7 +218,6 @@ contains
   subroutine psb_z_bjac_precbld(a,desc_a,prec,info,upd,mold,afmt)
 
     use psb_base_mod
-    use psb_prec_mod
     Implicit None
 
     type(psb_zspmat_type), intent(in), target :: a

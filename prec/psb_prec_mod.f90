@@ -106,16 +106,16 @@ module psb_prec_mod
       integer, intent(out)                   :: info
     end subroutine psb_dprecinit
     subroutine psb_cprecinit(prec,ptype,info)
-      use psb_base_mod
-      use psb_prec_type
+      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
+      use psb_prec_type, only : psb_cprec_type
       implicit none
       type(psb_cprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
       integer, intent(out)                   :: info
     end subroutine psb_cprecinit
     subroutine psb_zprecinit(prec,ptype,info)
-      use psb_base_mod
-      use psb_prec_type
+      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_prec_type, only : psb_zprec_type
       implicit none
       type(psb_zprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
