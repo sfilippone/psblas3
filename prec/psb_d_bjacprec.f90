@@ -213,6 +213,7 @@ contains
   subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,mold,afmt)
 
     use psb_base_mod
+    use psb_prec_mod, only : psb_ilu_fct
     Implicit None
 
     type(psb_dspmat_type), intent(in), target :: a

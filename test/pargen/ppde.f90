@@ -65,6 +65,7 @@ program ppde
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
+  use psb_util_mod
   implicit none
 
   ! input parameters
@@ -138,6 +139,8 @@ program ppde
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+!!$  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
+!!$  call hb_write(a,info,filename=fname,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
 !!$  write(fname,'(a,i2.2,a,i2.2,a)') 'amat-',iam,'-',np,'.mtx'
 !!$  call a%print(fname)
 !!$  call psb_cdprt(20+iam,desc_a,short=.false.)
