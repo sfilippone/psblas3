@@ -168,7 +168,7 @@ contains
 
     ngp = size(idxmap%vgp)
     do i=1, nv 
-      if ((1<=idx(i)).and.(idx(i)<ngp)) then
+      if ((1<=idx(i)).and.(idx(i)<=ngp)) then
         iprc(i) = idxmap%vgp(idx(i))
       else
         iprc(i) = -1

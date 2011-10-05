@@ -195,7 +195,7 @@ program d_file_spmv
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
   else 
-    if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
@@ -270,6 +270,7 @@ program d_file_spmv
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth
     bdwdth = times*nbytes/(tt2*1.d6)
     write(psb_out_unit,'("MBYTES/S                  (trans): ",F20.3)') bdwdth
+    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
     
   end if
 
