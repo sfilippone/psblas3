@@ -122,7 +122,8 @@ subroutine psi_bld_tmphalo(desc,info)
   do i=1,nh
     tmphl(j+0) = hproc(i)
     if (tmphl(j+0)<0) then 
-      write(psb_err_unit,*) 'Unrecoverable error: missing proc from asb'
+      write(psb_err_unit,*) me,'Unrecoverable error: missing proc from asb',&
+           & i, nh, n_row+i,helem(i),hproc(i)      
     end if
     tmphl(j+1) = 1
     tmphl(j+2) = n_row+i
