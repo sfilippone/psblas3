@@ -31,8 +31,6 @@
 !!$  
 program s_file_spmv
   use psb_base_mod
-  use psb_prec_mod
-  use psb_krylov_mod
   use psb_util_mod
   implicit none
 
@@ -41,9 +39,6 @@ program s_file_spmv
 
   ! sparse matrices
   type(psb_sspmat_type) :: a, aux_a
-
-  ! preconditioner data
-  type(psb_sprec_type)  :: prec
 
   ! dense matrices
   real(psb_spk_), allocatable, target ::  aux_b(:,:), d(:)
@@ -59,7 +54,7 @@ program s_file_spmv
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nr
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, annz, nbytes
+  integer(psb_long_int_k_) :: amatsize, descsize, annz, nbytes
   real(psb_spk_)   :: err, eps,cond
 
   character(len=5)   :: afmt
@@ -72,7 +67,7 @@ program s_file_spmv
   ! other variables
   integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
+  real(psb_dpk_) :: t1, t2, r_amax, b_amax,&
        &scale,resmx,resmxp, flops, bdwdth
   real(psb_dpk_) :: tt1, tt2, tflops
   integer :: nrhs, nrow, n_row, dim, nv, ne
@@ -99,9 +94,6 @@ program s_file_spmv
   if (iam == psb_root_) then 
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
-  end if
-  
-  if (iam == 0) then 
     read(psb_inp_unit,*) mtrx_file
     read(psb_inp_unit,*) filefmt
     read(psb_inp_unit,*) ipart
