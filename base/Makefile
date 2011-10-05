@@ -4,14 +4,8 @@ HERE=.
 LIBDIR=../lib
 LIBNAME=$(BASELIBNAME)
 LIBMOD=psb_base_mod$(.mod)
-lib: $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
-
-$(HERE)/$(LIBNAME): mods sr cm in pb tl
-
-$(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
+lib:  mods sr cm in pb tl
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-
-$(LIBDIR)/$(LIBMOD): $(LIBMOD)
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) *$(.mod) $(LIBDIR)
 
 sr cm in pb tl: mods
