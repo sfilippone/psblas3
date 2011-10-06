@@ -2569,7 +2569,7 @@ contains
     integer, intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer :: root_
-    integer(psb_long_int_k_) :: dat_
+    integer :: dat_
     integer :: iam, np, info
 
 #if !defined(SERIAL_MPI)
