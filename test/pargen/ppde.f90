@@ -139,8 +139,8 @@ program ppde
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-!!$  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
-!!$  call hb_write(a,info,filename=fname,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
+  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
+  call hb_write(a,info,filename=fname,rhs=b,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
 !!$  write(fname,'(a,i2.2,a,i2.2,a)') 'amat-',iam,'-',np,'.mtx'
 !!$  call a%print(fname)
 !!$  call psb_cdprt(20+iam,desc_a,short=.false.)
@@ -496,7 +496,7 @@ contains
           val(element)=-b1(x,y,z)-a1(x,y,z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          zt(k) = exp(-y**2-z**2)*(-val(element))
+          zt(k) = exp(-x**2-y**2-z**2)*(-val(element))
         else
           val(element)=-b1(x,y,z)-a1(x,y,z)
           val(element) = val(element)/(deltah*&
@@ -510,7 +510,7 @@ contains
           val(element)=-b2(x,y,z)-a2(x,y,z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
           val(element)=-b2(x,y,z)-a2(x,y,z)
           val(element) = val(element)/(deltah*deltah)
@@ -522,7 +522,7 @@ contains
         if (iz == 1) then 
           val(element)=-b3(x,y,z)-a3(x,y,z)
           val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
           val(element)=-b3(x,y,z)-a3(x,y,z)
           val(element) = val(element)/(deltah*deltah)
@@ -542,7 +542,7 @@ contains
         if (iz == idim) then 
           val(element)=-b1(x,y,z)
           val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
           val(element)=-b1(x,y,z)
           val(element) = val(element)/(deltah*deltah)
@@ -554,7 +554,7 @@ contains
         if (iy == idim) then 
           val(element)=-b2(x,y,z)
           val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
           val(element)=-b2(x,y,z)
           val(element) = val(element)/(deltah*deltah)
