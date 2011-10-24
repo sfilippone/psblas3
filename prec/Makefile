@@ -28,18 +28,11 @@ COBJS=
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 OBJS=$(F90OBJS) $(COBJS) $(MPFOBJS) $(MODOBJS)
 
-lib:  $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
-
-$(HERE)/$(LIBNAME): $(OBJS)
+lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-
-$(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-
-$(LIBDIR)/$(LIBMOD):
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
-
 
 
 $(OBJS): $(LIBDIR)/psb_base_mod$(.mod)

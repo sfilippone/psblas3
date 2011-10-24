@@ -48,6 +48,113 @@
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !    jy     -  integer(optional).   The column offset for sub( Y ).
 !
+function psb_ddot_vect(x, y, desc_a,info) result(res)
+  use psb_descriptor_type
+  use psb_d_base_mat_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_d_vect_mod
+  use psb_d_psblas_mod, psb_protect_name => psb_ddot_vect
+  implicit none 
+  real(psb_dpk_)                   :: res
+  type(psb_d_vect_type), intent(inout)    :: x, y
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer, intent(out)             :: info
+  
+  ! locals
+  integer                  :: ictxt, np, me, idx, ndm,&
+       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
+  real(psb_dpk_)         :: dot_local
+  real(psb_dpk_)         :: ddot
+  character(len=20)      :: name, ch_err
+
+  name='psb_ddot'
+  res = dzero
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  ijx = ione
+
+  iy = ione
+  ijy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if (info == psb_success_) &
+       & call psb_chkvect(m,ione,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione).or.(iiy /= ione)) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if(m /= 0) then
+    nr = desc_a%get_local_rows() 
+    if(nr > 0) then
+      dot_local = x%dot(nr,y)
+!!$      ! adjust dot_local because overlapped elements are computed more than once
+!!$      do i=1,size(desc_a%ovrlap_elem,1)
+!!$        idx  = desc_a%ovrlap_elem(i,1)
+!!$        ndm  = desc_a%ovrlap_elem(i,2)
+!!$        dot_local = dot_local - (real(ndm-1)/real(ndm))*(x(idx)*y(idx))
+!!$      end do
+    else
+      dot_local=dzero
+    end if
+  else
+    dot_local=dzero
+  end if
+
+  ! compute global sum
+  call psb_sum(ictxt, dot_local)
+  
+  res = dot_local
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+  
+end function psb_ddot_vect
+
 function psb_ddot(x, y,desc_a, info, jx, jy)  
   use psb_descriptor_type
   use psb_check_mod
@@ -69,7 +176,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -221,7 +328,7 @@ function psb_ddotv(x, y,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -356,7 +463,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -488,7 +595,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dmdots'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 

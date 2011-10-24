@@ -47,6 +47,22 @@ Module psb_z_tools_mod
       integer, intent(out)            :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_zallocv
+    subroutine psb_zalloc_vect(x, desc_a,info,n)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_z_vect_type), intent(out)  :: x
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n
+    end subroutine psb_zalloc_vect
+    subroutine psb_zalloc_vect_r2(x, desc_a,info,n,lb)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_z_vect_type), allocatable, intent(out)  :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n, lb
+    end subroutine psb_zalloc_vect_r2
   end interface
 
 
@@ -63,6 +79,22 @@ Module psb_z_tools_mod
       complex(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_zasbv
+    subroutine psb_zasb_vect(x, desc_a, info,mold)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_z_vect_type), intent(inout) :: x
+      integer, intent(out)             ::  info
+      class(psb_z_base_vect_type), intent(in), optional :: mold
+    end subroutine psb_zasb_vect
+    subroutine psb_zasb_vect_r2(x, desc_a, info,mold)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_z_vect_type), intent(inout) :: x(:)
+      integer, intent(out)             ::  info
+      class(psb_z_base_vect_type), intent(in), optional :: mold
+    end subroutine psb_zasb_vect_r2
   end interface
 
   interface psb_sphalo
@@ -93,6 +125,20 @@ Module psb_z_tools_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer, intent(out)            :: info
     end subroutine psb_zfreev
+    subroutine psb_zfree_vect(x, desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_z_vect_type), intent(inout) :: x
+      integer, intent(out)             ::  info
+    end subroutine psb_zfree_vect
+    subroutine psb_zfree_vect_r2(x, desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_z_vect_type), allocatable, intent(inout) :: x(:)
+      integer, intent(out)             ::  info
+    end subroutine psb_zfree_vect_r2
   end interface
 
 
@@ -117,9 +163,29 @@ Module psb_z_tools_mod
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_zinsvi
+    subroutine psb_zins_vect(m,irw,val,x,desc_a,info,dupl)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      integer, intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_z_vect_type), intent(inout) :: x
+      integer, intent(in)              :: irw(:)
+      complex(psb_dpk_), intent(in)    :: val(:)
+      integer, intent(out)             :: info
+      integer, optional, intent(in)    :: dupl
+    end subroutine psb_zins_vect
+    subroutine psb_zins_vect_r2(m,irw,val,x,desc_a,info,dupl)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_z_vect_mod
+      integer, intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_z_vect_type), intent(inout) :: x(:)
+      integer, intent(in)              :: irw(:)
+      complex(psb_dpk_), intent(in)    :: val(:,:)
+      integer, intent(out)             :: info
+      integer, optional, intent(in)    :: dupl
+    end subroutine psb_zins_vect_r2
   end interface
-
-
 
   interface psb_cdbldext
     Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info,extype)
@@ -203,92 +269,5 @@ Module psb_z_tools_mod
       logical, intent(in), optional        :: clear
     end subroutine psb_zsprn
   end interface
-
-
-!!$  interface psb_linmap_init
-!!$    module procedure psb_zlinmap_init
-!!$  end interface
-!!$
-!!$  interface psb_linmap_ins
-!!$    module procedure psb_zlinmap_ins
-!!$  end interface
-!!$
-!!$  interface psb_linmap_asb
-!!$    module procedure psb_zlinmap_asb
-!!$  end interface
-!!$
-!!$contains
-!!$
-!!$
-!!$  subroutine psb_zlinmap_init(a_map,cd_xt,descin,descout)
-!!$    use psb_base_tools_mod
-!!$    use psb_z_mat_mod
-!!$    use psb_descriptor_type
-!!$    use psb_serial_mod
-!!$    use psb_penv_mod
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$    type(psb_zspmat_type), intent(out) :: a_map
-!!$    type(psb_desc_type), intent(out)   :: cd_xt
-!!$    type(psb_desc_type), intent(in)    :: descin, descout 
-!!$
-!!$    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
-!!$
-!!$    ictxt = psb_cd_get_context(descin)
-!!$
-!!$    call psb_cdcpy(descin,cd_xt,info)
-!!$    if (info == psb_success_) call psb_cd_reinit(cd_xt,info)
-!!$    if (info /= psb_success_) then 
-!!$      write(psb_err_unit,*) 'Error on reinitialising the extension map'
-!!$      call psb_error(ictxt)
-!!$      call psb_abort(ictxt)
-!!$      stop
-!!$    end if
-!!$
-!!$    nrow_in  = psb_cd_get_local_rows(cd_xt)
-!!$    ncol_in  = psb_cd_get_local_cols(cd_xt)
-!!$    nrow_out = psb_cd_get_local_rows(descout)
-!!$
-!!$    call a_map%csall(nrow_out,ncol_in,info)
-!!$
-!!$  end subroutine psb_zlinmap_init
-!!$
-!!$  subroutine psb_zlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
-!!$    use psb_base_tools_mod
-!!$    use psb_z_mat_mod
-!!$    use psb_descriptor_type
-!!$    implicit none 
-!!$    integer, intent(in)                  :: nz
-!!$    integer, intent(in)                  :: ir(:),ic(:)
-!!$    complex(psb_dpk_), intent(in)      :: val(:)
-!!$    type(psb_zspmat_type), intent(inout) :: a_map
-!!$    type(psb_desc_type), intent(inout)   :: cd_xt
-!!$    type(psb_desc_type), intent(in)      :: descin, descout 
-!!$    integer :: info
-!!$
-!!$    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
-!!$
-!!$  end subroutine psb_zlinmap_ins
-!!$
-!!$  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout,afmt)
-!!$    use psb_base_tools_mod
-!!$    use psb_z_mat_mod
-!!$    use psb_descriptor_type
-!!$    use psb_serial_mod
-!!$    implicit none 
-!!$    type(psb_zspmat_type), intent(inout)   :: a_map
-!!$    type(psb_desc_type), intent(inout)     :: cd_xt
-!!$    type(psb_desc_type), intent(in)        :: descin, descout 
-!!$    character(len=*), optional, intent(in) :: afmt
-!!$
-!!$    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
-!!$
-!!$    ictxt = psb_cd_get_context(descin)
-!!$
-!!$    call psb_cdasb(cd_xt,info)
-!!$    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
-!!$    call a_map%cscnv(info,type=afmt)
-!!$
-!!$  end subroutine psb_zlinmap_asb
 
 end module psb_z_tools_mod

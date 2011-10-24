@@ -98,10 +98,10 @@ contains
     integer   :: i,j,k, ir, jc
     real(psb_spk_) :: acc
 
-    if (alpha == dzero) then
-      if (beta == dzero) then
+    if (alpha == szero) then
+      if (beta == szero) then
         do i = 1, m
-          y(i) = dzero
+          y(i) = szero
         enddo
       else
         do  i = 1, m
@@ -114,21 +114,21 @@ contains
 
     if (.not.tra) then 
 
-      if (beta == dzero) then 
+      if (beta == szero) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc - val(j) * x(ja(j))          
             enddo
@@ -138,7 +138,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -148,18 +148,18 @@ contains
         end if
 
 
-      else if (beta == done) then 
+      else if (beta == sone) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = y(i) + acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
             acc  = y(i)
@@ -172,7 +172,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -181,9 +181,9 @@ contains
 
         end if
 
-      else if (beta == -done) then 
+      else if (beta == -sone) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
             acc  = -y(i)
             do j=irp(i), irp(i+1)-1
@@ -192,7 +192,7 @@ contains
             y(i) = acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
             acc  = y(i)
@@ -205,7 +205,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -216,19 +216,19 @@ contains
 
       else 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = beta*y(i) + acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -238,7 +238,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = szero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -251,13 +251,13 @@ contains
 
     else if (tra) then 
 
-      if (beta == dzero) then 
+      if (beta == szero) then 
         do i=1, m
-          y(i) = dzero
+          y(i) = szero
         end do
-      else if (beta == done) then 
+      else if (beta == sone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -sone) then 
         do i=1, m
           y(i) = -y(i) 
         end do
@@ -267,7 +267,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == sone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -276,7 +276,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -sone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -402,10 +402,10 @@ contains
     integer   :: i,j,k, ir, jc
 
 
-    if (alpha == dzero) then
-      if (beta == dzero) then
+    if (alpha == szero) then
+      if (beta == szero) then
         do i = 1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = szero
         enddo
       else
         do  i = 1, m
@@ -417,21 +417,21 @@ contains
 
     if (.not.tra) then 
 
-      if (beta == dzero) then 
+      if (beta == szero) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
             enddo
@@ -441,7 +441,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -451,9 +451,9 @@ contains
         end if
 
 
-      else if (beta == done) then 
+      else if (beta == sone) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
             acc(1:nc)  = y(i,1:nc)
             do j=irp(i), irp(i+1)-1
@@ -462,7 +462,7 @@ contains
             y(i,1:nc) = acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m
             acc(1:nc)  = y(i,1:nc)
@@ -475,7 +475,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -484,21 +484,21 @@ contains
 
         end if
 
-      else if (beta == -done) then 
+      else if (beta == -sone) then 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = -y(i,1:nc) + acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -508,7 +508,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -519,19 +519,19 @@ contains
 
       else 
 
-        if (alpha == done) then 
+        if (alpha == sone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = beta*y(i,1:nc) + acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -sone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -541,7 +541,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = szero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -554,13 +554,13 @@ contains
 
     else if (tra) then 
 
-      if (beta == dzero) then 
+      if (beta == szero) then 
         do i=1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = szero
         end do
-      else if (beta == done) then 
+      else if (beta == sone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -sone) then 
         do i=1, m
           y(i,1:nc) = -y(i,1:nc) 
         end do
@@ -570,7 +570,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == sone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -579,7 +579,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -sone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -666,10 +666,10 @@ subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
   
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = szero
       enddo
     else
       do  i = 1, m
@@ -679,13 +679,13 @@ subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == szero) then 
 
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,y) 
-    if (alpha == done) then 
+    if (alpha == sone) then 
       ! do nothing
-    else if (alpha == -done) then 
+    else if (alpha == -sone) then 
       do  i = 1, m
         y(i) = -y(i)
       end do
@@ -737,7 +737,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=1, n
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -745,7 +745,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, n
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-2
               acc = acc + val(j)*y(ja(j))
             end do
@@ -756,7 +756,7 @@ contains
 
         if (unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -764,7 +764,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=irp(i)+1, irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -875,10 +875,10 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,:) = szero
       enddo
     else
       do  i = 1, m
@@ -888,7 +888,7 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == szero) then 
     call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
@@ -955,7 +955,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -963,7 +963,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-2
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -974,7 +974,7 @@ contains
 
         if (unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -982,7 +982,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=irp(i)+1, irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -1044,6 +1044,27 @@ contains
 
 end subroutine psb_s_csr_cssm
 
+function psb_s_csr_maxval(a) result(res)
+  use psb_error_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_maxval
+  implicit none 
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  character(len=20)  :: name='d_csr_maxval'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_s_csr_maxval
+
+
 function psb_s_csr_csnmi(a) result(res)
   use psb_error_mod
   use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_csnmi
@@ -1059,10 +1080,10 @@ function psb_s_csr_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = szero 
  
   do i = 1, a%get_nrows()
-    acc = dzero
+    acc = szero
     do j=a%irp(i),a%irp(i+1)-1  
       acc = acc + abs(a%val(j))
     end do
@@ -1070,6 +1091,246 @@ function psb_s_csr_csnmi(a) result(res)
   end do
 
 end function psb_s_csr_csnmi
+
+function psb_s_csr_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_csnm1
+
+  implicit none 
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act
+  character(len=20)  :: name='d_csr_csnm1'
+  logical, parameter :: debug=.false.
+
+
+  res = -sone 
+  nnz = a%get_nzeros()
+  m = a%get_nrows()
+  n = a%get_ncols()
+  allocate(vt(n),stat=info)
+  if (info /= 0) return
+  vt(:) = szero
+  do i=1, m
+    do j=a%irp(i),a%irp(i+1)-1
+      k = a%ja(j)
+      vt(k) = vt(k) + abs(a%val(j))
+    end do
+  end do
+  res = maxval(vt(1:n))
+  deallocate(vt,stat=info)
+
+  return
+
+end function psb_s_csr_csnm1
+
+subroutine psb_s_csr_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_rowsum
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)             :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_nrows()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  do i = 1, a%get_nrows()
+    d(i) = szero
+    do j=a%irp(i),a%irp(i+1)-1  
+      d(i) = d(i) + (a%val(j))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csr_rowsum
+
+subroutine psb_s_csr_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_arwsum
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_nrows()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+
+  do i = 1, a%get_nrows()
+    d(i) = szero
+    do j=a%irp(i),a%irp(i+1)-1  
+      d(i) = d(i) + abs(a%val(j))
+    end do
+  end do
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csr_arwsum
+
+subroutine psb_s_csr_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_colsum
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_nrows()
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%irp(i),a%irp(i+1)-1
+      k = a%ja(j)
+      d(k) = d(k) + (a%val(j))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csr_colsum
+
+subroutine psb_s_csr_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_s_csr_aclsum
+  class(psb_s_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_nrows()
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%irp(i),a%irp(i+1)-1
+      k = a%ja(j)
+      d(k) = d(k) + abs(a%val(j))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csr_aclsum
 
 subroutine psb_s_csr_get_diag(a,d,info) 
   use psb_error_mod
@@ -1109,7 +1370,7 @@ subroutine psb_s_csr_get_diag(a,d,info)
     end do
   end if
   do i=mnm+1,size(d) 
-    d(i) = dzero
+    d(i) = szero
   end do
   call psb_erractionrestore(err_act)
   return
@@ -2076,7 +2337,7 @@ subroutine psb_s_csr_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then 
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = szero
     call a%set_upd()
   else
     info = psb_err_invalid_mat_state_

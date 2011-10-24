@@ -6,7 +6,7 @@ LIBDIR=../lib
 
 MODOBJS= psb_base_inner_krylov_mod.o \
 	psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o \
-	psb_inner_krylov_mod.o psb_krylov_mod.o
+	psb_krylov_mod.o
 F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
         psb_dcgstab.o psb_dcg.o psb_dcgs.o \
 	psb_dbicg.o psb_dcgstabl.o psb_drgmres.o\
@@ -24,17 +24,12 @@ LIBNAME=$(METHDLIBNAME)
 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
-lib:  $(LIBDIR)/$(LIBNAME) $(LIBDIR)/$(LIBMOD)
-
-$(LIBDIR)/$(LIBNAME): $(HERE)/$(LIBNAME)
-	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-
-$(LIBDIR)/$(LIBMOD):
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
-
-$(HERE)/$(LIBNAME): $(OBJS) 
+lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
+	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
+
 
 psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o:  psb_base_inner_krylov_mod.o
 psb_inner_krylov_mod.o: psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o 

@@ -250,3 +250,148 @@ subroutine psb_casbv(x, desc_a, info)
 
 end subroutine psb_casbv
 
+subroutine psb_casb_vect(x, desc_a, info, mold)
+  use psb_base_mod, psb_protect_name => psb_casb_vect
+  implicit none
+
+  type(psb_desc_type), intent(in)  ::  desc_a
+  type(psb_c_vect_type), intent(inout) ::  x
+  integer, intent(out)        ::  info
+  class(psb_c_base_vect_type), intent(in), optional :: mold
+
+  ! local variables
+  integer :: ictxt,np,me
+  integer :: int_err(5), i1sz,nrow,ncol, err_act
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
+
+  info = psb_success_
+  if (psb_errstatus_fatal()) return 
+
+  int_err(1) = 0
+  name = 'psb_cgeasb_v'
+
+  ictxt       = desc_a%get_context()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  call psb_info(ictxt, me, np)
+
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  else   if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+
+  call x%asb(ncol,info)
+  ! ..update halo elements..
+  call psb_halo(x,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_halo')
+    goto 9999
+  end if
+  if (present(mold)) then 
+    call x%cnv(mold)
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_casb_vect
+
+
+subroutine psb_casb_vect_r2(x, desc_a, info, mold)
+  use psb_base_mod, psb_protect_name => psb_casb_vect_r2
+  implicit none
+
+  type(psb_desc_type), intent(in)  ::  desc_a
+  type(psb_c_vect_type), intent(inout) ::  x(:)
+  integer, intent(out)        ::  info
+  class(psb_c_base_vect_type), intent(in), optional :: mold
+
+  ! local variables
+  integer :: ictxt,np,me, i, n 
+  integer :: int_err(5), i1sz,nrow,ncol, err_act
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
+
+  info = psb_success_
+  if (psb_errstatus_fatal()) return 
+
+  int_err(1) = 0
+  name = 'psb_cgeasb_v'
+
+  ictxt       = desc_a%get_context()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  call psb_info(ictxt, me, np)
+
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  else   if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  n    = size(x)
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+
+  do i=1, n
+    call x(i)%asb(ncol,info)
+    if (info /= 0) exit
+    ! ..update halo elements..
+    call psb_halo(x(i),desc_a,info)
+    if (info /= 0) exit
+    if (present(mold)) then 
+      call x(i)%cnv(mold)
+    end if
+  end do
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_halo')
+    goto 9999
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_casb_vect_r2

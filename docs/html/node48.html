@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdfree -- Frees a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdfree -- Frees a communication descriptor">
+<TITLE>psb_cdasb -- Communication descriptor assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_cdasb -- Communication descriptor assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node49.html">
 <LINK REL="previous" HREF="node47.html">
-<LINK REL="up" HREF="node43.html">
+<LINK REL="up" HREF="node45.html">
 <LINK REL="next" HREF="node49.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html790"
+<A NAME="tex2html795"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html786"
-  HREF="node43.html">
+<A NAME="tex2html791"
+  HREF="node45.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html780"
+<A NAME="tex2html785"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html788"
+<A NAME="tex2html793"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html791"
-  HREF="node49.html">psb_cdbldext   Build</A>
-<B> Up:</B> <A NAME="tex2html787"
-  HREF="node43.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html781"
-  HREF="node47.html">psb_cdcpy   Copies</A>
- &nbsp; <B>  <A NAME="tex2html789"
+<B> Next:</B> <A NAME="tex2html796"
+  HREF="node49.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html792"
+  HREF="node45.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html786"
+  HREF="node47.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html794"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00075000000000000000">
-psb_cdfree -- Frees a communication descriptor</A>
+<H2><A NAME="SECTION00073000000000000000">
+psb_cdasb -- Communication descriptor assembly routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdfree(desc_a, info)
+call psb_cdasb(desc_a, info)
 </PRE>
 
 <P>
@@ -69,7 +69,7 @@ call psb_cdfree(desc_a, info)
 <DD>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor to be freed.
+<DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -86,6 +86,17 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -98,6 +109,13 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>On exit from this routine the descriptor is in the assembled
+  state. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

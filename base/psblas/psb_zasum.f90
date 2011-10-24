@@ -121,14 +121,12 @@ function psb_zasum (x,desc_a, info, jx)
         asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx,jjx))
       end do
 
-      ! compute global sum
-      call psb_sum(ictxt, asum)
 
     else
       asum=0.d0
-      ! compute global sum
-      call psb_sum(ictxt, asum)
     end if
+    ! compute global sum
+    call psb_sum(ictxt, asum)
   else
      asum=0.d0
   end if
@@ -148,6 +146,96 @@ function psb_zasum (x,desc_a, info, jx)
   end if
   return
 end function psb_zasum
+
+
+function psb_zasum_vect(x, desc_a, info) result(res)
+  use psb_penv_mod
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_z_vect_mod
+  implicit none
+
+  real(psb_dpk_)                        :: res
+  type(psb_z_vect_type), intent (inout) :: x
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer, intent(out)                  :: info
+
+  ! locals
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, jx, ix, m, imax
+  real(psb_dpk_)         :: asum
+  character(len=20)        :: name, ch_err
+
+  name='psb_zasumv'
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  asum=0.d0
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = 1
+  jx = 1
+
+  m = desc_a%get_global_rows()
+
+  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
+    asum=x%asum(desc_a%get_local_rows())
+  else 
+    asum = dzero
+  end if
+
+  ! compute global sum
+  call psb_sum(ictxt, asum)
+
+  res=asum
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+  
+end function psb_zasum_vect
+
 
 
 !!$ 

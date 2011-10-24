@@ -71,10 +71,10 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = szero
       enddo
     else
       do  i = 1, m
@@ -86,21 +86,21 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
 
   if (tra) then 
 
-    if (beta == dzero) then 
+    if (beta == szero) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
           y(i) = acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -110,7 +110,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -120,21 +120,21 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       end if
 
 
-    else if (beta == done) then 
+    else if (beta == sone) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
           y(i) = y(i) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -144,7 +144,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -153,21 +153,21 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
 
       end if
 
-    else if (beta == -done) then 
+    else if (beta == -sone) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
           y(i) = -y(i) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -177,7 +177,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -188,19 +188,19 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
 
     else 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
           y(i) = beta*y(i) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -210,7 +210,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j))          
           enddo
@@ -223,13 +223,13 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
 
   else if (.not.tra) then 
 
-    if (beta == dzero) then 
+    if (beta == szero) then 
       do i=1, m
-        y(i) = dzero
+        y(i) = szero
       end do
-    else if (beta == done) then 
+    else if (beta == sone) then 
       ! Do nothing
-    else if (beta == -done) then 
+    else if (beta == -sone) then 
       do i=1, m
         y(i) = -y(i) 
       end do
@@ -239,7 +239,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
       end do
     end if
 
-    if (alpha == done) then
+    if (alpha == sone) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -248,7 +248,7 @@ subroutine psb_s_csc_csmv(alpha,a,x,beta,y,info,trans)
         end do
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -sone) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -354,10 +354,10 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,:) = szero
       enddo
     else
       do  i = 1, m
@@ -369,21 +369,21 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
 
   if (tra) then 
 
-    if (beta == dzero) then 
+    if (beta == szero) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
           y(i,:) = acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -393,7 +393,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -403,21 +403,21 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       end if
 
 
-    else if (beta == done) then 
+    else if (beta == sone) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
           y(i,:) = y(i,:) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -427,7 +427,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -436,21 +436,21 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
 
       end if
 
-    else if (beta == -done) then 
+    else if (beta == -sone) then 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
           y(i,:) = -y(i,:) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -460,7 +460,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -471,19 +471,19 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
 
     else 
 
-      if (alpha == done) then 
+      if (alpha == sone) then 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
           y(i,:) = beta*y(i,:) + acc
         end do
 
-      else if (alpha == -done) then 
+      else if (alpha == -sone) then 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -493,7 +493,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       else 
 
         do i=1,m 
-          acc  = dzero
+          acc  = szero
           do j=a%icp(i), a%icp(i+1)-1
             acc  = acc + a%val(j) * x(a%ia(j),:)          
           enddo
@@ -506,13 +506,13 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
 
   else if (.not.tra) then 
 
-    if (beta == dzero) then 
+    if (beta == szero) then 
       do i=1, m
-        y(i,:) = dzero
+        y(i,:) = szero
       end do
-    else if (beta == done) then 
+    else if (beta == sone) then 
       ! Do nothing
-    else if (beta == -done) then 
+    else if (beta == -sone) then 
       do i=1, m
         y(i,:) = -y(i,:) 
       end do
@@ -522,7 +522,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
       end do
     end if
 
-    if (alpha == done) then
+    if (alpha == sone) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -531,7 +531,7 @@ subroutine psb_s_csc_csmm(alpha,a,x,beta,y,info,trans)
         end do
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -sone) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -629,10 +629,10 @@ subroutine psb_s_csc_cssv(alpha,a,x,beta,y,info,trans)
 
 
   
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = szero
       enddo
     else
       do  i = 1, m
@@ -642,12 +642,12 @@ subroutine psb_s_csc_cssv(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == szero) then 
     call inner_cscsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%icp,a%ia,a%val,x,y) 
-    if (alpha == done) then 
+    if (alpha == sone) then 
       ! do nothing
-    else if (alpha == -done) then 
+    else if (alpha == -sone) then 
       do  i = 1, m
         y(i) = -y(i)
       end do
@@ -699,7 +699,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-1
               acc = acc + val(j)*y(ia(j))
             end do
@@ -707,7 +707,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=icp(i)+1, icp(i+1)-1
               acc = acc + val(j)*y(ia(j))
             end do
@@ -719,7 +719,7 @@ contains
 
         if (unit) then 
           do i=1, n
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-1
               acc = acc + val(j)*y(ia(j))
             end do
@@ -727,7 +727,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, n
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-2
               acc = acc + val(j)*y(ia(j))
             end do
@@ -853,10 +853,10 @@ subroutine psb_s_csc_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == szero) then
+    if (beta == szero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,:) = szero
       enddo
     else
       do  i = 1, m
@@ -866,7 +866,7 @@ subroutine psb_s_csc_cssm(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == szero) then 
     call inner_cscsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%icp,a%ia,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
@@ -934,7 +934,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-1
               acc = acc + val(j)*y(ia(j),1:nc)
             end do
@@ -942,7 +942,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = szero 
             do j=icp(i)+1, icp(i+1)-1
               acc = acc + val(j)*y(ia(j),1:nc)
             end do
@@ -954,7 +954,7 @@ contains
 
         if (unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-1
               acc = acc + val(j)*y(ia(j),1:nc)
             end do
@@ -962,7 +962,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = szero 
             do j=icp(i), icp(i+1)-2
               acc = acc + val(j)*y(ia(j),1:nc)
             end do
@@ -1026,6 +1026,26 @@ contains
 
 end subroutine psb_s_csc_cssm
 
+function psb_s_csc_maxval(a) result(res)
+  use psb_error_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_maxval
+  implicit none 
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  character(len=20)  :: name='d_csc_maxval'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_s_csc_maxval
+
 function psb_s_csc_csnmi(a) result(res)
   use psb_error_mod
   use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_csnmi
@@ -1041,14 +1061,14 @@ function psb_s_csc_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = szero 
   nr = a%get_nrows()
   nc = a%get_ncols()
   allocate(acc(nr),stat=info)
   if (info /= psb_success_) then 
     return
   end if
-  acc(:) = dzero
+  acc(:) = szero
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1  
       acc(a%ia(j)) = acc(a%ia(j)) + abs(a%val(j))
@@ -1061,6 +1081,240 @@ function psb_s_csc_csnmi(a) result(res)
 
 end function psb_s_csc_csnmi
 
+function psb_s_csc_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_csnm1
+
+  implicit none 
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act
+  character(len=20)  :: name='d_csc_csnm1'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  m = a%get_nrows()
+  n = a%get_ncols()
+  do j=1, n
+    acc = szero 
+    do k=a%icp(j),a%icp(j+1)-1
+      acc = acc + abs(a%val(k))
+    end do
+    res = max(res,acc)
+  end do
+  
+  return
+
+end function psb_s_csc_csnm1
+
+subroutine psb_s_csc_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_colsum
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)             :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  do i = 1, a%get_ncols()
+    d(i) = szero
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + (a%val(j))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csc_colsum
+
+subroutine psb_s_csc_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_aclsum
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+
+  do i = 1, a%get_ncols()
+    d(i) = szero
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + abs(a%val(j))
+    end do
+  end do
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csc_aclsum
+
+subroutine psb_s_csc_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_rowsum
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + (a%val(k))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csc_rowsum
+
+subroutine psb_s_csc_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csc_mat_mod, psb_protect_name => psb_s_csc_arwsum
+  class(psb_s_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + abs(a%val(k))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_s_csc_arwsum
 
 subroutine psb_s_csc_get_diag(a,d,info) 
   use psb_error_mod
@@ -2398,7 +2652,7 @@ subroutine psb_s_csc_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then 
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = szero
     call a%set_upd()
   else
     info = psb_err_invalid_mat_state_

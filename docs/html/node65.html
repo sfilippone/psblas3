@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_local_index </TITLE>
-<META NAME="description" CONTENT="psb_local_index ">
+<TITLE>psb_owned_index </TITLE>
+<META NAME="description" CONTENT="psb_owned_index ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node66.html">
 <LINK REL="previous" HREF="node64.html">
-<LINK REL="up" HREF="node43.html">
+<LINK REL="up" HREF="node45.html">
 <LINK REL="next" HREF="node66.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html994"
+<A NAME="tex2html999"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html990"
-  HREF="node43.html">
+<A NAME="tex2html995"
+  HREF="node45.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html984"
+<A NAME="tex2html989"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html992"
+<A NAME="tex2html997"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html995"
-  HREF="node66.html">psb_get_boundary   Extract</A>
-<B> Up:</B> <A NAME="tex2html991"
-  HREF="node43.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html985"
-  HREF="node64.html">psb_is_local</A>
- &nbsp; <B>  <A NAME="tex2html993"
+<B> Next:</B> <A NAME="tex2html1000"
+  HREF="node66.html">psb_is_local</A>
+<B> Up:</B> <A NAME="tex2html996"
+  HREF="node45.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html990"
+  HREF="node64.html">psb_is_owned</A>
+ &nbsp; <B>  <A NAME="tex2html998"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000722000000000000000">
-psb_local_index </A>
+<H2><A NAME="SECTION000720000000000000000">
+psb_owned_index </A>
 </H2>
 
 <P>
 <PRE>
-call psb_local_index(y, x, desc_a, info)
+call psb_owned_index(y, x, desc_a, info)
 </PRE>
 
 <P>
@@ -111,9 +111,9 @@ Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
 <DT><STRONG>y</STRONG></DT>
 <DD>A logical mask which is true for all corresponding entries of
   <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> that are local to  the current process
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$x$"> that are owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
@@ -140,8 +140,8 @@ An integer value; 0 means no error has been detected.
 
 <OL>
 <LI>This routine returns a <code>.true.</code> value for those indices
-  that are local to  the current process, including the halo
-  indices.
+  that are strictly owned by the current process, excluding the halo
+  indices
 </LI>
 </OL>
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_spall -- Allocates a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_spall -- Allocates a sparse matrix">
+<TITLE>psb_cdfree -- Frees a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdfree -- Frees a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node51.html">
 <LINK REL="previous" HREF="node49.html">
-<LINK REL="up" HREF="node43.html">
+<LINK REL="up" HREF="node45.html">
 <LINK REL="next" HREF="node51.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html814"
+<A NAME="tex2html819"
   HREF="node51.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html810"
-  HREF="node43.html">
+<A NAME="tex2html815"
+  HREF="node45.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html804"
+<A NAME="tex2html809"
   HREF="node49.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html812"
+<A NAME="tex2html817"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html815"
-  HREF="node51.html">psb_spins   Insert</A>
-<B> Up:</B> <A NAME="tex2html811"
-  HREF="node43.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html805"
-  HREF="node49.html">psb_cdbldext   Build</A>
- &nbsp; <B>  <A NAME="tex2html813"
+<B> Next:</B> <A NAME="tex2html820"
+  HREF="node51.html">psb_cdbldext   Build</A>
+<B> Up:</B> <A NAME="tex2html816"
+  HREF="node45.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html810"
+  HREF="node49.html">psb_cdcpy   Copies</A>
+ &nbsp; <B>  <A NAME="tex2html818"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00077000000000000000">
-psb_spall -- Allocates a sparse matrix</A>
+<H2><A NAME="SECTION00075000000000000000">
+psb_cdfree -- Frees a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_spall(a, desc_a, info, nnz)
+call psb_cdfree(desc_a, info)
 </PRE>
 
 <P>
@@ -69,27 +69,15 @@ call psb_spall(a, desc_a, info, nnz)
 <DD>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DD>the communication descriptor to be freed.
 <BR>
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>nnz</STRONG></DT>
-<DD>An estimate of the number of nonzeroes in the local
-  part of the assembled matrix.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. 
 </DD>
 </DL>
 
@@ -97,17 +85,6 @@ Specified as: an integer value.
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix to be allocated.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>required</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -121,49 +98,9 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>On exit from this routine the sparse matrix  is in the build
-  state.
-</LI>
-<LI>The descriptor may be in either the build or assembled state.
-</LI>
-<LI>Providing a good estimate for the number of nonzeroes <IMG
- WIDTH="32" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img102.png"
- ALT="$nnz$"> in
-  the assembled matrix may substantially improve performance in the
-  matrix build phase, as it will reduce or eliminate the need for
-  (potentially multiple) data reallocations. 
-</LI>
-</OL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html814"
-  HREF="node51.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html810"
-  HREF="node43.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html804"
-  HREF="node49.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html812"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html815"
-  HREF="node51.html">psb_spins   Insert</A>
-<B> Up:</B> <A NAME="tex2html811"
-  HREF="node43.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html805"
-  HREF="node49.html">psb_cdbldext   Build</A>
- &nbsp; <B>  <A NAME="tex2html813"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

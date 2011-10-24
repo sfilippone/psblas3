@@ -32,23 +32,30 @@
 module psb_d_psblas_mod
 
   interface psb_gedot
-    function psb_ddotv(x, y, desc_a,info) 
+    function psb_ddot_vect(x, y, desc_a,info) result(res)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      real(psb_dpk_)                   :: psb_ddotv
+      use psb_d_vect_mod, only : psb_d_vect_type
+      real(psb_dpk_)                   :: res
+      type(psb_d_vect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+    end function psb_ddot_vect
+    function psb_ddotv(x, y, desc_a,info)  result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      real(psb_dpk_)                   :: res
       real(psb_dpk_), intent(in)       :: x(:), y(:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
     end function psb_ddotv
-    function psb_ddot(x, y, desc_a, info, jx, jy) 
+    function psb_ddot(x, y, desc_a, info, jx, jy)  result(res)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      real(psb_dpk_)                   :: psb_ddot
+      real(psb_dpk_)                   :: res
       real(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer, optional, intent(in)      :: jx, jy
-      integer, intent(out)               :: info
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, optional, intent(in)    :: jx, jy
+      integer, intent(out)             :: info
     end function psb_ddot
   end interface
-
 
   interface psb_gedots
     subroutine  psb_ddotvs(res,x, y, desc_a, info) 
@@ -68,6 +75,16 @@ module psb_d_psblas_mod
   end interface
 
   interface psb_geaxpby
+    subroutine psb_daxpby_vect(alpha, x, beta, y,&
+         & desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod, only : psb_d_vect_type
+      type(psb_d_vect_type), intent (inout)   :: x
+      type(psb_d_vect_type), intent (inout)   :: y
+      real(psb_dpk_), intent (in)         :: alpha, beta
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end subroutine psb_daxpby_vect
     subroutine psb_daxpbyv(alpha, x, beta, y,&
          & desc_a, info)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
@@ -105,6 +122,14 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_damaxv
+    function psb_damax_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod, only : psb_d_vect_type
+      real(psb_dpk_)                      :: res
+      type(psb_d_vect_type), intent (inout)   :: x
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_damax_vect
   end interface
 
   interface psb_geamaxs
@@ -126,6 +151,14 @@ module psb_d_psblas_mod
   end interface
 
   interface psb_geasum
+    function psb_dasum_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod, only : psb_d_vect_type
+      real(psb_dpk_)                      :: res
+      type(psb_d_vect_type), intent (inout)   :: x
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_dasum_vect
     function psb_dasum(x, desc_a, info, jx)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       real(psb_dpk_)   psb_dasum
@@ -177,6 +210,14 @@ module psb_d_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_dnrm2v
+    function psb_dnrm2_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod, only : psb_d_vect_type
+      real(psb_dpk_)                      :: res
+      type(psb_d_vect_type), intent (inout)   :: x
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_dnrm2_vect
   end interface
 
   interface psb_genrm2s
@@ -242,6 +283,21 @@ module psb_d_psblas_mod
       logical, optional, intent(in)        :: doswap
       integer, intent(out)                 :: info
     end subroutine psb_dspmv
+    subroutine psb_dspmv_vect(alpha, a, x, beta, y,&
+         & desc_a, info, trans, work,doswap)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(in)   :: a
+      type(psb_d_vect_type), intent(inout)    :: x
+      type(psb_d_vect_type), intent(inout)    :: y
+      real(psb_dpk_), intent(in)          :: alpha, beta
+      type(psb_desc_type), intent(in)     :: desc_a
+      character, optional, intent(in)     :: trans
+      real(psb_dpk_), optional, intent(inout),target :: work(:)
+      logical, optional, intent(in)        :: doswap
+      integer, intent(out)                 :: info
+    end subroutine psb_dspmv_vect
   end interface
 
   interface psb_spsm
@@ -278,6 +334,23 @@ module psb_d_psblas_mod
       real(psb_dpk_), optional, intent(inout), target :: work(:)
       integer, intent(out)                   :: info
     end subroutine psb_dspsv
+    subroutine psb_dspsv_vect(alpha, t, x, beta, y,&
+         & desc_a, info, trans, scale, choice,& 
+         & diag, work)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_ 
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_mat_mod, only : psb_dspmat_type
+      type(psb_dspmat_type), intent(inout)   :: t
+      type(psb_d_vect_type), intent(inout)       :: x
+      type(psb_d_vect_type), intent(inout)       :: y
+      real(psb_dpk_), intent(in)             :: alpha, beta
+      type(psb_desc_type), intent(in)        :: desc_a
+      character, optional, intent(in)        :: trans, scale
+      integer, optional, intent(in)          :: choice
+      type(psb_d_vect_type), intent(inout), optional :: diag
+      real(psb_dpk_), optional, intent(inout), target :: work(:)
+      integer, intent(out)                   :: info
+    end subroutine psb_dspsv_vect
   end interface
 
 end module psb_d_psblas_mod

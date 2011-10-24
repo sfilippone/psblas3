@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Data structure query routines</TITLE>
-<META NAME="description" CONTENT="Data structure query routines">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,59 +18,67 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node19.html">
 <LINK REL="previous" HREF="node13.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="up" HREF="node13.html">
 <LINK REL="next" HREF="node15.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html340"
+<A NAME="tex2html345"
   HREF="node15.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html336"
-  HREF="node8.html">
+<A NAME="tex2html341"
+  HREF="node13.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html330"
+<A NAME="tex2html337"
   HREF="node13.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html338"
+<A NAME="tex2html343"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html341"
-  HREF="node15.html">psb_cd_get_local_rows   Get</A>
-<B> Up:</B> <A NAME="tex2html337"
-  HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html331"
-  HREF="node13.html">Preconditioner data structure</A>
- &nbsp; <B>  <A NAME="tex2html339"
+<B> Next:</B> <A NAME="tex2html346"
+  HREF="node15.html">Preconditioner data structure</A>
+<B> Up:</B> <A NAME="tex2html342"
+  HREF="node13.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html338"
+  HREF="node13.html">Dense Vector Data Structure</A>
+ &nbsp; <B>  <A NAME="tex2html344"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00044000000000000000"></A>
-<A NAME="sec:dataquery"></A>
+<H3><A NAME="SECTION00043100000000000000"></A>
+<A NAME="sec:sp_constants"></A>
 <BR>
-Data structure query routines
-</H2>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+Named Constants
+</H3>
+<DL>
+<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
+<DD>Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
+</DD>
+<DT><STRONG>psb_dupl_add_</STRONG></DT>
+<DD>Duplicate coefficients should be added;	         
+</DD>
+<DT><STRONG>psb_dupl_err_</STRONG></DT>
+<DD>Duplicate coefficients should trigger an error conditino
+</DD>
+<DT><STRONG>psb_upd_dflt_</STRONG></DT>
+<DD>Default update strategy for matrix coefficients;
+</DD>
+<DT><STRONG>psb_upd_srch_</STRONG></DT>
+<DD>Update strategy based on search into the data structure;
+</DD>
+<DT><STRONG>psb_upd_perm_</STRONG></DT>
+<DD>Update strategy based on additional
+  permutation data (see tools routine description).
+</DD>
+</DL>
 
-<UL>
-<LI><A NAME="tex2html342"
-  HREF="node15.html">psb_cd_get_local_rows -- Get number of local rows</A>
-<LI><A NAME="tex2html343"
-  HREF="node16.html">psb_cd_get_local_cols -- Get number of local cols</A>
-<LI><A NAME="tex2html344"
-  HREF="node17.html">psb_cd_get_global_rows -- Get number of global rows</A>
-<LI><A NAME="tex2html345"
-  HREF="node18.html">psb_cd_get_global_cols -- Get number of global cols</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
 <BR><HR>
 
 </BODY>

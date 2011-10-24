@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zprecbld(a,desc_a,p,info,upd,mold,afmt)
+subroutine psb_zprecbld(a,desc_a,p,info,upd,amold,afmt,vmold)
 
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_zprecbld
@@ -41,8 +41,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd,mold,afmt)
   integer, intent(out)                       :: info
   character, intent(in), optional            :: upd
   character(len=*), intent(in), optional    :: afmt
-  class(psb_z_base_sparse_mat), intent(in), optional :: mold
-
+  class(psb_z_base_sparse_mat), intent(in), optional :: amold
+  class(psb_z_base_vect_type), intent(in), optional  :: vmold
 
   ! Local scalars
   Integer      :: err, n_row, n_col,ictxt,&
@@ -80,7 +80,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd,mold,afmt)
     goto 9999
   end if
 
-  call p%prec%precbld(a,desc_a,info,upd=upd,afmt=afmt,mold=mold)
+  call p%prec%precbld(a,desc_a,info,upd=upd,&
+       & afmt=afmt,amold=amold,vmold=vmold)
 
   if (info /= psb_success_) goto 9999
 

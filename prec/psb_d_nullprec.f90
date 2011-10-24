@@ -4,7 +4,8 @@ module psb_d_nullprec
   
   type, extends(psb_d_base_prec_type) :: psb_d_null_prec_type
   contains
-    procedure, pass(prec) :: apply     => psb_d_null_apply
+    procedure, pass(prec) :: d_apply_v => psb_d_null_apply_vect
+    procedure, pass(prec) :: d_apply   => psb_d_null_apply
     procedure, pass(prec) :: precbld   => psb_d_null_precbld
     procedure, pass(prec) :: precinit  => psb_d_null_precinit
     procedure, pass(prec) :: precseti  => psb_d_null_precseti
@@ -17,10 +18,64 @@ module psb_d_nullprec
 
   private :: psb_d_null_apply, psb_d_null_precbld, psb_d_null_precseti,&
        & psb_d_null_precsetr, psb_d_null_precsetc, psb_d_null_sizeof,&
-       & psb_d_null_precinit, psb_d_null_precfree, psb_d_null_precdescr
+       & psb_d_null_precinit, psb_d_null_precfree, psb_d_null_precdescr, &
+       & psb_d_null_apply_vect
   
 contains
   
+
+  subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_d_null_prec_type), intent(inout)  :: prec
+    type(psb_d_vect_type),intent(inout)   :: x
+    real(psb_dpk_),intent(in)         :: alpha, beta
+    type(psb_d_vect_type),intent(inout)   :: y
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='d_null_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = psb_success_
+    
+    nrow = desc_data%get_local_rows()
+    if (x%get_nrows() < nrow) then 
+      info = 36
+      call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+      goto 9999
+    end if
+    if (y%get_nrows() < nrow) then 
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+      goto 9999
+    end if
+
+    call psb_geaxpby(alpha,x,beta,y,desc_data,info)
+    if (info /= psb_success_ ) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(infoi,name,a_err="psb_geaxpby")
+      goto 9999
+    end if
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_d_null_apply_vect
 
   subroutine psb_d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_base_mod
@@ -103,7 +158,7 @@ contains
     return
   end subroutine psb_d_null_precinit
 
-  subroutine psb_d_null_precbld(a,desc_a,prec,info,upd,mold,afmt)
+  subroutine psb_d_null_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
     
     use psb_base_mod
     Implicit None
@@ -114,7 +169,8 @@ contains
     integer, intent(out)                      :: info
     character, intent(in), optional           :: upd
     character(len=*), intent(in), optional    :: afmt
-    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    class(psb_d_base_sparse_mat), intent(in), optional :: amold
+    class(psb_d_base_vect_type), intent(in), optional  :: vmold
     Integer :: err_act, nrow
     character(len=20)  :: name='d_null_precbld'
 

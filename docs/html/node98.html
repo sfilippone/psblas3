@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format">
+<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,46 +18,50 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node93.html">
+<LINK REL="up" HREF="node95.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1407"
+<A NAME="tex2html1414"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1403"
-  HREF="node93.html">
+<A NAME="tex2html1410"
+  HREF="node95.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1399"
+<A NAME="tex2html1404"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1405"
+<A NAME="tex2html1412"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1408"
-  HREF="node99.html">Preconditioner routines</A>
-<B> Up:</B> <A NAME="tex2html1404"
-  HREF="node93.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1400"
-  HREF="node97.html">mm_vet_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1406"
+<B> Next:</B> <A NAME="tex2html1415"
+  HREF="node99.html">mm_vet_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1411"
+  HREF="node95.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1405"
+  HREF="node97.html">hb_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1413"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000105000000000000000">
-mm_mat_write -- Write a sparse matrix to a
+<H2><A NAME="SECTION000103000000000000000">
+mm_mat_read -- Read a sparse matrix from a
   file in the MatrixMarket format</A>
 </H2>
 
+<P>
 <PRE>
-call mm_mat_write(a, mtitle, iret, iunit, filename)
+call mm_mat_read(a, iret, iunit, filename)
 </PRE>
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -65,28 +69,13 @@ call mm_mat_write(a, mtitle, iret, iunit, filename)
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix to be written.
-<BR>
-Type:<B>required</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
-</DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
-<BR>
-Type: <B>required</B> 
-<BR>
-A charachter variable holding a descriptive title for the matrix to be
- written to file.
-</DD>
 <DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written to.
+<DD>The name of the file to be read.
 <BR>
 Type:<B>optional</B>.
 <BR>
 Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default output unit  6 (i.e. standard output
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
 in Unix jargon) is used. Default: <code>-</code>. 
 </DD>
 <DT><STRONG>iunit</STRONG></DT>
@@ -102,6 +91,13 @@ Specified as: an integer value. Only meaningful if filename is not <code>-</code
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.

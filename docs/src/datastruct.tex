@@ -47,23 +47,7 @@ reader:
 \item[{\bf matrix\_data}] includes general information about matrix and
 process grid, such as the communication context, the size of the
 global matrix, the size of the portion of matrix stored on the current
-process, and so on. %% More precisely:
-%% \begin{description}
-%% \item[matrix\_data[psb\_dec\_type\_\hbox{]}] Identifies the decomposition type
-%% (global); the actual values are internally defined, so they should
-%% never be accessed directly.
-%% \item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context
-%%   associated with the processes comprised in the virtual parallel
-%%   machine (global).
-%% \item[matrix\_data[psb\_m\_\hbox{]}] Total number of equations (global).
-%% \item[matrix\_data[psb\_n\_\hbox{]}] Total number of variables (global).
-%% \item[matrix\_data[psb\_n\_row\_\hbox{]}] Number of grid variables owned by the
-%% current process (local); equivalent to the number of local rows in the
-%% sparse coefficient matrix.
-%% \item[matrix\_data[psb\_n\_col\_\hbox{]}] Total number of grid variables read by the
-%% current process (local); equivalent to the number of local columns in
-%% the sparse coefficient matrix. They include the halo.
-%% \end{description}
+process, and so on. 
 Specified as: an allocatable integer array of dimension \verb|psb_mdata_size_|.
 \item[{\bf halo\_index}] A list of the halo and boundary elements for
 the current process to be exchanged with other processes; for each
@@ -344,6 +328,161 @@ values:
   permutation data (see tools routine description).
 \end{description}
 
+\subsection{Dense Vector Data Structure}
+\label{sec:spmat}
+The \hypertarget{vdata}{{\tt psb\_vect\_type}} data structure
+contains all information about local portion of the sparse matrix and   
+its storage mode. Most  of these fields are set  by the tools
+routines when inserting a new sparse matrix; the user needs only
+choose, if he/she so whishes, a specific matrix storage mode. \\
+\begin{description}
+\item[{\bf aspk}] Contains values of the local distributed sparse
+matrix.\\
+Specified as: an allocatable array of rank one of type corresponding
+to matrix entries type.
+\item[{\bf ia1}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: an allocatable  integer array of rank one.
+\item[{\bf ia2}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: an allocatable  integer array of rank one.
+\item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
+matrix.  Actual information will depend on data format used.\\
+Specified as: an integer array of length \verb|psb_ifasize_|.
+\item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
+Specified as: a string of length 5
+\item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
+Specified as: array of character of length 9.
+\item[{\bf pl}] Specifies the local row permutation of distributed sparse
+matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
+Specified as: an allocatable integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
+\item[{\bf pr}] Specifies the local column permutation of distributed sparse
+matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
+Specified as: an allocatable integer array of dimension equal to number of
+local row (matrix\_data[psb\_n\_col\_\hbox{]})
+\item[{\bf m}] Number of rows; if row indices are stored explicitly,
+as in Coordinate Storage, should be greater than or equal to the
+maximum row index actually present in the sparse matrix.
+Specified as: integer variable.
+\item[{\bf k}] Number of columns; if column indices are stored explicitly,
+as in Coordinate Storage or Compressed Sparse Rows, should be greater
+than or equal to the maximum column  index actually present in the sparse matrix.
+Specified as: integer variable.
+\end{description}
+The Fortran~95 interface for distributed sparse matrices containing
+double precision real entries is defined as shown in
+figure~\ref{fig:spmattype}. The definitions for single precision and
+complex data are identical except for the \verb|real| declaration and
+for the kind type parameter.
+\begin{figure}[h!]
+  \begin{Sbox}
+    \begin{minipage}[tl]{0.85\textwidth}
+\begin{verbatim}
+type psb_sspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   real(psb_spk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_sspmat_type
+
+type psb_dspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   real(psb_dpk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_dspmat_type
+
+type psb_cspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   complex(psb_spk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_cspmat_type
+
+type psb_zspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   complex(psb_dpk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_zspmat_type
+
+\end{verbatim}
+    \end{minipage}
+  \end{Sbox}
+  \setlength{\fboxsep}{8pt}
+  \begin{center}
+    \fbox{\TheSbox}
+  \end{center}
+  \caption{\label{fig:spmattype} 
+    The PSBLAS defined data type that
+    contains a sparse matrix.} 
+\end{figure}
+
+The following two cases are among the most commonly used: 
+\begin{description}
+\item[fida=``CSR''] Compressed storage by rows. In this case the
+following should hold: 
+\begin{enumerate}
+\item \verb|ia2(i)| contains the index of the first element of row
+\verb|i|; the last element of the sparse matrix is thus stored at
+index $ia2(m+1)-1$. It should contain \verb|m+1| entries in
+nondecreasing order (strictly increasing, if there are no empty rows).
+\item \verb|ia1(j)| contains the column index and \verb|aspk(j)|
+contains the corresponding coefficient value, for all $ia2(1) \le j
+\le ia2(m+1)-1$.
+\end{enumerate}
+\item[fida=``COO''] Coordinate storage. In this case the following
+should hold: 
+\begin{enumerate}
+\item \verb|infoa(1)| contains the number of nonzero elements in the
+matrix; 
+\item For all $1 \le j \le infoa(1)$, the coefficient, row index and
+column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
+\verb|ia2(j)| respectively. 
+\end{enumerate}
+\end{description}
+A sparse matrix has an associated state, which can take the following
+values:
+\begin{description}
+\item[Build:] State entered after the first allocation, and before the
+  first assembly; in this state it is possible to add nonzero entries.
+\item[Assembled:] State entered after the assembly; computations using
+  the sparse matrix, such as matrix-vector products, are only possible
+  in this state;
+\item[Update:] State entered after a reinitalization; this is used to
+  handle applications in which the same sparsity pattern is used
+  multiple times with different coefficients. In this state it is only
+  possible to enter coefficients for already existing nonzero entries.
+\end{description}
+\subsubsection{Named Constants}
+\label{sec:sp_constants}
+\begin{description}
+%% \item[psb\_nztotreq\_] Request to fetch the total number of nonzeroes
+%%   stored in a sparse matrix
+%% \item[psb\_nzrowreq\_] Request to fetch the number of nonzeroes in a
+%%   given row in a sparse matrix
+\item[psb\_dupl\_ovwrt\_] Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
+\item[psb\_dupl\_add\_] Duplicate coefficients should be added;	         
+\item[psb\_dupl\_err\_] Duplicate coefficients should trigger an error conditino
+\item[psb\_upd\_dflt\_] Default update strategy for matrix coefficients;
+\item[psb\_upd\_srch\_] Update strategy based on search into the data structure;
+\item[psb\_upd\_perm\_] Update strategy based on additional
+  permutation data (see tools routine description).
+\end{description}
+
 
 
 \subsection{Preconditioner data structure}
@@ -453,11 +592,11 @@ research.
 
 \subsection{Data structure query routines}
 \label{sec:dataquery}
-\subsubsection*{psb\_cd\_get\_local\_rows --- Get number of local rows}
-\addcontentsline{toc}{subsubsection}{psb\_cd\_get\_local\_rows }
+\subsubsection*{get\_local\_rows --- Get number of local rows}
+\addcontentsline{toc}{subsubsection}{get\_local\_rows }
 
 \begin{verbatim}
-nr = psb_cd_get_local_rows(desc)
+nr = desc%get_local_rows()
 \end{verbatim}
 
 \begin{description}
@@ -479,11 +618,11 @@ Specified as: a structured data of type \descdata.
 \end{description}
 
 
-\subsubsection*{psb\_cd\_get\_local\_cols --- Get number of local cols}
-\addcontentsline{toc}{subsubsection}{psb\_cd\_get\_local\_cols }
+\subsubsection*{get\_local\_cols --- Get number of local cols}
+\addcontentsline{toc}{subsubsection}{get\_local\_cols }
 
 \begin{verbatim}
-nc = psb_cd_get_local_cols(desc)
+nc = desc%get_local_cols()
 \end{verbatim}
 
 \begin{description}
@@ -506,11 +645,11 @@ Specified as: a structured data of type \descdata.
 \end{description}
 
 
-\subsubsection*{psb\_cd\_get\_global\_rows --- Get number of global rows}
-\addcontentsline{toc}{subsubsection}{psb\_cd\_get\_global\_rows }
+\subsubsection*{get\_global\_rows --- Get number of global rows}
+\addcontentsline{toc}{subsubsection}{get\_global\_rows }
 
 \begin{verbatim}
-nr = psb_cd_get_global_rows(desc)
+nr = desc%get_global_rows()
 \end{verbatim}
 
 \begin{description}
@@ -528,11 +667,11 @@ Specified as: a structured data of type \descdata.
 \item[Function value] The number of global rows in the mesh
 \end{description}
 
-\subsubsection*{psb\_cd\_get\_global\_cols --- Get number of global cols}
-\addcontentsline{toc}{subsubsection}{psb\_cd\_get\_global\_cols }
+\subsubsection*{get\_global\_cols --- Get number of global cols}
+\addcontentsline{toc}{subsubsection}{get\_global\_cols }
 
 \begin{verbatim}
-nr = psb_cd_get_global_cols(desc)
+nr = desc%get_global_cols()
 \end{verbatim}
 
 \begin{description}
@@ -551,9 +690,9 @@ Specified as: a structured data of type \descdata.
 \end{description}
 
 
-\subsubroutine{psb\_cd\_get\_context}{Get communication context}
+\subsubroutine{get\_context}{Get communication context}
 \begin{verbatim}
-ictxt = psb_cd_get_context(desc)
+ictxt = desc%get_context()
 \end{verbatim}
 
 \begin{description}
@@ -608,12 +747,11 @@ Note: the threshold value is only queried by the library at the time a
 call to \verb|psb_cdall| is executed, therefore changing the threshold
 has no effect on communication descriptors that have already been initialized.
 
-\subsubsection*{psb\_sp\_get\_nrows --- Get number of  rows in a sparse
-  matrix}
-\addcontentsline{toc}{subsubsection}{ psb\_sp\_get\_nrows}
+\subsubsection*{get\_nrows --- Get number of  rows in a sparse  matrix}
+\addcontentsline{toc}{subsubsection}{get\_nrows}
 
 \begin{verbatim}
-nr = psb_sp_get_nrows(a)
+nr = a%get_nrows()
 \end{verbatim}
 
 \begin{description}
@@ -632,12 +770,11 @@ Specified as: a structured data of type \spdata.
 \end{description}
 
 
-\subsubsection*{psb\_sp\_get\_ncols --- Get number of  columns in a
-  sparse matrix}
-\addcontentsline{toc}{subsubsection}{psb\_sp\_get\_ncols}
+\subsubsection*{get\_ncols --- Get number of  columns in a  sparse matrix}
+\addcontentsline{toc}{subsubsection}{get\_ncols}
 
 \begin{verbatim}
-nr = psb_sp_get_ncols(a)
+nr = a%get_ncols()
 \end{verbatim}
 
 \begin{description}
@@ -656,12 +793,12 @@ Specified as: a structured data of type \spdata.
 \end{description}
 
 
-\subsubsection*{psb\_sp\_get\_nnzeros --- Get number of nonzero elements
+\subsubsection*{get\_nnzeros --- Get number of nonzero elements
   in a sparse matrix}
-\addcontentsline{toc}{subsubsection}{psb\_sp\_get\_nnzeros}
+\addcontentsline{toc}{subsubsection}{get\_nnzeros}
 
 \begin{verbatim}
-nr = psb_sp_get_nnzeros(a)
+nr = a%get_nnzeros()
 \end{verbatim}
 
 \begin{description}

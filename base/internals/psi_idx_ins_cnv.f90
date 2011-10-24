@@ -191,7 +191,6 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psi_mod
   implicit none
   integer, intent(in)  :: nv, idxin(:)
   integer, intent(out) :: idxout(:)

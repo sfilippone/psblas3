@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
-<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
+<TITLE>psb_info -- Return information about PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_info -- Return information about PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,48 +20,50 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node76.html">
 <LINK REL="previous" HREF="node74.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node73.html">
 <LINK REL="next" HREF="node76.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1128"
+<A NAME="tex2html1133"
   HREF="node76.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1124"
-  HREF="node71.html">
+<A NAME="tex2html1129"
+  HREF="node73.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1118"
+<A NAME="tex2html1123"
   HREF="node74.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1126"
+<A NAME="tex2html1131"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1129"
-  HREF="node76.html">psb_get_rank   Get</A>
-<B> Up:</B> <A NAME="tex2html1125"
-  HREF="node71.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1119"
-  HREF="node74.html">psb_exit   Exit</A>
- &nbsp; <B>  <A NAME="tex2html1127"
+<B> Next:</B> <A NAME="tex2html1134"
+  HREF="node76.html">psb_exit   Exit</A>
+<B> Up:</B> <A NAME="tex2html1130"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1124"
+  HREF="node74.html">psb_init   Initializes</A>
+ &nbsp; <B>  <A NAME="tex2html1132"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00084000000000000000">
-psb_get_mpicomm -- Get the MPI communicator</A>
+<H2><A NAME="SECTION00082000000000000000">
+psb_info -- Return information about  PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_mpicomm(icontxt, icomm)
+call psb_info(icontxt, iam, np)
 </PRE>
 
 <P>
-This subroutine returns the MPI communicator associated with a PSBLAS context
+This subroutine returns information about  the PSBLAS parallel environment, defining
+a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -88,19 +90,83 @@ Specified as: an integer variable.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icomm</STRONG></DT>
-<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<DT><STRONG>iam</STRONG></DT>
+<DD>Identifier of current  process in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer value. <!-- MATH
+ $-1 \le iam \le np-1$
+ -->
+<IMG
+ WIDTH="139" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img124.png"
+ ALT="$-1 \le iam \le np-1$"> </DD>
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+Specified as: an integer variable.  </DD>
 </DL>
 
 <P>
-<BR><HR>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>For processes in the virtual parallel machine  the identifier
+  will satisfy <!-- MATH
+ $0 \le iam \le np-1$
+ -->
+<IMG
+ WIDTH="128" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img125.png"
+ ALT="$0 \le iam \le np-1$">;
+</LI>
+<LI>If the user has requested on <code>psb_init</code> a number of
+  processes less than the total available in the parallel execution
+  environment, the remaining processes will have on return <IMG
+ WIDTH="73" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img126.png"
+ ALT="$iam=-1$">;
+  the only call involving <code>icontxt</code> that any such process may
+  execute is  to <code>psb_exit</code>. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1133"
+  HREF="node76.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1129"
+  HREF="node73.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1123"
+  HREF="node74.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1131"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1134"
+  HREF="node76.html">psb_exit   Exit</A>
+<B> Up:</B> <A NAME="tex2html1130"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1124"
+  HREF="node74.html">psb_init   Initializes</A>
+ &nbsp; <B>  <A NAME="tex2html1132"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

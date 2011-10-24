@@ -32,6 +32,14 @@
 module psb_c_psblas_mod
 
   interface psb_gedot
+    function psb_cdot_vect(x, y, desc_a,info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      complex(psb_spk_)                    :: res
+      type(psb_c_vect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer, intent(out)                 :: info
+    end function psb_cdot_vect
     function psb_cdotv(x, y, desc_a,info) 
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
       complex(psb_spk_)                :: psb_cdotv
@@ -68,6 +76,16 @@ module psb_c_psblas_mod
   end interface
 
   interface psb_geaxpby
+    subroutine psb_caxpby_vect(alpha, x, beta, y,&
+         & desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_c_vect_type), intent (inout) :: y
+      complex(psb_spk_), intent (in)        :: alpha, beta
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer, intent(out)                  :: info
+    end subroutine psb_caxpby_vect
     subroutine psb_caxpbyv(alpha, x, beta, y,&
          & desc_a, info)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
@@ -105,6 +123,14 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_camaxv
+    function psb_camax_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      real(psb_spk_)                        :: res
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer, intent(out)                  :: info
+    end function psb_camax_vect
   end interface
 
   interface psb_geamaxs
@@ -126,6 +152,14 @@ module psb_c_psblas_mod
   end interface
 
   interface psb_geasum
+    function psb_casum_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      real(psb_spk_)                        :: res
+      type(psb_c_vect_type), intent (inout) :: x
+      type(psb_desc_type), intent (in)      :: desc_a
+      integer, intent(out)                  :: info
+    end function psb_casum_vect
     function psb_casum(x, desc_a, info, jx)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_
       real(psb_spk_)   psb_casum
@@ -177,6 +211,14 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_cnrm2v
+    function psb_cnrm2_vect(x, desc_a, info) result(res)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      real(psb_spk_)                      :: res
+      type(psb_c_vect_type), intent (inout)   :: x
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_cnrm2_vect
   end interface
 
   interface psb_genrm2s
@@ -199,6 +241,17 @@ module psb_c_psblas_mod
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)               :: info
     end function psb_cnrmi
+  end interface
+
+  interface psb_spnrm1
+    function psb_cspnrm1(a, desc_a,info)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_mat_mod, only : psb_cspmat_type
+      real(psb_spk_)                      :: psb_cspnrm1
+      type(psb_cspmat_type), intent (in) :: a
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_cspnrm1
   end interface
 
   interface psb_spmm
@@ -231,6 +284,21 @@ module psb_c_psblas_mod
       logical, optional, intent(in)        :: doswap
       integer, intent(out)                 :: info
     end subroutine psb_cspmv
+    subroutine psb_cspmv_vect(alpha, a, x, beta, y,&
+         & desc_a, info, trans, work,doswap)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_
+      use psb_c_vect_mod, only : psb_c_vect_type
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(in)    :: a
+      type(psb_c_vect_type), intent(inout) :: x
+      type(psb_c_vect_type), intent(inout) :: y
+      complex(psb_spk_), intent(in)        :: alpha, beta
+      type(psb_desc_type), intent(in)      :: desc_a
+      character, optional, intent(in)      :: trans
+      complex(psb_spk_), optional, intent(inout),target :: work(:)
+      logical, optional, intent(in)        :: doswap
+      integer, intent(out)                 :: info
+    end subroutine psb_cspmv_vect
   end interface
 
   interface psb_spsm
@@ -267,6 +335,23 @@ module psb_c_psblas_mod
       complex(psb_spk_), optional, intent(inout), target :: work(:)
       integer, intent(out)                   :: info
     end subroutine psb_cspsv
+    subroutine psb_cspsv_vect(alpha, t, x, beta, y,&
+         & desc_a, info, trans, scale, choice,& 
+         & diag, work)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_ 
+      use psb_c_vect_mod, only : psb_c_vect_type
+      use psb_mat_mod, only : psb_cspmat_type
+      type(psb_cspmat_type), intent(inout)   :: t
+      type(psb_c_vect_type), intent(inout)   :: x
+      type(psb_c_vect_type), intent(inout)   :: y
+      complex(psb_spk_), intent(in)          :: alpha, beta
+      type(psb_desc_type), intent(in)        :: desc_a
+      character, optional, intent(in)        :: trans, scale
+      integer, optional, intent(in)          :: choice
+      type(psb_c_vect_type), intent(inout), optional :: diag
+      complex(psb_spk_), optional, intent(inout), target :: work(:)
+      integer, intent(out)                   :: info
+    end subroutine psb_cspsv_vect
   end interface
 
 end module psb_c_psblas_mod

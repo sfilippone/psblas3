@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geaxpby -- General Dense Matrix Sum</TITLE>
-<META NAME="description" CONTENT="psb_geaxpby -- General Dense Matrix Sum">
+<TITLE>get_nnzeros -- Get number of nonzero elements in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_nnzeros -- Get number of nonzero elements in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,203 +18,66 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node27.html">
 <LINK REL="previous" HREF="node25.html">
-<LINK REL="up" HREF="node25.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node27.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html499"
+<A NAME="tex2html492"
   HREF="node27.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html495"
-  HREF="node25.html">
+<A NAME="tex2html488"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html489"
+<A NAME="tex2html484"
   HREF="node25.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html497"
+<A NAME="tex2html490"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html500"
-  HREF="node27.html">psb_gedot   Dot</A>
-<B> Up:</B> <A NAME="tex2html496"
-  HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html490"
-  HREF="node25.html">Computational routines</A>
- &nbsp; <B>  <A NAME="tex2html498"
+<B> Next:</B> <A NAME="tex2html493"
+  HREF="node27.html">Computational routines</A>
+<B> Up:</B> <A NAME="tex2html489"
+  HREF="node21.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html485"
+  HREF="node25.html">get_ncols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html491"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00051000000000000000">
-psb_geaxpby -- General Dense Matrix Sum</A>
-</H2>
-
-<P>
-This subroutine is an interface to the computational kernel for
-dense matrix sum:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-y \leftarrow  \alpha\> x+ \beta y
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="93" HEIGHT="27" BORDER="0"
- SRC="img26.png"
- ALT="\begin{displaymath}y \leftarrow \alpha\&gt; x+ \beta y \end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P> 
+<H3><A NAME="SECTION00046500000000000000">
+get_nnzeros -- Get number of nonzero elements
+  in a sparse matrix</A>
+</H3>
 
 <P>
 <PRE>
-call psb_geaxpby(alpha, x, beta, y, desc_a, info)
+nr = a%get_nnzeros()
 </PRE>
-
-<P>
-<BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1418"></A>
-<TABLE>
-<CAPTION><STRONG>Table 1:</STRONG>
-Data types</CAPTION>
-<TR><TD>
-<DIV ALIGN="CENTER">
-<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">, <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">, <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img29.png"
- ALT="$\alpha$">, <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img30.png"
- ALT="$\beta$"></TD>
-<TD ALIGN="LEFT"><B>Subroutine</B></TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-</TABLE>
-</DIV>
-</TD></TR>
-</TABLE>
-</DIV><P></P>
-<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>alpha</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img29.png"
- ALT="$\alpha$">.
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix
 <BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank one or two array 
-containing numbers of type 
-specified in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> must be the same of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">. 
-</DD>
-<DT><STRONG>beta</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img30.png"
- ALT="$\beta$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of the global dense matrix
-<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">. 
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one or two array containing numbers of the type 
-indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$"> must be the same of <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">. 
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>contains data structures for communications.
-<BR>
-Scope: <B>local</B> 
+Scope: <B>local</B>
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 </DL>
 
@@ -223,59 +86,23 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of result submatrix <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The number of nonzero elements stored in sparse matrix <code>a</code>.
 </DD>
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html499"
-  HREF="node27.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html495"
-  HREF="node25.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html489"
-  HREF="node25.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html497"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html500"
-  HREF="node27.html">psb_gedot   Dot</A>
-<B> Up:</B> <A NAME="tex2html496"
-  HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html490"
-  HREF="node25.html">Computational routines</A>
- &nbsp; <B>  <A NAME="tex2html498"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<B>Notes</B>
+
+<OL>
+<LI>The function value is specific to the storage format of matrix
+  <code>a</code>; some storage formats employ padding, thus the returned
+  value for the same matrix may be different for different storage choices.
+</LI>
+</OL>
+
+<P>
+<BR><HR>
 
 </BODY>
 </HTML>

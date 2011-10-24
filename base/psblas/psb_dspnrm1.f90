@@ -65,7 +65,7 @@ function psb_dspnrm1(a,desc_a,info)
   real(psb_dpk_), allocatable :: v(:)
 
   name='psb_dnrm1'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 

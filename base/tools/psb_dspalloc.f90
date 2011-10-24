@@ -59,12 +59,18 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
+  if (psb_errstatus_fatal()) return 
   call psb_erractionsave(err_act)
   name = 'psb_dspall'
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   ictxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
@@ -104,9 +110,8 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
-  if(info /= psb_success_) then
+  if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
-    ch_err='sp_all'
     call psb_errpush(info,name,int_err)
     goto 9999
   end if

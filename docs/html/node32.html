@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasums -- Generalized 1-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_geasums -- Generalized 1-Norm of Vector">
+<TITLE>psb_geamaxs -- Generalized Infinity Norm</TITLE>
+<META NAME="description" CONTENT="psb_geamaxs -- Generalized Infinity Norm">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,46 +20,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node33.html">
 <LINK REL="previous" HREF="node31.html">
-<LINK REL="up" HREF="node25.html">
+<LINK REL="up" HREF="node27.html">
 <LINK REL="next" HREF="node33.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html571"
+<A NAME="tex2html576"
   HREF="node33.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html567"
-  HREF="node25.html">
+<A NAME="tex2html572"
+  HREF="node27.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html561"
+<A NAME="tex2html566"
   HREF="node31.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html569"
+<A NAME="tex2html574"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html572"
-  HREF="node33.html">psb_genrm2   2-Norm</A>
-<B> Up:</B> <A NAME="tex2html568"
-  HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html562"
-  HREF="node31.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html570"
+<B> Next:</B> <A NAME="tex2html577"
+  HREF="node33.html">psb_geasum   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html573"
+  HREF="node27.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html567"
+  HREF="node31.html">psb_geamax   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html575"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00057000000000000000">
-psb_geasums -- Generalized 1-Norm of Vector</A>
+<H2><A NAME="SECTION00055000000000000000">
+psb_geamaxs -- Generalized Infinity Norm</A>
 </H2>
 
 <P>
-This subroutine computes a series of  1-norms on the columns of
+This subroutine computes a series of  infinity norms on the columns of
 a  dense matrix  <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
  ALT="$x$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -70,96 +70,52 @@ res(i) \leftarrow \max_k |x(k,i)|
  -->
 
 <IMG
- WIDTH="147" HEIGHT="36" BORDER="0"
- SRC="img39.png"
+ WIDTH="148" HEIGHT="36" BORDER="0"
+ SRC="img40.png"
  ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-This function computes the 1-norm of a vector <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">.
-<BR>
-If <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> is a real vector 
-it computes 1-norm as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-res(i) \leftarrow  \|x_i\|
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="94" HEIGHT="28" BORDER="0"
- SRC="img43.png"
- ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-else if <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> is a complex vector then it computes 1-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="206" HEIGHT="28" BORDER="0"
- SRC="img44.png"
- ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 
 <P>
 <PRE>
-call psb_geasums(res, x, desc_a, info)
+call psb_geamaxs(res, x, desc_a, info)
 </PRE>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1424"></A>
+<DIV ALIGN="CENTER"><A NAME="1508"></A>
 <TABLE>
-<CAPTION><STRONG>Table 7:</STRONG>
+<CAPTION><STRONG>Table 5:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img35.png"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img36.png"
  ALT="$res$"></TD>
 <TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geasums</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geasums</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geasums</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geasums</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -179,10 +135,9 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
  ALT="$x$">. 
-
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -192,7 +147,7 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a rank one or two array 
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90asums">7</A>.
+Table&nbsp;<A HREF="#tab:f90mamax">5</A>. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -204,24 +159,21 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>res</STRONG></DT>
-<DD>contains the 1-norm of (the columns of) <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
+<DD>is the infinity norm of the columns of <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
 <BR>
 Intent: <B>out</B>.
 <BR>
-Short as: a long precision real  number.
-Specified as: a long precision real  number.
+Specified as: a number or a rank-one array  of long precision real numbers. 
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -239,26 +191,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html571"
+<A NAME="tex2html576"
   HREF="node33.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html567"
-  HREF="node25.html">
+<A NAME="tex2html572"
+  HREF="node27.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html561"
+<A NAME="tex2html566"
   HREF="node31.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html569"
+<A NAME="tex2html574"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html572"
-  HREF="node33.html">psb_genrm2   2-Norm</A>
-<B> Up:</B> <A NAME="tex2html568"
-  HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html562"
-  HREF="node31.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html570"
+<B> Next:</B> <A NAME="tex2html577"
+  HREF="node33.html">psb_geasum   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html573"
+  HREF="node27.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html567"
+  HREF="node31.html">psb_geamax   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html575"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

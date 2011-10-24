@@ -42,9 +42,10 @@ program d_file_spmv
 
   ! dense matrices
   real(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  real(psb_dpk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
-       & x_col_glob(:), r_col_glob(:)
+  real(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
   real(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_d_vect_type)    :: b_col, x_col, r_col
+
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -114,7 +115,7 @@ program d_file_spmv
       ! For Matrix Market we have an input file for the matrix
       ! and an (optional) second file for the RHS. 
       call mm_mat_read(aux_a,info,iunit=iunit,filename=mtrx_file)
-      if (info == 0) then 
+      if (info == psb_success_) then 
         if (rhs_file /= 'NONE') then
           call mm_vet_read(aux_b,info,iunit=iunit,filename=rhs_file)
         end if
@@ -129,7 +130,7 @@ program d_file_spmv
       info = -1 
       write(psb_err_unit,*) 'Wrong choice for fileformat ', filefmt
     end select
-    if (info /= 0) then
+    if (info /= psb_success_) then
       write(psb_err_unit,*) 'Error while reading input matrix '
       call psb_abort(ictxt)
     end if
@@ -147,7 +148,7 @@ program d_file_spmv
       write(psb_out_unit,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
-        call psb_errpush(4000,name)
+        call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
       endif
       
@@ -182,18 +183,21 @@ program d_file_spmv
     enddo
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+    
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
       call build_mtpart(aux_a,np)
+
     endif
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+
   else 
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')
     call psb_matdist(aux_a, a,  ictxt, &
@@ -201,7 +205,7 @@ program d_file_spmv
   end if
 
   call psb_geall(x_col,desc_a,info)
-  x_col(:) =1.0
+  call x_col%set(done)
   call psb_geasb(x_col,desc_a,info)
   t2 = psb_wtime() - t1
 
@@ -264,7 +268,8 @@ program d_file_spmv
     !
     ! This computation is valid for CSR
     !
-    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+ annz*(psb_sizeof_dp + psb_sizeof_int)
+    nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+&
+         & annz*(psb_sizeof_dp + psb_sizeof_int)
     bdwdth = times*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth

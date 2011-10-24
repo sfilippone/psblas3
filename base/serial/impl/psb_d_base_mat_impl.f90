@@ -1037,6 +1037,35 @@ end subroutine psb_d_base_scal
 
 
 
+function psb_d_base_maxval(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_maxval
+
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  Integer :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  res = -done
+
+  return
+
+end function psb_d_base_maxval
+
 function psb_d_base_csnmi(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1230,5 +1259,222 @@ subroutine psb_d_base_get_diag(a,d,info)
 end subroutine psb_d_base_get_diag
 
 
+! == ==================================
+!
+!
+!
+! Computational routines for D_VECT
+! variables. If the actual data type is 
+! a "normal" one, these are sufficient. 
+! 
+!
+!
+!
+! == ==================================
 
 
+
+subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_vect_mv
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in)       :: alpha, beta
+  class(psb_d_base_vect_type), intent(inout) :: x
+  class(psb_d_base_vect_type), intent(inout) :: y
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans
+
+  ! For the time being we just throw everything back
+  ! onto the normal routines. 
+  call x%sync()
+  call y%sync()
+  call a%csmm(alpha,x%v,beta,y%v,info,trans)
+  
+end subroutine psb_d_base_vect_mv
+
+subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_vect_cssv
+  use psb_d_base_vect_mod
+  use psb_error_mod
+  use psb_string_mod
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in)       :: alpha, beta
+  class(psb_d_base_vect_type), intent(inout) :: x,y
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans, scale
+  class(psb_d_base_vect_type), intent(inout),optional  :: d
+
+  real(psb_dpk_), allocatable :: tmp(:)
+  class(psb_d_base_vect_type), allocatable :: tmpv
+  Integer :: err_act, nar,nac,nc, i
+  character(len=1) :: scale_
+  character(len=20)  :: name='d_cssm'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  if (.not.a%is_asb()) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  nar = a%get_nrows()
+  nac = a%get_ncols()
+  nc = 1
+  if (x%get_nrows() < nac) then
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+    goto 9999
+  end if
+  if (y%get_nrows() < nar) then
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+    goto 9999
+  end if
+
+  if (.not. (a%is_triangle())) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call x%sync() 
+  call y%sync()
+  if (present(d)) then 
+    call d%sync()
+    if (present(scale)) then 
+      scale_ = scale
+    else
+      scale_ = 'L'
+    end if
+
+    if (psb_toupper(scale_) == 'R') then 
+      if (d%get_nrows() < nac) then
+        info = 36
+        call psb_errpush(info,name,i_err=(/9,nac,0,0,0/))
+        goto 9999
+      end if
+      
+      allocate(tmpv, mold=y,stat=info)
+      !    allocate(tmp(nac),stat=info) 
+      if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+      if (info == psb_success_) call tmpv%mlt(done,d%v(1:nac),x,dzero,info) 
+      if (info == psb_success_)&
+           & call a%inner_cssm(alpha,tmpv,beta,y,info,trans)
+
+      if (info == psb_success_) then 
+        call tmpv%free(info)
+        if (info == psb_success_) deallocate(tmpv,stat=info) 
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_
+      end if
+
+    else if (psb_toupper(scale_) == 'L') then 
+      if (d%get_nrows() < nar) then
+        info = 36
+        call psb_errpush(info,name,i_err=(/9,nar,0,0,0/))
+        goto 9999
+      end if
+
+      if (beta == dzero) then 
+        call a%inner_cssm(alpha,x,dzero,y,info,trans)
+        if (info == psb_success_)  call y%mlt(d%v(1:nar),info)
+!!$        if (info == psb_success_)  call inner_vscal1(nar,d,y)
+      else
+        !        allocate(tmp(nar),stat=info) 
+        allocate(tmpv, mold=y,stat=info)
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+        if (info == psb_success_)&
+             & call a%inner_cssm(alpha,x,dzero,tmpv,info,trans)
+
+        if (info == psb_success_)  call tmpv%mlt(d%v(1:nar),info)
+        if (info == psb_success_)&
+             & call y%axpby(nar,done,tmpv,beta,info)
+        if (info == psb_success_) then
+          call tmpv%free(info)
+          if (info == psb_success_) deallocate(tmpv,stat=info) 
+          if (info /= psb_success_) info = psb_err_alloc_dealloc_
+        end if
+      end if
+
+    else
+      info = 31
+      call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=scale_)
+      goto 9999
+    end if
+  else 
+    ! Scale is ignored in this case 
+    call a%inner_cssm(alpha,x,beta,y,info,trans)
+  end if
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='inner_cssm')
+    goto 9999
+  end if
+
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_base_vect_cssv
+
+
+subroutine psb_d_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_inner_vect_sv
+  use psb_error_mod
+  use psb_string_mod
+  use psb_d_base_vect_mod
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in)       :: alpha, beta
+  class(psb_d_base_vect_type), intent(inout) :: x, y
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans
+
+  Integer :: err_act
+  character(len=20)  :: name='d_base_inner_vect_sv'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_success_
+
+  call a%inner_cssm(alpha,x%v,beta,y%v,info,trans)  
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='inner_cssm')
+    goto 9999
+  end if
+
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_base_inner_vect_sv

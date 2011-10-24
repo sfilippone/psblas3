@@ -129,20 +129,26 @@ module psb_c_mat_mod
     procedure, pass(a) :: c_transc_2mat => psb_c_transc_2mat
     generic, public    :: transc        => c_transc_1mat, c_transc_2mat
 
-    
-    
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_c_get_diag
+    procedure, pass(a) :: maxval   => psb_c_maxval
     procedure, pass(a) :: csnmi    => psb_c_csnmi
+    procedure, pass(a) :: csnm1    => psb_c_csnm1
+    procedure, pass(a) :: rowsum   => psb_c_rowsum
+    procedure, pass(a) :: arwsum   => psb_c_arwsum
+    procedure, pass(a) :: colsum   => psb_c_colsum
+    procedure, pass(a) :: aclsum   => psb_c_aclsum
+    procedure, pass(a) :: c_csmv_v => psb_c_csmv_vect
     procedure, pass(a) :: c_csmv   => psb_c_csmv
     procedure, pass(a) :: c_csmm   => psb_c_csmm
-    generic, public    :: csmm     => c_csmm, c_csmv
+    generic, public    :: csmm     => c_csmm, c_csmv, c_csmv_v
     procedure, pass(a) :: c_scals  => psb_c_scals
     procedure, pass(a) :: c_scal   => psb_c_scal
     generic, public    :: scal     => c_scals, c_scal 
+    procedure, pass(a) :: c_cssv_v => psb_c_cssv_vect
     procedure, pass(a) :: c_cssv   => psb_c_cssv
     procedure, pass(a) :: c_cssm   => psb_c_cssm
-    generic, public    :: cssm     => c_cssm, c_cssv
+    generic, public    :: cssm     => c_cssm, c_cssv, c_cssv_v
 
   end type psb_cspmat_type
 
@@ -269,7 +275,6 @@ module psb_c_mat_mod
       logical, intent(in), optional :: val
     end subroutine psb_c_set_upper
   end interface
-  
   
   interface 
     subroutine psb_c_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
@@ -603,6 +608,16 @@ module psb_c_mat_mod
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_c_csmv
+    subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans) 
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in)   :: a
+      complex(psb_spk_), intent(in)        :: alpha, beta
+      type(psb_c_vect_type), intent(inout) :: x
+      type(psb_c_vect_type), intent(inout) :: y
+      integer, intent(out)                 :: info
+      character, optional, intent(in)      :: trans
+    end subroutine psb_c_csmv_vect
   end interface
   
   interface psb_cssm
@@ -624,6 +639,25 @@ module psb_c_mat_mod
       character, optional, intent(in) :: trans, scale
       complex(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_c_cssv
+    subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in)   :: a
+      complex(psb_spk_), intent(in)        :: alpha, beta
+      type(psb_c_vect_type), intent(inout) :: x
+      type(psb_c_vect_type), intent(inout) :: y
+      integer, intent(out)                 :: info
+      character, optional, intent(in)      :: trans, scale
+      type(psb_c_vect_type), optional, intent(inout)   :: d
+    end subroutine psb_c_cssv_vect
+  end interface
+  
+  interface 
+    function psb_c_maxval(a) result(res)
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      real(psb_spk_)         :: res
+    end function psb_c_maxval
   end interface
   
   interface 
@@ -633,6 +667,51 @@ module psb_c_mat_mod
       real(psb_spk_)         :: res
     end function psb_c_csnmi
   end interface
+  
+  interface 
+    function psb_c_csnm1(a) result(res)
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      real(psb_spk_)         :: res
+    end function psb_c_csnm1
+  end interface
+
+  interface 
+    subroutine psb_c_rowsum(d,a,info) 
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      complex(psb_spk_), intent(out)     :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_c_rowsum
+  end interface
+
+  interface 
+    subroutine psb_c_arwsum(d,a,info) 
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      real(psb_spk_), intent(out)        :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_c_arwsum
+  end interface
+  
+  interface 
+    subroutine psb_c_colsum(d,a,info) 
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      complex(psb_spk_), intent(out)     :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_c_colsum
+  end interface
+
+  interface 
+    subroutine psb_c_aclsum(d,a,info) 
+      import :: psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in) :: a
+      real(psb_spk_), intent(out)        :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_c_aclsum
+  end interface
+
   
   interface 
     subroutine psb_c_get_diag(a,d,info)
@@ -657,8 +736,6 @@ module psb_c_mat_mod
       integer, intent(out)                    :: info
     end subroutine psb_c_scals
   end interface
-
-
 
 
 contains 

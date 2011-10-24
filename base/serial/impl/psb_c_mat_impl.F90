@@ -1836,6 +1836,56 @@ subroutine psb_c_csmv(alpha,a,x,beta,y,info,trans)
 
 end subroutine psb_c_csmv
 
+subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_c_vect_mod
+  use psb_c_mat_mod, psb_protect_name => psb_c_csmv_vect
+  implicit none 
+  class(psb_cspmat_type), intent(in)   :: a
+  complex(psb_spk_), intent(in)        :: alpha, beta
+  type(psb_c_vect_type), intent(inout) :: x
+  type(psb_c_vect_type), intent(inout) :: y
+  integer, intent(out)                 :: info
+  character, optional, intent(in)      :: trans
+  Integer :: err_act
+  character(len=20)  :: name='psb_csmv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%csmm(alpha,x%v,beta,y%v,info,trans) 
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csmv_vect
+
 
 subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
   use psb_error_mod
@@ -1918,6 +1968,99 @@ subroutine psb_c_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 end subroutine psb_c_cssv
 
 
+subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+  use psb_error_mod
+  use psb_c_vect_mod
+  use psb_c_mat_mod, psb_protect_name => psb_c_cssv_vect
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  complex(psb_spk_), intent(in)         :: alpha, beta
+  type(psb_c_vect_type), intent(inout)   :: x
+  type(psb_c_vect_type), intent(inout)   :: y
+  integer, intent(out)               :: info
+  character, optional, intent(in)    :: trans, scale
+  type(psb_c_vect_type), optional, intent(inout)   :: d
+  Integer :: err_act
+  character(len=20)  :: name='psb_cssv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (present(d)) then 
+    if (.not.allocated(d%v)) then 
+      info = psb_err_invalid_vect_state_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale,d%v) 
+  else
+    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale) 
+  end if
+
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_cssv_vect
+
+
+function psb_c_maxval(a) result(res)
+  use psb_c_mat_mod, psb_protect_name => psb_c_maxval
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  Integer :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%maxval()
+  return
+
+9999 continue
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end function psb_c_maxval
 
 function psb_c_csnmi(a) result(res)
   use psb_c_mat_mod, psb_protect_name => psb_c_csnmi
@@ -1951,6 +2094,192 @@ function psb_c_csnmi(a) result(res)
   return
 
 end function psb_c_csnmi
+
+function psb_c_csnm1(a) result(res)
+  use psb_c_mat_mod, psb_protect_name => psb_c_csnm1
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  Integer :: err_act, info
+  character(len=20)  :: name='csnm1'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%csnm1()
+  return
+
+9999 continue
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end function psb_c_csnm1
+
+
+subroutine psb_c_rowsum(d,a,info)
+  use psb_c_mat_mod, psb_protect_name => psb_c_rowsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  complex(psb_spk_), intent(out)     :: d(:)
+  integer, intent(out)               :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%rowsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_rowsum
+
+subroutine psb_c_arwsum(d,a,info)
+  use psb_c_mat_mod, psb_protect_name => psb_c_arwsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  real(psb_spk_), intent(out)          :: d(:)
+  integer, intent(out)                 :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%arwsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_arwsum
+
+subroutine psb_c_colsum(d,a,info)
+  use psb_c_mat_mod, psb_protect_name => psb_c_colsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  complex(psb_spk_), intent(out)     :: d(:)
+  integer, intent(out)               :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%colsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_colsum
+
+subroutine psb_c_aclsum(d,a,info)
+  use psb_c_mat_mod, psb_protect_name => psb_c_aclsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_cspmat_type), intent(in) :: a
+  real(psb_spk_), intent(out)        :: d(:)
+  integer, intent(out)               :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%aclsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_aclsum
 
 
 subroutine psb_c_get_diag(a,d,info)

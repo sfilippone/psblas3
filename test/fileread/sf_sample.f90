@@ -48,9 +48,10 @@ program sf_sample
 
   ! dense matrices
   real(psb_spk_), allocatable, target ::  aux_b(:,:), d(:)
-  real(psb_spk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
-       & x_col_glob(:), r_col_glob(:)
+  real(psb_spk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
   real(psb_spk_), pointer  :: b_col_glob(:)
+  type(psb_s_vect_type)    :: b_col, x_col, r_col
+
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -72,10 +73,11 @@ program sf_sample
   ! other variables
   integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
-  real(psb_spk_) :: t1, t2, tprec, r_amax, b_amax,&
-       &scale,resmx,resmxp
+  real(psb_dpk_) :: t1, t2, tprec
+  real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:)
+  integer, allocatable :: ivg(:), ipv(:), perm(:)
+  character(len=40)  :: fname, fnout
 
 
   call psb_init(ictxt)
@@ -88,7 +90,7 @@ program sf_sample
   endif
 
 
-  name='df_sample'
+  name='sf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(2)
@@ -138,12 +140,15 @@ program sf_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    
+!!$    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
+!!$      call psb_gelp('N',perm(1:m_problem),&
+!!$           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
@@ -159,7 +164,9 @@ program sf_sample
       enddo
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
+
   else
+
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
@@ -181,6 +188,7 @@ program sf_sample
     enddo
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+    
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
@@ -194,6 +202,7 @@ program sf_sample
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
@@ -201,10 +210,10 @@ program sf_sample
   end if
 
   call psb_geall(x_col,desc_a,info)
-  x_col(:) =0.0
+  call x_col%set(szero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  r_col(:) =0.0
+  call r_col%set(szero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
@@ -237,7 +246,7 @@ program sf_sample
     write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
     write(psb_out_unit,'(" ")')
   end if
-  cond = -sone
+  cond = szero
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -250,8 +259,8 @@ program sf_sample
   call psb_amx(ictxt,t2)
   call psb_geaxpby(sone,b_col,szero,r_col,desc_a,info)
   call psb_spmm(-sone,a,x_col,sone,r_col,desc_a,info)
-  call psb_genrm2s(resmx,r_col,desc_a,info)
-  call psb_geamaxs(resmxp,r_col,desc_a,info)
+  resmx  = psb_genrm2(r_col,desc_a,info)
+  resmxp = psb_geamax(r_col,desc_a,info)
 
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
@@ -278,6 +287,7 @@ program sf_sample
     write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
          &  desc_a%indxmap%get_fmt()
   end if
+!!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr /= 0) then 

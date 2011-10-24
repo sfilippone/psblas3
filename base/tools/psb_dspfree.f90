@@ -56,16 +56,21 @@ subroutine psb_dspfree(a, desc_a,info)
   name = 'psb_dspfree'
   call psb_erractionsave(err_act)
 
-  if (.not.psb_is_ok_desc(desc_a)) then
-    info=psb_err_forgot_spall_
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
-    return
+    goto 9999
   else
     ictxt = desc_a%get_context()
   end if
 
   !...deallocate a....
   call a%free()
+  if (psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='a%free')
+    goto 9999
+  end if
 
   call psb_erractionrestore(err_act)
   return

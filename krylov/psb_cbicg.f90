@@ -96,7 +96,7 @@
 subroutine psb_cbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_inner_krylov_mod
+  use psb_c_inner_krylov_mod
   use psb_krylov_mod
   implicit none
 
@@ -334,4 +334,253 @@ subroutine psb_cbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
 end subroutine psb_cbicg
 
+
+
+subroutine psb_cbicg_vect(a,prec,b,x,eps,desc_a,info,&
+     & itmax,iter,err,itrace,istop)
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_c_inner_krylov_mod
+  use psb_krylov_mod
+  implicit none
+  type(psb_cspmat_type), intent(in)    :: a
+  type(psb_desc_type), intent(in)      :: desc_a
+  class(psb_cprec_type), intent(inout) :: prec
+  type(psb_c_vect_type), Intent(inout) :: b
+  type(psb_c_vect_type), Intent(inout) :: x
+  real(psb_spk_), intent(in)           :: eps
+  integer, intent(out)                 :: info
+  integer, optional, intent(in)        :: itmax, itrace, istop
+  integer, optional, intent(out)       :: iter
+  real(psb_spk_), optional, intent(out) :: err
+!!$   local data
+  complex(psb_spk_), allocatable, target   :: aux(:)
+  type(psb_c_vect_type), allocatable, target :: wwrk(:)
+  type(psb_c_vect_type), pointer  :: ww, q, r, p,&
+       & zt, pt, z, rt, qt
+  integer           :: int_err(5)
+  integer       :: itmax_, naux, mglob, it, itrace_,&
+       & np,me, n_row, n_col, istop_, err_act
+  integer            :: debug_level, debug_unit
+  logical, parameter :: exchange=.true., noexchange=.false.  
+  integer, parameter :: irmax = 8
+  integer            :: itx, isvch, ictxt
+  complex(psb_spk_)     :: alpha, beta, rho, rho_old, sigma
+  real(psb_dpk_)     :: derr  
+  type(psb_itconv_type) :: stopdat
+  character(len=20)           :: name,ch_err
+  character(len=*), parameter :: methdname='BiCG'
+
+  info = psb_success_
+  name = 'psb_bicg'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
+
+  mglob = desc_a%get_global_rows()
+  n_row = desc_a%get_local_rows()
+  n_col = desc_a%get_local_cols()
+
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(ictxt,isvch)
+
+  if (.not.allocated(b%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(istop)) then 
+    istop_ = istop 
+  else
+    istop_ = 2
+  endif
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2 
+  !
+
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    info=psb_err_invalid_istop_
+    int_err=istop_
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
+
+  call psb_chkvect(mglob,1,x%get_nrows(),1,1,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_chkvect on X')
+    goto 9999
+  end if
+  call psb_chkvect(mglob,1,b%get_nrows(),1,1,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
+    call psb_errpush(info,name,a_err='psb_chkvect on B')
+    goto 9999
+  end if
+
+
+  naux=4*n_col 
+
+  allocate(aux(naux),stat=info)
+  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=9)
+  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v)  
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_non_
+    ch_err='psb_asb'
+    err=info
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  q  => wwrk(1)
+  qt => wwrk(2)
+  r  => wwrk(3)
+  rt => wwrk(4)
+  p  => wwrk(5)
+  pt => wwrk(6)
+  z  => wwrk(7)
+  zt => wwrk(8)
+  ww => wwrk(9)
+
+  if (present(itmax)) then 
+    itmax_ = itmax
+  else
+    itmax_ = 1000
+  endif
+
+  if (present(itrace)) then
+    itrace_ = itrace
+  else
+    itrace_ = 0
+  end if
+
+  itx   = 0
+
+
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+  if (info /= psb_success_) Then 
+     call psb_errpush(psb_err_from_subroutine_non_,name)
+     goto 9999
+  End If
+
+  restart: do 
+!!$   
+!!$   r0 = b-ax0
+!!$ 
+    if (itx >= itmax_) exit restart  
+    it = 0      
+    call psb_geaxpby(cone,b,czero,r,desc_a,info)
+    if (info == psb_success_) call psb_spmm(-cone,a,x,cone,r,desc_a,info,work=aux)
+    if (debug_level >= psb_debug_ext_)&
+         & write(debug_unit,*) me,' ',trim(name),' Done spmm',info
+    if (info == psb_success_) call psb_geaxpby(cone,r,czero,rt,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    rho = czero
+    
+    ! Perhaps we already satisfy the convergence criterion...
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
+      goto 9999
+    End If
+
+    iteration:  do 
+      it   = it + 1
+      itx = itx + 1
+
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
+
+      call prec%apply(r,z,desc_a,info,work=aux)
+      if (info == psb_success_) call prec%apply(rt,zt,desc_a,info,trans='c',work=aux)
+
+      rho_old = rho    
+      rho = psb_gedot(rt,z,desc_a,info)
+      if (rho == czero) then
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' iteration breakdown r',rho
+        exit iteration
+      endif
+
+      if (it == 1) then
+        call psb_geaxpby(cone,z,czero,p,desc_a,info)
+        call psb_geaxpby(cone,zt,czero,pt,desc_a,info)
+      else
+        beta = (rho/rho_old)
+        call psb_geaxpby(cone,z,beta,p,desc_a,info)
+        call psb_geaxpby(cone,zt,beta,pt,desc_a,info)
+      end if
+
+      call psb_spmm(cone,a,p,czero,q,desc_a,info,&
+           & work=aux)
+      call psb_spmm(cone,a,pt,czero,qt,desc_a,info,&
+           & work=aux,trans='c')
+
+      sigma = psb_gedot(pt,q,desc_a,info)
+      if (sigma == czero) then
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' iteration breakdown s1', sigma
+        exit iteration
+      endif
+
+      alpha = rho/sigma
+
+
+      call psb_geaxpby(alpha,p,cone,x,desc_a,info)
+      call psb_geaxpby(-alpha,q,cone,r,desc_a,info)
+      call psb_geaxpby(-alpha,qt,cone,rt,desc_a,info)
+
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
+        goto 9999
+      End If
+
+    end do iteration
+  end do restart
+
+  call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
+  if (present(err)) err = derr
+
+  if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
+  if (info == psb_success_) deallocate(aux,stat=info)
+  if (info /= psb_success_) then
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  ! restore external global coherence behaviour
+  call psb_restore_coher(ictxt,isvch)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_cbicg_vect
 

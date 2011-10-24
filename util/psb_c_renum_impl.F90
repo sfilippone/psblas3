@@ -1,10 +1,11 @@
-subroutine psb_d_mat_renum(alg,mat,info)
+subroutine psb_c_mat_renum(alg,mat,info,perm)
   use psb_base_mod
-  use psb_renum_mod, psb_protect_name => psb_d_mat_renum
+  use psb_renum_mod, psb_protect_name => psb_c_mat_renum
   implicit none 
   integer, intent(in) :: alg
-  type(psb_dspmat_type), intent(inout) :: mat
+  type(psb_cspmat_type), intent(inout) :: mat
   integer, intent(out) :: info
+  integer, allocatable, optional, intent(out) :: perm(:)
   
   integer :: err_act
   character(len=20)           :: name
@@ -18,7 +19,7 @@ subroutine psb_d_mat_renum(alg,mat,info)
   select case (alg)
   case(psb_mat_renum_gps_) 
 
-    call psb_mat_renum_gps(mat,info)
+    call psb_mat_renum_gps(mat,info,perm)
 
   case default
     info = psb_err_input_value_invalid_i_
@@ -45,17 +46,18 @@ subroutine psb_d_mat_renum(alg,mat,info)
 
 contains
 
-  subroutine psb_mat_renum_gps(a,info)
+  subroutine psb_mat_renum_gps(a,info,operm)
     use psb_base_mod
     use psb_gps_mod
     implicit none 
-    type(psb_dspmat_type), intent(inout) :: a
+    type(psb_cspmat_type), intent(inout) :: a
     integer, intent(out) :: info
+    integer, allocatable, optional, intent(out) :: operm(:)
 
     ! 
-    class(psb_d_base_sparse_mat), allocatable :: aa
-    type(psb_d_csr_sparse_mat)  :: acsr
-    type(psb_d_coo_sparse_mat)  :: acoo
+    class(psb_c_base_sparse_mat), allocatable :: aa
+    type(psb_c_csr_sparse_mat)  :: acsr
+    type(psb_c_coo_sparse_mat)  :: acoo
     
     integer :: err_act
     character(len=20)           :: name
@@ -112,9 +114,17 @@ contains
 
     ! Get back to where we started from
     call aa%mv_from_coo(acoo,info)
-
     call a%mv_from(aa)
-    
+    if (present(operm)) then 
+      call psb_realloc(nr,operm,info)
+      if (info /= psb_success_) then 
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name) 
+        goto 9999
+      end if
+      operm(1:nr) = perm(1:nr)
+    end if
+
     deallocate(aa)
     call psb_erractionrestore(err_act)
     return
@@ -128,4 +138,5 @@ contains
     return
   end subroutine psb_mat_renum_gps
 
-end subroutine psb_d_mat_renum
+end subroutine psb_c_mat_renum
+

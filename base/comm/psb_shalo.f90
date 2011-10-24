@@ -118,18 +118,16 @@ subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   else
     tran_ = 'N'
   endif
+  if (present(mode)) then 
+    imode = mode
+  else
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
 
   if (present(data)) then     
     data_ = data
   else
     data_ = psb_comm_halo_
-  endif
-
-
-  if (present(mode)) then 
-    imode = mode
-  else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
   ! check vector correctness
@@ -152,7 +150,7 @@ subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   if(present(alpha)) then
     if(alpha /= 1.d0) then
       do i=0, k-1
-        call dscal(nrow,alpha,x(:,jjx+i),1)
+        call sscal(nrow,alpha,x(:,jjx+i),1)
       end do
     end if
   end if
@@ -160,8 +158,8 @@ subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
-      iwork => work
       aliw=.false.
+      iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -199,12 +197,13 @@ subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if(info /= psb_success_) then
-    ch_err='PSI_dSwapdata'
+    ch_err='PSI_sSwapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
 
   if (aliw) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -353,15 +352,15 @@ subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   if(present(alpha)) then
     if(alpha /= 1.d0) then
-      call dscal(nrow,alpha,x,ione)
+      call sscal(nrow,alpha,x,ione)
     end if
   end if
 
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
-      iwork => work
       aliw=.false.
+      iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -403,6 +402,7 @@ subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
   end if
 
   if (aliw) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -418,4 +418,152 @@ subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
 end subroutine psb_shalov
 
 
+subroutine  psb_shalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
+  use psb_base_mod, psb_protect_name => psb_shalo_vect
+  use psi_mod
+  implicit none
 
+  type(psb_s_vect_type), intent(inout)   :: x
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
+  real(psb_spk_), intent(in), optional    :: alpha
+  real(psb_spk_), target, optional, intent(inout)  :: work(:)
+  integer, intent(in), optional           :: mode,data
+  character, intent(in), optional         :: tran
+
+  ! locals
+  integer                  :: ictxt, np, me,&
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
+       & err, liwork,data_
+  real(psb_spk_),pointer :: iwork(:)
+  character                :: tran_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw
+
+  name='psb_shalov'
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  ! check on blacs grid 
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = 1
+  ijx = 1
+
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+
+  if (present(tran)) then     
+    tran_ = psb_toupper(tran)
+  else
+    tran_ = 'N'
+  endif
+  if (present(data)) then     
+    data_ = data
+  else
+    data_ = psb_comm_halo_
+  endif
+  if (present(mode)) then 
+    imode = mode
+  else
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+
+  ! check vector correctness
+  call psb_chkvect(m,1,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  err=info
+  call psb_errcomm(ictxt,err)
+  if(err /= 0) goto 9999
+
+  if(present(alpha)) then
+    if(alpha /= 1.0) then
+      call x%scal(alpha)
+    end if
+  end if
+
+  liwork=nrow
+  if (present(work)) then
+    if(size(work) >= liwork) then
+      iwork => work
+      aliw=.false.
+    else
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
+      if(info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        ch_err='psb_realloc'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+    end if
+  else
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  end if
+
+  ! exchange halo elements
+  if(tran_ == 'N') then
+    call psi_swapdata(imode,szero,x%v,&
+         & desc_a,iwork,info,data=data_)
+  else if((tran_ == 'T').or.(tran_ == 'C')) then
+    call psi_swaptran(imode,sone,x%v,&
+         & desc_a,iwork,info)
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='invalid tran')
+    goto 9999      
+  end if
+
+  if(info /= psb_success_) then
+    ch_err='PSI_swapdata'
+    call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if (aliw) deallocate(iwork)
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psb_shalo_vect

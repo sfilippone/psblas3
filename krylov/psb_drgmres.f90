@@ -109,7 +109,7 @@
 subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_inner_krylov_mod
+  use psb_d_inner_krylov_mod
   use psb_krylov_mod
   implicit none
   type(psb_dspmat_type), intent(in)  :: a
@@ -465,5 +465,379 @@ subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   return
 
 end subroutine psb_drgmres
+
+
+subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
+     & itmax,iter,err,itrace,irst,istop)
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_d_inner_krylov_mod
+  use psb_krylov_mod
+  implicit none
+  type(psb_dspmat_type), intent(in)    :: a
+  Type(psb_desc_type), Intent(in)      :: desc_a
+  class(psb_dprec_type), intent(inout) :: prec
+  type(psb_d_vect_type), Intent(inout) :: b
+  type(psb_d_vect_type), Intent(inout) :: x
+  Real(psb_dpk_), Intent(in)           :: eps
+  integer, intent(out)                 :: info
+  Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
+  Integer, Optional, Intent(out)       :: iter
+  Real(psb_dpk_), Optional, Intent(out) :: err
+!!$   local data
+  Real(psb_dpk_), allocatable   :: aux(:)
+  Real(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
+  type(psb_d_vect_type), allocatable :: v(:)
+  type(psb_d_vect_type)              :: w, w1, xt
+  Real(psb_dpk_) :: scal, gm, rti, rti1
+  Integer       ::litmax, naux, mglob, it,k, itrace_,&
+       & np,me, n_row, n_col, nl, int_err(5)
+  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
+  Integer, Parameter :: irmax = 8
+  Integer            :: itx, i, isvch, ictxt,istop_, err_act
+  integer            :: debug_level, debug_unit
+  Real(psb_dpk_) :: rni, xni, bni, ani,bn2, dt
+  real(psb_dpk_), external :: dnrm2
+  real(psb_dpk_)   :: errnum, errden
+  character(len=20)           :: name
+  character(len=*), parameter :: methdname='RGMRES'
+
+  info = psb_success_
+  name = 'psb_dgmres'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt = desc_a%get_context()
+  Call psb_info(ictxt, me, np)
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
+  if (.not.allocated(b%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  mglob = desc_a%get_global_rows()
+  n_row = desc_a%get_local_rows()
+  n_col = desc_a%get_local_cols()
+
+  if (present(istop)) then 
+    istop_ = istop 
+  else
+    istop_ = 2
+  endif
+!
+!  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
+!
+
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    info=psb_err_invalid_istop_
+    int_err(1)=istop_
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
+
+  if (present(itmax)) then 
+    litmax = itmax
+  else
+    litmax = 1000
+  endif
+
+  if (present(itrace)) then
+    itrace_ = itrace
+  else
+    itrace_ = 0
+  end if
+  
+  if (present(irst)) then
+    nl = irst
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' present: irst: ',irst,nl
+  else
+    nl = 10 
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' not present: irst: ',irst,nl
+  endif
+  if (nl <=0 ) then 
+    info=psb_err_invalid_istop_
+    int_err(1)=nl
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
+
+  call psb_chkvect(mglob,1,x%get_nrows(),1,1,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_chkvect on X')
+    goto 9999
+  end if
+  call psb_chkvect(mglob,1,b%get_nrows(),1,1,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
+    call psb_errpush(info,name,a_err='psb_chkvect on B')
+    goto 9999
+  end if
+
+
+  naux=4*n_col 
+  allocate(aux(naux),h(nl+1,nl+1),&
+       &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
+
+  if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
+  if (info == psb_success_) call psb_geall(w,desc_a,info)
+  if (info == psb_success_) call psb_geall(w1,desc_a,info)
+  if (info == psb_success_) call psb_geall(xt,desc_a,info)
+  if (info == psb_success_) call psb_geasb(v,desc_a,info,mold=x%v)  
+  if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v)  
+  if (info == psb_success_) call psb_geasb(w1,desc_a,info,mold=x%v)  
+  if (info == psb_success_) call psb_geasb(xt,desc_a,info,mold=x%v)  
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_ 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),&
+       & ' Size of V,W,W1 ',v(1)%get_nrows(),size(v),&
+       & w%get_nrows(),w1%get_nrows()
+
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(ictxt,isvch)
+
+  if (istop_ == 1) then 
+    ani = psb_spnrmi(a,desc_a,info)
+    bni = psb_geamax(b,desc_a,info)
+  else if (istop_ == 2) then 
+    bn2 = psb_genrm2(b,desc_a,info)
+  endif
+  errnum = dzero
+  errden = done
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_ 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if ((itrace_ > 0).and.(me == 0)) call log_header(methdname)
+
+  itx   = 0
+  restart: do 
+  
+    ! compute r0 = b-ax0
+    ! check convergence
+    ! compute v1 = r0/||r0||_2
+
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' restart: ',itx,it
+    it = 0      
+    call psb_geaxpby(done,b,dzero,v(1),desc_a,info)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_spmm(-done,a,x,done,v(1),desc_a,info,work=aux)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    rs(1) = psb_genrm2(v(1),desc_a,info)
+    rs(2:) = dzero
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    scal=done/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
+
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' on entry to amax: b: ',b%get_nrows(),rs(1),scal
+
+    !
+    ! check convergence
+    !
+    if (istop_ == 1) then 
+      rni = psb_geamax(v(1),desc_a,info)
+      xni = psb_geamax(x,desc_a,info)
+      errnum = rni
+      errden = (ani*xni+bni)
+    else if (istop_ == 2) then 
+      rni = psb_genrm2(v(1),desc_a,info)
+      errnum = rni
+      errden = bn2
+    endif
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    if (errnum <= eps*errden) exit restart
+
+    if (itrace_ > 0) &
+         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+     
+    call v(1)%scal(scal) !v(1) = v(1) * scal
+
+    if (itx >= litmax) exit restart  
+
+    !
+    ! inner iterations
+    !
+
+    inner:  Do i=1,nl
+      itx  = itx + 1
+
+      call prec%apply(v(i),w1,desc_a,info)
+      call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
+      !
+
+      do k = 1, i
+        h(k,i) = psb_gedot(v(k),w,desc_a,info)
+        call psb_geaxpby(-h(k,i),v(k),done,w,desc_a,info)
+      end do
+      h(i+1,i) = psb_genrm2(w,desc_a,info)
+      scal=done/h(i+1,i)
+      call psb_geaxpby(scal,w,dzero,v(i+1),desc_a,info)
+      do k=2,i
+        call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+      enddo
+      
+      rti  = h(i,i)
+      rti1 = h(i+1,i) 
+      call drotg(rti,rti1,c(i),s(i))
+      call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
+      h(i+1,i) = dzero
+      call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
+      
+      if (istop_ == 1) then 
+        !
+        ! build x and then compute the residual and its infinity norm
+        !
+        rst = rs
+        call w1%set(dzero)
+        call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rst,size(rst,1))
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' Rebuild x-> RS:',rst(1:nl)
+        do k=1, i
+          call psb_geaxpby(rst(k),v(k),done,xt,desc_a,info)
+        end do
+        call prec%apply(xt,desc_a,info)
+        call psb_geaxpby(done,x,done,xt,desc_a,info)
+        call psb_geaxpby(done,b,dzero,w1,desc_a,info)
+        call psb_spmm(-done,a,xt,done,w1,desc_a,info,work=aux)
+        rni = psb_geamax(w1,desc_a,info)
+        xni = psb_geamax(xt,desc_a,info)
+        errnum = rni
+        errden = (ani*xni+bni)
+        !
+
+      else if (istop_ == 2) then 
+        !
+        ! compute the residual 2-norm as byproduct of the solution
+        ! procedure of the least-squares problem
+        !
+        rni = abs(rs(i+1))
+        errnum = rni
+        errden = bn2
+      endif
+
+      if (errnum <= eps*errden) then 
+
+        if (istop_ == 1) then 
+          call psb_geaxpby(done,xt,dzero,x,desc_a,info)
+!!$          x = xt 
+        else if (istop_ == 2) then
+          !
+          ! build x
+          !
+          call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,size(rs,1))
+          if (debug_level >= psb_debug_ext_) &
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ' Rebuild x-> RS:',rs(1:nl)
+          call w1%set(dzero)
+          do k=1, i
+            call psb_geaxpby(rs(k),v(k),done,w1,desc_a,info)
+          end do
+          call prec%apply(w1,w,desc_a,info)
+          call psb_geaxpby(done,w,done,x,desc_a,info)
+        end if
+
+        exit restart
+
+      end if
+
+      if (itrace_ > 0) &
+           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+
+    end do inner
+
+    if (istop_ == 1) then 
+      call psb_geaxpby(done,xt,dzero,x,desc_a,info)!      x = xt 
+    else if (istop_ == 2) then
+      !
+      ! build x
+      !
+      call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,size(rs,1))
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' Rebuild x-> RS:',rs(1:nl)
+      call w1%set(dzero)
+      do k=1, nl
+        call psb_geaxpby(rs(k),v(k),done,w1,desc_a,info)
+      end do
+      call prec%apply(w1,w,desc_a,info)
+      call psb_geaxpby(done,w,done,x,desc_a,info)
+    end if
+     
+  end do restart
+  if (itrace_ > 0) &
+       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
+
+  call log_end(methdname,me,itx,errnum,errden,eps,err=err,iter=iter)
+
+  
+  if (info == psb_success_) call psb_gefree(v,desc_a,info)
+  if (info == psb_success_) call psb_gefree(w,desc_a,info)
+  if (info == psb_success_) call psb_gefree(w1,desc_a,info)
+  if (info == psb_success_) call psb_gefree(xt,desc_a,info)
+  if (info == psb_success_) deallocate(aux,h,c,s,rs,rst, stat=info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_non_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! restore external global coherence behaviour
+  call psb_restore_coher(ictxt,isvch)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_drgmres_vect
 
 

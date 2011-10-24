@@ -58,21 +58,26 @@
 module psb_d_base_mat_mod
   
   use psb_base_mat_mod
+  use psb_d_base_vect_mod
 
   type, extends(psb_base_sparse_mat) :: psb_d_base_sparse_mat
   contains
+    procedure, pass(a) :: d_sp_mv      => psb_d_base_vect_mv
     procedure, pass(a) :: d_csmv       => psb_d_base_csmv
     procedure, pass(a) :: d_csmm       => psb_d_base_csmm
-    generic, public    :: csmm         => d_csmm, d_csmv
+    generic, public    :: csmm         => d_csmm, d_csmv, d_sp_mv
+    procedure, pass(a) :: d_in_sv      => psb_d_base_inner_vect_sv
     procedure, pass(a) :: d_inner_cssv => psb_d_base_inner_cssv    
     procedure, pass(a) :: d_inner_cssm => psb_d_base_inner_cssm
-    generic, public    :: inner_cssm   => d_inner_cssm, d_inner_cssv
+    generic, public    :: inner_cssm   => d_inner_cssm, d_inner_cssv, d_in_sv
+    procedure, pass(a) :: d_vect_cssv  => psb_d_base_vect_cssv
     procedure, pass(a) :: d_cssv       => psb_d_base_cssv
     procedure, pass(a) :: d_cssm       => psb_d_base_cssm
-    generic, public    :: cssm         => d_cssm, d_cssv
+    generic, public    :: cssm         => d_cssm, d_cssv, d_vect_cssv
     procedure, pass(a) :: d_scals      => psb_d_base_scals
     procedure, pass(a) :: d_scal       => psb_d_base_scal
     generic, public    :: scal         => d_scals, d_scal 
+    procedure, pass(a) :: maxval       => psb_d_base_maxval
     procedure, pass(a) :: csnmi        => psb_d_base_csnmi
     procedure, pass(a) :: csnm1        => psb_d_base_csnm1
     procedure, pass(a) :: rowsum       => psb_d_base_rowsum
@@ -140,6 +145,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_to_fmt    => psb_d_mv_coo_to_fmt
     procedure, pass(a) :: mv_from_fmt  => psb_d_mv_coo_from_fmt
     procedure, pass(a) :: csput        => psb_d_coo_csput
+    procedure, pass(a) :: maxval       => psb_d_coo_maxval
     procedure, pass(a) :: csnmi        => psb_d_coo_csnmi
     procedure, pass(a) :: csnm1        => psb_d_coo_csnm1
     procedure, pass(a) :: rowsum       => psb_d_coo_rowsum
@@ -201,6 +207,18 @@ module psb_d_base_mat_mod
   end interface
   
   interface 
+    subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_d_base_sparse_mat, psb_dpk_, psb_d_base_vect_type
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(in)       :: alpha, beta
+      class(psb_d_base_vect_type), intent(inout) :: x
+      class(psb_d_base_vect_type), intent(inout) :: y
+      integer, intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_d_base_vect_mv
+  end interface
+  
+  interface 
     subroutine psb_d_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_d_base_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
@@ -220,6 +238,17 @@ module psb_d_base_mat_mod
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_base_inner_cssv
+  end interface
+  
+  interface 
+    subroutine psb_d_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_d_base_sparse_mat, psb_dpk_,  psb_d_base_vect_type
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(in)       :: alpha, beta
+      class(psb_d_base_vect_type), intent(inout) :: x, y
+      integer, intent(out)             :: info
+      character, optional, intent(in)  :: trans
+    end subroutine psb_d_base_inner_vect_sv
   end interface
   
   interface 
@@ -247,6 +276,18 @@ module psb_d_base_mat_mod
   end interface
   
   interface 
+    subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
+      import :: psb_d_base_sparse_mat, psb_dpk_,psb_d_base_vect_type
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(in)       :: alpha, beta
+      class(psb_d_base_vect_type), intent(inout) :: x,y
+      integer, intent(out)             :: info
+      character, optional, intent(in)  :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)   :: d
+    end subroutine psb_d_base_vect_cssv
+  end interface
+  
+  interface 
     subroutine psb_d_base_scals(d,a,info) 
       import :: psb_d_base_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(inout) :: a
@@ -262,6 +303,14 @@ module psb_d_base_mat_mod
       real(psb_dpk_), intent(in)      :: d(:)
       integer, intent(out)            :: info
     end subroutine psb_d_base_scal
+  end interface
+  
+  interface 
+    function psb_d_base_maxval(a) result(res)
+      import :: psb_d_base_sparse_mat, psb_dpk_
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_d_base_maxval
   end interface
   
   interface 
@@ -755,7 +804,15 @@ module psb_d_base_mat_mod
     end subroutine psb_d_coo_csmm
   end interface
   
-  
+    
+  interface 
+    function psb_d_coo_maxval(a) result(res)
+      import :: psb_d_coo_sparse_mat, psb_dpk_
+      class(psb_d_coo_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_d_coo_maxval
+  end interface
+
   interface 
     function psb_d_coo_csnmi(a) result(res)
       import :: psb_d_coo_sparse_mat, psb_dpk_
@@ -804,7 +861,6 @@ module psb_d_base_mat_mod
     end subroutine psb_d_coo_aclsum
   end interface
   
-
   interface 
     subroutine psb_d_coo_get_diag(a,d,info) 
       import :: psb_d_coo_sparse_mat, psb_dpk_
@@ -965,7 +1021,6 @@ contains
   !
   ! == ==================================
   
-
   subroutine  d_coo_free(a) 
     implicit none 
     

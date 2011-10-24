@@ -1388,6 +1388,26 @@ contains
 
 end subroutine psb_c_csc_cssm
 
+function psb_c_csc_maxval(a) result(res)
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_maxval
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  character(len=20)  :: name='c_csc_maxval'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_c_csc_maxval
+
 function psb_c_csc_csnmi(a) result(res)
   use psb_error_mod
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csnmi
@@ -1422,6 +1442,242 @@ function psb_c_csc_csnmi(a) result(res)
   deallocate(acc)
 
 end function psb_c_csc_csnmi
+
+
+function psb_c_csc_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csnm1
+
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act
+  character(len=20)  :: name='d_csc_csnm1'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  m = a%get_nrows()
+  n = a%get_ncols()
+  do j=1, n
+    acc = szero 
+    do k=a%icp(j),a%icp(j+1)-1
+      acc = acc + abs(a%val(k))
+    end do
+    res = max(res,acc)
+  end do
+  
+  return
+
+end function psb_c_csc_csnm1
+
+subroutine psb_c_csc_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_colsum
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)             :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  do i = 1, a%get_ncols()
+    d(i) = czero
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + (a%val(j))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_colsum
+
+subroutine psb_c_csc_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_aclsum
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+
+  do i = 1, a%get_ncols()
+    d(i) = szero
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + abs(a%val(j))
+    end do
+  end do
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_aclsum
+
+subroutine psb_c_csc_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_rowsum
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = czero
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + (a%val(k))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_rowsum
+
+subroutine psb_c_csc_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_arwsum
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  Integer :: err_act, info, int_err(5)
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    int_err(1) = 1
+    int_err(2) = size(d)
+    int_err(3) = n
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + abs(a%val(k))
+    end do
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_arwsum
 
 
 subroutine psb_c_csc_get_diag(a,d,info) 

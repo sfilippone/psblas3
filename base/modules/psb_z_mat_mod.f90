@@ -129,20 +129,26 @@ module psb_z_mat_mod
     procedure, pass(a) :: z_transc_2mat => psb_z_transc_2mat
     generic, public    :: transc        => z_transc_1mat, z_transc_2mat
 
-    
-    
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_z_get_diag
+    procedure, pass(a) :: maxval   => psb_z_maxval
     procedure, pass(a) :: csnmi    => psb_z_csnmi
+    procedure, pass(a) :: csnm1    => psb_z_csnm1
+    procedure, pass(a) :: rowsum   => psb_z_rowsum
+    procedure, pass(a) :: arwsum   => psb_z_arwsum
+    procedure, pass(a) :: colsum   => psb_z_colsum
+    procedure, pass(a) :: aclsum   => psb_z_aclsum
+    procedure, pass(a) :: z_csmv_v => psb_z_csmv_vect
     procedure, pass(a) :: z_csmv   => psb_z_csmv
     procedure, pass(a) :: z_csmm   => psb_z_csmm
-    generic, public    :: csmm     => z_csmm, z_csmv
+    generic, public    :: csmm     => z_csmm, z_csmv, z_csmv_v
     procedure, pass(a) :: z_scals  => psb_z_scals
     procedure, pass(a) :: z_scal   => psb_z_scal
     generic, public    :: scal     => z_scals, z_scal 
+    procedure, pass(a) :: z_cssv_v => psb_z_cssv_vect
     procedure, pass(a) :: z_cssv   => psb_z_cssv
     procedure, pass(a) :: z_cssm   => psb_z_cssm
-    generic, public    :: cssm     => z_cssm, z_cssv
+    generic, public    :: cssm     => z_cssm, z_cssv, z_cssv_v
 
   end type psb_zspmat_type
 
@@ -602,6 +608,16 @@ module psb_z_mat_mod
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_z_csmv
+    subroutine psb_z_csmv_vect(alpha,a,x,beta,y,info,trans) 
+      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in)   :: a
+      complex(psb_dpk_), intent(in)        :: alpha, beta
+      type(psb_z_vect_type), intent(inout) :: x
+      type(psb_z_vect_type), intent(inout) :: y
+      integer, intent(out)                 :: info
+      character, optional, intent(in)      :: trans
+    end subroutine psb_z_csmv_vect
   end interface
   
   interface psb_cssm
@@ -623,6 +639,25 @@ module psb_z_mat_mod
       character, optional, intent(in) :: trans, scale
       complex(psb_dpk_), intent(in), optional :: d(:)
     end subroutine psb_z_cssv
+    subroutine psb_z_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in)   :: a
+      complex(psb_dpk_), intent(in)        :: alpha, beta
+      type(psb_z_vect_type), intent(inout) :: x
+      type(psb_z_vect_type), intent(inout) :: y
+      integer, intent(out)                 :: info
+      character, optional, intent(in)      :: trans, scale
+      type(psb_z_vect_type), optional, intent(inout)   :: d
+    end subroutine psb_z_cssv_vect
+  end interface
+  
+  interface 
+    function psb_z_maxval(a) result(res)
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_z_maxval
   end interface
   
   interface 
@@ -632,6 +667,51 @@ module psb_z_mat_mod
       real(psb_dpk_)         :: res
     end function psb_z_csnmi
   end interface
+  
+  interface 
+    function psb_z_csnm1(a) result(res)
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_z_csnm1
+  end interface
+
+  interface 
+    subroutine psb_z_rowsum(d,a,info) 
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      complex(psb_dpk_), intent(out)     :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_z_rowsum
+  end interface
+
+  interface 
+    subroutine psb_z_arwsum(d,a,info) 
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      real(psb_dpk_), intent(out)        :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_z_arwsum
+  end interface
+  
+  interface 
+    subroutine psb_z_colsum(d,a,info) 
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      complex(psb_dpk_), intent(out)     :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_z_colsum
+  end interface
+
+  interface 
+    subroutine psb_z_aclsum(d,a,info) 
+      import :: psb_zspmat_type, psb_dpk_
+      class(psb_zspmat_type), intent(in) :: a
+      real(psb_dpk_), intent(out)        :: d(:)
+      integer, intent(out)               :: info
+    end subroutine psb_z_aclsum
+  end interface
+
   
   interface 
     subroutine psb_z_get_diag(a,d,info)
@@ -656,8 +736,6 @@ module psb_z_mat_mod
       integer, intent(out)                    :: info
     end subroutine psb_z_scals
   end interface
-
-
 
 
 contains 

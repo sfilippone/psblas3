@@ -58,7 +58,13 @@ module psb_z_csc_mat_mod
     procedure, pass(a) :: z_inner_cssv => psb_z_csc_cssv
     procedure, pass(a) :: z_scals      => psb_z_csc_scals
     procedure, pass(a) :: z_scal       => psb_z_csc_scal
+    procedure, pass(a) :: maxval       => psb_z_csc_maxval
     procedure, pass(a) :: csnmi        => psb_z_csc_csnmi
+    procedure, pass(a) :: csnm1        => psb_z_csc_csnm1
+    procedure, pass(a) :: rowsum       => psb_z_csc_rowsum
+    procedure, pass(a) :: arwsum       => psb_z_csc_arwsum
+    procedure, pass(a) :: colsum       => psb_z_csc_colsum
+    procedure, pass(a) :: aclsum       => psb_z_csc_aclsum
     procedure, pass(a) :: reallocate_nz => psb_z_csc_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_z_csc_allocate_mnnz
     procedure, pass(a) :: cp_to_coo    => psb_z_cp_csc_to_coo
@@ -331,6 +337,14 @@ module psb_z_csc_mat_mod
   
   
   interface 
+    function psb_z_csc_maxval(a) result(res)
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_z_csc_maxval
+  end interface
+  
+  interface 
     function psb_z_csc_csnmi(a) result(res)
       import :: psb_z_csc_sparse_mat, psb_dpk_
       class(psb_z_csc_sparse_mat), intent(in) :: a
@@ -338,6 +352,46 @@ module psb_z_csc_mat_mod
     end function psb_z_csc_csnmi
   end interface
   
+  interface 
+    function psb_z_csc_csnm1(a) result(res)
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_z_csc_csnm1
+  end interface
+
+  interface 
+    subroutine psb_z_csc_rowsum(d,a) 
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(out)          :: d(:)
+    end subroutine psb_z_csc_rowsum
+  end interface
+
+  interface 
+    subroutine psb_z_csc_arwsum(d,a) 
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)             :: d(:)
+    end subroutine psb_z_csc_arwsum
+  end interface
+  
+  interface 
+    subroutine psb_z_csc_colsum(d,a) 
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      complex(psb_dpk_), intent(out)          :: d(:)
+    end subroutine psb_z_csc_colsum
+  end interface
+
+  interface 
+    subroutine psb_z_csc_aclsum(d,a) 
+      import :: psb_z_csc_sparse_mat, psb_dpk_
+      class(psb_z_csc_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)             :: d(:)
+    end subroutine psb_z_csc_aclsum
+  end interface
+      
   interface 
     subroutine psb_z_csc_get_diag(a,d,info) 
       import :: psb_z_csc_sparse_mat, psb_dpk_

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_get_global_rows -- Get number of global rows</TITLE>
-<META NAME="description" CONTENT="psb_cd_get_global_rows -- Get number of global rows">
+<TITLE>get_local_rows -- Get number of local rows</TITLE>
+<META NAME="description" CONTENT="get_local_rows -- Get number of local rows">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,53 +20,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node18.html">
 <LINK REL="previous" HREF="node16.html">
-<LINK REL="up" HREF="node14.html">
+<LINK REL="up" HREF="node16.html">
 <LINK REL="next" HREF="node18.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html380"
+<A NAME="tex2html385"
   HREF="node18.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html376"
-  HREF="node14.html">
+<A NAME="tex2html381"
+  HREF="node16.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html370"
+<A NAME="tex2html375"
   HREF="node16.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html378"
+<A NAME="tex2html383"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html381"
-  HREF="node18.html">psb_cd_get_global_cols   Get</A>
-<B> Up:</B> <A NAME="tex2html377"
-  HREF="node14.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html371"
-  HREF="node16.html">psb_cd_get_local_cols   Get</A>
- &nbsp; <B>  <A NAME="tex2html379"
+<B> Next:</B> <A NAME="tex2html386"
+  HREF="node18.html">get_local_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html382"
+  HREF="node16.html">Data structure query routines</A>
+<B> Previous:</B> <A NAME="tex2html376"
+  HREF="node16.html">Data structure query routines</A>
+ &nbsp; <B>  <A NAME="tex2html384"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00044300000000000000">
-psb_cd_get_global_rows -- Get number of global rows</A>
+<H3><A NAME="SECTION00045100000000000000">
+get_local_rows -- Get number of local rows</A>
 </H3>
 
 <P>
 <PRE>
-nr = psb_cd_get_global_rows(desc)
+nr = desc%get_local_rows()
 </PRE>
 
 <P>
 <DL>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
 <DT><STRONG>desc</STRONG></DT>
 <DD>the communication descriptor.
@@ -87,7 +87,16 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of global rows in the mesh
+<DD>The number of local rows, i.e. the number of
+  rows owned by the current process; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>,
+  it is equal to <!-- MATH
+ $|{\cal I}_i| + |{\cal B}_i|$
+ -->
+<IMG
+ WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img10.png"
+ ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">. The returned value is
+  specific to the calling process. 
 </DD>
 </DL>
 

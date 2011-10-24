@@ -91,7 +91,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       use psb_base_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_,&
-           & psb_s_base_sparse_mat
+           & psb_s_base_sparse_mat, psb_s_vect_type
       implicit none
 
       ! parameters
@@ -99,7 +99,7 @@ module psb_mat_dist_mod
       real(psb_spk_)             :: b_glob(:)
       integer                    :: ictxt
       type(psb_sspmat_type)      :: a
-      real(psb_spk_), allocatable  :: b(:)
+      type(psb_s_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
       integer, optional          :: inroot
@@ -177,7 +177,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_d_base_sparse_mat
+           & psb_d_base_sparse_mat, psb_d_vect_type
       implicit none
 
       ! parameters
@@ -185,7 +185,7 @@ module psb_mat_dist_mod
       real(psb_dpk_)             :: b_glob(:)
       integer                    :: ictxt
       type(psb_dspmat_type)      :: a
-      real(psb_dpk_), allocatable  :: b(:)
+      type(psb_d_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
       integer, optional          :: inroot
@@ -264,7 +264,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       use psb_base_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type,&
-           & psb_c_base_sparse_mat
+           & psb_c_base_sparse_mat, psb_c_vect_type
       implicit none
 
       ! parameters
@@ -272,7 +272,7 @@ module psb_mat_dist_mod
       complex(psb_spk_)          :: b_glob(:)
       integer                    :: ictxt
       type(psb_cspmat_type)      :: a
-      complex(psb_spk_), allocatable  :: b(:)
+      type(psb_c_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
       integer, optional          :: inroot
@@ -351,7 +351,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       use psb_base_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat
+           & psb_z_base_sparse_mat, psb_z_vect_type
       implicit none
 
       ! parameters
@@ -359,7 +359,7 @@ module psb_mat_dist_mod
       complex(psb_dpk_)          :: b_glob(:)
       integer                    :: ictxt
       type(psb_zspmat_type)      :: a
-      complex(psb_dpk_), allocatable  :: b(:)
+      type(psb_z_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
       integer, intent(out)       :: info
       integer, optional          :: inroot

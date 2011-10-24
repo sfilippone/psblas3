@@ -150,10 +150,10 @@ ac_exeext=''
 ac_ext='F'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 dnl Warning : square brackets are EVIL!
-[AC_MSG_CHECKING([GNU Fortran version at least 4.3])
+[AC_MSG_CHECKING([GNU Fortran version at least 4.6])
 cat > conftest.$ac_ext <<EOF
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 3 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail

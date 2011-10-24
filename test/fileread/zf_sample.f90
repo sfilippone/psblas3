@@ -48,9 +48,9 @@ program zf_sample
 
   ! dense matrices
   complex(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  complex(psb_dpk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
-       & x_col_glob(:), r_col_glob(:)
+  complex(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
   complex(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_z_vect_type)    :: b_col, x_col, r_col
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -72,10 +72,11 @@ program zf_sample
   ! other variables
   integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
-       &scale,resmx,resmxp
+  real(psb_dpk_) :: t1, t2, tprec
+  real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:)
+  integer, allocatable :: ivg(:), ipv(:), perm(:)
+  character(len=40)  :: fname, fnout
 
 
   call psb_init(ictxt)
@@ -138,12 +139,15 @@ program zf_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    
+!!$    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
+!!$      call psb_gelp('N',perm(1:m_problem),&
+!!$           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
@@ -159,7 +163,9 @@ program zf_sample
       enddo      
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
+
   else
+
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
@@ -181,6 +187,7 @@ program zf_sample
     enddo
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+    
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
@@ -194,6 +201,7 @@ program zf_sample
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
@@ -201,10 +209,10 @@ program zf_sample
   end if
   
   call psb_geall(x_col,desc_a,info)
-  x_col(:) =0.0
+  call x_col%set(zzero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  r_col(:) =0.0
+  call r_col%set(zzero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
   
@@ -248,8 +256,8 @@ program zf_sample
   call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
   call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)
-  call psb_genrm2s(resmx,r_col,desc_a,info)
-  call psb_geamaxs(resmxp,r_col,desc_a,info)
+  resmx  = psb_genrm2(r_col,desc_a,info)
+  resmxp = psb_geamax(r_col,desc_a,info)
 
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)

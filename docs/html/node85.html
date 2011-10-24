@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_amn -- Global minimum absolute value</TITLE>
-<META NAME="description" CONTENT="psb_amn -- Global minimum absolute value">
+<TITLE>psb_min -- Global minimum</TITLE>
+<META NAME="description" CONTENT="psb_min -- Global minimum">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,48 +20,48 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node86.html">
 <LINK REL="previous" HREF="node84.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node73.html">
 <LINK REL="next" HREF="node86.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1248"
+<A NAME="tex2html1253"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1244"
-  HREF="node71.html">
+<A NAME="tex2html1249"
+  HREF="node73.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1238"
+<A NAME="tex2html1243"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1246"
+<A NAME="tex2html1251"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1249"
-  HREF="node86.html">psb_snd   Send</A>
-<B> Up:</B> <A NAME="tex2html1245"
-  HREF="node71.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1239"
-  HREF="node84.html">psb_amx   Global</A>
- &nbsp; <B>  <A NAME="tex2html1247"
+<B> Next:</B> <A NAME="tex2html1254"
+  HREF="node86.html">psb_amx   Global</A>
+<B> Up:</B> <A NAME="tex2html1250"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1244"
+  HREF="node84.html">psb_max   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1252"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000814000000000000000">
-psb_amn -- Global minimum absolute value</A>
+<H2><A NAME="SECTION000812000000000000000">
+psb_min -- Global minimum</A>
 </H2>
 
 <P>
 <PRE>
-call psb_amn(icontxt, dat, root)
+call psb_min(icontxt, dat, root)
 </PRE>
 
 <P>
-This subroutine implements a minimum absolute value reduction
+This subroutine implements a minimum value reduction
 operation based on the underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
@@ -91,13 +91,13 @@ Type: <B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: an integer, real or complex variable, which may be a
+Specified as: an integer  or real variable, which may be a
 scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
 <DT><STRONG>root</STRONG></DT>
 <DD>Process to hold the final value, or <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img84.png"
  ALT="$-1$"> to make it available
   on all processes.
 <BR>
@@ -112,7 +112,7 @@ Specified as: an integer value <!-- MATH
  -->
 <IMG
  WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img129.png"
+ SRC="img130.png"
  ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
 <BR></DD>
 </DL>
@@ -131,7 +131,7 @@ Type: <B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: an integer, real or complex variable, which may be a
+Specified as: an integer  or  real variable, which may be a
 scalar, or a rank 1 or 2 array. 
 <BR>
 Type, kind, rank and size must agree on all processes.
@@ -153,26 +153,26 @@ Type, kind, rank and size must agree on all processes.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1248"
+<A NAME="tex2html1253"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1244"
-  HREF="node71.html">
+<A NAME="tex2html1249"
+  HREF="node73.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1238"
+<A NAME="tex2html1243"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1246"
+<A NAME="tex2html1251"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1249"
-  HREF="node86.html">psb_snd   Send</A>
-<B> Up:</B> <A NAME="tex2html1245"
-  HREF="node71.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1239"
-  HREF="node84.html">psb_amx   Global</A>
- &nbsp; <B>  <A NAME="tex2html1247"
+<B> Next:</B> <A NAME="tex2html1254"
+  HREF="node86.html">psb_amx   Global</A>
+<B> Up:</B> <A NAME="tex2html1250"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1244"
+  HREF="node84.html">psb_max   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1252"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

@@ -48,9 +48,10 @@ program df_sample
 
   ! dense matrices
   real(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  real(psb_dpk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
-       & x_col_glob(:), r_col_glob(:)
+  real(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
   real(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_d_vect_type)    :: b_col, x_col, r_col
+
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -75,7 +76,7 @@ program df_sample
   real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:)
+  integer, allocatable :: ivg(:), ipv(:), perm(:)
   character(len=40)  :: fname, fnout
 
 
@@ -139,12 +140,15 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    
+    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
+      call psb_gelp('N',perm(1:m_problem),&
+           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
@@ -174,8 +178,6 @@ program df_sample
 
   end if
 
-  call psb_mat_renum(psb_mat_renum_gps_,aux_a,info) 
-  
   ! switch over different partition types
   if (ipart == 0) then 
     call psb_barrier(ictxt)
@@ -209,10 +211,10 @@ program df_sample
   end if
 
   call psb_geall(x_col,desc_a,info)
-  x_col(:) =0.0
+  call x_col%set(dzero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  r_col(:) =0.0
+  call r_col%set(dzero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
@@ -258,8 +260,8 @@ program df_sample
   call psb_amx(ictxt,t2)
   call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
   call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
-  call psb_genrm2s(resmx,r_col,desc_a,info)
-  call psb_geamaxs(resmxp,r_col,desc_a,info)
+  resmx  = psb_genrm2(r_col,desc_a,info)
+  resmxp = psb_geamax(r_col,desc_a,info)
 
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)

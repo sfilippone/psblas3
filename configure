@@ -5439,11 +5439,11 @@ if test "X$psblas_cv_fc" == "Xgcc" ; then
 ac_exeext=''
 ac_ext='F'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking GNU Fortran version at least 4.3" >&5
-$as_echo_n "checking GNU Fortran version at least 4.3... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking GNU Fortran version at least 4.6" >&5
+$as_echo_n "checking GNU Fortran version at least 4.6... " >&6; }
 cat > conftest.$ac_ext <<EOF
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 3 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -5465,7 +5465,7 @@ $as_echo " no." >&6; }
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
-  as_fn_error $? "Sorry, we require GNU Fortran 4.3 or later." "$LINENO" 5
+  as_fn_error $? "Sorry, we require GNU Fortran 4.6 or later." "$LINENO" 5
 
 fi
 rm -f conftest*

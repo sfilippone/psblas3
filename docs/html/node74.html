@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_exit -- Exit from PSBLAS parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_exit -- Exit from PSBLAS parallel environment">
+<TITLE>psb_init -- Initializes PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_init -- Initializes PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,49 +20,49 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node75.html">
 <LINK REL="previous" HREF="node73.html">
-<LINK REL="up" HREF="node71.html">
+<LINK REL="up" HREF="node73.html">
 <LINK REL="next" HREF="node75.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1116"
+<A NAME="tex2html1121"
   HREF="node75.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1112"
-  HREF="node71.html">
+<A NAME="tex2html1117"
+  HREF="node73.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1106"
+<A NAME="tex2html1111"
   HREF="node73.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1114"
+<A NAME="tex2html1119"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1117"
-  HREF="node75.html">psb_get_mpicomm   Get</A>
-<B> Up:</B> <A NAME="tex2html1113"
-  HREF="node71.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1107"
-  HREF="node73.html">psb_info   Return</A>
- &nbsp; <B>  <A NAME="tex2html1115"
+<B> Next:</B> <A NAME="tex2html1122"
+  HREF="node75.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1118"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1112"
+  HREF="node73.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1120"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00083000000000000000">
-psb_exit -- Exit from  PSBLAS parallel environment</A>
+<H2><A NAME="SECTION00081000000000000000">
+psb_init -- Initializes PSBLAS parallel environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_exit(icontxt)
-call psb_exit(icontxt,close)
+call psb_init(icontxt, np, basectxt, ids)
 </PRE>
 
 <P>
-This subroutine exits from the  PSBLAS parallel virtual  machine.
+This subroutine initializes the PSBLAS parallel environment, defining
+a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -70,21 +70,8 @@ This subroutine exits from the  PSBLAS parallel virtual  machine.
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
-</DD>
-<DT><STRONG>close</STRONG></DT>
-<DD>Whether to close all data structures related to the
-  virtual parallel machine, besides those associated with icontxt.
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.
 <BR>
@@ -92,7 +79,57 @@ Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a logical  variable, default value: true.
+Specified as: an integer value.  Default: use all available processes.
+</DD>
+<DT><STRONG>basectxt</STRONG></DT>
+<DD>the initial communication context. The new context
+  will be defined from the processes participating in the initial one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.  Default: use MPI_COMM_WORLD.
+</DD>
+<DT><STRONG>ids</STRONG></DT>
+<DD>Identities of the processes to use for the new context; the
+  argument is ignored when <code>np</code> is not specified. This allows the
+  processes in the new environment to be in an order different from the
+  original one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array.  Default: use the indices <IMG
+ WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img95.png"
+ ALT="$(0\dots np-1)$">.  
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine. Note that this is always a duplicate of
+  <code>basectxt</code>, so that library communications are completely
+  separated from other communication operations.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer variable.
 </DD>
 </DL>
 
@@ -100,49 +137,40 @@ Specified as: a logical  variable, default value: true.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This routine may be called even if a previous call to
-  <code>psb_info</code> has returned with <IMG
- WIDTH="73" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img125.png"
- ALT="$iam=-1$">; indeed, it it is the only
-  routine that may be called with argument <code>icontxt</code> in this
-  situation.
+<LI>A call to this routine must precede any other PSBLAS call. 
 </LI>
-<LI>A call to this routine with <code>close=.true.</code> implies a call
-  to <code>MPI_Finalize</code>, after which no parallel routine may be called.
-</LI>
-<LI>If the user whishes to use multiple communication contexts in the
-  same program, or to enter and exit multiple times into the parallel
-  environment, this routine may be called to 
-  selectively close the contexts with <code>close=.false.</code>, while on
-  the last call it should be called with <code>close=.true.</code> to
-  shutdown in a clean way the entire parallel environment.
+<LI>It is an error to specify a value for <IMG
+ WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img123.png"
+ ALT="$np$"> greater than the
+  number of processes available in the underlying base parallel
+  environment. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1116"
+<A NAME="tex2html1121"
   HREF="node75.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1112"
-  HREF="node71.html">
+<A NAME="tex2html1117"
+  HREF="node73.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1106"
+<A NAME="tex2html1111"
   HREF="node73.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1114"
+<A NAME="tex2html1119"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1117"
-  HREF="node75.html">psb_get_mpicomm   Get</A>
-<B> Up:</B> <A NAME="tex2html1113"
-  HREF="node71.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1107"
-  HREF="node73.html">psb_info   Return</A>
- &nbsp; <B>  <A NAME="tex2html1115"
+<B> Next:</B> <A NAME="tex2html1122"
+  HREF="node75.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1118"
+  HREF="node73.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1112"
+  HREF="node73.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1120"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

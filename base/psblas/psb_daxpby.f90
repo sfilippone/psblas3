@@ -30,6 +30,93 @@
 !!$ 
 !!$  
 ! File: psb_daxpby.f90
+
+
+subroutine psb_daxpby_vect(alpha, x, beta, y,&
+     & desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxpby_vect
+  implicit none                    
+  type(psb_d_vect_type), intent (inout) ::  x
+  type(psb_d_vect_type), intent (inout) ::  y
+  real(psb_dpk_), intent (in)           :: alpha, beta
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer, intent(out)                  :: info
+
+  ! locals
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, iy, m, iiy, jjy
+  character(len=20)        :: name, ch_err
+
+  name='psb_dgeaxpby'
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m,ione,x%get_nrows(),ix,ione,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m,ione,y%get_nrows(),iy,ione,desc_a,info,iiy,jjy)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione).or.(iiy /= ione)) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call y%axpby(desc_a%get_local_rows(),&
+         & alpha,x,beta,info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_daxpby_vect
+
 !
 ! Subroutine: psb_daxpby
 !    Adds one distributed matrix to another,
@@ -67,7 +154,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_dgeaxpby'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -217,7 +304,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   character(len=20)        :: name, ch_err
 
   name='psb_dgeaxpby'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 

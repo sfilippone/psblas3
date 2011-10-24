@@ -235,27 +235,41 @@ function psb_d_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot)
   use psb_const_mod
   integer, intent(in) :: nv1,nv2
   integer, intent(in) :: iv1(*), iv2(*)
-  real(psb_dpk_), intent(in) :: v1(*),v2(*)
+  real(psb_dpk_), intent(in) :: v1(*), v2(*)
   real(psb_dpk_)      :: dot
 
-  integer :: i,j,k, ip1, ip2
+  integer :: i,j,k, ip1, ip2, im1, im2, ix1, ix2
 
   dot = dzero 
   ip1 = 1
   ip2 = 1
   if (nv1 == 0) return
   if (nv2 == 0) return
+  im1 = iv1(nv1)
+  im2 = iv2(nv2)
+  ix1 = iv1(ip1)
+  ix2 = iv2(ip2)
   do 
-    if (iv1(ip1) == iv2(ip2)) then 
+    if (ix1>im2) exit
+    if (ix2>im1) exit
+
+    if (ix1 == ix2) then 
       dot = dot + v1(ip1)*v2(ip2)
       ip1 = ip1 + 1
+      if (ip1 > nv1) exit
+      ix1 = iv1(ip1)
       ip2 = ip2 + 1
-    else if (iv1(ip1) < iv2(ip2)) then 
+      if (ip2 > nv2) exit
+      ix2 = iv2(ip2)
+    else if (ix1 < ix2) then 
       ip1 = ip1 + 1 
+      if (ip1 > nv1) exit
+      ix1 = iv1(ip1)
     else
       ip2 = ip2 + 1 
+      if (ip2 > nv2) exit
+      ix2 = iv2(ip2)
     end if
-    if ((ip1 > nv1) .or. (ip2 > nv2)) exit
   end do
 
 end function psb_d_spdot_srtd

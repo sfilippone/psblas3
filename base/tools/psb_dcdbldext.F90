@@ -74,7 +74,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)                     :: novr
-  Type(psb_dspmat_type), Intent(in)       ::  a
+  Type(psb_dspmat_type), Intent(in)       :: a
   Type(psb_desc_type), Intent(in), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer, intent(out)                    :: info
@@ -100,10 +100,16 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   name='psb_dcdbldext'
   info  = psb_success_
+  if (psb_errstatus_fatal()) return
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
   Call psb_info(ictxt, me, np)
@@ -143,10 +149,10 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
        & ': Calling desccpy'
 
   call psb_cdcpy(desc_a,desc_ov,info)
-  if (info /= psb_success_) then
+
+  if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
-    ch_err='psb_cdcpy'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_cdcpy')
     goto 9999
   end if
 
@@ -219,15 +225,12 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   Allocate(works(lworks),workr(lworkr),t_halo_in(l_tmp_halo),&
        & t_halo_out(l_tmp_halo), temp(lworkr),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  Allocate(orig_ovr(l_tmp_ovr_idx),tmp_ovr_idx(l_tmp_ovr_idx),&
+  if (info == psb_success_) allocate(orig_ovr(l_tmp_ovr_idx),&
+       & tmp_ovr_idx(l_tmp_ovr_idx), &
        & tmp_halo(l_tmp_halo), halo(size(desc_a%halo_index)),stat=info)
+
   if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999      
   end if
   halo(:)        = desc_a%halo_index(:)
@@ -257,6 +260,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
         goto 9999
       endif
       call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-1)
+
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -370,6 +374,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
         tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
         call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-1)
+
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -464,12 +469,13 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! matchings SENDs.
       !       
       call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
+
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='mpi_alltoall'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='mpi_alltoall')
         goto 9999
       end if
+
       idxs = 0
       idxr = 0
       counter = 1
@@ -490,10 +496,10 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       iszr=sum(rvsz)
       if (max(iszr,1) > lworkr) then 
         call psb_realloc(max(iszr,1),workr,info)
-        if (info /= psb_success_) then
-          info=psb_err_from_subroutine_
-          ch_err='psb_realloc'
-          call psb_errpush(info,name,a_err=ch_err)
+
+        if (psb_errstatus_fatal()) then
+          info=psb_err_alloc_dealloc_
+          call psb_errpush(info,name)
           goto 9999
         end if
         lworkr = max(iszr,1)
@@ -503,8 +509,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
            & workr,rvsz,brvindx,mpi_integer,icomm,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='mpi_alltoallv'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='mpi_alltoallv')
         goto 9999
       end if
 
@@ -512,6 +517,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
            & write(debug_unit,*) me,' ',trim(name),': ISZR :',iszr
 
       call psb_ensure_size(iszr,maskr,info)
+
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_ensure_size')

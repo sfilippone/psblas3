@@ -52,6 +52,16 @@ module psb_d_linmap_mod
       integer, intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_X2Y
+    subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
+      use psb_d_vect_mod
+      use psb_linmap_type_mod
+      implicit none 
+      type(psb_dlinmap_type), intent(in) :: map
+      real(psb_dpk_), intent(in)     :: alpha,beta
+      type(psb_d_vect_type), intent(inout)  :: x,y
+      integer, intent(out)           :: info 
+      real(psb_dpk_), optional       :: work(:)
+    end subroutine psb_d_map_X2Y_vect
   end interface
 
   interface psb_map_Y2X
@@ -65,6 +75,16 @@ module psb_d_linmap_mod
       integer, intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_Y2X
+    subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
+      use psb_d_vect_mod
+      use psb_linmap_type_mod
+      implicit none 
+      type(psb_dlinmap_type), intent(in) :: map
+      real(psb_dpk_), intent(in)     :: alpha,beta
+      type(psb_d_vect_type), intent(inout)  :: x,y
+      integer, intent(out)           :: info 
+      real(psb_dpk_), optional       :: work(:)
+    end subroutine psb_d_map_Y2X_vect
   end interface
 
 
@@ -144,7 +164,8 @@ contains
     class(psb_d_base_sparse_mat), intent(in), optional :: mold
 
     call map%map_X2Y%cscnv(info,type=type,mold=mold)
-    if (info == psb_success_) call map%map_Y2X%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_)&
+         & call map%map_Y2X%cscnv(info,type=type,mold=mold)
 
   end subroutine psb_d_map_cscnv
 

@@ -83,7 +83,8 @@ program ppde
   ! descriptor
   type(psb_desc_type)   :: desc_a, desc_b
   ! dense matrices
-  real(psb_dpk_), allocatable :: b(:), x(:)
+  type(psb_d_vect_type)  :: xxv,bv, vtst
+  real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
   integer            :: ictxt, iam, np
 
@@ -128,7 +129,7 @@ program ppde
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info)  
+  call create_matrix(idim,a,bv,xxv,desc_a,ictxt,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -139,8 +140,8 @@ program ppde
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
-  call hb_write(a,info,filename=fname,rhs=b,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
+!!$  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
+!!$  call hb_write(a,info,filename=fname,rhs=b,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
 !!$  write(fname,'(a,i2.2,a,i2.2,a)') 'amat-',iam,'-',np,'.mtx'
 !!$  call a%print(fname)
 !!$  call psb_cdprt(20+iam,desc_a,short=.false.)
@@ -181,7 +182,7 @@ program ppde
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
   eps   = 1.d-9
-  call psb_krylov(kmethd,a,prec,b,x,eps,desc_a,info,& 
+  call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
   if(info /= psb_success_) then
@@ -194,7 +195,6 @@ program ppde
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
-
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
   precsize = psb_sizeof(prec)
@@ -215,12 +215,26 @@ program ppde
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
     write(psb_out_unit,'("Storage type for DESC_B: ",a)') desc_b%indxmap%get_fmt()
   end if
+  
+  !  
+  if (.false.) then 
+    call psb_geall(tst,desc_b, info)
+    call psb_geall(vtst,desc_b, info)
+    vtst%v%v = iam+1
+    call psb_geasb(vtst,desc_b,info)
+    tst = vtst
+    call psb_geasb(tst,desc_b,info)
+    call psb_ovrl(vtst,desc_b,info,update=psb_avg_)
+    call psb_ovrl(tst,desc_b,info,update=psb_avg_)
+    write(0,*) iam,' After ovrl:',vtst%v%v
+    write(0,*) iam,' After ovrl:',tst
+  end if
 
   !  
   !  cleanup storage and exit
   !
-  call psb_gefree(b,desc_a,info)
-  call psb_gefree(x,desc_a,info)
+  call psb_gefree(bv,desc_a,info)
+  call psb_gefree(xxv,desc_a,info)
   call psb_spfree(a,desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
@@ -346,7 +360,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info)
+  subroutine create_matrix(idim,a,bv,xxv,desc_a,ictxt,afmt,info)
     !
     !   discretize the partial diferential equation
     ! 
@@ -366,16 +380,16 @@ contains
     use psb_base_mod
     use psb_mat_mod
     implicit none
-    integer                      :: idim
-    integer, parameter           :: nb=20
-    real(psb_dpk_), allocatable  :: b(:),xv(:)
-    type(psb_desc_type)          :: desc_a
-    integer                      :: ictxt, info
-    character                    :: afmt*5
+    integer                     :: idim
+    integer, parameter          :: nb=20
+    type(psb_d_vect_type)       :: xxv,bv
+    type(psb_desc_type)         :: desc_a
+    integer                     :: ictxt, info
+    character                   :: afmt*5
     type(psb_dspmat_type)       :: a
-    type(psb_d_csc_sparse_mat)       :: acsc
-    type(psb_d_coo_sparse_mat)       :: acoo
-    type(psb_d_csr_sparse_mat)       :: acsr
+    type(psb_d_csc_sparse_mat)  :: acsc
+    type(psb_d_coo_sparse_mat)  :: acoo
+    type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: ix,iy,iz,ia,indx_owner
@@ -384,9 +398,8 @@ contains
     integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
-
     ! deltat discretization time
-    real(psb_dpk_)         :: deltah
+    real(psb_dpk_)         :: deltah, deltah2
     real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
@@ -401,7 +414,8 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    deltah = 1.d0/(idim-1)
+    deltah  = 1.d0/(idim-1)
+    deltah2 = deltah*deltah
 
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
@@ -425,8 +439,8 @@ contains
     call psb_cdall(ictxt,desc_a,info,nl=nr)
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
-    if (info == psb_success_) call psb_geall(b,desc_a,info)
-    if (info == psb_success_) call psb_geall(xv,desc_a,info)
+    if (info == psb_success_) call psb_geall(xxv,desc_a,info)
+    if (info == psb_success_) call psb_geall(bv,desc_a,info)
     nlr = desc_a%get_local_rows()
     call psb_barrier(ictxt)
     talc = psb_wtime()-t0
@@ -493,79 +507,63 @@ contains
         !  term depending on   (x-1,y,z)
         !
         if (ix == 1) then 
-          val(element)=-b1(x,y,z)-a1(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
+          val(element) = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
           zt(k) = exp(-x**2-y**2-z**2)*(-val(element))
         else
-          val(element)=-b1(x,y,z)-a1(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
+          val(element)  = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
           icol(element) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y-1,z)
         if (iy == 1) then 
-          val(element)=-b2(x,y,z)-a2(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
+          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(x,y,z)-a2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
           icol(element) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z-1)
         if (iz == 1) then 
-          val(element)=-b3(x,y,z)-a3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b3(x,y,z)-a3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z)
-        val(element)=2*b1(x,y,z) + 2*b2(x,y,z)&
-             & + 2*b3(x,y,z) + a1(x,y,z)&
-             & + a2(x,y,z) + a3(x,y,z)
-        val(element) = val(element)/(deltah*deltah)
+        val(element)=(2*b1(x,y,z) + 2*b2(x,y,z) + 2*b3(x,y,z))/deltah2&
+             & + (a1(x,y,z) + a2(x,y,z) + a3(x,y,z)+ a4(x,y,z))/deltah
         icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
         irow(element) = glob_row
         element       = element+1                  
         !  term depending on     (x,y,z+1)
         if (iz == idim) then 
-          val(element)=-b1(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b1(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b1(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b1(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y+1,z)
         if (iy == idim) then 
-          val(element)=-b2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b2(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b2(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x+1,y,z)
         if (ix<idim) then 
-          val(element)=-b3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b3(x,y,z)/deltah2
           icol(element) = (ix)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
@@ -574,10 +572,10 @@ contains
       end do
       call psb_spins(element-1,irow,icol,val,a,desc_a,info)
       if(info /= psb_success_) exit
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),b,desc_a,info)
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
       zt(:)=0.d0
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xxv,desc_a,info)
       if(info /= psb_success_) exit
     end do
 
@@ -603,8 +601,8 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_geasb(b,desc_a,info)
-    call psb_geasb(xv,desc_a,info)
+    if (info == psb_success_) call psb_geasb(xxv,desc_a,info)
+    if (info == psb_success_) call psb_geasb(bv,desc_a,info)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='asb rout.'

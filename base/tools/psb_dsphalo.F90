@@ -91,8 +91,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer           :: debug_level, debug_unit
   character(len=20) :: name, ch_err
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
+  if (psb_errstatus_fatal()) return 
   name='psb_dsphalo'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -132,6 +132,12 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   else
     outfmt_ = 'CSR'
   endif
+
+  if (.not.desc_a%is_asb()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()

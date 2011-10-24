@@ -1044,6 +1044,27 @@ contains
 
 end subroutine psb_d_csr_cssm
 
+
+function psb_d_csr_maxval(a) result(res)
+  use psb_error_mod
+  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_maxval
+  implicit none 
+  class(psb_d_csr_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  character(len=20)  :: name='d_csr_maxval'
+  logical, parameter :: debug=.false.
+
+
+  res = dzero 
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_d_csr_maxval
+
 function psb_d_csr_csnmi(a) result(res)
   use psb_error_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_csnmi

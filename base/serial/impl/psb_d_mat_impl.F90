@@ -1836,6 +1836,57 @@ subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans)
 end subroutine psb_d_csmv
 
 
+subroutine psb_d_csmv_vect(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_csmv_vect
+  implicit none 
+  class(psb_dspmat_type), intent(in) :: a
+  real(psb_dpk_), intent(in)       :: alpha, beta
+  type(psb_d_vect_type), intent(inout) :: x
+  type(psb_d_vect_type), intent(inout) :: y
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans
+  Integer :: err_act
+  character(len=20)  :: name='psb_csmv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call a%a%csmm(alpha,x%v,beta,y%v,info,trans) 
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_csmv_vect
+
+
 subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
   use psb_error_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cssm
@@ -1917,6 +1968,99 @@ subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 end subroutine psb_d_cssv
 
 
+subroutine psb_d_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+  use psb_error_mod
+  use psb_d_vect_mod
+  use psb_d_mat_mod, psb_protect_name => psb_d_cssv_vect
+  implicit none 
+  class(psb_dspmat_type), intent(in) :: a
+  real(psb_dpk_), intent(in)         :: alpha, beta
+  type(psb_d_vect_type), intent(inout)   :: x
+  type(psb_d_vect_type), intent(inout)   :: y
+  integer, intent(out)               :: info
+  character, optional, intent(in)    :: trans, scale
+  type(psb_d_vect_type), optional, intent(inout)   :: d
+  Integer :: err_act
+  character(len=20)  :: name='psb_cssv'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (present(d)) then 
+    if (.not.allocated(d%v)) then 
+      info = psb_err_invalid_vect_state_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale,d%v) 
+  else
+    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale) 
+  end if
+
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_cssv_vect
+
+function psb_d_maxval(a) result(res)
+  use psb_d_mat_mod, psb_protect_name => psb_d_maxval
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_dspmat_type), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+
+  Integer :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%maxval()
+  return
+
+9999 continue
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end function psb_d_maxval
 
 function psb_d_csnmi(a) result(res)
   use psb_d_mat_mod, psb_protect_name => psb_d_csnmi

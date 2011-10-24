@@ -528,3 +528,188 @@ subroutine  psi_iovrl_restrr2(x,xs,desc_a,info)
   end if
   return
 end subroutine psi_iovrl_restrr2
+
+
+
+subroutine  psi_sovrl_restr_vect(x,xs,desc_a,info)
+  use psi_mod, psi_protect_name =>   psi_sovrl_restr_vect
+  use psb_s_base_vect_mod
+
+  implicit none
+
+  class(psb_s_base_vect_type)     :: x
+  real(psb_spk_)                  :: xs(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+
+  ! locals
+  integer           :: ictxt, np, me, err_act, i, idx, isz
+  character(len=20) :: name, ch_err
+
+  name='psi_sovrl_restrr1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  isz = size(desc_a%ovrlap_elem,1)
+  
+  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,szero)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_sovrl_restr_vect
+
+
+subroutine  psi_dovrl_restr_vect(x,xs,desc_a,info)
+  use psi_mod, psi_protect_name =>   psi_dovrl_restr_vect
+  use psb_d_base_vect_mod
+
+  implicit none
+
+  class(psb_d_base_vect_type)     :: x
+  real(psb_dpk_)                  :: xs(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+
+  ! locals
+  integer           :: ictxt, np, me, err_act, i, idx, isz
+  character(len=20) :: name, ch_err
+
+  name='psi_dovrl_restrr1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  isz = size(desc_a%ovrlap_elem,1)
+  
+  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,dzero)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_dovrl_restr_vect
+
+
+
+
+subroutine  psi_covrl_restr_vect(x,xs,desc_a,info)
+  use psi_mod, psi_protect_name =>   psi_covrl_restr_vect
+  use psb_c_base_vect_mod
+
+  implicit none
+
+  class(psb_c_base_vect_type)     :: x
+  complex(psb_spk_)               :: xs(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+
+  ! locals
+  integer           :: ictxt, np, me, err_act, i, idx, isz
+  character(len=20) :: name, ch_err
+
+  name='psi_covrl_restrr1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  isz = size(desc_a%ovrlap_elem,1)
+  
+  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,czero)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_covrl_restr_vect
+
+
+subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
+  use psi_mod, psi_protect_name =>   psi_zovrl_restr_vect
+  use psb_z_base_vect_mod
+
+  implicit none
+
+  class(psb_z_base_vect_type)     :: x
+  complex(psb_dpk_)               :: xs(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+
+  ! locals
+  integer           :: ictxt, np, me, err_act, i, idx, isz
+  character(len=20) :: name, ch_err
+
+  name='psi_zovrl_restrr1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  isz = size(desc_a%ovrlap_elem,1)
+  
+  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_zovrl_restr_vect
+
+

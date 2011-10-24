@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precinit -- Initialize a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precinit -- Initialize a preconditioner">
+<TITLE>mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,120 +18,97 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node101.html">
 <LINK REL="previous" HREF="node99.html">
-<LINK REL="up" HREF="node99.html">
+<LINK REL="up" HREF="node95.html">
 <LINK REL="next" HREF="node101.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1435"
+<A NAME="tex2html1436"
   HREF="node101.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1431"
-  HREF="node99.html">
+<A NAME="tex2html1432"
+  HREF="node95.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1425"
+<A NAME="tex2html1428"
   HREF="node99.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1433"
+<A NAME="tex2html1434"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1436"
-  HREF="node101.html">psb_precbld   Builds</A>
-<B> Up:</B> <A NAME="tex2html1432"
-  HREF="node99.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1426"
-  HREF="node99.html">Preconditioner routines</A>
- &nbsp; <B>  <A NAME="tex2html1434"
+<B> Next:</B> <A NAME="tex2html1437"
+  HREF="node101.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1433"
+  HREF="node95.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1429"
+  HREF="node99.html">mm_vet_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1435"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000111000000000000000">
-psb_precinit -- Initialize a  preconditioner</A>
+<H2><A NAME="SECTION000105000000000000000">
+mm_mat_write -- Write a sparse matrix to a
+  file in the MatrixMarket format</A>
 </H2>
 
-<P>
 <PRE>
-call psb_precinit(prec, ptype, info)
+call mm_mat_write(a, mtitle, iret, iunit, filename)
 </PRE>
-
-<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ptype</STRONG></DT>
-<DD>the type of preconditioner. 
-Scope: <B>global</B> 
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix to be written.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character string, see usage notes.
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>required</B> 
+<BR>
+A charachter variable holding a descriptive title for the matrix to be
+ written to file.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written to.
 <BR>
-Type: <B>required</B>
+Type:<B>optional</B>.
 <BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: <code>-</code>. 
 </DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
 <BR>
-Type: <B>required</B>
+Type:<B>optional</B>.
 <BR>
-Intent: <B>out</B>.
-<BR>
-Error code: if no error, 0 is returned.
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-Legal inputs to this subroutine are interpreted depending on the
-<IMG
- WIDTH="42" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img140.png"
- ALT="$ptype$"> string as follows<A NAME="tex2html28"
-  HREF="footnode.html#foot6722"><SUP>3</SUP></A>:
+
+<P>
 <DL>
-<DT><STRONG>NONE</STRONG></DT>
-<DD>No preconditioning, i.e. the preconditioner is just a copy
-  operator.
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>DIAG</STRONG></DT>
-<DD>Diagonal scaling; each entry of the input vector is
-  multiplied by the reciprocal of the sum of the absolute values of
-  the coefficients in the corresponding row of matrix  <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">;
-</DD>
-<DT><STRONG>BJAC</STRONG></DT>
-<DD>Precondition by a  factorization of the
-  block-diagonal of matrix <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization <IMG
- WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img141.png"
- ALT="$ILU(0)$"> is
-  currently implemented.  
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

@@ -31,15 +31,21 @@
 !!$  
 module psb_error_mod
   use psb_const_mod
-  integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1, psb_no_err_=0
+  integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1
   integer, parameter, public :: psb_debug_ext_=1, psb_debug_outer_=2
   integer, parameter, public :: psb_debug_comp_=3, psb_debug_inner_=4
   integer, parameter, public :: psb_debug_serial_=8, psb_debug_serial_comp_=9
- 
+  
+  integer, parameter, public ::  psb_no_err_      = 0
+  integer, parameter, public ::  psb_err_warning_ = 1
+  integer, parameter, public ::  psb_err_fatal_   = 2
+  
   !
   !     Error handling 
   !
   public psb_errpush, psb_error, psb_get_errstatus,&
+       & psb_errstatus_fatal, psb_errstatus_warning,&
+       & psb_errstatus_ok, psb_warning_push,&
        & psb_errpop, psb_errmsg, psb_errcomm, psb_get_numerr, &
        & psb_get_errverbosity, psb_set_errverbosity, &
        & psb_erractionsave, psb_erractionrestore, &
@@ -95,10 +101,10 @@ module psb_error_mod
   end type psb_errstack
 
 
-  type(psb_errstack), save :: error_stack         !  the PSBLAS-2.0 error stack
-  integer, save            :: error_status=0      !  the error status (maybe not here)
-  integer, save            :: verbosity_level=1   !  the verbosity level (maybe not here)
-  integer, save            :: err_action=psb_act_abort_
+  type(psb_errstack), save :: error_stack         
+  integer, save            :: error_status = psb_no_err_    
+  integer, save            :: verbosity_level = 1 
+  integer, save            :: err_action = psb_act_abort_
   integer, save            :: debug_level=0, debug_unit, serial_debug_level=0
 
 contains
@@ -129,7 +135,7 @@ contains
   ! restores error action previously saved with psb_erractionsave
   subroutine psb_erractionrestore(err_act)
     integer, intent(in) :: err_act
-    err_action=err_act
+    err_action = err_act
   end subroutine psb_erractionrestore
 
 
@@ -189,7 +195,6 @@ contains
   ! returns number of errors
   function psb_get_numerr()
     integer :: psb_get_numerr
-
     psb_get_numerr = error_stack%n_elems
   end function psb_get_numerr
 
@@ -206,13 +211,32 @@ contains
   ! checks the status of the error condition
   function psb_get_errstatus()
     integer :: psb_get_errstatus
-    psb_get_errstatus=error_status
+    psb_get_errstatus = error_status
   end function psb_get_errstatus
 
+  subroutine  psb_set_errstatus(ircode)
+    integer :: ircode
+    if ((psb_no_err_<=ircode).and.(ircode <= psb_err_fatal_))&
+         &  error_status=ircode
+  end subroutine psb_set_errstatus
 
+  function psb_errstatus_fatal() result(res)
+    logical :: res
+    res = (error_status == psb_err_fatal_)
+  end function psb_errstatus_fatal
+
+  function psb_errstatus_warning() result(res)
+    logical :: res
+    res = (error_status == psb_err_warning_)
+  end function psb_errstatus_warning
+
+  function psb_errstatus_ok() result(res)
+    logical :: res
+    res = (error_status == psb_no_err_)
+  end function psb_errstatus_ok
 
   ! pushes an error on the error stack
-  subroutine psb_errpush(err_c, r_name, i_err, a_err)
+  subroutine psb_stackpush(err_c, r_name, i_err, a_err)
 
     integer, intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
@@ -235,10 +259,40 @@ contains
     new_node%next       => error_stack%top
     error_stack%top     => new_node
     error_stack%n_elems = error_stack%n_elems+1
-    if(error_status == 0) error_status=1
     nullify(new_node)
 
+  end subroutine psb_stackpush
+
+  ! pushes an error on the error stack
+  subroutine psb_errpush(err_c, r_name, i_err, a_err)
+
+    integer, intent(in)              ::  err_c
+    character(len=*), intent(in)     ::  r_name
+    character(len=*), optional       ::  a_err
+    integer, optional                ::  i_err(5)
+
+    type(psb_errstack_node), pointer     ::  new_node
+
+    call psb_set_errstatus(psb_err_fatal_)
+    call psb_stackpush(err_c, r_name, i_err, a_err)
+
   end subroutine psb_errpush
+
+  ! pushes a warning on the error stack
+  subroutine psb_warning_push(err_c, r_name, i_err, a_err)
+
+    integer, intent(in)              ::  err_c
+    character(len=*), intent(in)     ::  r_name
+    character(len=*), optional       ::  a_err
+    integer, optional                ::  i_err(5)
+
+    type(psb_errstack_node), pointer     ::  new_node
+
+
+    if (.not.psb_errstatus_fatal())&
+         &  call psb_set_errstatus( psb_err_warning_)
+    call psb_stackpush(err_c, r_name, i_err, a_err)
+  end subroutine psb_warning_push
 
 
   ! pops an error from the error stack
@@ -259,12 +313,11 @@ contains
     old_node   => error_stack%top
     error_stack%top  => old_node%next
     error_stack%n_elems = error_stack%n_elems - 1
-    if(error_stack%n_elems == 0) error_status=0
+    if (error_stack%n_elems == 0) error_status=0
 
     deallocate(old_node)
 
   end subroutine psb_errpop
-
 
 
   ! prints the error msg associated to a specific error code
@@ -277,10 +330,12 @@ contains
     integer, optional                ::  me
 
     if(present(me)) then
-      write(psb_err_unit,'("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a20)')&
+      write(psb_err_unit,&
+           & '("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a20)')&
            & me,err_c,trim(r_name)
     else
-      write(psb_err_unit,'("PSBLAS Error (",i0,") in subroutine: ",a)')err_c,trim(r_name)
+      write(psb_err_unit,'("PSBLAS Error (",i0,") in subroutine: ",a)')&
+           & err_c,trim(r_name)
     end if
 
 
@@ -438,7 +493,9 @@ contains
       write(psb_err_unit,'("Invalid state for communication descriptor")')
     case (psb_err_invalid_a_and_cd_state_)
       write(psb_err_unit,'("Invalid combined state for A and DESC_A")')
-    case(1124:1999)
+    case (psb_err_invalid_vect_state_)
+      write(psb_err_unit,'("Invalid state for vector")')
+    case(1125:1999)
       write(psb_err_unit,'("computational error. code: ",i0)')err_c
     case(psb_err_context_error_)
       write(0,'("Parallel context error. Number of processes=-1")')

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sp_get_ncols -- Get number of columns in a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_sp_get_ncols -- Get number of columns in a sparse matrix">
+<TITLE>psb_cd_set_large_threshold -- Set threshold for index mapping switch</TITLE>
+<META NAME="description" CONTENT="psb_cd_set_large_threshold -- Set threshold for index mapping switch">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node24.html">
 <LINK REL="previous" HREF="node22.html">
-<LINK REL="up" HREF="node19.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node24.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html453"
+<A NAME="tex2html458"
   HREF="node24.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html449"
-  HREF="node19.html">
+<A NAME="tex2html454"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html443"
+<A NAME="tex2html448"
   HREF="node22.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html451"
+<A NAME="tex2html456"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html454"
-  HREF="node24.html">psb_sp_get_nnzeros   Get</A>
-<B> Up:</B> <A NAME="tex2html450"
-  HREF="node19.html">psb_cd_get_context Get communication context</A>
-<B> Previous:</B> <A NAME="tex2html444"
-  HREF="node22.html">psb_sp_get_nrows   Get</A>
- &nbsp; <B>  <A NAME="tex2html452"
+<B> Next:</B> <A NAME="tex2html459"
+  HREF="node24.html">get_nrows   Get</A>
+<B> Up:</B> <A NAME="tex2html455"
+  HREF="node21.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html449"
+  HREF="node22.html">psb_cd_get_large_threshold   Get</A>
+ &nbsp; <B>  <A NAME="tex2html457"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045400000000000000">
-psb_sp_get_ncols -- Get number of  columns in a
-  sparse matrix</A>
+<H3><A NAME="SECTION00046200000000000000">
+psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
 </H3>
 
-<P>
 <PRE>
-nr = psb_sp_get_ncols(a)
+call psb_cd_set_large_threshold(ith)
 </PRE>
 
 <P>
@@ -69,28 +68,21 @@ nr = psb_sp_get_ncols(a)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix
+<DT><STRONG>ith</STRONG></DT>
+<DD>the new threshold for communication descriptors.
 <BR>
-Scope: <B>local</B>
+Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: an integer value greater than zero.
 </DD>
 </DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of  columns  of sparse matrix <code>a</code>.
-</DD>
-</DL>
+Note: the threshold value is only queried by the library at the time a
+call to <code>psb_cdall</code> is executed, therefore changing the threshold
+has no effect on communication descriptors that have already been initialized.
 
 <P>
 <BR><HR>

@@ -39,13 +39,18 @@ module psb_z_base_prec_mod
   use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
-       & psb_zspmat_type
-  
+       & psb_zspmat_type, psb_z_base_vect, psb_z_vect_type
+
   use psb_prec_const_mod
 
   type psb_z_base_prec_type
+    integer :: ictxt
   contains
-    procedure, pass(prec) :: apply     => psb_z_base_apply
+    procedure, pass(prec) :: set_ctxt  => psb_z_base_set_ctxt
+    procedure, pass(prec) :: get_ctxt  => psb_z_base_get_ctxt
+    procedure, pass(prec) :: z_apply_v => psb_z_base_apply_vect
+    procedure, pass(prec) :: z_apply   => psb_z_base_apply
+    generic, public       :: apply     => z_apply, z_apply_v
     procedure, pass(prec) :: precbld   => psb_z_base_precbld
     procedure, pass(prec) :: precseti  => psb_z_base_precseti
     procedure, pass(prec) :: precsetr  => psb_z_base_precsetr
@@ -55,15 +60,52 @@ module psb_z_base_prec_mod
     procedure, pass(prec) :: precinit  => psb_z_base_precinit
     procedure, pass(prec) :: precfree  => psb_z_base_precfree
     procedure, pass(prec) :: precdescr => psb_z_base_precdescr
+    procedure, pass(prec) :: dump      => psb_z_base_precdump
   end type psb_z_base_prec_type
   
   private :: psb_z_base_apply, psb_z_base_precbld, psb_z_base_precseti,&
        & psb_z_base_precsetr, psb_z_base_precsetc, psb_z_base_sizeof,&
-       & psb_z_base_precinit, psb_z_base_precfree, psb_z_base_precdescr
+       & psb_z_base_precinit, psb_z_base_precfree, psb_z_base_precdescr,&
+       & psb_z_base_precdump, psb_z_base_set_ctxt, psb_z_base_get_ctxt, &
+       & psb_z_base_apply_vect
   
-
 contains
- 
+
+  subroutine psb_z_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)        :: desc_data
+    class(psb_z_base_prec_type), intent(inout)  :: prec
+    complex(psb_dpk_),intent(in)          :: alpha, beta
+    type(psb_z_vect_type),intent(inout)   :: x
+    type(psb_z_vect_type),intent(inout)   :: y
+    integer, intent(out)                  :: info
+    character(len=1), optional            :: trans
+    complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='d_base_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_z_base_apply_vect
 
   subroutine psb_z_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_base_mod
@@ -133,7 +175,7 @@ contains
     return
   end subroutine psb_z_base_precinit
 
-  subroutine psb_z_base_precbld(a,desc_a,prec,info,upd,mold,afmt)
+  subroutine psb_z_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
     
     use psb_base_mod
     Implicit None
@@ -144,7 +186,8 @@ contains
     integer, intent(out)                      :: info
     character, intent(in), optional           :: upd
     character(len=*), intent(in), optional    :: afmt
-    class(psb_z_base_sparse_mat), intent(in), optional :: mold
+    class(psb_z_base_sparse_mat), intent(in), optional :: amold
+    class(psb_z_base_vect_type), intent(in), optional  :: vmold
     Integer :: err_act, nrow
     character(len=20)  :: name='z_base_precbld'
 
@@ -341,6 +384,47 @@ contains
     
   end subroutine psb_z_base_precdescr
   
+  subroutine psb_z_base_precdump(prec,info,prefix,head)
+    use psb_base_mod
+    implicit none 
+    class(psb_z_base_prec_type), intent(in) :: prec
+    integer, intent(out)             :: info
+    character(len=*), intent(in), optional :: prefix,head
+    Integer :: err_act, nrow
+    character(len=20)  :: name='d_base_precdump'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psb_z_base_precdump
+
+  subroutine psb_z_base_set_ctxt(prec,ictxt)
+    use psb_base_mod
+    implicit none 
+    class(psb_z_base_prec_type), intent(inout) :: prec
+    integer, intent(in)  :: ictxt
+
+    prec%ictxt = ictxt
+
+  end subroutine psb_z_base_set_ctxt
 
   function psb_z_base_sizeof(prec) result(val)
     use psb_base_mod
@@ -350,5 +434,14 @@ contains
     val = 0
     return
   end function psb_z_base_sizeof
+
+  function psb_z_base_get_ctxt(prec) result(val)
+    use psb_base_mod
+    class(psb_z_base_prec_type), intent(in) :: prec
+    integer :: val
+    
+    val = prec%ictxt
+    return
+  end function psb_z_base_get_ctxt
 
 end module psb_z_base_prec_mod

@@ -79,7 +79,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
 
   call psb_info(ictxt, me, np)
 
-  if (.not.psb_is_bld_desc(desc_a)) then 
+  if (.not.desc_a%is_bld()) then 
     info = psb_err_invalid_cd_state_  
     call psb_errpush(info,name)
     goto 9999
@@ -204,7 +204,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
 
   call psb_info(ictxt, me, np)
 
-  if (.not.psb_is_bld_desc(desc)) then 
+  if (.not.desc%is_bld()) then 
     info = psb_err_invalid_cd_state_  
     call psb_errpush(info,name)
     goto 9999

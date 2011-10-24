@@ -6,7 +6,6 @@ program d_matgen
   use psb_d_mat_mod
   use psb_d_cxx_mat_mod
   use psb_d_cyy_mat_mod
-  use psb_d_czz_mat_mod
 #ifdef HAVE_LIBRSB
   use psb_d_rsb_mat_mod
 #endif
@@ -40,7 +39,6 @@ program d_matgen
 #endif
   type(psb_d_cyy_sparse_mat) :: acyy
   type(psb_d_csr_sparse_mat) :: acsr
-  type(psb_d_czz_sparse_mat) :: aczz
   type(psb_d_cxx_sparse_mat) :: acxx
   
   ! other variables
@@ -78,7 +76,6 @@ program d_matgen
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acyy)  
-  !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,aczz)  
   !call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,acxx)  
 #ifdef HAVE_LIBRSB
   call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info,arsb)  

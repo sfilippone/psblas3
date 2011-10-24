@@ -59,23 +59,29 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   logical             :: clear_
 
   info = psb_success_
+  if (psb_errstatus_fatal()) return 
   err  = 0
   int_err(1)=0
   name = 'psb_dsprn'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start '
 
-  if (psb_is_bld_desc(desc_a)) then
+  if (a%is_bld()) then
     ! Should do nothing, we are called redundantly
     return
   endif
-  if (.not.psb_is_asb_desc(desc_a)) then
+  if (.not.a%is_asb()) then
     info=590     
     call psb_errpush(info,name)
     goto 9999
@@ -83,7 +89,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
   call a%reinit(clear=clear)
 
-  if (info /= psb_success_) goto 9999
+  if (psb_errstatus_fatal()) goto 9999
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': done'
 

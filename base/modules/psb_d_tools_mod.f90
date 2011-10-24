@@ -48,8 +48,23 @@ Module psb_d_tools_mod
       integer,intent(out)             :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_dallocv
+    subroutine psb_dalloc_vect(x, desc_a,info,n)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_d_vect_type), intent(out)  :: x
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n
+    end subroutine psb_dalloc_vect
+    subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_d_vect_type), allocatable, intent(out)  :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n, lb
+    end subroutine psb_dalloc_vect_r2
   end interface
-
 
   interface psb_geasb
     subroutine psb_dasb(x, desc_a, info)
@@ -64,6 +79,22 @@ Module psb_d_tools_mod
       real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_dasbv
+    subroutine psb_dasb_vect(x, desc_a, info,mold)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_vect_type), intent(inout) :: x
+      integer, intent(out)             ::  info
+      class(psb_d_base_vect_type), intent(in), optional :: mold
+    end subroutine psb_dasb_vect
+    subroutine psb_dasb_vect_r2(x, desc_a, info,mold)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_vect_type), intent(inout) :: x(:)
+      integer, intent(out)             ::  info
+      class(psb_d_base_vect_type), intent(in), optional :: mold
+    end subroutine psb_dasb_vect_r2
   end interface
 
   interface psb_sphalo
@@ -94,18 +125,32 @@ Module psb_d_tools_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer, intent(out)       :: info
     end subroutine psb_dfreev
+    subroutine psb_dfree_vect(x, desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_vect_type), intent(inout) :: x
+      integer, intent(out)             ::  info
+    end subroutine psb_dfree_vect
+    subroutine psb_dfree_vect_r2(x, desc_a, info)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_vect_type), allocatable, intent(inout) :: x(:)
+      integer, intent(out)             ::  info
+    end subroutine psb_dfree_vect_r2
   end interface
 
   interface psb_geins
     subroutine psb_dinsi(m,irw,val, x,desc_a,info,dupl)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      integer, intent(in)                ::  m
-      type(psb_desc_type), intent(in)    ::  desc_a
-      real(psb_dpk_),intent(inout)           ::  x(:,:)
-      integer, intent(in)                ::  irw(:)
+      integer, intent(in)              ::  m
+      type(psb_desc_type), intent(in)  ::  desc_a
+      real(psb_dpk_),intent(inout)     ::  x(:,:)
+      integer, intent(in)              ::  irw(:)
       real(psb_dpk_), intent(in)       ::  val(:,:)
-      integer, intent(out)               ::  info
-      integer, optional, intent(in)      ::  dupl
+      integer, intent(out)             ::  info
+      integer, optional, intent(in)    ::  dupl
     end subroutine psb_dinsi
     subroutine psb_dinsvi(m,irw,val,x,desc_a,info,dupl)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
@@ -117,6 +162,28 @@ Module psb_d_tools_mod
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_dinsvi
+    subroutine psb_dins_vect(m,irw,val,x,desc_a,info,dupl)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      integer, intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_d_vect_type), intent(inout) :: x
+      integer, intent(in)              :: irw(:)
+      real(psb_dpk_), intent(in)       :: val(:)
+      integer, intent(out)             :: info
+      integer, optional, intent(in)    :: dupl
+    end subroutine psb_dins_vect
+    subroutine psb_dins_vect_r2(m,irw,val,x,desc_a,info,dupl)
+      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      use psb_d_vect_mod
+      integer, intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_d_vect_type), intent(inout) :: x(:)
+      integer, intent(in)              :: irw(:)
+      real(psb_dpk_), intent(in)       :: val(:,:)
+      integer, intent(out)             :: info
+      integer, optional, intent(in)    :: dupl
+    end subroutine psb_dins_vect_r2
   end interface
 
 
@@ -203,88 +270,4 @@ Module psb_d_tools_mod
     end subroutine psb_dsprn
   end interface
 
-!!$
-!!$  interface psb_linmap_init
-!!$    module procedure psb_dlinmap_init
-!!$  end interface
-!!$
-!!$  interface psb_linmap_ins
-!!$    module procedure psb_dlinmap_ins
-!!$  end interface
-!!$
-!!$  interface psb_linmap_asb
-!!$    module procedure psb_dlinmap_asb
-!!$  end interface
-!!$
-!!$contains
-!!$
-!!$  subroutine psb_dlinmap_init(a_map,cd_xt,descin,descout)
-!!$    use psb_descriptor_type
-!!$    use psb_serial_mod
-!!$    use psb_penv_mod
-!!$    use psb_error_mod
-!!$    use psb_base_tools_mod
-!!$    use psb_d_mat_mod
-!!$    implicit none 
-!!$    type(psb_dspmat_type), intent(out) :: a_map
-!!$    type(psb_desc_type), intent(out)   :: cd_xt
-!!$    type(psb_desc_type), intent(in)    :: descin, descout 
-!!$
-!!$    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
-!!$
-!!$    ictxt = psb_cd_get_context(descin)
-!!$    call psb_cdcpy(descin,cd_xt,info)
-!!$    if (info == psb_success_) call psb_cd_reinit(cd_xt,info)
-!!$    if (info /= psb_success_) then 
-!!$      write(psb_err_unit,*) 'Error on reinitialising the extension map'
-!!$      call psb_error(ictxt)
-!!$      call psb_abort(ictxt)
-!!$      stop
-!!$    end if
-!!$
-!!$    nrow_in  = psb_cd_get_local_rows(cd_xt)
-!!$    ncol_in  = psb_cd_get_local_cols(cd_xt)
-!!$    nrow_out = psb_cd_get_local_rows(descout)
-!!$
-!!$    call a_map%csall(nrow_out,ncol_in,info)
-!!$
-!!$  end subroutine psb_dlinmap_init
-!!$
-!!$  subroutine psb_dlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
-!!$    use psb_d_mat_mod
-!!$    use psb_descriptor_type
-!!$    implicit none 
-!!$    integer, intent(in)                  :: nz
-!!$    integer, intent(in)                  :: ir(:),ic(:)
-!!$    real(psb_dpk_), intent(in)         :: val(:)
-!!$    type(psb_dspmat_type), intent(inout) :: a_map
-!!$    type(psb_desc_type), intent(inout)   :: cd_xt
-!!$    type(psb_desc_type), intent(in)      :: descin, descout 
-!!$    integer :: info
-!!$    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
-!!$
-!!$  end subroutine psb_dlinmap_ins
-!!$
-!!$  subroutine psb_dlinmap_asb(a_map,cd_xt,descin,descout,afmt)
-!!$    use psb_base_tools_mod
-!!$    use psb_d_mat_mod
-!!$    use psb_descriptor_type
-!!$    use psb_serial_mod
-!!$    implicit none 
-!!$    type(psb_dspmat_type), intent(inout)   :: a_map
-!!$    type(psb_desc_type), intent(inout)     :: cd_xt
-!!$    type(psb_desc_type), intent(in)        :: descin, descout 
-!!$    character(len=*), optional, intent(in) :: afmt
-!!$
-!!$
-!!$    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
-!!$
-!!$    ictxt = psb_cd_get_context(descin)
-!!$
-!!$    call psb_cdasb(cd_xt,info)
-!!$    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
-!!$    call a_map%cscnv(info,type=afmt)
-!!$
-!!$  end subroutine psb_dlinmap_asb
-!!$
 end module psb_d_tools_mod

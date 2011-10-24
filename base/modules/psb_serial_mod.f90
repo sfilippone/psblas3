@@ -344,7 +344,7 @@ module psb_serial_mod
       use psb_const_mod
       integer, intent(in) :: nv1,nv2
       integer, intent(in) :: iv1(*), iv2(*)
-      real(psb_dpk_), intent(in) :: v1(*),v2(*)
+      real(psb_dpk_), intent(in) :: v1(*), v2(*)
       real(psb_dpk_)      :: dot
     end function psb_d_spdot_srtd
 

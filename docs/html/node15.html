@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_get_local_rows -- Get number of local rows</TITLE>
-<META NAME="description" CONTENT="psb_cd_get_local_rows -- Get number of local rows">
+<TITLE>Preconditioner data structure</TITLE>
+<META NAME="description" CONTENT="Preconditioner data structure">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,86 +19,78 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node16.html">
-<LINK REL="previous" HREF="node14.html">
-<LINK REL="up" HREF="node14.html">
+<LINK REL="previous" HREF="node13.html">
+<LINK REL="up" HREF="node8.html">
 <LINK REL="next" HREF="node16.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html356"
+<A NAME="tex2html357"
   HREF="node16.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html352"
-  HREF="node14.html">
+<A NAME="tex2html353"
+  HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html346"
+<A NAME="tex2html347"
   HREF="node14.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html354"
+<A NAME="tex2html355"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html357"
-  HREF="node16.html">psb_cd_get_local_cols   Get</A>
-<B> Up:</B> <A NAME="tex2html353"
-  HREF="node14.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html347"
-  HREF="node14.html">Data structure query routines</A>
- &nbsp; <B>  <A NAME="tex2html355"
+<B> Next:</B> <A NAME="tex2html358"
+  HREF="node16.html">Data structure query routines</A>
+<B> Up:</B> <A NAME="tex2html354"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html348"
+  HREF="node14.html">Named Constants</A>
+ &nbsp; <B>  <A NAME="tex2html356"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00044100000000000000">
-psb_cd_get_local_rows -- Get number of local rows</A>
-</H3>
+<H2><A NAME="SECTION00044000000000000000"></A>
+<A NAME="sec:prec"></A>
+<BR>
+Preconditioner data structure
+</H2>
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
 
 <P>
-<PRE>
-nr = psb_cd_get_local_rows(desc)
-</PRE>
+A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
+figure&nbsp;<A HREF="#fig:prectype">6</A>. The <code>psb_prec_type</code> 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor.The values contained in
+the <code>iprcparm</code> and <code>rprcparm</code> define tha type of
+preconditioner along with all the parameters related to it; thus,
+<code>iprcparm</code> and <code>rprcparm</code> define how the other records have
+to be interpreted. This data structure is the basis of more complex
+preconditioning strategies, which are the subject of further
+research. 
 
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-</DL>
+<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="674"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
+The PSBLAS defined data type that contains a preconditioner.</CAPTION>
+<TR><TD><FONT SIZE="-1">  <BR>
 
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of local rows, i.e. the number of
-  rows owned by the current process; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>,
-  it is equal to <!-- MATH
- $|{\cal I}_i| + |{\cal B}_i|$
+<BR>
+   
+  </FONT>
+<DIV ALIGN="CENTER"><FONT SIZE="-1"><!-- MATH
+ $\fbox{\TheSbox}$
  -->
 <IMG
- WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img10.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">. The returned value is
-  specific to the calling process. 
-</DD>
-</DL>
+ WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
+ SRC="img20.png"
+ ALT="\fbox{\TheSbox}"></FONT></DIV><FONT SIZE="-1">
+  </FONT></TD></TR>
+</TABLE>
+</DIV>
 
 <P>
 <BR><HR>

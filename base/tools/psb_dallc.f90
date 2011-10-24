@@ -76,7 +76,7 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
   endif
 
   !... check m and n parameters....
-  if (.not.psb_is_ok_desc(desc_a)) then 
+  if (.not.desc_a%is_ok()) then 
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
@@ -253,3 +253,186 @@ subroutine psb_dallocv(x, desc_a,info,n)
 
 end subroutine psb_dallocv
 
+subroutine psb_dalloc_vect(x, desc_a,info,n)
+  use psb_base_mod, psb_protect_name => psb_dalloc_vect
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_d_vect_type), intent(out)  :: x
+  type(psb_desc_type), intent(in) :: desc_a
+  integer,intent(out)             :: info
+  integer, optional, intent(in)   :: n
+
+  !locals
+  integer             :: np,me,nr,i,err_act
+  integer             :: ictxt, int_err(5)
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  name='psb_geall'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check m and n parameters....
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! As this is a rank-1 array, optional parameter N is actually ignored.
+
+  !....allocate x .....
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
+    nr = max(1,desc_a%get_local_cols())
+  else if (psb_is_bld_desc(desc_a)) then
+    nr = max(1,desc_a%get_local_rows())
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
+  endif
+
+  allocate(psb_d_base_vect_type :: x%v, stat=info) 
+  if (info == 0) call x%all(nr,info)
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_alloc_request_
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
+    goto 9999
+  endif
+  call x%zero()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_dalloc_vect
+
+subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
+  use psb_base_mod, psb_protect_name => psb_dalloc_vect_r2
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_d_vect_type), allocatable, intent(out)  :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer,intent(out)             :: info
+  integer, optional, intent(in)   :: n,lb
+
+  !locals
+  integer            :: np,me,nr,i,err_act, n_, lb_
+  integer            :: ictxt, int_err(5), exch(1)
+  integer            :: debug_level, debug_unit
+  character(len=20)  :: name
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  name='psb_geall'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check m and n parameters....
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (present(n)) then 
+    n_ = n
+  else
+    n_ = 1
+  endif
+  if (present(lb)) then 
+    lb_ = lb
+  else
+    lb_ = 1
+  endif
+
+  !global check on n parameters
+  if (me == psb_root_) then
+    exch(1)=n_
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+  else
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    if (exch(1) /= n_) then
+      info=psb_err_parm_differs_among_procs_
+      int_err(1)=1
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
+  endif
+  ! As this is a rank-1 array, optional parameter N is actually ignored.
+
+  !....allocate x .....
+  if (desc_a%is_asb().or.desc_a%is_upd()) then
+    nr = max(1,desc_a%get_local_cols())
+  else if (desc_a%is_bld()) then
+    nr = max(1,desc_a%get_local_rows())
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
+  endif
+
+  allocate(x(lb_:lb_+n_-1), stat=info)
+  if (info == 0) then 
+    do i=lb_, lb_+n_-1
+      allocate(psb_d_base_vect_type :: x(i)%v, stat=info) 
+      if (info == 0) call x(i)%all(nr,info)
+      if (info == 0) call x(i)%zero()
+      if (info /= 0) exit
+    end do
+  end if
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_alloc_request_
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
+    goto 9999
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_dalloc_vect_r2

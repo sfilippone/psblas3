@@ -133,6 +133,93 @@ function psb_zamax (x,desc_a, info, jx)
 end function psb_zamax
 
 
+function psb_zamax_vect(x, desc_a, info) result(res)
+  use psb_penv_mod
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_z_vect_mod
+  implicit none
+
+  real(psb_dpk_)                        :: res
+  type(psb_z_vect_type), intent (inout) :: x
+  type(psb_desc_type), intent (in)      :: desc_a
+  integer, intent(out)                  :: info
+
+  ! locals
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, jx, ix, m, imax, isamax
+  real(psb_dpk_)         :: amax
+  character(len=20)      :: name, ch_err
+
+  name='psb_zamaxv'
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  amax=dzero
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = 1
+  jx = 1
+
+  m = desc_a%get_global_rows()
+
+  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
+    amax=x%amax(desc_a%get_local_rows())
+  else 
+    amax = dzero
+  end if
+
+  ! compute global max
+  call psb_amx(ictxt, amax)
+
+  res=amax
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end function psb_zamax_vect
+
+
 
 
 !!$ 

@@ -270,6 +270,101 @@ end function psb_cnrm2v
 
 
 
+function psb_cnrm2_vect(x, desc_a, info)  result(res)
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_c_vect_mod
+  implicit none
+
+  real(psb_spk_)                        :: res
+  type(psb_c_vect_type), intent (inout) :: x
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer, intent(out)                  :: info
+
+  ! locals
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
+  real(psb_spk_)         :: nrm2, snrm2, dd
+!!$  external dcombnrm2
+  character(len=20)      :: name, ch_err
+
+  name='psb_cnrm2v'
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ix = 1
+  jx=1
+  m = desc_a%get_global_rows()
+
+  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if(m /= 0) then
+    if (desc_a%get_local_rows() > 0) then 
+      ndim = desc_a%get_local_rows()
+      nrm2 = x%nrm2(ndim)
+!!$      ! adjust  because overlapped elements are computed more than once
+!!$      do i=1,size(desc_a%ovrlap_elem,1)
+!!$        idx = desc_a%ovrlap_elem(i,1)
+!!$        ndm = desc_a%ovrlap_elem(i,2)
+!!$        dd  = dble(ndm-1)/dble(ndm)
+!!$        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx))/nrm2)**2) 
+!!$      end do
+    else 	    
+      nrm2 = szero
+    end if
+  else 	    
+    nrm2 = szero
+  end if
+
+!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+  call psb_nrm2(ictxt,nrm2)
+
+  res = nrm2  
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end function psb_cnrm2_vect
+
+
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0

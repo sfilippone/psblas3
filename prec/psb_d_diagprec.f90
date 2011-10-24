@@ -1,11 +1,14 @@
 module psb_d_diagprec
-  use psb_d_base_prec_mod
 
+  use psb_d_base_prec_mod
+  
   
   type, extends(psb_d_base_prec_type) :: psb_d_diag_prec_type
-    real(psb_dpk_), allocatable :: d(:)
+    real(psb_dpk_), allocatable        :: d(:)
+    type(psb_d_vect_type), allocatable :: dv
   contains
-    procedure, pass(prec) :: apply     => psb_d_diag_apply
+    procedure, pass(prec) :: d_apply_v => psb_d_diag_apply_vect
+    procedure, pass(prec) :: d_apply   => psb_d_diag_apply
     procedure, pass(prec) :: precbld   => psb_d_diag_precbld
     procedure, pass(prec) :: precinit  => psb_d_diag_precinit  
     procedure, pass(prec) :: precseti  => psb_d_diag_precseti
@@ -18,11 +21,111 @@ module psb_d_diagprec
 
   private :: psb_d_diag_apply, psb_d_diag_precbld, psb_d_diag_precseti,&
        & psb_d_diag_precsetr, psb_d_diag_precsetc, psb_d_diag_sizeof,&
-       & psb_d_diag_precinit, psb_d_diag_precfree, psb_d_diag_precdescr
+       & psb_d_diag_precinit, psb_d_diag_precfree, psb_d_diag_precdescr,&
+       & psb_d_diag_apply_vect
   
 
 contains
   
+
+  subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_d_diag_prec_type), intent(inout)  :: prec
+    type(psb_d_vect_type),intent(inout)   :: x
+    real(psb_dpk_),intent(in)         :: alpha, beta
+    type(psb_d_vect_type),intent(inout)   :: y
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='d_diag_prec_apply'
+    real(psb_dpk_), pointer :: ww(:)
+    class(psb_d_base_vect_type), allocatable :: dw
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the DIAG preonditioner???
+    !
+    info = psb_success_
+    
+    nrow = desc_data%get_local_rows()
+    if (x%get_nrows() < nrow) then 
+      info = 36
+      call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+      goto 9999
+    end if
+    if (y%get_nrows() < nrow) then 
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+      goto 9999
+    end if
+    if (.not.allocated(prec%d)) then
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner: D")
+      goto 9999
+    end if
+    if (size(prec%d) < nrow) then
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner: D")
+      goto 9999
+    end if
+    
+    if (size(work) >= x%get_nrows()) then 
+      ww => work
+    else
+      allocate(ww(x%get_nrows()),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_alloc_request_,name,&
+             & i_err=(/x%get_nrows(),0,0,0,0/),a_err='real(psb_dpk_)')
+        goto 9999      
+      end if
+    end if
+    
+!!$      allocate(dw, mold=x, stat=info) 
+!!$      call dw%bld(x%get_nrows())
+!!$      if (.true.) then 
+!!$        if (info == 0) call dw%mlt(prec%dv,x,info)
+!!$      else
+!!$        if (info == 0) call dw%axpby(nrow,done,x,dzero,info) 
+!!$        if (info == 0) call dw%mlt(prec%dv,info)
+!!$      end if
+!!$      if (info == 0) call y%axpby(nrow,alpha,dw,beta,info)
+
+    call y%mlt(alpha,prec%dv,x,beta,info)
+
+!!$      call x%mlt(ww,prec%d(1:nrow),info)
+!!$    if (info == 0) call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
+
+!!$    call dw%free(info) 
+!!$    if (info /= psb_success_) then 
+!!$      call psb_errpush(psb_err_from_subroutine_,name,a_err='Deallocate')
+!!$      goto 9999      
+!!$    end if
+
+    if (size(work) < x%get_nrows()) then 
+      deallocate(ww,stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Deallocate')
+        goto 9999      
+      end if
+    end if
+   
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_d_diag_apply_vect
+
 
   subroutine psb_d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_base_mod
@@ -131,7 +234,7 @@ contains
   end subroutine psb_d_diag_precinit
 
 
-  subroutine psb_d_diag_precbld(a,desc_a,prec,info,upd,mold,afmt)
+  subroutine psb_d_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
     
     use psb_base_mod
     Implicit None
@@ -142,7 +245,8 @@ contains
     integer, intent(out)                      :: info
     character, intent(in), optional           :: upd
     character(len=*), intent(in), optional    :: afmt
-    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    class(psb_d_base_sparse_mat), intent(in), optional :: amold
+    class(psb_d_base_vect_type), intent(in), optional  :: vmold
     Integer :: err_act, nrow,i
     character(len=20)  :: name='d_diag_precbld'
 
@@ -178,7 +282,20 @@ contains
         prec%d(i) = done/prec%d(i)
       endif
     end do
-
+    allocate(prec%dv,stat=info) 
+    if (info == 0) then 
+      if (present(vmold)) then 
+        allocate(prec%dv%v,mold=vmold,stat=info) 
+      else
+        allocate(psb_d_base_vect_type :: prec%dv%v,stat=info) 
+      end if
+    end if
+    if (info == 0) then 
+      call prec%dv%bld(prec%d)
+    else 
+      write(0,*) 'Error on precbld ',info
+    end if
+    
     call psb_erractionrestore(err_act)
     return
 

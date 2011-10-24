@@ -333,15 +333,15 @@ contains
     
     integer :: code, info 
 
+#if defined(SERIAL_MPI) 
+    stop 
+#else    
     if (present(errc)) then 
       code = errc
     else
       code = -1 
     endif
 
-#if defined(SERIAL_MPI) 
-    stop 
-#else    
     call mpi_abort(ictxt,code,info)
 #endif    
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Computational routines</TITLE>
-<META NAME="description" CONTENT="Computational routines">
+<TITLE>get_ncols -- Get number of columns in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_ncols -- Get number of columns in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,75 +18,80 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node38.html">
-<LINK REL="previous" HREF="node8.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node26.html">
+<LINK REL="previous" HREF="node24.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node26.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html475"
+<A NAME="tex2html482"
   HREF="node26.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html471"
-  HREF="userhtml.html">
+<A NAME="tex2html478"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html465"
+<A NAME="tex2html472"
   HREF="node24.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html473"
+<A NAME="tex2html480"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html476"
-  HREF="node26.html">psb_geaxpby   General</A>
-<B> Up:</B> <A NAME="tex2html472"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html466"
-  HREF="node24.html">psb_sp_get_nnzeros   Get</A>
- &nbsp; <B>  <A NAME="tex2html474"
+<B> Next:</B> <A NAME="tex2html483"
+  HREF="node26.html">get_nnzeros   Get</A>
+<B> Up:</B> <A NAME="tex2html479"
+  HREF="node21.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html473"
+  HREF="node24.html">get_nrows   Get</A>
+ &nbsp; <B>  <A NAME="tex2html481"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00050000000000000000">
-Computational routines</A>
-</H1>
+<H3><A NAME="SECTION00046400000000000000">
+get_ncols -- Get number of  columns in a  sparse matrix</A>
+</H3>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<PRE>
+nr = a%get_ncols()
+</PRE>
 
-<UL>
-<LI><A NAME="tex2html477"
-  HREF="node26.html">psb_geaxpby -- General Dense Matrix Sum</A>
-<LI><A NAME="tex2html478"
-  HREF="node27.html">psb_gedot -- Dot Product</A>
-<LI><A NAME="tex2html479"
-  HREF="node28.html">psb_gedots -- Generalized Dot Product</A>
-<LI><A NAME="tex2html480"
-  HREF="node29.html">psb_geamax -- Infinity-Norm of Vector</A>
-<LI><A NAME="tex2html481"
-  HREF="node30.html">psb_geamaxs -- Generalized Infinity Norm</A>
-<LI><A NAME="tex2html482"
-  HREF="node31.html">psb_geasum -- 1-Norm of Vector</A>
-<LI><A NAME="tex2html483"
-  HREF="node32.html">psb_geasums -- Generalized 1-Norm of Vector</A>
-<LI><A NAME="tex2html484"
-  HREF="node33.html">psb_genrm2 -- 2-Norm of Vector</A>
-<LI><A NAME="tex2html485"
-  HREF="node34.html">psb_genrm2s -- Generalized 2-Norm of Vector</A>
-<LI><A NAME="tex2html486"
-  HREF="node35.html">psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html487"
-  HREF="node36.html">psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
-<LI><A NAME="tex2html488"
-  HREF="node37.html">psb_spsm -- Triangular System Solve</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix
+<BR>
+Scope: <B>local</B>
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The number of  columns  of sparse matrix <code>a</code>.
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>
