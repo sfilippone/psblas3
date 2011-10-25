@@ -50,7 +50,7 @@ subroutine psb_c_csr_csmv(alpha,a,x,beta,y,info,trans)
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -394,7 +394,7 @@ subroutine psb_c_csr_csmm(alpha,a,x,beta,y,info,trans)
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else

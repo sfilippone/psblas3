@@ -1203,7 +1203,7 @@ subroutine psb_c_coo_csmv(alpha,a,x,beta,y,info,trans)
 
 
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -1401,7 +1401,7 @@ subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans)
   ctra = (psb_toupper(trans_) == 'C')
 
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
