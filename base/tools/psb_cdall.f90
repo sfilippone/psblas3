@@ -128,14 +128,6 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   else if (present(nl)) then 
     
-!!$    allocate(desc%matrix_data(psb_mdata_size_))
-!!$    desc%matrix_data(psb_m_)        = nl
-!!$    call psb_sum(ictxt,desc%matrix_data(psb_m_))
-!!$    desc%matrix_data(psb_n_)        = desc%matrix_data(psb_m_)
-!!$    desc%matrix_data(psb_ctxt_)     = ictxt
-!!$    call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
-
-
 
     if (np == 1) then 
       allocate(psb_repl_map      :: desc%indxmap, stat=info)
