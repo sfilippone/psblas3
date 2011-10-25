@@ -1600,7 +1600,7 @@ function psb_c_coo_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = szero 
   nnz = a%get_nzeros()
   i   = 1
   j   = i
@@ -1608,7 +1608,7 @@ function psb_c_coo_csnmi(a) result(res)
     do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
       j = j+1
     enddo
-    acc = dzero
+    acc = szero
     do k=i, j-1
       acc = acc + abs(a%val(k))
     end do
@@ -1637,7 +1637,7 @@ function psb_c_coo_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = szero 
   nnz = a%get_nzeros()
   n = a%get_ncols()
   allocate(vt(n),stat=info)

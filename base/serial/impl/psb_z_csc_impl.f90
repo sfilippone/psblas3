@@ -1424,7 +1424,7 @@ function psb_z_csc_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = zzero 
+  res = dzero 
   nr = a%get_nrows()
   nc = a%get_ncols()
   allocate(acc(nr),stat=info)

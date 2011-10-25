@@ -1110,7 +1110,7 @@ function psb_s_csr_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -sone 
+  res = szero
   nnz = a%get_nzeros()
   m = a%get_nrows()
   n = a%get_ncols()

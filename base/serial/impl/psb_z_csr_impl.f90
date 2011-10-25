@@ -100,10 +100,10 @@ contains
     integer   :: i,j,k, ir, jc
     complex(psb_dpk_) :: acc
 
-    if (alpha == dzero) then
-      if (beta == dzero) then
+    if (alpha == zzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i) = dzero
+          y(i) = zzero
         enddo
       else
         do  i = 1, m
@@ -116,21 +116,21 @@ contains
 
     if ((.not.tra).and.(.not.ctra)) then 
 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -140,7 +140,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -150,21 +150,21 @@ contains
         end if
 
 
-      else if (beta == done) then 
+      else if (beta == zone) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = y(i) + acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -174,7 +174,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -183,21 +183,21 @@ contains
 
         end if
 
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = -y(i) + acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -207,7 +207,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -218,19 +218,19 @@ contains
 
       else 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
             y(i) = beta*y(i) + acc
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -240,7 +240,7 @@ contains
         else 
 
           do i=1,m 
-            acc  = dzero
+            acc  = zzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
@@ -253,13 +253,13 @@ contains
 
     else if (tra) then 
 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
         do i=1, m
-          y(i) = dzero
+          y(i) = zzero
         end do
-      else if (beta == done) then 
+      else if (beta == zone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
         do i=1, m
           y(i) = -y(i) 
         end do
@@ -269,7 +269,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -278,7 +278,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -300,13 +300,13 @@ contains
 
     else if (ctra) then 
 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
         do i=1, m
-          y(i) = dzero
+          y(i) = zzero
         end do
-      else if (beta == done) then 
+      else if (beta == zone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
         do i=1, m
           y(i) = -y(i) 
         end do
@@ -316,7 +316,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -325,7 +325,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -452,10 +452,10 @@ contains
     integer   :: i,j,k, ir, jc
 
 
-    if (alpha == dzero) then
-      if (beta == dzero) then
+    if (alpha == zzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         enddo
       else
         do  i = 1, m
@@ -466,21 +466,21 @@ contains
     end if
 
     if ((.not.tra).and.(.not.ctra)) then 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -490,7 +490,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -500,21 +500,21 @@ contains
         end if
 
 
-      else if (beta == done) then 
+      else if (beta == zone) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = y(i,1:nc) + acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -524,7 +524,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -533,21 +533,21 @@ contains
 
         end if
 
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = -y(i,1:nc) + acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -557,7 +557,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -568,19 +568,19 @@ contains
 
       else 
 
-        if (alpha == done) then 
+        if (alpha == zone) then 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
             y(i,1:nc) = beta*y(i,1:nc) + acc(1:nc)
           end do
 
-        else if (alpha == -done) then 
+        else if (alpha == -zone) then 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -590,7 +590,7 @@ contains
         else 
 
           do i=1,m 
-            acc(1:nc)  = dzero
+            acc(1:nc)  = zzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
@@ -603,13 +603,13 @@ contains
 
     else if (tra) then 
 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
         do i=1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         end do
-      else if (beta == done) then 
+      else if (beta == zone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
         do i=1, m
           y(i,1:nc) = -y(i,1:nc) 
         end do
@@ -619,7 +619,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -628,7 +628,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -650,13 +650,13 @@ contains
 
     else if (ctra) then 
 
-      if (beta == dzero) then 
+      if (beta == zzero) then 
         do i=1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         end do
-      else if (beta == done) then 
+      else if (beta == zone) then 
         ! Do nothing
-      else if (beta == -done) then 
+      else if (beta == -zone) then 
         do i=1, m
           y(i,1:nc) = -y(i,1:nc) 
         end do
@@ -666,7 +666,7 @@ contains
         end do
       end if
 
-      if (alpha == done) then
+      if (alpha == zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -675,7 +675,7 @@ contains
           end do
         enddo
 
-      else if (alpha == -done) then
+      else if (alpha == -zone) then
 
         do i=1,n
           do j=irp(i), irp(i+1)-1
@@ -763,10 +763,10 @@ subroutine psb_z_csr_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
   
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = zzero
       enddo
     else
       do  i = 1, m
@@ -776,13 +776,13 @@ subroutine psb_z_csr_cssv(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == zzero) then 
 
     call inner_csrsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,y) 
-    if (alpha == done) then 
+    if (alpha == zone) then 
       ! do nothing
-    else if (alpha == -done) then 
+    else if (alpha == -zone) then 
       do  i = 1, m
         y(i) = -y(i)
       end do
@@ -834,7 +834,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=1, n
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -842,7 +842,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, n
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-2
               acc = acc + val(j)*y(ja(j))
             end do
@@ -853,7 +853,7 @@ contains
 
         if (unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -861,7 +861,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=n, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do j=irp(i)+1, irp(i+1)-1
               acc = acc + val(j)*y(ja(j))
             end do
@@ -1021,10 +1021,10 @@ subroutine psb_z_csr_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,:) = zzero
       enddo
     else
       do  i = 1, m
@@ -1034,7 +1034,7 @@ subroutine psb_z_csr_cssm(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
+  if (beta == zzero) then 
     call inner_csrsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
@@ -1100,7 +1100,7 @@ contains
       if (lower) then 
         if (unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -1108,7 +1108,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=1, nr
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-2
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -1119,7 +1119,7 @@ contains
 
         if (unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do j=irp(i), irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -1127,7 +1127,7 @@ contains
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do j=irp(i)+1, irp(i+1)-1
               acc = acc + val(j)*y(ja(j),1:nc)
             end do
@@ -1302,7 +1302,7 @@ function psb_z_csr_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -sone 
+  res = dzero
   nnz = a%get_nzeros()
   m = a%get_nrows()
   n = a%get_ncols()
@@ -2528,7 +2528,7 @@ subroutine psb_z_csr_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then 
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = zzero
     call a%set_upd()
   else
     info = psb_err_invalid_mat_state_

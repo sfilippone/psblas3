@@ -1423,14 +1423,14 @@ function psb_c_csc_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = czero 
+  res = szero 
   nr = a%get_nrows()
   nc = a%get_ncols()
   allocate(acc(nr),stat=info)
   if (info /= psb_success_) then 
     return
   end if
-  acc(:) = dzero
+  acc(:) = szero
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1  
       acc(a%ia(j)) = acc(a%ia(j)) + abs(a%val(j))

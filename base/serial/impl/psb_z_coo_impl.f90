@@ -1637,7 +1637,7 @@ function psb_z_coo_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = dzero
   nnz = a%get_nzeros()
   n = a%get_ncols()
   allocate(vt(n),stat=info)
