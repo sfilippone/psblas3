@@ -485,7 +485,7 @@ module psb_s_mat_mod
   interface 
     subroutine psb_s_mv_from(a,b)
       import :: psb_sspmat_type, psb_spk_, psb_s_base_sparse_mat
-      class(psb_sspmat_type), intent(out) :: a
+      class(psb_sspmat_type), intent(out)         :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
     end subroutine psb_s_mv_from
   end interface
@@ -493,15 +493,15 @@ module psb_s_mat_mod
   interface 
     subroutine psb_s_cp_from(a,b)
       import :: psb_sspmat_type, psb_spk_, psb_s_base_sparse_mat
-      class(psb_sspmat_type), intent(out) :: a
-      class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
+      class(psb_sspmat_type), intent(out)      :: a
+      class(psb_s_base_sparse_mat), intent(in) :: b
     end subroutine psb_s_cp_from
   end interface
 
   interface 
     subroutine psb_s_mv_to(a,b)
       import :: psb_sspmat_type, psb_spk_, psb_s_base_sparse_mat
-      class(psb_sspmat_type), intent(inout) :: a
+      class(psb_sspmat_type), intent(inout)     :: a
       class(psb_s_base_sparse_mat), intent(out) :: b
     end subroutine psb_s_mv_to
   end interface
@@ -509,7 +509,7 @@ module psb_s_mat_mod
   interface 
     subroutine psb_s_cp_to(a,b)
       import :: psb_sspmat_type, psb_spk_, psb_s_base_sparse_mat    
-      class(psb_sspmat_type), intent(in) :: a
+      class(psb_sspmat_type), intent(in)        :: a
       class(psb_s_base_sparse_mat), intent(out) :: b
     end subroutine psb_s_cp_to
   end interface

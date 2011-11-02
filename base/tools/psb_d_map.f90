@@ -121,7 +121,7 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   real(psb_dpk_), optional       :: work(:)
   ! Local
   type(psb_d_vect_type)         :: xt, yt
-  real(psb_dpk_), allocatable :: xta(:), yta(:)
+  real(psb_dpk_), allocatable   :: xta(:), yta(:)
   integer                       :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'

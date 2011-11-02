@@ -115,8 +115,8 @@ contains
   end subroutine z_vect_set_scal
 
   subroutine z_vect_set_vect(x,val)
-    class(psb_z_vect_type), intent(inout)  :: x
-    complex(psb_dpk_), intent(in) :: val(:)
+    class(psb_z_vect_type), intent(inout) :: x
+    complex(psb_dpk_), intent(in)         :: val(:)
         
     integer :: info
     if (allocated(x%v)) call x%v%set(val)

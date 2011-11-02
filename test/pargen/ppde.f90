@@ -399,8 +399,8 @@ contains
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_dpk_)         :: deltah, deltah2
-    real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
+    real(psb_dpk_)            :: deltah, deltah2
+    real(psb_dpk_), parameter :: rhs=0.d0,one=1.d0,zero=0.d0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
     external           :: a1, a2, a3, a4, b1, b2, b3
@@ -562,7 +562,10 @@ contains
           element       = element+1
         endif
         !  term depending on     (x+1,y,z)
-        if (ix<idim) then 
+        if (ix==idim) then 
+          val(element)=-b3(x,y,z)/deltah2
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+        else
           val(element)=-b3(x,y,z)/deltah2
           icol(element) = (ix)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row

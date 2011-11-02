@@ -224,36 +224,12 @@ module psb_descriptor_type
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
+    procedure, pass(desc) :: sizeof          => psb_cd_sizeof
   end type psb_desc_type
 
   interface psb_sizeof
     module procedure psb_cd_sizeof
   end interface psb_sizeof
-
-!!$  interface psb_is_ok_desc
-!!$    module procedure psb_is_ok_desc
-!!$  end interface psb_is_ok_desc
-!!$
-!!$  interface psb_is_valid_desc
-!!$    module procedure psb_is_valid_desc
-!!$  end interface psb_is_valid_desc
-!!$
-!!$  interface psb_is_asb_desc
-!!$    module procedure psb_is_asb_desc
-!!$  end interface psb_is_asb_desc
-!!$
-!!$  interface psb_is_upd_desc
-!!$    module procedure psb_is_upd_desc
-!!$  end interface psb_is_upd_desc
-!!$
-!!$  interface psb_is_ovl_desc
-!!$    module procedure psb_is_ovl_desc
-!!$  end interface psb_is_ovl_desc
-!!$
-!!$  interface psb_is_bld_desc
-!!$    module procedure psb_is_bld_desc
-!!$  end interface psb_is_bld_desc
-!!$
 
   interface psb_move_alloc
     module procedure psb_cdtransfer
@@ -273,7 +249,7 @@ contains
     implicit none
     !....Parameters...
 
-    Type(psb_desc_type), intent(in) :: desc
+    class(psb_desc_type), intent(in) :: desc
     integer(psb_long_int_k_) :: val
 
     val = 0 

@@ -1414,8 +1414,8 @@ subroutine psb_d_cp_from(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cp_from
   implicit none 
-  class(psb_dspmat_type), intent(out) :: a
-  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+  class(psb_dspmat_type), intent(out)      :: a
+  class(psb_d_base_sparse_mat), intent(in) :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
   logical, parameter :: debug=.false.

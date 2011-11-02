@@ -115,8 +115,8 @@ contains
   end subroutine s_vect_set_scal
 
   subroutine s_vect_set_vect(x,val)
-    class(psb_s_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in) :: val(:)
+    class(psb_s_vect_type), intent(inout) :: x
+    real(psb_spk_), intent(in)            :: val(:)
         
     integer :: info
     if (allocated(x%v)) call x%v%set(val)

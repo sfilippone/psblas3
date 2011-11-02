@@ -113,10 +113,14 @@ contains
   subroutine s_base_set_vect(x,val)
     class(psb_s_base_vect_type), intent(inout)  :: x
     real(psb_spk_), intent(in) :: val(:)
-        
+    integer :: nr
     integer :: info
-    x%v = val
-    
+    if (allocated(x%v)) then 
+      nr = min(size(x%v),size(val))
+      x%v(1:nr) = val(1:nr)
+    else
+      x%v = val
+    end if
   end subroutine s_base_set_vect
     
   
