@@ -559,9 +559,9 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   real(psb_spk_), intent(in)              :: alpha, beta
   type(psb_s_vect_type), intent(inout)    :: x
   type(psb_s_vect_type), intent(inout)    :: y
-  type(psb_sspmat_type), intent(in)         :: a
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  type(psb_sspmat_type), intent(inout)    :: a
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
   type(psb_s_vect_type), intent(inout), optional  :: diag
   real(psb_spk_), optional, target, intent(inout)        :: work(:)
   character, intent(in), optional           :: trans, scale

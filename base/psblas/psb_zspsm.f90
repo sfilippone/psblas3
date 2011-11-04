@@ -559,7 +559,7 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_dpk_), intent(in)           :: alpha, beta
   type(psb_z_vect_type), intent(inout)    :: x
   type(psb_z_vect_type), intent(inout)    :: y
-  type(psb_zspmat_type), intent(in)       :: a
+  type(psb_zspmat_type), intent(inout)    :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   type(psb_z_vect_type), intent(inout), optional  :: diag

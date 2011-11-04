@@ -559,7 +559,7 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_spk_), intent(in)           :: alpha, beta
   type(psb_c_vect_type), intent(inout)    :: x
   type(psb_c_vect_type), intent(inout)    :: y
-  type(psb_cspmat_type), intent(in)       :: a
+  type(psb_cspmat_type), intent(inout)    :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   type(psb_c_vect_type), intent(inout), optional  :: diag
