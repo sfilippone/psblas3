@@ -1612,7 +1612,7 @@ subroutine psb_d_transp_2mat(a,b)
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transp_2mat(b%a)    
+  call a%a%transp(b%a)    
 
   call psb_erractionrestore(err_act)
   return
@@ -1693,7 +1693,7 @@ subroutine psb_d_transc_2mat(a,b)
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transc_2mat(b%a)    
+  call a%a%transc(b%a)    
 
   call psb_erractionrestore(err_act)
   return
