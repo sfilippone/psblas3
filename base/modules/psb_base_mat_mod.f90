@@ -538,28 +538,38 @@ contains
   subroutine psb_base_transp_2mat(a,b)
     implicit none 
     
-    class(psb_base_sparse_mat), intent(out) :: a
-    class(psb_base_sparse_mat), intent(in)  :: b
+    class(psb_base_sparse_mat), intent(in)  :: a
+    class(psb_base_sparse_mat), intent(out) :: b
     
-    a%m         = b%n
-    a%n         = b%m
-    a%state     = b%state
-    a%duplicate = b%duplicate
-    a%triangle  = b%triangle
-    a%unitd     = b%unitd
-    a%upper     = .not.b%upper
-    a%sorted    = .false.
-    a%aux(:)    = b%aux(:)
+    b%m         = a%n
+    b%n         = a%m
+    b%state     = a%state
+    b%duplicate = a%duplicate
+    b%triangle  = a%triangle
+    b%unitd     = a%unitd
+    b%upper     = .not.a%upper
+    b%sorted    = .false.
+    b%aux(:)    = a%aux(:)
     
   end subroutine psb_base_transp_2mat
 
   subroutine psb_base_transc_2mat(a,b)
     implicit none 
     
-    class(psb_base_sparse_mat), intent(out) :: a
-    class(psb_base_sparse_mat), intent(in)   :: b
+    class(psb_base_sparse_mat), intent(in)  :: a
+    class(psb_base_sparse_mat), intent(out) :: b
 
-    call a%transp(b) 
+    
+    b%m         = a%n
+    b%n         = a%m
+    b%state     = a%state
+    b%duplicate = a%duplicate
+    b%triangle  = a%triangle
+    b%unitd     = a%unitd
+    b%upper     = .not.a%upper
+    b%sorted    = .false.
+    b%aux(:)    = a%aux(:)
+
   end subroutine psb_base_transc_2mat
 
   subroutine psb_base_transp_1mat(a)
