@@ -547,8 +547,8 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_transp_2mat(a,b)
       import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(out) :: a
-      class(psb_cspmat_type), intent(in)  :: b
+      class(psb_cspmat_type), intent(in)  :: a
+      class(psb_cspmat_type), intent(out) :: b
     end subroutine psb_c_transp_2mat
   end interface
   
@@ -562,8 +562,8 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_transc_2mat(a,b)
       import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(out) :: a
-      class(psb_cspmat_type), intent(in)  :: b
+      class(psb_cspmat_type), intent(in)  :: a
+      class(psb_cspmat_type), intent(out) :: b
     end subroutine psb_c_transc_2mat
   end interface
   

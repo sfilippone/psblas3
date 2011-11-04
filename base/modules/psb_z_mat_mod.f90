@@ -547,8 +547,8 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_transp_2mat(a,b)
       import :: psb_zspmat_type
-      class(psb_zspmat_type), intent(out) :: a
-      class(psb_zspmat_type), intent(in)  :: b
+      class(psb_zspmat_type), intent(in)  :: a
+      class(psb_zspmat_type), intent(out) :: b
     end subroutine psb_z_transp_2mat
   end interface
   
@@ -562,8 +562,8 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_transc_2mat(a,b)
       import :: psb_zspmat_type
-      class(psb_zspmat_type), intent(out) :: a
-      class(psb_zspmat_type), intent(in)  :: b
+      class(psb_zspmat_type), intent(in)  :: a
+      class(psb_zspmat_type), intent(out) :: b
     end subroutine psb_z_transc_2mat
   end interface
   

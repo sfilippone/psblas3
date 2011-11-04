@@ -473,8 +473,8 @@ subroutine psb_c_base_transp_2mat(a,b)
   use psb_error_mod
   implicit none 
 
-  class(psb_c_base_sparse_mat), intent(out) :: a
-  class(psb_base_sparse_mat), intent(in)   :: b
+  class(psb_c_base_sparse_mat), intent(in) :: a
+  class(psb_base_sparse_mat), intent(out)  :: b
 
   type(psb_c_coo_sparse_mat) :: tmp
   integer err_act, info
@@ -485,9 +485,9 @@ subroutine psb_c_base_transp_2mat(a,b)
   info = psb_success_
   select type(b)
   class is (psb_c_base_sparse_mat)
-    call b%cp_to_coo(tmp,info)
+    call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call tmp%transp()
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select
@@ -511,8 +511,8 @@ subroutine psb_c_base_transc_2mat(a,b)
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_transc_2mat
   implicit none 
 
-  class(psb_c_base_sparse_mat), intent(out) :: a
-  class(psb_base_sparse_mat), intent(in)   :: b
+  class(psb_c_base_sparse_mat), intent(in) :: a
+  class(psb_base_sparse_mat), intent(out)  :: b
 
   type(psb_c_coo_sparse_mat) :: tmp
   integer err_act, info
@@ -523,9 +523,9 @@ subroutine psb_c_base_transc_2mat(a,b)
   info = psb_success_
   select type(b)
   class is (psb_c_base_sparse_mat)
-    call b%cp_to_coo(tmp,info)
+    call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call tmp%transc()
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select

@@ -510,16 +510,16 @@ module psb_c_base_mat_mod
   interface 
     subroutine psb_c_base_transp_2mat(a,b)
       import :: psb_c_base_sparse_mat, psb_base_sparse_mat, psb_spk_
-      class(psb_c_base_sparse_mat), intent(out) :: a
-      class(psb_base_sparse_mat), intent(in)   :: b
+      class(psb_c_base_sparse_mat), intent(in) :: a
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_c_base_transp_2mat
   end interface
   
   interface  
     subroutine psb_c_base_transc_2mat(a,b)
       import :: psb_c_base_sparse_mat, psb_base_sparse_mat, psb_spk_
-      class(psb_c_base_sparse_mat), intent(out) :: a
-      class(psb_base_sparse_mat), intent(in)   :: b
+      class(psb_c_base_sparse_mat), intent(in) :: a
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_c_base_transc_2mat
   end interface
   

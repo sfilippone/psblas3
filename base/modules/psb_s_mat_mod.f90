@@ -550,8 +550,8 @@ module psb_s_mat_mod
   interface 
     subroutine psb_s_transp_2mat(a,b)
       import :: psb_sspmat_type
-      class(psb_sspmat_type), intent(out) :: a
-      class(psb_sspmat_type), intent(in)  :: b
+      class(psb_sspmat_type), intent(in)  :: a
+      class(psb_sspmat_type), intent(out) :: b
     end subroutine psb_s_transp_2mat
   end interface
 
@@ -565,8 +565,8 @@ module psb_s_mat_mod
   interface 
     subroutine psb_s_transc_2mat(a,b)
       import :: psb_sspmat_type
-      class(psb_sspmat_type), intent(out) :: a
-      class(psb_sspmat_type), intent(in)  :: b
+      class(psb_sspmat_type), intent(in)  :: a
+      class(psb_sspmat_type), intent(out) :: b
     end subroutine psb_s_transc_2mat
   end interface
 

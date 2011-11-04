@@ -108,6 +108,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: d_cscnv_ip    => psb_d_cscnv_ip
     procedure, pass(a) :: d_cscnv_base  => psb_d_cscnv_base
     generic, public    :: cscnv         => d_cscnv, d_cscnv_ip, d_cscnv_base
+    procedure, pass(a) :: clone         => psb_dspmat_type_clone
     procedure, pass(a) :: reinit        => psb_d_reinit
     procedure, pass(a) :: print_i       => psb_d_sparse_print
     procedure, pass(a) :: print_n       => psb_d_n_sparse_print
@@ -549,8 +550,8 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_transp_2mat(a,b)
       import :: psb_dspmat_type
-      class(psb_dspmat_type), intent(out) :: a
-      class(psb_dspmat_type), intent(in)  :: b
+      class(psb_dspmat_type), intent(in)  :: a
+      class(psb_dspmat_type), intent(out) :: b
     end subroutine psb_d_transp_2mat
   end interface
 
@@ -564,8 +565,8 @@ module psb_d_mat_mod
   interface 
     subroutine psb_d_transc_2mat(a,b)
       import :: psb_dspmat_type
-      class(psb_dspmat_type), intent(out) :: a
-      class(psb_dspmat_type), intent(in)  :: b
+      class(psb_dspmat_type), intent(in)  :: a
+      class(psb_dspmat_type), intent(out) :: b
     end subroutine psb_d_transc_2mat
   end interface
 

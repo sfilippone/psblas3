@@ -1589,8 +1589,8 @@ subroutine psb_c_transp_2mat(a,b)
   use psb_string_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_transp_2mat
   implicit none 
-  class(psb_cspmat_type), intent(out) :: a
-  class(psb_cspmat_type), intent(in)  :: b
+  class(psb_cspmat_type), intent(in)  :: a
+  class(psb_cspmat_type), intent(out) :: b
 
   Integer :: err_act, info
   character(len=20)  :: name='transp'
@@ -1598,22 +1598,22 @@ subroutine psb_c_transp_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (b%is_null()) then 
+  if (a%is_null()) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 #if defined(HAVE_MOLD)
-  allocate(a%a,mold=b%a,stat=info)
+  allocate(b%a,mold=a%a,stat=info)
 #else
-  call b%a%mold(a%a,info)
+  call a%a%mold(b%a,info)
 #endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transp(b%a)    
+  call a%a%transp_2mat(b%a)    
 
   call psb_erractionrestore(err_act)
   return
@@ -1670,8 +1670,8 @@ subroutine psb_c_transc_2mat(a,b)
   use psb_string_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_transc_2mat
   implicit none 
-  class(psb_cspmat_type), intent(out) :: a
-  class(psb_cspmat_type), intent(in)  :: b
+  class(psb_cspmat_type), intent(in)  :: a
+  class(psb_cspmat_type), intent(out) :: b
 
   Integer :: err_act, info
   character(len=20)  :: name='transc'
@@ -1679,22 +1679,22 @@ subroutine psb_c_transc_2mat(a,b)
 
 
   call psb_erractionsave(err_act)
-  if (b%is_null()) then 
+  if (a%is_null()) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 #if defined(HAVE_MOLD)
-  allocate(a%a,mold=b%a,stat=info)
+  allocate(b%a,mold=a%a,stat=info)
 #else
-  call b%a%mold(a%a,info)
+  call a%a%mold(b%a,info)
 #endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
-  call a%a%transc(b%a)    
+  call a%a%transc_2mat(b%a)    
 
   call psb_erractionrestore(err_act)
   return
