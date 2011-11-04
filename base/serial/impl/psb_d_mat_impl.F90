@@ -1035,12 +1035,6 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   endif
 
-  if (present(dupl)) then 
-    call b%set_dupl(dupl)
-  else if (a%is_bld()) then 
-    ! Does this make sense at all?? Who knows..
-    call b%set_dupl(psb_dupl_def_)
-  end if
 
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
@@ -1080,6 +1074,12 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
+  if (present(dupl)) then 
+    call altmp%set_dupl(dupl)
+  else if (a%is_bld()) then 
+    ! Does this make sense at all?? Who knows..
+    call altmp%set_dupl(psb_dupl_def_)
+  end if
   if (debug) write(psb_err_unit,*) 'Converting from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
@@ -1091,7 +1091,7 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  call move_alloc(altmp,b%a)
+  call move_alloc(altmp,b%a) 
   call b%set_asb() 
   call b%trim()
   call psb_erractionrestore(err_act)
