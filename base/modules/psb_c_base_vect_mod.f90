@@ -71,10 +71,12 @@ contains
     
   
   subroutine c_base_bld_n(x,n)
+    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_c_base_vect_type), intent(inout) :: x
     integer :: info
 
+    call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
   end subroutine c_base_bld_n

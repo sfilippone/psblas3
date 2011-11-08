@@ -114,7 +114,7 @@ contains
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
-    call wv%bld(n_col)
+    call wv%bld(n_col,mold=x%v)
     
     select case(prec%iprcparm(psb_f_type_))
     case(psb_f_ilu_n_) 
@@ -127,7 +127,14 @@ contains
              & beta,y,desc_data,info,&
              & trans=trans_,scale='U',choice=psb_none_, work=aux)
         
-      case('T','C')
+      case('T')
+        call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
+             & beta,y,desc_data,info,&
+           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+        
+      case('C')
         call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
@@ -147,7 +154,7 @@ contains
       goto 9999
     end select
     
-!!$    call psb_halo(y,desc_data,info,data=psb_comm_mov_)
+    call psb_halo(y,desc_data,info,data=psb_comm_mov_)
     
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
@@ -291,6 +298,7 @@ contains
     
     call psb_halo(y,desc_data,info,data=psb_comm_mov_)
     
+    call wv%free(info)
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
       else

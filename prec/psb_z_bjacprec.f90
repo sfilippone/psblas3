@@ -114,7 +114,7 @@ contains
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
-    call wv%bld(n_col)
+    call wv%bld(n_col,mold=x%v)
     
     select case(prec%iprcparm(psb_f_type_))
     case(psb_f_ilu_n_) 
@@ -155,8 +155,9 @@ contains
       goto 9999
     end select
     
-!!$    call psb_halo(y,desc_data,info,data=psb_comm_mov_)
+    call psb_halo(y,desc_data,info,data=psb_comm_mov_)
     
+    call wv%free(info)
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
       else
@@ -233,16 +234,6 @@ contains
       call psb_errpush(info,name,i_err=(/3,n_row,0,0,0/))
       goto 9999
     end if
-!!$    if (.not.allocated(prec%d)) then
-!!$      info = 1124
-!!$      call psb_errpush(info,name,a_err="preconditioner: D")
-!!$      goto 9999
-!!$    end if
-!!$    if (size(prec%d) < n_row) then
-!!$      info = 1124
-!!$      call psb_errpush(info,name,a_err="preconditioner: D")
-!!$      goto 9999
-!!$    end if
 
     
     if (n_col <= size(work)) then 

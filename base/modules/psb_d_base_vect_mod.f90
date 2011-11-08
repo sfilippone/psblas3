@@ -71,10 +71,12 @@ contains
     
   
   subroutine d_base_bld_n(x,n)
+    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_d_base_vect_type), intent(inout) :: x
     integer :: info
-
+    
+    call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
   end subroutine d_base_bld_n
@@ -218,15 +220,24 @@ contains
   end subroutine d_base_axpby_a
 
     
-  subroutine d_base_mlt_v(x, y, info)
+  subroutine d_base_mlt_v(x, y, info, xconj)
     use psi_serial_mod
+    use psb_string_mod
     implicit none 
-    class(psb_d_base_vect_type), intent(inout)  :: x
-    class(psb_d_base_vect_type), intent(inout)  :: y
-    integer, intent(out)              :: info    
-    integer :: i, n
+    class(psb_d_base_vect_type), intent(inout) :: x
+    class(psb_d_base_vect_type), intent(inout) :: y
+    integer, intent(out)                       :: info    
+    character, intent(in), optional            :: xconj
+    integer   :: i, n
+    character :: xconj_
 
     info = 0
+    if (present(xconj)) then 
+      xconj_ = (psb_toupper(xconj))
+    else
+      xconj_ = 'N'
+    end if
+
     select type(xx => x)
     type is (psb_d_base_vect_type)
       n = min(size(y%v), size(xx%v))

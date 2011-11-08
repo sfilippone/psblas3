@@ -103,7 +103,8 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
    
 
   case default
-    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
+         & map_kind, psb_map_aggr_, psb_map_gen_linear_
     info = 1
     return 
   end select
@@ -141,11 +142,10 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     ictxt = map%p_desc_Y%get_context()
     nr2   = map%p_desc_Y%get_global_rows()
     nc2   = map%p_desc_Y%get_local_cols() 
-    call psb_geall(yt,map%p_desc_Y,info)
-    call psb_geasb(yt,map%p_desc_Y,info,mold=y%v)
+    call yt%bld(nc2,mold=x%v)
     if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%map_X2Y,x,czero,yt,info)
-    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_Y)) then
+    if ((info == psb_success_) .and. map%p_desc_Y%is_repl()) then
       yta = yt
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
@@ -155,7 +155,7 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-    call psb_gefree(yt,map%p_desc_Y,info)
+    call yt%free(info)
 
   case(psb_map_gen_linear_)
 
@@ -165,15 +165,14 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     nr2   = map%desc_Y%get_global_rows()
     nc2   = map%desc_Y%get_local_cols() 
 
-    call psb_geall(xt,map%p_desc_X,info)
-    call psb_geasb(xt,map%p_desc_X,info,mold=x%v)    
-    call psb_geall(yt,map%p_desc_Y,info)
-    call psb_geasb(yt,map%p_desc_Y,info,mold=y%v)
+    call xt%bld(nc1,mold=x%v)
+    call yt%bld(nc2,mold=y%v)
+
     xta = x
     call xt%set(xta(1:nr1))
     if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%map_X2Y,xt,czero,yt,info)
-    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_Y)) then
+    if ((info == psb_success_) .and. map%desc_Y%is_repl()) then
       yta = yt
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
@@ -183,9 +182,9 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
-    call psb_gefree(xt,map%p_desc_Y,info)
-    call psb_gefree(yt,map%p_desc_Y,info)
+   
+    call xt%free(info)
+    call yt%free(info)
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
@@ -306,11 +305,10 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     ictxt = map%p_desc_X%get_context()
     nr2   = map%p_desc_X%get_global_rows()
     nc2   = map%p_desc_X%get_local_cols() 
-    call psb_geall(yt,map%p_desc_X,info)
-    call psb_geasb(yt,map%p_desc_X,info,mold=y%v)
+    call yt%bld(nc2,mold=y%v)
     if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%map_Y2X,x,czero,yt,info)
-    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_X)) then
+    if ((info == psb_success_) .and. map%p_desc_X%is_repl()) then
       yta = yt
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
@@ -320,7 +318,7 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-    call psb_gefree(yt,map%p_desc_Y,info)
+    call yt%free(info)
 
   case(psb_map_gen_linear_)
 
@@ -329,18 +327,14 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     nc1   = map%desc_Y%get_local_cols() 
     nr2   = map%desc_X%get_global_rows()
     nc2   = map%desc_X%get_local_cols() 
-
-    call psb_geall(xt,map%p_desc_Y,info)
-    call psb_geasb(xt,map%p_desc_Y,info,mold=x%v)    
-    call psb_geall(yt,map%p_desc_X,info)
-    call psb_geasb(yt,map%p_desc_X,info,mold=y%v)
-
+    call xt%bld(nc1,mold=x%v)
+    call yt%bld(nc2,mold=y%v)
     xta = x
     call xt%set(xta(1:nr1))
 
     if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(cone,map%map_Y2X,xt,czero,yt,info)
-    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_X)) then
+    if ((info == psb_success_) .and. map%desc_X%is_repl()) then
       yta = yt
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
@@ -351,8 +345,8 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
       info = -1
     end if
    
-    call psb_gefree(xt,map%p_desc_Y,info)
-    call psb_gefree(yt,map%p_desc_Y,info)
+    call xt%free(info)
+    call yt%free(info)
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'
