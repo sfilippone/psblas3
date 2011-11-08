@@ -156,6 +156,7 @@ contains
     
     call psb_halo(y,desc_data,info,data=psb_comm_mov_)
     
+    call wv%free(info)
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
       else
@@ -298,7 +299,6 @@ contains
     
     call psb_halo(y,desc_data,info,data=psb_comm_mov_)
     
-    call wv%free(info)
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
       else
