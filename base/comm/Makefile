@@ -19,7 +19,7 @@ lib: mpfobjs $(OBJS)
 
 
 mpfobjs: 
-	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")
+	$(MAKE) $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)"
 
 
 clean:
