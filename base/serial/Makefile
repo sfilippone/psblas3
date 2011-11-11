@@ -23,12 +23,12 @@ lib1:	$(FOBJS)
 
 
 auxd: 
-	(cd aux; $(MAKE) lib)
+	cd aux && $(MAKE) lib
 
 f77d:
-	(cd f77; $(MAKE) lib)
+	cd f77 && $(MAKE) lib
 impld:
-	(cd impl; $(MAKE) lib)
+	cd impl && $(MAKE) lib
 
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)

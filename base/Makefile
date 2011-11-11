@@ -11,17 +11,17 @@ lib: mods sr cm in pb tl
 sr cm in pb tl: mods
 
 mods:
-	(cd modules; $(MAKE) lib LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)")
+	cd modules && $(MAKE) lib LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)"
 sr:
-	(cd serial; $(MAKE) lib LIBNAME=$(BASELIBNAME))
+	cd serial && $(MAKE) lib LIBNAME=$(BASELIBNAME)
 cm:
-	(cd comm; $(MAKE) lib LIBNAME=$(BASELIBNAME))
+	cd comm && $(MAKE) lib LIBNAME=$(BASELIBNAME)
 in:
-	(cd internals; $(MAKE) lib LIBNAME=$(BASELIBNAME))
+	cd internals && $(MAKE) lib LIBNAME=$(BASELIBNAME)
 pb:
-	(cd psblas; $(MAKE) lib LIBNAME=$(BASELIBNAME))
+	cd psblas && $(MAKE) lib LIBNAME=$(BASELIBNAME)
 tl:
-	(cd tools; $(MAKE) lib LIBNAME=$(BASELIBNAME))
+	cd tools && $(MAKE) lib LIBNAME=$(BASELIBNAME)
 
 clean: 
 	(cd modules; $(MAKE) clean)

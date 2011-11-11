@@ -40,7 +40,7 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  penvmod  $(UTIL_MODS)  $(OBJS)  $(LIBDIR)/$(LIBNAME) 
+lib:  psb_penv_mod.o  $(UTIL_MODS)  $(OBJS)  $(LIBDIR)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
@@ -54,6 +54,7 @@ psb_realloc_mod.o:  psb_error_mod.o
 $(UTILS_MODS): $(BASIC_MODS)
 
 
+psi_comm_buffers_mod.o: psb_const_mod.o
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
 psb_penv_mod.o: psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
@@ -64,7 +65,7 @@ psb_s_base_mat_mod.o: psb_s_base_vect_mod.o
 psb_d_base_mat_mod.o: psb_d_base_vect_mod.o
 psb_c_base_mat_mod.o: psb_c_base_vect_mod.o
 psb_z_base_mat_mod.o: psb_z_base_vect_mod.o
-psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o
+psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o psb_realloc_mod.o
 psb_s_mat_mod.o: psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_vect_mod.o
 psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_vect_mod.o
 psb_c_mat_mod.o: psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o psb_c_vect_mod.o
@@ -88,12 +89,13 @@ psb_desc_type.o: psb_penv_mod.o psb_realloc_mod.o\
 	  psb_hash_mod.o psb_hash_map_mod.o psb_list_map_mod.o \
 	  psb_repl_map_mod.o psb_gen_block_map_mod.o psb_desc_const_mod.o\
 	  psb_indx_map_mod.o 
-psb_indx_map_mod.o: psb_desc_const_mod.o
+psb_indx_map_mod.o: psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o
 psb_hash_map_mod.o psb_list_map_mod.o psb_repl_map_mod.o psb_gen_block_map_mod.o:\
     psb_indx_map_mod.o psb_desc_const_mod.o  \
     psb_sort_mod.o psb_penv_mod.o 
 psb_glist_map_mod.o: psb_list_map_mod.o
 psb_hash_map_mod.o: psb_hash_mod.o psb_sort_mod.o
+psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
 psb_linmap_mod.o: psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o 
 psb_s_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_s_vect_mod.o
 psb_d_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_d_vect_mod.o
@@ -131,8 +133,8 @@ psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_type.o psb_mat_mod.o
 
 psb_base_mod.o: $(MODULES)
 
-penvmod: $(BASIC_MODS)
-	($(MAKE) psb_penv_mod.o F90COPT="$(F90COPT) $(EXTRA_OPT)")
+psb_penv_mod.o: $(BASIC_MODS) psb_penv_mod.F90
+	$(F90) -c psb_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
 
 
 

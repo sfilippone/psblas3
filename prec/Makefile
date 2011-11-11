@@ -44,10 +44,10 @@ psb_s_prec_type.o: psb_s_base_prec_mod.o
 psb_d_prec_type.o: psb_d_base_prec_mod.o
 psb_c_prec_type.o: psb_c_base_prec_mod.o
 psb_z_prec_type.o: psb_z_base_prec_mod.o
-psb_s_prec_mod.o:  psb_s_prec_type.o
-psb_d_prec_mod.o:  psb_d_prec_type.o
-psb_c_prec_mod.o:  psb_c_prec_type.o
-psb_z_prec_mod.o:  psb_z_prec_type.o
+psb_s_prec_mod.o:  psb_prec_type.o
+psb_d_prec_mod.o:  psb_prec_type.o
+psb_c_prec_mod.o:  psb_prec_type.o
+psb_z_prec_mod.o:  psb_prec_type.o
 psb_prec_type.o: psb_s_prec_type.o psb_d_prec_type.o psb_c_prec_type.o psb_z_prec_type.o
 psb_prec_mod.o: psb_s_prec_mod.o psb_d_prec_mod.o psb_c_prec_mod.o psb_z_prec_mod.o 
 psb_s_bjacprec.o psb_s_diagprec.o psb_s_nullprec.o: psb_prec_mod.o psb_s_base_prec_mod.o 

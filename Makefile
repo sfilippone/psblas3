@@ -12,15 +12,15 @@ kryld: precd based
 libd:
 	(if test ! -d lib ; then mkdir lib; fi)
 based:
-	(cd base; $(MAKE) lib)
+	cd base && $(MAKE) lib
 precd:
-	(cd prec; $(MAKE) lib )
+	cd prec && $(MAKE) lib
 kryld:
-	(cd krylov; $(MAKE) lib)
+	cd krylov && $(MAKE) lib
 utild:
-	(cd util; $(MAKE) lib )
+	cd util&& $(MAKE) lib 
 
-install:
+install: all
 	(./mkdir.sh  $(INSTALL_DIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_DIR))
 	(./mkdir.sh  $(INSTALL_LIBDIR) &&\
