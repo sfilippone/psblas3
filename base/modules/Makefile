@@ -57,7 +57,7 @@ $(UTILS_MODS): $(BASIC_MODS)
 psi_comm_buffers_mod.o: psb_const_mod.o
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
-psb_penv_mod.o: psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
+
 
 psb_base_mat_mod.o: psi_serial_mod.o
 psb_s_base_mat_mod.o psb_d_base_mat_mod.o psb_c_base_mat_mod.o psb_z_base_mat_mod.o: psb_base_mat_mod.o
@@ -133,9 +133,11 @@ psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_type.o psb_mat_mod.o
 
 psb_base_mod.o: $(MODULES)
 
-psb_penv_mod.o: $(BASIC_MODS) psb_penv_mod.F90
+psb_penv_mod.o: basic_mods psb_penv_mod.F90 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
 	$(F90) -c psb_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
 
+basic_mods:
+	$(MAKE) $(BASIC_MODS)
 
 
 clean:
