@@ -136,8 +136,7 @@ psb_base_mod.o: $(MODULES)
 psb_penv_mod.o: basic_mods psb_penv_mod.F90 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
 	$(F90) -c psb_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
 
-basic_mods:
-	$(MAKE) $(BASIC_MODS)
+basic_mods: $(BASIC_MODS)
 
 
 clean:
