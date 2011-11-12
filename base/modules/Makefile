@@ -1,14 +1,14 @@
 include ../../Make.inc
 
 BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
+COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o
 UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
         psb_gen_block_map_mod.o psb_list_map_mod.o psb_repl_map_mod.o\
         psb_glist_map_mod.o psb_hash_map_mod.o \
 	psb_desc_type.o psb_sort_mod.o psb_serial_mod.o \
 	psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
-	psb_penv_mod.o psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
-	psi_reduce_mod.o psi_p2p_mod.o psb_error_impl.o \
+	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
 	psb_linmap_type_mod.o psb_linmap_mod.o \
 	psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o \
 	psb_comm_mod.o psb_i_comm_mod.o psb_s_comm_mod.o psb_d_comm_mod.o\
@@ -32,7 +32,6 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
-
 LIBMOD=psb_base_mod$(.mod)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
 LIBDIR=..
@@ -40,7 +39,7 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  psb_penv_mod.o  $(UTIL_MODS)  $(OBJS)  $(LIBDIR)/$(LIBNAME) 
+lib:  $(MODULES)  $(OBJS)  $(LIBDIR)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
@@ -133,10 +132,8 @@ psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_type.o psb_mat_mod.o
 
 psb_base_mod.o: $(MODULES)
 
-psb_penv_mod.o: basic_mods psb_penv_mod.F90 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
+psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
 	$(F90) -c psb_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
-
-basic_mods: $(BASIC_MODS)
 
 
 clean:
