@@ -276,8 +276,11 @@ contains
              & trans=trans_,scale='U',choice=psb_none_,work=aux)
         
       case('C')
+!!$        call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
+!!$             & trans=trans_,scale='L',diag=conjg(prec%dv%v%v),choice=psb_none_, work=aux)
         call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
-             & trans=trans_,scale='L',diag=conjg(prec%dv%v%v),choice=psb_none_, work=aux)
+             & trans=trans_,scale='L',choice=psb_none_, work=aux)
+        ww(1:n_row) = ww(1:n_row)*conjg(prec%dv%v%v(1:n_row))
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,&
              & beta,y,desc_data,info,&
              & trans=trans_,scale='U',choice=psb_none_,work=aux)

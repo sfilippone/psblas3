@@ -34,9 +34,9 @@ module psb_z_prec_mod
   use psb_z_prec_type
 
   interface psb_precbld
-    subroutine psb_zprecbld(a,desc_a,prec,info,upd,mold,afmt)
+    subroutine psb_zprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type,&
-           & psb_z_base_sparse_mat, psb_dpk_
+           & psb_z_base_sparse_mat, psb_dpk_, psb_z_base_vect_type
       use psb_prec_type, only : psb_zprec_type
       implicit none
       type(psb_zspmat_type), intent(in), target  :: a
@@ -44,8 +44,9 @@ module psb_z_prec_mod
       type(psb_zprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
-      character(len=*), intent(in), optional    :: afmt
-      class(psb_z_base_sparse_mat), intent(in), optional :: mold
+      character(len=*), intent(in), optional     :: afmt
+      class(psb_z_base_sparse_mat), intent(in), optional :: amold
+      class(psb_z_base_vect_type), intent(in), optional  :: vmold
     end subroutine psb_zprecbld
   end interface
 

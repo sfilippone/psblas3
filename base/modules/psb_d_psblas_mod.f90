@@ -341,8 +341,8 @@ module psb_d_psblas_mod
       use psb_d_vect_mod, only : psb_d_vect_type
       use psb_mat_mod, only : psb_dspmat_type
       type(psb_dspmat_type), intent(inout)   :: t
-      type(psb_d_vect_type), intent(inout)       :: x
-      type(psb_d_vect_type), intent(inout)       :: y
+      type(psb_d_vect_type), intent(inout)   :: x
+      type(psb_d_vect_type), intent(inout)   :: y
       real(psb_dpk_), intent(in)             :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
       character, optional, intent(in)        :: trans, scale

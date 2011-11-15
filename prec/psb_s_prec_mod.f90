@@ -34,9 +34,9 @@ module psb_s_prec_mod
   use psb_s_prec_type
 
   interface psb_precbld
-    subroutine psb_sprecbld(a,desc_a,prec,info,upd,mold,afmt)
+    subroutine psb_sprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type,&
-           & psb_s_base_sparse_mat, psb_spk_
+           & psb_s_base_sparse_mat, psb_spk_, psb_s_base_vect_type
       use psb_prec_type, only : psb_sprec_type
       implicit none
       type(psb_sspmat_type), intent(in), target  :: a
@@ -44,8 +44,10 @@ module psb_s_prec_mod
       type(psb_sprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
-      character(len=*), intent(in), optional    :: afmt
-      class(psb_s_base_sparse_mat), intent(in), optional :: mold
+      character(len=*), intent(in), optional     :: afmt
+      class(psb_s_base_sparse_mat), intent(in), optional :: amold
+      class(psb_s_base_vect_type), intent(in), optional  :: vmold
+
     end subroutine psb_sprecbld
   end interface
 

@@ -52,10 +52,10 @@ psb_error_mod.o: psb_const_mod.o
 psb_realloc_mod.o:  psb_error_mod.o
 $(UTILS_MODS): $(BASIC_MODS)
 
-
 psi_comm_buffers_mod.o: psb_const_mod.o
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
+
 
 psb_ip_reord_mod.o psi_serial_mod.o psb_sort_mod.o: $(BASIC_MODS)
 psb_base_mat_mod.o: psi_serial_mod.o
@@ -132,8 +132,24 @@ psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_type.o psb_mat_mod.o
 
 psb_base_mod.o: $(MODULES)
 
+psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 
+	$(F90) -c psi_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
 	$(F90) -c psb_penv_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
+psi_comm_buffers_mod.o: psi_comm_buffers_mod.F90 $(BASIC_MODS)
+	$(F90) -c psi_comm_buffers_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
+psi_p2p_mod.o: psi_p2p_mod.F90 $(BASIC_MODS) 
+	$(F90) -c psi_p2p_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
+psi_bcast_mod.o: psi_bcast_mod.F90 $(BASIC_MODS) 
+	$(F90) -c psi_bcast_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
+psi_reduce_mod.o: psi_reduce_mod.F90 $(BASIC_MODS)
+	$(F90) -c psi_reduce_mod.F90  $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT)
+
 
 
 clean:

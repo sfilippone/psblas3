@@ -134,7 +134,7 @@ contains
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
              & beta,y,desc_data,info,&
            & trans=trans_,scale='U',choice=psb_none_,work=aux)
-        
+
       case('C')
         call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
@@ -143,6 +143,7 @@ contains
            & trans=trans_,scale='U',choice=psb_none_,work=aux)
         
       end select
+
       if (info /= psb_success_) then 
         ch_err="psb_spsm"
         goto 9999
@@ -278,7 +279,14 @@ contains
              & beta,y,desc_data,info,&
              & trans=trans_,scale='U',choice=psb_none_, work=aux)
         
-      case('T','C')
+      case('T')
+        call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,ww,desc_data,info,&
+             & trans=trans_,scale='L',diag=prec%dv%v%v,choice=psb_none_, work=aux)
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,&
+             & beta,y,desc_data,info,&
+             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+        
+      case('C')
         call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,ww,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%dv%v%v,choice=psb_none_, work=aux)
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,&
