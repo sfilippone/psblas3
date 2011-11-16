@@ -20,7 +20,7 @@ kryld:
 utild:
 	cd util&& $(MAKE) lib 
 
-install: 
+install: all
 	(./mkdir.sh  $(INSTALL_DIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_DIR))
 	(./mkdir.sh  $(INSTALL_LIBDIR) &&\
