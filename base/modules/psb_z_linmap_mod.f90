@@ -100,6 +100,10 @@ module psb_z_linmap_mod
     module procedure psb_set_zmap_kind
   end interface
 
+  interface psb_map_cscnv
+    module procedure psb_z_map_cscnv
+  end interface
+
   interface psb_is_asb_map
     module procedure psb_is_asb_zlinmap
   end interface
@@ -149,6 +153,20 @@ contains
     map%itd_data(psb_map_kind_) = map_kind
 
   end subroutine psb_set_zmap_kind
+
+  subroutine psb_z_map_cscnv(map,info,type,mold)    
+    use psb_mat_mod
+    implicit none
+    type(psb_zlinmap_type), intent(inout)  :: map
+    integer, intent(out)                   :: info
+    character(len=*), intent(in), optional :: type
+    class(psb_z_base_sparse_mat), intent(in), optional :: mold
+
+    call map%map_X2Y%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_)&
+         & call map%map_Y2X%cscnv(info,type=type,mold=mold)
+
+  end subroutine psb_z_map_cscnv
 
   function psb_is_asb_zlinmap(map) result(this)
     use psb_descriptor_type

@@ -11,9 +11,10 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 DBOBJS=dpsbench.o   	
 DTOBJS=d_file_spmv.o   	
 STOBJS=s_file_spmv.o   	
+DPGOBJS=pdgenspmv.o
 EXEDIR=./runs
 
-all: d_file_spmv s_file_spmv 
+all: d_file_spmv s_file_spmv pdgenspmv
 
 
 dpsbench: $(DBOBJS)
@@ -23,6 +24,10 @@ dpsbench: $(DBOBJS)
 d_file_spmv: $(DTOBJS)
 	$(F90LINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv d_file_spmv $(EXEDIR) 
+
+pdgenspmv: $(DPGOBJS)
+	$(F90LINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv pdgenspmv $(EXEDIR) 
 
 
 s_file_spmv: $(STOBJS)

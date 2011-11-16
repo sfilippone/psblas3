@@ -32,7 +32,7 @@
 subroutine psb_sprecbld(a,desc_a,p,info,upd,amold,afmt,vmold)
 
   use psb_base_mod
-  use psb_prec_mod, psb_protect_name => psb_sprecbld
+  use psb_s_prec_type
   Implicit None
 
   type(psb_sspmat_type), intent(in), target :: a

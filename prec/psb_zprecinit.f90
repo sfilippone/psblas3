@@ -32,7 +32,7 @@
 subroutine psb_zprecinit(p,ptype,info)
 
   use psb_base_mod
-  use psb_prec_mod, psb_protect_name => psb_zprecinit
+  use psb_z_prec_type
   use psb_z_nullprec, only : psb_z_null_prec_type
   use psb_z_diagprec, only : psb_z_diag_prec_type
   use psb_z_bjacprec, only : psb_z_bjac_prec_type
