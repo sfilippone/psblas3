@@ -488,10 +488,10 @@ contains
 
 
   subroutine d_vect_cnv(x,mold)
-    class(psb_d_vect_type), intent(inout) :: x
-    class(psb_d_base_vect_type), intent(in) :: mold
+    class(psb_d_vect_type), intent(inout)    :: x
+    class(psb_d_base_vect_type), intent(in)  :: mold
     class(psb_d_base_vect_type), allocatable :: tmp
-    real(psb_dpk_), allocatable          :: invect(:)
+    real(psb_dpk_), allocatable              :: invect(:)
     integer :: info
 
     allocate(tmp,stat=info,mold=mold)

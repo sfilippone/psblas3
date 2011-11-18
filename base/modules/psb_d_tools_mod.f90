@@ -76,24 +76,26 @@ Module psb_d_tools_mod
     subroutine psb_dasbv(x, desc_a, info)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       type(psb_desc_type), intent(in) ::  desc_a
-      real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
-      integer, intent(out)        ::  info
+      real(psb_dpk_), allocatable, intent(inout) :: x(:)
+      integer, intent(out)            ::  info
     end subroutine psb_dasbv
-    subroutine psb_dasb_vect(x, desc_a, info,mold)
+    subroutine psb_dasb_vect(x, desc_a, info,mold, scratch)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_d_vect_mod
-      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_desc_type), intent(in)      :: desc_a
       type(psb_d_vect_type), intent(inout) :: x
-      integer, intent(out)             ::  info
+      integer, intent(out)                 :: info
       class(psb_d_base_vect_type), intent(in), optional :: mold
+      logical, intent(in), optional        :: scratch
     end subroutine psb_dasb_vect
-    subroutine psb_dasb_vect_r2(x, desc_a, info,mold)
+    subroutine psb_dasb_vect_r2(x, desc_a, info,mold, scratch)
       use psb_descriptor_type, only : psb_desc_type, psb_dpk_
       use psb_d_vect_mod
-      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_desc_type), intent(in)      :: desc_a
       type(psb_d_vect_type), intent(inout) :: x(:)
-      integer, intent(out)             ::  info
+      integer, intent(out)                 :: info
       class(psb_d_base_vect_type), intent(in), optional :: mold
+      logical, intent(in), optional        :: scratch
     end subroutine psb_dasb_vect_r2
   end interface
 
