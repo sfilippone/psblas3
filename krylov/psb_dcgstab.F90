@@ -442,8 +442,6 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   Local data
   Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
-!!$  Real(psb_dpk_), Pointer  :: q(:),&
-!!$       & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   type(psb_d_vect_type) :: q, r, p, v, s, t, z, f
 
   Integer       :: itmax_, naux, mglob, it,itrace_,&
@@ -518,23 +516,14 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   End If
 
 
-  call psb_geall(q,desc_a,info) 
-  call psb_geall(r,desc_a,info)
-  call psb_geall(p,desc_a,info)
-  call psb_geall(v,desc_a,info)
-  call psb_geall(s,desc_a,info)
-  call psb_geall(t,desc_a,info)
-  call psb_geall(z,desc_a,info)
-  call psb_geall(f,desc_a,info)
-
-  call psb_geasb(q,desc_a,info,mold=x%v) 
-  call psb_geasb(r,desc_a,info,mold=x%v)
-  call psb_geasb(p,desc_a,info,mold=x%v)
-  call psb_geasb(v,desc_a,info,mold=x%v)
-  call psb_geasb(s,desc_a,info,mold=x%v)
-  call psb_geasb(t,desc_a,info,mold=x%v)
-  call psb_geasb(z,desc_a,info,mold=x%v)
-  call psb_geasb(f,desc_a,info,mold=x%v)
+  call psb_geasb(q,desc_a,info,mold=x%v,scratch=.true.) 
+  call psb_geasb(r,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(p,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(v,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(s,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(t,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(z,desc_a,info,mold=x%v,scratch=.true.)
+  call psb_geasb(f,desc_a,info,mold=x%v,scratch=.true.)
 
 
   if (psb_errstatus_fatal()) then 

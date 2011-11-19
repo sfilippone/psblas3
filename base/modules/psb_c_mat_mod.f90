@@ -109,6 +109,7 @@ module psb_c_mat_mod
     procedure, pass(a) :: c_cscnv_ip    => psb_c_cscnv_ip
     procedure, pass(a) :: c_cscnv_base  => psb_c_cscnv_base
     generic, public    :: cscnv         => c_cscnv, c_cscnv_ip, c_cscnv_base
+    procedure, pass(a) :: clone         => psb_cspmat_type_clone
     procedure, pass(a) :: reinit        => psb_c_reinit
     procedure, pass(a) :: print_i       => psb_c_sparse_print
     procedure, pass(a) :: print_n       => psb_c_n_sparse_print
