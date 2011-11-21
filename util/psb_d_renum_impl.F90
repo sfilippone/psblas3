@@ -1,3 +1,31 @@
+subroutine psb_d_mat_renums(alg,mat,info,perm)
+  use psb_base_mod
+  use psb_renum_mod, psb_protect_name => psb_d_mat_renums
+  implicit none 
+  character(len=*), intent(in) :: alg
+  type(psb_dspmat_type), intent(inout) :: mat
+  integer, intent(out) :: info
+  integer, allocatable, optional, intent(out) :: perm(:)
+  
+  integer            :: err_act, nr, nc, ialg
+  character(len=20)  :: name
+
+  info = psb_success_
+  name = 'mat_renum'
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+  select case (psb_toupper(alg))
+  case ('GPS')
+    ialg = psb_mat_renum_gps_
+  case ('AMD')
+    ialg = psb_mat_renum_amd_
+  case default
+    ialg = -1
+  end select
+  call psb_mat_renum(ialg,mat,info,perm)
+end subroutine psb_d_mat_renums
+  
 subroutine psb_d_mat_renum(alg,mat,info,perm)
   use psb_base_mod
   use psb_renum_mod, psb_protect_name => psb_d_mat_renum

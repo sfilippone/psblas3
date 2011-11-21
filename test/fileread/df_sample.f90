@@ -38,7 +38,7 @@ program df_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file,renum
 
   ! sparse matrices
   type(psb_dspmat_type) :: a, aux_a
@@ -140,7 +140,7 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_amd_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
