@@ -7,14 +7,22 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
   integer, intent(out) :: info
   integer, allocatable, optional, intent(out) :: perm(:)
   
-  integer :: err_act
-  character(len=20)           :: name
+  integer            :: err_act, nr, nc
+  character(len=20)  :: name
 
   info = psb_success_
   name = 'mat_renum'
   call psb_erractionsave(err_act)
 
   info = psb_success_
+  
+  nr = mat%get_nrows()
+  nc = mat%get_ncols()
+  if (nr /= nc) then 
+    info = psb_err_rectangular_mat_unsupported_
+    call psb_errpush(info,name,i_err=(/nr,nc,0,0,0/))
+    goto 9999
+  end if
 
   select case (alg)
   case(psb_mat_renum_gps_) 

@@ -178,6 +178,7 @@ module psb_const_mod
   integer, parameter, public :: psb_err_spmat_invalid_state_=600
   integer, parameter, public :: psb_err_missing_override_method_=700
   integer, parameter, public :: psb_err_invalid_dynamic_type_=701
+  integer, parameter, public :: psb_err_rectangular_mat_unsupported_=1120
   integer, parameter, public :: psb_err_invalid_mat_state_=1121
   integer, parameter, public :: psb_err_invalid_cd_state_=1122
   integer, parameter, public :: psb_err_invalid_a_and_cd_state_=1123
