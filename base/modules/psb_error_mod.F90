@@ -488,7 +488,8 @@ contains
       write(psb_err_unit,'("input argument n. ",i0," has a dynamic type not allowed here.")')&
            & i_e_d(1)
     case (psb_err_rectangular_mat_unsupported_)
-      write(psb_err_unit,'("This routine does not support rectangular matrices: ",i0, " /= ",i0)'), &
+      write(psb_err_unit,&
+           &'("This routine does not support rectangular matrices: ",i0, " /= ",i0)') &
            & i_e_d(1), i_e_d(2)
     case (psb_err_invalid_mat_state_)
       write(psb_err_unit,'("Invalid state for sparse matrix")')
