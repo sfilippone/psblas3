@@ -192,12 +192,12 @@ contains
     ! 
 #if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
     interface 
-      function psb_amd_interface(n,ap,ai,p)&
-           & result(res) bind(c,name='psb_amd_interface')
+      function psb_amd_order(n,ap,ai,p)&
+           & result(res) bind(c,name='psb_amd_order')
         use iso_c_binding
         integer(c_int) :: res, n
         integer(c_int) :: ap(*), ai(*), p(*)
-      end function psb_amd_interface
+      end function psb_amd_order
     end interface
 #endif
 
@@ -225,7 +225,7 @@ contains
 
     acsc%ia(:)  = acsc%ia(:) - 1
     acsc%icp(:) = acsc%icp(:) - 1
-    info = psb_amd_interface(nr,acsc%icp,acsc%ia,perm)
+    info = psb_amd_order(nr,acsc%icp,acsc%ia,perm)
     if (info /= psb_success_) then 
       info = psb_err_from_subroutine_
       call psb_errpush(info,name) 

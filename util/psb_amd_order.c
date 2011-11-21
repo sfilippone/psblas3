@@ -33,7 +33,7 @@
 #include "amd.h"
 #endif
 
-int psb_amd_interface(int n, int Ap[], int Ai[], int P[])
+int psb_amd_order(int n, int Ap[], int Ai[], int P[])
 { 
   int i;
 #ifdef HAVE_AMD_
