@@ -9152,6 +9152,7 @@ fi
 
 
 if test "x$pac_amd_header_ok" == "xyes" ; then
+      psblas_cv_amd_includes="$AMD_INCLUDES"
       AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
       LIBS="$AMD_LIBS -lm $LIBS";
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for amd_order in $AMD_LIBS" >&5
@@ -9282,6 +9283,7 @@ CPPFLAGS="$SAVE_CPPFLAGS";
 
 if test "x$psblas_cv_have_amd" == "xyes" ; then
    FDEFINES="$mld_cv_define_prepend-DHAVE_AMD $FDEFINES"
+   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
 fi
 
 

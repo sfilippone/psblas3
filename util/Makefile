@@ -17,7 +17,8 @@ IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 	psb_s_renum_impl.o psb_d_renum_impl.o \
 	psb_c_renum_impl.o psb_z_renum_impl.o 
 MODOBJS=psb_util_mod.o $(BASEOBJS)
-OBJS=$(MODOBJS) $(IMPLOBJS)
+COBJS=psb_amd_interface.o
+OBJS=$(MODOBJS) $(IMPLOBJS) $(COBJS)
 LIBMOD=psb_util_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)

@@ -684,6 +684,7 @@ fi
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
    FDEFINES="$mld_cv_define_prepend-DHAVE_AMD $FDEFINES"
+   CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
 fi
 
 

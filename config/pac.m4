@@ -1583,6 +1583,7 @@ fi
 
 
 if test "x$pac_amd_header_ok" == "xyes" ; then 
+      psblas_cv_amd_includes="$AMD_INCLUDES"
       AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
       LIBS="$AMD_LIBS -lm $LIBS";
       AC_MSG_CHECKING([for amd_order in $AMD_LIBS])
