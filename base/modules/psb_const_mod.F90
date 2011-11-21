@@ -194,6 +194,7 @@ module psb_const_mod
   integer, parameter, public :: psb_err_ja_nix_ia_niy_unsupported_=3030
   integer, parameter, public :: psb_err_ix_n1_iy_n1_unsupported_=3040
   integer, parameter, public :: psb_err_input_matrix_unassembled_=3110
+  integer, parameter, public :: psb_err_missing_aux_lib_=3999
   integer, parameter, public :: psb_err_alloc_dealloc_=4000
   integer, parameter, public :: psb_err_internal_error_=4001
   integer, parameter, public :: psb_err_from_subroutine_=4010

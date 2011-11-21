@@ -561,8 +561,13 @@ contains
     case(3112)
       write(psb_err_unit,&
            & '("Before you call this routine, you must build the preconditioner")')
-    case(3113:3999)
+    case(3113:3998)
       write(psb_err_unit,'("miscellaneus error. code: ",i0)')err_c
+    case(psb_err_missing_aux_lib_)
+      write(psb_err_unit,&
+           &'("This method requires an external support library.")')
+      write(psb_err_unit,&
+           &'("Fix configure and rebuild the software.")')
     case(psb_err_alloc_dealloc_)
       write(psb_err_unit,'("Allocation/deallocation error")')
     case(psb_err_internal_error_)

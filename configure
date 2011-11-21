@@ -615,6 +615,7 @@ PSBLASRULES
 FINCLUDES
 CINCLUDES
 METIS_LIBS
+AMD_LIBS
 INSTALL_DOCSDIR
 INSTALL_INCLUDEDIR
 INSTALL_LIBDIR
@@ -751,6 +752,10 @@ with_blas
 with_lapack
 with_rsb
 with_metis
+with_amd
+with_amddir
+with_amdincdir
+with_amdlibdir
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1421,6 +1426,11 @@ Optional Packages:
                           configure script invoke librsb-config)
   --with-metis=LIB        Specify -lMETISLIBNAME or the absolute library
                           filename.
+  --with-amd=LIBNAME      Specify the library name for AMD library. Default:
+                          "-lamd"
+  --with-amddir=DIR       Specify the directory for AMD library and includes.
+  --with-amdincdir=DIR    Specify the directory for AMD includes.
+  --with-amdlibdir=DIR    Specify the directory for AMD library.
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -2125,6 +2135,97 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_compile
+
+# ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
+# -------------------------------------------------------
+# Tests whether HEADER exists, giving a warning if it cannot be compiled using
+# the include files in INCLUDES and setting the cache variable VAR
+# accordingly.
+ac_fn_c_check_header_mongrel ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if eval \${$3+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 usability" >&5
+$as_echo_n "checking $2 usability... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_header_compiler=yes
+else
+  ac_header_compiler=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 presence" >&5
+$as_echo_n "checking $2 presence... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <$2>
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  ac_header_preproc=yes
+else
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in #((
+  yes:no: )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: $2: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: $2:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: $2: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+( $as_echo "## ---------------------------------------------- ##
+## Report this to salvatore.filippone@uniroma2.it ##
+## ---------------------------------------------- ##"
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=\$ac_header_compiler"
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+fi
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_header_mongrel
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -8954,6 +9055,236 @@ if test "x$psblas_cv_have_metis" == "xyes" ; then
 fi
 
 
+# Check whether --with-amd was given.
+if test "${with_amd+set}" = set; then :
+  withval=$with_amd; psblas_cv_amd=$withval
+else
+  psblas_cv_amd='-lamd'
+fi
+
+
+# Check whether --with-amddir was given.
+if test "${with_amddir+set}" = set; then :
+  withval=$with_amddir; psblas_cv_amddir=$withval
+else
+  psblas_cv_amddir=''
+fi
+
+
+# Check whether --with-amdincdir was given.
+if test "${with_amdincdir+set}" = set; then :
+  withval=$with_amdincdir; psblas_cv_amdincdir=$withval
+else
+  psblas_cv_amdincdir=''
+fi
+
+
+# Check whether --with-amdlibdir was given.
+if test "${with_amdlibdir+set}" = set; then :
+  withval=$with_amdlibdir; psblas_cv_amdlibdir=$withval
+else
+  psblas_cv_amdlibdir=''
+fi
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$psblas_cv_amddir" != "x"; then
+   AMD_LIBDIR="-L$psblas_cv_amddir"
+   LIBS="-L$psblas_cv_amddir $LIBS"
+   AMD_INCLUDES="-I$psblas_cv_amddir"
+   CPPFLAGS="$AMD_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_amdincdir" != "x"; then
+   AMD_INCLUDES="-I$psblas_cv_amdincdir"
+   CPPFLAGS="$AMD_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_amdlibdir" != "x"; then
+   LIBS="-L$psblas_cv_amdlibdir $LIBS"
+   AMD_LIBDIR="-L$psblas_cv_amdlibdir"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: amd dir $psblas_cv_amddir" >&5
+$as_echo "$as_me: amd dir $psblas_cv_amddir" >&6;}
+ac_fn_c_check_header_mongrel "$LINENO" "amd.h" "ac_cv_header_amd_h" "$ac_includes_default"
+if test "x$ac_cv_header_amd_h" = xyes; then :
+  pac_amd_header_ok=yes
+else
+  pac_amd_header_ok=no; AMD_INCLUDES=""
+fi
+
+
+if test "x$pac_amd_header_ok" == "xno" ; then
+  unset ac_cv_header_amd_h
+  AMD_INCLUDES="-I$psblas_cv_amddir/include -I$psblas_cv_amddir/Include "
+  CPPFLAGS="$AMD_INCLUDES $SAVE_CPPFLAGS"
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for amd_h in $AMD_INCLUDES" >&5
+$as_echo_n "checking for amd_h in $AMD_INCLUDES... " >&6; }
+ ac_fn_c_check_header_mongrel "$LINENO" "amd.h" "ac_cv_header_amd_h" "$ac_includes_default"
+if test "x$ac_cv_header_amd_h" = xyes; then :
+  pac_amd_header_ok=yes
+else
+  pac_amd_header_ok=no; AMD_INCLUDES=""
+fi
+
+
+fi
+if test "x$pac_amd_header_ok" == "xno" ; then
+   unset ac_cv_header_amd_h
+   AMD_INCLUDES="-I$psblas_cv_amddir/UFconfig -I$psblas_cv_amddir/AMD/Include -I$psblas_cv_amddir/AMD/Include"
+   CPPFLAGS="$AMD_INCLUDES $SAVE_CPPFLAGS"
+   ac_fn_c_check_header_mongrel "$LINENO" "amd.h" "ac_cv_header_amd_h" "$ac_includes_default"
+if test "x$ac_cv_header_amd_h" = xyes; then :
+  pac_amd_header_ok=yes
+else
+  pac_amd_header_ok=no; AMD_INCLUDES=""
+fi
+
+
+fi
+
+
+if test "x$pac_amd_header_ok" == "xyes" ; then
+      AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      LIBS="$AMD_LIBS -lm $LIBS";
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for amd_order in $AMD_LIBS" >&5
+$as_echo_n "checking for amd_order in $AMD_LIBS... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_order ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return amd_order ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  psblas_cv_have_amd=yes;pac_amd_lib_ok=yes;
+else
+  psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_amd_lib_ok" >&5
+$as_echo "$pac_amd_lib_ok" >&6; }
+     if test "x$pac_amd_lib_ok" == "xno" ; then
+                AMD_LIBDIR="-L$psblas_cv_amddir/Lib -L$psblas_cv_amddir/lib"
+        AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+        LIBS="$AMD_LIBS -lm $SAVE_LIBS"
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for amd_order in $AMD_LIBS" >&5
+$as_echo_n "checking for amd_order in $AMD_LIBS... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_order ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return amd_order ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  psblas_cv_have_amd=yes;pac_amd_lib_ok=yes;
+else
+  psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_amd_lib_ok" >&5
+$as_echo "$pac_amd_lib_ok" >&6; }
+     fi
+     if test "x$pac_amd_lib_ok" == "xno" ; then
+                AMD_LIBDIR="-L$psblas_cv_amddir/AMD/Lib -L$psblas_cv_amddir/AMD/Lib"
+        AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+        LIBS="$AMD_LIBS -lm $SAVE_LIBS"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for amd_order in $AMD_LIBS" >&5
+$as_echo_n "checking for amd_order in $AMD_LIBS... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_order ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return amd_order ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  psblas_cv_have_amd=yes;pac_amd_lib_ok=yes;
+else
+  psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_amd_lib_ok" >&5
+$as_echo "$pac_amd_lib_ok" >&6; }
+     fi
+fi
+LIBS="$SAVE_LIBS";
+CPPFLAGS="$SAVE_CPPFLAGS";
+
+if test "x$psblas_cv_have_amd" == "xyes" ; then
+   FDEFINES="$mld_cv_define_prepend-DHAVE_AMD $FDEFINES"
+fi
+
+
 
 # Note  : We would like to detect PSBLAS, but this is complicated by the
 #         module symbols mangling rules, which are compiler specific !
@@ -9009,7 +9340,7 @@ UTILLIBNAME=libpsb_util.a
 
 
 
-#AC_SUBST(BLACS_LIBS)
+
 
 
 
@@ -9018,7 +9349,7 @@ UTILLIBNAME=libpsb_util.a
 
 
 PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIBS) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 
@@ -10381,6 +10712,7 @@ fi
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
+	AMD detected          : ${psblas_cv_have_amd}
 
         LIBS                  : ${LIBS}
 
@@ -10413,6 +10745,7 @@ $as_echo "$as_me:
 	BLAS                  : ${BLAS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
+	AMD detected          : ${psblas_cv_have_amd}
 
         LIBS                  : ${LIBS}
 

@@ -1508,3 +1508,113 @@ fi
 cd ..
 rm -fr tmpdir_$i])
 
+
+dnl @synopsis PAC_CHECK_AMD
+dnl
+dnl Will try to find the AMD library and headers.
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_AMD,
+[AC_ARG_WITH(amd, AC_HELP_STRING([--with-amd=LIBNAME], [Specify the library name for AMD library. 
+Default: "-lamd"]),
+        [psblas_cv_amd=$withval],
+        [psblas_cv_amd='-lamd'])
+AC_ARG_WITH(amddir, AC_HELP_STRING([--with-amddir=DIR], [Specify the directory for AMD library and includes.]),
+        [psblas_cv_amddir=$withval],
+        [psblas_cv_amddir=''])
+AC_ARG_WITH(amdincdir, AC_HELP_STRING([--with-amdincdir=DIR], [Specify the directory for AMD includes.]),
+        [psblas_cv_amdincdir=$withval],
+        [psblas_cv_amdincdir=''])
+AC_ARG_WITH(amdlibdir, AC_HELP_STRING([--with-amdlibdir=DIR], [Specify the directory for AMD library.]),
+        [psblas_cv_amdlibdir=$withval],
+        [psblas_cv_amdlibdir=''])
+
+AC_LANG([C])
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$psblas_cv_amddir" != "x"; then 
+   AMD_LIBDIR="-L$psblas_cv_amddir"
+   LIBS="-L$psblas_cv_amddir $LIBS"
+   AMD_INCLUDES="-I$psblas_cv_amddir"
+   CPPFLAGS="$AMD_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_amdincdir" != "x"; then 
+   AMD_INCLUDES="-I$psblas_cv_amdincdir"
+   CPPFLAGS="$AMD_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_amdlibdir" != "x"; then 
+   LIBS="-L$psblas_cv_amdlibdir $LIBS"
+   AMD_LIBDIR="-L$psblas_cv_amdlibdir"
+fi
+
+AC_MSG_NOTICE([amd dir $psblas_cv_amddir])
+AC_CHECK_HEADER([amd.h],
+ [pac_amd_header_ok=yes],
+ [pac_amd_header_ok=no; AMD_INCLUDES=""])
+if test "x$pac_amd_header_ok" == "xno" ; then
+dnl Maybe Include or include subdirs? 
+  unset ac_cv_header_amd_h
+  AMD_INCLUDES="-I$psblas_cv_amddir/include -I$psblas_cv_amddir/Include "
+  CPPFLAGS="$AMD_INCLUDES $SAVE_CPPFLAGS"
+
+ AC_MSG_CHECKING([for amd_h in $AMD_INCLUDES])
+ AC_CHECK_HEADER([amd.h],
+    [pac_amd_header_ok=yes],
+    [pac_amd_header_ok=no; AMD_INCLUDES=""])
+fi
+if test "x$pac_amd_header_ok" == "xno" ; then
+dnl Maybe new structure with AMD UFconfig AMD? 
+   unset ac_cv_header_amd_h
+   AMD_INCLUDES="-I$psblas_cv_amddir/UFconfig -I$psblas_cv_amddir/AMD/Include -I$psblas_cv_amddir/AMD/Include"
+   CPPFLAGS="$AMD_INCLUDES $SAVE_CPPFLAGS"
+   AC_CHECK_HEADER([amd.h],
+     [pac_amd_header_ok=yes],
+     [pac_amd_header_ok=no; AMD_INCLUDES=""])
+fi
+
+
+if test "x$pac_amd_header_ok" == "xyes" ; then 
+      AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+      LIBS="$AMD_LIBS -lm $LIBS";
+      AC_MSG_CHECKING([for amd_order in $AMD_LIBS])
+      AC_TRY_LINK_FUNC(amd_order, 
+       [psblas_cv_have_amd=yes;pac_amd_lib_ok=yes; ],
+       [psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""])
+      AC_MSG_RESULT($pac_amd_lib_ok)
+     if test "x$pac_amd_lib_ok" == "xno" ; then 
+        dnl Maybe Lib or lib? 
+        AMD_LIBDIR="-L$psblas_cv_amddir/Lib -L$psblas_cv_amddir/lib"
+        AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+        LIBS="$AMD_LIBS -lm $SAVE_LIBS"
+        
+      AC_MSG_CHECKING([for amd_order in $AMD_LIBS])
+      AC_TRY_LINK_FUNC(amd_order, 
+       [psblas_cv_have_amd=yes;pac_amd_lib_ok=yes; ],
+       [psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""])
+      AC_MSG_RESULT($pac_amd_lib_ok)
+     fi
+     if test "x$pac_amd_lib_ok" == "xno" ; then 
+        dnl Maybe AMD/Lib? 
+        AMD_LIBDIR="-L$psblas_cv_amddir/AMD/Lib -L$psblas_cv_amddir/AMD/Lib"
+        AMD_LIBS="$psblas_cv_amd $AMD_LIBDIR"
+        LIBS="$AMD_LIBS -lm $SAVE_LIBS"
+      AC_MSG_CHECKING([for amd_order in $AMD_LIBS])
+      AC_TRY_LINK_FUNC(amd_order, 
+       [psblas_cv_have_amd=yes;pac_amd_lib_ok=yes; ],
+       [psblas_cv_have_amd=no;pac_amd_lib_ok=no; AMD_LIBS=""])
+      AC_MSG_RESULT($pac_amd_lib_ok)
+     fi
+fi
+LIBS="$SAVE_LIBS";
+CPPFLAGS="$SAVE_CPPFLAGS";
+])dnl 
+

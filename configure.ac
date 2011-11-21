@@ -681,6 +681,11 @@ if test "x$psblas_cv_have_metis" == "xyes" ; then
   FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_METIS"
 fi
 
+PAC_CHECK_AMD
+if test "x$psblas_cv_have_amd" == "xyes" ; then 
+   FDEFINES="$mld_cv_define_prepend-DHAVE_AMD $FDEFINES"
+fi
+
 
 
 # Note  : We would like to detect PSBLAS, but this is complicated by the
@@ -737,7 +742,7 @@ AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 
 AC_SUBST(BLAS_LIBS)
-#AC_SUBST(BLACS_LIBS)
+AC_SUBST(AMD_LIBS)
 AC_SUBST(METIS_LIBS)
 AC_SUBST(LAPACK_LIBS)
 
@@ -746,7 +751,7 @@ AC_SUBST(FINCLUDES)
 
 
 PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(AMD_LIBS) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 	
@@ -807,6 +812,7 @@ dnl	ESSL/PESSL            : ${psblas_cv_have_essl} / ${psblas_cv_have_pessl}
 dnl	BLACS                 : ${BLACS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
+	AMD detected          : ${psblas_cv_have_amd}
 dnl	SuperLU detected      : ${psblas_cv_have_superlu}
 dnl	SuperLU_Dist detected : ${psblas_cv_have_superludist}
 dnl	UMFPack detected      : ${psblas_cv_have_umfpack}
