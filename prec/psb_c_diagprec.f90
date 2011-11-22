@@ -16,12 +16,13 @@ module psb_c_diagprec
     procedure, pass(prec) :: precfree  => psb_c_diag_precfree
     procedure, pass(prec) :: precdescr => psb_c_diag_precdescr
     procedure, pass(prec) :: sizeof    => psb_c_diag_sizeof
+    procedure, pass(prec) :: get_nzeros => psb_c_diag_get_nzeros
   end type psb_c_diag_prec_type
 
   private :: psb_c_diag_apply, psb_c_diag_precbld, psb_c_diag_precseti,&
        & psb_c_diag_precsetr, psb_c_diag_precsetc, psb_c_diag_sizeof,&
        & psb_c_diag_precinit, psb_c_diag_precfree, psb_c_diag_precdescr,&
-       & psb_c_diag_apply_vect
+       & psb_c_diag_apply_vect, psb_c_diag_get_nzeros
   
 
 contains
@@ -464,7 +465,7 @@ contains
   end subroutine psb_c_diag_precdescr
 
   function psb_c_diag_sizeof(prec) result(val)
-    use psb_base_mod
+    use psb_base_mod, only : psb_long_int_k_
     class(psb_c_diag_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     
@@ -472,5 +473,16 @@ contains
     val = val + 2*psb_sizeof_sp * size(prec%d)
     return
   end function psb_c_diag_sizeof
+
+  function psb_c_diag_get_nzeros(prec) result(val)
+    use psb_base_mod, only: psb_long_int_k_
+    class(psb_c_diag_prec_type), intent(in) :: prec
+    integer(psb_long_int_k_) :: val
+
+    val = 0
+    if (allocated(prec%dv)) val = val + prec%dv%get_nrows()
+    return
+  end function psb_c_diag_get_nzeros
+
 
 end module psb_c_diagprec

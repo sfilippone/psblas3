@@ -61,13 +61,14 @@ module psb_c_base_prec_mod
     procedure, pass(prec) :: precfree  => psb_c_base_precfree
     procedure, pass(prec) :: precdescr => psb_c_base_precdescr
     procedure, pass(prec) :: dump      => psb_c_base_precdump
+    procedure, pass(prec) :: get_nzeros => psb_c_base_get_nzeros
   end type psb_c_base_prec_type
   
   private :: psb_c_base_apply, psb_c_base_precbld, psb_c_base_precseti,&
        & psb_c_base_precsetr, psb_c_base_precsetc, psb_c_base_sizeof,&
        & psb_c_base_precinit, psb_c_base_precfree, psb_c_base_precdescr,&
        & psb_c_base_precdump, psb_c_base_set_ctxt, psb_c_base_get_ctxt, &
-       & psb_c_base_apply_vect
+       & psb_c_base_apply_vect, psb_c_base_get_nzeros
   
 contains
 
@@ -443,5 +444,13 @@ contains
     val = prec%ictxt
     return
   end function psb_c_base_get_ctxt
+
+  function psb_c_base_get_nzeros(prec) result(res)
+    class(psb_c_base_prec_type), intent(in) :: prec
+    integer(psb_long_int_k_) :: res
+    
+    res = 0
+
+  end function psb_c_base_get_nzeros
 
 end module psb_c_base_prec_mod
