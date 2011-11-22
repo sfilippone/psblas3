@@ -38,7 +38,7 @@ int psb_amd_order(int n, int Ap[], int Ai[], int P[])
   int i;
 #ifdef HAVE_AMD_
   i= amd_order(n,Ap,Ai, P,(double *)NULL, (double *)NULL);
-  if ((i==AMD_OK)||(AMD_OK_BUT_JUMBLED)) return(0);
+  if ((i==AMD_OK)||(i==AMD_OK_BUT_JUMBLED)) return(0);
 #endif
   return(-1);
 }

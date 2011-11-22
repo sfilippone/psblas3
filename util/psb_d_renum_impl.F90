@@ -188,14 +188,15 @@ contains
     type(psb_dspmat_type), intent(inout) :: a
     integer, intent(out) :: info
     integer, allocatable, optional, intent(out) :: operm(:)
-       
+
     ! 
 #if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
     interface 
       function psb_amd_order(n,ap,ai,p)&
            & result(res) bind(c,name='psb_amd_order')
         use iso_c_binding
-        integer(c_int) :: res, n
+        integer(c_int) :: res
+        integer(c_int), value :: n
         integer(c_int) :: ap(*), ai(*), p(*)
       end function psb_amd_order
     end interface
@@ -204,10 +205,10 @@ contains
     type(psb_d_csc_sparse_mat)  :: acsc
     class(psb_d_base_sparse_mat), allocatable :: aa
     type(psb_d_coo_sparse_mat)  :: acoo
-    
+
     integer :: err_act
     character(len=20)           :: name
-    integer :: i, j, k, ideg, nr, ibw, ipf, idpth
+    integer :: i, j, k, ideg, nr, ibw, ipf, idpth, nz
 
     info = psb_success_
     name = 'mat_renum_amd'
@@ -216,24 +217,32 @@ contains
 #if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
 
     info = psb_success_
-    nr = a%get_nrows()
-    allocate(perm(nr))
-
-    call a%mold(aa)
-    call a%mv_to(aa)
-    call aa%mv_to_fmt(acsc,info)
-
-    acsc%ia(:)  = acsc%ia(:) - 1
-    acsc%icp(:) = acsc%icp(:) - 1
-    info = psb_amd_order(nr,acsc%icp,acsc%ia,perm)
-    if (info /= psb_success_) then 
-      info = psb_err_from_subroutine_
+    nr   = a%get_nrows()
+    nz   = a%get_nzeros()
+    allocate(perm(nr),stat=info)
+    if (info /= 0) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name) 
       goto 9999
     end if
-    perm(:)     = perm(:) + 1
+
+
+    allocate(aa, mold=a%a)
+    call a%mv_to(acsc)
+
     acsc%ia(:)  = acsc%ia(:) - 1
     acsc%icp(:) = acsc%icp(:) - 1
+
+    info = psb_amd_order(nr,acsc%icp,acsc%ia,perm)
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_amd_order') 
+      goto 9999
+    end if
+
+    perm(:)     = perm(:) + 1
+    acsc%ia(:)  = acsc%ia(:) + 1
+    acsc%icp(:) = acsc%icp(:) + 1
 
     call acsc%mv_to_coo(acoo,info)
     do i=1, acoo%get_nzeros()
@@ -254,9 +263,9 @@ contains
       end if
       operm(1:nr) = perm(1:nr)
     end if
-    
+
     deallocate(aa,perm)
-    
+
 #else 
 
     info = psb_err_missing_aux_lib_
