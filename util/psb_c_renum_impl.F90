@@ -1,3 +1,31 @@
+subroutine psb_c_mat_renums(alg,mat,info,perm)
+  use psb_base_mod
+  use psb_renum_mod, psb_protect_name => psb_c_mat_renums
+  implicit none 
+  character(len=*), intent(in) :: alg
+  type(psb_cspmat_type), intent(inout) :: mat
+  integer, intent(out) :: info
+  integer, allocatable, optional, intent(out) :: perm(:)
+  
+  integer            :: err_act, nr, nc, ialg
+  character(len=20)  :: name
+
+  info = psb_success_
+  name = 'mat_renum'
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+  select case (psb_toupper(alg))
+  case ('GPS')
+    ialg = psb_mat_renum_gps_
+  case ('AMD')
+    ialg = psb_mat_renum_amd_
+  case default
+    ialg = -1
+  end select
+  call psb_mat_renum(ialg,mat,info,perm)
+end subroutine psb_c_mat_renums
+  
 subroutine psb_c_mat_renum(alg,mat,info,perm)
   use psb_base_mod
   use psb_renum_mod, psb_protect_name => psb_c_mat_renum
@@ -7,19 +35,31 @@ subroutine psb_c_mat_renum(alg,mat,info,perm)
   integer, intent(out) :: info
   integer, allocatable, optional, intent(out) :: perm(:)
   
-  integer :: err_act
-  character(len=20)           :: name
+  integer            :: err_act, nr, nc
+  character(len=20)  :: name
 
   info = psb_success_
   name = 'mat_renum'
   call psb_erractionsave(err_act)
 
   info = psb_success_
+  
+  nr = mat%get_nrows()
+  nc = mat%get_ncols()
+  if (nr /= nc) then 
+    info = psb_err_rectangular_mat_unsupported_
+    call psb_errpush(info,name,i_err=(/nr,nc,0,0,0/))
+    goto 9999
+  end if
 
   select case (alg)
   case(psb_mat_renum_gps_) 
 
     call psb_mat_renum_gps(mat,info,perm)
+
+  case(psb_mat_renum_amd_) 
+
+    call psb_mat_renum_amd(mat,info,perm)
 
   case default
     info = psb_err_input_value_invalid_i_
@@ -138,5 +178,162 @@ contains
     return
   end subroutine psb_mat_renum_gps
 
+
+  subroutine psb_mat_renum_amd(a,info,operm)
+#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+    use iso_c_binding
+#endif
+    use psb_base_mod    
+    implicit none 
+    type(psb_cspmat_type), intent(inout) :: a
+    integer, intent(out) :: info
+    integer, allocatable, optional, intent(out) :: operm(:)
+
+    ! 
+#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+    interface 
+      function psb_amd_order(n,ap,ai,p)&
+           & result(res) bind(c,name='psb_amd_order')
+        use iso_c_binding
+        integer(c_int) :: res
+        integer(c_int), value :: n
+        integer(c_int) :: ap(*), ai(*), p(*)
+      end function psb_amd_order
+    end interface
+#endif
+
+    type(psb_c_csc_sparse_mat)  :: acsc
+    class(psb_c_base_sparse_mat), allocatable :: aa
+    type(psb_c_coo_sparse_mat)  :: acoo
+
+    integer :: err_act
+    character(len=20)           :: name
+    integer :: i, j, k, ideg, nr, ibw, ipf, idpth, nz
+
+    info = psb_success_
+    name = 'mat_renum_amd'
+    call psb_erractionsave(err_act)
+
+#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+
+    info = psb_success_
+    nr   = a%get_nrows()
+    nz   = a%get_nzeros()
+    allocate(perm(nr),stat=info)
+    if (info /= 0) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name) 
+      goto 9999
+    end if
+
+
+    allocate(aa, mold=a%a)
+    call a%mv_to(acsc)
+
+    acsc%ia(:)  = acsc%ia(:) - 1
+    acsc%icp(:) = acsc%icp(:) - 1
+
+    info = psb_amd_order(nr,acsc%icp,acsc%ia,perm)
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_amd_order') 
+      goto 9999
+    end if
+
+    perm(:)     = perm(:) + 1
+    acsc%ia(:)  = acsc%ia(:) + 1
+    acsc%icp(:) = acsc%icp(:) + 1
+
+    call acsc%mv_to_coo(acoo,info)
+    do i=1, acoo%get_nzeros()
+      acoo%ia(i) = perm(acoo%ia(i))
+      acoo%ja(i) = perm(acoo%ja(i))
+    end do
+    call acoo%fix(info) 
+
+    ! Get back to where we started from
+    call aa%mv_from_coo(acoo,info)
+    call a%mv_from(aa)
+    if (present(operm)) then 
+      call psb_realloc(nr,operm,info)
+      if (info /= psb_success_) then 
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info,name) 
+        goto 9999
+      end if
+      operm(1:nr) = perm(1:nr)
+    end if
+
+    deallocate(aa,perm)
+
+#else 
+
+    info = psb_err_missing_aux_lib_
+    call psb_errpush(info, name) 
+    goto 9999
+#endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psb_mat_renum_amd
+
 end subroutine psb_c_mat_renum
 
+
+subroutine psb_c_cmp_bwpf(mat,bwl,bwu,prf,info)
+  use psb_base_mod
+  use psb_renum_mod, psb_protect_name => psb_c_cmp_bwpf
+  implicit none 
+  type(psb_cspmat_type), intent(in) :: mat
+  integer, intent(out) :: bwl, bwu
+  integer, intent(out) :: prf
+  integer, intent(out) :: info
+  !
+  integer, allocatable :: irow(:), icol(:)
+  complex(psb_spk_), allocatable :: val(:)
+  integer :: nz
+  integer :: i, j, lrbu, lrbl
+  
+  info = psb_success_
+  bwl = 0
+  bwu = 0
+  prf = 0
+  select type (aa=>mat%a)
+  class is (psb_c_csr_sparse_mat)
+    do i=1, aa%get_nrows()
+      lrbl = 0
+      lrbu = 0
+      do j = aa%irp(i), aa%irp(i+1) - 1
+        lrbl = max(lrbl,i-aa%ja(j))
+        lrbu = max(lrbu,aa%ja(j)-i)
+      end do
+      prf = prf + lrbl+lrbu
+      bwu  = max(bwu,lrbu)
+      bwl  = max(bwl,lrbu)
+    end do
+    
+  class default
+    do i=1, aa%get_nrows()
+      lrbl = 0
+      lrbu = 0
+      call aa%csget(i,i,nz,irow,icol,val,info)
+      if (info /= psb_success_) return
+      do j=1, nz
+        lrbl = max(lrbl,i-icol(j))
+        lrbu = max(lrbu,icol(j)-i)
+      end do
+      prf = prf + lrbl+lrbu
+      bwu  = max(bwu,lrbu)
+      bwl  = max(bwl,lrbu)
+    end do
+  end select
+  
+end subroutine psb_c_cmp_bwpf

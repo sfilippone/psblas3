@@ -6,6 +6,7 @@ module psb_d_vect_mod
     class(psb_d_base_vect_type), allocatable :: v 
   contains
     procedure, pass(x) :: get_nrows => d_vect_get_nrows
+    procedure, pass(x) :: sizeof   => d_vect_sizeof
     procedure, pass(x) :: dot_v    => d_vect_dot_v
     procedure, pass(x) :: dot_a    => d_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -148,14 +149,21 @@ contains
 
   end function size_const
 
-
   function d_vect_get_nrows(x) result(res)
     implicit none 
     class(psb_d_vect_type), intent(in) :: x
     integer :: res
-    res = -1
+    res = 0
     if (allocated(x%v)) res = x%v%get_nrows()
   end function d_vect_get_nrows
+
+  function d_vect_sizeof(x) result(res)
+    implicit none 
+    class(psb_d_vect_type), intent(in) :: x
+    integer(psb_long_int_k_) :: res
+    res = 0
+    if (allocated(x%v)) res = x%v%sizeof()
+  end function d_vect_sizeof
 
   function d_vect_dot_v(n,x,y) result(res)
     implicit none 

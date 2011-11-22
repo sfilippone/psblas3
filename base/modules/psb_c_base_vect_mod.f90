@@ -7,6 +7,7 @@ module psb_c_base_vect_mod
     complex(psb_spk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => c_base_get_nrows
+    procedure, pass(x) :: sizeof   => c_base_sizeof
     procedure, pass(x) :: dot_v    => c_base_dot_v
     procedure, pass(x) :: dot_a    => c_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -145,14 +146,20 @@ contains
 
   end function size_const
     
-
   function c_base_get_nrows(x) result(res)
     implicit none 
     class(psb_c_base_vect_type), intent(in) :: x
     integer :: res
-    res = -1
+    res = 0
     if (allocated(x%v)) res = size(x%v)
   end function c_base_get_nrows
+
+  function c_base_sizeof(x) result(res)
+    implicit none 
+    class(psb_c_base_vect_type), intent(in) :: x
+    integer(psb_long_int_k_) :: res
+    res = (2*psb_sizeof_sp)*x%get_nrows()
+  end function c_base_sizeof
 
   function c_base_dot_v(n,x,y) result(res)
     implicit none 

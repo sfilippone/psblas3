@@ -7,6 +7,7 @@ module psb_z_base_vect_mod
     complex(psb_dpk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => z_base_get_nrows
+    procedure, pass(x) :: sizeof   => z_base_sizeof
     procedure, pass(x) :: dot_v    => z_base_dot_v
     procedure, pass(x) :: dot_a    => z_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -146,14 +147,20 @@ contains
 
   end function size_const
     
-
   function z_base_get_nrows(x) result(res)
     implicit none 
     class(psb_z_base_vect_type), intent(in) :: x
     integer :: res
-    res = -1
+    res = 0
     if (allocated(x%v)) res = size(x%v)
   end function z_base_get_nrows
+
+  function z_base_sizeof(x) result(res)
+    implicit none 
+    class(psb_z_base_vect_type), intent(in) :: x
+    integer(psb_long_int_k_) :: res
+    res = (2*psb_sizeof_dp)*x%get_nrows()
+  end function z_base_sizeof
 
   function z_base_dot_v(n,x,y) result(res)
     implicit none 
