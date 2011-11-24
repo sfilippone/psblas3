@@ -220,18 +220,19 @@ contains
     type(psb_dlinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
 
-    val = 0
-    if (allocated(map%itd_data))   &
-         & val = val + psb_sizeof_int*size(map%itd_data)
-    if (allocated(map%iaggr))   &
-         & val = val + psb_sizeof_int*size(map%iaggr)
-    if (allocated(map%naggr))   &
-         & val = val + psb_sizeof_int*size(map%naggr)
-    val = val + psb_sizeof(map%desc_X)
-    val = val + psb_sizeof(map%desc_Y)
-    val = val + psb_sizeof(map%map_X2Y)
-    val = val + psb_sizeof(map%map_Y2X)
+!!$    val = 0
+!!$    if (allocated(map%itd_data))   &
+!!$         & val = val + psb_sizeof_int*size(map%itd_data)
+!!$    if (allocated(map%iaggr))   &
+!!$         & val = val + psb_sizeof_int*size(map%iaggr)
+!!$    if (allocated(map%naggr))   &
+!!$         & val = val + psb_sizeof_int*size(map%naggr)
+!!$    val = val + psb_sizeof(map%desc_X)
+!!$    val = val + psb_sizeof(map%desc_Y)
+!!$    val = val + psb_sizeof(map%map_X2Y)
+!!$    val = val + psb_sizeof(map%map_Y2X)
 
+    val = map%sizeof()
   end function psb_dlinmap_sizeof
 
   subroutine psb_d_linmap_sub(out_map,map_kind,desc_X, desc_Y,&

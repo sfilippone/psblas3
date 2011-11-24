@@ -59,6 +59,8 @@ module psb_linmap_type_mod
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
     type(psb_sspmat_type) :: map_X2Y, map_Y2X
+  contains
+    procedure, pass(map)  :: sizeof => s_map_sizeof
   end type psb_slinmap_type
 
   type psb_dlinmap_type 
@@ -66,6 +68,8 @@ module psb_linmap_type_mod
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
     type(psb_dspmat_type) :: map_X2Y, map_Y2X
+  contains
+    procedure, pass(map)  :: sizeof => d_map_sizeof
   end type psb_dlinmap_type
 
   type psb_clinmap_type 
@@ -73,6 +77,8 @@ module psb_linmap_type_mod
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
     type(psb_cspmat_type) :: map_X2Y, map_Y2X
+  contains
+    procedure, pass(map)  :: sizeof => c_map_sizeof
   end type psb_clinmap_type
   
   type psb_zlinmap_type 
@@ -80,7 +86,97 @@ module psb_linmap_type_mod
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
     type(psb_zspmat_type) :: map_X2Y, map_Y2X
+  contains
+    procedure, pass(map)  :: sizeof => z_map_sizeof
   end type psb_zlinmap_type
+
+  private :: s_map_sizeof, d_map_sizeof, c_map_sizeof, z_map_sizeof
+
+contains
+
+  function s_map_sizeof(map) result(val)
+    use psb_descriptor_type
+    use psb_s_mat_mod
+    implicit none 
+    class(psb_slinmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = 0
+    if (allocated(map%itd_data))   &
+         & val = val + psb_sizeof_int*size(map%itd_data)
+    if (allocated(map%iaggr))   &
+         & val = val + psb_sizeof_int*size(map%iaggr)
+    if (allocated(map%naggr))   &
+         & val = val + psb_sizeof_int*size(map%naggr)
+    val = val + map%desc_X%sizeof()
+    val = val + map%desc_Y%sizeof()
+    val = val + map%map_X2Y%sizeof()
+    val = val + map%map_Y2X%sizeof()
+
+  end function s_map_sizeof
+
+  function d_map_sizeof(map) result(val)
+    use psb_descriptor_type
+    use psb_d_mat_mod
+    implicit none 
+    class(psb_dlinmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = 0
+    if (allocated(map%itd_data))   &
+         & val = val + psb_sizeof_int*size(map%itd_data)
+    if (allocated(map%iaggr))   &
+         & val = val + psb_sizeof_int*size(map%iaggr)
+    if (allocated(map%naggr))   &
+         & val = val + psb_sizeof_int*size(map%naggr)
+    val = val + map%desc_X%sizeof()
+    val = val + map%desc_Y%sizeof()
+    val = val + map%map_X2Y%sizeof()
+    val = val + map%map_Y2X%sizeof()
+
+  end function d_map_sizeof
+
+  function c_map_sizeof(map) result(val)
+    use psb_descriptor_type
+    use psb_c_mat_mod
+    implicit none 
+    class(psb_clinmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = 0
+    if (allocated(map%itd_data))   &
+         & val = val + psb_sizeof_int*size(map%itd_data)
+    if (allocated(map%iaggr))   &
+         & val = val + psb_sizeof_int*size(map%iaggr)
+    if (allocated(map%naggr))   &
+         & val = val + psb_sizeof_int*size(map%naggr)
+    val = val + map%desc_X%sizeof()
+    val = val + map%desc_Y%sizeof()
+    val = val + map%map_X2Y%sizeof()
+    val = val + map%map_Y2X%sizeof()
+
+  end function c_map_sizeof
+
+  function z_map_sizeof(map) result(val)
+    use psb_descriptor_type
+    use psb_z_mat_mod
+    implicit none 
+    class(psb_zlinmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = 0
+    if (allocated(map%itd_data))   &
+         & val = val + psb_sizeof_int*size(map%itd_data)
+    if (allocated(map%iaggr))   &
+         & val = val + psb_sizeof_int*size(map%iaggr)
+    if (allocated(map%naggr))   &
+         & val = val + psb_sizeof_int*size(map%naggr)
+    val = val + map%desc_X%sizeof()
+    val = val + map%desc_Y%sizeof()
+    val = val + map%map_X2Y%sizeof()
+    val = val + map%map_Y2X%sizeof()
+
+  end function z_map_sizeof
 
 end module psb_linmap_type_mod
 
