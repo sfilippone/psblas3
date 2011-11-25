@@ -75,7 +75,10 @@ module psb_const_mod
   real(psb_dpk_), parameter      :: d_epstol=1.1d-16 ! Unit roundoff.  
   real(psb_spk_), parameter      :: s_epstol=5.e-8   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
-  
+  logical, parameter             :: psb_s_is_complex_ = .false.
+  logical, parameter             :: psb_d_is_complex_ = .false.
+  logical, parameter             :: psb_c_is_complex_ = .true.
+  logical, parameter             :: psb_z_is_complex_ = .true.
   !
   ! Sparse matrix constants
   !
