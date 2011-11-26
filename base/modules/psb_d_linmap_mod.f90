@@ -31,19 +31,31 @@
 !!$  
 !
 !
-! package: psb_linmap_mod
-!    Defines facilities for mapping between vectors belonging
+! package: psb_d_linmap_mod
+!    Defines data types and interfaces for mapping between vectors belonging
 !    to different spaces.
 !
 module psb_d_linmap_mod
 
   use psb_const_mod
-  use psb_linmap_type_mod
+  use psb_d_mat_mod, only : psb_dspmat_type
+  use psb_descriptor_type, only : psb_desc_type
+  use psb_base_linmap_mod
+
+
+  type, extends(psb_base_linmap_type) ::  psb_dlinmap_type 
+    type(psb_dspmat_type) :: map_X2Y, map_Y2X
+  contains
+    procedure, pass(map)  :: sizeof   => d_map_sizeof
+    procedure, pass(map)  :: is_asb   => d_is_asb
+    procedure, pass(map)  :: free     => d_free
+  end type psb_dlinmap_type
 
 
   interface psb_map_X2Y
     subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
-      use psb_linmap_type_mod
+      use psb_const_mod
+      import :: psb_dlinmap_type
       implicit none 
       type(psb_dlinmap_type), intent(in) :: map
       real(psb_dpk_), intent(in)     :: alpha,beta
@@ -53,8 +65,9 @@ module psb_d_linmap_mod
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_X2Y
     subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
+      use psb_const_mod
       use psb_d_vect_mod
-      use psb_linmap_type_mod
+      import :: psb_dlinmap_type
       implicit none 
       type(psb_dlinmap_type), intent(in) :: map
       real(psb_dpk_), intent(in)     :: alpha,beta
@@ -66,7 +79,8 @@ module psb_d_linmap_mod
 
   interface psb_map_Y2X
     subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
-      use psb_linmap_type_mod
+      use psb_const_mod
+      import :: psb_dlinmap_type
       implicit none 
       type(psb_dlinmap_type), intent(in) :: map
       real(psb_dpk_), intent(in)     :: alpha,beta
@@ -76,8 +90,9 @@ module psb_d_linmap_mod
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_Y2X
     subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
+      use psb_const_mod
       use psb_d_vect_mod
-      use psb_linmap_type_mod
+      import :: psb_dlinmap_type
       implicit none 
       type(psb_dlinmap_type), intent(in) :: map
       real(psb_dpk_), intent(in)     :: alpha,beta
@@ -88,24 +103,8 @@ module psb_d_linmap_mod
   end interface
 
 
-  interface psb_is_ok_map
-    module procedure psb_is_ok_dlinmap
-  end interface
-
-  interface psb_get_map_kind
-    module procedure psb_get_dmap_kind
-  end interface
-
-  interface psb_set_map_kind
-    module procedure psb_set_dmap_kind
-  end interface
-
   interface psb_map_cscnv
     module procedure psb_d_map_cscnv
-  end interface
-
-  interface psb_is_asb_map
-    module procedure psb_is_asb_dlinmap
   end interface
 
   interface psb_linmap_sub
@@ -118,9 +117,10 @@ module psb_d_linmap_mod
 
   interface psb_linmap
     function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
-      use psb_linmap_type_mod
+      use psb_d_mat_mod, only : psb_dspmat_type
+      import :: psb_dlinmap_type, psb_desc_type
       implicit none 
-      type(psb_dlinmap_type)         :: psb_d_linmap    
+      type(psb_dlinmap_type)            :: psb_d_linmap    
       type(psb_desc_type), target       :: desc_X, desc_Y
       type(psb_dspmat_type), intent(in) :: map_X2Y, map_Y2X
       integer, intent(in)               :: map_kind
@@ -128,35 +128,42 @@ module psb_d_linmap_mod
     end function psb_d_linmap
   end interface
 
-  interface psb_sizeof
-    module procedure psb_dlinmap_sizeof
-  end interface
+  private :: d_map_sizeof, d_is_asb, d_free
+
+
+
+
 
 contains
 
-  function psb_get_dmap_kind(map)    
-    implicit none
-    type(psb_dlinmap_type), intent(in) :: map
-    Integer                      :: psb_get_dmap_kind
-    if (allocated(map%itd_data)) then
-      psb_get_dmap_kind = map%itd_data(psb_map_kind_) 
-    else    
-      psb_get_dmap_kind = -1
-    end if
-  end function psb_get_dmap_kind
+  function d_map_sizeof(map) result(val)
+    use psb_descriptor_type
+    use psb_d_mat_mod
+    implicit none 
+    class(psb_dlinmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = map%psb_base_linmap_type%sizeof()
+    val = val + map%map_X2Y%sizeof()
+    val = val + map%map_Y2X%sizeof()
+
+  end function d_map_sizeof
 
 
-  subroutine psb_set_dmap_kind(map_kind,map)    
-    implicit none
-    integer, intent(in)          :: map_kind
-    type(psb_dlinmap_type), intent(inout) :: map
+  function d_is_asb(map) result(val)
+    use psb_descriptor_type
+    implicit none 
+    class(psb_dlinmap_type), intent(in) :: map
+    logical  :: val
 
-    map%itd_data(psb_map_kind_) = map_kind
+    val = map%psb_base_linmap_type%is_asb() .and. &
+         & map%map_X2Y%is_asb() .and.map%map_Y2X%is_asb() 
+    
+  end function d_is_asb
 
-  end subroutine psb_set_dmap_kind
 
   subroutine psb_d_map_cscnv(map,info,type,mold)    
-    use psb_mat_mod
+    use psb_d_mat_mod
     implicit none
     type(psb_dlinmap_type), intent(inout)  :: map
     integer, intent(out)                   :: info
@@ -169,75 +176,9 @@ contains
 
   end subroutine psb_d_map_cscnv
 
-  function psb_is_asb_dlinmap(map) result(this)
-    use psb_descriptor_type
-    implicit none 
-    type(psb_dlinmap_type), intent(in) :: map
-    logical :: this
-
-    this = .false.
-    if (.not.allocated(map%itd_data)) return
-    select case(psb_get_map_kind(map))
-    case (psb_map_aggr_)
-      if (.not.associated(map%p_desc_X)) return
-      if (.not.associated(map%p_desc_Y)) return
-      this  = &
-           & psb_is_asb_desc(map%p_desc_X).and.psb_is_asb_desc(map%p_desc_Y)    
-
-    case(psb_map_gen_linear_)    
-
-      this = &
-           & psb_is_asb_desc(map%desc_X).and.psb_is_asb_desc(map%desc_Y)    
-
-    end select
-
-  end function psb_is_asb_dlinmap
-
-  function psb_is_ok_dlinmap(map) result(this)
-    use psb_descriptor_type
-    implicit none 
-    type(psb_dlinmap_type), intent(in) :: map
-    logical  :: this
-    this = .false.
-    if (.not.allocated(map%itd_data)) return
-    select case(psb_get_map_kind(map))
-    case (psb_map_aggr_)
-      if (.not.associated(map%p_desc_X)) return
-      if (.not.associated(map%p_desc_Y)) return
-      this = &
-           & psb_is_ok_desc(map%p_desc_X).and.psb_is_ok_desc(map%p_desc_Y)    
-    case(psb_map_gen_linear_)    
-      this = &
-           & psb_is_ok_desc(map%desc_X).and.psb_is_ok_desc(map%desc_Y)    
-    end select
-
-  end function psb_is_ok_dlinmap
-
-  function psb_dlinmap_sizeof(map) result(val)
-    use psb_descriptor_type
-    use psb_mat_mod, only : psb_sizeof
-    implicit none 
-    type(psb_dlinmap_type), intent(in) :: map
-    integer(psb_long_int_k_) :: val
-
-!!$    val = 0
-!!$    if (allocated(map%itd_data))   &
-!!$         & val = val + psb_sizeof_int*size(map%itd_data)
-!!$    if (allocated(map%iaggr))   &
-!!$         & val = val + psb_sizeof_int*size(map%iaggr)
-!!$    if (allocated(map%naggr))   &
-!!$         & val = val + psb_sizeof_int*size(map%naggr)
-!!$    val = val + psb_sizeof(map%desc_X)
-!!$    val = val + psb_sizeof(map%desc_Y)
-!!$    val = val + psb_sizeof(map%map_X2Y)
-!!$    val = val + psb_sizeof(map%map_Y2X)
-
-    val = map%sizeof()
-  end function psb_dlinmap_sizeof
-
   subroutine psb_d_linmap_sub(out_map,map_kind,desc_X, desc_Y,&
        & map_X2Y, map_Y2X,iaggr,naggr)
-    use psb_linmap_type_mod
+    use psb_d_mat_mod
     implicit none 
     type(psb_dlinmap_type), intent(out) :: out_map    
     type(psb_desc_type), target       :: desc_X, desc_Y
@@ -255,18 +196,26 @@ contains
     type(psb_dlinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 
     
-    call psb_move_alloc(mapin%itd_data,mapout%itd_data,info)
-    call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)
-    call psb_move_alloc(mapin%naggr,mapout%naggr,info)
-    mapout%p_desc_X => mapin%p_desc_X 
-    mapin%p_desc_X  => null()
-    mapout%p_desc_Y => mapin%p_desc_Y
-    mapin%p_desc_Y  => null()
-    call psb_move_alloc(mapin%desc_X,mapout%desc_X,info)
-    call psb_move_alloc(mapin%desc_Y,mapout%desc_Y,info)
+    call psb_move_alloc(mapin%psb_base_linmap_type, &
+         & mapout%psb_base_linmap_type,info)
     call psb_move_alloc(mapin%map_X2Y,mapout%map_X2Y,info)
     call psb_move_alloc(mapin%map_Y2X,mapout%map_Y2X,info)
 
   end subroutine psb_dlinmap_transfer
+
+  subroutine  d_free(map,info)
+    use psb_descriptor_type
+    implicit none 
+    class(psb_dlinmap_type) :: map
+    integer, intent(out)      :: info 
+    
+    call map%psb_base_linmap_type%free(info)
+    
+    call map%map_X2Y%free()
+    call map%map_Y2X%free()
+
+  end subroutine d_free
   
+
 end module psb_d_linmap_mod
+

@@ -225,6 +225,8 @@ module psb_descriptor_type
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
+    procedure, pass(desc) :: free            => psb_cdfree
+    procedure, pass(desc) :: nullify         => nullify_desc
   end type psb_desc_type
 
   interface psb_sizeof
@@ -239,6 +241,7 @@ module psb_descriptor_type
     module procedure psb_cdfree
   end interface psb_free
 
+  private :: nullify_desc
 
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
@@ -304,6 +307,14 @@ contains
     nullify(desc%base_desc)
 
   end subroutine psb_nullify_desc
+
+  subroutine nullify_desc(desc)
+    class(psb_desc_type), intent(inout) :: desc
+    ! We have nothing left to do here.
+    ! Perhaps we should delete this subroutine? 
+    nullify(desc%base_desc)
+
+  end subroutine nullify_desc
 
   function psb_is_ok_desc(desc) result(val)
 
@@ -581,14 +592,14 @@ contains
   ! Arguments: 
   !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
   !    info     - integer.                       return code.
-  subroutine psb_cdfree(desc_a,info)
+  subroutine psb_cdfree(desc,info)
     !...free descriptor structure...
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
     implicit none
     !....parameters...
-    type(psb_desc_type), intent(inout) :: desc_a
+    class(psb_desc_type), intent(inout) :: desc
     integer, intent(out)               :: info
     !...locals....
     integer             :: ictxt,np,me, err_act
@@ -600,7 +611,7 @@ contains
     name = 'psb_cdfree'
 
 
-    ictxt=psb_cd_get_context(desc_a)
+    ictxt=psb_cd_get_context(desc)
 
     call psb_info(ictxt, me, np)
     !     ....verify blacs grid correctness..
@@ -611,28 +622,28 @@ contains
     endif
 
     
-    if (.not.allocated(desc_a%halo_index)) then
+    if (.not.allocated(desc%halo_index)) then
       info=298
       call psb_errpush(info,name)
       goto 9999
     end if
 
     !deallocate halo_index field
-    deallocate(desc_a%halo_index,stat=info)
+    deallocate(desc%halo_index,stat=info)
     if (info /= psb_success_) then
       info=2053
       call psb_errpush(info,name)
       goto 9999
     end if
 
-    if (.not.allocated(desc_a%bnd_elem)) then
+    if (.not.allocated(desc%bnd_elem)) then
 !!$    info=296
 !!$    call psb_errpush(info,name)
 !!$    goto 9999
 !!$  end if
     else
       !deallocate halo_index field
-      deallocate(desc_a%bnd_elem,stat=info)
+      deallocate(desc%bnd_elem,stat=info)
       if (info /= psb_success_) then
         info=2054
         call psb_errpush(info,name)
@@ -640,14 +651,14 @@ contains
       end if
     end if
 
-    if (.not.allocated(desc_a%ovrlap_index)) then
+    if (.not.allocated(desc%ovrlap_index)) then
       info=299
       call psb_errpush(info,name)
       goto 9999
     end if
 
     !deallocate ovrlap_index  field
-    deallocate(desc_a%ovrlap_index,stat=info)
+    deallocate(desc%ovrlap_index,stat=info)
     if (info /= psb_success_) then
       info=2055
       call psb_errpush(info,name)
@@ -655,7 +666,7 @@ contains
     end if
 
     !deallocate ovrlap_elem  field
-    deallocate(desc_a%ovrlap_elem,stat=info)
+    deallocate(desc%ovrlap_elem,stat=info)
     if (info /= psb_success_) then 
       info=2056
       call psb_errpush(info,name)
@@ -663,7 +674,7 @@ contains
     end if
 
     !deallocate ovrlap_index  field
-    deallocate(desc_a%ovr_mst_idx,stat=info)
+    deallocate(desc%ovr_mst_idx,stat=info)
     if (info /= psb_success_) then
       info=2055
       call psb_errpush(info,name)
@@ -671,20 +682,20 @@ contains
     end if
 
 
-    if (allocated(desc_a%lprm)) &
-         & deallocate(desc_a%lprm,stat=info)
+    if (allocated(desc%lprm)) &
+         & deallocate(desc%lprm,stat=info)
     if (info /= psb_success_) then 
       info=2057
       call psb_errpush(info,name)
       goto 9999
     end if
 
-    if (allocated(desc_a%indxmap)) then 
-      call desc_a%indxmap%free()
-      deallocate(desc_a%indxmap, stat=info)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%free()
+      deallocate(desc%indxmap, stat=info)
     end if
-    if (allocated(desc_a%idx_space)) then 
-      deallocate(desc_a%idx_space,stat=info)
+    if (allocated(desc%idx_space)) then 
+      deallocate(desc%idx_space,stat=info)
       if (info /= psb_success_) then 
         info=2056
         call psb_errpush(info,name)
@@ -692,7 +703,7 @@ contains
       end if
     end if
 
-    call psb_nullify_desc(desc_a)
+    call desc%nullify()
 
     call psb_erractionrestore(err_act)
     return

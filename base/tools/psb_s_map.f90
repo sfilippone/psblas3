@@ -39,28 +39,29 @@
 !
 subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
   use psb_base_mod, psb_protect_name => psb_s_map_X2Y
+
   implicit none 
   type(psb_slinmap_type), intent(in) :: map
-  real(psb_spk_), intent(in)     :: alpha,beta
-  real(psb_spk_), intent(inout)  :: x(:)
-  real(psb_spk_), intent(out)    :: y(:)
-  integer, intent(out)           :: info 
-  real(psb_spk_), optional       :: work(:)
+  real(psb_spk_), intent(in)       :: alpha,beta
+  real(psb_spk_), intent(inout)    :: x(:)
+  real(psb_spk_), intent(out)      :: y(:)
+  integer, intent(out)                  :: info 
+  real(psb_spk_), optional         :: work(:)
 
   !
-  real(psb_spk_), allocatable   :: xt(:), yt(:)
+  real(psb_spk_), allocatable :: xt(:), yt(:)
   integer                       :: i, j, nr1, nc1,nr2, nc2,&
-       &  map_kind, map_data, nr, ictxt
+       & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
   info = psb_success_
-  if (.not.psb_is_asb_map(map)) then 
-    write(psb_err_unit,*) trim(name),' Invalid descriptor input: unassembled'
+  if (.not.map%is_asb()) then 
+    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
     info = 1
     return 
   end if
 
-  map_kind = psb_get_map_kind(map)
+  map_kind = map%get_kind()
 
   select case(map_kind)
   case(psb_map_aggr_)
@@ -99,7 +100,7 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
+   
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
@@ -110,30 +111,29 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_s_map_X2Y
 
-
 subroutine psb_s_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   use psb_base_mod, psb_protect_name => psb_s_map_X2Y_vect
   implicit none 
-  type(psb_slinmap_type), intent(in) :: map
-  real(psb_spk_), intent(in)     :: alpha,beta
-  type(psb_s_vect_type), intent(inout)  :: x,y
-  integer, intent(out)           :: info 
-  real(psb_spk_), optional       :: work(:)
+  type(psb_slinmap_type), intent(in)   :: map
+  real(psb_spk_), intent(in)        :: alpha,beta
+  type(psb_s_vect_type), intent(inout) :: x,y
+  integer, intent(out)                 :: info 
+  real(psb_spk_), optional          :: work(:)
   ! Local
-  type(psb_s_vect_type)         :: xt, yt
+  type(psb_s_vect_type)          :: xt, yt
   real(psb_spk_), allocatable :: xta(:), yta(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2 ,&
-       &  map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_map_X2Y'
+  integer                        :: i, j, nr1, nc1,nr2, nc2 ,&
+       &  map_kind, nr, ictxt
+  character(len=20), parameter   :: name='psb_map_X2Y'
 
   info = psb_success_
-  if (.not.psb_is_asb_map(map)) then 
-    write(psb_err_unit,*) trim(name),' Invalid descriptor input: unassembled'
+  if (.not.map%is_asb()) then 
+    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
     info = 1
     return 
   end if
 
-  map_kind = psb_get_map_kind(map)
+  map_kind = map%get_kind()
 
   select case(map_kind)
   case(psb_map_aggr_)
@@ -206,26 +206,26 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
 
   implicit none 
   type(psb_slinmap_type), intent(in) :: map
-  real(psb_spk_), intent(in)     :: alpha,beta
-  real(psb_spk_), intent(inout)  :: x(:)
-  real(psb_spk_), intent(out)    :: y(:)
-  integer, intent(out)             :: info 
-  real(psb_spk_), optional       :: work(:)
+  real(psb_spk_), intent(in)       :: alpha,beta
+  real(psb_spk_), intent(inout)    :: x(:)
+  real(psb_spk_), intent(out)      :: y(:)
+  integer, intent(out)                :: info 
+  real(psb_spk_), optional         :: work(:)
 
   !
   real(psb_spk_), allocatable :: xt(:), yt(:)
   integer                       :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, map_data, nr, ictxt
+       & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
   info = psb_success_
-  if (.not.psb_is_asb_map(map)) then 
-    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
+  if (.not.map%is_asb()) then 
+    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
     info = 1
     return 
   end if
 
-  map_kind = psb_get_map_kind(map)
+  map_kind = map%get_kind()
 
   select case(map_kind)
   case(psb_map_aggr_)
@@ -264,7 +264,7 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
+   
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'
@@ -277,26 +277,26 @@ end subroutine psb_s_map_Y2X
 subroutine psb_s_map_Y2X_vect(alpha,x,beta,y,map,info,work)
   use psb_base_mod, psb_protect_name => psb_s_map_Y2X_vect
   implicit none 
-  type(psb_slinmap_type), intent(in) :: map
-  real(psb_spk_), intent(in)     :: alpha,beta
-  type(psb_s_vect_type), intent(inout)  :: x,y
-  integer, intent(out)           :: info 
-  real(psb_spk_), optional       :: work(:)
+  type(psb_slinmap_type), intent(in)   :: map
+  real(psb_spk_), intent(in)        :: alpha,beta
+  type(psb_s_vect_type), intent(inout) :: x,y
+  integer, intent(out)                 :: info 
+  real(psb_spk_), optional          :: work(:)
   !
-  type(psb_s_vect_type)         :: xt, yt
+  type(psb_s_vect_type)          :: xt, yt
   real(psb_spk_), allocatable :: xta(:), yta(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_map_Y2X'
+  integer                        :: i, j, nr1, nc1,nr2, nc2,&
+       & map_kind, nr, ictxt
+  character(len=20), parameter   :: name='psb_map_Y2X'
 
   info = psb_success_
-  if (.not.psb_is_asb_map(map)) then 
-    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
+  if (.not.map%is_asb()) then 
+    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
     info = 1
     return 
   end if
 
-  map_kind = psb_get_map_kind(map)
+  map_kind = map%get_kind()
 
   select case(map_kind)
   case(psb_map_aggr_)
@@ -355,22 +355,21 @@ subroutine psb_s_map_Y2X_vect(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_s_map_Y2X_vect
 
-function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) result(this)
+function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
+     & result(this)
 
   use psb_base_mod, psb_protect_name => psb_s_linmap
-
   implicit none 
-  type(psb_slinmap_type)             :: this
-  type(psb_desc_type), target        :: desc_X, desc_Y
+  type(psb_slinmap_type)         :: this
+  type(psb_desc_type), target       :: desc_X, desc_Y
   type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
-  integer, intent(in)                :: map_kind
-  integer, intent(in), optional      :: iaggr(:), naggr(:)
+  integer, intent(in)               :: map_kind
+  integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
   integer                      :: info
   character(len=20), parameter :: name='psb_linmap'
 
   info = psb_success_
-
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK
@@ -402,12 +401,12 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
 
   case(psb_map_gen_linear_)    
     
-    if (psb_is_ok_desc(desc_X)) then 
+    if (desc_X%is_ok()) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else
       info = psb_err_pivot_too_small_
     endif
-    if (psb_is_ok_desc(desc_Y)) then 
+    if (desc_Y%is_ok()) then 
       call psb_cdcpy(desc_Y, this%desc_Y,info) 
     else
       info = psb_err_invalid_ovr_num_
@@ -419,13 +418,11 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
     info = 1
   end select
-  
 
   if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
   if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
-  if (info == psb_success_) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
   if (info == psb_success_) then
-    call psb_set_map_kind(map_kind, this)
+    call this%set_kind(map_kind)
   end if
   if (info /= psb_success_) then
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'
@@ -433,4 +430,3 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   end if
 
 end function psb_s_linmap
-

@@ -9,7 +9,7 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 	psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
 	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
-	psb_linmap_type_mod.o psb_linmap_mod.o \
+	psb_base_linmap_mod.o psb_linmap_mod.o \
 	psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o \
 	psb_comm_mod.o psb_i_comm_mod.o psb_s_comm_mod.o psb_d_comm_mod.o\
 	psb_c_comm_mod.o psb_z_comm_mod.o \
@@ -96,11 +96,11 @@ psb_glist_map_mod.o: psb_list_map_mod.o
 psb_hash_map_mod.o: psb_hash_mod.o psb_sort_mod.o
 psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
 psb_linmap_mod.o: psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o 
-psb_s_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_s_vect_mod.o
-psb_d_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_d_vect_mod.o
-psb_c_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_c_vect_mod.o
-psb_z_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o psb_z_vect_mod.o
-psb_linmap_type_mod.o: psb_desc_type.o psb_serial_mod.o psb_comm_mod.o psb_mat_mod.o
+psb_s_linmap_mod.o: psb_base_linmap_mod.o psb_s_mat_mod.o psb_s_vect_mod.o
+psb_d_linmap_mod.o: psb_base_linmap_mod.o psb_d_mat_mod.o psb_d_vect_mod.o
+psb_c_linmap_mod.o: psb_base_linmap_mod.o psb_c_mat_mod.o psb_c_vect_mod.o
+psb_z_linmap_mod.o: psb_base_linmap_mod.o psb_z_mat_mod.o psb_z_vect_mod.o
+psb_base_linmap_mod.o: psb_desc_type.o psb_serial_mod.o psb_comm_mod.o 
 psb_comm_mod.o: psb_desc_type.o psb_mat_mod.o 
 psb_check_mod.o: psb_desc_type.o
 psb_serial_mod.o: psb_mat_mod.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o

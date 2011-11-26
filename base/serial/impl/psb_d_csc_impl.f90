@@ -2309,7 +2309,7 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
         if (i >= icl) exit inner
         if (i > nc) then 
           write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nc,j,nza,icl
+               & ' Strange situation: i>nr ',i,nc,j,nza,icl
           exit outer
         end if
         a%icp(i+1) = a%icp(i) 
