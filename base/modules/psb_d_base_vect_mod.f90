@@ -7,7 +7,6 @@ module psb_d_base_vect_mod
     real(psb_dpk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => d_base_get_nrows
-    procedure, pass(x) :: sizeof   => d_base_sizeof
     procedure, pass(x) :: dot_v    => d_base_dot_v
     procedure, pass(x) :: dot_a    => d_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -72,12 +71,10 @@ contains
     
   
   subroutine d_base_bld_n(x,n)
-    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_d_base_vect_type), intent(inout) :: x
     integer :: info
-    
-    call psb_realloc(n,x%v,info)
+
     call x%asb(n,info)
 
   end subroutine d_base_bld_n
@@ -116,14 +113,10 @@ contains
   subroutine d_base_set_vect(x,val)
     class(psb_d_base_vect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val(:)
-    integer :: nr
+        
     integer :: info
-    if (allocated(x%v)) then 
-      nr = min(size(x%v),size(val))
-      x%v(1:nr) = val(1:nr)
-    else
-      x%v = val
-    end if
+    x%v = val
+    
   end subroutine d_base_set_vect
     
   
@@ -146,20 +139,14 @@ contains
 
   end function size_const
     
+
   function d_base_get_nrows(x) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(in) :: x
     integer :: res
-    res = 0
+    res = -1
     if (allocated(x%v)) res = size(x%v)
   end function d_base_get_nrows
-
-  function d_base_sizeof(x) result(res)
-    implicit none 
-    class(psb_d_base_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
-    res = psb_sizeof_dp*x%get_nrows()
-  end function d_base_sizeof
 
   function d_base_dot_v(n,x,y) result(res)
     implicit none 
@@ -227,24 +214,15 @@ contains
   end subroutine d_base_axpby_a
 
     
-  subroutine d_base_mlt_v(x, y, info, xconj)
+  subroutine d_base_mlt_v(x, y, info)
     use psi_serial_mod
-    use psb_string_mod
     implicit none 
-    class(psb_d_base_vect_type), intent(inout) :: x
-    class(psb_d_base_vect_type), intent(inout) :: y
-    integer, intent(out)                       :: info    
-    character, intent(in), optional            :: xconj
-    integer   :: i, n
-    character :: xconj_
+    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    integer, intent(out)              :: info    
+    integer :: i, n
 
     info = 0
-    if (present(xconj)) then 
-      xconj_ = (psb_toupper(xconj))
-    else
-      xconj_ = 'N'
-    end if
-
     select type(xx => x)
     type is (psb_d_base_vect_type)
       n = min(size(y%v), size(xx%v))

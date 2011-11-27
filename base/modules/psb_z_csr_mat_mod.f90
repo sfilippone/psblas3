@@ -126,7 +126,7 @@ module psb_z_csr_mat_mod
       integer, intent(out)                                 :: info
     end subroutine psb_z_csr_mold
   end interface
-  
+
   interface
     subroutine  psb_z_csr_allocate_mnnz(m,n,a,nz) 
       import :: psb_z_csr_sparse_mat
@@ -135,7 +135,7 @@ module psb_z_csr_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_z_csr_allocate_mnnz
   end interface
-
+  
   interface
     subroutine psb_z_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_z_csr_sparse_mat
@@ -364,7 +364,7 @@ module psb_z_csr_mat_mod
     subroutine psb_z_csr_rowsum(d,a) 
       import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csr_rowsum
   end interface
 
@@ -372,7 +372,7 @@ module psb_z_csr_mat_mod
     subroutine psb_z_csr_arwsum(d,a) 
       import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)             :: d(:)
+      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csr_arwsum
   end interface
   
@@ -380,7 +380,7 @@ module psb_z_csr_mat_mod
     subroutine psb_z_csr_colsum(d,a) 
       import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csr_colsum
   end interface
 
@@ -388,7 +388,7 @@ module psb_z_csr_mat_mod
     subroutine psb_z_csr_aclsum(d,a) 
       import :: psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)             :: d(:)
+      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csr_aclsum
   end interface
     
@@ -441,7 +441,7 @@ contains
     class(psb_z_csr_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + 2 * psb_sizeof_dp  * size(a%val)
+    res = res + (2*psb_sizeof_dp)  * size(a%val)
     res = res + psb_sizeof_int * size(a%irp)
     res = res + psb_sizeof_int * size(a%ja)
       
@@ -465,7 +465,7 @@ contains
     class(psb_z_csr_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ja)) then 
       if (res >= 0) then 

@@ -7,7 +7,6 @@ module psb_z_base_vect_mod
     complex(psb_dpk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => z_base_get_nrows
-    procedure, pass(x) :: sizeof   => z_base_sizeof
     procedure, pass(x) :: dot_v    => z_base_dot_v
     procedure, pass(x) :: dot_a    => z_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -72,12 +71,10 @@ contains
     
   
   subroutine z_base_bld_n(x,n)
-    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_z_base_vect_type), intent(inout) :: x
     integer :: info
 
-    call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
   end subroutine z_base_bld_n
@@ -116,16 +113,11 @@ contains
   subroutine z_base_set_vect(x,val)
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val(:)
-    integer :: nr
+        
     integer :: info
-    if (allocated(x%v)) then 
-      nr = min(size(x%v),size(val))
-      x%v(1:nr) = val(1:nr)
-    else
-      x%v = val
-    end if
+    x%v = val
+    
   end subroutine z_base_set_vect
-
     
   
   function constructor(x) result(this)
@@ -147,27 +139,21 @@ contains
 
   end function size_const
     
+
   function z_base_get_nrows(x) result(res)
     implicit none 
     class(psb_z_base_vect_type), intent(in) :: x
     integer :: res
-    res = 0
+    res = -1
     if (allocated(x%v)) res = size(x%v)
   end function z_base_get_nrows
-
-  function z_base_sizeof(x) result(res)
-    implicit none 
-    class(psb_z_base_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
-    res = (2*psb_sizeof_dp)*x%get_nrows()
-  end function z_base_sizeof
 
   function z_base_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_z_base_vect_type), intent(inout) :: x, y
     integer, intent(in)           :: n
-    complex(psb_dpk_)             :: res
-    complex(psb_dpk_), external   :: zdotc
+    complex(psb_dpk_)                :: res
+    complex(psb_dpk_), external      :: zdotc
     
     res = zzero
     !
@@ -187,10 +173,10 @@ contains
   function z_base_dot_a(n,x,y) result(res)
     implicit none 
     class(psb_z_base_vect_type), intent(inout) :: x
-    complex(psb_dpk_), intent(in) :: y(:)
+    complex(psb_dpk_), intent(in)    :: y(:)
     integer, intent(in)           :: n
-    complex(psb_dpk_)             :: res
-    complex(psb_dpk_), external   :: zdotc
+    complex(psb_dpk_)                :: res
+    complex(psb_dpk_), external      :: zdotc
     
     res = zdotc(n,y,1,x%v,1)
 
@@ -202,7 +188,7 @@ contains
     integer, intent(in)               :: m
     class(psb_z_base_vect_type), intent(inout)  :: x
     class(psb_z_base_vect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent (in)    :: alpha, beta
+    complex(psb_dpk_), intent (in)       :: alpha, beta
     integer, intent(out)              :: info
     
     select type(xx => x)
@@ -228,72 +214,41 @@ contains
   end subroutine z_base_axpby_a
 
     
-  subroutine z_base_mlt_v(x, y, info, xconj)
+  subroutine z_base_mlt_v(x, y, info)
     use psi_serial_mod
-    use psb_string_mod
     implicit none 
-    class(psb_z_base_vect_type), intent(inout) :: x
-    class(psb_z_base_vect_type), intent(inout) :: y
-    integer, intent(out)                       :: info    
-    character, intent(in), optional            :: xconj
-    integer   :: i, n
-    character :: xconj_
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer, intent(out)              :: info    
+    integer :: i, n
 
     info = 0
-    if (present(xconj)) then 
-      xconj_ = (psb_toupper(xconj))
-    else
-      xconj_ = 'N'
-    end if
-
     select type(xx => x)
     type is (psb_z_base_vect_type)
       n = min(size(y%v), size(xx%v))
-      select case (xconj_) 
-      case ('C')
-        do i=1, n 
-          y%v(i) = y%v(i)*conjg(xx%v(i))
-        end do
-      case default
-        do i=1, n 
-          y%v(i) = y%v(i)*xx%v(i)
-        end do
-      end select
+      do i=1, n 
+        y%v(i) = y%v(i)*xx%v(i)
+      end do
     class default
-      call y%mlt(x%v,info,xconj)
+      call y%mlt(x%v,info)
     end select
 
   end subroutine z_base_mlt_v
 
-  subroutine z_base_mlt_a(x, y, info, xconj)
+  subroutine z_base_mlt_a(x, y, info)
     use psi_serial_mod
-    use psb_string_mod
     implicit none 
-    complex(psb_dpk_), intent(in)              :: x(:)
-    class(psb_z_base_vect_type), intent(inout) :: y
-    integer, intent(out)                       :: info
-    character, intent(in), optional            :: xconj
-    character :: xconj_
+    complex(psb_dpk_), intent(in)        :: x(:)
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer, intent(out)              :: info
     integer :: i, n
 
     info = 0
-    if (present(xconj)) then 
-      xconj_ = (psb_toupper(xconj))
-    else
-      xconj_ = 'N'
-    end if
-
     n = min(size(y%v), size(x))
-    select case (xconj_) 
-    case ('C')
-      do i=1, n 
-        y%v(i) = y%v(i)*conjg(x(i))
-      end do
-    case default
-      do i=1, n 
-        y%v(i) = y%v(i)*x(i)
-      end do
-    end select
+    do i=1, n 
+      y%v(i) = y%v(i)*x(i)
+    end do
+    
   end subroutine z_base_mlt_a
 
 
@@ -365,44 +320,30 @@ contains
     end if
   end subroutine z_base_mlt_a_2
 
-  subroutine z_base_mlt_v_2(alpha,x,y,beta,z,info,xconj,yconj)
+  subroutine z_base_mlt_v_2(alpha,x,y,beta,z,info)
     use psi_serial_mod
-    use psb_string_mod
     implicit none 
-    complex(psb_dpk_), intent(in)              :: alpha,beta
-    class(psb_z_base_vect_type), intent(inout) :: x
-    class(psb_z_base_vect_type), intent(inout) :: y
-    class(psb_z_base_vect_type), intent(inout) :: z
-    integer, intent(out)                       :: info    
-    character(len=1), intent(in), optional     :: xconj, yconj
+    complex(psb_dpk_), intent(in)        :: alpha,beta
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: z
+    integer, intent(out)              :: info    
     integer :: i, n
 
     info = 0
-    if (present(xconj)) then 
-      if (psb_toupper(xconj)=='C') x%v=conjg(x%v)
-    end if
-    if (present(yconj)) then 
-      if (psb_toupper(yconj)=='C') y%v=conjg(y%v)
-    end if
+    
     call z%mlt(alpha,x%v,y%v,beta,info)
-    if (present(xconj)) then 
-      if (psb_toupper(xconj)=='C') x%v=conjg(x%v)
-    end if
-    if (present(yconj)) then 
-      if (psb_toupper(yconj)=='C') y%v=conjg(y%v)
-    end if
 
   end subroutine z_base_mlt_v_2
 
-  subroutine z_base_mlt_av(alpha,x,y,beta,z,info,xconj,yconj)
+  subroutine z_base_mlt_av(alpha,x,y,beta,z,info)
     use psi_serial_mod
     implicit none 
-    complex(psb_dpk_), intent(in)              :: alpha,beta
-    complex(psb_dpk_), intent(in)              :: x(:)
-    class(psb_z_base_vect_type), intent(inout) :: y
-    class(psb_z_base_vect_type), intent(inout) :: z
-    integer, intent(out)                       :: info    
-    character(len=1), intent(in), optional     :: xconj, yconj
+    complex(psb_dpk_), intent(in)        :: alpha,beta
+    complex(psb_dpk_), intent(in)        :: x(:)
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: z
+    integer, intent(out)              :: info    
     integer :: i, n
 
     info = 0
@@ -411,20 +352,19 @@ contains
 
   end subroutine z_base_mlt_av
 
-  subroutine z_base_mlt_va(alpha,x,y,beta,z,info,xconj,yconj)
+  subroutine z_base_mlt_va(alpha,x,y,beta,z,info)
     use psi_serial_mod
     implicit none 
-    complex(psb_dpk_), intent(in)              :: alpha,beta
-    complex(psb_dpk_), intent(in)              :: y(:)
-    class(psb_z_base_vect_type), intent(inout) :: x
-    class(psb_z_base_vect_type), intent(inout) :: z
-    integer, intent(out)                       :: info    
-    character(len=1), intent(in), optional     :: xconj, yconj
+    complex(psb_dpk_), intent(in)        :: alpha,beta
+    complex(psb_dpk_), intent(in)        :: y(:)
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    class(psb_z_base_vect_type), intent(inout)  :: z
+    integer, intent(out)              :: info    
     integer :: i, n
 
     info = 0
     
-    call z%mlt(alpha,y,x,beta,info,xconj=yconj,yconj=xconj)
+    call z%mlt(alpha,y,x,beta,info)
 
   end subroutine z_base_mlt_va
 
@@ -570,7 +510,7 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: x
     integer, intent(in)               :: n, dupl
     integer, intent(in)               :: irl(:)
-    complex(psb_dpk_), intent(in)     :: val(:)
+    complex(psb_dpk_), intent(in)        :: val(:)
     integer, intent(out)              :: info
 
     integer :: i

@@ -135,7 +135,7 @@ module psb_z_csc_mat_mod
       integer, intent(out)                                 :: info
     end subroutine psb_z_csc_mold
   end interface
-  
+
   interface
     subroutine psb_z_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_z_csc_sparse_mat
@@ -364,7 +364,7 @@ module psb_z_csc_mat_mod
     subroutine psb_z_csc_rowsum(d,a) 
       import :: psb_z_csc_sparse_mat, psb_dpk_
       class(psb_z_csc_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csc_rowsum
   end interface
 
@@ -372,7 +372,7 @@ module psb_z_csc_mat_mod
     subroutine psb_z_csc_arwsum(d,a) 
       import :: psb_z_csc_sparse_mat, psb_dpk_
       class(psb_z_csc_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)             :: d(:)
+      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csc_arwsum
   end interface
   
@@ -380,7 +380,7 @@ module psb_z_csc_mat_mod
     subroutine psb_z_csc_colsum(d,a) 
       import :: psb_z_csc_sparse_mat, psb_dpk_
       class(psb_z_csc_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csc_colsum
   end interface
 
@@ -388,10 +388,10 @@ module psb_z_csc_mat_mod
     subroutine psb_z_csc_aclsum(d,a) 
       import :: psb_z_csc_sparse_mat, psb_dpk_
       class(psb_z_csc_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)             :: d(:)
+      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_csc_aclsum
   end interface
-      
+    
   interface 
     subroutine psb_z_csc_get_diag(a,d,info) 
       import :: psb_z_csc_sparse_mat, psb_dpk_
@@ -440,7 +440,7 @@ contains
     class(psb_z_csc_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + 2 * psb_sizeof_dp  * size(a%val)
+    res = res + (2*psb_sizeof_dp)  * size(a%val)
     res = res + psb_sizeof_int * size(a%icp)
     res = res + psb_sizeof_int * size(a%ia)
       
@@ -464,7 +464,7 @@ contains
     class(psb_z_csc_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ia)) then 
       if (res >= 0) then 

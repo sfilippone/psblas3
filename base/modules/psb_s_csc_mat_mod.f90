@@ -126,7 +126,7 @@ module psb_s_csc_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_s_csc_allocate_mnnz
   end interface
-  
+
   interface 
     subroutine psb_s_csc_mold(a,b,info) 
       import :: psb_s_csc_sparse_mat, psb_s_base_sparse_mat, psb_long_int_k_
@@ -343,7 +343,7 @@ module psb_s_csc_mat_mod
       real(psb_spk_)         :: res
     end function psb_s_csc_maxval
   end interface
-
+  
   interface 
     function psb_s_csc_csnmi(a) result(res)
       import :: psb_s_csc_sparse_mat, psb_spk_
@@ -391,7 +391,7 @@ module psb_s_csc_mat_mod
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_s_csc_aclsum
   end interface
-      
+    
   interface 
     subroutine psb_s_csc_get_diag(a,d,info) 
       import :: psb_s_csc_sparse_mat, psb_spk_
@@ -464,7 +464,7 @@ contains
     class(psb_s_csc_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ia)) then 
       if (res >= 0) then 

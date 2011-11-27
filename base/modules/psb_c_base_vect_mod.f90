@@ -7,7 +7,6 @@ module psb_c_base_vect_mod
     complex(psb_spk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => c_base_get_nrows
-    procedure, pass(x) :: sizeof   => c_base_sizeof
     procedure, pass(x) :: dot_v    => c_base_dot_v
     procedure, pass(x) :: dot_a    => c_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -72,12 +71,10 @@ contains
     
   
   subroutine c_base_bld_n(x,n)
-    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_c_base_vect_type), intent(inout) :: x
     integer :: info
 
-    call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
   end subroutine c_base_bld_n
@@ -116,14 +113,10 @@ contains
   subroutine c_base_set_vect(x,val)
     class(psb_c_base_vect_type), intent(inout)  :: x
     complex(psb_spk_), intent(in) :: val(:)
-    integer :: nr
+        
     integer :: info
-    if (allocated(x%v)) then 
-      nr = min(size(x%v),size(val))
-      x%v(1:nr) = val(1:nr)
-    else
-      x%v = val
-    end if
+    x%v = val
+    
   end subroutine c_base_set_vect
     
   
@@ -146,27 +139,21 @@ contains
 
   end function size_const
     
+
   function c_base_get_nrows(x) result(res)
     implicit none 
     class(psb_c_base_vect_type), intent(in) :: x
     integer :: res
-    res = 0
+    res = -1
     if (allocated(x%v)) res = size(x%v)
   end function c_base_get_nrows
-
-  function c_base_sizeof(x) result(res)
-    implicit none 
-    class(psb_c_base_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
-    res = (2*psb_sizeof_sp)*x%get_nrows()
-  end function c_base_sizeof
 
   function c_base_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_c_base_vect_type), intent(inout) :: x, y
     integer, intent(in)           :: n
-    complex(psb_spk_)             :: res
-    complex(psb_spk_), external   :: cdotc
+    complex(psb_spk_)                :: res
+    complex(psb_spk_), external      :: cdotc
     
     res = czero
     !
@@ -186,10 +173,10 @@ contains
   function c_base_dot_a(n,x,y) result(res)
     implicit none 
     class(psb_c_base_vect_type), intent(inout) :: x
-    complex(psb_spk_), intent(in) :: y(:)
+    complex(psb_spk_), intent(in)    :: y(:)
     integer, intent(in)           :: n
-    complex(psb_spk_)             :: res
-    complex(psb_spk_), external   :: cdotc
+    complex(psb_spk_)                :: res
+    complex(psb_spk_), external      :: cdotc
     
     res = cdotc(n,y,1,x%v,1)
 
@@ -268,13 +255,11 @@ contains
   subroutine c_base_mlt_a_2(alpha,x,y,beta,z,info)
     use psi_serial_mod
     implicit none 
-    complex(psb_spk_), intent(in)              :: alpha,beta
-    complex(psb_spk_), intent(in)              :: y(:)
-    complex(psb_spk_), intent(in)              :: x(:)
-    class(psb_c_base_vect_type), intent(inout) :: z
-    integer, intent(out)                       :: info
-!    character(len=1), intent(in), optional     :: conjgx, conjgy
-
+    complex(psb_spk_), intent(in)        :: alpha,beta
+    complex(psb_spk_), intent(in)        :: y(:)
+    complex(psb_spk_), intent(in)        :: x(:)
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer, intent(out)              :: info
     integer :: i, n
 
     info = 0    
@@ -335,32 +320,19 @@ contains
     end if
   end subroutine c_base_mlt_a_2
 
-  subroutine c_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+  subroutine c_base_mlt_v_2(alpha,x,y,beta,z,info)
     use psi_serial_mod
-    use psb_string_mod
     implicit none 
-    complex(psb_spk_), intent(in)              :: alpha,beta
-    class(psb_c_base_vect_type), intent(inout) :: x
-    class(psb_c_base_vect_type), intent(inout) :: y
-    class(psb_c_base_vect_type), intent(inout) :: z
-    integer, intent(out)                       :: info    
-    character(len=1), intent(in), optional     :: conjgx, conjgy
+    complex(psb_spk_), intent(in)        :: alpha,beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    class(psb_c_base_vect_type), intent(inout)  :: z
+    integer, intent(out)              :: info    
     integer :: i, n
 
     info = 0
-    if (present(conjgx)) then 
-      if (psb_toupper(conjgx)=='C') x%v=conjg(x%v)
-    end if
-    if (present(conjgy)) then 
-      if (psb_toupper(conjgy)=='C') y%v=conjg(y%v)
-    end if
+    
     call z%mlt(alpha,x%v,y%v,beta,info)
-    if (present(conjgx)) then 
-      if (psb_toupper(conjgx)=='C') x%v=conjg(x%v)
-    end if
-    if (present(conjgy)) then 
-      if (psb_toupper(conjgy)=='C') y%v=conjg(y%v)
-    end if
 
   end subroutine c_base_mlt_v_2
 

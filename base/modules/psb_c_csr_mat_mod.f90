@@ -79,7 +79,7 @@ module psb_c_csr_mat_mod
     procedure, pass(a) :: get_diag     => psb_c_csr_get_diag
     procedure, pass(a) :: csgetptn     => psb_c_csr_csgetptn
     procedure, pass(a) :: c_csgetrow   => psb_c_csr_csgetrow
-!!$    procedure, pass(a) :: get_nz_row   => c_csr_get_nz_row
+    procedure, pass(a) :: get_nz_row   => c_csr_get_nz_row
     procedure, pass(a) :: reinit       => psb_c_csr_reinit
     procedure, pass(a) :: trim         => psb_c_csr_trim
     procedure, pass(a) :: print        => psb_c_csr_print
@@ -93,7 +93,7 @@ module psb_c_csr_mat_mod
   end type psb_c_csr_sparse_mat
 
   private :: c_csr_get_nzeros, c_csr_free,  c_csr_get_fmt, &
-       & c_csr_get_size, c_csr_sizeof, c_csr_get_nc_row
+       & c_csr_get_size, c_csr_sizeof, c_csr_get_nz_row
 
   interface
     subroutine  psb_c_csr_reallocate_nz(nz,a) 
@@ -126,7 +126,7 @@ module psb_c_csr_mat_mod
       integer, intent(out)                                 :: info
     end subroutine psb_c_csr_mold
   end interface
-  
+
   interface
     subroutine  psb_c_csr_allocate_mnnz(m,n,a,nz) 
       import :: psb_c_csr_sparse_mat
@@ -135,7 +135,7 @@ module psb_c_csr_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_c_csr_allocate_mnnz
   end interface
-
+  
   interface
     subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_c_csr_sparse_mat
@@ -335,6 +335,7 @@ module psb_c_csr_mat_mod
     end subroutine psb_c_csr_csmm
   end interface
   
+  
   interface 
     function psb_c_csr_maxval(a) result(res)
       import :: psb_c_csr_sparse_mat, psb_spk_
@@ -342,7 +343,7 @@ module psb_c_csr_mat_mod
       real(psb_spk_)         :: res
     end function psb_c_csr_maxval
   end interface
-
+  
   interface 
     function psb_c_csr_csnmi(a) result(res)
       import :: psb_c_csr_sparse_mat, psb_spk_
@@ -363,7 +364,7 @@ module psb_c_csr_mat_mod
     subroutine psb_c_csr_rowsum(d,a) 
       import :: psb_c_csr_sparse_mat, psb_spk_
       class(psb_c_csr_sparse_mat), intent(in) :: a
-      complex(psb_spk_), intent(out)          :: d(:)
+      complex(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csr_rowsum
   end interface
 
@@ -371,7 +372,7 @@ module psb_c_csr_mat_mod
     subroutine psb_c_csr_arwsum(d,a) 
       import :: psb_c_csr_sparse_mat, psb_spk_
       class(psb_c_csr_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)             :: d(:)
+      real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csr_arwsum
   end interface
   
@@ -379,7 +380,7 @@ module psb_c_csr_mat_mod
     subroutine psb_c_csr_colsum(d,a) 
       import :: psb_c_csr_sparse_mat, psb_spk_
       class(psb_c_csr_sparse_mat), intent(in) :: a
-      complex(psb_spk_), intent(out)          :: d(:)
+      complex(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csr_colsum
   end interface
 
@@ -387,7 +388,7 @@ module psb_c_csr_mat_mod
     subroutine psb_c_csr_aclsum(d,a) 
       import :: psb_c_csr_sparse_mat, psb_spk_
       class(psb_c_csr_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)             :: d(:)
+      real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csr_aclsum
   end interface
     
@@ -440,7 +441,7 @@ contains
     class(psb_c_csr_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + 2 * psb_sizeof_sp  * size(a%val)
+    res = res + (2*psb_sizeof_sp)  * size(a%val)
     res = res + psb_sizeof_int * size(a%irp)
     res = res + psb_sizeof_int * size(a%ja)
       
@@ -464,7 +465,7 @@ contains
     class(psb_c_csr_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ja)) then 
       if (res >= 0) then 
@@ -485,7 +486,7 @@ contains
 
 
 
-  function  c_csr_get_nc_row(idx,a) result(res)
+  function  c_csr_get_nz_row(idx,a) result(res)
 
     implicit none
     
@@ -499,7 +500,7 @@ contains
       res = a%irp(idx+1)-a%irp(idx)
     end if
     
-  end function c_csr_get_nc_row
+  end function c_csr_get_nz_row
 
 
 

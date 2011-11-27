@@ -38,7 +38,6 @@
 ! specific to the type and could not be defined higher in the
 ! hierarchy). We are at the bottom level of the inheritance chain.
 ! 
-
 module psb_c_csc_mat_mod
 
   use psb_c_base_mat_mod
@@ -80,7 +79,7 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: get_diag     => psb_c_csc_get_diag
     procedure, pass(a) :: csgetptn     => psb_c_csc_csgetptn
     procedure, pass(a) :: c_csgetrow   => psb_c_csc_csgetrow
-!!$    procedure, pass(a) :: get_nz_col   => c_csc_get_nz_col
+    procedure, pass(a) :: get_nz_col   => c_csc_get_nz_col
     procedure, pass(a) :: reinit       => psb_c_csc_reinit
     procedure, pass(a) :: trim         => psb_c_csc_trim
     procedure, pass(a) :: print        => psb_c_csc_print
@@ -94,7 +93,7 @@ module psb_c_csc_mat_mod
   end type psb_c_csc_sparse_mat
 
  private :: c_csc_get_nzeros, c_csc_free,  c_csc_get_fmt, &
-       & c_csc_get_size, c_csc_sizeof, c_csc_get_nc_col
+       & c_csc_get_size, c_csc_sizeof, c_csc_get_nz_col
 
   interface
     subroutine  psb_c_csc_reallocate_nz(nz,a) 
@@ -127,7 +126,7 @@ module psb_c_csc_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_c_csc_allocate_mnnz
   end interface
-  
+
   interface 
     subroutine psb_c_csc_mold(a,b,info) 
       import :: psb_c_csc_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
@@ -336,6 +335,7 @@ module psb_c_csc_mat_mod
     end subroutine psb_c_csc_csmm
   end interface
   
+  
   interface 
     function psb_c_csc_maxval(a) result(res)
       import :: psb_c_csc_sparse_mat, psb_spk_
@@ -364,7 +364,7 @@ module psb_c_csc_mat_mod
     subroutine psb_c_csc_rowsum(d,a) 
       import :: psb_c_csc_sparse_mat, psb_spk_
       class(psb_c_csc_sparse_mat), intent(in) :: a
-      complex(psb_spk_), intent(out)          :: d(:)
+      complex(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csc_rowsum
   end interface
 
@@ -372,7 +372,7 @@ module psb_c_csc_mat_mod
     subroutine psb_c_csc_arwsum(d,a) 
       import :: psb_c_csc_sparse_mat, psb_spk_
       class(psb_c_csc_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)             :: d(:)
+      real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csc_arwsum
   end interface
   
@@ -380,7 +380,7 @@ module psb_c_csc_mat_mod
     subroutine psb_c_csc_colsum(d,a) 
       import :: psb_c_csc_sparse_mat, psb_spk_
       class(psb_c_csc_sparse_mat), intent(in) :: a
-      complex(psb_spk_), intent(out)          :: d(:)
+      complex(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csc_colsum
   end interface
 
@@ -388,10 +388,10 @@ module psb_c_csc_mat_mod
     subroutine psb_c_csc_aclsum(d,a) 
       import :: psb_c_csc_sparse_mat, psb_spk_
       class(psb_c_csc_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)             :: d(:)
+      real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_csc_aclsum
   end interface
-      
+    
   interface 
     subroutine psb_c_csc_get_diag(a,d,info) 
       import :: psb_c_csc_sparse_mat, psb_spk_
@@ -440,7 +440,7 @@ contains
     class(psb_c_csc_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + 2 * psb_sizeof_sp  * size(a%val)
+    res = res + (2*psb_sizeof_sp)  * size(a%val)
     res = res + psb_sizeof_int * size(a%icp)
     res = res + psb_sizeof_int * size(a%ia)
       
@@ -464,7 +464,7 @@ contains
     class(psb_c_csc_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ia)) then 
       if (res >= 0) then 
@@ -485,7 +485,7 @@ contains
 
 
 
-  function  c_csc_get_nc_col(idx,a) result(res)
+  function  c_csc_get_nz_col(idx,a) result(res)
     use psb_const_mod
     implicit none
     
@@ -499,7 +499,7 @@ contains
       res = a%icp(idx+1)-a%icp(idx)
     end if
     
-  end function c_csc_get_nc_col
+  end function c_csc_get_nz_col
 
 
 

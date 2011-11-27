@@ -126,7 +126,7 @@ module psb_s_csr_mat_mod
       integer, intent(out)                                 :: info
     end subroutine psb_s_csr_mold
   end interface
-  
+
   interface
     subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz) 
       import :: psb_s_csr_sparse_mat
@@ -135,7 +135,7 @@ module psb_s_csr_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_s_csr_allocate_mnnz
   end interface
-
+  
   interface
     subroutine psb_s_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_s_csr_sparse_mat
@@ -465,7 +465,7 @@ contains
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ja)) then 
       if (res >= 0) then 

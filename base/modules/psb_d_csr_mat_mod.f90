@@ -465,7 +465,7 @@ contains
     class(psb_d_csr_sparse_mat), intent(in) :: a
     integer :: res
 
-    res = -1
+    res = 0
     
     if (allocated(a%ja)) then 
       if (res >= 0) then 
