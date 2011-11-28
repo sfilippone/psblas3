@@ -32,13 +32,13 @@
 !
 ! package: psb_s_base_mat_mod
 !
-! This module contains the implementation of the psb_s_base_sparse_mat
-! type, derived from the psb_base_sparse_mat one to define a middle
-! level definition of a real(psb_spk_) sparse matrix
-! object.This class object itself does not have any additional members
-! with respect to those of the base class. No methods can be fully
-! implemented at this level, but we can define the interface for the
-! computational methods requiring the knowledge of the underlying
+! This module contains the implementation of the
+! psb_s_base_sparse_mat, derived from the psb_base_sparse_mat to
+! define a middle level definition of a real, single-precision sparse
+! matrix object.This class object itself does not have any additional
+! members with respect to those of the base class. No methods can be
+! fully implemented at this level, but we can define the interface for
+! the computational methods requiring the knowledge of the underlying
 ! field, such as the matrix-vector product; this interface is defined,
 ! but is supposed to be overridden at the leaf level.
 !
@@ -50,9 +50,11 @@
 ! psb_s_base_sparse_mat one.
 !
 ! About the method MOLD: this has been defined for those compilers
-! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+! not yet supporting ALLOCATE( ...MOLD=...); it's otherwise silly to
 ! duplicate "by hand" what is specified in the language (in this case F2008)
 !
+
+
 module psb_s_base_mat_mod
   
   use psb_base_mat_mod
@@ -132,6 +134,13 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: s_inner_cssv => psb_s_coo_cssv
     procedure, pass(a) :: s_scals      => psb_s_coo_scals
     procedure, pass(a) :: s_scal       => psb_s_coo_scal
+    procedure, pass(a) :: maxval       => psb_s_coo_maxval
+    procedure, pass(a) :: csnmi        => psb_s_coo_csnmi
+    procedure, pass(a) :: csnm1        => psb_s_coo_csnm1
+    procedure, pass(a) :: rowsum       => psb_s_coo_rowsum
+    procedure, pass(a) :: arwsum       => psb_s_coo_arwsum
+    procedure, pass(a) :: colsum       => psb_s_coo_colsum
+    procedure, pass(a) :: aclsum       => psb_s_coo_aclsum
     procedure, pass(a) :: reallocate_nz => psb_s_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_s_coo_allocate_mnnz
     procedure, pass(a) :: cp_to_coo    => psb_s_cp_coo_to_coo
@@ -143,13 +152,6 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: mv_to_fmt    => psb_s_mv_coo_to_fmt
     procedure, pass(a) :: mv_from_fmt  => psb_s_mv_coo_from_fmt
     procedure, pass(a) :: csput        => psb_s_coo_csput
-    procedure, pass(a) :: maxval       => psb_s_coo_maxval
-    procedure, pass(a) :: csnmi        => psb_s_coo_csnmi
-    procedure, pass(a) :: csnm1        => psb_s_coo_csnm1
-    procedure, pass(a) :: rowsum       => psb_s_coo_rowsum
-    procedure, pass(a) :: arwsum       => psb_s_coo_arwsum
-    procedure, pass(a) :: colsum       => psb_s_coo_colsum
-    procedure, pass(a) :: aclsum       => psb_s_coo_aclsum
     procedure, pass(a) :: get_diag     => psb_s_coo_get_diag
     procedure, pass(a) :: s_csgetrow   => psb_s_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_s_coo_csgetptn
@@ -215,7 +217,7 @@ module psb_s_base_mat_mod
       character, optional, intent(in)  :: trans
     end subroutine psb_s_base_vect_mv
   end interface
-  
+
   interface 
     subroutine psb_s_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_s_base_sparse_mat, psb_spk_
@@ -310,7 +312,7 @@ module psb_s_base_mat_mod
       real(psb_spk_)         :: res
     end function psb_s_base_maxval
   end interface
-  
+
   interface 
     function psb_s_base_csnmi(a) result(res)
       import :: psb_s_base_sparse_mat, psb_spk_
@@ -358,7 +360,7 @@ module psb_s_base_mat_mod
       real(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_s_base_aclsum
   end interface
-  
+    
   interface 
     subroutine psb_s_base_get_diag(a,d,info) 
       import :: psb_s_base_sparse_mat, psb_spk_
@@ -510,7 +512,7 @@ module psb_s_base_mat_mod
     subroutine psb_s_base_transp_2mat(a,b)
       import :: psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_
       class(psb_s_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_s_base_transp_2mat
   end interface
   
@@ -518,7 +520,7 @@ module psb_s_base_mat_mod
     subroutine psb_s_base_transc_2mat(a,b)
       import :: psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_
       class(psb_s_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_s_base_transc_2mat
   end interface
   
@@ -576,7 +578,7 @@ module psb_s_base_mat_mod
       integer, intent(in), optional :: nz
     end subroutine psb_s_coo_allocate_mnnz
   end interface
-
+  
   interface 
     subroutine psb_s_coo_mold(a,b,info) 
       import :: psb_s_coo_sparse_mat, psb_s_base_sparse_mat, psb_long_int_k_
@@ -586,7 +588,6 @@ module psb_s_base_mat_mod
     end subroutine psb_s_coo_mold
   end interface
 
-  
   interface
     subroutine psb_s_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
       import :: psb_s_coo_sparse_mat
@@ -620,7 +621,7 @@ module psb_s_base_mat_mod
       integer, intent(in), optional :: idir
     end subroutine psb_s_fix_coo_inner
   end interface
-  
+
   interface 
     subroutine psb_s_fix_coo(a,info,idir) 
       import :: psb_s_coo_sparse_mat
@@ -802,7 +803,7 @@ module psb_s_base_mat_mod
     end subroutine psb_s_coo_csmm
   end interface
   
-    
+  
   interface 
     function psb_s_coo_maxval(a) result(res)
       import :: psb_s_coo_sparse_mat, psb_spk_
@@ -810,7 +811,7 @@ module psb_s_base_mat_mod
       real(psb_spk_)         :: res
     end function psb_s_coo_maxval
   end interface
-
+  
   interface 
     function psb_s_coo_csnmi(a) result(res)
       import :: psb_s_coo_sparse_mat, psb_spk_
@@ -1075,11 +1076,6 @@ contains
     class(psb_s_coo_sparse_mat), intent(inout) :: a
     
     call a%transp() 
-    ! This will morph into conjg() for C and Z
-    ! and into a no-op for S and D, so a conditional
-    ! on a constant ought to take it out completely. 
-    if (psb_s_is_complex_) a%val(:) = (a%val(:))
-
   end subroutine s_coo_transc_1mat
 
 

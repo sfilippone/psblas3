@@ -7,6 +7,7 @@ module psb_s_base_vect_mod
     real(psb_spk_), allocatable :: v(:)
   contains
     procedure, pass(x) :: get_nrows => s_base_get_nrows
+    procedure, pass(x) :: sizeof   => s_base_sizeof
     procedure, pass(x) :: dot_v    => s_base_dot_v
     procedure, pass(x) :: dot_a    => s_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -71,10 +72,12 @@ contains
     
   
   subroutine s_base_bld_n(x,n)
+    use psb_realloc_mod
     integer, intent(in) :: n
     class(psb_s_base_vect_type), intent(inout) :: x
     integer :: info
 
+    call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
   end subroutine s_base_bld_n
@@ -113,10 +116,14 @@ contains
   subroutine s_base_set_vect(x,val)
     class(psb_s_base_vect_type), intent(inout)  :: x
     real(psb_spk_), intent(in) :: val(:)
-        
+    integer :: nr
     integer :: info
-    x%v = val
-    
+    if (allocated(x%v)) then 
+      nr = min(size(x%v),size(val))
+      x%v(1:nr) = val(1:nr)
+    else
+      x%v = val
+    end if
   end subroutine s_base_set_vect
     
   
@@ -139,14 +146,20 @@ contains
 
   end function size_const
     
-
   function s_base_get_nrows(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
     integer :: res
-    res = -1
+    res = 0
     if (allocated(x%v)) res = size(x%v)
   end function s_base_get_nrows
+    
+  function s_base_sizeof(x) result(res)
+    implicit none 
+    class(psb_s_base_vect_type), intent(in) :: x
+    integer(psb_long_int_k_) :: res
+    res = psb_sizeof_sp*x%get_nrows()
+  end function s_base_sizeof
 
   function s_base_dot_v(n,x,y) result(res)
     implicit none 

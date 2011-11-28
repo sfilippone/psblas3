@@ -32,15 +32,16 @@
 !
 ! package: psb_z_base_mat_mod
 !
-! This module contains the implementation of the psb_z_base_sparse_mat
-! type, derived from the psb_base_sparse_mat one to define a middle
-! level definition of a complex(psb_dpk_) sparse matrix
-! object.This class object itself does not have any additional members
-! with respect to those of the base class. No methods can be fully
-! implemented at this level, but we can define the interface for the
-! computational methods requiring the knowledge of the underlying
-! field, such as the matrix-vector product; this interface is defined,
-! but is supposed to be overridden at the leaf level.
+! This module contains the implementation of the
+! psb_z_base_sparse_mat, derived from the psb_base_sparse_mat to
+! define a middle level definition of a complex, double-precision
+! sparse matrix object.This class object itself does not have any
+! additional members with respect to those of the base class. No
+! methods can be fully implemented at this level, but we can define
+! the interface for the computational methods requiring the knowledge
+! of the underlying field, such as the matrix-vector product; this
+! interface is defined, but is supposed to be overridden at the leaf
+! level.
 !
 ! This module also contains the implementation of the
 ! psb_z_coo_sparse_mat type and the related methods. This is the
@@ -50,9 +51,11 @@
 ! psb_z_base_sparse_mat one.
 !
 ! About the method MOLD: this has been defined for those compilers
-! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+! not yet supporting ALLOCATE( ...MOLD=...); it's otherwise silly to
 ! duplicate "by hand" what is specified in the language (in this case F2008)
 !
+
+
 module psb_z_base_mat_mod
   
   use psb_base_mat_mod
@@ -132,6 +135,13 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: z_inner_cssv => psb_z_coo_cssv
     procedure, pass(a) :: z_scals      => psb_z_coo_scals
     procedure, pass(a) :: z_scal       => psb_z_coo_scal
+    procedure, pass(a) :: maxval       => psb_z_coo_maxval
+    procedure, pass(a) :: csnmi        => psb_z_coo_csnmi
+    procedure, pass(a) :: csnm1        => psb_z_coo_csnm1
+    procedure, pass(a) :: rowsum       => psb_z_coo_rowsum
+    procedure, pass(a) :: arwsum       => psb_z_coo_arwsum
+    procedure, pass(a) :: colsum       => psb_z_coo_colsum
+    procedure, pass(a) :: aclsum       => psb_z_coo_aclsum
     procedure, pass(a) :: reallocate_nz => psb_z_coo_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_z_coo_allocate_mnnz
     procedure, pass(a) :: cp_to_coo    => psb_z_cp_coo_to_coo
@@ -143,13 +153,6 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: mv_to_fmt    => psb_z_mv_coo_to_fmt
     procedure, pass(a) :: mv_from_fmt  => psb_z_mv_coo_from_fmt
     procedure, pass(a) :: csput        => psb_z_coo_csput
-    procedure, pass(a) :: maxval       => psb_z_coo_maxval
-    procedure, pass(a) :: csnmi        => psb_z_coo_csnmi
-    procedure, pass(a) :: csnm1        => psb_z_coo_csnm1
-    procedure, pass(a) :: rowsum       => psb_z_coo_rowsum
-    procedure, pass(a) :: arwsum       => psb_z_coo_arwsum
-    procedure, pass(a) :: colsum       => psb_z_coo_colsum
-    procedure, pass(a) :: aclsum       => psb_z_coo_aclsum
     procedure, pass(a) :: get_diag     => psb_z_coo_get_diag
     procedure, pass(a) :: z_csgetrow   => psb_z_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_z_coo_csgetptn
@@ -208,14 +211,14 @@ module psb_z_base_mat_mod
     subroutine psb_z_base_vect_mv(alpha,a,x,beta,y,info,trans) 
       import :: psb_z_base_sparse_mat, psb_dpk_, psb_z_base_vect_type
       class(psb_z_base_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in)       :: alpha, beta
+      complex(psb_dpk_), intent(in)            :: alpha, beta
       class(psb_z_base_vect_type), intent(inout) :: x
       class(psb_z_base_vect_type), intent(inout) :: y
       integer, intent(out)             :: info
       character, optional, intent(in)  :: trans
     end subroutine psb_z_base_vect_mv
   end interface
-  
+
   interface 
     subroutine psb_z_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_z_base_sparse_mat, psb_dpk_
@@ -242,7 +245,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
       import :: psb_z_base_sparse_mat, psb_dpk_,  psb_z_base_vect_type
       class(psb_z_base_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in)       :: alpha, beta
+      complex(psb_dpk_), intent(in)            :: alpha, beta
       class(psb_z_base_vect_type), intent(inout) :: x, y
       integer, intent(out)             :: info
       character, optional, intent(in)  :: trans
@@ -277,7 +280,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_z_base_sparse_mat, psb_dpk_,psb_z_base_vect_type
       class(psb_z_base_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(in)       :: alpha, beta
+      complex(psb_dpk_), intent(in)            :: alpha, beta
       class(psb_z_base_vect_type), intent(inout) :: x,y
       integer, intent(out)             :: info
       character, optional, intent(in)  :: trans, scale
@@ -318,7 +321,7 @@ module psb_z_base_mat_mod
       real(psb_dpk_)         :: res
     end function psb_z_base_csnmi
   end interface
-
+  
   interface 
     function psb_z_base_csnm1(a) result(res)
       import :: psb_z_base_sparse_mat, psb_dpk_
@@ -358,7 +361,7 @@ module psb_z_base_mat_mod
       real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_z_base_aclsum
   end interface
-  
+    
   interface 
     subroutine psb_z_base_get_diag(a,d,info) 
       import :: psb_z_base_sparse_mat, psb_dpk_
@@ -510,7 +513,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_base_transp_2mat(a,b)
       import :: psb_z_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
       class(psb_z_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_z_base_transp_2mat
   end interface
   
@@ -518,7 +521,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_base_transc_2mat(a,b)
       import :: psb_z_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
       class(psb_z_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_z_base_transc_2mat
   end interface
   
@@ -585,7 +588,6 @@ module psb_z_base_mat_mod
       integer, intent(out)                                 :: info
     end subroutine psb_z_coo_mold
   end interface
-
   
   interface
     subroutine psb_z_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
@@ -801,8 +803,7 @@ module psb_z_base_mat_mod
       character, optional, intent(in)     :: trans
     end subroutine psb_z_coo_csmm
   end interface
-  
-    
+   
   interface 
     function psb_z_coo_maxval(a) result(res)
       import :: psb_z_coo_sparse_mat, psb_dpk_
@@ -810,7 +811,7 @@ module psb_z_base_mat_mod
       real(psb_dpk_)         :: res
     end function psb_z_coo_maxval
   end interface
-
+   
   interface 
     function psb_z_coo_csnmi(a) result(res)
       import :: psb_z_coo_sparse_mat, psb_dpk_
@@ -831,7 +832,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_coo_rowsum(d,a) 
       import :: psb_z_coo_sparse_mat, psb_dpk_
       class(psb_z_coo_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)              :: d(:)
+      complex(psb_dpk_), intent(out)          :: d(:)
     end subroutine psb_z_coo_rowsum
   end interface
 
@@ -839,7 +840,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_coo_arwsum(d,a) 
       import :: psb_z_coo_sparse_mat, psb_dpk_
       class(psb_z_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)             :: d(:)
     end subroutine psb_z_coo_arwsum
   end interface
   
@@ -847,7 +848,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_coo_colsum(d,a) 
       import :: psb_z_coo_sparse_mat, psb_dpk_
       class(psb_z_coo_sparse_mat), intent(in) :: a
-      complex(psb_dpk_), intent(out)              :: d(:)
+      complex(psb_dpk_), intent(out)          :: d(:)
     end subroutine psb_z_coo_colsum
   end interface
 
@@ -855,7 +856,7 @@ module psb_z_base_mat_mod
     subroutine psb_z_coo_aclsum(d,a) 
       import :: psb_z_coo_sparse_mat, psb_dpk_
       class(psb_z_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)             :: d(:)
     end subroutine psb_z_coo_aclsum
   end interface
   
@@ -939,7 +940,7 @@ contains
     class(psb_z_coo_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 + 1
-    res = res + (2*psb_sizeof_dp)  * size(a%val)
+    res = res + 2 * psb_sizeof_dp  * size(a%val)
     res = res + psb_sizeof_int * size(a%ia)
     res = res + psb_sizeof_int * size(a%ja)
     
@@ -1019,6 +1020,8 @@ contains
   !
   ! == ==================================
   
+  
+  
   subroutine  z_coo_free(a) 
     implicit none 
     
@@ -1070,15 +1073,13 @@ contains
   end subroutine z_coo_transp_1mat
   
   subroutine z_coo_transc_1mat(a)
+  
     implicit none 
     
     class(psb_z_coo_sparse_mat), intent(inout) :: a
     
     call a%transp() 
-    ! This will morph into conjg() for C and Z
-    ! and into a no-op for S and D, so a conditional
-    ! on a constant ought to take it out completely. 
-    if (psb_z_is_complex_) a%val(:) = conjg(a%val(:))
+    a%val(:) = conjg(a%val)
 
   end subroutine z_coo_transc_1mat
 

@@ -34,7 +34,7 @@
 !
 ! This module contains the implementation of the psb_d_base_sparse_mat
 ! type, derived from the psb_base_sparse_mat one to define a middle
-! level definition of a real(psb_dpk_) sparse matrix
+! level definition of a real, double-precision sparse matrix
 ! object.This class object itself does not have any additional members
 ! with respect to those of the base class. No methods can be fully
 ! implemented at this level, but we can define the interface for the
@@ -50,9 +50,11 @@
 ! psb_d_base_sparse_mat one.
 !
 ! About the method MOLD: this has been defined for those compilers
-! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+! not yet supporting ALLOCATE( ...MOLD=...); it's otherwise silly to
 ! duplicate "by hand" what is specified in the language (in this case F2008)
 !
+
+
 module psb_d_base_mat_mod
   
   use psb_base_mat_mod
@@ -510,7 +512,7 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_transp_2mat(a,b)
       import :: psb_d_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_d_base_transp_2mat
   end interface
   
@@ -518,7 +520,7 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_transc_2mat(a,b)
       import :: psb_d_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_base_sparse_mat), intent(out)  :: b
     end subroutine psb_d_base_transc_2mat
   end interface
   
@@ -1075,11 +1077,6 @@ contains
     class(psb_d_coo_sparse_mat), intent(inout) :: a
     
     call a%transp() 
-    ! This will morph into conjg() for C and Z
-    ! and into a no-op for S and D, so a conditional
-    ! on a constant ought to take it out completely. 
-    if (psb_d_is_complex_) a%val(:) = (a%val(:))
-
   end subroutine d_coo_transc_1mat
 
 
