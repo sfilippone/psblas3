@@ -59,7 +59,6 @@ module psb_z_mat_mod
     procedure, pass(a) :: get_nzeros  => psb_z_get_nzeros
     procedure, pass(a) :: get_nz_row  => psb_z_get_nz_row
     procedure, pass(a) :: get_size    => psb_z_get_size
-    procedure, pass(a) :: get_state   => psb_z_get_state
     procedure, pass(a) :: get_dupl    => psb_z_get_dupl
     procedure, pass(a) :: is_null     => psb_z_is_null
     procedure, pass(a) :: is_bld      => psb_z_is_bld
@@ -77,7 +76,6 @@ module psb_z_mat_mod
     procedure, pass(a) :: set_nrows    => psb_z_set_nrows
     procedure, pass(a) :: set_ncols    => psb_z_set_ncols
     procedure, pass(a) :: set_dupl     => psb_z_set_dupl
-    procedure, pass(a) :: set_state    => psb_z_set_state
     procedure, pass(a) :: set_null     => psb_z_set_null
     procedure, pass(a) :: set_bld      => psb_z_set_bld
     procedure, pass(a) :: set_upd      => psb_z_set_upd
@@ -109,7 +107,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: z_cscnv_ip    => psb_z_cscnv_ip
     procedure, pass(a) :: z_cscnv_base  => psb_z_cscnv_base
     generic, public    :: cscnv         => z_cscnv, z_cscnv_ip, z_cscnv_base
-    procedure, pass(a) :: clone         => psb_zspmat_type_clone
+    procedure, pass(a) :: clone         => psb_zspmat_clone
     procedure, pass(a) :: reinit        => psb_z_reinit
     procedure, pass(a) :: print_i       => psb_z_sparse_print
     procedure, pass(a) :: print_n       => psb_z_n_sparse_print
@@ -154,9 +152,9 @@ module psb_z_mat_mod
   end type psb_zspmat_type
 
   private :: psb_z_get_nrows, psb_z_get_ncols, psb_z_get_nzeros, psb_z_get_size, &
-       & psb_z_get_state, psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, psb_z_is_upd, &
-       & psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, psb_z_is_lower, psb_z_is_triangle,&
-       & psb_z_get_nz_row
+       & psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, &
+       & psb_z_is_upd, psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, &
+       & psb_z_is_lower, psb_z_is_triangle, psb_z_get_nz_row
 
   interface psb_sizeof
     module procedure psb_z_sizeof
@@ -191,14 +189,6 @@ module psb_z_mat_mod
       class(psb_zspmat_type), intent(inout) :: a
       integer, intent(in) :: n
     end subroutine psb_z_set_ncols
-  end interface
-  
-  interface 
-    subroutine  psb_z_set_state(n,a) 
-      import :: psb_zspmat_type
-      class(psb_zspmat_type), intent(inout) :: a
-      integer, intent(in) :: n
-    end subroutine psb_z_set_state
   end interface
   
   interface 
@@ -483,7 +473,7 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_mv_from(a,b)
       import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_zspmat_type), intent(out)         :: a
+      class(psb_zspmat_type), intent(out) :: a
       class(psb_z_base_sparse_mat), intent(inout) :: b
     end subroutine psb_z_mv_from
   end interface
@@ -491,15 +481,15 @@ module psb_z_mat_mod
   interface 
     subroutine psb_z_cp_from(a,b)
       import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_zspmat_type), intent(out)      :: a
-      class(psb_z_base_sparse_mat), intent(in) :: b
+      class(psb_zspmat_type), intent(out) :: a
+      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
     end subroutine psb_z_cp_from
   end interface
   
   interface 
     subroutine psb_z_mv_to(a,b)
       import :: psb_zspmat_type, psb_dpk_, psb_z_base_sparse_mat
-      class(psb_zspmat_type), intent(inout)     :: a
+      class(psb_zspmat_type), intent(inout) :: a
       class(psb_z_base_sparse_mat), intent(out) :: b
     end subroutine psb_z_mv_to
   end interface
@@ -522,12 +512,12 @@ module psb_z_mat_mod
   end interface
   
   interface psb_clone
-    subroutine psb_zspmat_type_clone(a,b,info)
+    subroutine psb_zspmat_clone(a,b,info)
       import :: psb_zspmat_type
       class(psb_zspmat_type), intent(in)  :: a
       class(psb_zspmat_type), intent(out) :: b
       integer, intent(out)                 :: info
-    end subroutine psb_zspmat_type_clone
+    end subroutine psb_zspmat_clone
   end interface
 
   interface 
@@ -793,19 +783,6 @@ contains
       res = psb_invalid_
     end if
   end function psb_z_get_dupl
-
-
-  function psb_z_get_state(a) result(res)
-    implicit none 
-    class(psb_zspmat_type), intent(in) :: a
-    integer :: res
-
-    if (allocated(a%a)) then 
-      res = a%a%get_state()
-    else
-      res = psb_spmat_null_
-    end if
-  end function psb_z_get_state
 
   function psb_z_get_nrows(a) result(res)
     implicit none 

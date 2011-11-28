@@ -1,3 +1,15 @@
+!
+!  z_mat_impl:
+!   implementation of the outer matrix methods.
+!   Most of the methods rely on the STATE design pattern:
+!   the inner class(psb_z_base_sparse_mat) is responsbile
+!   for actually executing the method.
+!
+!
+!
+
+
+
 ! == ===================================
 !
 !
@@ -80,39 +92,12 @@ end subroutine psb_z_set_ncols
 
 
 
-subroutine  psb_z_set_state(n,a) 
-  use psb_z_mat_mod, psb_protect_name => psb_z_set_state
-  use psb_error_mod
-  implicit none 
-  class(psb_zspmat_type), intent(inout) :: a
-  integer, intent(in) :: n
-  Integer :: err_act, info
-  character(len=20)  :: name='get_nzeros'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
-    info = psb_err_invalid_mat_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  call a%a%set_state(n)
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
-
-end subroutine psb_z_set_state
-
-
+!
+!  Valid values for DUPL: 
+!  psb_dupl_ovwrt_ 
+!  psb_dupl_add_   
+!  psb_dupl_err_   
+!
 
 subroutine  psb_z_set_dupl(n,a) 
   use psb_z_mat_mod, psb_protect_name => psb_z_set_dupl
@@ -147,6 +132,10 @@ subroutine  psb_z_set_dupl(n,a)
 
 end subroutine psb_z_set_dupl
 
+
+!
+! Set the STATE of the internal matrix object
+!
 
 subroutine  psb_z_set_null(a) 
   use psb_z_mat_mod, psb_protect_name => psb_z_set_null
@@ -1033,7 +1022,6 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1072,6 +1060,7 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
+  
   if (present(dupl)) then 
     call altmp%set_dupl(dupl)
   else if (a%is_bld()) then 
@@ -1421,13 +1410,18 @@ subroutine psb_z_cp_from(a,b)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-
+  
+  !
+  ! Note: it is tempting to use SOURCE allocation below;
+  ! however this would run the risk of messing up with data
+  ! allocated externally (e.g. GPU-side data).
+  !
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b,stat=info)
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
 #else
   call b%mold(a%a,info)
 #endif
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
   if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
   if (info /= psb_success_) goto 9999 
 
@@ -1506,10 +1500,10 @@ subroutine psb_zspmat_type_move(a,b,info)
 end subroutine psb_zspmat_type_move
 
 
-subroutine psb_zspmat_type_clone(a,b,info)
+subroutine psb_zspmat_clone(a,b,info)
   use psb_error_mod
   use psb_string_mod
-  use psb_z_mat_mod, psb_protect_name => psb_zspmat_type_clone
+  use psb_z_mat_mod, psb_protect_name => psb_zspmat_clone
   implicit none 
   class(psb_zspmat_type), intent(in)  :: a
   class(psb_zspmat_type), intent(out) :: b
@@ -1542,7 +1536,7 @@ subroutine psb_zspmat_type_clone(a,b,info)
     return
   end if
 
-end subroutine psb_zspmat_type_clone
+end subroutine psb_zspmat_clone
 
 
 

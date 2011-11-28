@@ -1,3 +1,15 @@
+!
+!  c_mat_impl:
+!   implementation of the outer matrix methods.
+!   Most of the methods rely on the STATE design pattern:
+!   the inner class(psb_c_base_sparse_mat) is responsbile
+!   for actually executing the method.
+!
+!
+!
+
+
+
 ! == ===================================
 !
 !
@@ -80,39 +92,12 @@ end subroutine psb_c_set_ncols
 
 
 
-subroutine  psb_c_set_state(n,a) 
-  use psb_c_mat_mod, psb_protect_name => psb_c_set_state
-  use psb_error_mod
-  implicit none 
-  class(psb_cspmat_type), intent(inout) :: a
-  integer, intent(in) :: n
-  Integer :: err_act, info
-  character(len=20)  :: name='get_nzeros'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  if (.not.allocated(a%a)) then 
-    info = psb_err_invalid_mat_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  call a%a%set_state(n)
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
-
-end subroutine psb_c_set_state
-
-
+!
+!  Valid values for DUPL: 
+!  psb_dupl_ovwrt_ 
+!  psb_dupl_add_   
+!  psb_dupl_err_   
+!
 
 subroutine  psb_c_set_dupl(n,a) 
   use psb_c_mat_mod, psb_protect_name => psb_c_set_dupl
@@ -147,6 +132,10 @@ subroutine  psb_c_set_dupl(n,a)
 
 end subroutine psb_c_set_dupl
 
+
+!
+! Set the STATE of the internal matrix object
+!
 
 subroutine  psb_c_set_null(a) 
   use psb_c_mat_mod, psb_protect_name => psb_c_set_null
@@ -1033,7 +1022,6 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1071,14 +1059,15 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   end if
- 
 
+  
   if (present(dupl)) then 
     call altmp%set_dupl(dupl)
   else if (a%is_bld()) then 
     ! Does this make sense at all?? Who knows..
     call altmp%set_dupl(psb_dupl_def_)
   end if
+
   if (debug) write(psb_err_unit,*) 'Converting from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
@@ -1421,10 +1410,14 @@ subroutine psb_c_cp_from(a,b)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-
+  
+  !
+  ! Note: it is tempting to use SOURCE allocation below;
+  ! however this would run the risk of messing up with data
+  ! allocated externally (e.g. GPU-side data).
+  !
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b,stat=info)
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
 #else
   call b%mold(a%a,info)
 #endif
@@ -1507,10 +1500,10 @@ subroutine psb_cspmat_type_move(a,b,info)
 end subroutine psb_cspmat_type_move
 
 
-subroutine psb_cspmat_type_clone(a,b,info)
+subroutine psb_cspmat_clone(a,b,info)
   use psb_error_mod
   use psb_string_mod
-  use psb_c_mat_mod, psb_protect_name => psb_cspmat_type_clone
+  use psb_c_mat_mod, psb_protect_name => psb_cspmat_clone
   implicit none 
   class(psb_cspmat_type), intent(in)  :: a
   class(psb_cspmat_type), intent(out) :: b
@@ -1529,7 +1522,6 @@ subroutine psb_cspmat_type_clone(a,b,info)
 #else
   call a%a%mold(b%a,info)
 #endif
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
   if (info == psb_success_) call b%a%cp_from_fmt(a%a, info)    
   if (info /= psb_success_) goto 9999 
 
@@ -1544,7 +1536,7 @@ subroutine psb_cspmat_type_clone(a,b,info)
     return
   end if
 
-end subroutine psb_cspmat_type_clone
+end subroutine psb_cspmat_clone
 
 
 
@@ -1887,6 +1879,7 @@ subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans)
 end subroutine psb_c_csmv_vect
 
 
+
 subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
   use psb_error_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_cssm
@@ -2028,7 +2021,6 @@ subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
 
 end subroutine psb_c_cssv_vect
 
-
 function psb_c_maxval(a) result(res)
   use psb_c_mat_mod, psb_protect_name => psb_c_maxval
   use psb_error_mod
@@ -2036,6 +2028,7 @@ function psb_c_maxval(a) result(res)
   implicit none 
   class(psb_cspmat_type), intent(in) :: a
   real(psb_spk_)         :: res
+
 
   Integer :: err_act, info
   character(len=20)  :: name='maxval'
@@ -2074,8 +2067,8 @@ function psb_c_csnmi(a) result(res)
   character(len=20)  :: name='csnmi'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
   info = psb_success_
+  call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2094,6 +2087,7 @@ function psb_c_csnmi(a) result(res)
   return
 
 end function psb_c_csnmi
+
 
 function psb_c_csnm1(a) result(res)
   use psb_c_mat_mod, psb_protect_name => psb_c_csnm1
@@ -2295,8 +2289,8 @@ subroutine psb_c_get_diag(a,d,info)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
-  call psb_erractionsave(err_act)
   info = psb_success_
+  call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2334,8 +2328,8 @@ subroutine psb_c_scal(d,a,info)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
-  call psb_erractionsave(err_act)
   info = psb_success_
+  call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
