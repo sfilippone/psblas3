@@ -77,17 +77,14 @@ subroutine psb_c_base_cp_to_fmt(a,b,info)
   Integer :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
+  type(psb_c_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+  ! 
+  call a%cp_to_coo(tmp,info)
+  if (info == psb_success_) call b%mv_from_coo(tmp,info)
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
-
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
   return
 
 end subroutine psb_c_base_cp_to_fmt
@@ -104,17 +101,14 @@ subroutine psb_c_base_cp_from_fmt(a,b,info)
   Integer :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
+  type(psb_c_coo_sparse_mat)  :: tmp
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  !
+  ! Default implementation
+  ! 
+  call b%cp_to_coo(tmp,info)
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
   return
 
 end subroutine psb_c_base_cp_from_fmt
@@ -187,17 +181,15 @@ subroutine psb_c_base_mv_to_fmt(a,b,info)
   Integer :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
+  type(psb_c_coo_sparse_mat)  :: tmp
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  !
+  ! Default implementation
+  ! 
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+  call a%mv_to_coo(tmp,info)
+  if (info == psb_success_) call b%mv_from_coo(tmp,info)
+
   return
 
 end subroutine psb_c_base_mv_to_fmt
@@ -214,17 +206,14 @@ subroutine psb_c_base_mv_from_fmt(a,b,info)
   Integer :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
+  type(psb_c_coo_sparse_mat)  :: tmp
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  !
+  ! Default implementation
+  ! 
+  call b%mv_to_coo(tmp,info)
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
   return
 
 end subroutine psb_c_base_mv_from_fmt

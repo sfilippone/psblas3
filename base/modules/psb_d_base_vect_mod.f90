@@ -738,6 +738,7 @@ contains
   !
   ! Scatter: 
   ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
+  ! 
   
   subroutine d_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod

@@ -39,7 +39,8 @@
 ! indirection. This type encapsulates the psb_c_base_sparse_mat class
 ! inside another class which is the one visible to the user. All the
 ! methods of the psb_c_mat_mod simply call the methods of the
-! encapsulated class.
+! encapsulated class, except for cscnv and cp_from/cp_to.
+! 
 
 
 module psb_c_mat_mod
@@ -98,20 +99,20 @@ module psb_c_mat_mod
     procedure, pass(a) :: c_csclip      => psb_c_csclip
     procedure, pass(a) :: c_b_csclip    => psb_c_b_csclip
     generic, public    :: csclip        => c_b_csclip, c_csclip
-    procedure, pass(a) :: c_clip_d_ip   => psb_c_clip_d_ip
-    procedure, pass(a) :: c_clip_d      => psb_c_clip_d
-    generic, public    :: clip_diag     => c_clip_d_ip, c_clip_d
     procedure, pass(a) :: reall         => psb_c_reallocate_nz
     procedure, pass(a) :: get_neigh     => psb_c_get_neigh
-    procedure, pass(a) :: c_cscnv       => psb_c_cscnv
-    procedure, pass(a) :: c_cscnv_ip    => psb_c_cscnv_ip
-    procedure, pass(a) :: c_cscnv_base  => psb_c_cscnv_base
-    generic, public    :: cscnv         => c_cscnv, c_cscnv_ip, c_cscnv_base
-    procedure, pass(a) :: clone         => psb_cspmat_clone
     procedure, pass(a) :: reinit        => psb_c_reinit
     procedure, pass(a) :: print_i       => psb_c_sparse_print
     procedure, pass(a) :: print_n       => psb_c_n_sparse_print
     generic, public    :: print         => print_i, print_n
+    procedure, pass(a) :: mold          => psb_c_mold
+    procedure, pass(a) :: c_transp_1mat => psb_c_transp_1mat
+    procedure, pass(a) :: c_transp_2mat => psb_c_transp_2mat
+    generic, public    :: transp        => c_transp_1mat, c_transp_2mat
+    procedure, pass(a) :: c_transc_1mat => psb_c_transc_1mat
+    procedure, pass(a) :: c_transc_2mat => psb_c_transc_2mat
+    generic, public    :: transc        => c_transc_1mat, c_transc_2mat
+    ! These are specific to this level of encapsulation.
     procedure, pass(a) :: c_mv_from     => psb_c_mv_from
     generic, public    :: mv_from       => c_mv_from
     procedure, pass(a) :: c_mv_to       => psb_c_mv_to
@@ -120,13 +121,14 @@ module psb_c_mat_mod
     generic, public    :: cp_from       => c_cp_from
     procedure, pass(a) :: c_cp_to       => psb_c_cp_to
     generic, public    :: cp_to         => c_cp_to
-    procedure, pass(a) :: mold          => psb_c_mold
-    procedure, pass(a) :: c_transp_1mat => psb_c_transp_1mat
-    procedure, pass(a) :: c_transp_2mat => psb_c_transp_2mat
-    generic, public    :: transp        => c_transp_1mat, c_transp_2mat
-    procedure, pass(a) :: c_transc_1mat => psb_c_transc_1mat
-    procedure, pass(a) :: c_transc_2mat => psb_c_transc_2mat
-    generic, public    :: transc        => c_transc_1mat, c_transc_2mat
+    procedure, pass(a) :: c_clip_d_ip   => psb_c_clip_d_ip
+    procedure, pass(a) :: c_clip_d      => psb_c_clip_d
+    generic, public    :: clip_diag     => c_clip_d_ip, c_clip_d
+    procedure, pass(a) :: c_cscnv       => psb_c_cscnv
+    procedure, pass(a) :: c_cscnv_ip    => psb_c_cscnv_ip
+    procedure, pass(a) :: c_cscnv_base  => psb_c_cscnv_base
+    generic, public    :: cscnv         => c_cscnv, c_cscnv_ip, c_cscnv_base
+    procedure, pass(a) :: clone         => psb_cspmat_clone
 
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_c_get_diag
@@ -419,108 +421,6 @@ module psb_c_mat_mod
   end interface
   
   interface 
-    subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(in)    :: a
-      class(psb_cspmat_type), intent(out)   :: b
-      integer, intent(out)                   :: info
-      integer,optional, intent(in)           :: dupl, upd
-      character(len=*), optional, intent(in) :: type
-      class(psb_c_base_sparse_mat), intent(in), optional :: mold
-    end subroutine psb_c_cscnv
-  end interface
-  
-
-  interface 
-    subroutine psb_c_cscnv_ip(a,iinfo,type,mold,dupl)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(inout) :: a
-      integer, intent(out)                   :: iinfo
-      integer,optional, intent(in)           :: dupl
-      character(len=*), optional, intent(in) :: type
-      class(psb_c_base_sparse_mat), intent(in), optional :: mold
-    end subroutine psb_c_cscnv_ip
-  end interface
-  
-
-  interface 
-    subroutine psb_c_cscnv_base(a,b,info,dupl)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(in)       :: a
-      class(psb_c_base_sparse_mat), intent(out) :: b
-      integer, intent(out)                   :: info
-      integer,optional, intent(in)           :: dupl
-    end subroutine psb_c_cscnv_base
-  end interface
-  
-  interface 
-    subroutine psb_c_clip_d(a,b,info)
-      import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(in) :: a
-      class(psb_cspmat_type), intent(out) :: b
-      integer,intent(out)                  :: info
-    end subroutine psb_c_clip_d
-  end interface
-  
-  interface 
-    subroutine psb_c_clip_d_ip(a,info)
-      import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(inout) :: a
-      integer,intent(out)                  :: info
-    end subroutine psb_c_clip_d_ip
-  end interface
-  
-  interface 
-    subroutine psb_c_mv_from(a,b)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(out) :: a
-      class(psb_c_base_sparse_mat), intent(inout) :: b
-    end subroutine psb_c_mv_from
-  end interface
-  
-  interface 
-    subroutine psb_c_cp_from(a,b)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(out) :: a
-      class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
-    end subroutine psb_c_cp_from
-  end interface
-  
-  interface 
-    subroutine psb_c_mv_to(a,b)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
-      class(psb_cspmat_type), intent(inout) :: a
-      class(psb_c_base_sparse_mat), intent(out) :: b
-    end subroutine psb_c_mv_to
-  end interface
-  
-  interface 
-    subroutine psb_c_cp_to(a,b)
-      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat    
-      class(psb_cspmat_type), intent(in) :: a
-      class(psb_c_base_sparse_mat), intent(out) :: b
-    end subroutine psb_c_cp_to
-  end interface
-  
-  interface psb_move_alloc 
-    subroutine psb_cspmat_type_move(a,b,info)
-      import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(inout) :: a
-      class(psb_cspmat_type), intent(out)   :: b
-      integer, intent(out)                   :: info
-    end subroutine psb_cspmat_type_move
-  end interface
-  
-  interface psb_clone
-    subroutine psb_cspmat_clone(a,b,info)
-      import :: psb_cspmat_type
-      class(psb_cspmat_type), intent(in)  :: a
-      class(psb_cspmat_type), intent(out) :: b
-      integer, intent(out)                 :: info
-    end subroutine psb_cspmat_clone
-  end interface
-
-  interface 
     subroutine psb_c_mold(a,b)
       import :: psb_cspmat_type, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout)     :: a
@@ -566,7 +466,135 @@ module psb_c_mat_mod
     end subroutine psb_c_reinit
     
   end interface
+
+
+  !
+  ! These methods are specific to the outer SPMAT_TYPE level, since
+  ! they tamper with the inner BASE_SPARSE_MAT object.
+  !
+  !
+
+  !
+  ! CSCNV: switches to a different internal derived type.
+  !   3 versions: copying to target
+  !               copying to a base_sparse_mat object.
+  !               in place
+  !                 
+  !
+  interface 
+    subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(in)    :: a
+      class(psb_cspmat_type), intent(out)   :: b
+      integer, intent(out)                   :: info
+      integer,optional, intent(in)           :: dupl, upd
+      character(len=*), optional, intent(in) :: type
+      class(psb_c_base_sparse_mat), intent(in), optional :: mold
+    end subroutine psb_c_cscnv
+  end interface
   
+
+  interface 
+    subroutine psb_c_cscnv_ip(a,iinfo,type,mold,dupl)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(inout) :: a
+      integer, intent(out)                   :: iinfo
+      integer,optional, intent(in)           :: dupl
+      character(len=*), optional, intent(in) :: type
+      class(psb_c_base_sparse_mat), intent(in), optional :: mold
+    end subroutine psb_c_cscnv_ip
+  end interface
+  
+
+  interface 
+    subroutine psb_c_cscnv_base(a,b,info,dupl)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(in)       :: a
+      class(psb_c_base_sparse_mat), intent(out) :: b
+      integer, intent(out)                   :: info
+      integer,optional, intent(in)           :: dupl
+    end subroutine psb_c_cscnv_base
+  end interface
+  
+  !
+  ! Produce a version of the matrix with diagonal cut
+  ! out; passes through a COO buffer. 
+  !
+  interface 
+    subroutine psb_c_clip_d(a,b,info)
+      import :: psb_cspmat_type
+      class(psb_cspmat_type), intent(in) :: a
+      class(psb_cspmat_type), intent(out) :: b
+      integer,intent(out)                  :: info
+    end subroutine psb_c_clip_d
+  end interface
+  
+  interface 
+    subroutine psb_c_clip_d_ip(a,info)
+      import :: psb_cspmat_type
+      class(psb_cspmat_type), intent(inout) :: a
+      integer,intent(out)                  :: info
+    end subroutine psb_c_clip_d_ip
+  end interface
+  
+  !
+  ! These four interfaces cut through the
+  ! encapsulation between spmat_type and base_sparse_mat.
+  !
+  interface 
+    subroutine psb_c_mv_from(a,b)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(out) :: a
+      class(psb_c_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_c_mv_from
+  end interface
+  
+  interface 
+    subroutine psb_c_cp_from(a,b)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(out) :: a
+      class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
+    end subroutine psb_c_cp_from
+  end interface
+  
+  interface 
+    subroutine psb_c_mv_to(a,b)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
+      class(psb_cspmat_type), intent(inout) :: a
+      class(psb_c_base_sparse_mat), intent(out) :: b
+    end subroutine psb_c_mv_to
+  end interface
+  
+  interface 
+    subroutine psb_c_cp_to(a,b)
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat    
+      class(psb_cspmat_type), intent(in) :: a
+      class(psb_c_base_sparse_mat), intent(out) :: b
+    end subroutine psb_c_cp_to
+  end interface
+  
+  !
+  ! Transfer the internal allocation to the target.
+  !  
+  interface psb_move_alloc 
+    subroutine psb_cspmat_type_move(a,b,info)
+      import :: psb_cspmat_type
+      class(psb_cspmat_type), intent(inout) :: a
+      class(psb_cspmat_type), intent(out)   :: b
+      integer, intent(out)                   :: info
+    end subroutine psb_cspmat_type_move
+  end interface
+  
+  interface 
+    subroutine psb_cspmat_clone(a,b,info)
+      import :: psb_cspmat_type
+      class(psb_cspmat_type), intent(in)  :: a
+      class(psb_cspmat_type), intent(out) :: b
+      integer, intent(out)                 :: info
+    end subroutine psb_cspmat_clone
+  end interface
+
+
 
 
   ! == ===================================

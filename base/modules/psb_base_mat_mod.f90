@@ -64,15 +64,27 @@ module psb_base_mat_mod
   
   use psb_const_mod 
   use psi_serial_mod
-  integer, parameter, private :: auxsz=32
+  
+  !
+  ! type psb_base_sparse_mat: the basic data about your matrix
+  !  M:        number of rows
+  !  N:        number of columns
+  !  STATE:    null:   pristine
+  !            build:  it's being filled with entries
+  !            assembled: ready to use in computations
+  !            update: accepts coefficients but only
+  !                    in already existing entries
+  !  TRIANGLE: is it triangular?
+  !  UPPER:    If it is triangular, is it upper (otherwise lower)
+  !  UNITD:    If it is triangular, is the diagonal assumed to 
+  !            be unitary and not stored explicitly?
+  !  SORTED:   are the entries guaranteed to be sorted? 
+  !
+  ! 
   type  :: psb_base_sparse_mat
     integer, private     :: m, n
     integer, private     :: state, duplicate 
-    logical, private     :: triangle, unitd, upper, sorted
-    ! This is a different animal: it's a kitchen sink for
-    ! any additional parameters that may be needed
-    ! when converting to/from COO. 
-    integer              :: aux(auxsz)
+    logical, private     :: triangle, upper, unitd, sorted
   contains 
 
     ! == = =================================
@@ -89,7 +101,6 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_state => psb_base_get_state
     procedure, pass(a) :: get_dupl => psb_base_get_dupl
     procedure, nopass  :: get_fmt => psb_base_get_fmt
-    procedure, pass(a) :: get_aux => psb_base_get_aux
     procedure, pass(a) :: is_null => psb_base_is_null
     procedure, pass(a) :: is_bld => psb_base_is_bld
     procedure, pass(a) :: is_upd => psb_base_is_upd
@@ -118,7 +129,6 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_lower => psb_base_set_lower
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
     procedure, pass(a) :: set_unit => psb_base_set_unit
-    procedure, pass(a) :: set_aux => psb_base_set_aux
 
 
     ! == = =================================
@@ -301,23 +311,6 @@ contains
     res = a%n
   end function psb_base_get_ncols
 
- 
-  subroutine  psb_base_set_aux(v,a) 
-    implicit none 
-    class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: v(:)
-    ! TBD
-    !write(psb_err_unit,*) 'SET_AUX is empty right now '
-  end subroutine psb_base_set_aux
-
-  subroutine  psb_base_get_aux(v,a) 
-    implicit none 
-    class(psb_base_sparse_mat), intent(in) :: a
-    integer, intent(out), allocatable      :: v(:)
-    ! TBD
-    !write(psb_err_unit,*) 'GET_AUX is empty right now '
-  end subroutine psb_base_get_aux
- 
   subroutine  psb_base_set_nrows(m,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
@@ -513,7 +506,6 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    a%aux(:)    = b%aux(:)
 
   end subroutine psb_base_mv_from
   
@@ -531,7 +523,6 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    a%aux(:)    = b%aux(:)
 
   end subroutine psb_base_cp_from
 
@@ -549,7 +540,6 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
-    b%aux(:)    = a%aux(:)
     
   end subroutine psb_base_transp_2mat
 
@@ -568,7 +558,6 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
-    b%aux(:)    = a%aux(:)
 
   end subroutine psb_base_transc_2mat
 

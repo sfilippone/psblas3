@@ -37,6 +37,9 @@
 ! a sparse matrix as well as the related methods (those who are
 ! specific to the type and could not be defined higher in the
 ! hierarchy). We are at the bottom level of the inheritance chain.
+!
+! Please refere to psb_s_base_mat_mod for a detailed description
+! of the various methods, and to psb_s_csc_impl for implementation details.
 ! 
 module psb_s_csc_mat_mod
 
