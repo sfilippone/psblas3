@@ -79,26 +79,15 @@ module psb_const_mod
   logical, parameter             :: psb_d_is_complex_ = .false.
   logical, parameter             :: psb_c_is_complex_ = .true.
   logical, parameter             :: psb_z_is_complex_ = .true.
+
+
   !
   ! Sparse matrix constants
   !
 
   !
+  ! State of matrices.
   !
-  !     Queries into spmat%info
-  !     
-  integer, parameter :: psb_nztotreq_=1, psb_nzrowreq_=2
-  integer, parameter :: psb_nzsizereq_=3
-  !
-  !     Entries and values for  spmat%info
-  !     
-  integer, parameter :: psb_nnz_=1
-  integer, parameter :: psb_del_bnd_=7, psb_srtd_=8
-  integer, parameter :: psb_state_=9
-  integer, parameter :: psb_upd_pnt_=10
-  integer, parameter :: psb_dupl_=11,  psb_upd_=12
-  integer, parameter :: psb_ifasize_=16
-  !  
   integer, parameter :: psb_invalid_ = -1 
   integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
