@@ -29,6 +29,17 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! Gather/scatter routines for implementing halo/ovrl communication. 
+!
+!  
+!
+! Gather: Y = beta * Y + alpha * X(IDX(:))
+!
+!
+! Scatter: 
+! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
+!
 subroutine psi_igthv(n,idx,alpha,x,beta,y)
 
   use psb_const_mod
