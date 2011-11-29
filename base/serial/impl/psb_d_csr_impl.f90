@@ -26,7 +26,7 @@ subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_csr_csmv'
   logical, parameter :: debug=.false.
@@ -47,9 +47,10 @@ subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -72,7 +73,7 @@ subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans)
 
   call psb_d_csr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
        & a%is_triangle(),a%is_unit(),&
-       & x,beta,y,tra) 
+       & x,beta,y,tra,ctra) 
 
   call psb_erractionrestore(err_act)
   return
@@ -88,11 +89,11 @@ subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans)
 
 contains
   subroutine psb_d_csr_csmv_inner(m,n,alpha,irp,ja,val,is_triangle,is_unit,&
-       & x,beta,y,tra) 
+       & x,beta,y,tra,ctra) 
     integer, intent(in)             :: m,n,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(*),val(*)
     real(psb_dpk_), intent(inout)   :: y(*)
-    logical, intent(in)             :: is_triangle,is_unit,tra
+    logical, intent(in)             :: is_triangle,is_unit,tra, ctra
 
 
     integer   :: i,j,k, ir, jc
@@ -112,7 +113,7 @@ contains
     end if
 
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (beta == dzero) then 
 
@@ -130,9 +131,9 @@ contains
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = -acc
           end do
 
         else 
@@ -162,11 +163,11 @@ contains
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = y(i) -acc
           end do
 
         else 
@@ -185,21 +186,21 @@ contains
 
         if (alpha == done) then 
           do i=1,m 
-            acc  = -y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = -y(i) + acc
           end do
 
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) =  acc
+            y(i) = -y(i) -acc
           end do
 
         else 
@@ -296,6 +297,53 @@ contains
 
       end if
 
+    else if (ctra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i) = -y(i) 
+        end do
+      else
+        do i=1, m
+          y(i) = beta*y(i) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) +  (val(j))*x(i)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) -  (val(j))*x(i)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) + alpha*(val(j))*x(i)
+          end do
+        enddo
+
+      end if
+
     endif
 
     if (is_triangle.and.is_unit) then 
@@ -324,7 +372,7 @@ subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_), allocatable  :: acc(:)
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_csr_csmm'
   logical, parameter :: debug=.false.
@@ -343,9 +391,10 @@ subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -376,7 +425,7 @@ subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans)
   
   call  psb_d_csr_csmm_inner(m,n,nc,alpha,a%irp,a%ja,a%val, &
        & a%is_triangle(),a%is_unit(),x,size(x,1), &
-       & beta,y,size(y,1),tra,acc) 
+       & beta,y,size(y,1),tra,ctra,acc) 
 
 
   call psb_erractionrestore(err_act)
@@ -392,11 +441,11 @@ subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans)
 
 contains
   subroutine psb_d_csr_csmm_inner(m,n,nc,alpha,irp,ja,val,&
-       & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,acc) 
+       & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,ctra,acc) 
     integer, intent(in)             :: m,n,ldx,ldy,nc,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(ldx,*),val(*)
     real(psb_dpk_), intent(inout)   :: y(ldy,*)
-    logical, intent(in)             :: is_triangle,is_unit,tra
+    logical, intent(in)             :: is_triangle,is_unit,tra,ctra
 
     real(psb_dpk_), intent(inout)   :: acc(*)
     integer   :: i,j,k, ir, jc
@@ -415,8 +464,7 @@ contains
       return
     end if
 
-    if (.not.tra) then 
-
+    if ((.not.tra).and.(.not.ctra)) then 
       if (beta == dzero) then 
 
         if (alpha == done) then 
@@ -433,9 +481,9 @@ contains
           do i=1,m 
             acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
-              acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
+              acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = -acc(1:nc)
           end do
 
         else 
@@ -455,21 +503,21 @@ contains
 
         if (alpha == done) then 
           do i=1,m 
-            acc(1:nc)  = y(i,1:nc)
+            acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = y(i,1:nc) + acc(1:nc)
           end do
 
         else if (alpha == -done) then 
 
-          do i=1,m
-            acc(1:nc)  = y(i,1:nc)
+          do i=1,m 
+            acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
-              acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
+              acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = y(i,1:nc) -acc(1:nc)
           end do
 
         else 
@@ -599,6 +647,53 @@ contains
 
       end if
 
+    else if (ctra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i,1:nc) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i,1:nc) = -y(i,1:nc) 
+        end do
+      else
+        do i=1, m
+          y(i,1:nc) = beta*y(i,1:nc) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) +  (val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) -  (val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) + alpha*(val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      end if
+
     endif
 
     if (is_triangle.and.is_unit) then 
@@ -627,7 +722,7 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:)
-  logical   :: tra
+  logical   :: tra,ctra
   Integer :: err_act
   character(len=20)  :: name='d_csr_cssv'
   logical, parameter :: debug=.false.
@@ -645,7 +740,8 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -681,7 +777,7 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
 
   if (beta == dzero) then 
 
-    call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_csrsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,y) 
     if (alpha == done) then 
       ! do nothing
@@ -700,7 +796,7 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
       return
     end if
 
-    call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_csrsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,tmp) 
 
     call psb_geaxpby(m,alpha,tmp,beta,y,info)
@@ -721,18 +817,18 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_csrsv(tra,lower,unit,n,irp,ja,val,x,y) 
+  subroutine inner_csrsv(tra,ctra,lower,unit,n,irp,ja,val,x,y) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit  
-    integer, intent(in)                 :: irp(*), ja(*),n
-    real(psb_dpk_), intent(in)          :: val(*)
-    real(psb_dpk_), intent(in)          :: x(*)
-    real(psb_dpk_), intent(out)         :: y(*)
+    logical, intent(in)            :: tra,ctra,lower,unit  
+    integer, intent(in)            :: irp(*), ja(*),n
+    real(psb_dpk_), intent(in)  :: val(*)
+    real(psb_dpk_), intent(in)  :: x(*)
+    real(psb_dpk_), intent(out) :: y(*)
 
     integer :: i,j,k,m, ir, jc
     real(psb_dpk_) :: acc
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
@@ -821,6 +917,54 @@ contains
         end if
 
       end if
+
+    else if (ctra) then 
+
+      do i=1, n
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=n, 1, -1
+            acc = y(i) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(irp(i+1)-1)
+            acc  = y(i) 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, n
+            acc  = y(i) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            y(i) = y(i)/val(irp(i))
+            acc  = y(i) 
+            do j=irp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        end if
+
+      end if
     end if
   end subroutine inner_csrsv
 
@@ -843,7 +987,7 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:,:)
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_csr_cssm'
   logical, parameter :: debug=.false.
@@ -863,7 +1007,8 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
@@ -889,7 +1034,7 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+    call inner_csrsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*y(i,1:nc)
@@ -902,7 +1047,7 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+    call inner_csrsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,x,size(x,1),tmp,size(tmp,1),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
@@ -931,14 +1076,14 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_csrsm(tra,lower,unit,nr,nc,&
+  subroutine inner_csrsm(tra,ctra,lower,unit,nr,nc,&
        & irp,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit
-    integer, intent(in)                 :: nr,nc,ldx,ldy,irp(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
-    real(psb_dpk_), intent(out)         :: y(ldy,*)
-    integer, intent(out)                :: info
+    logical, intent(in)              :: tra,ctra,lower,unit
+    integer, intent(in)              :: nr,nc,ldx,ldy,irp(*),ja(*)
+    real(psb_dpk_), intent(in)    :: val(*), x(ldx,*)
+    real(psb_dpk_), intent(out)   :: y(ldy,*)
+    integer, intent(out)             :: info
     integer :: i,j,k,m, ir, jc
     real(psb_dpk_), allocatable  :: acc(:)
 
@@ -950,8 +1095,7 @@ contains
     end if
 
 
-    if (.not.tra) then 
-
+    if ((.not.tra).and.(.not.ctra)) then 
       if (lower) then 
         if (unit) then 
           do i=1, nr
@@ -1039,11 +1183,58 @@ contains
         end if
 
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=nr, 1, -1
+            acc = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=nr, 1, -1
+            y(i,1:nc) = y(i,1:nc)/(val(irp(i+1)-1))
+            acc  = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, nr
+            acc  = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, nr
+            y(i,1:nc) = y(i,1:nc)/(val(irp(i)))
+            acc    = y(i,1:nc) 
+            do j=irp(i)+1, irp(i+1)-1
+              jc      = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        end if
+
+      end if
     end if
   end subroutine inner_csrsm
 
 end subroutine psb_d_csr_cssm
-
 
 function psb_d_csr_maxval(a) result(res)
   use psb_error_mod
@@ -1057,7 +1248,7 @@ function psb_d_csr_maxval(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
     nnz = min(nnz,size(a%val))
@@ -1080,7 +1271,7 @@ function psb_d_csr_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
  
   do i = 1, a%get_nrows()
     acc = dzero
@@ -1091,7 +1282,6 @@ function psb_d_csr_csnmi(a) result(res)
   end do
 
 end function psb_d_csr_csnmi
-
 
 function psb_d_csr_csnm1(a) result(res)
   use psb_error_mod
@@ -1111,7 +1301,7 @@ function psb_d_csr_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = dzero
   nnz = a%get_nzeros()
   m = a%get_nrows()
   n = a%get_ncols()
@@ -1333,7 +1523,6 @@ subroutine psb_d_csr_aclsum(d,a)
 
 end subroutine psb_d_csr_aclsum
 
-
 subroutine psb_d_csr_get_diag(a,d,info) 
   use psb_error_mod
   use psb_const_mod
@@ -1359,7 +1548,7 @@ subroutine psb_d_csr_get_diag(a,d,info)
 
 
   if (a%is_triangle().and.a%is_unit()) then 
-    d(1:mnm) = done 
+    d(1:mnm) = done
   else
     do i=1, mnm
       d(i) = dzero
@@ -1372,8 +1561,9 @@ subroutine psb_d_csr_get_diag(a,d,info)
     end do
   end if
   do i=mnm+1,size(d) 
-    d(i) = dzero
+    d(i) = czero
   end do
+
   call psb_erractionrestore(err_act)
   return
 
@@ -1585,7 +1775,7 @@ subroutine  psb_d_csr_allocate_mnnz(m,n,a,nz)
   if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
   if (info == psb_success_) call psb_realloc(nz_,a%val,info)
   if (info == psb_success_) then 
-    a%irp = 0
+    a%irp=0
     call a%set_nrows(m)
     call a%set_ncols(n)
     call a%set_bld()
@@ -2410,7 +2600,7 @@ subroutine psb_d_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   Integer :: err_act
   character(len=20)  :: name='d_csr_print'
   logical, parameter :: debug=.false.
-
+  character(len=*), parameter  :: datatype='real'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2438,7 +2628,11 @@ subroutine psb_d_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nr
@@ -2497,10 +2691,10 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
-   info = psb_success_
-   ! This is to have fix_coo called behind the scenes
-   call b%cp_to_coo(tmp,info)
-   if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  info = psb_success_
+  ! This is to have fix_coo called behind the scenes
+  call tmp%cp_from_coo(b,info)
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
 end subroutine psb_d_cp_csr_from_coo
 
@@ -2608,8 +2802,8 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, err_act, nc
   Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
-  character(len=20)   :: name='csr_mv_from_coo'
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name='mv_from_coo'
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2618,9 +2812,11 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
 
   call b%fix(info)
   if (info /= psb_success_) return
+
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
+  
   call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
@@ -2628,9 +2824,8 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
-  
   call b%free()
-  if (info /= psb_success_) return
+
   if (nza <= 0) then 
     a%irp(:) = 1
   else
@@ -2725,8 +2920,8 @@ end subroutine psb_d_mv_csr_to_fmt
 
 subroutine psb_d_cp_csr_to_fmt(a,b,info) 
   use psb_const_mod
-  use psb_realloc_mod
   use psb_d_base_mat_mod
+  use psb_realloc_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_csr_to_fmt
   implicit none 
 
@@ -2805,8 +3000,8 @@ end subroutine psb_d_mv_csr_from_fmt
 
 subroutine psb_d_cp_csr_from_fmt(a,b,info) 
   use psb_const_mod
-  use psb_realloc_mod
   use psb_d_base_mat_mod
+  use psb_realloc_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_csr_from_fmt
   implicit none 
 

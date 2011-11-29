@@ -1,5 +1,4 @@
 
-
 ! == ===================================
 !
 !
@@ -1249,7 +1248,7 @@ function psb_z_csr_maxval(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
     nnz = min(nnz,size(a%val))
@@ -1272,7 +1271,7 @@ function psb_z_csr_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
  
   do i = 1, a%get_nrows()
     acc = dzero
@@ -1547,8 +1546,9 @@ subroutine psb_z_csr_get_diag(a,d,info)
     goto 9999
   end if
 
+
   if (a%is_triangle().and.a%is_unit()) then 
-    d(1:mnm) = zone 
+    d(1:mnm) = zone
   else
     do i=1, mnm
       d(i) = zzero
@@ -1561,8 +1561,9 @@ subroutine psb_z_csr_get_diag(a,d,info)
     end do
   end if
   do i=mnm+1,size(d) 
-    d(i) = zzero
+    d(i) = czero
   end do
+
   call psb_erractionrestore(err_act)
   return
 
@@ -2599,7 +2600,7 @@ subroutine psb_z_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   Integer :: err_act
   character(len=20)  :: name='z_csr_print'
   logical, parameter :: debug=.false.
-
+  character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2627,7 +2628,11 @@ subroutine psb_z_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nr

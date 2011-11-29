@@ -351,6 +351,7 @@ subroutine psb_d_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='d_coo_print'
   logical, parameter :: debug=.false.
 
+  character(len=*), parameter  :: datatype='real'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -378,7 +379,11 @@ subroutine psb_d_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do j=1,a%get_nzeros()
@@ -476,7 +481,7 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:,:)
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_base_csmm'
   logical, parameter :: debug=.false.
@@ -502,7 +507,8 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
   m   = a%get_nrows()
   if (size(x,1) < m) then
     info = 36
@@ -532,7 +538,7 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1),y,size(y,1),info)
     do  i = 1, m
@@ -546,7 +552,7 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1),tmp,size(tmp,1),info)
     do  i = 1, m
@@ -576,10 +582,10 @@ subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosm(tra,lower,unit,sorted,nr,nc,nz,&
+  subroutine inner_coosm(tra,ctra,lower,unit,sorted,nr,nc,nz,&
        & ia,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit,sorted
+    logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nc,nz,ldx,ldy,ia(*),ja(*)
     real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
     real(psb_dpk_), intent(out)         :: y(ldy,*)
@@ -603,7 +609,8 @@ contains
 
     nnz = nz
 
-    if (.not.tra) then 
+
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
@@ -739,6 +746,76 @@ contains
           end if
         end if
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            acc(1:nc) = y(i,1:nc) 
+            do
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc) 
+              j     = j - 1 
+            end do
+          end do
+        else if (.not.unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i,1:nc) = y(i,1:nc) / (val(j))
+              j    = j - 1
+            end if
+            acc(1:nc)  = y(i,1:nc) 
+            do 
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc) 
+              j     = j - 1
+            end do
+          end do
+
+        else if (.not.lower) then 
+          if (unit) then 
+            j = 1
+            do i=1, nr
+              acc(1:nc) = y(i,1:nc)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc) 
+                j   = j + 1
+              end do
+            end do
+          else if (.not.unit) then 
+            j = 1
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i,1:nc) = y(i,1:nc) / (val(j))
+                j    = j + 1
+              end if
+              acc(1:nc) = y(i,1:nc)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc(1:nc) 
+                j   = j + 1
+              end do
+            end do
+          end if
+        end if
+      end if
+
     end if
   end subroutine inner_coosm
 
@@ -762,7 +839,7 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:)
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_coo_cssv_impl'
   logical, parameter :: debug=.false.
@@ -781,7 +858,9 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
   m = a%get_nrows()
   if (size(x,1) < m) then
     info = 36
@@ -814,7 +893,7 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,y,info)
     if (info /= psb_success_) then 
@@ -832,7 +911,7 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,tmp,info)
     if (info /= psb_success_) then 
@@ -858,10 +937,10 @@ subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosv(tra,lower,unit,sorted,nr,nz,&
+  subroutine inner_coosv(tra,ctra,lower,unit,sorted,nr,nz,&
        & ia,ja,val,x,y,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit,sorted
+    logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nz,ia(*),ja(*)
     real(psb_dpk_), intent(in)          :: val(*), x(*)
     real(psb_dpk_), intent(out)         :: y(*)
@@ -878,7 +957,7 @@ contains
 
     nnz = nz
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
@@ -1014,6 +1093,75 @@ contains
           end if
         end if
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            acc = y(i) 
+            do
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+              j     = j - 1 
+            end do
+          end do
+        else if (.not.unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i) = y(i) /(val(j))
+              j    = j - 1
+            end if
+            acc  = y(i) 
+            do 
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+              j     = j - 1
+            end do
+          end do
+
+        else if (.not.lower) then 
+          if (unit) then 
+            j = 1
+            do i=1, nr
+              acc = y(i)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - (val(j))*acc 
+                j   = j + 1
+              end do
+            end do
+          else if (.not.unit) then 
+            j = 1
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i) = y(i) /(val(j))
+                j    = j + 1
+              end if
+              acc = y(i)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - (val(j))*acc 
+                j   = j + 1
+              end do
+            end do
+          end if
+        end if
+      end if
     end if
 
   end subroutine inner_coosv
@@ -1037,7 +1185,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_coo_csmv_impl'
   logical, parameter :: debug=.false.
@@ -1058,10 +1206,12 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -1123,7 +1273,7 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
   end if
 
-  if (.not.tra) then 
+  if ((.not.tra).and.(.not.ctra)) then 
     i    = 1
     j    = i
     if (nnz > 0) then 
@@ -1172,6 +1322,34 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
 
     end if                  !.....end testing on alpha
 
+  else if (ctra) then 
+
+    if (alpha == done) then
+      i    = 1
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) +  (a%val(i))*x(jc)
+      enddo
+
+    else if (alpha == -done) then
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) - (a%val(i))*x(jc)
+      enddo
+
+    else                    
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) + alpha*(a%val(i))*x(jc)
+      enddo
+
+    end if                  !.....end testing on alpha
+
   endif
 
   call psb_erractionrestore(err_act)
@@ -1204,7 +1382,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_), allocatable  :: acc(:)
-  logical   :: tra
+  logical   :: tra, ctra
   Integer :: err_act
   character(len=20)  :: name='d_coo_csmm_impl'
   logical, parameter :: debug=.false.
@@ -1227,9 +1405,11 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -1323,6 +1503,7 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
     end if
 
   else if (tra) then 
+
     if (alpha == done) then
       i    = 1
       do i=1,nnz
@@ -1345,6 +1526,34 @@ subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
         ir = a%ja(i)
         jc = a%ia(i)
         y(ir,1:nc) = y(ir,1:nc) + alpha*a%val(i)*x(jc,1:nc)
+      enddo
+
+    end if                  !.....end testing on alpha
+
+  else if (ctra) then 
+
+    if (alpha == done) then
+      i    = 1
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) +  (a%val(i))*x(jc,1:nc)
+      enddo
+
+    else if (alpha == -done) then
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) - (a%val(i))*x(jc,1:nc)
+      enddo
+
+    else                    
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*(a%val(i))*x(jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -1401,7 +1610,7 @@ function psb_d_coo_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = dzero
   nnz = a%get_nzeros()
   if (a%is_sorted()) then 
     i   = 1
@@ -1452,7 +1661,7 @@ function psb_d_coo_csnm1(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = dzero
   nnz = a%get_nzeros()
   n = a%get_ncols()
   allocate(vt(n),stat=info)

@@ -1248,7 +1248,7 @@ function psb_c_csr_maxval(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = szero 
+  res = szero
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
     nnz = min(nnz,size(a%val))
@@ -1271,10 +1271,10 @@ function psb_c_csr_csnmi(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = szero 
+  res = szero
  
   do i = 1, a%get_nrows()
-    acc = szero
+    acc = dzero
     do j=a%irp(i),a%irp(i+1)-1  
       acc = acc + abs(a%val(j))
     end do
@@ -1548,7 +1548,7 @@ subroutine psb_c_csr_get_diag(a,d,info)
 
 
   if (a%is_triangle().and.a%is_unit()) then 
-    d(1:mnm) = cone 
+    d(1:mnm) = cone
   else
     do i=1, mnm
       d(i) = czero
@@ -2529,7 +2529,7 @@ subroutine psb_c_csr_reinit(a,clear)
     ! do nothing
     return
   else if (a%is_asb()) then 
-    if (clear_) a%val(:) = dzero
+    if (clear_) a%val(:) = czero
     call a%set_upd()
   else
     info = psb_err_invalid_mat_state_
@@ -2600,7 +2600,7 @@ subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   Integer :: err_act
   character(len=20)  :: name='c_csr_print'
   logical, parameter :: debug=.false.
-
+  character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2628,7 +2628,11 @@ subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nr

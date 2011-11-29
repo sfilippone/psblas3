@@ -351,6 +351,7 @@ subroutine psb_z_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='z_coo_print'
   logical, parameter :: debug=.false.
 
+  character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -378,7 +379,11 @@ subroutine psb_z_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do j=1,a%get_nzeros()
@@ -582,8 +587,8 @@ contains
     implicit none 
     logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nc,nz,ldx,ldy,ia(*),ja(*)
-    complex(psb_dpk_), intent(in)       :: val(*), x(ldx,*)
-    complex(psb_dpk_), intent(out)      :: y(ldy,*)
+    complex(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
+    complex(psb_dpk_), intent(out)         :: y(ldy,*)
     integer, intent(out)                :: info
 
     integer :: i,j,k,m, ir, jc
@@ -603,6 +608,7 @@ contains
     end if
 
     nnz = nz
+
 
     if ((.not.tra).and.(.not.ctra)) then 
 
@@ -764,7 +770,7 @@ contains
           j = nnz
           do i=nr, 1, -1
             if (ja(j) == i) then 
-              y(i,1:nc) = y(i,1:nc) /conjg(val(j))
+              y(i,1:nc) = y(i,1:nc) / conjg(val(j))
               j    = j - 1
             end if
             acc(1:nc)  = y(i,1:nc) 
@@ -794,7 +800,7 @@ contains
             j = 1
             do i=1, nr
               if (ja(j) == i) then 
-                y(i,1:nc) = y(i,1:nc) /conjg(val(j))
+                y(i,1:nc) = y(i,1:nc) / conjg(val(j))
                 j    = j + 1
               end if
               acc(1:nc) = y(i,1:nc)
@@ -809,6 +815,7 @@ contains
           end if
         end if
       end if
+
     end if
   end subroutine inner_coosm
 
@@ -850,6 +857,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
+
 
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
@@ -934,8 +942,8 @@ contains
     implicit none 
     logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nz,ia(*),ja(*)
-    complex(psb_dpk_), intent(in)       :: val(*), x(*)
-    complex(psb_dpk_), intent(out)      :: y(*)
+    complex(psb_dpk_), intent(in)          :: val(*), x(*)
+    complex(psb_dpk_), intent(out)         :: y(*)
     integer, intent(out)                :: info
 
     integer :: i,j,k,m, ir, jc, nnz
@@ -1198,9 +1206,9 @@ subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
+
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
-
 
 
   if (tra.or.ctra) then 
@@ -1473,7 +1481,7 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
 
   end if
 
-  if ((.not.tra).and.(.not.ctra)) then 
+  if (.not.tra) then 
     i    = 1
     j    = i
     if (nnz > 0) then 
@@ -1495,6 +1503,7 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
     end if
 
   else if (tra) then 
+
     if (alpha == zone) then
       i    = 1
       do i=1,nnz
@@ -1573,7 +1582,7 @@ function psb_z_coo_maxval(a) result(res)
   real(psb_dpk_)         :: res
 
   integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
-  character(len=20)  :: name='c_coo_maxval'
+  character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
 
 
@@ -1592,30 +1601,45 @@ function psb_z_coo_csnmi(a) result(res)
   class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='z_base_csnmi'
+  character(len=20)  :: name='z_coo_csnmi'
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
   nnz = a%get_nzeros()
-  i   = 1
-  j   = i
-  do while (i<=nnz) 
-    do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
-      j = j+1
-    enddo
-    acc = dzero
-    do k=i, j-1
-      acc = acc + abs(a%val(k))
+  if (a%is_sorted()) then 
+    i   = 1
+    j   = i
+    res = dzero 
+    do while (i<=nnz) 
+      do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
+        j = j+1
+      enddo
+      acc = dzero
+      do k=i, j-1
+        acc = acc + abs(a%val(k))
+      end do
+      res = max(res,acc)
+      i = j
     end do
-    res = max(res,acc)
-    i = j
-  end do
-
+  else
+    m = a%get_nrows()
+    allocate(vt(m),stat=info)
+    if (info /= 0) return
+    vt(:) = dzero
+    do j=1, nnz
+      i = a%ia(j)
+      vt(i) = vt(i) + abs(a%val(j))
+    end do
+    res = maxval(vt(1:m))
+    deallocate(vt,stat=info)
+  end if
+    
 end function psb_z_coo_csnmi
 
 
@@ -1633,7 +1657,7 @@ function psb_z_coo_csnm1(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_coo_csnm1'
+  character(len=20)  :: name='z_coo_csnm1'
   logical, parameter :: debug=.false.
 
 
@@ -1708,7 +1732,7 @@ subroutine psb_z_coo_arwsum(d,a)
   use psb_const_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_z_coo_arwsum
   class(psb_z_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(out)             :: d(:)
+  real(psb_dpk_), intent(out)              :: d(:)
 
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
@@ -1779,7 +1803,7 @@ subroutine psb_z_coo_colsum(d,a)
     goto 9999
   end if
 
-  d   = zzero 
+  d   = zzero
   nnz = a%get_nzeros()
   do j=1, nnz
     k    = a%ja(j)
@@ -1849,6 +1873,7 @@ subroutine psb_z_coo_aclsum(d,a)
   return
 
 end subroutine psb_z_coo_aclsum
+
 
 
 ! == ==================================

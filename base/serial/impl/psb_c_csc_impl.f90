@@ -1,3 +1,4 @@
+
 ! == ===================================
 !
 !
@@ -25,7 +26,7 @@ subroutine psb_c_csc_csmv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc
   complex(psb_spk_) :: acc
-  logical   :: tra, ctra
+  logical   :: tra
   Integer :: err_act
   character(len=20)  :: name='c_csc_csmv'
   logical, parameter :: debug=.false.
@@ -46,11 +47,9 @@ subroutine psb_c_csc_csmv(alpha,a,x,beta,y,info,trans)
   endif
 
 
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
 
-  tra  = (psb_toupper(trans_) == 'T')
-  ctra = (psb_toupper(trans_) == 'C')
-
-  if (tra.or.ctra) then 
+  if (tra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -222,144 +221,7 @@ subroutine psb_c_csc_csmv(alpha,a,x,beta,y,info,trans)
 
     end if
 
-  else if (ctra) then 
-
-    if (beta == czero) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = alpha*acc
-        end do
-
-      end if
-
-
-    else if (beta == cone) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = y(i) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = y(i) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = y(i) + alpha*acc
-        end do
-
-      end if
-
-    else if (beta == -cone) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = -y(i) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = -y(i) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = -y(i) + alpha*acc
-        end do
-
-      end if
-
-    else 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = beta*y(i) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = beta*y(i) - acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j))          
-          enddo
-          y(i) = beta*y(i) + alpha*acc
-        end do
-
-      end if
-
-    end if
-
-  else if (.not.(tra.or.ctra)) then 
+  else if (.not.tra) then 
 
     if (beta == czero) then 
       do i=1, m
@@ -441,7 +303,7 @@ subroutine psb_c_csc_csmm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_spk_), allocatable  :: acc(:)
-  logical   :: tra, ctra
+  logical   :: tra
   Integer :: err_act
   character(len=20)  :: name='c_csc_csmm'
   logical, parameter :: debug=.false.
@@ -455,16 +317,14 @@ subroutine psb_c_csc_csmm(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   if (.not.a%is_asb()) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  tra  = (psb_toupper(trans_) == 'T')
-  ctra = (psb_toupper(trans_) == 'C')
-
-  if (tra.or.ctra) then 
+  if (tra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -644,144 +504,7 @@ subroutine psb_c_csc_csmm(alpha,a,x,beta,y,info,trans)
 
     end if
 
-  else if (ctra) then 
-
-    if (beta == czero) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = alpha*acc
-        end do
-
-      end if
-
-
-    else if (beta == cone) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = y(i,:) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = y(i,:) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    else if (beta == -cone) then 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = -y(i,:) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = -y(i,:) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = -y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    else 
-
-      if (alpha == cone) then 
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) + acc
-        end do
-
-      else if (alpha == -cone) then 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) - acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = czero
-          do j=a%icp(i), a%icp(i+1)-1
-            acc  = acc + conjg(a%val(j)) * x(a%ia(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    end if
-
-  else if (.not.(tra.or.ctra)) then 
+  else if (.not.tra) then 
 
     if (beta == czero) then 
       do i=1, m
@@ -865,7 +588,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m, nnz, ir, jc
   complex(psb_spk_) :: acc
   complex(psb_spk_), allocatable :: tmp(:)
-  logical   :: tra, ctra
+  logical   :: tra
   Integer :: err_act
   character(len=20)  :: name='c_csc_cssv'
   logical, parameter :: debug=.false.
@@ -883,9 +606,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra  = (psb_toupper(trans_) == 'T')
-  ctra = (psb_toupper(trans_) == 'C')
-
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -922,7 +643,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == czero) then 
-    call inner_cscsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_cscsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%icp,a%ia,a%val,x,y) 
     if (alpha == cone) then 
       ! do nothing
@@ -941,7 +662,7 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
       return
     end if
     tmp(1:m) = x(1:m)
-    call inner_cscsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_cscsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%icp,a%ia,a%val,tmp,y) 
     do  i = 1, m
       y(i) = alpha*tmp(i) + beta*y(i)
@@ -962,9 +683,9 @@ subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_cscsv(tra,ctra,lower,unit,n,icp,ia,val,x,y) 
+  subroutine inner_cscsv(tra,lower,unit,n,icp,ia,val,x,y) 
     implicit none 
-    logical, intent(in)                 :: tra,ctra,lower,unit  
+    logical, intent(in)                 :: tra,lower,unit  
     integer, intent(in)                 :: icp(*), ia(*),n
     complex(psb_spk_), intent(in)          :: val(*)
     complex(psb_spk_), intent(in)          :: x(*)
@@ -1013,53 +734,10 @@ contains
             y(i) = (x(i) - acc)/val(icp(i+1)-1)
           end do
         end if
-      end if
-
-    else if (ctra) then 
-
-      if (lower) then 
-
-        if (unit) then 
-          do i=n, 1, -1 
-            acc = czero 
-            do j=icp(i), icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j))
-            end do
-            y(i) = x(i) - acc
-          end do
-        else if (.not.unit) then 
-          do i=n, 1, -1 
-            acc = czero 
-            do j=icp(i)+1, icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j))
-            end do
-            y(i) = (x(i) - acc)/conjg(val(icp(i)))
-          end do
-        end if
-
-      else if (.not.lower) then 
-
-        if (unit) then 
-          do i=1, n
-            acc = czero 
-            do j=icp(i), icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j))
-            end do
-            y(i) = x(i) - acc
-          end do
-        else if (.not.unit) then 
-          do i=1, n
-            acc = czero 
-            do j=icp(i), icp(i+1)-2
-              acc = acc + conjg(val(j))*y(ia(j))
-            end do
-            y(i) = (x(i) - acc)/conjg(val(icp(i+1)-1))
-          end do
-        end if
 
       end if
 
-    else if (.not.(tra.or.ctra)) then 
+    else if (.not.tra) then 
 
       do i=1, n
         y(i) = x(i)
@@ -1130,7 +808,7 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_spk_) :: acc
   complex(psb_spk_), allocatable :: tmp(:,:)
-  logical   :: tra, ctra
+  logical   :: tra
   Integer :: err_act
   character(len=20)  :: name='c_base_csmm'
   logical, parameter :: debug=.false.
@@ -1150,11 +828,8 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra  = (psb_toupper(trans_) == 'T')
-  ctra = (psb_toupper(trans_) == 'C')
-
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   m   = a%get_nrows()
-  nc  = min(size(x,2) , size(y,2)) 
 
   if (size(x,1)<m) then 
     info = 36
@@ -1168,6 +843,7 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
+  nc  = min(size(x,2) , size(y,2)) 
 
   if (.not. (a%is_triangle())) then 
     info = psb_err_invalid_mat_state_
@@ -1190,7 +866,7 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == czero) then 
-    call inner_cscsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+    call inner_cscsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%icp,a%ia,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*y(i,1:nc)
@@ -1204,7 +880,7 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
     end if
 
     tmp(1:m,:) = x(1:m,1:nc)
-    call inner_cscsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+    call inner_cscsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%icp,a%ia,a%val,tmp,size(tmp,1),y,size(y,1),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
@@ -1233,10 +909,10 @@ subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_cscsm(tra,ctra,lower,unit,nr,nc,&
+  subroutine inner_cscsm(tra,lower,unit,nr,nc,&
        & icp,ia,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra,ctra,lower,unit
+    logical, intent(in)                 :: tra,lower,unit
     integer, intent(in)                 :: nr,nc,ldx,ldy,icp(*),ia(*)
     complex(psb_spk_), intent(in)          :: val(*), x(ldx,*)
     complex(psb_spk_), intent(out)         :: y(ldy,*)
@@ -1256,25 +932,6 @@ contains
 
       if (lower) then 
         if (unit) then 
-          do i=1, nr
-            acc = czero 
-            do j=icp(i), icp(i+1)-1
-              acc = acc + val(j)*y(ia(j),1:nc)
-            end do
-            y(i,1:nc) = x(i,1:nc) - acc
-          end do
-        else if (.not.unit) then 
-          do i=1, nr
-            acc = czero 
-            do j=icp(i), icp(i+1)-2
-              acc = acc + val(j)*y(ia(j),1:nc)
-            end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/val(icp(i+1)-1)
-          end do
-        end if
-      else if (.not.lower) then 
-
-        if (unit) then 
           do i=nr, 1, -1 
             acc = czero 
             do j=icp(i), icp(i+1)-1
@@ -1292,16 +949,13 @@ contains
           end do
         end if
 
-      end if
+      else if (.not.lower) then 
 
-    else if (ctra) then 
-
-      if (lower) then 
         if (unit) then 
           do i=1, nr
             acc = czero 
             do j=icp(i), icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j),1:nc)
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
@@ -1309,40 +963,43 @@ contains
           do i=1, nr
             acc = czero 
             do j=icp(i), icp(i+1)-2
-              acc = acc + conjg(val(j))*y(ia(j),1:nc)
+              acc = acc + val(j)*y(ia(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(val(icp(i+1)-1))
-          end do
-        end if
-      else if (.not.lower) then 
-
-        if (unit) then 
-          do i=nr, 1, -1 
-            acc = czero 
-            do j=icp(i), icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j),1:nc)
-            end do
-            y(i,1:nc) = x(i,1:nc) - acc
-          end do
-        else if (.not.unit) then 
-          do i=nr, 1, -1 
-            acc = czero 
-            do j=icp(i)+1, icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j),1:nc)
-            end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/conjg(val(icp(i)))
+            y(i,1:nc) = (x(i,1:nc) - acc)/val(icp(i+1)-1)
           end do
         end if
 
       end if
 
-    else if (.not.(tra.or.ctra)) then 
+    else if (.not.tra) then 
 
       do i=1, nr
         y(i,1:nc) = x(i,1:nc)
       end do
 
-      if (lower) then 
+      if (lower) then
+
+        if (unit) then  
+          do i=1, nr
+            acc  = y(i,1:nc) 
+            do j=icp(i), icp(i+1)-1
+              jc    = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, nr
+            y(i,1:nc) = y(i,1:nc)/val(icp(i))
+            acc    = y(i,1:nc) 
+            do j=icp(i)+1, icp(i+1)-1
+              jc      = ia(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
+            end do
+          end do
+        end if
+
+      else if (.not.lower) then 
+
         if (unit) then 
           do i=nr, 1, -1
             acc = y(i,1:nc) 
@@ -1357,26 +1014,6 @@ contains
             acc  = y(i,1:nc) 
             do j=icp(i), icp(i+1)-2
               jc    = ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
-            end do
-          end do
-        end if
-      else if (.not.lower) then 
-
-        if (unit) then 
-          do i=1, nr
-            acc  = y(i,1:nc) 
-            do j=icp(i), icp(i+1)-1
-              jc    = ia(j)
-              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
-            end do
-          end do
-        else if (.not.unit) then 
-          do i=1, nr
-            y(i,1:nc) = y(i,1:nc)/val(icp(i))
-            acc    = y(i,1:nc) 
-            do j=icp(i)+1, icp(i+1)-1
-              jc      = ia(j)
               y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
@@ -1458,7 +1095,7 @@ function psb_c_csc_csnm1(a) result(res)
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_csc_csnm1'
+  character(len=20)  :: name='c_csc_csnm1'
   logical, parameter :: debug=.false.
 
 
@@ -1716,11 +1353,10 @@ subroutine psb_c_csc_get_diag(a,d,info)
         endif
       enddo
     end do
-  end if
+  endif
   do i=mnm+1,size(d) 
     d(i) = czero
   end do
-
   call psb_erractionrestore(err_act)
   return
 
@@ -2630,8 +2266,8 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, err_act, nc, icl
   Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
-  character(len=20)   :: name='csc_from_coo'
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2894,6 +2530,7 @@ subroutine psb_c_csc_mold(a,b,info)
 
 end subroutine psb_c_csc_mold
 
+
 subroutine  psb_c_csc_reallocate_nz(nz,a) 
   use psb_error_mod
   use psb_realloc_mod
@@ -3150,6 +2787,7 @@ subroutine psb_c_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='c_csc_print'
   logical, parameter :: debug=.false.
 
+  character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -3177,7 +2815,11 @@ subroutine psb_c_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nc

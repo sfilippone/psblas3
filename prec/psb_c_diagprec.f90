@@ -95,7 +95,7 @@ contains
       end if
     end if
    
-2    call psb_erractionrestore(err_act)
+    call psb_erractionrestore(err_act)
     return
 
 9999 continue

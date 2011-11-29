@@ -1022,6 +1022,13 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
+  if (present(dupl)) then 
+    call b%set_dupl(dupl)
+  else if (a%is_bld()) then 
+    ! Does this make sense at all?? Who knows..
+    call b%set_dupl(psb_dupl_def_)
+  end if
+
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1402,8 +1409,8 @@ subroutine psb_z_cp_from(a,b)
   use psb_string_mod
   use psb_z_mat_mod, psb_protect_name => psb_z_cp_from
   implicit none 
-  class(psb_zspmat_type), intent(out)      :: a
-  class(psb_z_base_sparse_mat), intent(in) :: b
+  class(psb_zspmat_type), intent(out) :: a
+  class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
   logical, parameter :: debug=.false.

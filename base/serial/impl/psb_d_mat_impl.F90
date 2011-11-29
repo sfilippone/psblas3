@@ -1402,8 +1402,8 @@ subroutine psb_d_cp_from(a,b)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_cp_from
   implicit none 
-  class(psb_dspmat_type), intent(out)      :: a
-  class(psb_d_base_sparse_mat), intent(in) :: b
+  class(psb_dspmat_type), intent(out) :: a
+  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
   logical, parameter :: debug=.false.
@@ -2067,7 +2067,6 @@ function psb_d_csnmi(a) result(res)
   character(len=20)  :: name='csnmi'
   logical, parameter :: debug=.false.
 
-  info = psb_success_
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
@@ -2289,7 +2288,6 @@ subroutine psb_d_get_diag(a,d,info)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
-  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
@@ -2328,7 +2326,6 @@ subroutine psb_d_scal(d,a,info)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
-  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
@@ -2367,7 +2364,6 @@ subroutine psb_d_scals(d,a,info)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
-  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_

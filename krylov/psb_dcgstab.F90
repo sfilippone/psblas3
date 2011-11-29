@@ -94,334 +94,334 @@
 ! 
 !
 !
-Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
-  use psb_base_mod
-  use psb_prec_mod
-  use psb_d_inner_krylov_mod
-  use psb_krylov_mod
-  implicit none
-
-  type(psb_dspmat_type), intent(in)  :: a
-  class(psb_dprec_type), Intent(in)   :: prec 
-  Type(psb_desc_type), Intent(in)    :: desc_a
-  Real(psb_dpk_), Intent(in)       :: b(:)
-  Real(psb_dpk_), Intent(inout)    :: x(:)
-  Real(psb_dpk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, istop
-  Integer, Optional, Intent(out)     :: iter
-  Real(psb_dpk_), Optional, Intent(out) :: err
-!!$   Local data
-  Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
-  Real(psb_dpk_), Pointer  :: q(:),&
-       & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
-  Integer       :: itmax_, naux, mglob, it,itrace_,&
-       & np,me, n_row, n_col
-  integer            :: debug_level, debug_unit
-  Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, isvch, ictxt, err_act, i
-  Integer            :: istop_
-  Real(psb_dpk_)     :: alpha, beta, rho, rho_old, sigma, omega, tau
-  type(psb_itconv_type) :: stopdat
-
-#ifdef MPE_KRYLOV
-  include "mpe_logf.h"
-  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
-#endif
-  character(len=20)           :: name
-  character(len=*), parameter :: methdname='BiCGStab'
-
-  info = psb_success_
-  name = 'psb_dcgstab'
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  if (debug_level >= psb_debug_ext_)&
-       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
-
-#ifdef MPE_KRYLOV
-!!$  call psb_get_mpicomm(ictxt,icomm)
-!!$  call psb_get_rank(irank,icomm,me)
-  imerr = MPE_Log_get_state_eventIDs(istpb,istpe)
-  imerr = MPE_Log_get_state_eventIDs(ifctb,ifcte)
-  imerr = MPE_Log_get_state_eventIDs(immb,imme)
-
-  if (me == 0) then 
-    info = mpe_describe_state(istpb,istpe,"Solver","WhiteSmoke")
-    info = mpe_describe_state(ifctb,ifcte,"PREC","SteelBlue")
-    info = mpe_describe_state(immb,imme,"SPMM","DarkOrange")
-  endif
-  call psb_barrier(ictxt)
-  call mpi_Pcontrol(1,info)
-#endif
-
-  mglob = desc_a%get_global_rows()
-  n_row = desc_a%get_local_rows()
-  n_col = desc_a%get_local_cols()
-
-  If (Present(istop)) Then 
-    istop_ = istop 
-  Else
-    istop_ = 2
-  Endif
-  !
-  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
-  !  ISTOP_ = 2:  ||r||/||b||   norm 2 
-  !
-
-#ifdef MPE_KRYLOV
-  imerr = MPE_Log_event( istpb, 0, "st CGSTAB" )
-#endif
-
-
-  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='psb_chkvect on X')
-    goto 9999
-  end if
-  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_    
-    call psb_errpush(info,name,a_err='psb_chkvect on B')
-    goto 9999
-  end if
-
-  naux=6*n_col 
-  allocate(aux(naux),stat=info)
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=8)
-  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
-
-  if (info /= psb_success_) then 
-     info=psb_err_from_subroutine_non_
-     call psb_errpush(info,name)
-     goto 9999
-  End If
-
-  Q => WWRK(:,1)
-  R => WWRK(:,2)
-  P => WWRK(:,3)
-  V => WWRK(:,4)
-  F => WWRK(:,5)
-  S => WWRK(:,6)
-  T => WWRK(:,7)
-  Z => WWRK(:,8)
-
-  If (Present(itmax)) Then 
-    itmax_ = itmax
-  Else
-    itmax_ = 1000
-  Endif
-
-  If (Present(itrace)) Then
-     itrace_ = itrace
-  Else
-     itrace_ = 0
-  End If
-  
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-
-  itx   = 0
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-  if (psb_errstatus_fatal()) Then 
-     call psb_errpush(psb_err_from_subroutine_non_,name)
-     goto 9999
-  End If
-
-  restart: Do 
-    
-    if (itx >= itmax_) exit restart  
-
-    it = 0      
-    call psb_geaxpby(done,b,dzero,r,desc_a,info)
-#ifdef MPE_KRYLOV
-    imerr = MPE_Log_event( immb, 0, "st SPMM" )
-#endif
-    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
-#ifdef MPE_KRYLOV
-    imerr = MPE_Log_event( imme, 0, "ed SPMM" )
-#endif
-    if (info == psb_success_) call psb_geaxpby(done,r,dzero,q,desc_a,info)
-    if (psb_errstatus_fatal()) then 
-       info=psb_err_from_subroutine_
-       call psb_errpush(info,name,a_err='Init residual')
-       goto 9999
-    end if
-
-    ! Perhaps we already satisfy the convergence criterion...
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-    if (psb_errstatus_fatal()) Then 
-      call psb_errpush(psb_err_from_subroutine_non_,name)
-      goto 9999
-    End If
-    
-    rho = dzero
-
-    iteration:  Do 
-      it   = it + 1
-      itx = itx + 1
-
-      if (debug_level >= psb_debug_ext_)&
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Iteration: ',itx
-
-      rho_old = rho    
-      rho     = psb_gedot(q,r,desc_a,info)
-
-      if (debug_level >= psb_debug_ext_)&
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Rho: ',rho
-
-      if (rho == dzero) then
-         if (debug_level >= psb_debug_ext_) &
-              & write(debug_unit,*) me,' ',trim(name),&
-              & ' Iteration breakdown R',rho
-        exit iteration
-      endif
-
-      if (it == 1) then
-        call psb_geaxpby(done,r,dzero,p,desc_a,info)
-      else
-        beta = (rho/rho_old)*(alpha/omega)
-        call psb_geaxpby(-omega,v,done,p,desc_a,info)
-        call psb_geaxpby(done,r,beta,p,desc_a,info)
-      End If
-
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
-#endif
-      if (debug_level >= psb_debug_inner_) write(0,*) 'P: ',p
-      call prec%apply(p,f,desc_a,info,work=aux)
-      if (debug_level >= psb_debug_inner_)  write(0,*) 'F: ',f
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
-      imerr = MPE_Log_event( immb, 0, "st SPMM" )
-#endif
-      call psb_spmm(done,a,f,dzero,v,desc_a,info,&
-           & work=aux)
-      if (debug_level >= psb_debug_inner_)  write(0,*) 'Q: ',q
-      if (debug_level >= psb_debug_inner_)  write(0,*) 'V: ',v
-
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
-#endif
-
-      sigma = psb_gedot(q,v,desc_a,info)
-
-      if (debug_level >= psb_debug_ext_)&
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Sigma: ',sigma
-      if (sigma == dzero) then
-         if (debug_level >= psb_debug_ext_) &
-              & write(debug_unit,*) me,' ',trim(name),&
-              & ' Iteration breakdown S1', sigma
-         exit iteration
-      endif
-
-      alpha = rho/sigma
-      call psb_geaxpby(done,r,dzero,s,desc_a,info)
-      if (info == psb_success_) call psb_geaxpby(-alpha,v,done,s,desc_a,info)
-      if (debug_level >= psb_debug_ext_)&
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' alpha: ',alpha
-
-      if(psb_errstatus_fatal()) then
-         call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_geaxpby')
-         goto 9999
-      end if
-      
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
-#endif
-      call prec%apply(s,z,desc_a,info,work=aux)
-
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
-      imerr = MPE_Log_event( immb, 0, "st SPMM" )
-#endif
-      if (info == psb_success_) Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
-           & work=aux)
-
-#ifdef MPE_KRYLOV
-      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
-#endif
-      if(psb_errstatus_fatal()) then
-         call psb_errpush(psb_err_from_subroutine_,name,a_err='precaply/spmm')
-         goto 9999
-      end if
-      
-      sigma = psb_gedot(t,t,desc_a,info)
-      if (sigma == dzero) then
-         if (debug_level >= psb_debug_ext_) &
-              & write(debug_unit,*) me,' ',trim(name),&
-              & ' Iteration breakdown S2', sigma
-        exit iteration
-      endif
-      
-      tau   = psb_gedot(t,s,desc_a,info)
-      omega = tau/sigma
-
-
-      if (debug_level >= psb_debug_ext_)&
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' sigma, tau, omega: ',sigma, tau, omega
-      if (omega == dzero) then
-         if (debug_level >= psb_debug_ext_) &
-              & write(debug_unit,*) me,' ',trim(name),&
-              & ' Iteration breakdown O',omega
-        exit iteration
-      endif
-
-      call psb_geaxpby(alpha,f,done,x,desc_a,info)
-      if (info == psb_success_) call psb_geaxpby(omega,z,done,x,desc_a,info)
-      if (info == psb_success_) call psb_geaxpby(done,s,dzero,r,desc_a,info)
-      if (info == psb_success_) call psb_geaxpby(-omega,t,done,r,desc_a,info)
-      if (psb_errstatus_fatal()) Then 
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='X/R update ')
-        goto 9999
-      End If
-      
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      if (psb_errstatus_fatal()) Then 
-        call psb_errpush(psb_err_from_subroutine_non_,name)
-        goto 9999
-      End If
-      
-    end do iteration
-  end do restart
-
-  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
-
-  deallocate(aux,stat=info)
-  call psb_gefree(wwrk,desc_a,info)
-  if((info /= 0).or.(psb_errstatus_fatal())) then
-     call psb_errpush(info,name)
-     goto 9999
-  end if
-#ifdef MPE_KRYLOV
-  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
-  call mpi_Pcontrol(2,info)
-  call mpi_Pcontrol(0,info)
-#endif
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
-  return
-
-End Subroutine psb_dcgstab
+!!$Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+!!$  use psb_base_mod
+!!$  use psb_prec_mod
+!!$  use psb_d_inner_krylov_mod
+!!$  use psb_krylov_mod
+!!$  implicit none
+!!$
+!!$  type(psb_dspmat_type), intent(in)  :: a
+!!$  class(psb_dprec_type), Intent(in)   :: prec 
+!!$  Type(psb_desc_type), Intent(in)    :: desc_a
+!!$  Real(psb_dpk_), Intent(in)       :: b(:)
+!!$  Real(psb_dpk_), Intent(inout)    :: x(:)
+!!$  Real(psb_dpk_), Intent(in)       :: eps
+!!$  integer, intent(out)               :: info
+!!$  Integer, Optional, Intent(in)      :: itmax, itrace, istop
+!!$  Integer, Optional, Intent(out)     :: iter
+!!$  Real(psb_dpk_), Optional, Intent(out) :: err
+!!$! !$   Local data
+!!$  Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
+!!$  Real(psb_dpk_), Pointer  :: q(:),&
+!!$       & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
+!!$  Integer       :: itmax_, naux, mglob, it,itrace_,&
+!!$       & np,me, n_row, n_col
+!!$  integer            :: debug_level, debug_unit
+!!$  Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
+!!$  Integer, Parameter :: irmax = 8
+!!$  Integer            :: itx, isvch, ictxt, err_act, i
+!!$  Integer            :: istop_
+!!$  Real(psb_dpk_)     :: alpha, beta, rho, rho_old, sigma, omega, tau
+!!$  type(psb_itconv_type) :: stopdat
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$  include "mpe_logf.h"
+!!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
+!!$#endif
+!!$  character(len=20)           :: name
+!!$  character(len=*), parameter :: methdname='BiCGStab'
+!!$
+!!$  info = psb_success_
+!!$  name = 'psb_dcgstab'
+!!$  call psb_erractionsave(err_act)
+!!$  debug_unit  = psb_get_debug_unit()
+!!$  debug_level = psb_get_debug_level()
+!!$  ictxt = desc_a%get_context()
+!!$  call psb_info(ictxt, me, np)
+!!$  if (debug_level >= psb_debug_ext_)&
+!!$       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$! !$  call psb_get_mpicomm(ictxt,icomm)
+!!$! !$  call psb_get_rank(irank,icomm,me)
+!!$  imerr = MPE_Log_get_state_eventIDs(istpb,istpe)
+!!$  imerr = MPE_Log_get_state_eventIDs(ifctb,ifcte)
+!!$  imerr = MPE_Log_get_state_eventIDs(immb,imme)
+!!$
+!!$  if (me == 0) then 
+!!$    info = mpe_describe_state(istpb,istpe,"Solver","WhiteSmoke")
+!!$    info = mpe_describe_state(ifctb,ifcte,"PREC","SteelBlue")
+!!$    info = mpe_describe_state(immb,imme,"SPMM","DarkOrange")
+!!$  endif
+!!$  call psb_barrier(ictxt)
+!!$  call mpi_Pcontrol(1,info)
+!!$#endif
+!!$
+!!$  mglob = desc_a%get_global_rows()
+!!$  n_row = desc_a%get_local_rows()
+!!$  n_col = desc_a%get_local_cols()
+!!$
+!!$  If (Present(istop)) Then 
+!!$    istop_ = istop 
+!!$  Else
+!!$    istop_ = 2
+!!$  Endif
+!!$  !
+!!$  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!!$  !  ISTOP_ = 2:  ||r||/||b||   norm 2 
+!!$  !
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$  imerr = MPE_Log_event( istpb, 0, "st CGSTAB" )
+!!$#endif
+!!$
+!!$
+!!$  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    call psb_errpush(info,name,a_err='psb_chkvect on X')
+!!$    goto 9999
+!!$  end if
+!!$  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_    
+!!$    call psb_errpush(info,name,a_err='psb_chkvect on B')
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  naux=6*n_col 
+!!$  allocate(aux(naux),stat=info)
+!!$  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=8)
+!!$  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
+!!$
+!!$  if (info /= psb_success_) then 
+!!$     info=psb_err_from_subroutine_non_
+!!$     call psb_errpush(info,name)
+!!$     goto 9999
+!!$  End If
+!!$
+!!$  Q => WWRK(:,1)
+!!$  R => WWRK(:,2)
+!!$  P => WWRK(:,3)
+!!$  V => WWRK(:,4)
+!!$  F => WWRK(:,5)
+!!$  S => WWRK(:,6)
+!!$  T => WWRK(:,7)
+!!$  Z => WWRK(:,8)
+!!$
+!!$  If (Present(itmax)) Then 
+!!$    itmax_ = itmax
+!!$  Else
+!!$    itmax_ = 1000
+!!$  Endif
+!!$
+!!$  If (Present(itrace)) Then
+!!$     itrace_ = itrace
+!!$  Else
+!!$     itrace_ = 0
+!!$  End If
+!!$  
+!!$  ! Ensure global coherence for convergence checks.
+!!$  call psb_set_coher(ictxt,isvch)
+!!$
+!!$  itx   = 0
+!!$  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+!!$  if (psb_errstatus_fatal()) Then 
+!!$     call psb_errpush(psb_err_from_subroutine_non_,name)
+!!$     goto 9999
+!!$  End If
+!!$
+!!$  restart: Do 
+!!$    
+!!$    if (itx >= itmax_) exit restart  
+!!$
+!!$    it = 0      
+!!$    call psb_geaxpby(done,b,dzero,r,desc_a,info)
+!!$#ifdef MPE_KRYLOV
+!!$    imerr = MPE_Log_event( immb, 0, "st SPMM" )
+!!$#endif
+!!$    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+!!$#ifdef MPE_KRYLOV
+!!$    imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+!!$#endif
+!!$    if (info == psb_success_) call psb_geaxpby(done,r,dzero,q,desc_a,info)
+!!$    if (psb_errstatus_fatal()) then 
+!!$       info=psb_err_from_subroutine_
+!!$       call psb_errpush(info,name,a_err='Init residual')
+!!$       goto 9999
+!!$    end if
+!!$
+!!$    ! Perhaps we already satisfy the convergence criterion...
+!!$    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+!!$    if (psb_errstatus_fatal()) Then 
+!!$      call psb_errpush(psb_err_from_subroutine_non_,name)
+!!$      goto 9999
+!!$    End If
+!!$    
+!!$    rho = dzero
+!!$
+!!$    iteration:  Do 
+!!$      it   = it + 1
+!!$      itx = itx + 1
+!!$
+!!$      if (debug_level >= psb_debug_ext_)&
+!!$           & write(debug_unit,*) me,' ',trim(name),&
+!!$           & ' Iteration: ',itx
+!!$
+!!$      rho_old = rho    
+!!$      rho     = psb_gedot(q,r,desc_a,info)
+!!$
+!!$      if (debug_level >= psb_debug_ext_)&
+!!$           & write(debug_unit,*) me,' ',trim(name),&
+!!$           & ' Rho: ',rho
+!!$
+!!$      if (rho == dzero) then
+!!$         if (debug_level >= psb_debug_ext_) &
+!!$              & write(debug_unit,*) me,' ',trim(name),&
+!!$              & ' Iteration breakdown R',rho
+!!$        exit iteration
+!!$      endif
+!!$
+!!$      if (it == 1) then
+!!$        call psb_geaxpby(done,r,dzero,p,desc_a,info)
+!!$      else
+!!$        beta = (rho/rho_old)*(alpha/omega)
+!!$        call psb_geaxpby(-omega,v,done,p,desc_a,info)
+!!$        call psb_geaxpby(done,r,beta,p,desc_a,info)
+!!$      End If
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
+!!$#endif
+!!$      if (debug_level >= psb_debug_inner_) write(0,*) 'P: ',p
+!!$      call prec%apply(p,f,desc_a,info,work=aux)
+!!$      if (debug_level >= psb_debug_inner_)  write(0,*) 'F: ',f
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
+!!$      imerr = MPE_Log_event( immb, 0, "st SPMM" )
+!!$#endif
+!!$      call psb_spmm(done,a,f,dzero,v,desc_a,info,&
+!!$           & work=aux)
+!!$      if (debug_level >= psb_debug_inner_)  write(0,*) 'Q: ',q
+!!$      if (debug_level >= psb_debug_inner_)  write(0,*) 'V: ',v
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+!!$#endif
+!!$
+!!$      sigma = psb_gedot(q,v,desc_a,info)
+!!$
+!!$      if (debug_level >= psb_debug_ext_)&
+!!$           & write(debug_unit,*) me,' ',trim(name),&
+!!$           & ' Sigma: ',sigma
+!!$      if (sigma == dzero) then
+!!$         if (debug_level >= psb_debug_ext_) &
+!!$              & write(debug_unit,*) me,' ',trim(name),&
+!!$              & ' Iteration breakdown S1', sigma
+!!$         exit iteration
+!!$      endif
+!!$
+!!$      alpha = rho/sigma
+!!$      call psb_geaxpby(done,r,dzero,s,desc_a,info)
+!!$      if (info == psb_success_) call psb_geaxpby(-alpha,v,done,s,desc_a,info)
+!!$      if (debug_level >= psb_debug_ext_)&
+!!$           & write(debug_unit,*) me,' ',trim(name),&
+!!$           & ' alpha: ',alpha
+!!$
+!!$      if(psb_errstatus_fatal()) then
+!!$         call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_geaxpby')
+!!$         goto 9999
+!!$      end if
+!!$      
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
+!!$#endif
+!!$      call prec%apply(s,z,desc_a,info,work=aux)
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
+!!$      imerr = MPE_Log_event( immb, 0, "st SPMM" )
+!!$#endif
+!!$      if (info == psb_success_) Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
+!!$           & work=aux)
+!!$
+!!$#ifdef MPE_KRYLOV
+!!$      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+!!$#endif
+!!$      if(psb_errstatus_fatal()) then
+!!$         call psb_errpush(psb_err_from_subroutine_,name,a_err='precaply/spmm')
+!!$         goto 9999
+!!$      end if
+!!$      
+!!$      sigma = psb_gedot(t,t,desc_a,info)
+!!$      if (sigma == dzero) then
+!!$         if (debug_level >= psb_debug_ext_) &
+!!$              & write(debug_unit,*) me,' ',trim(name),&
+!!$              & ' Iteration breakdown S2', sigma
+!!$        exit iteration
+!!$      endif
+!!$      
+!!$      tau   = psb_gedot(t,s,desc_a,info)
+!!$      omega = tau/sigma
+!!$
+!!$
+!!$      if (debug_level >= psb_debug_ext_)&
+!!$           & write(debug_unit,*) me,' ',trim(name),&
+!!$           & ' sigma, tau, omega: ',sigma, tau, omega
+!!$      if (omega == dzero) then
+!!$         if (debug_level >= psb_debug_ext_) &
+!!$              & write(debug_unit,*) me,' ',trim(name),&
+!!$              & ' Iteration breakdown O',omega
+!!$        exit iteration
+!!$      endif
+!!$
+!!$      call psb_geaxpby(alpha,f,done,x,desc_a,info)
+!!$      if (info == psb_success_) call psb_geaxpby(omega,z,done,x,desc_a,info)
+!!$      if (info == psb_success_) call psb_geaxpby(done,s,dzero,r,desc_a,info)
+!!$      if (info == psb_success_) call psb_geaxpby(-omega,t,done,r,desc_a,info)
+!!$      if (psb_errstatus_fatal()) Then 
+!!$        call psb_errpush(psb_err_from_subroutine_,name,a_err='X/R update ')
+!!$        goto 9999
+!!$      End If
+!!$      
+!!$      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+!!$      if (psb_errstatus_fatal()) Then 
+!!$        call psb_errpush(psb_err_from_subroutine_non_,name)
+!!$        goto 9999
+!!$      End If
+!!$      
+!!$    end do iteration
+!!$  end do restart
+!!$
+!!$  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
+!!$
+!!$  deallocate(aux,stat=info)
+!!$  call psb_gefree(wwrk,desc_a,info)
+!!$  if((info /= 0).or.(psb_errstatus_fatal())) then
+!!$     call psb_errpush(info,name)
+!!$     goto 9999
+!!$  end if
+!!$#ifdef MPE_KRYLOV
+!!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
+!!$  call mpi_Pcontrol(2,info)
+!!$  call mpi_Pcontrol(0,info)
+!!$#endif
+!!$  ! restore external global coherence behaviour
+!!$  call psb_restore_coher(ictxt,isvch)
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$  if (err_act == psb_act_abort_) then
+!!$     call psb_error(ictxt)
+!!$     return
+!!$  end if
+!!$  return
+!!$
+!!$End Subroutine psb_dcgstab
 
 
 Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)

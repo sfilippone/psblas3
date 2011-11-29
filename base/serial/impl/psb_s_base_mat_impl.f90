@@ -295,6 +295,11 @@ end subroutine psb_s_base_csgetrow
 
 
 
+!
+! Here we have the base implementation of getblk and clip:
+! this is just based on the getrow.
+! If performance is critical it can be overridden.
+!
 subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
   ! Output is always in  COO format 
@@ -474,7 +479,7 @@ subroutine psb_s_base_transp_2mat(a,b)
   implicit none 
 
   class(psb_s_base_sparse_mat), intent(in) :: a
-  class(psb_base_sparse_mat), intent(out)  :: b
+  class(psb_base_sparse_mat), intent(out)    :: b
 
   type(psb_s_coo_sparse_mat) :: tmp
   integer err_act, info
@@ -512,7 +517,8 @@ subroutine psb_s_base_transc_2mat(a,b)
   implicit none 
 
   class(psb_s_base_sparse_mat), intent(in) :: a
-  class(psb_base_sparse_mat), intent(out)  :: b
+  class(psb_base_sparse_mat), intent(out)    :: b
+
   type(psb_s_coo_sparse_mat) :: tmp
   integer err_act, info
   character(len=*), parameter :: name='s_base_transc'
@@ -583,7 +589,31 @@ subroutine psb_s_base_transc_1mat(a)
 
   class(psb_s_base_sparse_mat), intent(inout) :: a
 
-  call a%transp() 
+  type(psb_s_coo_sparse_mat) :: tmp
+  integer :: err_act, info
+  character(len=*), parameter :: name='s_base_transc'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  call a%mv_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%transc()
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+
+  if (info /= psb_success_) then 
+    info = psb_err_missing_override_method_ 
+    call psb_errpush(info,name,a_err=a%get_fmt())
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+9999 continue
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+
+  return
+
 end subroutine psb_s_base_transc_1mat
 
 
@@ -1062,6 +1092,7 @@ subroutine psb_s_base_scal(d,a,info)
 end subroutine psb_s_base_scal
 
 
+
 function psb_s_base_maxval(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1085,7 +1116,7 @@ function psb_s_base_maxval(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -sone
+  res = szero
 
   return
 
@@ -1114,12 +1145,11 @@ function psb_s_base_csnmi(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -sone
+  res = szero
 
   return
 
 end function psb_s_base_csnmi
-
 
 function psb_s_base_csnm1(a) result(res)
   use psb_error_mod
@@ -1144,7 +1174,7 @@ function psb_s_base_csnm1(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -sone
+  res = szero
 
   return
 
@@ -1254,6 +1284,7 @@ subroutine psb_s_base_aclsum(d,a)
 
 end subroutine psb_s_base_aclsum
 
+
 subroutine psb_s_base_get_diag(a,d,info) 
   use psb_error_mod
   use psb_const_mod
@@ -1284,12 +1315,11 @@ subroutine psb_s_base_get_diag(a,d,info)
 end subroutine psb_s_base_get_diag
 
 
-
 ! == ==================================
 !
 !
 !
-! Computational routines for S_VECT
+! Computational routines for s_VECT
 ! variables. If the actual data type is 
 ! a "normal" one, these are sufficient. 
 ! 

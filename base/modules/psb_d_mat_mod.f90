@@ -699,7 +699,7 @@ module psb_d_mat_mod
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)        :: d(:)
-      integer, intent(out)               :: info
+      integer, intent(out)              :: info
     end subroutine psb_d_aclsum
   end interface
 
@@ -708,7 +708,7 @@ module psb_d_mat_mod
     subroutine psb_d_get_diag(a,d,info)
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(out)          :: d(:)
+      real(psb_dpk_), intent(out)         :: d(:)
       integer, intent(out)                 :: info
     end subroutine psb_d_get_diag
   end interface
@@ -717,13 +717,13 @@ module psb_d_mat_mod
     subroutine psb_d_scal(d,a,info)
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
-      real(psb_dpk_), intent(in)              :: d(:)
+      real(psb_dpk_), intent(in)             :: d(:)
       integer, intent(out)                    :: info
     end subroutine psb_d_scal
     subroutine psb_d_scals(d,a,info)
       import :: psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
-      real(psb_dpk_), intent(in)              :: d
+      real(psb_dpk_), intent(in)             :: d
       integer, intent(out)                    :: info
     end subroutine psb_d_scals
   end interface

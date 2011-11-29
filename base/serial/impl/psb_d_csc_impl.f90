@@ -2266,8 +2266,8 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, err_act, nc, icl
   Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
-  character(len=20)   :: name='csc_from_coo'
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2309,7 +2309,7 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
         if (i >= icl) exit inner
         if (i > nc) then 
           write(debug_unit,*) trim(name),&
-               & ' Strange situation: i>nr ',i,nc,j,nza,icl
+               & 'Strange situation: i>nr ',i,nc,j,nza,icl
           exit outer
         end if
         a%icp(i+1) = a%icp(i) 
@@ -2787,6 +2787,7 @@ subroutine psb_d_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='d_csc_print'
   logical, parameter :: debug=.false.
 
+  character(len=*), parameter  :: datatype='real'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2814,7 +2815,11 @@ subroutine psb_d_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nc

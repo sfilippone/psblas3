@@ -295,6 +295,11 @@ end subroutine psb_z_base_csgetrow
 
 
 
+!
+! Here we have the base implementation of getblk and clip:
+! this is just based on the getrow.
+! If performance is critical it can be overridden.
+!
 subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
   ! Output is always in  COO format 
@@ -468,14 +473,13 @@ subroutine psb_z_base_mold(a,b,info)
 
 end subroutine psb_z_base_mold
 
-
 subroutine psb_z_base_transp_2mat(a,b)
   use psb_z_base_mat_mod, psb_protect_name => psb_z_base_transp_2mat
   use psb_error_mod
   implicit none 
 
   class(psb_z_base_sparse_mat), intent(in) :: a
-  class(psb_base_sparse_mat), intent(out)  :: b
+  class(psb_base_sparse_mat), intent(out)    :: b
 
   type(psb_z_coo_sparse_mat) :: tmp
   integer err_act, info
@@ -513,7 +517,8 @@ subroutine psb_z_base_transc_2mat(a,b)
   implicit none 
 
   class(psb_z_base_sparse_mat), intent(in) :: a
-  class(psb_base_sparse_mat), intent(out)  :: b
+  class(psb_base_sparse_mat), intent(out)    :: b
+
   type(psb_z_coo_sparse_mat) :: tmp
   integer err_act, info
   character(len=*), parameter :: name='z_base_transc'
@@ -542,7 +547,6 @@ subroutine psb_z_base_transc_2mat(a,b)
   end if
 
   return
-
 end subroutine psb_z_base_transc_2mat
 
 subroutine psb_z_base_transp_1mat(a)
@@ -584,6 +588,7 @@ subroutine psb_z_base_transc_1mat(a)
   implicit none 
 
   class(psb_z_base_sparse_mat), intent(inout) :: a
+
   type(psb_z_coo_sparse_mat) :: tmp
   integer :: err_act, info
   character(len=*), parameter :: name='z_base_transc'
@@ -1087,6 +1092,7 @@ subroutine psb_z_base_scal(d,a,info)
 end subroutine psb_z_base_scal
 
 
+
 function psb_z_base_maxval(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1110,7 +1116,7 @@ function psb_z_base_maxval(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -done
+  res = dzero
 
   return
 
@@ -1139,7 +1145,7 @@ function psb_z_base_csnmi(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -done
+  res = dzero
 
   return
 
@@ -1168,7 +1174,7 @@ function psb_z_base_csnm1(a) result(res)
   if (err_act /= psb_act_ret_) then
     call psb_error()
   end if
-  res = -sone
+  res = dzero
 
   return
 
@@ -1179,7 +1185,7 @@ subroutine psb_z_base_rowsum(d,a)
   use psb_const_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_z_base_rowsum
   class(psb_z_base_sparse_mat), intent(in) :: a
-  complex(psb_dpk_), intent(out)           :: d(:)
+  complex(psb_dpk_), intent(out)              :: d(:)
 
   Integer :: err_act, info
   character(len=20)  :: name='rowsum'
@@ -1231,7 +1237,7 @@ subroutine psb_z_base_colsum(d,a)
   use psb_const_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_z_base_colsum
   class(psb_z_base_sparse_mat), intent(in) :: a
-  complex(psb_dpk_), intent(out)           :: d(:)
+  complex(psb_dpk_), intent(out)              :: d(:)
 
   Integer :: err_act, info
   character(len=20)  :: name='colsum'
@@ -1278,6 +1284,7 @@ subroutine psb_z_base_aclsum(d,a)
 
 end subroutine psb_z_base_aclsum
 
+
 subroutine psb_z_base_get_diag(a,d,info) 
   use psb_error_mod
   use psb_const_mod
@@ -1308,14 +1315,11 @@ subroutine psb_z_base_get_diag(a,d,info)
 end subroutine psb_z_base_get_diag
 
 
-
-
-
 ! == ==================================
 !
 !
 !
-! Computational routines for Z_VECT
+! Computational routines for z_VECT
 ! variables. If the actual data type is 
 ! a "normal" one, these are sufficient. 
 ! 
@@ -1331,12 +1335,12 @@ subroutine psb_z_base_vect_mv(alpha,a,x,beta,y,info,trans)
   use psb_const_mod
   use psb_z_base_mat_mod, psb_protect_name => psb_z_base_vect_mv
   implicit none 
-  class(psb_z_base_sparse_mat), intent(in)   :: a
-  complex(psb_dpk_), intent(in)              :: alpha, beta
+  class(psb_z_base_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)       :: alpha, beta
   class(psb_z_base_vect_type), intent(inout) :: x
   class(psb_z_base_vect_type), intent(inout) :: y
-  integer, intent(out)                       :: info
-  character, optional, intent(in)            :: trans
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans
 
   ! For the time being we just throw everything back
   ! onto the normal routines. 
@@ -1352,18 +1356,18 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   use psb_error_mod
   use psb_string_mod
   implicit none 
-  class(psb_z_base_sparse_mat), intent(in)   :: a
-  complex(psb_dpk_), intent(in)              :: alpha, beta
+  class(psb_z_base_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)       :: alpha, beta
   class(psb_z_base_vect_type), intent(inout) :: x,y
-  integer, intent(out)                       :: info
-  character, optional, intent(in)            :: trans, scale
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans, scale
   class(psb_z_base_vect_type), intent(inout),optional  :: d
 
   complex(psb_dpk_), allocatable :: tmp(:)
   class(psb_z_base_vect_type), allocatable :: tmpv
   Integer :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
-  character(len=20)  :: name='s_cssm'
+  character(len=20)  :: name='z_cssm'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
@@ -1491,14 +1495,14 @@ subroutine psb_z_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   use psb_string_mod
   use psb_z_base_vect_mod
   implicit none 
-  class(psb_z_base_sparse_mat), intent(in)   :: a
-  complex(psb_dpk_), intent(in)              :: alpha, beta
+  class(psb_z_base_sparse_mat), intent(in) :: a
+  complex(psb_dpk_), intent(in)       :: alpha, beta
   class(psb_z_base_vect_type), intent(inout) :: x, y
-  integer, intent(out)                       :: info
-  character, optional, intent(in)            :: trans
+  integer, intent(out)             :: info
+  character, optional, intent(in)  :: trans
 
   Integer :: err_act
-  character(len=20)  :: name='s_base_inner_vect_sv'
+  character(len=20)  :: name='z_base_inner_vect_sv'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
@@ -1530,5 +1534,3 @@ subroutine psb_z_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   return
 
 end subroutine psb_z_base_inner_vect_sv
-
-

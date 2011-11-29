@@ -699,7 +699,7 @@ module psb_z_mat_mod
       import :: psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(in) :: a
       real(psb_dpk_), intent(out)        :: d(:)
-      integer, intent(out)               :: info
+      integer, intent(out)              :: info
     end subroutine psb_z_aclsum
   end interface
 
@@ -708,7 +708,7 @@ module psb_z_mat_mod
     subroutine psb_z_get_diag(a,d,info)
       import :: psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_dpk_), intent(out)         :: d(:)
       integer, intent(out)                 :: info
     end subroutine psb_z_get_diag
   end interface
@@ -717,13 +717,13 @@ module psb_z_mat_mod
     subroutine psb_z_scal(d,a,info)
       import :: psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(inout) :: a
-      complex(psb_dpk_), intent(in)              :: d(:)
+      complex(psb_dpk_), intent(in)             :: d(:)
       integer, intent(out)                    :: info
     end subroutine psb_z_scal
     subroutine psb_z_scals(d,a,info)
       import :: psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(inout) :: a
-      complex(psb_dpk_), intent(in)              :: d
+      complex(psb_dpk_), intent(in)             :: d
       integer, intent(out)                    :: info
     end subroutine psb_z_scals
   end interface

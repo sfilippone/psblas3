@@ -337,9 +337,9 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(inout) :: a
-      complex(psb_dpk_), intent(in)      :: val(:)
+      complex(psb_spk_), intent(in)      :: val(:)
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
       integer, intent(in), optional   :: gtl(:)
@@ -349,7 +349,7 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
@@ -365,12 +365,12 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       integer, intent(in)                  :: imin,imax
       integer, intent(out)                 :: nz
       integer, allocatable, intent(inout)  :: ia(:), ja(:)
-      complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+      complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
       integer,intent(out)                  :: info
       logical, intent(in), optional        :: append
       integer, intent(in), optional        :: iren(:)
@@ -382,7 +382,7 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       class(psb_cspmat_type), intent(out) :: b
       integer, intent(in)                  :: imin,imax
@@ -397,7 +397,7 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
       class(psb_cspmat_type), intent(out) :: b
       integer,intent(out)                  :: info
@@ -409,7 +409,7 @@ module psb_c_mat_mod
   interface 
     subroutine psb_c_b_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_coo_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_coo_sparse_mat
       class(psb_cspmat_type), intent(in) :: a
       type(psb_c_coo_sparse_mat), intent(out) :: b
       integer,intent(out)                  :: info
@@ -420,7 +420,7 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(in)    :: a
       class(psb_cspmat_type), intent(out)   :: b
       integer, intent(out)                   :: info
@@ -433,7 +433,7 @@ module psb_c_mat_mod
 
   interface 
     subroutine psb_c_cscnv_ip(a,iinfo,type,mold,dupl)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       integer, intent(out)                   :: iinfo
       integer,optional, intent(in)           :: dupl
@@ -445,7 +445,7 @@ module psb_c_mat_mod
 
   interface 
     subroutine psb_c_cscnv_base(a,b,info,dupl)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(in)       :: a
       class(psb_c_base_sparse_mat), intent(out) :: b
       integer, intent(out)                   :: info
@@ -472,7 +472,7 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_mv_from(a,b)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(out) :: a
       class(psb_c_base_sparse_mat), intent(inout) :: b
     end subroutine psb_c_mv_from
@@ -480,7 +480,7 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_cp_from(a,b)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(out) :: a
       class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
     end subroutine psb_c_cp_from
@@ -488,7 +488,7 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_mv_to(a,b)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat
       class(psb_cspmat_type), intent(inout) :: a
       class(psb_c_base_sparse_mat), intent(out) :: b
     end subroutine psb_c_mv_to
@@ -496,7 +496,7 @@ module psb_c_mat_mod
   
   interface 
     subroutine psb_c_cp_to(a,b)
-      import :: psb_cspmat_type, psb_dpk_, psb_c_base_sparse_mat    
+      import :: psb_cspmat_type, psb_spk_, psb_c_base_sparse_mat    
       class(psb_cspmat_type), intent(in) :: a
       class(psb_c_base_sparse_mat), intent(out) :: b
     end subroutine psb_c_cp_to
@@ -584,26 +584,26 @@ module psb_c_mat_mod
 
   interface psb_csmm
     subroutine psb_c_csmm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      complex(psb_dpk_), intent(inout) :: y(:,:)
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
+      complex(psb_spk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_c_csmm
     subroutine psb_c_csmv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      complex(psb_dpk_), intent(inout) :: y(:)
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
+      complex(psb_spk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_c_csmv
     subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans) 
       use psb_c_vect_mod, only : psb_c_vect_type
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in)   :: a
-      complex(psb_dpk_), intent(in)        :: alpha, beta
+      complex(psb_spk_), intent(in)        :: alpha, beta
       type(psb_c_vect_type), intent(inout) :: x
       type(psb_c_vect_type), intent(inout) :: y
       integer, intent(out)                 :: info
@@ -613,28 +613,28 @@ module psb_c_mat_mod
   
   interface psb_cssm
     subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      complex(psb_dpk_), intent(inout) :: y(:,:)
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
+      complex(psb_spk_), intent(inout) :: y(:,:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans, scale
-      complex(psb_dpk_), intent(in), optional :: d(:)
+      complex(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_c_cssm
     subroutine psb_c_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      complex(psb_dpk_), intent(inout) :: y(:)
+      complex(psb_spk_), intent(in)    :: alpha, beta, x(:)
+      complex(psb_spk_), intent(inout) :: y(:)
       integer, intent(out)            :: info
       character, optional, intent(in) :: trans, scale
-      complex(psb_dpk_), intent(in), optional :: d(:)
+      complex(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_c_cssv
     subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
       use psb_c_vect_mod, only : psb_c_vect_type
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in)   :: a
-      complex(psb_dpk_), intent(in)        :: alpha, beta
+      complex(psb_spk_), intent(in)        :: alpha, beta
       type(psb_c_vect_type), intent(inout) :: x
       type(psb_c_vect_type), intent(inout) :: y
       integer, intent(out)                 :: info
@@ -645,85 +645,85 @@ module psb_c_mat_mod
   
   interface 
     function psb_c_maxval(a) result(res)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_spk_)         :: res
     end function psb_c_maxval
   end interface
   
   interface 
     function psb_c_csnmi(a) result(res)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_spk_)         :: res
     end function psb_c_csnmi
   end interface
   
   interface 
     function psb_c_csnm1(a) result(res)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_spk_)         :: res
     end function psb_c_csnm1
   end interface
 
   interface 
     subroutine psb_c_rowsum(d,a,info) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(out)     :: d(:)
+      complex(psb_spk_), intent(out)     :: d(:)
       integer, intent(out)               :: info
     end subroutine psb_c_rowsum
   end interface
 
   interface 
     subroutine psb_c_arwsum(d,a,info) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(out)        :: d(:)
+      real(psb_spk_), intent(out)        :: d(:)
       integer, intent(out)               :: info
     end subroutine psb_c_arwsum
   end interface
   
   interface 
     subroutine psb_c_colsum(d,a,info) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(out)     :: d(:)
+      complex(psb_spk_), intent(out)     :: d(:)
       integer, intent(out)               :: info
     end subroutine psb_c_colsum
   end interface
 
   interface 
     subroutine psb_c_aclsum(d,a,info) 
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(out)        :: d(:)
-      integer, intent(out)               :: info
+      real(psb_spk_), intent(out)        :: d(:)
+      integer, intent(out)              :: info
     end subroutine psb_c_aclsum
   end interface
 
   
   interface 
     subroutine psb_c_get_diag(a,d,info)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(out)          :: d(:)
+      complex(psb_spk_), intent(out)         :: d(:)
       integer, intent(out)                 :: info
     end subroutine psb_c_get_diag
   end interface
   
   interface psb_scal
     subroutine psb_c_scal(d,a,info)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(inout) :: a
-      complex(psb_dpk_), intent(in)              :: d(:)
+      complex(psb_spk_), intent(in)             :: d(:)
       integer, intent(out)                    :: info
     end subroutine psb_c_scal
     subroutine psb_c_scals(d,a,info)
-      import :: psb_cspmat_type, psb_dpk_
+      import :: psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(inout) :: a
-      complex(psb_dpk_), intent(in)              :: d
+      complex(psb_spk_), intent(in)             :: d
       integer, intent(out)                    :: info
     end subroutine psb_c_scals
   end interface

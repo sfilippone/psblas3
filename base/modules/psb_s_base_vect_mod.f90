@@ -118,12 +118,14 @@ contains
     real(psb_spk_), intent(in) :: val(:)
     integer :: nr
     integer :: info
+
     if (allocated(x%v)) then 
       nr = min(size(x%v),size(val))
       x%v(1:nr) = val(1:nr)
     else
       x%v = val
     end if
+
   end subroutine s_base_set_vect
     
   
@@ -150,15 +152,19 @@ contains
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
     integer :: res
+
     res = 0
     if (allocated(x%v)) res = size(x%v)
+
   end function s_base_get_nrows
-    
+
   function s_base_sizeof(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
     integer(psb_long_int_k_) :: res
-    res = psb_sizeof_sp*x%get_nrows()
+
+    res = (1_psb_long_int_k_ * psb_sizeof_sp) * x%get_nrows()
+
   end function s_base_sizeof
 
   function s_base_dot_v(n,x,y) result(res)
@@ -333,20 +339,33 @@ contains
     end if
   end subroutine s_base_mlt_a_2
 
-  subroutine s_base_mlt_v_2(alpha,x,y,beta,z,info)
+  subroutine s_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
     use psi_serial_mod
+    use psb_string_mod
     implicit none 
     real(psb_spk_), intent(in)        :: alpha,beta
     class(psb_s_base_vect_type), intent(inout)  :: x
     class(psb_s_base_vect_type), intent(inout)  :: y
     class(psb_s_base_vect_type), intent(inout)  :: z
     integer, intent(out)              :: info    
+    character(len=1), intent(in), optional     :: conjgx, conjgy
     integer :: i, n
+    logical :: conjgx_, conjgy_
 
     info = 0
-    
-    call z%mlt(alpha,x%v,y%v,beta,info)
-
+    if (.not.psb_s_is_complex_) then
+      call z%mlt(alpha,x%v,y%v,beta,info)
+    else 
+      conjgx_=.false.
+      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
+      conjgy_=.false.
+      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+      if (conjgx_) x%v=(x%v)
+      if (conjgy_) y%v=(y%v)
+      call z%mlt(alpha,x%v,y%v,beta,info)
+      if (conjgx_) x%v=(x%v)
+      if (conjgy_) y%v=(y%v)
+    end if
   end subroutine s_base_mlt_v_2
 
   subroutine s_base_mlt_av(alpha,x,y,beta,z,info)

@@ -766,7 +766,6 @@ contains
 
       else if (.not.lower) then 
 
-
         if (unit) then 
           do i=n, 1, -1
             acc = y(i) 
@@ -1034,7 +1033,7 @@ function psb_s_csc_maxval(a) result(res)
   real(psb_spk_)         :: res
 
   integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
-  character(len=20)  :: name='d_csc_maxval'
+  character(len=20)  :: name='s_csc_maxval'
   logical, parameter :: debug=.false.
 
 
@@ -1081,6 +1080,7 @@ function psb_s_csc_csnmi(a) result(res)
 
 end function psb_s_csc_csnmi
 
+
 function psb_s_csc_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1095,7 +1095,7 @@ function psb_s_csc_csnm1(a) result(res)
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_csc_csnm1'
+  character(len=20)  :: name='s_csc_csnm1'
   logical, parameter :: debug=.false.
 
 
@@ -1316,6 +1316,7 @@ subroutine psb_s_csc_arwsum(d,a)
 
 end subroutine psb_s_csc_arwsum
 
+
 subroutine psb_s_csc_get_diag(a,d,info) 
   use psb_error_mod
   use psb_const_mod
@@ -1352,7 +1353,7 @@ subroutine psb_s_csc_get_diag(a,d,info)
         endif
       enddo
     end do
-  end if
+  endif
   do i=mnm+1,size(d) 
     d(i) = szero
   end do
@@ -2265,8 +2266,8 @@ subroutine psb_s_mv_csc_from_coo(a,b,info)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, err_act, nc, icl
   Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
-  character(len=20)   :: name='csc_from_coo'
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
@@ -2529,6 +2530,7 @@ subroutine psb_s_csc_mold(a,b,info)
 
 end subroutine psb_s_csc_mold
 
+
 subroutine  psb_s_csc_reallocate_nz(nz,a) 
   use psb_error_mod
   use psb_realloc_mod
@@ -2785,6 +2787,7 @@ subroutine psb_s_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='s_csc_print'
   logical, parameter :: debug=.false.
 
+  character(len=*), parameter  :: datatype='real'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2812,7 +2815,11 @@ subroutine psb_s_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nc
