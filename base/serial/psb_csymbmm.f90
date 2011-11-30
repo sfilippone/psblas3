@@ -36,7 +36,7 @@
 !
 ! Note: This subroutine performs the symbolic product of two sparse matrices.
 !       It is modeled after the SMMP package by R. Bank and C. Douglas, but is 
-!       rewritten in Fortran 95 making use of our sparse matrix facilities.
+!       rewritten in Fortran 95/2003 making use of our sparse matrix facilities.
 !
 
 subroutine psb_csymbmm(a,b,c,info)
