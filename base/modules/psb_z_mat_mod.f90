@@ -37,9 +37,35 @@
 ! provide a mean of switching, at run-time, among different formats,
 ! potentially unknown at the library compile-time by adding a layer of
 ! indirection. This type encapsulates the psb_z_base_sparse_mat class
-! inside another class which is the one visible to the user. All the
-! methods of the psb_z_mat_mod simply call the methods of the
-! encapsulated class, except for cscnv and cp_from/cp_to.
+! inside another class which is the one visible to the user. 
+! Most methods of the psb_z_mat_mod simply call the methods of the
+! encapsulated class.
+! The exceptions are mainly cscnv and cp_from/cp_to; these provide
+! the functionalities to have the encapsulated class change its
+! type dynamically, and to extract/input an inner object.
+!
+! A sparse matric has a state corresponding to its progression
+! through the application life.
+! In particular, computational methods can only be invoked when
+! the matrix is in the ASSEMBLED state, whereas the other states are
+! dedicated to operations on the internal matrix data. 
+! A sparse matrix can move between states according to the 
+! following state transition table. Associated with these states are
+! the possible dynamic types of the inner matrix object.
+! Only COO matrices can ever be in the BUILD state, whereas
+! the ASSEMBLED and UPDATE state can be entered by any class. 
+! 
+! In           Out        Method    
+!| ----------------------------------
+!| Null         Build      csall
+!| Build        Build      csput
+!| Build        Assembled  cscnv
+!| Assembled    Assembled  cscnv
+!| Assembled    Update     reinit
+!| Update       Update     csput
+!| Update       Assembled  cscnv
+!| *            unchanged  reall 
+!| Assembled    Null       free
 ! 
 
 

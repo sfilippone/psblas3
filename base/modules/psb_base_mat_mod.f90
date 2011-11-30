@@ -67,6 +67,13 @@ module psb_base_mat_mod
   
   !
   ! type psb_base_sparse_mat: the basic data about your matrix
+  !            This class is extended twice, to provide the various
+  !            data variations S/D/C/Z and to implement the actual
+  !            storage formats. The grandchild classes are then
+  !            encapsulated to implement the STATE design pattern.
+  !            We have an ambiguity in that the inner class has a
+  !            "state" variable; we hope the context will make it clear. 
+  !
   !  M:        number of rows
   !  N:        number of columns
   !  STATE:    null:   pristine
@@ -74,12 +81,23 @@ module psb_base_mat_mod
   !            assembled: ready to use in computations
   !            update: accepts coefficients but only
   !                    in already existing entries
+  !            The transitions among the states are detailed in
+  !            psb_T_mat_mod
+  !            
   !  TRIANGLE: is it triangular?
   !  UPPER:    If it is triangular, is it upper (otherwise lower)
   !  UNITD:    If it is triangular, is the diagonal assumed to 
   !            be unitary and not stored explicitly?
   !  SORTED:   are the entries guaranteed to be sorted? 
   !
+  ! DUPLICATE: How duplicate entries are to be handled when
+  !            transitioning from the BUILD to the ASSEMBLED state. 
+  !            While many formats would allow for duplicate
+  !            entries, it is much better to constrain the matrices
+  !            NOT to have duplicate entries, except while in the
+  !            BUILD state; in our overall design, only COO matrices
+  !            can ever be in the BUILD state, hence all other formats
+  !            cannot have duplicate entries.
   ! 
   type  :: psb_base_sparse_mat
     integer, private     :: m, n
