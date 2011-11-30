@@ -37,7 +37,6 @@
 ! type variants, such as number of rows and columns, whether the
 ! matrix is supposed to be triangular (upper or lower) and with a unit
 ! (i.e. assumed) diagonal, together with some state variables. This
-
 ! base class is in common among all variants of real/complex,
 ! short/long precision; as such, it only contains information that is
 ! inherently integer in nature.
@@ -85,7 +84,7 @@ module psb_base_mat_mod
   !            psb_T_mat_mod
   !            
   !  TRIANGLE: is it triangular?
-  !  UPPER:    If it is triangular, is it upper (otherwise lower)
+  !  UPPER:    If it is triangular, is it upper (otherwise lower)?
   !  UNITD:    If it is triangular, is the diagonal assumed to 
   !            be unitary and not stored explicitly?
   !  SORTED:   are the entries guaranteed to be sorted? 
