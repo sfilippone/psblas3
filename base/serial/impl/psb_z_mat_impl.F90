@@ -882,7 +882,8 @@ subroutine psb_z_csgetblk(imin,imax,a,b,info,&
 
   if (info == psb_success_) call a%a%csget(imin,imax,acoo,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-  if (info == psb_success_) call move_alloc(acoo,b%a)
+!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%mv_from(acoo)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -932,9 +933,10 @@ subroutine psb_z_csclip(a,b,info,&
   allocate(acoo,stat=info)    
   if (info == psb_success_) call a%a%csclip(acoo,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info == psb_success_) call move_alloc(acoo,b%a)
+!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%mv_from(acoo)
   if (info /= psb_success_) goto 9999 
-
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -1022,13 +1024,6 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(dupl)) then 
-    call b%set_dupl(dupl)
-  else if (a%is_bld()) then 
-    ! Does this make sense at all?? Who knows..
-    call b%set_dupl(psb_dupl_def_)
-  end if
-
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1409,8 +1404,8 @@ subroutine psb_z_cp_from(a,b)
   use psb_string_mod
   use psb_z_mat_mod, psb_protect_name => psb_z_cp_from
   implicit none 
-  class(psb_zspmat_type), intent(out) :: a
-  class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
+  class(psb_zspmat_type), intent(out)      :: a
+  class(psb_z_base_sparse_mat), intent(in) :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
   logical, parameter :: debug=.false.

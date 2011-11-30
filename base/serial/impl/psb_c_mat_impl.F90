@@ -882,7 +882,8 @@ subroutine psb_c_csgetblk(imin,imax,a,b,info,&
 
   if (info == psb_success_) call a%a%csget(imin,imax,acoo,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-  if (info == psb_success_) call move_alloc(acoo,b%a)
+!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%mv_from(acoo)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -932,9 +933,10 @@ subroutine psb_c_csclip(a,b,info,&
   allocate(acoo,stat=info)    
   if (info == psb_success_) call a%a%csclip(acoo,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info == psb_success_) call move_alloc(acoo,b%a)
+!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%mv_from(acoo)
   if (info /= psb_success_) goto 9999 
-
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -1022,13 +1024,6 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(dupl)) then 
-    call b%set_dupl(dupl)
-  else if (a%is_bld()) then 
-    ! Does this make sense at all?? Who knows..
-    call b%set_dupl(psb_dupl_def_)
-  end if
-
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1409,8 +1404,8 @@ subroutine psb_c_cp_from(a,b)
   use psb_string_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_cp_from
   implicit none 
-  class(psb_cspmat_type), intent(out) :: a
-  class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
+  class(psb_cspmat_type), intent(out)      :: a
+  class(psb_c_base_sparse_mat), intent(in) :: b
   Integer :: err_act, info
   character(len=20)  :: name='clone'
   logical, parameter :: debug=.false.
@@ -1428,6 +1423,7 @@ subroutine psb_c_cp_from(a,b)
 #else
   call b%mold(a%a,info)
 #endif
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
   if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
   if (info /= psb_success_) goto 9999 
 
@@ -2073,6 +2069,7 @@ function psb_c_csnmi(a) result(res)
   character(len=20)  :: name='csnmi'
   logical, parameter :: debug=.false.
 
+  info = psb_success_
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
@@ -2294,6 +2291,7 @@ subroutine psb_c_get_diag(a,d,info)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
@@ -2332,6 +2330,7 @@ subroutine psb_c_scal(d,a,info)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = psb_err_invalid_mat_state_
