@@ -169,7 +169,7 @@ contains
     mb = b%get_nrows()
     nb = b%get_ncols()
     
-    call numbmm(ma,na,nb,a%irp,a%ja,0,a%val,&
+    call dnumbmm(ma,na,nb,a%irp,a%ja,0,a%val,&
          & b%irp,b%ja,0,b%val,&
          & c%irp,c%ja,0,c%val,temp)
 

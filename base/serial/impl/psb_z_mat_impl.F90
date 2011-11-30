@@ -867,7 +867,7 @@ subroutine psb_z_csgetblk(imin,imax,a,b,info,&
   Integer :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat), allocatable  :: acoo
+  class(psb_z_base_sparse_mat), allocatable  :: acoo
 
 
   info = psb_success_
@@ -878,12 +878,21 @@ subroutine psb_z_csgetblk(imin,imax,a,b,info,&
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
+  allocate(psb_z_coo_sparse_mat :: acoo,stat=info)    
 
-  if (info == psb_success_) call a%a%csget(imin,imax,acoo,info,&
-       & jmin,jmax,iren,append,rscale,cscale)
-!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info == psb_success_) call b%mv_from(acoo)
+  if (info == psb_success_) then 
+    select type (acoo)
+    type is (psb_z_coo_sparse_mat)
+      call a%a%csget(imin,imax,acoo,info,&
+           & jmin,jmax,iren,append,rscale,cscale)
+      class default
+        ! This is impossible
+      info = psb_err_internal_error_
+    end select
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  if (info == psb_success_) call move_alloc(acoo,b%a)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -920,7 +929,7 @@ subroutine psb_z_csclip(a,b,info,&
   Integer :: err_act
   character(len=20)  :: name='csclip'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat), allocatable  :: acoo
+  class(psb_z_base_sparse_mat), allocatable  :: acoo
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -930,11 +939,22 @@ subroutine psb_z_csclip(a,b,info,&
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
-  if (info == psb_success_) call a%a%csclip(acoo,info,&
-       & imin,imax,jmin,jmax,rscale,cscale)
-!!$  if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info == psb_success_) call b%mv_from(acoo)
+  allocate(psb_z_coo_sparse_mat :: acoo,stat=info)    
+  
+  if (info == psb_success_) then 
+    select type (acoo)
+    type is (psb_z_coo_sparse_mat)
+      call a%a%csclip(acoo,info,&
+           & imin,imax,jmin,jmax,rscale,cscale)
+    class default
+      ! This is impossible
+      info = psb_err_internal_error_
+    end select
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+ 
+  if (info == psb_success_) call move_alloc(acoo,b%a)
   if (info /= psb_success_) goto 9999 
   
   call psb_erractionrestore(err_act)

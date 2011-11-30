@@ -198,7 +198,7 @@ contains
     endif
 
     do i = 1,maxlmn
-      temp(i) = dzero
+      temp(i) = czero
     end do
     minlm = min(l,m)
     minln = min(l,n)
@@ -233,7 +233,7 @@ contains
             return
         else
           c%val(j) = temp(c%ja(j))
-          temp(c%ja(j)) = dzero
+          temp(c%ja(j)) = czero
         endif
       end do
     end do
@@ -242,4 +242,3 @@ contains
   end subroutine gen_numbmm
 
 end subroutine psb_cbase_numbmm
-

@@ -210,7 +210,7 @@ c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
  50   continue
       return
       end
-      subroutine numbmm(n, m, l,
+      subroutine dnumbmm(n, m, l,
      *  ia, ja, diaga, a,
      *  ib, jb, diagb, b,
      *  ic, jc, diagc, c,

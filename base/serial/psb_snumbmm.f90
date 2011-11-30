@@ -198,7 +198,7 @@ contains
     endif
 
     do i = 1,maxlmn
-      temp(i) = dzero
+      temp(i) = szero
     end do
     minlm = min(l,m)
     minln = min(l,n)
@@ -233,7 +233,7 @@ contains
             return
         else
           c%val(j) = temp(c%ja(j))
-          temp(c%ja(j)) = dzero
+          temp(c%ja(j)) = szero
         endif
       end do
     end do
