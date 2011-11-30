@@ -106,11 +106,6 @@ module psb_const_mod
   integer, parameter :: psb_upd_srch_   = 98764
   integer, parameter :: psb_upd_perm_   = 98765
   integer, parameter :: psb_upd_dflt_   = psb_upd_srch_
-  ! Mark a COO matrix with sorted entries.
-  integer, parameter :: psb_isrtdcoo_   = 98761
-  integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
-  integer, parameter :: psb_dbleint_=2
-  character(len=5)   :: psb_fidef_='CSR'
 
 #if defined(HAVE_ISO_FORTRAN_ENV) 
   integer, save :: psb_err_unit = error_unit  
