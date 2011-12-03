@@ -2164,6 +2164,10 @@ contains
 end subroutine psb_s_coo_csgetptn
 
 
+!
+! NZ is the number of non-zeros on output. 
+! The output is guaranteed to be sorted
+! 
 subroutine psb_s_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format 
@@ -2271,6 +2275,7 @@ contains
     use psb_error_mod
     use psb_realloc_mod
     use psb_sort_mod
+    use psb_ip_reord_mod
     implicit none
 
     class(psb_s_coo_sparse_mat), intent(in)    :: a
@@ -2369,25 +2374,25 @@ contains
         if (present(iren)) then 
           do i=ip,jp
             if ((jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
-              nzin_ = nzin_ + 1
               nz    = nz + 1
-              val(nzin_) = a%val(i)
-              ia(nzin_)  = iren(a%ia(i))
-              ja(nzin_)  = iren(a%ja(i))
+              val(nzin_+nz) = a%val(i)
+              ia(nzin_+nz)  = iren(a%ia(i))
+              ja(nzin_+nz)  = iren(a%ja(i))
             end if
           enddo
+          call psb_s_fix_coo_inner(nzin_+nz,psb_dupl_add_,ia,ja,val,nz,info)
+          nz = nz - nzin_        
         else
           do i=ip,jp
             if ((jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
-              nzin_ = nzin_ + 1
               nz    = nz + 1
-              val(nzin_) = a%val(i)
-              ia(nzin_)  = a%ia(i)
-              ja(nzin_)  = a%ja(i)
+              val(nzin_+nz) = a%val(i)
+              ia(nzin_+nz)  = a%ia(i)
+              ja(nzin_+nz)  = a%ja(i)
             end if
           enddo
         end if
-      else 
+      else
         nz = 0 
       end if
 
@@ -2438,9 +2443,9 @@ contains
             ja(nzin_+k)  = (a%ja(i))
           endif
         enddo
-        nzin_=nzin_+k
-      end if
-      nz = k 
+      end if      
+      call psb_s_fix_coo_inner(nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
+      nz = nz - nzin_
     end if
 
   end subroutine coo_getrow

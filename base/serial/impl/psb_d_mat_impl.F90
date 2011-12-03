@@ -867,7 +867,7 @@ subroutine psb_d_csgetblk(imin,imax,a,b,info,&
   Integer :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
-  class(psb_d_base_sparse_mat), allocatable  :: acoo
+  type(psb_d_coo_sparse_mat), allocatable  :: acoo
 
 
   info = psb_success_
@@ -878,17 +878,11 @@ subroutine psb_d_csgetblk(imin,imax,a,b,info,&
     goto 9999
   endif
 
-  allocate(psb_d_coo_sparse_mat :: acoo,stat=info)    
+  allocate(acoo,stat=info)    
 
   if (info == psb_success_) then 
-    select type (acoo)
-    type is (psb_d_coo_sparse_mat)
-      call a%a%csget(imin,imax,acoo,info,&
-           & jmin,jmax,iren,append,rscale,cscale)
-      class default
-        ! This is impossible
-      info = psb_err_internal_error_
-    end select
+    call a%a%csget(imin,imax,acoo,info,&
+         & jmin,jmax,iren,append,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
@@ -929,7 +923,7 @@ subroutine psb_d_csclip(a,b,info,&
   Integer :: err_act
   character(len=20)  :: name='csclip'
   logical, parameter :: debug=.false.
-  class(psb_d_base_sparse_mat), allocatable  :: acoo
+  type(psb_d_coo_sparse_mat), allocatable  :: acoo
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -939,17 +933,11 @@ subroutine psb_d_csclip(a,b,info,&
     goto 9999
   endif
 
-  allocate(psb_d_coo_sparse_mat :: acoo,stat=info)    
+  allocate(acoo,stat=info)    
   
   if (info == psb_success_) then 
-    select type (acoo)
-    type is (psb_d_coo_sparse_mat)
-      call a%a%csclip(acoo,info,&
-           & imin,imax,jmin,jmax,rscale,cscale)
-    class default
-      ! This is impossible
-      info = psb_err_internal_error_
-    end select
+    call a%a%csclip(acoo,info,&
+         & imin,imax,jmin,jmax,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
