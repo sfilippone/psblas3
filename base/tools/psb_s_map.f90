@@ -419,8 +419,8 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
     info = 1
   end select
 
-  if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
-  if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
+  if (info == psb_success_) call map_X2Y%clone(this%map_X2Y,info)
+  if (info == psb_success_) call map_Y2X%clone(this%map_Y2X,info)
   if (info == psb_success_) then
     call this%set_kind(map_kind)
   end if
