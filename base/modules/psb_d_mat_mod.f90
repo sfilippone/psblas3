@@ -579,7 +579,7 @@ module psb_d_mat_mod
     subroutine psb_d_cp_from(a,b)
       import :: psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(out) :: a
-      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+      class(psb_d_base_sparse_mat), intent(in) :: b
     end subroutine psb_d_cp_from
   end interface
   
