@@ -46,7 +46,7 @@ subroutine psb_dsymbmm(a,b,c,info)
   type(psb_dspmat_type), intent(in)    :: a,b
   type(psb_dspmat_type), intent(out)   :: c
   integer, intent(out)                  :: info
-  class(psb_d_base_sparse_mat), allocatable :: ccsr
+  type(psb_d_csr_sparse_mat), allocatable :: ccsr
   integer               :: err_act
   character(len=*), parameter ::  name='psb_symbmm'
   call psb_erractionsave(err_act)
@@ -58,16 +58,10 @@ subroutine psb_dsymbmm(a,b,c,info)
     goto 9999
   endif
 
-  allocate(psb_d_csr_sparse_mat :: ccsr,stat=info)    
+  allocate(ccsr,stat=info)    
 
   if (info == psb_success_) then 
-    select type (ccsr)
-    type is (psb_d_csr_sparse_mat)
       call psb_symbmm(a%a,b%a,ccsr,info)
-    class default
-      ! This is impossible
-      info = psb_err_internal_error_
-    end select
   else
     info = psb_err_alloc_dealloc_
   end if
