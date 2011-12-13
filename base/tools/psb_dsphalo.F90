@@ -163,15 +163,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end select
 
-
-  allocate(acoo,stat=info)    
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-
   l1  = 0
 
   sdsz(:)=0
