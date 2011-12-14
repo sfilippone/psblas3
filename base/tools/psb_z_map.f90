@@ -145,7 +145,7 @@ subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%map_X2Y,x,zzero,yt,info)
     if ((info == psb_success_) .and. map%p_desc_Y%is_repl()) then
-      yta = yt
+      yta = yt%get_vect()
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
     end if
@@ -167,12 +167,12 @@ subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     call xt%bld(nc1,mold=x%v)
     call yt%bld(nc2,mold=y%v)
 
-    xta = x
+    xta = x%get_vect()
     call xt%set(xta(1:nr1))
     if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%map_X2Y,xt,zzero,yt,info)
     if ((info == psb_success_) .and. map%desc_Y%is_repl()) then
-      yta = yt
+      yta = yt%get_vect()
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
     end if
@@ -308,7 +308,7 @@ subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%map_Y2X,x,zzero,yt,info)
     if ((info == psb_success_) .and. map%p_desc_X%is_repl()) then
-      yta = yt
+      yta = yt%get_vect()
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
     end if
@@ -328,13 +328,13 @@ subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     nc2   = map%desc_X%get_local_cols() 
     call xt%bld(nc1,mold=x%v)
     call yt%bld(nc2,mold=y%v)
-    xta = x
+    xta = x%get_vect()
     call xt%set(xta(1:nr1))
 
     if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%map_Y2X,xt,zzero,yt,info)
     if ((info == psb_success_) .and. map%desc_X%is_repl()) then
-      yta = yt
+      yta = yt%get_vect()
       call psb_sum(ictxt,yta(1:nr2))
       call yt%set(yta)
     end if
