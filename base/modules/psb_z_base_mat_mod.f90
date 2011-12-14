@@ -61,7 +61,7 @@ module psb_z_base_mat_mod
   type, extends(psb_base_sparse_mat) :: psb_z_base_sparse_mat
   contains
     !
-    ! Data management methods: defined here, but not implemented.
+    ! Data management methods: defined here, but (mostly) not implemented.
     !    
     procedure, pass(a) :: csput         => psb_z_base_csput  
     procedure, pass(a) :: z_csgetrow  => psb_z_base_csgetrow
@@ -212,7 +212,7 @@ module psb_z_base_mat_mod
   !   Catches:
   !     1. If A is in the BUILD state, then this method
   !        can only be called for COO matrice, in which case it
-  !        is more like queueing coefficients for later processing.
+  !        is more like queueing coefficients for later processing;
   !     2. If A is in the UPDATE state, then every derived class must
   !        implement this;
   !     3. In the UPDATE state, depending on the value of DUPL flag 

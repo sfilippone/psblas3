@@ -24,6 +24,23 @@ subroutine psb_c_mat_renums(alg,mat,info,perm)
     ialg = -1
   end select
   call psb_mat_renum(ialg,mat,info,perm)
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_non_
+    call psb_errpush(info,name)
+    goto 9999 
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
 end subroutine psb_c_mat_renums
   
 subroutine psb_c_mat_renum(alg,mat,info,perm)
@@ -206,6 +223,7 @@ contains
     class(psb_c_base_sparse_mat), allocatable :: aa
     type(psb_c_coo_sparse_mat)  :: acoo
 
+    integer, allocatable :: perm(:) 
     integer :: err_act
     character(len=20)           :: name
     integer :: i, j, k, ideg, nr, ibw, ipf, idpth, nz

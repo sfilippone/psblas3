@@ -222,7 +222,7 @@ program ppde
     call psb_geall(vtst,desc_b, info)
     vtst%v%v = iam+1
     call psb_geasb(vtst,desc_b,info)
-    tst = vtst
+    tst = vtst%get_vect()
     call psb_geasb(tst,desc_b,info)
     call psb_ovrl(vtst,desc_b,info,update=psb_avg_)
     call psb_ovrl(tst,desc_b,info,update=psb_avg_)

@@ -78,9 +78,7 @@ module psb_d_vect_mod
     procedure, pass(x) :: bld_x    => d_vect_bld_x
     procedure, pass(x) :: bld_n    => d_vect_bld_n
     generic, public    :: bld      => bld_x, bld_n
-    procedure, pass(x) :: getCopy  => d_vect_getCopy
-    procedure, pass(x) :: cpy_vect => d_vect_cpy_vect
-    generic, public    :: assignment(=) => cpy_vect
+    procedure, pass(x) :: get_vect => d_vect_get_vect
     procedure, pass(x) :: cnv      => d_vect_cnv
     procedure, pass(x) :: set_scal => d_vect_set_scal
     procedure, pass(x) :: set_vect => d_vect_set_vect
@@ -127,23 +125,15 @@ contains
 
   end subroutine d_vect_bld_n
 
-  function  d_vect_getCopy(x) result(res)
-    class(psb_d_vect_type), intent(in)  :: x
-    real(psb_dpk_), allocatable              :: res(:)
+  function  d_vect_get_vect(x) result(res)
+    class(psb_d_vect_type), intent(inout)  :: x
+    real(psb_dpk_), allocatable                 :: res(:)
     integer :: info
 
-    if (allocated(x%v)) res = x%v%getCopy()
-
-  end function d_vect_getCopy
-
-  subroutine d_vect_cpy_vect(res,x)
-    real(psb_dpk_), allocatable, intent(out) :: res(:)
-    class(psb_d_vect_type), intent(in)  :: x
-    integer :: info
-
-    if (allocated(x%v)) res = x%v
-
-  end subroutine d_vect_cpy_vect
+    if (allocated(x%v)) then
+      res = x%v%get_vect()
+    end if
+  end function d_vect_get_vect
 
   subroutine d_vect_set_scal(x,val)
     class(psb_d_vect_type), intent(inout)  :: x

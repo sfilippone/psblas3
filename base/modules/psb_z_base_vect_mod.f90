@@ -82,12 +82,10 @@ module psb_z_base_vect_mod
     ! Set/get data from/to an external array; also
     ! overload assignment.
     !
-    procedure, pass(x) :: getCopy  => z_base_getCopy
-    procedure, pass(x) :: cpy_vect => z_base_cpy_vect
+    procedure, pass(x) :: get_vect => z_base_get_vect
     procedure, pass(x) :: set_scal => z_base_set_scal
     procedure, pass(x) :: set_vect => z_base_set_vect
     generic, public    :: set      => set_vect, set_scal
-    generic, public    :: assignment(=) => cpy_vect, set_scal
 
     !
     ! Dot product and AXPBY
@@ -354,28 +352,21 @@ contains
   ! overload the assignment. 
   !
     
-  function  z_base_getCopy(x) result(res)
-    class(psb_z_base_vect_type), intent(in) :: x
-    complex(psb_dpk_), allocatable              :: res(:)
+  function  z_base_get_vect(x) result(res)
+    class(psb_z_base_vect_type), intent(inout) :: x
+    complex(psb_dpk_), allocatable                 :: res(:)
     integer :: info
     
+    if (.not.allocated(x%v)) return 
+    call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'base_getCopy')
+      call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
     res(:) = x%v(:)
-  end function z_base_getCopy
+  end function z_base_get_vect
     
-  subroutine z_base_cpy_vect(res,x)
-    complex(psb_dpk_), allocatable, intent(out) :: res(:)
-    class(psb_z_base_vect_type), intent(in)  :: x
-    integer :: info
-
-    res = x%v 
-
-  end subroutine z_base_cpy_vect
-
   !
   ! Reset all values 
   !
