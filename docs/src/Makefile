@@ -86,7 +86,7 @@
 TOPFILE   = userguide.tex
 HTMLFILE  = userhtml.tex
 SECFILE   = intro.tex commrout.tex datastruct.tex psbrout.tex toolsrout.tex\
-	methods.tex precs.tex penv.tex error.tex util.tex
+	methods.tex precs.tex penv.tex error.tex util.tex biblio.tex
 FIGDIR    = figures
 
 XPDFFLAGS = 

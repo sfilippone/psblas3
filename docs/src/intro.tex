@@ -11,11 +11,21 @@ dense matrix operations.  The current implementation of PSBLAS
 addresses a distributed memory execution model operating with message
 passing. 
 
-The PSBLAS library is internally implemented in
- the Fortran~95~\cite{metcalf} programming language, with reuse and/or
+The PSBLAS library version 3 is internally implemented in
+ the Fortran~2003~\cite{metcalf} programming language, with reuse and/or
  adaptation of some existing Fortran~77 software, and a handful of C
  routines. 
-A similar approach has been advocated by a number of authors,
+
+The use of Fortran~2003 offers a number of advantages over Fortran~95,
+mostly in the handling of requirements for evolution and adaptation of
+the library to new computing architectures and integration of
+new algorithms. 
+For a detailed discussion of our design see~\cite{Sparse03}; other
+works tackling advanced programming in Fortran~2003 include~\cite{DesPat:11,RouXiaXu:11}
+
+Previous approaches have been based on mixing Fortran~95, with its
+support for object-based design, with other languages; these have
+been advocated by a number of authors, 
 e.g.~\cite{machiels}.  Moreover, the Fortran~95 facilities for dynamic
 memory management and interface overloading greatly enhance the
 usability of the PSBLAS 
