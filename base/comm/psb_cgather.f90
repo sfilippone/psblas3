@@ -333,7 +333,7 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_cgather_vect
   implicit none
 
-  type(psb_c_vect_type), intent(in) :: locx
+  type(psb_c_vect_type), intent(inout) :: locx
   complex(psb_spk_), intent(out)    :: globx(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
@@ -406,8 +406,8 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
   
-  globx(:)=czero
-  llocx = locx
+  globx(:) = czero
+  llocx    = locx%get_vect()
 
   do i=1,desc_a%get_local_rows()
     call psb_loc_to_glob(i,idx,desc_a,info)

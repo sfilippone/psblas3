@@ -144,7 +144,7 @@ module psb_s_comm_mod
     subroutine  psb_sgather_vect(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       use psb_s_vect_mod
-      type(psb_s_vect_type), intent(in) :: locx
+      type(psb_s_vect_type), intent(inout) :: locx
       real(psb_spk_), intent(out)     :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer, intent(out)            :: info
