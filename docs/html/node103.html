@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precbld -- Builds a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precbld -- Builds a preconditioner">
+<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node104.html">
 <LINK REL="previous" HREF="node102.html">
-<LINK REL="up" HREF="node101.html">
+<LINK REL="up" HREF="node100.html">
 <LINK REL="next" HREF="node104.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1476"
+<A NAME="tex2html1474"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1472"
-  HREF="node101.html">
+<A NAME="tex2html1470"
+  HREF="node100.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1466"
+<A NAME="tex2html1464"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1474"
+<A NAME="tex2html1472"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1477"
-  HREF="node104.html">psb_precaply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1473"
-  HREF="node101.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1467"
-  HREF="node102.html">psb_precinit   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1475"
+<B> Next:</B> <A NAME="tex2html1475"
+  HREF="node104.html">psb_precdescr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1471"
+  HREF="node100.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1465"
+  HREF="node102.html">psb_precbld   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1473"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000112000000000000000">
-psb_precbld -- Builds a preconditioner</A>
+<H2><A NAME="SECTION000113000000000000000">
+psb_precaply -- Preconditioner application routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precbld(a, desc_a, prec, info)
+call psb_precaply(prec,x,y,desc_a,info,trans,work)
+call psb_precaply(prec,x,desc_a,info,trans)
 </PRE>
 
 <P>
@@ -68,36 +69,54 @@ call psb_precbld(a, desc_a, prec, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the system sparse matrix.
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in</B>, target.
+Intent: <B>in</B>.
 <BR>
-Specified as: a sparse matrix data structure spdata<TT>psb_spmat_type</TT>.
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
+Specified as: a double precision array.
+</DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor. 
+<DD>the problem communication descriptor.
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in</B>, target.
+Intent: <B>in</B>.
 <BR>
-Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
 </DD>
 </DL>
 
@@ -106,17 +125,16 @@ Specified as: a communication descriptor data structure descdata<TT>psb_desc_typ
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
+Specified as: a double precision array.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>

@@ -33,22 +33,55 @@ it is only used for the \verb|psb_sizeof| utility.
 All the general matrix informations and elements to be
 exchanged among processes are stored within a data structure of the
 type \hypertarget{descdata}{{\tt psb\_desc\_type}}. 
-Every structure of this type is associated to a sparse matrix, it
-contains data about general matrix informations and elements to be
-exchanged among processes.  
+Every structure of this type is associated with a discretization
+pattern and enables data communications and other operations that are
+necessary for implementing the various algorithms of interest to us. 
 
-It is not necessary for the user to know the internal structure of
-\verb|psb_desc_type|, it is set in a transparent mode by the tools
-routines of Sec.~\ref{sec:toolsrout}, and its fields may be accessed
-if necessary via  the routines of sec.~\ref{sec:dataquery};
-nevertheless we include a  description for the curious 
-reader:   
+The data structure itself \verb|psb_desc_type| can be treated as an
+opaque object handled via the  tools routines of
+Sec.~\ref{sec:toolsrout} and~\ref{sec:dataquery};
+nevertheless we include here a  description for the curious 
+reader. 
+
+First we describe the \verb|psb_indx_map| type. This is a data
+structure that keeps track of a certain number of basic issues such
+as:
+\begin{itemize}
+\item The value of the communication/MPI context;
+\item The number of indices in the index space, i.e. global number of
+  rows and columns of a sparse matrix;
+\item The local set of indices, including:
+\begin{itemize}
+\item The number of local indices (and local rows);
+\item The number of halo indices (and therefore local columns); 
+\item The global indices corresponding to the local ones. 
+\end{itemize}
+\end{itemize}
+There are many different schemes for storing these data; therefore
+there are a number of types extending the base one, and the descriptor
+structure holds a polymorphic object whose dynamic type can be any of
+the extended  types. 
+The methods associated with this data type answer the following
+queries:
+\begin{itemize}
+\item For a given set of local indices, find the corresponding indices
+  in the global numbering;
+\item For a given set of global indices, find the corresponding
+  indices in the local numbering, if any, or return an invalid 
+\item Add a global index to the set of halo indices;
+\item Find the process  owner of each member of a set of global
+  indices.
+\end{itemize}
+All methods but the last are purely local; the last method potentially
+requires communication among processes, and thus is a synchronous
+method. The choice of a specific dynamic type for the index map is
+made at the time the descriptor is initially allocated, according to
+the mode of initialization (see also~\ref{sec:toolsrout}).
+
+The descriptor contents are as follows:
 \begin{description}
-\item[{\bf matrix\_data}] includes general information about matrix and
-process grid, such as the communication context, the size of the
-global matrix, the size of the portion of matrix stored on the current
-process, and so on. 
-Specified as: an allocatable integer array of dimension \verb|psb_mdata_size_|.
+\item[{\bf indxmap}] A polymorphic variable of a type that is any
+  extension of the indx\_map type described above. \\
 \item[{\bf halo\_index}] A list of the halo and boundary elements for
 the current process to be exchanged with other processes; for each
 processes with which it is necessary to communicate:
@@ -88,26 +121,23 @@ ecurrent process:
 \item Index of a ``master'' process: 
 \end{enumerate}
 Specified as: an allocatable integer array of rank two.
-\item[{\bf loc\_to\_glob}] each element $i$ of this array contains
-global identifier of the local variable $i$.\\
-Specified as: an allocatable integer array of rank one.
-\item[{\bf glob\_to\_loc, glb\_lc, hashv}] Contain a mapping from
-  global to local indices. 
+\item [{\bf bnd\_elem}] A list of all boundary points, i.e. points
+  that have a connection with other processes.
 \end{description}
-The Fortran~95 definition  for \verb|psb_desc_type| structures is 
+The Fortran~2003 declaration  for \verb|psb_desc_type| structures is 
 as follows:
 \begin{figure}[h!]
   \begin{Sbox}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
-   integer, allocatable :: matrix_data(:), halo_index(:)
-   integer, allocatable :: ext_index(:)
-   integer, allocatable :: ovrlap_elem(:,:)
-   integer, allocatable :: ovrlap_index(:)
-   integer, allocatable :: ovr_mst_idx(:)
-   integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
-   integer, allocatable :: hashv(:), glb_lc(:,:)
+    class(psb_indx_map), allocatable :: indxmap
+    integer, allocatable  :: halo_index(:)
+    integer, allocatable  :: ext_index(:)
+    integer, allocatable  :: ovrlap_index(:)
+    integer, allocatable  :: ovrlap_elem(:,:)
+    integer, allocatable  :: ovr_mst_idx(:)
+    integer, allocatable  :: bnd_elem(:)
 end type psb_desc_type 
 \end{verbatim}
     \end{minipage}
@@ -130,14 +160,7 @@ state, which can take the following values:
   the associated sparse matrix, such as matrix-vector products, are
   only possible   in this state.
 \end{description}
-The global to local index  mapping may be stored in two different
-formats: the first is simpler but more expensive, as it requires on
-each process an amount of memory proportional to the global size of
-the index space; the second is more complex, but only requires memory
-proportional to the local index space size. The choice is made at the
-time of the initialization according to a threshold; this threshold
-may be queried and set using the functions in
-sec.~\ref{sec:dataquery}. 
+
 
 \subsubsection{Named Constants}
 \label{sec:cd_constants}
@@ -176,10 +199,12 @@ sec.~\ref{sec:dataquery}.
 \subsection{Sparse Matrix data structure}
 \label{sec:spmat}
 The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
-contains all information about local portion of the sparse matrix and   
+contains all information about the local portion of the sparse matrix and   
 its storage mode. Most  of these fields are set  by the tools
 routines when inserting a new sparse matrix; the user needs only
-choose, if he/she so whishes, a specific matrix storage mode. \\
+choose, if he/she so whishes, a specific matrix storage mode. 
+
+The 
 \begin{description}
 \item[{\bf aspk}] Contains values of the local distributed sparse
 matrix.\\
@@ -335,153 +360,7 @@ contains all information about local portion of the sparse matrix and
 its storage mode. Most  of these fields are set  by the tools
 routines when inserting a new sparse matrix; the user needs only
 choose, if he/she so whishes, a specific matrix storage mode. \\
-\begin{description}
-\item[{\bf aspk}] Contains values of the local distributed sparse
-matrix.\\
-Specified as: an allocatable array of rank one of type corresponding
-to matrix entries type.
-\item[{\bf ia1}] Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.\\
-Specified as: an allocatable  integer array of rank one.
-\item[{\bf ia2}] Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.\\
-Specified as: an allocatable  integer array of rank one.
-\item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
-matrix.  Actual information will depend on data format used.\\
-Specified as: an integer array of length \verb|psb_ifasize_|.
-\item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
-Specified as: a string of length 5
-\item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
-Specified as: array of character of length 9.
-\item[{\bf pl}] Specifies the local row permutation of distributed sparse
-matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
-Specified as: an allocatable integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
-\item[{\bf pr}] Specifies the local column permutation of distributed sparse
-matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
-Specified as: an allocatable integer array of dimension equal to number of
-local row (matrix\_data[psb\_n\_col\_\hbox{]})
-\item[{\bf m}] Number of rows; if row indices are stored explicitly,
-as in Coordinate Storage, should be greater than or equal to the
-maximum row index actually present in the sparse matrix.
-Specified as: integer variable.
-\item[{\bf k}] Number of columns; if column indices are stored explicitly,
-as in Coordinate Storage or Compressed Sparse Rows, should be greater
-than or equal to the maximum column  index actually present in the sparse matrix.
-Specified as: integer variable.
-\end{description}
-The Fortran~95 interface for distributed sparse matrices containing
-double precision real entries is defined as shown in
-figure~\ref{fig:spmattype}. The definitions for single precision and
-complex data are identical except for the \verb|real| declaration and
-for the kind type parameter.
-\begin{figure}[h!]
-  \begin{Sbox}
-    \begin{minipage}[tl]{0.85\textwidth}
-\begin{verbatim}
-type psb_sspmat_type
-   integer     :: m, k
-   character   :: fida(5)
-   character   :: descra(10)
-   integer     :: infoa(psb_ifa_size_)
-   real(psb_spk_), allocatable :: aspk(:)
-   integer, allocatable :: ia1(:), ia2(:)
-   integer, allocatable :: pr(:), pl(:)
-end type psb_sspmat_type
 
-type psb_dspmat_type
-   integer     :: m, k
-   character   :: fida(5)
-   character   :: descra(10)
-   integer     :: infoa(psb_ifa_size_)
-   real(psb_dpk_), allocatable :: aspk(:)
-   integer, allocatable :: ia1(:), ia2(:)
-   integer, allocatable :: pr(:), pl(:)
-end type psb_dspmat_type
-
-type psb_cspmat_type
-   integer     :: m, k
-   character   :: fida(5)
-   character   :: descra(10)
-   integer     :: infoa(psb_ifa_size_)
-   complex(psb_spk_), allocatable :: aspk(:)
-   integer, allocatable :: ia1(:), ia2(:)
-   integer, allocatable :: pr(:), pl(:)
-end type psb_cspmat_type
-
-type psb_zspmat_type
-   integer     :: m, k
-   character   :: fida(5)
-   character   :: descra(10)
-   integer     :: infoa(psb_ifa_size_)
-   complex(psb_dpk_), allocatable :: aspk(:)
-   integer, allocatable :: ia1(:), ia2(:)
-   integer, allocatable :: pr(:), pl(:)
-end type psb_zspmat_type
-
-\end{verbatim}
-    \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
-  \end{center}
-  \caption{\label{fig:spmattype} 
-    The PSBLAS defined data type that
-    contains a sparse matrix.} 
-\end{figure}
-
-The following two cases are among the most commonly used: 
-\begin{description}
-\item[fida=``CSR''] Compressed storage by rows. In this case the
-following should hold: 
-\begin{enumerate}
-\item \verb|ia2(i)| contains the index of the first element of row
-\verb|i|; the last element of the sparse matrix is thus stored at
-index $ia2(m+1)-1$. It should contain \verb|m+1| entries in
-nondecreasing order (strictly increasing, if there are no empty rows).
-\item \verb|ia1(j)| contains the column index and \verb|aspk(j)|
-contains the corresponding coefficient value, for all $ia2(1) \le j
-\le ia2(m+1)-1$.
-\end{enumerate}
-\item[fida=``COO''] Coordinate storage. In this case the following
-should hold: 
-\begin{enumerate}
-\item \verb|infoa(1)| contains the number of nonzero elements in the
-matrix; 
-\item For all $1 \le j \le infoa(1)$, the coefficient, row index and
-column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
-\verb|ia2(j)| respectively. 
-\end{enumerate}
-\end{description}
-A sparse matrix has an associated state, which can take the following
-values:
-\begin{description}
-\item[Build:] State entered after the first allocation, and before the
-  first assembly; in this state it is possible to add nonzero entries.
-\item[Assembled:] State entered after the assembly; computations using
-  the sparse matrix, such as matrix-vector products, are only possible
-  in this state;
-\item[Update:] State entered after a reinitalization; this is used to
-  handle applications in which the same sparsity pattern is used
-  multiple times with different coefficients. In this state it is only
-  possible to enter coefficients for already existing nonzero entries.
-\end{description}
-\subsubsection{Named Constants}
-\label{sec:sp_constants}
-\begin{description}
-%% \item[psb\_nztotreq\_] Request to fetch the total number of nonzeroes
-%%   stored in a sparse matrix
-%% \item[psb\_nzrowreq\_] Request to fetch the number of nonzeroes in a
-%%   given row in a sparse matrix
-\item[psb\_dupl\_ovwrt\_] Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
-\item[psb\_dupl\_add\_] Duplicate coefficients should be added;	         
-\item[psb\_dupl\_err\_] Duplicate coefficients should trigger an error conditino
-\item[psb\_upd\_dflt\_] Default update strategy for matrix coefficients;
-\item[psb\_upd\_srch\_] Update strategy based on search into the data structure;
-\item[psb\_upd\_perm\_] Update strategy based on additional
-  permutation data (see tools routine description).
-\end{description}
 
 
 

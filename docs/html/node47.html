@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
-<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
+<TITLE>psb_cdasb -- Communication descriptor assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_cdasb -- Communication descriptor assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,98 +20,64 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node48.html">
 <LINK REL="previous" HREF="node46.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node48.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html783"
+<A NAME="tex2html781"
   HREF="node48.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html779"
-  HREF="node45.html">
+<A NAME="tex2html777"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html773"
+<A NAME="tex2html771"
   HREF="node46.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html781"
+<A NAME="tex2html779"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html784"
-  HREF="node48.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html780"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html774"
-  HREF="node46.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html782"
+<B> Next:</B> <A NAME="tex2html782"
+  HREF="node48.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html778"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html772"
+  HREF="node46.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html780"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00072000000000000000">
-psb_cdins -- Communication descriptor insert routine</A>
+<H2><A NAME="SECTION00073000000000000000">
+psb_cdasb -- Communication descriptor assembly routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdins(nz, ia, ja, desc_a, info)
+call psb_cdasb(desc_a, info)
 </PRE>
-
-<P>
-This subroutine examines the edges of the graph associated with the
-discretization mesh (and isomorphic to the sparsity pattern of a
-linear system coefficient matrix), storing them as necessary into the
-communication descriptor.
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of points being inserted.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B>.
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>.
+Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the indices of the end vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 </DL>
 
@@ -121,7 +87,7 @@ Specified as: an integer array of length <IMG
 <DD>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the updated communication descriptor.
+<DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -146,40 +112,13 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This routine may only be called if the descriptor is in the
-  build state;
-</LI>
-<LI>This routine automatically ignores edges that do not
-insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process. 
+<LI>On exit from this routine the descriptor is in the assembled
+  state. 
 </LI>
 </OL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html783"
-  HREF="node48.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html779"
-  HREF="node45.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html773"
-  HREF="node46.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html781"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html784"
-  HREF="node48.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html780"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html774"
-  HREF="node46.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html782"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

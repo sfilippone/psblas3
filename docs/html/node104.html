@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
-<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
+<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,53 +18,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node105.html">
 <LINK REL="previous" HREF="node103.html">
-<LINK REL="up" HREF="node101.html">
+<LINK REL="up" HREF="node100.html">
 <LINK REL="next" HREF="node105.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1488"
+<A NAME="tex2html1484"
   HREF="node105.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1484"
-  HREF="node101.html">
+<A NAME="tex2html1480"
+  HREF="node100.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1478"
+<A NAME="tex2html1476"
   HREF="node103.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1486"
+<A NAME="tex2html1482"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1489"
-  HREF="node105.html">psb_precdescr   Prints</A>
-<B> Up:</B> <A NAME="tex2html1485"
-  HREF="node101.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1479"
-  HREF="node103.html">psb_precbld   Builds</A>
- &nbsp; <B>  <A NAME="tex2html1487"
+<B> Next:</B> <A NAME="tex2html1485"
+  HREF="node105.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1481"
+  HREF="node100.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1477"
+  HREF="node103.html">psb_precaply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1483"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000113000000000000000">
-psb_precaply -- Preconditioner application routine</A>
+<H2><A NAME="SECTION000114000000000000000">
+psb_precdescr -- Prints a description of current
+  preconditioner</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precaply(prec,x,y,desc_a,info,trans,work)
-call psb_precaply(prec,x,desc_a,info,trans)
+call psb_precdescr(prec)
+call psb_precdescr(prec, iout)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
@@ -79,72 +79,15 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the source vector.
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
+Type: <B>optiona</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>Scope:  
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character.
-</DD>
-<DT><STRONG>work</STRONG></DT>
-<DD>an optional work space
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the destination vector.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+Specified as: an integer number. 
 </DD>
 </DL>
 

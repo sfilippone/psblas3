@@ -21,7 +21,11 @@ mostly in the handling of requirements for evolution and adaptation of
 the library to new computing architectures and integration of
 new algorithms. 
 For a detailed discussion of our design see~\cite{Sparse03}; other
-works tackling advanced programming in Fortran~2003 include~\cite{DesPat:11,RouXiaXu:11}
+works discussing advanced programming in Fortran~2003
+include~\cite{DesPat:11,RouXiaXu:11}; sufficient support for
+Fortran~2003 is now available from many compilers, including the GNU
+Fortran compiler from the Free Software Foundation (as of version 4.6). 
+
 
 Previous approaches have been based on mixing Fortran~95, with its
 support for object-based design, with other languages; these have
@@ -32,12 +36,7 @@ usability of the PSBLAS
 subroutines. In this way, the library can take care of runtime memory
 requirements that are quite difficult or even impossible to predict at
 implementation or compilation time.  
-In the current release we rely on the availability of the so-called
-allocatable extensions, specified in TR~15581. Strictly speaking they
-are outside the Fortran~95 standard; however they have been included
-in  the Fortran~2003 language standard, and are available in
-practically all Fortran~95 compilers on the market, including the GNU
-Fortran compiler from the Free Software Foundation (as of version 4.2). 
+
 The presentation of the
 PSBLAS library follows the general structure of the proposal for
 serial Sparse BLAS~\cite{sblas97,sblas02}, which in its turn is based on the
@@ -84,20 +83,16 @@ influenced by the structure of the ScaLAPACK parallel
 library.  The layered structure of the PSBLAS library
 is shown in figure~\ref{fig:psblas}; lower layers of the library
 indicate an encapsulation relationship with upper layers. The ongoing
-discussion focuses on the Fortran~95 layer immediately below the
+discussion focuses on the Fortran~2003 layer immediately below the
 application layer.
 The serial parts of the computation on each process are executed through
-calls to the serial sparse BLAS subroutines. In a similar way, the
-inter-process message exchanges are implemented through the Basic
-Linear Algebra Communication Subroutines (BLACS) library~\cite{BLACS}
-that guarantees a portable and efficient communication layer. The
-Message Passing Interface code is encapsulated within the BLACS
-layer. However, in some cases, MPI routines are directly used either
-to improve efficiency or to implement communication patterns for which
-the BLACS package doesn't provide any method. 
-
-In any case we provide wrappers around the BLACS routines so that the
-user does not need to delve into their details (see Sec.~\ref{sec:parenv}).
+calls to the serial sparse BLAS subroutines. 
+In a similar way, the inter-process message exchanges are encapsulated
+in an applicaiton layer that has been strongly inspired by the  Basic
+Linear Algebra Communication Subroutines (BLACS) library~\cite{BLACS}.  
+Usually  there is no need to deal directly with MPI;  however, in some
+cases, MPI routines are used directly to improve efficiency. For
+further details on our communication layer see Sec.~\ref{sec:parenv}.
 %% We assume that the user program has initialized a BLACS process grid
 %% with one column and as many rows as there are processes; the PSBLAS
 %% initialization routines will take the communication context for this
@@ -136,10 +131,12 @@ sub-domains}.
 Our library  supports any distribution that keeps together 
 the coefficients of each matrix row; there are no other constraints on
 the variable assignment. 
-This choice is consistent with  data distributions commonly used in
-ScaLAPACK  such as  \verb|CYCLIC(N)| and \verb|BLOCK|, 
+This choice is consistent with simple  data distributions 
+%commonly used in ScaLAPACK 
+such as  \verb|CYCLIC(N)| and \verb|BLOCK|, 
 as well as completely arbitrary assignments of
-equation indices to processes. In particular it is consistent with the
+equation indices to processes. 
+In particular it is consistent with the
 usage of graph partitioning tools commonly available in the
 literature, e.g. METIS~\cite{METIS}.
 Dense vectors  conform  to sparse

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format</TITLE>
-<META NAME="description" CONTENT="hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format">
+<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node98.html">
 <LINK REL="previous" HREF="node96.html">
-<LINK REL="up" HREF="node95.html">
+<LINK REL="up" HREF="node94.html">
 <LINK REL="next" HREF="node98.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1402"
+<A NAME="tex2html1400"
   HREF="node98.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1398"
-  HREF="node95.html">
+<A NAME="tex2html1396"
+  HREF="node94.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1392"
+<A NAME="tex2html1390"
   HREF="node96.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1400"
+<A NAME="tex2html1398"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1403"
-  HREF="node98.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1399"
-  HREF="node95.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1393"
-  HREF="node96.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1401"
+<B> Next:</B> <A NAME="tex2html1401"
+  HREF="node98.html">mm_vet_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1397"
+  HREF="node94.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1391"
+  HREF="node96.html">hb_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1399"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000102000000000000000">
-hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
+<H2><A NAME="SECTION000103000000000000000">
+mm_mat_read -- Read a sparse matrix from a
+  file in the MatrixMarket format</A>
 </H2>
 
 <P>
 <PRE>
-call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
+call mm_mat_read(a, iret, iunit, filename)
 </PRE>
 
 <P>
@@ -69,29 +69,13 @@ call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix to be written.
-<BR>
-Type:<B>required</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
-</DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-An  array of type real or complex, rank 1 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side. 
-</DD>
 <DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written to.
+<DD>The name of the file to be read.
 <BR>
 Type:<B>optional</B>.
 <BR>
 Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default output unit  6 (i.e. standard output
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
 in Unix jargon) is used. Default: <code>-</code>. 
 </DD>
 <DT><STRONG>iunit</STRONG></DT>
@@ -101,30 +85,19 @@ Type:<B>optional</B>.
 <BR>
 Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
 </DD>
-<DT><STRONG>key</STRONG></DT>
-<DD>Matrix key.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 8 holding the
-matrix key as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 72 holding the
-matrix title as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
 </DL>
 
 <P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.
@@ -136,30 +109,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1402"
-  HREF="node98.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1398"
-  HREF="node95.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1392"
-  HREF="node96.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1400"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1403"
-  HREF="node98.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1399"
-  HREF="node95.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1393"
-  HREF="node96.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1401"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

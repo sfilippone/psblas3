@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_local_cols -- Get number of local cols</TITLE>
-<META NAME="description" CONTENT="get_local_cols -- Get number of local cols">
+<TITLE>get_global_rows -- Get number of global rows</TITLE>
+<META NAME="description" CONTENT="get_global_rows -- Get number of global rows">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node19.html">
 <LINK REL="previous" HREF="node17.html">
-<LINK REL="up" HREF="node16.html">
+<LINK REL="up" HREF="node15.html">
 <LINK REL="next" HREF="node19.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html397"
+<A NAME="tex2html395"
   HREF="node19.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html393"
-  HREF="node16.html">
+<A NAME="tex2html391"
+  HREF="node15.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html387"
+<A NAME="tex2html385"
   HREF="node17.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html395"
+<A NAME="tex2html393"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html398"
-  HREF="node19.html">get_global_rows   Get</A>
-<B> Up:</B> <A NAME="tex2html394"
-  HREF="node16.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html388"
-  HREF="node17.html">get_local_rows   Get</A>
- &nbsp; <B>  <A NAME="tex2html396"
+<B> Next:</B> <A NAME="tex2html396"
+  HREF="node19.html">get_global_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html392"
+  HREF="node15.html">Data structure query routines</A>
+<B> Previous:</B> <A NAME="tex2html386"
+  HREF="node17.html">get_local_cols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html394"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045200000000000000">
-get_local_cols -- Get number of local cols</A>
+<H3><A NAME="SECTION00045300000000000000">
+get_global_rows -- Get number of global rows</A>
 </H3>
 
 <P>
 <PRE>
-nc = desc%get_local_cols()
+nr = desc%get_global_rows()
 </PRE>
 
 <P>
@@ -87,17 +87,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of local cols, i.e. the number of
-  indices used by the current process, including both local and halo
-  indices; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>, 
-  it is equal to  <!-- MATH
- $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$
- -->
-<IMG
- WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img11.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert +\vert{\cal H}_i\vert$">. The
-  returned value is specific to the calling process. 
+<DD>The number of global rows in the mesh
 </DD>
 </DL>
 

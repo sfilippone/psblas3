@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
+<TITLE>psb_gelp -- Applies a left permutation to a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gelp -- Applies a left permutation to a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,71 +20,63 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node61.html">
 <LINK REL="previous" HREF="node59.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node61.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html939"
+<A NAME="tex2html937"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html935"
-  HREF="node45.html">
+<A NAME="tex2html933"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html929"
+<A NAME="tex2html927"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html937"
+<A NAME="tex2html935"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html940"
-  HREF="node61.html">psb_gelp   Applies</A>
-<B> Up:</B> <A NAME="tex2html936"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html930"
-  HREF="node59.html">psb_geasb   Assembly</A>
- &nbsp; <B>  <A NAME="tex2html938"
+<B> Next:</B> <A NAME="tex2html938"
+  HREF="node61.html">psb_glob_to_loc   Global</A>
+<B> Up:</B> <A NAME="tex2html934"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html928"
+  HREF="node59.html">psb_gefree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html936"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000715000000000000000">
-psb_gefree -- Frees a dense matrix</A>
+<H2><A NAME="SECTION000716000000000000000">
+psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_gefree(x, desc_a, info)
+call psb_gelp(trans, iperm, x, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to
-  be freed.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR>
-<P>
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DT><STRONG>trans</STRONG></DT>
+<DD>A character that specifies whether to permute <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img107.png"
+ ALT="$A^T$">.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -92,7 +84,35 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
+Specified as: a single character with value 'N' for <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or 'T' for <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img107.png"
+ ALT="$A^T$">.
+<BR></DD>
+<DT><STRONG>iperm</STRONG></DT>
+<DD>An integer array containing permutation information.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer one-dimensional array.
+<BR></DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be permuted.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a one or two dimensional array.
 <BR></DD>
 </DL>
 

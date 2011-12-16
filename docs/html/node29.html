@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gedot -- Dot Product</TITLE>
-<META NAME="description" CONTENT="psb_gedot -- Dot Product">
+<TITLE>psb_gedots -- Generalized Dot Product</TITLE>
+<META NAME="description" CONTENT="psb_gedots -- Generalized Dot Product">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,132 +20,117 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node30.html">
 <LINK REL="previous" HREF="node28.html">
-<LINK REL="up" HREF="node27.html">
+<LINK REL="up" HREF="node26.html">
 <LINK REL="next" HREF="node30.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html540"
+<A NAME="tex2html538"
   HREF="node30.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html536"
-  HREF="node27.html">
+<A NAME="tex2html534"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html530"
+<A NAME="tex2html528"
   HREF="node28.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html538"
+<A NAME="tex2html536"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html541"
-  HREF="node30.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html537"
-  HREF="node27.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html531"
-  HREF="node28.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html539"
+<B> Next:</B> <A NAME="tex2html539"
+  HREF="node30.html">psb_geamax   Infinity-Norm</A>
+<B> Up:</B> <A NAME="tex2html535"
+  HREF="node26.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html529"
+  HREF="node28.html">psb_gedot   Dot</A>
+ &nbsp; <B>  <A NAME="tex2html537"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00052000000000000000">
-psb_gedot -- Dot Product</A>
+<H2><A NAME="SECTION00053000000000000000">
+psb_gedots -- Generalized Dot Product</A>
 </H2>
 
 <P>
-This function computes dot product between two vectors <IMG
+This subroutine computes a series of  dot products among the columns of
+two dense matrices  <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
- ALT="$x$"> and
-<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
- ALT="$y$">.
-<BR>
-If <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
- ALT="$y$"> are real vectors
-it computes dot-product as:
+ SRC="img28.png"
+ ALT="$y$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-dot \leftarrow x^T y
+res(i) \leftarrow x(:,i)^T y(:,i)
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="74" HEIGHT="27" BORDER="0"
- SRC="img32.png"
- ALT="\begin{displaymath}dot \leftarrow x^T y\end{displaymath}">
+ WIDTH="150" HEIGHT="28" BORDER="0"
+ SRC="img34.png"
+ ALT="\begin{displaymath}res(i) \leftarrow x(:,i)^T y(:,i)\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
-Else if <IMG
+If the matrices are complex, then the
+usual convention applies, i.e. the conjugate transpose of <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
+ ALT="$x$"> is
+used. If <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
- ALT="$y$"> are complex vectors then it computes dot-product as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-dot \leftarrow x^H y
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="75" HEIGHT="27" BORDER="0"
- SRC="img33.png"
- ALT="\begin{displaymath}dot \leftarrow x^H y\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
+ SRC="img28.png"
+ ALT="$y$"> are of rank one, then <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img35.png"
+ ALT="$res$"> is a scalar, else it
+is a rank one array. 
 
 <P>
 <PRE>
-psb_gedot(x, y, desc_a, info)
+call psb_gedots(res, x, y, desc_a, info)
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1511"></A>
+<DIV ALIGN="CENTER"><A NAME="1440"></A>
 <TABLE>
-<CAPTION><STRONG>Table 2:</STRONG>
+<CAPTION><STRONG>Table 3:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img34.png"
- ALT="$dot$">, <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img35.png"
+ ALT="$res$">, <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
  ALT="$x$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img28.png"
  ALT="$y$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -166,8 +151,8 @@ Data types</CAPTION>
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
- ALT="$x$">.
+ SRC="img27.png"
+ ALT="$x$">. 
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -177,19 +162,19 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an array of rank one or two
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
+Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img28.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img28.png"
  ALT="$y$">. 
 <BR>
 Scope: <B>local</B> 
@@ -200,12 +185,12 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an array of rank one or two
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
+Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img28.png"
  ALT="$y$"> must be the same of <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
  ALT="$x$">. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -218,24 +203,25 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
+<DT><STRONG>res</STRONG></DT>
 <DD>is the dot product of subvectors <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img28.png"
+ SRC="img27.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img29.png"
+ SRC="img28.png"
  ALT="$y$">.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90dot">2</A>.
+Intent: <B>out</B>.
+<BR>
+Specified as: a number or a rank-one array  of the data type indicated
+in Table&nbsp;<A HREF="#tab:f90dot">2</A>. 
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -253,26 +239,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html540"
+<A NAME="tex2html538"
   HREF="node30.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html536"
-  HREF="node27.html">
+<A NAME="tex2html534"
+  HREF="node26.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html530"
+<A NAME="tex2html528"
   HREF="node28.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html538"
+<A NAME="tex2html536"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html541"
-  HREF="node30.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html537"
-  HREF="node27.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html531"
-  HREF="node28.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html539"
+<B> Next:</B> <A NAME="tex2html539"
+  HREF="node30.html">psb_geamax   Infinity-Norm</A>
+<B> Up:</B> <A NAME="tex2html535"
+  HREF="node26.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html529"
+  HREF="node28.html">psb_gedot   Dot</A>
+ &nbsp; <B>  <A NAME="tex2html537"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

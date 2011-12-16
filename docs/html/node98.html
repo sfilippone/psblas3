@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
+<TITLE>mm_vet_read -- Read a dense vector from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_vet_read -- Read a dense vector from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node95.html">
+<LINK REL="up" HREF="node94.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1414"
+<A NAME="tex2html1412"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1410"
-  HREF="node95.html">
+<A NAME="tex2html1408"
+  HREF="node94.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1404"
+<A NAME="tex2html1402"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1412"
+<A NAME="tex2html1410"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1415"
-  HREF="node99.html">mm_vet_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1411"
-  HREF="node95.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1405"
-  HREF="node97.html">hb_write   Write</A>
- &nbsp; <B>  <A NAME="tex2html1413"
+<B> Next:</B> <A NAME="tex2html1413"
+  HREF="node99.html">mm_mat_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1409"
+  HREF="node94.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1403"
+  HREF="node97.html">mm_mat_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1411"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000103000000000000000">
-mm_mat_read -- Read a sparse matrix from a
+<H2><A NAME="SECTION000104000000000000000">
+mm_vet_read -- Read a dense vector from a
   file in the MatrixMarket format</A>
 </H2>
 
-<P>
 <PRE>
-call mm_mat_read(a, iret, iunit, filename)
+call mm_vet_read(b, iret, iunit, filename)
 </PRE>
 
 <P>
@@ -92,12 +91,14 @@ Specified as: an integer value. Only meaningful if filename is not <code>-</code
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix read from file.
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B> 
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+An  array of type real or complex, rank 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
 </DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Data structure query routines</TITLE>
-<META NAME="description" CONTENT="Data structure query routines">
+<TITLE>get_local_rows -- Get number of local rows</TITLE>
+<META NAME="description" CONTENT="get_local_rows -- Get number of local rows">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,59 +18,89 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node21.html">
+<LINK REL="next" HREF="node17.html">
 <LINK REL="previous" HREF="node15.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="up" HREF="node15.html">
 <LINK REL="next" HREF="node17.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html369"
+<A NAME="tex2html371"
   HREF="node17.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html365"
-  HREF="node8.html">
+<A NAME="tex2html367"
+  HREF="node15.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html359"
+<A NAME="tex2html361"
   HREF="node15.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html367"
+<A NAME="tex2html369"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html370"
-  HREF="node17.html">get_local_rows   Get</A>
-<B> Up:</B> <A NAME="tex2html366"
-  HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html360"
-  HREF="node15.html">Preconditioner data structure</A>
- &nbsp; <B>  <A NAME="tex2html368"
+<B> Next:</B> <A NAME="tex2html372"
+  HREF="node17.html">get_local_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html368"
+  HREF="node15.html">Data structure query routines</A>
+<B> Previous:</B> <A NAME="tex2html362"
+  HREF="node15.html">Data structure query routines</A>
+ &nbsp; <B>  <A NAME="tex2html370"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00045000000000000000"></A>
-<A NAME="sec:dataquery"></A>
-<BR>
-Data structure query routines
-</H2>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<H3><A NAME="SECTION00045100000000000000">
+get_local_rows -- Get number of local rows</A>
+</H3>
 
-<UL>
-<LI><A NAME="tex2html371"
-  HREF="node17.html">get_local_rows -- Get number of local rows</A>
-<LI><A NAME="tex2html372"
-  HREF="node18.html">get_local_cols -- Get number of local cols</A>
-<LI><A NAME="tex2html373"
-  HREF="node19.html">get_global_rows -- Get number of global rows</A>
-<LI><A NAME="tex2html374"
-  HREF="node20.html">get_global_cols -- Get number of global cols</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<PRE>
+nr = desc%get_local_rows()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The number of local rows, i.e. the number of
+  rows owned by the current process; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>,
+  it is equal to <!-- MATH
+ $|{\cal I}_i| + |{\cal B}_i|$
+ -->
+<IMG
+ WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img10.png"
+ ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">. The returned value is
+  specific to the calling process. 
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>

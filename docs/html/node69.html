@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
-<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
+<TITLE>psb_sp_getrow -- Extract row(s) from a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_sp_getrow -- Extract row(s) from a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node70.html">
 <LINK REL="previous" HREF="node68.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node70.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1047"
+<A NAME="tex2html1045"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1043"
-  HREF="node45.html">
+<A NAME="tex2html1041"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1037"
+<A NAME="tex2html1035"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1045"
+<A NAME="tex2html1043"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1048"
-  HREF="node70.html">psb_sp_getrow   Extract</A>
-<B> Up:</B> <A NAME="tex2html1044"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1038"
-  HREF="node68.html">psb_get_boundary   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1046"
+<B> Next:</B> <A NAME="tex2html1046"
+  HREF="node70.html">psb_sizeof   Memory</A>
+<B> Up:</B> <A NAME="tex2html1042"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1036"
+  HREF="node68.html">psb_get_overlap   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1044"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000724000000000000000">
-psb_get_overlap -- Extract list of overlap elements</A>
+<H2><A NAME="SECTION000725000000000000000">
+psb_sp_getrow -- Extract row(s) from a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_overlap(ovrel, desc, info)
+call psb_sp_getrow(row, a, nz, ia, ja, val, info, &amp;
+              &amp; append, nzin, lrw)
 </PRE>
 
 <P>
@@ -68,16 +69,75 @@ call psb_get_overlap(ovrel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>row</STRONG></DT>
+<DD>The (first) row to be extracted.
 <BR>
-Scope:<B>local</B>.
+Scope:<B>local</B>
 <BR>
-Type:<B>required</B>.
+Type:<B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an integer <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img108.png"
+ ALT="$&gt;0$">.
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix from  which to get rows.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>append</STRONG></DT>
+<DD>Whether to append or overwrite existing output.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical value default: false (overwrite).
+</DD>
+<DT><STRONG>nzin</STRONG></DT>
+<DD>Input size to be appended to.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img108.png"
+ ALT="$&gt;0$">. When append is true, specifies how many
+entries in the output vectors are already filled. 
+</DD>
+<DT><STRONG>lrw</STRONG></DT>
+<DD>The last  row to be extracted.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img108.png"
+ ALT="$&gt;0$">, default: <IMG
+ WIDTH="31" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img109.png"
+ ALT="$row$">.
+
+<P>
 </DD>
 </DL>
 
@@ -86,19 +146,50 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ovrel</STRONG></DT>
-<DD>The list of overlap elements on the calling process, in
-  local numbering.
+<DT><STRONG>nz</STRONG></DT>
+<DD>the number of elements returned by this call.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
-<BR></DD>
+Returned  as: an integer scalar.
+</DD>
+<DT><STRONG>ia</STRONG></DT>
+<DD>the row indices.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
+</DD>
+<DT><STRONG>ja</STRONG></DT>
+<DD>the column indices of the elements to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
+</DD>
+<DT><STRONG>val</STRONG></DT>
+<DD>the elements to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a real  array with the <code>ALLOCATABLE</code> attribute.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -116,16 +207,51 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>If there are no overlap elements the output vector is set
-  to the ``not allocated'' state.  
+<LI>The output <IMG
+ WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img100.png"
+ ALT="$nz$"> is always the size of the output generated by
+  the current call; thus, if <code>append=.true.</code>, the total output
+  size will be <IMG
+ WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img110.png"
+ ALT="$nzin+nz$">, with the newly extracted coefficients stored in
+  entries <code>nzin+1:nzin+nz</code> of the array arguments;
 </LI>
-<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
-  number of overlap elements. 
+<LI>When <code>append=.true.</code>  the output arrays are reallocated as
+  necessary;
+</LI>
+<LI>The row and column indices are returned in the local numbering
+  scheme; if the global numbering is desired, the user may employ the
+  <code>psb_loc_to_glob</code> routine on the output.
 </LI>
 </OL>
 
 <P>
-<BR><HR>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1045"
+  HREF="node70.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1041"
+  HREF="node44.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1035"
+  HREF="node68.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1043"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1046"
+  HREF="node70.html">psb_sizeof   Memory</A>
+<B> Up:</B> <A NAME="tex2html1042"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1036"
+  HREF="node68.html">psb_get_overlap   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1044"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
-<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,124 +20,65 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node59.html">
 <LINK REL="previous" HREF="node57.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node59.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html915"
+<A NAME="tex2html913"
   HREF="node59.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html911"
-  HREF="node45.html">
+<A NAME="tex2html909"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html905"
+<A NAME="tex2html903"
   HREF="node57.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html913"
+<A NAME="tex2html911"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html916"
-  HREF="node59.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html912"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html906"
-  HREF="node57.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html914"
+<B> Next:</B> <A NAME="tex2html914"
+  HREF="node59.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html910"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html904"
+  HREF="node57.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html912"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000713000000000000000">
-psb_geins -- Dense matrix insertion routine</A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geins(m, irw, val, x, desc_a, info,dupl)
+call psb_geasb(x, desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>m</STRONG></DT>
-<DD>Number of rows in <IMG
- WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img106.png"
- ALT="$val$"> to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>Indices of the rows to be inserted. Specifically, row <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$">
-  of <IMG
- WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img106.png"
- ALT="$val$"> will be inserted into the local row corresponding to the
-  global row index <IMG
- WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img107.png"
- ALT="$irw(i)$">.
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the dense submatrix to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank 1 or 2  array.
-Specified as: an integer value.
-</DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DD>The communication descriptor.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>dupl</STRONG></DT>
-<DD>How to handle duplicate coefficients.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
-<code>psb_dupl_add_</code>.
-</DD>
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
+<BR></DD>
 </DL>
 
 <P>
@@ -146,7 +87,7 @@ Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>the output dense matrix.
+<DD>The dense matrix to be assembled.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -169,43 +110,7 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>Dense vectors/matrices do not have an associated state;
-</LI>
-<LI>Duplicate entries are either overwritten or added, there is no
-  provision for raising an error condition. 
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html915"
-  HREF="node59.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html911"
-  HREF="node45.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html905"
-  HREF="node57.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html913"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html916"
-  HREF="node59.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html912"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html906"
-  HREF="node57.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html914"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

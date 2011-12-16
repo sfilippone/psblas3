@@ -18,7 +18,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node15.html">
+<LINK REL="next" HREF="node14.html">
 <LINK REL="previous" HREF="node11.html">
 <LINK REL="up" HREF="node8.html">
 <LINK REL="next" HREF="node14.html">
@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html334"
+<A NAME="tex2html331"
   HREF="node14.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html330"
+<A NAME="tex2html327"
   HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html324"
+<A NAME="tex2html321"
   HREF="node12.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html332"
+<A NAME="tex2html329"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html335"
-  HREF="node14.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html331"
+<B> Next:</B> <A NAME="tex2html332"
+  HREF="node14.html">Preconditioner data structure</A>
+<B> Up:</B> <A NAME="tex2html328"
   HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html325"
+<B> Previous:</B> <A NAME="tex2html322"
   HREF="node12.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html333"
+ &nbsp; <B>  <A NAME="tex2html330"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -61,196 +61,9 @@ contains all information about local portion of the sparse matrix and
 its storage mode. Most  of these fields are set  by the tools
 routines when inserting a new sparse matrix; the user needs only
 choose, if he/she so whishes, a specific matrix storage mode. 
-<BR><DL>
-<DT><STRONG><B>aspk</B></STRONG></DT>
-<DD>Contains values of the local distributed sparse
-matrix.
 <BR>
-Specified as: an allocatable array of rank one of type corresponding
-to matrix entries type.
-</DD>
-<DT><STRONG><B>ia1</B></STRONG></DT>
-<DD>Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.
-<BR>
-Specified as: an allocatable  integer array of rank one.
-</DD>
-<DT><STRONG><B>ia2</B></STRONG></DT>
-<DD>Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.
-<BR>
-Specified as: an allocatable  integer array of rank one.
-</DD>
-<DT><STRONG><B>infoa</B></STRONG></DT>
-<DD>On entry can hold auxiliary information on distributed sparse
-matrix.  Actual information will depend on data format used.
-<BR>
-Specified as: an integer array of length <code>psb_ifasize_</code>.
-</DD>
-<DT><STRONG><B>fida</B></STRONG></DT>
-<DD>Defines the format of the distributed sparse matrix.
-<BR>
-Specified as: a string of length 5
-</DD>
-<DT><STRONG><B>descra</B></STRONG></DT>
-<DD>Describe the characteristic of the distributed sparse matrix.
-<BR>
-Specified as: array of character of length 9.
-</DD>
-<DT><STRONG><B>pl</B></STRONG></DT>
-<DD>Specifies the local row permutation of distributed sparse
-matrix. If pl(1) is equal to 0, then there isn't row permutation.
-<BR>
-Specified as: an allocatable integer array of dimension equal to number of local row (matrix_data[psb_n_row_])
-</DD>
-<DT><STRONG><B>pr</B></STRONG></DT>
-<DD>Specifies the local column permutation of distributed sparse
-matrix. If PR(1) is equal to 0, then there isn't columnm permutation.
-<BR>
-Specified as: an allocatable integer array of dimension equal to number of
-local row (matrix_data[psb_n_col_])
-</DD>
-<DT><STRONG><B>m</B></STRONG></DT>
-<DD>Number of rows; if row indices are stored explicitly,
-as in Coordinate Storage, should be greater than or equal to the
-maximum row index actually present in the sparse matrix.
-Specified as: integer variable.
-</DD>
-<DT><STRONG><B>k</B></STRONG></DT>
-<DD>Number of columns; if column indices are stored explicitly,
-as in Coordinate Storage or Compressed Sparse Rows, should be greater
-than or equal to the maximum column  index actually present in the sparse matrix.
-Specified as: integer variable.
-</DD>
-</DL>
-The Fortran&nbsp;95 interface for distributed sparse matrices containing
-double precision real entries is defined as shown in
-figure&nbsp;<A HREF="#fig:spmattype">5</A>. The definitions for single precision and
-complex data are identical except for the <code>real</code> declaration and
-for the kind type parameter.
-
-<DIV ALIGN="CENTER"><A NAME="fig:spmattype"></A><A NAME="678"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
-    The PSBLAS defined data type that
-    contains a sparse matrix.</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
 <P>
-The following two cases are among the most commonly used: 
-<DL>
-<DT><STRONG>fida=``CSR''</STRONG></DT>
-<DD>Compressed storage by rows. In this case the
-following should hold: 
-
-<OL>
-<LI><code>ia2(i)</code> contains the index of the first element of row
-<code>i</code>; the last element of the sparse matrix is thus stored at
-index <IMG
- WIDTH="107" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img22.png"
- ALT="$ia2(m+1)-1$">. It should contain <code>m+1</code> entries in
-nondecreasing order (strictly increasing, if there are no empty rows).
-</LI>
-<LI><code>ia1(j)</code> contains the column index and <code>aspk(j)</code>
-contains the corresponding coefficient value, for all <!-- MATH
- $ia2(1) \le j
-\le ia2(m+1)-1$
- -->
-<IMG
- WIDTH="200" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img23.png"
- ALT="$ia2(1) \le j
-\le ia2(m+1)-1$">.
-</LI>
-</OL>
-</DD>
-<DT><STRONG>fida=``COO''</STRONG></DT>
-<DD>Coordinate storage. In this case the following
-should hold: 
-
-<OL>
-<LI><code>infoa(1)</code> contains the number of nonzero elements in the
-matrix; 
-</LI>
-<LI>For all <!-- MATH
- $1 \le j \le infoa(1)$
- -->
-<IMG
- WIDTH="122" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img24.png"
- ALT="$1 \le j \le infoa(1)$">, the coefficient, row index and
-column index are stored into <code>apsk(j)</code>, <code>ia1(j)</code> and
-<code>ia2(j)</code> respectively. 
-</LI>
-</OL>
-</DD>
-</DL>
-A sparse matrix has an associated state, which can take the following
-values:
-<DL>
-<DT><STRONG>Build:</STRONG></DT>
-<DD>State entered after the first allocation, and before the
-  first assembly; in this state it is possible to add nonzero entries.
-</DD>
-<DT><STRONG>Assembled:</STRONG></DT>
-<DD>State entered after the assembly; computations using
-  the sparse matrix, such as matrix-vector products, are only possible
-  in this state;
-</DD>
-<DT><STRONG>Update:</STRONG></DT>
-<DD>State entered after a reinitalization; this is used to
-  handle applications in which the same sparsity pattern is used
-  multiple times with different coefficients. In this state it is only
-  possible to enter coefficients for already existing nonzero entries.
-</DD>
-</DL>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html336"
-  HREF="node14.html">Named Constants</A>
-</UL>
-<!--End of Table of Child-Links-->
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html334"
-  HREF="node14.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html330"
-  HREF="node8.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html324"
-  HREF="node12.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html332"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html335"
-  HREF="node14.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html331"
-  HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html325"
-  HREF="node12.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html333"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

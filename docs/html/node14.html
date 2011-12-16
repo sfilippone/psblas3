@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Named Constants</TITLE>
-<META NAME="description" CONTENT="Named Constants">
+<TITLE>Preconditioner data structure</TITLE>
+<META NAME="description" CONTENT="Preconditioner data structure">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,65 +18,79 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node15.html">
 <LINK REL="previous" HREF="node13.html">
-<LINK REL="up" HREF="node13.html">
+<LINK REL="up" HREF="node8.html">
 <LINK REL="next" HREF="node15.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html345"
+<A NAME="tex2html343"
   HREF="node15.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html341"
-  HREF="node13.html">
+<A NAME="tex2html339"
+  HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html337"
+<A NAME="tex2html333"
   HREF="node13.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html343"
+<A NAME="tex2html341"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html346"
-  HREF="node15.html">Preconditioner data structure</A>
-<B> Up:</B> <A NAME="tex2html342"
+<B> Next:</B> <A NAME="tex2html344"
+  HREF="node15.html">Data structure query routines</A>
+<B> Up:</B> <A NAME="tex2html340"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html334"
   HREF="node13.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html338"
-  HREF="node13.html">Dense Vector Data Structure</A>
- &nbsp; <B>  <A NAME="tex2html344"
+ &nbsp; <B>  <A NAME="tex2html342"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043100000000000000"></A>
-<A NAME="sec:sp_constants"></A>
+<H2><A NAME="SECTION00044000000000000000"></A>
+<A NAME="sec:prec"></A>
 <BR>
-Named Constants
-</H3>
-<DL>
-<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
-<DD>Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
-</DD>
-<DT><STRONG>psb_dupl_add_</STRONG></DT>
-<DD>Duplicate coefficients should be added;	         
-</DD>
-<DT><STRONG>psb_dupl_err_</STRONG></DT>
-<DD>Duplicate coefficients should trigger an error conditino
-</DD>
-<DT><STRONG>psb_upd_dflt_</STRONG></DT>
-<DD>Default update strategy for matrix coefficients;
-</DD>
-<DT><STRONG>psb_upd_srch_</STRONG></DT>
-<DD>Update strategy based on search into the data structure;
-</DD>
-<DT><STRONG>psb_upd_perm_</STRONG></DT>
-<DD>Update strategy based on additional
-  permutation data (see tools routine description).
-</DD>
-</DL>
+Preconditioner data structure
+</H2>
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
+
+<P>
+A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
+figure&nbsp;<A HREF="#fig:prectype">5</A>. The <code>psb_prec_type</code> 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor.The values contained in
+the <code>iprcparm</code> and <code>rprcparm</code> define tha type of
+preconditioner along with all the parameters related to it; thus,
+<code>iprcparm</code> and <code>rprcparm</code> define how the other records have
+to be interpreted. This data structure is the basis of more complex
+preconditioning strategies, which are the subject of further
+research. 
+
+<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="642"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
+The PSBLAS defined data type that contains a preconditioner.</CAPTION>
+<TR><TD><FONT SIZE="-1">  <BR>
+
+<BR>
+   
+  </FONT>
+<DIV ALIGN="CENTER"><FONT SIZE="-1"><!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<IMG
+ WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
+ SRC="img20.png"
+ ALT="\fbox{\TheSbox}"></FONT></DIV><FONT SIZE="-1">
+  </FONT></TD></TR>
+</TABLE>
+</DIV>
 
 <P>
 <BR><HR>

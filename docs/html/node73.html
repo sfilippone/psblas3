@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Parallel environment routines</TITLE>
-<META NAME="description" CONTENT="Parallel environment routines">
+<TITLE>psb_init -- Initializes PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_init -- Initializes PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,88 +18,161 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node90.html">
-<LINK REL="previous" HREF="node45.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node74.html">
+<LINK REL="previous" HREF="node72.html">
+<LINK REL="up" HREF="node72.html">
 <LINK REL="next" HREF="node74.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1093"
+<A NAME="tex2html1107"
   HREF="node74.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1089"
-  HREF="userhtml.html">
+<A NAME="tex2html1103"
+  HREF="node72.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1083"
+<A NAME="tex2html1097"
   HREF="node72.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1091"
+<A NAME="tex2html1105"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1094"
-  HREF="node74.html">psb_init   Initializes</A>
-<B> Up:</B> <A NAME="tex2html1090"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1084"
-  HREF="node72.html">Sorting utilities</A>
- &nbsp; <B>  <A NAME="tex2html1092"
+<B> Next:</B> <A NAME="tex2html1108"
+  HREF="node74.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1104"
+  HREF="node72.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1098"
+  HREF="node72.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1106"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00080000000000000000"></A>
-<A NAME="sec:parenv"></A>
-<BR>
-Parallel environment routines
-</H1>
+<H2><A NAME="SECTION00081000000000000000">
+psb_init -- Initializes PSBLAS parallel environment</A>
+</H2>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<PRE>
+call psb_init(icontxt, np, basectxt, ids)
+</PRE>
 
-<UL>
-<LI><A NAME="tex2html1095"
-  HREF="node74.html">psb_init -- Initializes PSBLAS parallel environment</A>
-<LI><A NAME="tex2html1096"
-  HREF="node75.html">psb_info -- Return information about  PSBLAS parallel
-  environment</A>
-<LI><A NAME="tex2html1097"
-  HREF="node76.html">psb_exit -- Exit from  PSBLAS parallel environment</A>
-<LI><A NAME="tex2html1098"
-  HREF="node77.html">psb_get_mpicomm -- Get the MPI communicator</A>
-<LI><A NAME="tex2html1099"
-  HREF="node78.html">psb_get_rank -- Get the MPI rank</A>
-<LI><A NAME="tex2html1100"
-  HREF="node79.html">psb_wtime -- Wall clock timing</A>
-<LI><A NAME="tex2html1101"
-  HREF="node80.html">psb_barrier -- Sinchronization point  parallel
-  environment</A>
-<LI><A NAME="tex2html1102"
-  HREF="node81.html">psb_abort -- Abort a computation</A>
-<LI><A NAME="tex2html1103"
-  HREF="node82.html">psb_bcast -- Broadcast data</A>
-<LI><A NAME="tex2html1104"
-  HREF="node83.html">psb_sum -- Global sum</A>
-<LI><A NAME="tex2html1105"
-  HREF="node84.html">psb_max -- Global maximum</A>
-<LI><A NAME="tex2html1106"
-  HREF="node85.html">psb_min -- Global minimum</A>
-<LI><A NAME="tex2html1107"
-  HREF="node86.html">psb_amx -- Global maximum absolute value</A>
-<LI><A NAME="tex2html1108"
-  HREF="node87.html">psb_amn -- Global minimum absolute value</A>
-<LI><A NAME="tex2html1109"
-  HREF="node88.html">psb_snd -- Send data</A>
-<LI><A NAME="tex2html1110"
-  HREF="node89.html">psb_rcv -- Receive data</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
+<P>
+This subroutine initializes the PSBLAS parallel environment, defining
+a virtual parallel machine.
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.  Default: use all available processes.
+</DD>
+<DT><STRONG>basectxt</STRONG></DT>
+<DD>the initial communication context. The new context
+  will be defined from the processes participating in the initial one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.  Default: use MPI_COMM_WORLD.
+</DD>
+<DT><STRONG>ids</STRONG></DT>
+<DD>Identities of the processes to use for the new context; the
+  argument is ignored when <code>np</code> is not specified. This allows the
+  processes in the new environment to be in an order different from the
+  original one.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array.  Default: use the indices <IMG
+ WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img94.png"
+ ALT="$(0\dots np-1)$">.  
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine. Note that this is always a duplicate of
+  <code>basectxt</code>, so that library communications are completely
+  separated from other communication operations.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer variable.
+</DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>A call to this routine must precede any other PSBLAS call. 
+</LI>
+<LI>It is an error to specify a value for <IMG
+ WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img122.png"
+ ALT="$np$"> greater than the
+  number of processes available in the underlying base parallel
+  environment. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1107"
+  HREF="node74.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1103"
+  HREF="node72.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1097"
+  HREF="node72.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1105"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1108"
+  HREF="node74.html">psb_info   Return</A>
+<B> Up:</B> <A NAME="tex2html1104"
+  HREF="node72.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1098"
+  HREF="node72.html">Parallel environment routines</A>
+ &nbsp; <B>  <A NAME="tex2html1106"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

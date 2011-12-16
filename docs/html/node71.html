@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sizeof -- Memory occupation</TITLE>
-<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
+<TITLE>Sorting utilities</TITLE>
+<META NAME="description" CONTENT="Sorting utilities">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,111 +18,276 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node72.html">
 <LINK REL="previous" HREF="node70.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node72.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1071"
+<A NAME="tex2html1067"
   HREF="node72.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1067"
-  HREF="node45.html">
+<A NAME="tex2html1063"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1061"
+<A NAME="tex2html1059"
   HREF="node70.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1069"
+<A NAME="tex2html1065"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1072"
-  HREF="node72.html">Sorting utilities</A>
-<B> Up:</B> <A NAME="tex2html1068"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1062"
-  HREF="node70.html">psb_sp_getrow   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1070"
+<B> Next:</B> <A NAME="tex2html1068"
+  HREF="node72.html">Parallel environment routines</A>
+<B> Up:</B> <A NAME="tex2html1064"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1060"
+  HREF="node70.html">psb_sizeof   Memory</A>
+ &nbsp; <B>  <A NAME="tex2html1066"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000726000000000000000">
-psb_sizeof -- Memory occupation</A>
+<H2><A NAME="SECTION000727000000000000000">
+Sorting utilities</A>
 </H2>
 
 <P>
-This function computes the memory occupation of a PSBLAS object.
+<FONT SIZE="+1"><B>psb_msort -- Sorting by the Merge-sort
+  algorithm</B></FONT>
 
 <P>
+<FONT SIZE="+1"><B>psb_qsort -- Sorting by the Quicksort
+  algorithm</B></FONT>
+
+<P>
+<FONT SIZE="+1"><B>psb_hsort -- Sorting by the Heapsort  algorithm</B></FONT>
 <PRE>
-isz = psb_sizeof(a)
-isz = psb_sizeof(desc_a)
-isz = psb_sizeof(prec)
+call psb_msort(x,ix,dir,flag)
+call psb_qsort(x,ix,dir,flag)
+call psb_hsort(x,ix,dir,flag)
 </PRE>
 
 <P>
+These  serial routines sort a sequence <IMG
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$X$"> into ascending or
+descending  order. The argument meaning is identical for the three
+calls; the only difference is the algorithm used to accomplish the
+task (see Usage Notes below). 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-<IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">. 
+<DT><STRONG>x</STRONG></DT>
+<DD>The sequence to be sorted.
 <BR>
-Scope: <B>local</B> 
+Type:<B>required</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: an integer, real or complex  array of rank 1.
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>Communication descriptor.
+<DT><STRONG>ix</STRONG></DT>
+<DD>A vector of indices.
 <BR>
-Scope: <B>local</B> 
+Type:<B>optional</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an integer array of (at least) the same size as <IMG
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$X$">.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
+<DT><STRONG>dir</STRONG></DT>
+<DD>The desired ordering.
 <BR>
-Type: <B>required</B>
+Type:<B>optional</B>.
 <BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as: an integer value: <DL>
+<DT><STRONG>Integer and real data:</STRONG></DT>
+<DD><code>psb_sort_up_</code>,
+<code>psb_sort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
+default <code>psb_sort_up_</code>. 
 </DD>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
+<DT><STRONG>Complex data:</STRONG></DT>
+<DD><code>psb_lsort_up_</code>,
+<code>psb_lsort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
+default <code>psb_lsort_up_</code>. 
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation of the object specified in
-  the calling sequence, in bytes.
+</DL>
+</DD>
+<DT><STRONG>flag</STRONG></DT>
+<DD>Whether to keep the original values in <IMG
+ WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img112.png"
+ ALT="$IX$">.
 <BR>
-Scope: <B>local</B> 
+Type:<B>optional</B>.
 <BR>
-Returned  as: an <code>integer(psb_long_int_k_)</code> number.
+Specified as: an integer value <code>psb_sort_ovw_idx_</code> or
+<code>psb_sort_keep_idx_</code>; default <code>psb_sort_ovw_idx_</code>.
+
+<P>
 </DD>
 </DL>
 
 <P>
-<BR><HR>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The sequence of values, in the chosen ordering.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: an integer, real or complex array of rank 1.
+</DD>
+<DT><STRONG>ix</STRONG></DT>
+<DD>A vector of indices.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+An integer array of rank 1, whose entries are moved to the same
+position as the corresponding entries in <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="$x$">.
+</DD>
+</DL>
+
+<P>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>For integer or real data the sorting can be performed in the up/down direction, on the
+  natural or absolute values;
+</LI>
+<LI>For  complex data the sorting can  be done in a lexicographic
+  order (i.e.: sort on the real part with ties broken according to
+  the imaginary part) or on the absolute values; 
+</LI>
+<LI>The routines return the items in the chosen ordering; the
+  output difference is the handling of  ties (i.e. items with an
+  equal   value) in the original input. With the merge-sort algorithm
+  ties are   preserved in the same relative order as they had in the
+  original   sequence,  while this is not guaranteed for quicksort or
+  heapsort; 
+</LI>
+<LI>If <!-- MATH
+ $flag = psb\_sort\_ovw\_idx\_$
+ -->
+<IMG
+ WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img113.png"
+ ALT="$flag = psb\_sort\_ovw\_idx\_$"> then the entries in <IMG
+ WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img114.png"
+ ALT="$ix(1:n)$">
+  where <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img16.png"
+ ALT="$n$"> is the size of <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="$x$"> are initialized to <!-- MATH
+ $ix(i) \leftarrow
+  i$
+ -->
+<IMG
+ WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img115.png"
+ ALT="$ix(i) \leftarrow
+i$">; thus, upon return from the subroutine, for each
+  index <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"> we have in <IMG
+ WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img116.png"
+ ALT="$ix(i)$"> the position that the item <IMG
+ WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img117.png"
+ ALT="$x(i)$">
+  occupied in the original data sequence;
+</LI>
+<LI>If <!-- MATH
+ $flag = psb\_sort\_keep\_idx\_$
+ -->
+<IMG
+ WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img118.png"
+ ALT="$flag = psb\_sort\_keep\_idx\_$"> the routine will assume that
+  the entries in <IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img119.png"
+ ALT="$ix(:)$"> have already been initialized by the user;
+</LI>
+<LI>The three sorting algorithms have a similar <IMG
+ WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img120.png"
+ ALT="$O(n \log n)$"> expected
+  running time; in the average case quicksort will be the
+  fastest and merge-sort the slowest. However note that:
+
+<OL>
+<LI>The worst case running time for quicksort is <IMG
+ WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img121.png"
+ ALT="$O(n^2)$">; the algorithm
+  implemented here follows the well-known median-of-three heuristics,
+  but the worst case may still apply;
+</LI>
+<LI>The worst case running time for merge-sort and heap-sort is
+  <IMG
+ WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img120.png"
+ ALT="$O(n \log n)$"> as the average case;
+</LI>
+<LI>The merge-sort algorithm is implemented to take advantage of 
+  subsequences that may be already in the desired ordering prior to
+  the subroutine call; this situation is relatively common when
+  dealing with groups of indices of sparse matrix entries, thus
+  merge-sort is often the preferred  choice when a sorting is needed
+  by other routines in the library. 
+</LI>
+</OL>
+</LI>
+</OL>
+
+<P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1067"
+  HREF="node72.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1063"
+  HREF="node44.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1059"
+  HREF="node70.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1065"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1068"
+  HREF="node72.html">Parallel environment routines</A>
+<B> Up:</B> <A NAME="tex2html1064"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1060"
+  HREF="node70.html">psb_sizeof   Memory</A>
+ &nbsp; <B>  <A NAME="tex2html1066"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

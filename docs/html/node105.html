@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
+<TITLE>Iterative Methods</TITLE>
+<META NAME="description" CONTENT="Iterative Methods">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,80 +18,61 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="previous" HREF="node104.html">
-<LINK REL="up" HREF="node101.html">
+<LINK REL="next" HREF="node107.html">
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node106.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1498"
+<A NAME="tex2html1496"
   HREF="node106.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1494"
-  HREF="node101.html">
+<A NAME="tex2html1492"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1490"
+<A NAME="tex2html1486"
   HREF="node104.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1496"
+<A NAME="tex2html1494"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1499"
-  HREF="node106.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1495"
-  HREF="node101.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1491"
-  HREF="node104.html">psb_precaply   Preconditioner</A>
- &nbsp; <B>  <A NAME="tex2html1497"
+<B> Next:</B> <A NAME="tex2html1497"
+  HREF="node106.html">psb_krylov   Krylov</A>
+<B> Up:</B> <A NAME="tex2html1493"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1487"
+  HREF="node104.html">psb_precdescr   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1495"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000114000000000000000">
-psb_precdescr -- Prints a description of current
-  preconditioner</A>
-</H2>
+<H1><A NAME="SECTION000120000000000000000"></A>
+<A NAME="sec:methods"></A>
+<BR>
+Iterative Methods
+</H1>
 
 <P>
-<PRE>
-call psb_precdescr(prec)
-call psb_precdescr(prec, iout)
-</PRE>
+In this chapter we provide routines for preconditioners and iterative
+methods. The interfaces for Krylov subspace methods are available in
+the module <code>psb_krylov_mod</code>.
 
 <P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
-<DT><STRONG>iout</STRONG></DT>
-<DD>output unit.
-Scope: <B>local</B> 
-<BR>
-Type: <B>optiona</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer number. 
-</DD>
-</DL>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
+<UL>
+<LI><A NAME="tex2html1498"
+  HREF="node106.html">psb_krylov  -- Krylov Methods Driver
+      Routine</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

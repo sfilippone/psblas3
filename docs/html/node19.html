@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_global_rows -- Get number of global rows</TITLE>
-<META NAME="description" CONTENT="get_global_rows -- Get number of global rows">
+<TITLE>get_global_cols -- Get number of global cols</TITLE>
+<META NAME="description" CONTENT="get_global_cols -- Get number of global cols">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,55 +18,54 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node20.html">
 <LINK REL="previous" HREF="node18.html">
-<LINK REL="up" HREF="node16.html">
+<LINK REL="up" HREF="node15.html">
 <LINK REL="next" HREF="node20.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html409"
+<A NAME="tex2html405"
   HREF="node20.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html405"
-  HREF="node16.html">
+<A NAME="tex2html401"
+  HREF="node15.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html399"
+<A NAME="tex2html397"
   HREF="node18.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html407"
+<A NAME="tex2html403"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html410"
-  HREF="node20.html">get_global_cols   Get</A>
-<B> Up:</B> <A NAME="tex2html406"
-  HREF="node16.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html400"
-  HREF="node18.html">get_local_cols   Get</A>
- &nbsp; <B>  <A NAME="tex2html408"
+<B> Next:</B> <A NAME="tex2html406"
+  HREF="node20.html">get_context Get communication context</A>
+<B> Up:</B> <A NAME="tex2html402"
+  HREF="node15.html">Data structure query routines</A>
+<B> Previous:</B> <A NAME="tex2html398"
+  HREF="node18.html">get_global_rows   Get</A>
+ &nbsp; <B>  <A NAME="tex2html404"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045300000000000000">
-get_global_rows -- Get number of global rows</A>
+<H3><A NAME="SECTION00045400000000000000">
+get_global_cols -- Get number of global cols</A>
 </H3>
 
 <P>
 <PRE>
-nr = desc%get_global_rows()
+nr = desc%get_global_cols()
 </PRE>
 
 <P>
 <DL>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
 <DT><STRONG>desc</STRONG></DT>
 <DD>the communication descriptor.
@@ -87,7 +86,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of global rows in the mesh
+<DD>The number of global cols in the mesh
 </DD>
 </DL>
 

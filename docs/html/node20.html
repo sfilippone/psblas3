@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_global_cols -- Get number of global cols</TITLE>
-<META NAME="description" CONTENT="get_global_cols -- Get number of global cols">
+<TITLE>get_context--Get communication context </TITLE>
+<META NAME="description" CONTENT="get_context--Get communication context ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,45 +18,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="previous" HREF="node19.html">
-<LINK REL="up" HREF="node16.html">
+<LINK REL="previous" HREF="node15.html">
+<LINK REL="up" HREF="node8.html">
 <LINK REL="next" HREF="node21.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html419"
+<A NAME="tex2html415"
   HREF="node21.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html415"
-  HREF="node16.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html411"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html407"
   HREF="node19.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html417"
+<A NAME="tex2html413"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html420"
-  HREF="node21.html">get_context Get communication context</A>
-<B> Up:</B> <A NAME="tex2html416"
-  HREF="node16.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html412"
-  HREF="node19.html">get_global_rows   Get</A>
- &nbsp; <B>  <A NAME="tex2html418"
+<B> Next:</B> <A NAME="tex2html416"
+  HREF="node21.html">psb_cd_get_large_threshold   Get</A>
+<B> Up:</B> <A NAME="tex2html412"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html408"
+  HREF="node19.html">get_global_cols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html414"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045400000000000000">
-get_global_cols -- Get number of global cols</A>
-</H3>
-
-<P>
+<H2><A NAME="SECTION00046000000000000000">
+<DIV ALIGN="LEFT">
+get_context--Get communication context 
+</DIV></A>
+</H2>
 <PRE>
-nr = desc%get_global_cols()
+ictxt = desc%get_context()
 </PRE>
 
 <P>
@@ -86,11 +86,31 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of global cols in the mesh
+<DD>The communication context.
 </DD>
 </DL>
 
 <P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html417"
+  HREF="node21.html">psb_cd_get_large_threshold -- Get threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html418"
+  HREF="node22.html">psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html419"
+  HREF="node23.html">get_nrows -- Get number of  rows in a sparse  matrix</A>
+<LI><A NAME="tex2html420"
+  HREF="node24.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
+<LI><A NAME="tex2html421"
+  HREF="node25.html">get_nnzeros -- Get number of nonzero elements
+  in a sparse matrix</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

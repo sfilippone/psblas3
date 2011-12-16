@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_spins -- Insert a cloud of elements into a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_spins -- Insert a cloud of elements into a sparse matrix">
+<TITLE>psb_spasb -- Sparse matrix assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_spasb -- Sparse matrix assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,123 +20,99 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node54.html">
 <LINK REL="previous" HREF="node52.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node54.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html855"
+<A NAME="tex2html853"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html851"
-  HREF="node45.html">
+<A NAME="tex2html849"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html845"
+<A NAME="tex2html843"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html853"
+<A NAME="tex2html851"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html856"
-  HREF="node54.html">psb_spasb   Sparse</A>
-<B> Up:</B> <A NAME="tex2html852"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html846"
-  HREF="node52.html">psb_spall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html854"
+<B> Next:</B> <A NAME="tex2html854"
+  HREF="node54.html">psb_spfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html850"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html844"
+  HREF="node52.html">psb_spins   Insert</A>
+ &nbsp; <B>  <A NAME="tex2html852"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00078000000000000000">
-psb_spins -- Insert a cloud of elements into a sparse
-  matrix</A>
+<H2><A NAME="SECTION00079000000000000000">
+psb_spasb -- Sparse matrix assembly routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_spins(nz, ia, ja, val, a, desc_a, info)
+call psb_spasb(a, desc_a, info, afmt, upd, dupl)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer scalar.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the row indices of the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the column indices of the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">. Must be of the same type and kind
-of the <code>aspk</code> component of the sparse matrix <IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img104.png"
- ALT="$a$">.
-</DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B>. 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>.
+Type:<B>required</B>.
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>afmt</STRONG></DT>
+<DD>the storage format for the sparse matrix.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an array of characters. Defalt:  'CSR'.
+</DD>
+<DT><STRONG>upd</STRONG></DT>
+<DD>Provide for updates to the matrix coefficients.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: integer, possible values: <code>psb_upd_srch_</code>, <code>psb_upd_perm_</code>
+</DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>How to handle duplicate coefficients.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
+<code>psb_dupl_add_</code>, <code>psb_dupl_err_</code>.
+</DD>
 </DL>
 
 <P>
@@ -145,7 +121,7 @@ Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the matrix into which elements will be inserted.
+<DD>the matrix to be assembled.
 <BR>
 Scope:<B>local</B>
 <BR>
@@ -155,17 +131,6 @@ Intent: <B>inout</B>.
 <BR>
 Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
-<BR>
-Scope: <B>local</B>. 
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -183,54 +148,48 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>On entry to this routine the descriptor may be in either the
-  build or assembled state.
+<LI>On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. <code>psb_cdasb</code> must already have been called.
 </LI>
-<LI>On entry to this routine the sparse matrix may be in either the
-  build or update state. 
+<LI>The sparse matrix may be in either the build or update state;
 </LI>
-<LI>If the descriptor is in the build state, then the sparse matrix
-  must also be in the build state; the action of the routine is to
-  (implicitly) call <code>psb_cdins</code> to add entries to the sparsity
-  pattern; each sparse matrix entry implicitly defines a graph edge,
-  that is passed to the descriptor routine for the appropriate
-  processing. 
+<LI>Duplicate entries are detected and handled in both build and
+  update state, with the exception of the error action that is only
+  taken in the build state, i.e. on the first assembly; 
 </LI>
-<LI>Any coefficients from matrix rows not assigned to the calling
-  process are silently ignored;
+<LI>If the update choice is <code>psb_upd_perm_</code>, then subsequent
+  calls to <code>psb_spins</code> to update the matrix must be arranged in
+  such a way as to produce exactly the same sequence of coefficient
+  values as encountered at the first assembly; 
 </LI>
-<LI>If the descriptor is in the assembled state, then any entries in
-  the sparse matrix that would generate additional communication
-  requirements will be ignored; 
-</LI>
-<LI>If the matrix is in the update state, any entries in positions
-  that were not present in the original matrix will be ignored. 
+<LI>On exit from this routine the matrix is in the assembled state,
+  and thus is suitable for the computational routines. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html855"
+<A NAME="tex2html853"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html851"
-  HREF="node45.html">
+<A NAME="tex2html849"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html845"
+<A NAME="tex2html843"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html853"
+<A NAME="tex2html851"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html856"
-  HREF="node54.html">psb_spasb   Sparse</A>
-<B> Up:</B> <A NAME="tex2html852"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html846"
-  HREF="node52.html">psb_spall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html854"
+<B> Next:</B> <A NAME="tex2html854"
+  HREF="node54.html">psb_spfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html850"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html844"
+  HREF="node52.html">psb_spins   Insert</A>
+ &nbsp; <B>  <A NAME="tex2html852"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

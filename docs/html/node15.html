@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Preconditioner data structure</TITLE>
-<META NAME="description" CONTENT="Preconditioner data structure">
+<TITLE>Data structure query routines</TITLE>
+<META NAME="description" CONTENT="Data structure query routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,81 +18,59 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node16.html">
-<LINK REL="previous" HREF="node13.html">
+<LINK REL="next" HREF="node20.html">
+<LINK REL="previous" HREF="node14.html">
 <LINK REL="up" HREF="node8.html">
 <LINK REL="next" HREF="node16.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html357"
+<A NAME="tex2html355"
   HREF="node16.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html353"
+<A NAME="tex2html351"
   HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html347"
+<A NAME="tex2html345"
   HREF="node14.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html355"
+<A NAME="tex2html353"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html358"
-  HREF="node16.html">Data structure query routines</A>
-<B> Up:</B> <A NAME="tex2html354"
+<B> Next:</B> <A NAME="tex2html356"
+  HREF="node16.html">get_local_rows   Get</A>
+<B> Up:</B> <A NAME="tex2html352"
   HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html348"
-  HREF="node14.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html356"
+<B> Previous:</B> <A NAME="tex2html346"
+  HREF="node14.html">Preconditioner data structure</A>
+ &nbsp; <B>  <A NAME="tex2html354"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00044000000000000000"></A>
-<A NAME="sec:prec"></A>
+<H2><A NAME="SECTION00045000000000000000"></A>
+<A NAME="sec:dataquery"></A>
 <BR>
-Preconditioner data structure
+Data structure query routines
 </H2>
-Our base library  offers support for  simple well known preconditioners
-like Diagonal Scaling or Block Jacobi with incomplete
-factorization ILU(0). 
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
-A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
-figure&nbsp;<A HREF="#fig:prectype">6</A>. The <code>psb_prec_type</code> 
-data type may contain a simple preconditioning matrix with the
-associated communication descriptor.The values contained in
-the <code>iprcparm</code> and <code>rprcparm</code> define tha type of
-preconditioner along with all the parameters related to it; thus,
-<code>iprcparm</code> and <code>rprcparm</code> define how the other records have
-to be interpreted. This data structure is the basis of more complex
-preconditioning strategies, which are the subject of further
-research. 
-
-<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="680"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
-The PSBLAS defined data type that contains a preconditioner.</CAPTION>
-<TR><TD><FONT SIZE="-1">  <BR>
-
-<BR>
-   
-  </FONT>
-<DIV ALIGN="CENTER"><FONT SIZE="-1"><!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}"></FONT></DIV><FONT SIZE="-1">
-  </FONT></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
+<UL>
+<LI><A NAME="tex2html357"
+  HREF="node16.html">get_local_rows -- Get number of local rows</A>
+<LI><A NAME="tex2html358"
+  HREF="node17.html">get_local_cols -- Get number of local cols</A>
+<LI><A NAME="tex2html359"
+  HREF="node18.html">get_global_rows -- Get number of global rows</A>
+<LI><A NAME="tex2html360"
+  HREF="node19.html">get_global_cols -- Get number of global cols</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

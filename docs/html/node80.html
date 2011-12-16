@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>psb_abort -- Abort a computation</TITLE>
+<META NAME="description" CONTENT="psb_abort -- Abort a computation">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,53 +20,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node81.html">
 <LINK REL="previous" HREF="node79.html">
-<LINK REL="up" HREF="node73.html">
+<LINK REL="up" HREF="node72.html">
 <LINK REL="next" HREF="node81.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1193"
+<A NAME="tex2html1191"
   HREF="node81.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1189"
-  HREF="node73.html">
+<A NAME="tex2html1187"
+  HREF="node72.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1183"
+<A NAME="tex2html1181"
   HREF="node79.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1191"
+<A NAME="tex2html1189"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1194"
-  HREF="node81.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1190"
-  HREF="node73.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1184"
-  HREF="node79.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1192"
+<B> Next:</B> <A NAME="tex2html1192"
+  HREF="node81.html">psb_bcast   Broadcast</A>
+<B> Up:</B> <A NAME="tex2html1188"
+  HREF="node72.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1182"
+  HREF="node79.html">psb_barrier   Sinchronization</A>
+ &nbsp; <B>  <A NAME="tex2html1190"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
-  environment</A>
+<H2><A NAME="SECTION00088000000000000000">
+psb_abort -- Abort a computation</A>
 </H2>
 
 <P>
 <PRE>
-call psb_barrier(icontxt)
+call psb_abort(icontxt)
 </PRE>
 
 <P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
+This subroutine aborts computation on the parallel virtual machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>

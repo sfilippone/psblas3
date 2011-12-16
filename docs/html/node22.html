@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_get_large_threshold -- Get threshold for index mapping switch</TITLE>
-<META NAME="description" CONTENT="psb_cd_get_large_threshold -- Get threshold for index mapping switch">
+<TITLE>psb_cd_set_large_threshold -- Set threshold for index mapping switch</TITLE>
+<META NAME="description" CONTENT="psb_cd_set_large_threshold -- Set threshold for index mapping switch">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node23.html">
 <LINK REL="previous" HREF="node21.html">
-<LINK REL="up" HREF="node21.html">
+<LINK REL="up" HREF="node20.html">
 <LINK REL="next" HREF="node23.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html446"
+<A NAME="tex2html444"
   HREF="node23.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html442"
-  HREF="node21.html">
+<A NAME="tex2html440"
+  HREF="node20.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html436"
+<A NAME="tex2html434"
   HREF="node21.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html444"
+<A NAME="tex2html442"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html447"
-  HREF="node23.html">psb_cd_set_large_threshold   Set</A>
-<B> Up:</B> <A NAME="tex2html443"
-  HREF="node21.html">get_context Get communication context</A>
-<B> Previous:</B> <A NAME="tex2html437"
-  HREF="node21.html">get_context Get communication context</A>
- &nbsp; <B>  <A NAME="tex2html445"
+<B> Next:</B> <A NAME="tex2html445"
+  HREF="node23.html">get_nrows   Get</A>
+<B> Up:</B> <A NAME="tex2html441"
+  HREF="node20.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html435"
+  HREF="node21.html">psb_cd_get_large_threshold   Get</A>
+ &nbsp; <B>  <A NAME="tex2html443"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00046100000000000000">
-psb_cd_get_large_threshold -- Get threshold for
+<H3><A NAME="SECTION00046200000000000000">
+psb_cd_set_large_threshold -- Set threshold for
   index mapping switch</A>
 </H3>
 
 <PRE>
-ith = psb_cd_get_large_threshold()
+call psb_cd_set_large_threshold(ith)
 </PRE>
 
 <P>
@@ -65,15 +65,24 @@ ith = psb_cd_get_large_threshold()
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Return</B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The current value for the size threshold. 
-
-<P>
+<DT><STRONG>ith</STRONG></DT>
+<DD>the new threshold for communication descriptors.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value greater than zero.
 </DD>
 </DL>
+Note: the threshold value is only queried by the library at the time a
+call to <code>psb_cdall</code> is executed, therefore changing the threshold
+has no effect on communication descriptors that have already been initialized.
 
 <P>
 <BR><HR>

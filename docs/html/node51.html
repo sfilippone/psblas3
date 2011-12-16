@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdbldext -- Build an extended communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdbldext -- Build an extended communication descriptor">
+<TITLE>psb_spall -- Allocates a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spall -- Allocates a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,67 +20,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node52.html">
 <LINK REL="previous" HREF="node50.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node52.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html831"
+<A NAME="tex2html829"
   HREF="node52.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html827"
-  HREF="node45.html">
+<A NAME="tex2html825"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html821"
+<A NAME="tex2html819"
   HREF="node50.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html829"
+<A NAME="tex2html827"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html832"
-  HREF="node52.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html828"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html822"
-  HREF="node50.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html830"
+<B> Next:</B> <A NAME="tex2html830"
+  HREF="node52.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html826"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html820"
+  HREF="node50.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html828"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00076000000000000000">
-psb_cdbldext -- Build an extended  communication
-  descriptor</A>
+<H2><A NAME="SECTION00077000000000000000">
+psb_spall -- Allocates a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
+call psb_spall(a, desc_a, info, nnz)
 </PRE>
 
 <P>
-This subroutine builds an extended communication descriptor, based on
-the input descriptor <code>desc_a</code> and on the stencil specified
-through the input sparse matrix <code>a</code>. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data type.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -91,35 +77,19 @@ Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>nl</STRONG></DT>
-<DD>the number of additional layers desired.
+<DT><STRONG>nnz</STRONG></DT>
+<DD>An estimate of the number of nonzeroes in the local
+  part of the assembled matrix.
 <BR>
-Scope:<B>global</B>.
+Scope: <B>global</B>.
 <BR>
-Type:<B>required</B>.
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value <IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img102.png"
- ALT="$nl\ge 0$">. 
-</DD>
-<DT><STRONG>extype</STRONG></DT>
-<DD>the kind of estension required.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional </B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value
-<code>psb_ovt_xhal_</code>, <code>psb_ovt_asov_</code>, default: <code>psb_ovt_xhal_</code>
-
-<P>
+Specified as: an integer value. 
 </DD>
 </DL>
 
@@ -128,16 +98,16 @@ Specified as: an integer value
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the extended communication descriptor.
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be allocated.
 <BR>
-Scope:<B>local</B>.
+Scope:<B>local</B>
 <BR>
-Type:<B>required</B>.
+Type:<B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -151,48 +121,47 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>Specifying <code>psb_ovt_xhal_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor for a domain partition in which
-  the additional layers are fetched as part of an (extended) halo;
-  however the index-to-process mapping is identical to that of the
-  base descriptor;
+<LI>On exit from this routine the sparse matrix  is in the build
+  state.
 </LI>
-<LI>Specifying <code>psb_ovt_asov_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor with an overlapped decomposition:
-  the additional layer is aggregated to  the local subdomain (and thus
-  is an overlap), and a new halo extending beyond the last additional
-  layer is formed. 
+<LI>The descriptor may be in either the build or assembled state.
+</LI>
+<LI>Providing a good estimate for the number of nonzeroes <IMG
+ WIDTH="32" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
+ ALT="$nnz$"> in
+  the assembled matrix may substantially improve performance in the
+  matrix build phase, as it will reduce or eliminate the need for
+  (potentially multiple) data reallocations. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html831"
+<A NAME="tex2html829"
   HREF="node52.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html827"
-  HREF="node45.html">
+<A NAME="tex2html825"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html821"
+<A NAME="tex2html819"
   HREF="node50.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html829"
+<A NAME="tex2html827"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html832"
-  HREF="node52.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html828"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html822"
-  HREF="node50.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html830"
+<B> Next:</B> <A NAME="tex2html830"
+  HREF="node52.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html826"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html820"
+  HREF="node50.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html828"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

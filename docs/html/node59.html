@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
+<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node60.html">
 <LINK REL="previous" HREF="node58.html">
-<LINK REL="up" HREF="node45.html">
+<LINK REL="up" HREF="node44.html">
 <LINK REL="next" HREF="node60.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html927"
+<A NAME="tex2html925"
   HREF="node60.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html923"
-  HREF="node45.html">
+<A NAME="tex2html921"
+  HREF="node44.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html917"
+<A NAME="tex2html915"
   HREF="node58.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html925"
+<A NAME="tex2html923"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html928"
-  HREF="node60.html">psb_gefree   Frees</A>
-<B> Up:</B> <A NAME="tex2html924"
-  HREF="node45.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html918"
-  HREF="node58.html">psb_geins   Dense</A>
- &nbsp; <B>  <A NAME="tex2html926"
+<B> Next:</B> <A NAME="tex2html926"
+  HREF="node60.html">psb_gelp   Applies</A>
+<B> Up:</B> <A NAME="tex2html922"
+  HREF="node44.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html916"
+  HREF="node58.html">psb_geasb   Assembly</A>
+ &nbsp; <B>  <A NAME="tex2html924"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000714000000000000000">
-psb_geasb -- Assembly a dense matrix</A>
+<H2><A NAME="SECTION000715000000000000000">
+psb_gefree -- Frees a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info)
+call psb_gefree(x, desc_a, info)
 </PRE>
 
 <P>
@@ -67,6 +67,21 @@ call psb_geasb(x, desc_a, info)
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to
+  be freed.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array with the ALLOCATABLE
+attribute, of type real, complex or integer.
+<BR>
+<P>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>The communication descriptor.
@@ -86,18 +101,6 @@ Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be assembled.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -110,6 +113,8 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+
+<P>
 <BR><HR>
 
 </BODY>
