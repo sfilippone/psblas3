@@ -20,6 +20,8 @@ subroutine psb_d_mat_renums(alg,mat,info,perm)
     ialg = psb_mat_renum_gps_
   case ('AMD')
     ialg = psb_mat_renum_amd_
+  case ('NONE', 'ID') 
+    ialg = psb_mat_renum_identity_
   case default
     write(0,*) 'Unknown algorithm "',psb_toupper(alg),'"'
     ialg = -1
@@ -54,7 +56,7 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
   integer, intent(out) :: info
   integer, allocatable, optional, intent(out) :: perm(:)
   
-  integer            :: err_act, nr, nc
+  integer            :: err_act, nr, nc, i
   character(len=20)  :: name
 
   info = psb_success_
@@ -80,6 +82,18 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
 
     call psb_mat_renum_amd(mat,info,perm)
 
+  case(psb_mat_renum_identity_) 
+    nr = mat%get_nrows()
+    allocate(perm(nr),stat=info) 
+    if (info == 0) then 
+      do i=1,nr
+        perm(i) = i
+      end do
+    else
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
   case default
     info = psb_err_input_value_invalid_i_
     call psb_errpush(info,name,i_err=(/1,alg,0,0,0/))

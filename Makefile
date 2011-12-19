@@ -1,7 +1,7 @@
 include Make.inc
 
 all: libd based precd kryld utild
-	(cd opt; $(MAKE) lib)
+#	(cd opt; $(MAKE) lib)
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
