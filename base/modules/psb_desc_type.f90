@@ -224,6 +224,7 @@ module psb_descriptor_type
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
+    procedure, pass(desc) :: get_list        => psb_cd_get_list
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: free            => psb_cdfree
     procedure, pass(desc) :: nullify         => nullify_desc
@@ -525,9 +526,9 @@ contains
     implicit none
     integer, intent(in)          :: data
     integer, pointer             :: ipnt(:)
-    type(psb_desc_type), target  :: desc
+    class(psb_desc_type), target  :: desc
     integer, intent(out)         :: totxch,idxr,idxs,info
-
+    
     !locals
     integer             :: np,me,ictxt,err_act, debug_level,debug_unit
     logical, parameter  :: debug=.false.,debugprt=.false.

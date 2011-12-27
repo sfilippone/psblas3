@@ -138,7 +138,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
@@ -626,7 +626,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
   
-  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999

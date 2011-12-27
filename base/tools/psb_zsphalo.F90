@@ -78,7 +78,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
-       &     irmin,icmin,irmax,icmax,data_,ngtz
+       &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
@@ -149,19 +149,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   If (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Data selector',data_
   select case(data_) 
-  case(psb_comm_halo_) 
-    idxv => desc_a%halo_index
-
-  case(psb_comm_ext_) 
-    idxv => desc_a%ext_index
-
-    ! !$  case(psb_comm_ovr_) 
-    ! !$    idxv => desc_a%ovrlap_index
+  case(psb_comm_halo_,psb_comm_ext_ ) 
     ! Do not accept OVRLAP_INDEX any longer. 
   case default
     call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong Data selector')
     goto 9999
   end select
+
+  call desc_a%get_list(data_,idxv,totxch,nxs,nxr,info)
 
   l1  = 0
 

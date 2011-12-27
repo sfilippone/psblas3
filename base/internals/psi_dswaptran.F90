@@ -30,9 +30,9 @@
 !!$ 
 !!$  
 !
-! File: psi_dswaptran.F90
+! File: psi_zswaptran.F90
 !
-! Subroutine: psi_dswaptranm
+! Subroutine: psi_zswaptranm
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -85,9 +85,9 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
+subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_dswaptranm
+  use psi_mod, psb_protect_name => psi_zswaptranm
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -103,8 +103,8 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   real(psb_dpk_)         :: y(:,:), beta
   real(psb_dpk_), target :: work(:)
-  type(psb_desc_type),target      :: desc_a
-  integer, optional        :: data
+  type(psb_desc_type),target       :: desc_a
+  integer, optional         :: data
 
   ! locals
   integer  :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
@@ -138,7 +138,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
@@ -157,11 +157,11 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_dswaptranm
+end subroutine psi_zswaptranm
 
-subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_dtranidxm
+  use psi_mod, psb_protect_name => psi_ztranidxm
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -340,7 +340,9 @@ subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send', &
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+n*nesd-1) = rcvbuf(rcv_pt:rcv_pt+n*nerv-1) 
       end if
@@ -386,7 +388,7 @@ subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        p2ptag=psb_double_swap_tag
+        p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
                & mpi_double_precision,prcid(i),&
@@ -429,7 +431,9 @@ subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
         end if
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send',&
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+n*nesd-1) = rcvbuf(rcv_pt:rcv_pt+n*nerv-1) 
       end if
@@ -518,10 +522,10 @@ subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     return
   end if
   return
-end subroutine psi_dtranidxm
+end subroutine psi_ztranidxm
 !
 !
-! Subroutine: psi_dswaptranv
+! Subroutine: psi_zswaptranv
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -574,9 +578,9 @@ end subroutine psi_dtranidxm
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
+subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_dswaptranv
+  use psi_mod, psb_protect_name => psi_zswaptranv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -626,7 +630,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
   
-  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
@@ -645,13 +649,13 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_dswaptranv
+end subroutine psi_zswaptranv
 
 
 
-subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_dtranidxv
+  use psi_mod, psb_protect_name => psi_ztranidxv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -829,7 +833,9 @@ subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send', &
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+nesd-1) = rcvbuf(rcv_pt:rcv_pt+nerv-1) 
       end if
@@ -875,7 +881,7 @@ subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        p2ptag=psb_double_swap_tag
+        p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
                & mpi_double_precision,prcid(i),&
@@ -917,7 +923,9 @@ subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
         end if
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send', &
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+nesd-1) = rcvbuf(rcv_pt:rcv_pt+nerv-1) 
       end if
@@ -1008,11 +1016,12 @@ subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
     return
   end if
   return
-end subroutine psi_dtranidxv
+end subroutine psi_ztranidxv
 
-subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_dswaptran_vect
+subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
+
+  use psi_mod, psb_protect_name => psi_zswaptran_vect
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -1025,11 +1034,11 @@ subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: flag
-  integer, intent(out)     :: info
+  integer, intent(in)         :: flag
+  integer, intent(out)        :: info
   class(psb_d_base_vect_type) :: y
-  real(psb_dpk_)         :: beta
-  real(psb_dpk_), target :: work(:)
+  real(psb_dpk_)           :: beta
+  real(psb_dpk_), target   :: work(:)
   type(psb_desc_type),target  :: desc_a
   integer, optional    :: data
 
@@ -1064,7 +1073,7 @@ subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
   
-  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
@@ -1083,14 +1092,14 @@ subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_dswaptran_vect
+end subroutine psi_zswaptran_vect
 
 
 
-subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+subroutine psi_ztranidx_vect(ictxt,icomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_dtranidx_vect
+  use psi_mod, psb_protect_name => psi_ztranidx_vect
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -1270,7 +1279,9 @@ subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send',& 
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+nesd-1) = rcvbuf(rcv_pt:rcv_pt+nerv-1) 
       end if
@@ -1316,7 +1327,7 @@ subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        p2ptag=psb_double_swap_tag
+        p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
                & mpi_double_precision,prcid(i),&
@@ -1358,7 +1369,9 @@ subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
         end if
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
-          write(psb_err_unit,*) 'Fatal error in swaptran: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) &
+               & 'Fatal error in swaptran: mismatch on self send', &
+               & nerv,nesd
         end if
         sndbuf(snd_pt:snd_pt+nesd-1) = rcvbuf(rcv_pt:rcv_pt+nerv-1) 
       end if
@@ -1449,7 +1462,7 @@ subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
     return
   end if
   return
-end subroutine psi_dtranidx_vect
+end subroutine psi_ztranidx_vect
 
 
 
