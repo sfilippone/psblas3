@@ -42,7 +42,9 @@
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
+!                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
+!                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
@@ -535,7 +537,9 @@ end subroutine psi_ztranidxm
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
+!                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
+!                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));

@@ -30,9 +30,9 @@
 !!$ 
 !!$  
 !
-! File: psi_zswaptran.F90
+! File: psi_dswaptran.F90
 !
-! Subroutine: psi_zswaptranm
+! Subroutine: psi_dswaptranm
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -42,7 +42,9 @@
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
+!                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
+!                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
@@ -85,9 +87,9 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
+subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_zswaptranm
+  use psi_mod, psb_protect_name => psi_dswaptranm
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -157,11 +159,11 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_zswaptranm
+end subroutine psi_dswaptranm
 
-subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_ztranidxm
+  use psi_mod, psb_protect_name => psi_dtranidxm
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -522,10 +524,10 @@ subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     return
   end if
   return
-end subroutine psi_ztranidxm
+end subroutine psi_dtranidxm
 !
 !
-! Subroutine: psi_zswaptranv
+! Subroutine: psi_dswaptranv
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -535,7 +537,9 @@ end subroutine psi_ztranidxm
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
+!                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
+!                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
@@ -578,9 +582,9 @@ end subroutine psi_ztranidxm
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
+subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_zswaptranv
+  use psi_mod, psb_protect_name => psi_dswaptranv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -649,13 +653,13 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_zswaptranv
+end subroutine psi_dswaptranv
 
 
 
-subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_ztranidxv
+  use psi_mod, psb_protect_name => psi_dtranidxv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -1016,12 +1020,12 @@ subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
     return
   end if
   return
-end subroutine psi_ztranidxv
+end subroutine psi_dtranidxv
 
 
-subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
+subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_zswaptran_vect
+  use psi_mod, psb_protect_name => psi_dswaptran_vect
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -1092,14 +1096,14 @@ subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_zswaptran_vect
+end subroutine psi_dswaptran_vect
 
 
 
-subroutine psi_ztranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
      & totxch,totsnd,totrcv,work,info)
 
-  use psi_mod, psb_protect_name => psi_ztranidx_vect
+  use psi_mod, psb_protect_name => psi_dtranidx_vect
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -1462,7 +1466,7 @@ subroutine psi_ztranidx_vect(ictxt,icomm,flag,beta,y,idx,&
     return
   end if
   return
-end subroutine psi_ztranidx_vect
+end subroutine psi_dtranidx_vect
 
 
 
