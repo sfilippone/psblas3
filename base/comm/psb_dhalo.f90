@@ -33,16 +33,16 @@
 !
 ! Subroutine: psb_dhalom
 !   This subroutine performs the exchange of the halo elements in a 
-!   distributed dense matrix between all the processes.
+!    distributed dense matrix between all the processes.
 !
 ! Arguments:
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
-!   info      -  integer.                      return code.
-!   alpha     -  real(optional).               Scale factor.
+!   info      -  integer.                      Return code
+!   alpha     -  real(optional).            Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
-!   work      -  real(optional).               Work  area.
+!   work      -  real(optional).            Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
 !   data     - integer                 Which index list in desc_a should be used
@@ -62,12 +62,12 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional    :: alpha
-  real(psb_dpk_), optional, target, intent(inout)  :: work(:)
+  real(psb_dpk_), optional, target, intent(inout) :: work(:)
   integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_
   real(psb_dpk_),pointer :: iwork(:), xp(:,:)
@@ -89,7 +89,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   if (present(jx)) then
     ijx = jx
@@ -118,18 +118,16 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   else
     tran_ = 'N'
   endif
+  if (present(mode)) then 
+    imode = mode
+  else
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
 
   if (present(data)) then     
     data_ = data
   else
     data_ = psb_comm_halo_
-  endif
-
-
-  if (present(mode)) then 
-    imode = mode
-  else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
   ! check vector correctness
@@ -160,8 +158,8 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
-      iwork => work
       aliw=.false.
+      iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -174,8 +172,8 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     end if
   else
     aliw=.true.
-!!$    write(psb_err_unit,*) 'halom ',liwork
     allocate(iwork(liwork),stat=info)
+
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_realloc'
@@ -199,12 +197,13 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if(info /= psb_success_) then
-    ch_err='PSI_dSwapdata'
+    ch_err='PSI_cswapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
 
   if (aliw) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -256,18 +255,20 @@ end subroutine psb_dhalom
 !
 ! Subroutine: psb_dhalov
 !   This subroutine performs the exchange of the halo elements in a 
-!   distributed dense vector between all the processes.
+!    distributed dense vector between all the processes.
 !
 ! Arguments:
 !   x         -  real,dimension(:).            The local part of the dense vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   alpha     -  real(optional).               Scale factor.
-!   work      -  real(optional).               Work  area.
+!   alpha     -  real(optional).            Scale factor.
+!   jx        -  integer(optional).            The starting column of the global matrix. 
+!   ik        -  integer(optional).            The number of columns to gather. 
+!   work      -  real(optional).            Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
-!   data      - integer                 Which index list in desc_a should be used
-!                                       to retrieve rows, default psb_comm_halo_
+!   data     - integer                 Which index list in desc_a should be used
+!                                      to retrieve rows, default psb_comm_halo_
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_    use ovrl_index
@@ -279,18 +280,17 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psi_mod
   implicit none
 
-  real(psb_dpk_), intent(inout)           :: x(:)
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
-  real(psb_dpk_), intent(in), optional    :: alpha
-  real(psb_dpk_), target, optional, intent(inout)  :: work(:)
-  integer, intent(in), optional           :: mode,data
-  character, intent(in), optional         :: tran
+  real(psb_dpk_), intent(inout)          :: x(:)
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer, intent(out)                      :: info
+  real(psb_dpk_), intent(in), optional   :: alpha
+  real(psb_dpk_), target, optional, intent(inout) :: work(:)
+  integer, intent(in), optional             :: mode,data
+  character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork,data_
+  integer                  :: ictxt, np, me, err_act, &
+       & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   real(psb_dpk_),pointer :: iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
@@ -360,8 +360,8 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
-      iwork => work
       aliw=.false.
+      iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -403,6 +403,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   end if
 
   if (aliw) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -417,15 +418,16 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   return
 end subroutine psb_dhalov
 
+
 subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_vect
   use psi_mod
   implicit none
 
-  type(psb_d_vect_type), intent(inout)   :: x
+  type(psb_d_vect_type), intent(inout)    :: x
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
-  real(psb_dpk_), intent(in), optional    :: alpha
+  real(psb_dpk_), intent(in), optional :: alpha
   real(psb_dpk_), target, optional, intent(inout)  :: work(:)
   integer, intent(in), optional           :: mode,data
   character, intent(in), optional         :: tran
@@ -435,9 +437,9 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork,data_
   real(psb_dpk_),pointer :: iwork(:)
-  character                :: tran_
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  character                 :: tran_
+  character(len=20)         :: name, ch_err
+  logical                   :: aliw
 
   name='psb_dhalov'
   if(psb_get_errstatus() /= 0) return 
@@ -501,7 +503,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha /= 1.d0) then
+    if(alpha /= done) then
       call x%scal(alpha)
     end if
   end if
@@ -545,13 +547,14 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
     goto 9999      
   end if
 
-  if(info /= psb_success_) then
+  if (info /= psb_success_) then
     ch_err='PSI_swapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
 
   if (aliw) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  

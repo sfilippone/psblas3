@@ -58,10 +58,10 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psi_mod
   implicit none
 
-  complex(psb_dpk_), intent(inout), target  :: x(:,:)
+  complex(psb_dpk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(psb_dpk_), intent(in), optional   :: alpha
+  complex(psb_dpk_), intent(in), optional    :: alpha
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
@@ -197,7 +197,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if(info /= psb_success_) then
-    ch_err='PSI_zswapdata'
+    ch_err='PSI_cswapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
@@ -503,7 +503,7 @@ subroutine  psb_zhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha /= 1.0) then
+    if(alpha /= zone) then
       call x%scal(alpha)
     end if
   end if
@@ -547,7 +547,7 @@ subroutine  psb_zhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
     goto 9999      
   end if
 
-  if(info /= psb_success_) then
+  if (info /= psb_success_) then
     ch_err='PSI_swapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999

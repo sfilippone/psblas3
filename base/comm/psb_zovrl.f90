@@ -72,7 +72,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   complex(psb_dpk_), intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(psb_dpk_), optional, target, intent(inout) :: work(:)
+  complex(psb_dpk_), optional, target, intent(inout)  :: work(:)
   integer, intent(in), optional             :: update,jx,ik,mode
 
   ! locals
@@ -269,11 +269,11 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   use psi_mod
   implicit none
 
-  complex(psb_dpk_), intent(inout), target :: x(:)
-  type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  complex(psb_dpk_), intent(inout), target  :: x(:)
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer, intent(out)                      :: info
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional            :: update,mode
+  integer, intent(in), optional             :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
@@ -363,7 +363,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,zone,x(:),&
+    call psi_swapdata(mode_,zone,x,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x,desc_a,update_,info)
@@ -409,7 +409,7 @@ subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
-  name='psb_covrlv'
+  name='psb_zovrlv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)

@@ -29,14 +29,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! File:  psb_dovrl.f90
 !
 ! Subroutine: psb_dovrlm
 !   This subroutine performs the exchange of the overlap elements in a 
-!   distributed dense matrix between all the processes.
+!    distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x(:,:)      -  real                      The local part of the dense matrix.
+!   x(:,:)      -  real                   The local part of the dense matrix.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
@@ -68,11 +69,11 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psi_mod
   implicit none
 
-  real(psb_dpk_), intent(inout), target   :: x(:,:)
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
-  real(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional           :: update,jx,ik,mode
+  real(psb_dpk_), intent(inout), target  :: x(:,:)
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer, intent(out)                      :: info
+  real(psb_dpk_), optional, target, intent(inout)  :: work(:)
+  integer, intent(in), optional             :: update,jx,ik,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
@@ -172,7 +173,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
       goto 9999
     end if
   else
-      iwork => work    
+    iwork => work    
   end if
   ! exchange overlap elements
   if(do_swap) then
@@ -201,7 +202,6 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   end if
   return
 end subroutine psb_dovrlm
-
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
 !!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
@@ -236,10 +236,10 @@ end subroutine psb_dovrlm
 !
 ! Subroutine: psb_dovrlv
 !   This subroutine performs the exchange of the overlap elements in a 
-!   distributed dense vector between all the processes.
+!    distributed dense vector between all the processes.
 !
 ! Arguments:
-!   x(:)        -  real                      The local part of the dense vector.
+!   x(:)        -  real                   The local part of the dense vector.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   work        -  real(optional).           A work area.
@@ -264,17 +264,16 @@ end subroutine psb_dovrlm
 !                                                       previous call with swap_send)
 !
 !
-!
 subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   use psb_base_mod, psb_protect_name => psb_dovrlv
   use psi_mod
   implicit none
 
-  real(psb_dpk_), intent(inout), target   :: x(:)
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
+  real(psb_dpk_), intent(inout), target  :: x(:)
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer, intent(out)                      :: info
   real(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional           :: update,mode
+  integer, intent(in), optional             :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
@@ -364,7 +363,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,done,x(:),&
+    call psi_swapdata(mode_,done,x,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x,desc_a,update_,info)
@@ -389,16 +388,17 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   return
 end subroutine psb_dovrlv
 
+
 subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
   use psb_base_mod, psb_protect_name => psb_dovrl_vect
   use psi_mod
   implicit none
 
   type(psb_d_vect_type), intent(inout)   :: x
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
+  type(psb_desc_type), intent(in)        :: desc_a
+  integer, intent(out)                   :: info
   real(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional           :: update,mode
+  integer, intent(in), optional          :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &

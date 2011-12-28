@@ -363,7 +363,7 @@ subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,cone,x(:),&
+    call psi_swapdata(mode_,cone,x,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x,desc_a,update_,info)

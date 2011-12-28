@@ -503,7 +503,7 @@ subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha /= 1.0) then
+    if(alpha /= cone) then
       call x%scal(alpha)
     end if
   end if
@@ -547,7 +547,7 @@ subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
     goto 9999      
   end if
 
-  if(info /= psb_success_) then
+  if (info /= psb_success_) then
     ch_err='PSI_swapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
