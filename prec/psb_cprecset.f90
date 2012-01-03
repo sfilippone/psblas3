@@ -54,10 +54,10 @@ subroutine psb_cprecseti(p,what,val,info)
 end subroutine psb_cprecseti
 
 
-subroutine psb_cprecsets(p,what,val,info)
+subroutine psb_cprecsetr(p,what,val,info)
 
   use psb_base_mod
-  use psb_prec_mod, psb_protect_name => psb_cprecsets
+  use psb_prec_mod, psb_protect_name => psb_cprecsetr
   implicit none
   type(psb_cprec_type), intent(inout)    :: p
   integer                                :: what
@@ -77,4 +77,4 @@ subroutine psb_cprecsets(p,what,val,info)
 
   return
 
-end subroutine psb_cprecsets
+end subroutine psb_cprecsetr

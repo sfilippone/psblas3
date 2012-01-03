@@ -32,12 +32,13 @@
 
 module psb_c_prec_mod
   use psb_c_prec_type
+  use psb_c_base_prec_mod
 
   interface psb_precbld
     subroutine psb_cprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type,&
-           & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type
-      use psb_prec_type, only : psb_cprec_type
+      import :: psb_desc_type, psb_cspmat_type,&
+           & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type, &
+           & psb_cprec_type
       implicit none
       type(psb_cspmat_type), intent(in), target  :: a
       type(psb_desc_type), intent(in), target    :: desc_a
@@ -52,8 +53,7 @@ module psb_c_prec_mod
 
   interface psb_precinit
     subroutine psb_cprecinit(prec,ptype,info)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      import :: psb_desc_type, psb_cspmat_type, psb_spk_, psb_cprec_type
       implicit none
       type(psb_cprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
@@ -63,27 +63,25 @@ module psb_c_prec_mod
 
   interface psb_precset
     subroutine psb_cprecseti(prec,what,val,info)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      import :: psb_desc_type, psb_cspmat_type, psb_spk_, psb_cprec_type
       implicit none
       type(psb_cprec_type), intent(inout)    :: prec
       integer                                :: what, val 
       integer, intent(out)                   :: info
     end subroutine psb_cprecseti
-    subroutine psb_cprecsets(prec,what,val,info)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+    subroutine psb_cprecsetr(prec,what,val,info)
+      import :: psb_desc_type, psb_cspmat_type, psb_spk_, psb_cprec_type
       implicit none
       type(psb_cprec_type), intent(inout)    :: prec
       integer                                :: what
       real(psb_spk_)                       :: val 
       integer, intent(out)                   :: info
-    end subroutine psb_cprecsets
+    end subroutine psb_cprecsetr
   end interface
 
   interface psb_ilu_fct
     subroutine psb_cilu_fct(a,l,u,d,info,blck)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, &
+      import :: psb_desc_type, psb_cspmat_type, &
            & psb_c_csr_sparse_mat, psb_spk_
       integer, intent(out)                ::     info
       type(psb_cspmat_type),intent(in)    :: a

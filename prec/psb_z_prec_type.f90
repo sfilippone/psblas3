@@ -35,24 +35,18 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_z_prec_type
 
-  ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
-       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
-       & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
-       & psb_zspmat_type
-  
   use psb_prec_const_mod
   use psb_z_base_prec_mod
-  
+
   type psb_zprec_type
     class(psb_z_base_prec_type), allocatable :: prec
   contains
-    procedure, pass(prec)               :: z_apply1_vect
-    procedure, pass(prec)               :: z_apply2_vect
-    procedure, pass(prec)               :: z_apply2v
-    procedure, pass(prec)               :: z_apply1v
-    generic, public                     :: apply => z_apply2v, z_apply1v,&
-         & z_apply1_vect, z_apply2_vect
+    procedure, pass(prec)               :: psb_z_apply1_vect
+    procedure, pass(prec)               :: psb_z_apply2_vect
+    procedure, pass(prec)               :: psb_z_apply2v
+    procedure, pass(prec)               :: psb_z_apply1v
+    generic, public                     :: apply => psb_z_apply2v, psb_z_apply1v,&
+         & psb_z_apply1_vect, psb_z_apply2_vect
   end type psb_zprec_type
 
   interface psb_precfree
@@ -60,7 +54,7 @@ module psb_z_prec_type
   end interface
 
   interface psb_nullify_prec
-    module procedure psb_nullify_zprec
+    module procedure psb_nullify_cprec
   end interface
 
   interface psb_precdescr
@@ -75,10 +69,58 @@ module psb_z_prec_type
     module procedure psb_zprec_sizeof
   end interface
 
+  interface psb_z_apply2_vect
+    subroutine psb_z_apply2_vect(prec,x,y,desc_data,info,trans,work)
+      import :: psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
+      type(psb_desc_type),intent(in)       :: desc_data
+      class(psb_zprec_type), intent(inout) :: prec
+      type(psb_z_vect_type),intent(inout)  :: x
+      type(psb_z_vect_type),intent(inout)  :: y
+      integer, intent(out)                 :: info
+      character(len=1), optional           :: trans
+      complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_z_apply2_vect
+  end interface psb_z_apply2_vect
+  
+  interface  psb_z_apply1_vect
+    subroutine psb_z_apply1_vect(prec,x,desc_data,info,trans,work)
+      import :: psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
+        type(psb_desc_type),intent(in)       :: desc_data
+      class(psb_zprec_type), intent(inout) :: prec
+      type(psb_z_vect_type),intent(inout)  :: x
+      integer, intent(out)                 :: info
+      character(len=1), optional           :: trans
+      complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_z_apply1_vect
+  end interface psb_z_apply1_vect
+  
+  interface  psb_z_apply2v
+    subroutine psb_z_apply2v(prec,x,y,desc_data,info,trans,work)
+      import :: psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
+      type(psb_desc_type),intent(in)    :: desc_data
+      class(psb_zprec_type), intent(in) :: prec
+      complex(psb_dpk_),intent(inout)   :: x(:)
+      complex(psb_dpk_),intent(inout)   :: y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_z_apply2v
+  end interface psb_z_apply2v
+  
+  interface  psb_z_apply1v
+    subroutine psb_z_apply1v(prec,x,desc_data,info,trans)
+      import :: psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
+      type(psb_desc_type),intent(in)    :: desc_data
+      class(psb_zprec_type), intent(in) :: prec
+      complex(psb_dpk_),intent(inout)   :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_z_apply1v
+  end interface psb_z_apply1v
+  
 contains
 
   subroutine psb_zfile_prec_descr(p,iout)
-    use psb_base_mod
     type(psb_zprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
     integer :: iout_,info
@@ -99,7 +141,6 @@ contains
   end subroutine psb_zfile_prec_descr
 
   subroutine psb_z_prec_dump(prec,info,prefix,head)
-    use psb_base_mod
     implicit none 
     type(psb_zprec_type), intent(in) :: prec
     integer, intent(out)             :: info
@@ -121,7 +162,6 @@ contains
 
 
   subroutine psb_z_precfree(p,info)
-    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: me, err_act,i
@@ -151,13 +191,12 @@ contains
     return
   end subroutine psb_z_precfree
 
-  subroutine psb_nullify_zprec(p)
+  subroutine psb_nullify_cprec(p)
     type(psb_zprec_type), intent(inout) :: p
 
-  end subroutine psb_nullify_zprec
+  end subroutine psb_nullify_cprec
 
   function psb_zprec_sizeof(prec) result(val)
-    use psb_base_mod
     type(psb_zprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i
@@ -168,282 +207,5 @@ contains
     end if
     
   end function psb_zprec_sizeof
-
-  subroutine z_apply2_vect(prec,x,y,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)       :: desc_data
-    class(psb_zprec_type), intent(inout) :: prec
-    type(psb_z_vect_type),intent(inout)  :: x
-    type(psb_z_vect_type),intent(inout)  :: y
-    integer, intent(out)                 :: info
-    character(len=1), optional           :: trans
-    complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    
-    character     :: trans_ 
-    complex(psb_dpk_), pointer :: work_(:)
-    integer :: ictxt,np,me,err_act
-    character(len=20)   :: name
-    
-    name = 'z_apply2v'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    
-    ictxt = desc_data%get_context()
-    call psb_info(ictxt, me, np)
-    
-    if (present(trans)) then 
-      trans_=psb_toupper(trans)
-    else
-      trans_='N'
-    end if
-    
-    if (present(work)) then 
-      work_ => work
-    else
-      allocate(work_(4*desc_data%get_local_cols()),stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='Allocate')
-        goto 9999      
-      end if
-      
-    end if
-    
-    if (.not.allocated(prec%prec)) then 
-      info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
-      goto 9999
-    end if
-
-    call prec%prec%apply(zone,x,zzero,y,desc_data,info,&
-         & trans=trans_,work=work_)
-
-    if (present(work)) then 
-    else
-      deallocate(work_,stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='DeAllocate')
-        goto 9999      
-      end if
-    end if
-    
-    call psb_erractionrestore(err_act)
-    return
-    
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine z_apply2_vect
-
-  subroutine z_apply1_vect(prec,x,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)       :: desc_data
-    class(psb_zprec_type), intent(inout) :: prec
-    type(psb_z_vect_type),intent(inout)  :: x
-    integer, intent(out)                 :: info
-    character(len=1), optional           :: trans
-    complex(psb_dpk_),intent(inout), optional, target :: work(:)
-
-    type(psb_z_vect_type)       :: ww
-    character     :: trans_ 
-    complex(psb_dpk_), pointer :: work_(:)
-    integer :: ictxt,np,me,err_act
-    character(len=20)   :: name
-
-    name = 'z_apply1v'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-
-    ictxt = desc_data%get_context()
-    call psb_info(ictxt, me, np)
-
-    if (present(trans)) then 
-      trans_=psb_toupper(trans)
-    else
-      trans_='N'
-    end if
-
-    if (present(work)) then 
-      work_ => work
-    else
-      allocate(work_(4*desc_data%get_local_cols()),stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='Allocate')
-        goto 9999      
-      end if
-
-    end if
-
-    if (.not.allocated(prec%prec)) then 
-      info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
-      goto 9999
-    end if
-
-    call psb_geall(ww,desc_data,info)
-    if (info == 0) call psb_geasb(ww,desc_data,info,mold=x%v)
-    if (info == 0) call prec%prec%apply(zone,x,zzero,ww,desc_data,info,&
-         & trans=trans_,work=work_)
-    if (info == 0) call psb_geaxpby(zone,ww,zzero,x,desc_data,info)
-
-    if (present(work)) then 
-    else
-      deallocate(work_,stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='DeAllocate')
-        goto 9999      
-      end if
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine z_apply1_vect
- 
-  subroutine z_apply2v(prec,x,y,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_zprec_type), intent(in) :: prec
-    complex(psb_dpk_),intent(inout)   :: x(:)
-    complex(psb_dpk_),intent(inout)   :: y(:)
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
-    complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    
-    character     :: trans_ 
-    complex(psb_dpk_), pointer :: work_(:)
-    integer :: ictxt,np,me,err_act
-    character(len=20)   :: name
-    
-    name='z_apply2v'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    
-    ictxt = desc_data%get_context()
-    call psb_info(ictxt, me, np)
-    
-    if (present(trans)) then 
-      trans_=trans
-    else
-      trans_='N'
-    end if
-    
-    if (present(work)) then 
-      work_ => work
-    else
-      allocate(work_(4*desc_data%get_local_cols()),stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='Allocate')
-        goto 9999      
-      end if
-      
-    end if
-    
-    if (.not.allocated(prec%prec)) then 
-      info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
-      goto 9999
-    end if
-    call prec%prec%apply(zone,x,zzero,y,desc_data,info,trans_,work=work_)
-    if (present(work)) then 
-    else
-      deallocate(work_,stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='DeAllocate')
-        goto 9999      
-      end if
-    end if
-    
-    call psb_erractionrestore(err_act)
-    return
-    
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine z_apply2v
-
-  subroutine z_apply1v(prec,x,desc_data,info,trans)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_zprec_type), intent(in) :: prec
-    complex(psb_dpk_),intent(inout)   :: x(:)
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
-
-    character     :: trans_
-    integer :: ictxt,np,me, err_act
-    complex(psb_dpk_), pointer :: WW(:), w1(:)
-    character(len=20)   :: name
-    name='z_apply1v'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    
-    
-    ictxt=desc_data%get_context()
-    call psb_info(ictxt, me, np)
-    if (present(trans)) then 
-      trans_=psb_toupper(trans)
-    else
-      trans_='N'
-    end if
-    
-    if (.not.allocated(prec%prec)) then 
-      info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
-      goto 9999
-    end if
-    allocate(ww(size(x)),w1(size(x)),stat=info)
-    if (info /= psb_success_) then 
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='Allocate')
-      goto 9999      
-    end if
-    call prec%prec%apply(zone,x,zzero,ww,desc_data,info,trans_,work=w1)
-    if(info /= psb_success_) goto 9999
-    x(:) = ww(:)
-    deallocate(ww,W1,stat=info)
-    if (info /= psb_success_) then 
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999      
-    end if
-
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_errpush(info,name)
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-    
-  end subroutine z_apply1v
 
 end module psb_z_prec_type

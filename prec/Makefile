@@ -25,15 +25,17 @@ LIBMOD=psb_prec_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(PRECLIBNAME)
 COBJS=
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
 OBJS=$(F90OBJS) $(COBJS) $(MPFOBJS) $(MODOBJS)
 
-lib:  $(OBJS)
+lib:  $(OBJS) impld
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
+impld: $(OBJS)
+	cd impl && $(MAKE)
 
 $(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
 

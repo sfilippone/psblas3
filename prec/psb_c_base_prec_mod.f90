@@ -36,10 +36,11 @@
 module psb_c_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
-       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
+  use psb_base_mod, only : psb_spk_, psb_long_int_k_,&
+       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
-       & psb_cspmat_type, psb_c_base_vect, psb_c_vect_type
+       & psb_c_base_sparse_mat, psb_cspmat_type, psb_c_csr_sparse_mat,& 
+       & psb_c_base_vect_type, psb_c_vect_type
 
   use psb_prec_const_mod
 
@@ -73,7 +74,7 @@ module psb_c_base_prec_mod
 contains
 
   subroutine psb_c_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
+    implicit none 
     type(psb_desc_type),intent(in)        :: desc_data
     class(psb_c_base_prec_type), intent(inout)  :: prec
     complex(psb_spk_),intent(in)          :: alpha, beta
@@ -83,7 +84,7 @@ contains
     character(len=1), optional            :: trans
     complex(psb_spk_),intent(inout), optional, target :: work(:)
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_base_prec_apply'
+    character(len=20)  :: name='c_base_prec_apply'
 
     call psb_erractionsave(err_act)
 
@@ -109,7 +110,7 @@ contains
   end subroutine psb_c_base_apply_vect
 
   subroutine psb_c_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
+    implicit none 
     type(psb_desc_type),intent(in)       :: desc_data
     class(psb_c_base_prec_type), intent(in)  :: prec
     complex(psb_spk_),intent(in)         :: alpha, beta
@@ -145,10 +146,8 @@ contains
   end subroutine psb_c_base_apply
 
   subroutine psb_c_base_precinit(prec,info)
-    
-    use psb_base_mod
     Implicit None
-    
+   
     class(psb_c_base_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
@@ -177,8 +176,6 @@ contains
   end subroutine psb_c_base_precinit
 
   subroutine psb_c_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-    
-    use psb_base_mod
     Implicit None
     
     type(psb_cspmat_type), intent(in), target :: a
@@ -215,8 +212,6 @@ contains
   end subroutine psb_c_base_precbld
 
   subroutine psb_c_base_precseti(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_c_base_prec_type),intent(inout) :: prec
@@ -249,8 +244,6 @@ contains
   end subroutine psb_c_base_precseti
 
   subroutine psb_c_base_precsetr(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_c_base_prec_type),intent(inout) :: prec
@@ -283,8 +276,6 @@ contains
   end subroutine psb_c_base_precsetr
 
   subroutine psb_c_base_precsetc(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_c_base_prec_type),intent(inout) :: prec
@@ -317,8 +308,6 @@ contains
   end subroutine psb_c_base_precsetc
 
   subroutine psb_c_base_precfree(prec,info)
-    
-    use psb_base_mod
     Implicit None
 
     class(psb_c_base_prec_type), intent(inout) :: prec
@@ -352,8 +341,6 @@ contains
   
 
   subroutine psb_c_base_precdescr(prec,iout)
-    
-    use psb_base_mod
     Implicit None
 
     class(psb_c_base_prec_type), intent(in) :: prec
@@ -386,13 +373,12 @@ contains
   end subroutine psb_c_base_precdescr
   
   subroutine psb_c_base_precdump(prec,info,prefix,head)
-    use psb_base_mod
     implicit none 
     class(psb_c_base_prec_type), intent(in) :: prec
     integer, intent(out)             :: info
     character(len=*), intent(in), optional :: prefix,head
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_base_precdump'
+    character(len=20)  :: name='c_base_precdump'
 
     call psb_erractionsave(err_act)
 
@@ -418,7 +404,6 @@ contains
   end subroutine psb_c_base_precdump
 
   subroutine psb_c_base_set_ctxt(prec,ictxt)
-    use psb_base_mod
     implicit none 
     class(psb_c_base_prec_type), intent(inout) :: prec
     integer, intent(in)  :: ictxt
@@ -428,7 +413,6 @@ contains
   end subroutine psb_c_base_set_ctxt
 
   function psb_c_base_sizeof(prec) result(val)
-    use psb_base_mod
     class(psb_c_base_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     
@@ -437,7 +421,6 @@ contains
   end function psb_c_base_sizeof
 
   function psb_c_base_get_ctxt(prec) result(val)
-    use psb_base_mod
     class(psb_c_base_prec_type), intent(in) :: prec
     integer :: val
     

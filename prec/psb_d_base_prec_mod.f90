@@ -36,12 +36,12 @@
 module psb_d_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
-       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
+  use psb_base_mod, only : psb_dpk_, psb_long_int_k_,&
+       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
-       & psb_dspmat_type, psb_d_base_vect, psb_d_vect_type
+       & psb_d_base_sparse_mat, psb_dspmat_type, psb_d_csr_sparse_mat,& 
+       & psb_d_base_vect_type, psb_d_vect_type
 
-  
   use psb_prec_const_mod
 
   type psb_d_base_prec_type
@@ -64,7 +64,7 @@ module psb_d_base_prec_mod
     procedure, pass(prec) :: dump      => psb_d_base_precdump
     procedure, pass(prec) :: get_nzeros => psb_d_base_get_nzeros
   end type psb_d_base_prec_type
-
+  
   private :: psb_d_base_apply, psb_d_base_precbld, psb_d_base_precseti,&
        & psb_d_base_precsetr, psb_d_base_precsetc, psb_d_base_sizeof,&
        & psb_d_base_precinit, psb_d_base_precfree, psb_d_base_precdescr,&
@@ -74,14 +74,14 @@ module psb_d_base_prec_mod
 contains
 
   subroutine psb_d_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
+    implicit none 
+    type(psb_desc_type),intent(in)        :: desc_data
     class(psb_d_base_prec_type), intent(inout)  :: prec
-    real(psb_dpk_),intent(in)         :: alpha, beta
+    real(psb_dpk_),intent(in)          :: alpha, beta
     type(psb_d_vect_type),intent(inout)   :: x
     type(psb_d_vect_type),intent(inout)   :: y
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
+    integer, intent(out)                  :: info
+    character(len=1), optional            :: trans
     real(psb_dpk_),intent(inout), optional, target :: work(:)
     Integer :: err_act, nrow
     character(len=20)  :: name='d_base_prec_apply'
@@ -110,14 +110,14 @@ contains
   end subroutine psb_d_base_apply_vect
 
   subroutine psb_d_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
+    implicit none 
+    type(psb_desc_type),intent(in)       :: desc_data
     class(psb_d_base_prec_type), intent(in)  :: prec
     real(psb_dpk_),intent(in)         :: alpha, beta
     real(psb_dpk_),intent(inout)      :: x(:)
     real(psb_dpk_),intent(inout)      :: y(:)
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
+    integer, intent(out)                 :: info
+    character(len=1), optional           :: trans
     real(psb_dpk_),intent(inout), optional, target :: work(:)
     Integer :: err_act, nrow
     character(len=20)  :: name='d_base_prec_apply'
@@ -146,10 +146,8 @@ contains
   end subroutine psb_d_base_apply
 
   subroutine psb_d_base_precinit(prec,info)
-    
-    use psb_base_mod
     Implicit None
-    
+   
     class(psb_d_base_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
@@ -178,8 +176,6 @@ contains
   end subroutine psb_d_base_precinit
 
   subroutine psb_d_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-    
-    use psb_base_mod
     Implicit None
     
     type(psb_dspmat_type), intent(in), target :: a
@@ -189,7 +185,7 @@ contains
     character, intent(in), optional           :: upd
     character(len=*), intent(in), optional    :: afmt
     class(psb_d_base_sparse_mat), intent(in), optional :: amold
-    class(psb_d_base_vect_type), intent(in), optional   :: vmold
+    class(psb_d_base_vect_type), intent(in), optional  :: vmold
     Integer :: err_act, nrow
     character(len=20)  :: name='d_base_precbld'
 
@@ -216,8 +212,6 @@ contains
   end subroutine psb_d_base_precbld
 
   subroutine psb_d_base_precseti(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_d_base_prec_type),intent(inout) :: prec
@@ -250,8 +244,6 @@ contains
   end subroutine psb_d_base_precseti
 
   subroutine psb_d_base_precsetr(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_d_base_prec_type),intent(inout) :: prec
@@ -284,8 +276,6 @@ contains
   end subroutine psb_d_base_precsetr
 
   subroutine psb_d_base_precsetc(prec,what,val,info)
-    
-    use psb_base_mod
     Implicit None
     
     class(psb_d_base_prec_type),intent(inout) :: prec
@@ -318,8 +308,6 @@ contains
   end subroutine psb_d_base_precsetc
 
   subroutine psb_d_base_precfree(prec,info)
-    
-    use psb_base_mod
     Implicit None
 
     class(psb_d_base_prec_type), intent(inout) :: prec
@@ -353,8 +341,6 @@ contains
   
 
   subroutine psb_d_base_precdescr(prec,iout)
-    
-    use psb_base_mod
     Implicit None
 
     class(psb_d_base_prec_type), intent(in) :: prec
@@ -387,7 +373,6 @@ contains
   end subroutine psb_d_base_precdescr
   
   subroutine psb_d_base_precdump(prec,info,prefix,head)
-    use psb_base_mod
     implicit none 
     class(psb_d_base_prec_type), intent(in) :: prec
     integer, intent(out)             :: info
@@ -419,7 +404,6 @@ contains
   end subroutine psb_d_base_precdump
 
   subroutine psb_d_base_set_ctxt(prec,ictxt)
-    use psb_base_mod
     implicit none 
     class(psb_d_base_prec_type), intent(inout) :: prec
     integer, intent(in)  :: ictxt
@@ -429,7 +413,6 @@ contains
   end subroutine psb_d_base_set_ctxt
 
   function psb_d_base_sizeof(prec) result(val)
-    use psb_base_mod
     class(psb_d_base_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     
@@ -438,7 +421,6 @@ contains
   end function psb_d_base_sizeof
 
   function psb_d_base_get_ctxt(prec) result(val)
-    use psb_base_mod
     class(psb_d_base_prec_type), intent(in) :: prec
     integer :: val
     
@@ -453,6 +435,5 @@ contains
     res = 0
 
   end function psb_d_base_get_nzeros
-
 
 end module psb_d_base_prec_mod
