@@ -153,12 +153,11 @@ subroutine psb_s_apply1_vect(prec,x,desc_data,info,trans,work)
     goto 9999
   end if
 
-  call psb_geall(ww,desc_data,info)
-  if (info == 0) call psb_geasb(ww,desc_data,info,mold=x%v)
+  call psb_geasb(ww,desc_data,info,mold=x%v,scratch=.true.)
   if (info == 0) call prec%prec%apply(sone,x,szero,ww,desc_data,info,&
        & trans=trans_,work=work_)
   if (info == 0) call psb_geaxpby(sone,ww,szero,x,desc_data,info)
-
+  call psb_gefree(ww,desc_data,info)
   if (present(work)) then 
   else
     deallocate(work_,stat=info)
