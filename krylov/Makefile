@@ -22,7 +22,7 @@ LIBMOD=psb_krylov_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(METHDLIBNAME)	
 
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

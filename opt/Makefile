@@ -10,7 +10,7 @@ LDLIBS=$(PSBLDLIBS)
 # Compilers and such
 #
 CCOPT= -g
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
 HERE=.
 LIBMOD=*$(.mod)
 
