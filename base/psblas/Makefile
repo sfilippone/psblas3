@@ -14,7 +14,7 @@ OBJS= psb_ddot.o psb_damax.o psb_dasum.o psb_daxpby.o\
 
 LIBDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
 
 
 lib: $(OBJS) 
