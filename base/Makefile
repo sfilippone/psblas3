@@ -3,10 +3,10 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 LIBNAME=$(BASELIBNAME)
-LIBMOD=psb_base_mod$(.mod)
+
 lib: mods sr cm in pb tl
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) *$(.mod) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 sr cm in pb tl: mods
 
