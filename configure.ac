@@ -91,9 +91,9 @@ esac
 AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR])
 
 # Note that the following line won't save from troubles.
-AC_PROG_FC([xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
-AC_PROG_F77([xlf pgf77 ifort ifc nagfor gfortran])
-AC_PROG_CC([xlc pgcc icc gcc ])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_F77([ftn xlf pgf77 ifort ifc nagfor gfortran])
+AC_PROG_CC([xlc pgcc icc gcc cc ])
 dnl AC_PROG_CXX
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
@@ -135,7 +135,7 @@ AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90  ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
@@ -143,7 +143,7 @@ ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fort
 AC_LANG(Fortran 77)
 if test "X$MPIF77" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIF77],[mpxlf mpf77 mpif77])
+    AC_CHECK_PROGS([MPIF77],[mpxlf mpf77 mpif77 ftn])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran 77]])])
 FC="$MPIFC" ;
@@ -212,6 +212,10 @@ dnl NOTE : in /autoconf/autoconf/fortran.m4 there are plenty of better tests!
 
 PAC_CHECK_HAVE_GFORTRAN(
 	[psblas_cv_fc="gcc"],
+)
+
+PAC_CHECK_HAVE_CRAYFTN(
+	[psblas_cv_fc="cray"],
 )
 
 if test x"$psblas_cv_fc" == "x" ; then
@@ -354,7 +358,9 @@ if test "X$CCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      CCOPT="-fast $CCOPT"
-  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     CCOPT="-O3 $CCOPT"
+     MPICC="cc"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # using GCC in conjunction with NAG.
      CCOPT="-O2"
@@ -382,6 +388,8 @@ if test "X$FCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     FCOPT="-O3 -em $FCOPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG  compiler ..
      FCOPT="-O2 "
@@ -412,6 +420,9 @@ if test "X$F90COPT" == "X" ; then
      F90COPT="-fast $F90COPT"
  elif test "X$psblas_cv_fc" == X"sun" ; then
      F90COPT="-fast $F90COPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     MPIFC="ftn"
+     F90COPT="-O3 -em $F90COPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG compiler
      F90COPT="-O2"

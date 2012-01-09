@@ -2773,7 +2773,7 @@ ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
+  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -2817,7 +2817,7 @@ fi
 fi
 if test -z "$FC"; then
   ac_ct_FC=$FC
-  for ac_prog in xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
+  for ac_prog in ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3211,7 +3211,7 @@ ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
 ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_f77_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlf pgf77 ifort ifc nagfor gfortran
+  for ac_prog in ftn xlf pgf77 ifort ifc nagfor gfortran
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -3255,7 +3255,7 @@ fi
 fi
 if test -z "$F77"; then
   ac_ct_F77=$F77
-  for ac_prog in xlf pgf77 ifort ifc nagfor gfortran
+  for ac_prog in ftn xlf pgf77 ifort ifc nagfor gfortran
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3423,7 +3423,7 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlc pgcc icc gcc
+  for ac_prog in xlc pgcc icc gcc cc
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -3467,7 +3467,7 @@ fi
 fi
 if test -z "$CC"; then
   ac_ct_CC=$CC
-  for ac_prog in xlc pgcc icc gcc
+  for ac_prog in xlc pgcc icc gcc cc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4059,7 +4059,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    for ac_prog in mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90
+    for ac_prog in mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90 ftn
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4337,7 +4337,7 @@ ac_compiler_gnu=$ac_cv_f77_compiler_gnu
 
 if test "X$MPIF77" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    for ac_prog in mpxlf mpf77 mpif77
+    for ac_prog in mpxlf mpf77 mpif77 ftn
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -5509,6 +5509,33 @@ else
 fi
 rm -f conftest*
 
+ac_exeext=''
+ac_ext='F'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+
+cat > conftest.$ac_ext <<EOF
+           program main
+#ifdef _CRAYFTN
+              print *, "Cray FTN!"
+#else
+        this program will fail
+#endif
+           end
+
+EOF
+if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_link\""; } >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  psblas_cv_fc="cray"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+fi
+rm -f conftest*
+
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
 	psblas_cv_fc="xlf"
@@ -6257,7 +6284,9 @@ if test "X$CCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      CCOPT="-fast $CCOPT"
-  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     CCOPT="-O3 $CCOPT"
+     MPICC="cc"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # using GCC in conjunction with NAG.
      CCOPT="-O2"
@@ -6285,6 +6314,8 @@ if test "X$FCOPT" == "X" ; then
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     FCOPT="-O3 -em $FCOPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG  compiler ..
      FCOPT="-O2 "
@@ -6315,6 +6346,9 @@ if test "X$F90COPT" == "X" ; then
      F90COPT="-fast $F90COPT"
  elif test "X$psblas_cv_fc" == X"sun" ; then
      F90COPT="-fast $F90COPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     MPIFC="ftn"
+     F90COPT="-O3 -em $F90COPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG compiler
      F90COPT="-O2"
