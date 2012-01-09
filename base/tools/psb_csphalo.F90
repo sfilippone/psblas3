@@ -97,6 +97,11 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
+
+  Call psb_info(ictxt, me, np)
+
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': Start'
 
@@ -131,11 +136,6 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   else
     outfmt_ = 'CSR'
   endif
-
-  ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
-
-  Call psb_info(ictxt, me, np)
 
   Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
