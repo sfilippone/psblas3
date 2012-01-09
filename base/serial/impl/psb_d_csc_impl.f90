@@ -2267,7 +2267,7 @@ subroutine psb_d_mv_csc_from_coo(a,b,info)
   Integer             :: nza, nr, i,j,irw, err_act, nc, icl
   Integer, Parameter  :: maxtry=8
   integer              :: debug_level, debug_unit
-  character(len=20)   :: name='d_mv_csc_from_coo'ì
+  character(len=20)   :: name='d_mv_csc_from_coo'
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
