@@ -13,8 +13,6 @@ MODOBJS=psb_prec_const_mod.o\
 	psb_z_diagprec.o psb_z_nullprec.o psb_z_bjacprec.o 
 
 
-LIBMOD=psb_prec_mod$(.mod)
-LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(PRECLIBNAME)
 COBJS=
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
@@ -24,12 +22,12 @@ lib:  $(OBJS) impld
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 impld: $(OBJS)
 	cd impl && $(MAKE)
 
-$(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
+$(OBJS): $(LIBDIR)/psb_base_mod.o
 
 
 psb_s_base_prec_mod.o psb_d_base_prec_mod.o psb_c_base_prec_mod.o psb_z_base_prec_mod.o: psb_prec_const_mod.o
