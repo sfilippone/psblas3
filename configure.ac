@@ -470,12 +470,18 @@ fi
 ##############################################################################
 #			Include flags
 ##############################################################################
-AX_F90_MODULE_EXTENSION
-AX_F90_MODULE_FLAG
-MODEXT=".$ax_cv_f90_modext"
-FMFLAG="${ax_cv_f90_modflag%%[ ]*}"
-FIFLAG=-I
-
+if test "X$psblas_cv_fc" == X"cray" 
+then
+   MODEXT=".mod"
+   FMFLAG="-I"
+   FIFLAG="-I"
+else 
+   AX_F90_MODULE_EXTENSION
+   AX_F90_MODULE_FLAG
+   MODEXT=".$ax_cv_f90_modext"
+   FMFLAG="${ax_cv_f90_modflag%%[ ]*}"
+   FIFLAG=-I
+fi
 ###############################################################################
 
 ###############################################################################

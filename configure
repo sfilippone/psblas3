@@ -6396,6 +6396,12 @@ fi
 ##############################################################################
 #			Include flags
 ##############################################################################
+if test "X$psblas_cv_fc" == X"cray"
+then
+   MODEXT=".mod"
+   FMFLAG="-I"
+   FIFLAG="-I"
+else
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking fortran 90 modules extension" >&5
 $as_echo_n "checking fortran 90 modules extension... " >&6; }
@@ -6514,10 +6520,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_f90_modflag" >&5
 $as_echo "$ax_cv_f90_modflag" >&6; }
-MODEXT=".$ax_cv_f90_modext"
-FMFLAG="${ax_cv_f90_modflag%% *}"
-FIFLAG=-I
-
+   MODEXT=".$ax_cv_f90_modext"
+   FMFLAG="${ax_cv_f90_modflag%% *}"
+   FIFLAG=-I
+fi
 ###############################################################################
 
 ###############################################################################
