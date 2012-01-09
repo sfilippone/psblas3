@@ -26,7 +26,7 @@ lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2) $(MPFOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) $(COBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
-$(FOBJS) $(FBOJS2): $(MODDIR)/psi_mod$(.mod)
+$(FOBJS) $(FBOJS2): $(MODDIR)/psi_mod.o
 mpfobjs: 
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")	
 	(make $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
