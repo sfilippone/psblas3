@@ -10,22 +10,20 @@ FINAL subroutines), but the features we use were sufficient in
 identifying bugs in ALL compilers we tried (all the bugs have been
 reported and mostly fixed by the respective vendors). 
 
-Notes: This code is confirmed to work with NAGware 5.2 on an i686 and
-       XLF 13.1 on a POWER6.  
-       It does NOT work with GNU Fortran 4.5; it is one of the
-       testbeds for GNU Fortran 4.6.
-       GNU 4.6.0: as of Sep. 2, 2010 it works; note however that the 
-       configure script will define the HAVE_MOLD compilation flag,
-       and this does not work properly until the fix for PR45451 is
-       available. Until then, you'll need to take out  HAVE_MOLD by
-       hand in Make.inc. 
-        
+Notes: This code is confirmed to work with the following compilers 
+       (as well as newer versions):
+       NAGware 5.2 and subsequent;
+       XLF 13.1;
+       GNU 4.6.1;  
+       Cray CCE 7.4.4;
+       All these are recognized by the configure script. 
        If you find it working with other compilers, please let us
        know. 
+       The Intel compiler up to version 12.1 fails. 
 
        The "undocumented" in the warning above refers to the
        internals; the new internals have been completely overhauled,
-       and in many cases rewritten; they are supposed to enable much
+       and in many cases rewritten; they now enable a much
        better interfacing with user-defined storage formats. If the
        user is only interested in the predefined formats, then the
        user's guide should be sufficient; what is lacking is
@@ -38,18 +36,6 @@ S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
 ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 
-PLATFORMS: 
-
-OBSOLETE!!!!!!!! see above ... 
---The compilation process relies on the choice of an appropriate
---Make.inc file; we have tested with AIX XLF, Intel ifort/Linux,  Nag
---f95/Linux, GNU Fortran/Linux, Sun Forte 6.2. If you succeed in
---compiling with  other compiler/operating systems please let us know. 
-
-
-LINUX:
-
-
 
 UTILITIES
 The test/util directory contains some utilities to convert to/from
@@ -58,7 +44,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 
-See docs/psblas-2.3.pdf; an HTML version of the same document is
+See docs/psblas-3.0.pdf; an HTML version of the same document is
 available in docs/html. 
 Please consult the sample programs, especially test/pargen/ppde.f90. 
 
@@ -145,8 +131,11 @@ If you are looking for more sophisticated preconditioners, you may be
 interested in the package  MLD2P4 from http://www.mld2p4.it 
 
 
-
 Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
+
+Credits for version 3.0:
+Salvatore  Filippone
+Alfredo    Buttari
 
 Credits for version 2.2:
 Michele Martone contributed the initial version of the configure
