@@ -82,6 +82,7 @@ subroutine psb_s_base_cp_to_fmt(a,b,info)
   !
   ! Default implementation
   ! 
+  info = psb_success_
   call a%cp_to_coo(tmp,info)
   if (info == psb_success_) call b%mv_from_coo(tmp,info)
 
@@ -106,6 +107,7 @@ subroutine psb_s_base_cp_from_fmt(a,b,info)
   !
   ! Default implementation
   ! 
+  info = psb_success_
   call b%cp_to_coo(tmp,info)
   if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
@@ -186,7 +188,7 @@ subroutine psb_s_base_mv_to_fmt(a,b,info)
   !
   ! Default implementation
   ! 
-
+  info = psb_success_
   call a%mv_to_coo(tmp,info)
   if (info == psb_success_) call b%mv_from_coo(tmp,info)
 
@@ -211,6 +213,7 @@ subroutine psb_s_base_mv_from_fmt(a,b,info)
   !
   ! Default implementation
   ! 
+  info = psb_success_
   call b%mv_to_coo(tmp,info)
   if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
