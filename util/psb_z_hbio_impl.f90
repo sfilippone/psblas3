@@ -254,8 +254,7 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   character(len=*), parameter :: fmt11='(a3,11x,2i14)'
   character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
 
-  type(psb_z_csc_sparse_mat), target  ::  acsc
-  type(psb_z_csc_sparse_mat), pointer ::  acpnt
+  type(psb_z_csc_sparse_mat)  ::  acsc
   character(len=72) :: mtitle_
   character(len=8)  :: key_
 
@@ -297,23 +296,13 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   endif
 
 
-  select type(aa=>a%a)
-  type is (psb_z_csc_sparse_mat)
-
-    acpnt => aa
-
-    class default
-
-    call acsc%cp_from_fmt(aa, iret)
-    if (iret /= 0) return
-    acpnt => acsc
-
-  end select
+  call acsc%cp_from_fmt(a%a, iret)
+  if (iret /= 0) return
 
 
-  nrow   = acpnt%get_nrows()
-  ncol   = acpnt%get_ncols()
-  nnzero = acpnt%get_nzeros()
+  nrow   = acsc%get_nrows()
+  ncol   = acsc%get_ncols()
+  nnzero = acsc%get_nzeros()
 
   neltvl = 0 
 
@@ -352,9 +341,9 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   write (iout,fmt=fmt10) mtitle_,key_,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
        &  type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
   if (rhscrd > 0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
-  write (iout,fmt=ptrfmt) (acpnt%icp(i),i=1,ncol+1)
-  write (iout,fmt=indfmt) (acpnt%ia(i),i=1,nnzero)
-  if (valcrd > 0) write (iout,fmt=valfmt) (acpnt%val(i),i=1,nnzero)
+  write (iout,fmt=ptrfmt) (acsc%icp(i),i=1,ncol+1)
+  write (iout,fmt=indfmt) (acsc%ia(i),i=1,nnzero)
+  if (valcrd > 0) write (iout,fmt=valfmt) (acsc%val(i),i=1,nnzero)
   if (rhscrd > 0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
   if (present(g).and.(rhscrd>0)) write (iout,fmt=rhsfmt) (g(i),i=1,nrow)
   if (present(x).and.(rhscrd>0)) write (iout,fmt=rhsfmt) (x(i),i=1,nrow)
@@ -372,4 +361,3 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine zhb_write
-
