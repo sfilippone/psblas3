@@ -4,7 +4,7 @@ include ../../Make.inc
 #
 LIBDIR=../../lib/
 OPTDIR=../../opt
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_base -L$(OPTDIR) -lpsb_opt $(RSB_LIBS) 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_base -L$(OPTDIR)  $(RSB_LIBS) 
 #-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
@@ -23,11 +23,10 @@ all: d_coo_matgen d_matgen
 d_coo_matgen: d_coo_matgen.o 
 	$(F90LINK) $(LINKOPT) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/cp -p $(CPUPDFLAG) d_coo_matgen $(EXEDIR)	
-	#/bin/mv d_coo_matgen $(EXEDIR)	
 
 psb_d_cxx_impl.o d_matgen.o: psb_d_cxx_mat_mod.o 
 psb_d_cyy_impl.o d_matgen.o: psb_d_cyy_mat_mod.o 
-d_matgen.o: psb_d_czz_mat_mod.o 
+
 d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  
 	$(F90LINK) $(LINKOPT) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o\
 	 psb_d_cyy_impl.o  -o d_matgen  $(PSBLAS_LIB) $(LDLIBS) $(RSB_EXTRA)
