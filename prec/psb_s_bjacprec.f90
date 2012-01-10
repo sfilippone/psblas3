@@ -5,7 +5,6 @@ module psb_s_bjacprec
   type, extends(psb_s_base_prec_type)   :: psb_s_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
     type(psb_sspmat_type), allocatable  :: av(:)
-    real(psb_spk_), allocatable      :: d(:)
     type(psb_s_vect_type), allocatable  :: dv
   contains
     procedure, pass(prec) :: s_apply_v => psb_s_bjac_apply_vect
@@ -30,16 +29,16 @@ module psb_s_bjacprec
        &  'ILU(eps)      '/)
 
   
-  interface  psb_s_bjac_dump
+  interface  
     subroutine psb_s_bjac_dump(prec,info,prefix,head)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       class(psb_s_bjac_prec_type), intent(in) :: prec
       integer, intent(out)                    :: info
       character(len=*), intent(in), optional  :: prefix,head
     end subroutine psb_s_bjac_dump
-  end interface psb_s_bjac_dump
+  end interface
 
-  interface  psb_s_bjac_apply_vect
+  interface  
     subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
@@ -51,9 +50,9 @@ module psb_s_bjacprec
       character(len=1), optional        :: trans
       real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_bjac_apply_vect
-  end interface psb_s_bjac_apply_vect
+  end interface
 
-  interface  psb_s_bjac_apply
+  interface
     subroutine psb_s_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       
@@ -66,17 +65,17 @@ module psb_s_bjacprec
       character(len=1), optional        :: trans
       real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_bjac_apply
-  end interface psb_s_bjac_apply
+  end interface
   
-  interface  psb_s_bjac_precinit
+  interface
     subroutine psb_s_bjac_precinit(prec,info)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       class(psb_s_bjac_prec_type),intent(inout) :: prec
       integer, intent(out)                     :: info
     end subroutine psb_s_bjac_precinit
-  end interface psb_s_bjac_precinit
+  end interface
   
-  interface  psb_s_bjac_precbld
+  interface
     subroutine psb_s_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_, &
            & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type
@@ -89,9 +88,9 @@ module psb_s_bjacprec
       class(psb_s_base_sparse_mat), intent(in), optional :: amold
       class(psb_s_base_vect_type), intent(in), optional  :: vmold
     end subroutine psb_s_bjac_precbld
-  end interface psb_s_bjac_precbld
+  end interface
   
-  interface  psb_s_bjac_precseti
+  interface
     subroutine psb_s_bjac_precseti(prec,what,val,info)
       import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       class(psb_s_bjac_prec_type),intent(inout) :: prec
@@ -99,9 +98,9 @@ module psb_s_bjacprec
       integer, intent(in)                      :: val 
       integer, intent(out)                     :: info
     end subroutine psb_s_bjac_precseti
-  end interface psb_s_bjac_precseti
+  end interface
   
-!!$  interface  psb_s_bjac_precsetr
+!!$  interface
 !!$    subroutine psb_s_bjac_precsetr(prec,what,val,info)
 !!$      import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
 !!$      class(psb_s_bjac_prec_type),intent(inout) :: prec
@@ -109,9 +108,9 @@ module psb_s_bjacprec
 !!$      real(psb_spk_), intent(in)               :: val 
 !!$      integer, intent(out)                     :: info
 !!$    end subroutine psb_s_bjac_precsetr
-!!$  end interface psb_s_bjac_precsetr
+!!$  end interface
 !!$  
-!!$  interface  psb_s_bjac_precsetc
+!!$  interface
 !!$    subroutine psb_s_bjac_precsetc(prec,what,val,info)
 !!$      import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
 !!$      class(psb_s_bjac_prec_type),intent(inout) :: prec
@@ -119,15 +118,15 @@ module psb_s_bjacprec
 !!$      character(len=*), intent(in)             :: val
 !!$      integer, intent(out)                     :: info
 !!$    end subroutine psb_s_bjac_precsetc
-!!$  end interface psb_s_bjac_precsetc
+!!$  end interface
 !!$  
-!!$  interface  psb_s_bjac_precfree
+!!$  interface 
 !!$    subroutine psb_s_bjac_precfree(prec,info)
 !!$      import :: psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
 !!$      class(psb_s_bjac_prec_type), intent(inout) :: prec
 !!$      integer, intent(out)                :: info
 !!$    end subroutine psb_s_bjac_precfree
-!!$  end interface psb_s_bjac_precfree
+!!$  end interface 
 
 contains
 
@@ -280,9 +279,7 @@ contains
       enddo
       deallocate(prec%av,stat=info)
     end if
-    if (allocated(prec%d)) then 
-      deallocate(prec%d,stat=info)
-    end if
+
     if (allocated(prec%dv)) then 
       call prec%dv%free(info)
       if (info == 0) deallocate(prec%dv,stat=info)

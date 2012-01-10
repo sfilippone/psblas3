@@ -31,8 +31,8 @@ subroutine psb_c_bjac_dump(prec,info,prefix,head)
   if (prec%av(psb_l_pr_)%is_asb())  &
        & call prec%av(psb_l_pr_)%print(fname,head=head)
   write(fname(lname+1:),'(a,a)')'_diag.mtx'
-  if (allocated(prec%d)) &
-       & call psb_geprt(fname,prec%d,head=head)
+  if (allocated(prec%dv)) &
+       & call psb_geprt(fname,prec%dv%v%v,head=head)
   write(fname(lname+1:),'(a)')'_upper.mtx'
   if (prec%av(psb_u_pr_)%is_asb()) &
        & call prec%av(psb_u_pr_)%print(fname,head=head)
@@ -503,7 +503,7 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       call prec%av(psb_l_pr_)%trim()
       call prec%av(psb_u_pr_)%trim()
       call prec%dv%bld(dd)
-      call move_alloc(dd,prec%d)
+      ! call move_alloc(dd,prec%d)
     else
       info=psb_err_from_subroutine_
       ch_err='psb_ilu_fct'

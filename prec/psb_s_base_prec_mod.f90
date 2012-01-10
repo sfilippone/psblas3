@@ -38,6 +38,7 @@ module psb_s_base_prec_mod
   ! Reduces size of .mod file.
   use psb_base_mod, only : psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
+       & psb_sizeof_int, psb_sizeof_long_int, psb_sizeof_sp, psb_sizeof_dp, &
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus, psb_success_,&
        & psb_s_base_sparse_mat, psb_sspmat_type, psb_s_csr_sparse_mat,& 
        & psb_s_base_vect_type, psb_s_vect_type

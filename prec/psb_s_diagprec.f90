@@ -26,7 +26,7 @@ module psb_s_diagprec
   
   
   
-  interface  psb_s_diag_apply_vect
+  interface  
     subroutine psb_s_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_s_diag_prec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
@@ -38,9 +38,9 @@ module psb_s_diagprec
       character(len=1), optional        :: trans
       real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_diag_apply_vect
-  end interface psb_s_diag_apply_vect
+  end interface
   
-  interface  psb_s_diag_apply
+  interface  
     subroutine psb_s_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_s_diag_prec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
@@ -52,9 +52,9 @@ module psb_s_diagprec
       character(len=1), optional        :: trans
       real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_diag_apply
-  end interface psb_s_diag_apply
+  end interface
   
-  interface  psb_s_diag_precbld
+  interface
     subroutine psb_s_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       import :: psb_desc_type, psb_s_diag_prec_type, psb_s_vect_type, psb_spk_, &
            & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type
@@ -67,7 +67,7 @@ module psb_s_diagprec
       class(psb_s_base_sparse_mat), intent(in), optional :: amold
       class(psb_s_base_vect_type), intent(in), optional  :: vmold
     end subroutine psb_s_diag_precbld
-  end interface psb_s_diag_precbld
+  end interface
   
 
 contains

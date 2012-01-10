@@ -21,7 +21,7 @@ module psb_z_nullprec
        & psb_z_null_precinit, psb_z_null_precfree, psb_z_null_precdescr
   
 
-  interface  psb_z_null_apply_vect
+  interface
     subroutine psb_z_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_z_null_prec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)       :: desc_data
@@ -32,11 +32,10 @@ module psb_z_nullprec
       integer, intent(out)                 :: info
       character(len=1), optional           :: trans
       complex(psb_dpk_),intent(inout), optional, target :: work(:)
-
     end subroutine psb_z_null_apply_vect
-  end interface psb_z_null_apply_vect
+  end interface
   
-  interface  psb_z_null_apply
+  interface
     subroutine psb_z_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_z_null_prec_type, psb_dpk_
       type(psb_desc_type),intent(in)       :: desc_data
@@ -48,7 +47,7 @@ module psb_z_nullprec
       character(len=1), optional           :: trans
       complex(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_z_null_apply
-  end interface psb_z_null_apply
+  end interface
   
   
 contains
