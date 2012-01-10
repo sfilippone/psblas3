@@ -69,7 +69,7 @@ module psb_d_prec_type
     module procedure psb_dprec_sizeof
   end interface
 
-  interface psb_d_apply2_vect
+  interface 
     subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)       :: desc_data
@@ -80,9 +80,9 @@ module psb_d_prec_type
       character(len=1), optional           :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2_vect
-  end interface psb_d_apply2_vect
+  end interface
   
-  interface  psb_d_apply1_vect
+  interface 
     subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
       import :: psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
         type(psb_desc_type),intent(in)       :: desc_data
@@ -92,9 +92,9 @@ module psb_d_prec_type
       character(len=1), optional           :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply1_vect
-  end interface psb_d_apply1_vect
+  end interface
   
-  interface  psb_d_apply2v
+  interface
     subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
       import :: psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
@@ -105,9 +105,9 @@ module psb_d_prec_type
       character(len=1), optional        :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2v
-  end interface psb_d_apply2v
+  end interface
   
-  interface  psb_d_apply1v
+  interface 
     subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
       import :: psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
@@ -116,7 +116,7 @@ module psb_d_prec_type
       integer, intent(out)              :: info
       character(len=1), optional        :: trans
     end subroutine psb_d_apply1v
-  end interface psb_d_apply1v
+  end interface
   
 contains
 
