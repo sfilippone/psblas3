@@ -441,6 +441,13 @@ contains
   end subroutine psi_i8amx_op
 
   subroutine psi_i8amn_op(inv, outv,len,type) 
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer(psb_long_int_k_) :: inv(*),outv(*)
     integer :: len,type
     integer :: i
