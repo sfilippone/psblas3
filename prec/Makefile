@@ -27,7 +27,7 @@ lib:  $(OBJS) impld
 impld: $(OBJS)
 	cd impl && $(MAKE)
 
-$(OBJS): $(LIBDIR)/psb_base_mod.o
+$(OBJS): $(LIBDIR)/$(BASEMODNAME)$(.mod)
 
 
 psb_s_base_prec_mod.o psb_d_base_prec_mod.o psb_c_base_prec_mod.o psb_z_base_prec_mod.o: psb_prec_const_mod.o

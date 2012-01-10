@@ -32,6 +32,7 @@ lib: $(OBJS)
 libpsb_opt.a: $(OBJS)
 	ar cur libpsb_opt.a $(OBJS)
 
+$(OBJS): $(LIBDIR)/$(BASEMODNAME)$(.mod)
 psb_d_ell_impl.o: psb_d_ell_mat_mod.o
 
 

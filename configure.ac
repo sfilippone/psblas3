@@ -466,15 +466,27 @@ fi
 if test "X$F90LINK" == "X" ; then
    F90LINK=${MPF90}
 fi
+
 ##############################################################################
+#
+#      Include flags and Module file names for dependencies.
+#
 ##############################################################################
-#			Include flags
-##############################################################################
+BASEMODNAME=psb_base_mod
+PRECMODNAME=psb_prec_mod
+METHDMODNAME=psb_krylov_mod
+UTILMODNAME=psb_util_mod
+
 if test "X$psblas_cv_fc" == X"cray" 
 then
    MODEXT=".mod"
    FMFLAG="-I"
    FIFLAG="-I"
+   BASEMODNAME=PSB_BASE_MOD
+   PRECMODNAME=PSB_PREC_MOD
+   METHDMODNAME=PSB_KRYLOV_MOD
+   UTILMODNAME=PSB_UTIL_MOD
+
 else 
    AX_F90_MODULE_EXTENSION
    AX_F90_MODULE_FLAG
@@ -719,10 +731,7 @@ LIBDIR=lib
 BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
 METHDLIBNAME=libpsb_krylov.a
-
-# Note: psb_util code will be compiled conditionally for METIS functionalities.. using HAVE_METIS
 UTILLIBNAME=libpsb_util.a
-
 
 ###############################################################################
 # Variable substitutions : the Make.inc.in will have these @VARIABLES@
@@ -730,6 +739,10 @@ UTILLIBNAME=libpsb_util.a
 
 AC_SUBST(FDEFINES)
 AC_SUBST(CDEFINES)
+AC_SUBST(BASEMODNAME)
+AC_SUBST(PRECMODNAME)
+AC_SUBST(METHDMODNAME)
+AC_SUBST(UTILMODNAME)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(F90)
 AC_SUBST(F90COPT)

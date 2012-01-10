@@ -18,7 +18,6 @@ F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
 	psb_zbicg.o psb_zcgstabl.o psb_zrgmres.o
 OBJS=$(F90OBJS) $(MODOBJS)
 
-LIBMOD=psb_krylov_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(METHDLIBNAME)	
 
@@ -28,13 +27,14 @@ lib: $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 
 psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o:  psb_base_inner_krylov_mod.o
 psb_inner_krylov_mod.o: psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o 
 $(F90OBJS): $(MODOBJS)
-$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)  $(LIBDIR)/psb_base_mod$(.mod)
+$(OBJS): $(LIBDIR)/$(PRECMODNAME)$(.mod)  $(LIBDIR)/$(BASEMODNAME)$(.mod)
+
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

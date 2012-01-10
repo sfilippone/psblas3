@@ -19,7 +19,6 @@ IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 MODOBJS=psb_util_mod.o $(BASEOBJS)
 COBJS=psb_amd_order.o
 OBJS=$(MODOBJS) $(IMPLOBJS) $(COBJS)
-LIBMOD=psb_util_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
@@ -27,12 +26,13 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR)
 
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 $(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
+$(OBJS): $(LIBDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
 
 veryclean: clean
