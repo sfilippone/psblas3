@@ -214,7 +214,7 @@ module psb_d_base_mat_mod
   !        can only be called for COO matrice, in which case it
   !        is more like queueing coefficients for later processing;
   !     2. If A is in the UPDATE state, then every derived class must
-  !        implement this;
+  !        implement it;
   !     3. In the UPDATE state, depending on the value of DUPL flag 
   !        inside A, it will be A=VAL or A = A + VAL
   !
@@ -725,12 +725,11 @@ module psb_d_base_mat_mod
 
   
   interface
-    subroutine psb_d_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
       import :: psb_d_coo_sparse_mat
       integer, intent(in)               :: iout
       class(psb_d_coo_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
-      integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
       integer, intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_d_coo_print
@@ -747,6 +746,12 @@ module psb_d_base_mat_mod
   end interface
   
   
+  !
+  ! Fix: make sure that
+  !   1. The coefficients are sorted
+  !   2. Handle duplicates if necessary.
+  !   Optional: IDIR: sort by rows or columns.
+  !
   interface 
     subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir) 
       import :: psb_dpk_

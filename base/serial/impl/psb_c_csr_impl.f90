@@ -2585,7 +2585,7 @@ subroutine  psb_c_csr_trim(a)
 
 end subroutine psb_c_csr_trim
 
-subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_c_csr_print(iout,a,iv,head,ivr,ivc)
   use psb_string_mod
   use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_print
   implicit none 
@@ -2593,7 +2593,6 @@ subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   integer, intent(in)               :: iout
   class(psb_c_csr_sparse_mat), intent(in) :: a   
   integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
@@ -2603,17 +2602,6 @@ subroutine psb_c_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
-
-  if (present(eirs)) then 
-    irs = eirs
-  else
-    irs = 0
-  endif
-  if (present(eics)) then 
-    ics = eics
-  else
-    ics = 0
-  endif
 
   if (present(head)) then 
     write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'

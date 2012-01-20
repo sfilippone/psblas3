@@ -1036,7 +1036,7 @@ dnl would fail even when linking in the compiler's library)
 AC_DEFUN([PAC_BLAS], [
 AC_PREREQ(2.50)
 AC_REQUIRE([AC_F77_LIBRARY_LDFLAGS])
-pac_blas_ok=no
+pac_blas_ok=no 
 
 AC_ARG_WITH(blas,
 	[AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])

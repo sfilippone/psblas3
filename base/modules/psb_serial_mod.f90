@@ -456,107 +456,99 @@ module psb_serial_mod
 
 contains
 
-  subroutine psb_scsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_scsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
     integer, intent(in)       :: iout
     type(psb_sspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+    call a%print(iout,iv,head,ivr,ivc)
 
   end subroutine psb_scsprt
 
-  subroutine psb_scsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_scsprtn(fname,a,iv,head,ivr,ivc)
     use psb_mat_mod
     character(len=*), intent(in)  :: fname   
     type(psb_sspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+    call a%print(fname,iv,head,ivr,ivc)
 
   end subroutine psb_scsprtn
 
-  subroutine psb_dcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_dcsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
     integer, intent(in)       :: iout
     type(psb_dspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+    call a%print(iout,iv,head,ivr,ivc)
 
   end subroutine psb_dcsprt
 
-  subroutine psb_dcsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_dcsprtn(fname,a,iv,head,ivr,ivc)
     use psb_mat_mod
     character(len=*), intent(in)  :: fname   
     type(psb_dspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+    call a%print(fname,iv,head,ivr,ivc)
 
   end subroutine psb_dcsprtn
 
-  subroutine psb_ccsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_ccsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
     integer, intent(in)       :: iout
     type(psb_cspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+    call a%print(iout,iv,head,ivr,ivc)
 
   end subroutine psb_ccsprt
 
-  subroutine psb_ccsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_ccsprtn(fname,a,iv,head,ivr,ivc)
     use psb_mat_mod
     character(len=*), intent(in)  :: fname   
     type(psb_cspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+    call a%print(fname,iv,head,ivr,ivc)
 
   end subroutine psb_ccsprtn
 
-  subroutine psb_zcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_zcsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
     integer, intent(in)       :: iout
     type(psb_zspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(iout,iv,irs,ics,head,ivr,ivc)
+    call a%print(iout,iv,head,ivr,ivc)
 
   end subroutine psb_zcsprt
 
-  subroutine psb_zcsprtn(fname,a,iv,irs,ics,head,ivr,ivc)
+  subroutine psb_zcsprtn(fname,a,iv,head,ivr,ivc)
     use psb_mat_mod
     character(len=*), intent(in)  :: fname   
     type(psb_zspmat_type), intent(in) :: a
     integer, intent(in), optional :: iv(:)
-    integer, intent(in), optional :: irs,ics
     character(len=*), optional    :: head
     integer, intent(in), optional :: ivr(:),ivc(:)
 
-    call a%print(fname,iv,irs,ics,head,ivr,ivc)
+    call a%print(fname,iv,head,ivr,ivc)
 
   end subroutine psb_zcsprtn
 

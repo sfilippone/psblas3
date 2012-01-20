@@ -140,12 +140,11 @@ module psb_c_csc_mat_mod
   end interface
 
   interface
-    subroutine psb_c_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    subroutine psb_c_csc_print(iout,a,iv,head,ivr,ivc)
       import :: psb_c_csc_sparse_mat
       integer, intent(in)               :: iout
       class(psb_c_csc_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
-      integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
       integer, intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_c_csc_print

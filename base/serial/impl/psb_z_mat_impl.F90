@@ -446,7 +446,7 @@ end subroutine psb_z_set_upper
 ! == ===================================  
 
 
-subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_z_sparse_print(iout,a,iv,head,ivr,ivc)
   use psb_z_mat_mod, psb_protect_name => psb_z_sparse_print
   use psb_error_mod
   implicit none 
@@ -454,7 +454,6 @@ subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   integer, intent(in)               :: iout
   class(psb_zspmat_type), intent(in) :: a   
   integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
@@ -470,7 +469,7 @@ subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     goto 9999
   endif
 
-  call a%a%print(iout,iv,eirs,eics,head,ivr,ivc)
+  call a%a%print(iout,iv,head,ivr,ivc)
 
   return
 
@@ -485,7 +484,7 @@ subroutine psb_z_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
 end subroutine psb_z_sparse_print
 
 
-subroutine psb_z_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_z_n_sparse_print(fname,a,iv,head,ivr,ivc)
   use psb_z_mat_mod, psb_protect_name => psb_z_n_sparse_print
   use psb_error_mod
   implicit none 
@@ -493,7 +492,6 @@ subroutine psb_z_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
   character(len=*), intent(in)  :: fname   
   class(psb_zspmat_type), intent(in) :: a   
   integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
@@ -522,7 +520,7 @@ subroutine psb_z_n_sparse_print(fname,a,iv,eirs,eics,head,ivr,ivc)
   end if
   open(iout,file=fname,iostat=info)
   if (info == psb_success_) then 
-    call a%a%print(iout,iv,eirs,eics,head,ivr,ivc)
+    call a%a%print(iout,iv,head,ivr,ivc)
     close(iout)
   else
     write(psb_err_unit,*) 'Error: could not open ',fname,' for output'

@@ -56,8 +56,8 @@
 !    an actual implementation. If it is not the case, the method
 !    defined at this level will raise an error. These methods are
 !    defined in the serial/f03/psb_base_mat_impl.f03 file
-
-
+!
+!
 
 module psb_base_mat_mod
   
@@ -178,7 +178,11 @@ module psb_base_mat_mod
  
   end type psb_base_sparse_mat
 
-
+  !
+  ! GET_NZ_ROW:
+  !    
+  !    count(A(idx,:)/=0) 
+  !
   interface 
     function psb_base_get_nz_row(idx,a) result(res)
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -188,6 +192,11 @@ module psb_base_mat_mod
     end function psb_base_get_nz_row
   end interface
   
+  !
+  ! GET_NZEROS: 
+  !    
+  !    count(A(:,:)/=0) 
+  !
   interface 
     function psb_base_get_nzeros(a) result(res)
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -196,6 +205,12 @@ module psb_base_mat_mod
     end function psb_base_get_nzeros
   end interface
 
+  !
+  ! GET_SIZE: how many items can A hold with
+  !           its current space allocation?
+  !           (as opposed to how many are
+  !            currently occupied) 
+  !    
   interface 
     function psb_base_get_size(a) result(res)
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -204,6 +219,10 @@ module psb_base_mat_mod
     end function psb_base_get_size
   end interface
 
+  !
+  ! REINIT: transition state from ASB to UPDATE
+  !         by default zero the coefficient values. 
+  !    
   interface 
     subroutine psb_base_reinit(a,clear)
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -212,17 +231,43 @@ module psb_base_mat_mod
     end subroutine psb_base_reinit
   end interface
   
+
+  !
+  ! PRINT:  print on file in Matrix Market format. 
+  !         Optional arguments:
+  !         head: header descriptive string.
+  !         iv: renumbering to be applied to both rows and columns
+  !         ivr, ivc: renumbering to be applied independently to
+  !                   rows and columns
+  !    
   interface 
-    subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_base_sparse_mat, psb_long_int_k_
       integer, intent(in)               :: iout
       class(psb_base_sparse_mat), intent(in) :: a   
       integer, intent(in), optional     :: iv(:)
-      integer, intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
       integer, intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_base_sparse_print
   end interface
+
+
+  !
+  ! GETPTN: Get the pattern.
+  !         Return a list of NZ pairs
+  !           (IA(i),JA(i))
+  !         each identifying the position of a nonzero in A
+  !         between row indices IMIN:IMAX.
+  !         IA,JA are reallocated as necessary.
+  !         Optional arguments:
+  !         iren: return (IREN(IA(:)),IREN(JA(:))
+  !         RSCALE: map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !         CSCALE: map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !
+  !         iren cannot be specified with rscale/cscale.   
+  !
+  !         APPEND: append to IA,JA; first new entry will be in NZIN+1
+  !           
 
   interface 
     subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
@@ -240,6 +285,12 @@ module psb_base_mat_mod
     end subroutine psb_base_csgetptn
   end interface
   
+  !
+  ! GETNEIGH: Get the neighbours of index IDX, i.e.
+  !           get the nonzero indices in its row.
+  !           Optional: LEV: recurse at LEV levels,
+  !           i.e. LEV=2 add neighours of neighbours of IDX, etc. 
+  !           
   interface 
     subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -252,6 +303,11 @@ module psb_base_mat_mod
     end subroutine psb_base_get_neigh
   end interface
   
+  !         
+  !  ALLOCATE_MNNZ: allocate/initialize empty for 
+  !         an MxN matrix capable of holding NZ nonzeros.
+  !         Note: NZ is usually an estimate
+  !
   interface 
     subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -261,6 +317,10 @@ module psb_base_mat_mod
     end subroutine psb_base_allocate_mnnz
   end interface
 
+  
+  !         
+  !  REALLOCATE_NZ: make room for NZ in an existing matrix
+  !
   interface 
     subroutine psb_base_reallocate_nz(nz,a) 
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -269,6 +329,9 @@ module psb_base_mat_mod
     end subroutine psb_base_reallocate_nz
   end interface
 
+  !         
+  !  FREE: name says all
+  !
   interface 
     subroutine psb_base_free(a) 
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -276,6 +339,10 @@ module psb_base_mat_mod
     end subroutine psb_base_free
   end interface
   
+  !         
+  !  TRIM: reallocate internal memory to the barest minimum
+  !        necessary to hold the current nonzeros. 
+  !
   interface 
     subroutine psb_base_trim(a) 
       import :: psb_base_sparse_mat, psb_long_int_k_
@@ -286,6 +353,10 @@ module psb_base_mat_mod
  
 contains
 
+  
+  !         
+  !  SIZEOF: size in bytes
+  !
   function psb_base_sizeof(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -293,12 +364,18 @@ contains
     res = 8
   end function psb_base_sizeof
  
+  !         
+  !  GET_FMT: descriptive name (e.g. COO CSR etc.)
+  !
   function psb_base_get_fmt() result(res)
     implicit none 
     character(len=5) :: res
     res = 'NULL'
   end function psb_base_get_fmt
   
+  !
+  ! Standard getter functions: self-explaining. 
+  !
   function psb_base_get_dupl(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -509,6 +586,12 @@ contains
     res = a%sorted
   end function psb_base_is_sorted
 
+
+  !
+  !  MV|CP_FROM: at base level they are the same.
+  !
+  !
+
   subroutine psb_base_mv_from(a,b)
     implicit none 
 
@@ -526,6 +609,7 @@ contains
 
   end subroutine psb_base_mv_from
   
+
   subroutine psb_base_cp_from(a,b)
     implicit none 
 
@@ -542,6 +626,13 @@ contains
     a%sorted    = b%sorted
 
   end subroutine psb_base_cp_from
+
+  !
+  !  TRANSP: note sorted=.false.
+  !    better invoke a fix() too many than
+  !    regret it later...
+  !
+
 
   subroutine psb_base_transp_2mat(a,b)
     implicit none 
