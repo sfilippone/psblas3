@@ -30,11 +30,11 @@ install: all
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 clean: 
-	(cd base; $(MAKE) clean)
-	(cd prec; $(MAKE) clean )
-	(cd krylov; $(MAKE) clean)
-	(cd util; $(MAKE) clean)
-	(cd opt; $(MAKE) clean)
+	cd base && $(MAKE) clean
+	cd prec && $(MAKE) clean 
+	cd krylov && $(MAKE) clean
+	cd util && $(MAKE) clean
+	cd opt && $(MAKE) clean
 
 check: all
 	make check -C test/serial
@@ -42,11 +42,11 @@ check: all
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 veryclean: cleanlib
-	(cd base; $(MAKE) veryclean)
-	(cd prec; $(MAKE) veryclean )
-	(cd krylov; $(MAKE) veryclean)
-	(cd util; $(MAKE) veryclean)
-	(cd test/fileread; $(MAKE) clean)
-	(cd test/pargen; $(MAKE) clean)
-	(cd test/util; $(MAKE) clean)
+	cd base && $(MAKE) veryclean
+	cd prec && $(MAKE) veryclean 
+	cd krylov && $(MAKE) veryclean
+	cd util && $(MAKE) veryclean
+	cd test/fileread && $(MAKE) clean
+	cd test/pargen && $(MAKE) clean
+	cd test/util && $(MAKE) clean
 
