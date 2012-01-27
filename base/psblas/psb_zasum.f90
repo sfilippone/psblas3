@@ -55,12 +55,12 @@ function psb_zasum (x,desc_a, info, jx)
 
   complex(psb_dpk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, optional, intent(in)     :: jx
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), optional, intent(in)     :: jx
   real(psb_dpk_)                  :: psb_zasum
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, iix, jjx, ix, ijx, m, i, idx, ndm
   real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err
@@ -160,10 +160,10 @@ function psb_zasum_vect(x, desc_a, info) result(res)
   real(psb_dpk_)                        :: res
   type(psb_z_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax
   real(psb_dpk_)         :: asum
   character(len=20)        :: name, ch_err
@@ -291,11 +291,11 @@ function psb_zasumv(x,desc_a, info)
 
   complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_dpk_)                  :: psb_zasumv
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, i, idx, ndm
   real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err
@@ -431,10 +431,10 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   complex(psb_dpk_), intent(in)   :: x(:)
   real(psb_dpk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, jx, m, i, idx, ndm
   real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err

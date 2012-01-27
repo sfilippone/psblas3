@@ -31,40 +31,45 @@
 !!$  
 module psb_mmio_mod
 
+
+  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_,&
+       & psb_sspmat_type, psb_cspmat_type, &
+       & psb_dspmat_type, psb_zspmat_type
+
   public mm_mat_read, mm_mat_write, mm_vet_read, mm_vet_write
 
   interface mm_vet_read
 
     subroutine mm_svet_read(b, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       real(psb_spk_), allocatable, intent(out)  :: b(:,:)
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_svet_read
     subroutine mm_dvet_read(b, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_dvet_read
     subroutine mm_cvet_read(b, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_cvet_read
     subroutine mm_zvet_read(b, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet_read
   end interface
@@ -72,149 +77,149 @@ module psb_mmio_mod
   interface mm_vet_write
 
     subroutine mm_svet2_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       real(psb_spk_), intent(in)  :: b(:,:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_svet2_write
     subroutine mm_svet1_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       real(psb_spk_), intent(in)  :: b(:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_svet1_write
     subroutine mm_dvet2_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       real(psb_dpk_), intent(in)  :: b(:,:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_dvet2_write
     subroutine mm_dvet1_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       real(psb_dpk_), intent(in)  :: b(:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_dvet1_write
     subroutine mm_cvet2_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       complex(psb_spk_), intent(in)  :: b(:,:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_cvet2_write
     subroutine mm_cvet1_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_spk_
+      import :: psb_spk_, psb_ipk_
       implicit none
       complex(psb_spk_), intent(in)  :: b(:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_cvet1_write
     subroutine mm_zvet2_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       complex(psb_dpk_), intent(in)  :: b(:,:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet2_write
     subroutine mm_zvet1_write(b, header, info, iunit, filename)   
-      use psb_base_mod, only : psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       implicit none
       complex(psb_dpk_), intent(in)  :: b(:)
       character(len=*), intent(in) :: header
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet1_write
   end interface
 
   interface mm_mat_read
     subroutine smm_mat_read(a, info, iunit, filename)   
-      use psb_base_mod, only : psb_sspmat_type
+      import :: psb_sspmat_type, psb_ipk_
       implicit none
       type(psb_sspmat_type), intent(out)  :: a
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine smm_mat_read
     subroutine dmm_mat_read(a, info, iunit, filename)   
-      use psb_base_mod, only : psb_dspmat_type
+      import :: psb_dspmat_type, psb_ipk_
       implicit none
       type(psb_dspmat_type), intent(out)  :: a
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine dmm_mat_read
     subroutine cmm_mat_read(a, info, iunit, filename)   
-      use psb_base_mod, only : psb_cspmat_type
+      import :: psb_cspmat_type, psb_ipk_
       implicit none
       type(psb_cspmat_type), intent(out)  :: a
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine cmm_mat_read
     subroutine zmm_mat_read(a, info, iunit, filename)   
-      use psb_base_mod, only : psb_zspmat_type 
+      import :: psb_zspmat_type, psb_ipk_
       implicit none
       type(psb_zspmat_type), intent(out)  :: a
-      integer, intent(out)        :: info
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine zmm_mat_read
   end interface
 
   interface mm_mat_write
     subroutine smm_mat_write(a,mtitle,info,iunit,filename)
-      use psb_base_mod, only : psb_sspmat_type 
+      import :: psb_sspmat_type, psb_ipk_ 
       implicit none
       type(psb_sspmat_type), intent(in)  :: a
-      integer, intent(out)        :: info
+      integer(psb_ipk_), intent(out)        :: info
       character(len=*), intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine smm_mat_write
     subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
-      use psb_base_mod, only : psb_dspmat_type
+      import :: psb_dspmat_type, psb_ipk_
       implicit none
       type(psb_dspmat_type), intent(in)  :: a
-      integer, intent(out)        :: info
+      integer(psb_ipk_), intent(out)        :: info
       character(len=*), intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine dmm_mat_write
     subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
-      use psb_base_mod, only : psb_cspmat_type
+      import :: psb_cspmat_type, psb_ipk_
       implicit none
       type(psb_cspmat_type), intent(in)  :: a
-      integer, intent(out)        :: info
+      integer(psb_ipk_), intent(out)        :: info
       character(len=*), intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine cmm_mat_write
     subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
-      use psb_base_mod, only : psb_zspmat_type 
+      import :: psb_zspmat_type, psb_ipk_
       implicit none
       type(psb_zspmat_type), intent(in)  :: a
-      integer, intent(out)        :: info
+      integer(psb_ipk_), intent(out)        :: info
       character(len=*), intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine zmm_mat_write
   end interface

@@ -39,14 +39,14 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   use psb_base_mod
   implicit none
   !     .. Scalar Arguments ..
-  integer, intent(out)                ::     info
+  integer(psb_ipk_), intent(out)                ::     info
   !     .. Array Arguments ..
   type(psb_dspmat_type),intent(in)    :: a
   type(psb_d_csr_sparse_mat),intent(inout) :: l,u
   type(psb_dspmat_type),intent(in), optional, target :: blck
   real(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
-  integer   ::  l1,l2,m,err_act  
+  integer(psb_ipk_) ::  l1,l2,m,err_act  
   type(psb_dspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_ilu_fct'
@@ -121,15 +121,15 @@ contains
 
     type(psb_dspmat_type), target :: a
     type(psb_dspmat_type), target :: b
-    integer                        :: m,ma,mb,l1,l2,info
-    integer, dimension(:)          :: lia1,lia2,uia1,uia2
+    integer(psb_ipk_) :: m,ma,mb,l1,l2,info
+    integer(psb_ipk_), dimension(:)          :: lia1,lia2,uia1,uia2
     real(psb_dpk_), dimension(:) :: laspk,uaspk,d
 
-    integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act, nz
+    integer(psb_ipk_) :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act, nz
     real(psb_dpk_) :: dia,temp
-    integer, parameter :: nrb=60
+    integer(psb_ipk_), parameter :: nrb=60
     type(psb_d_coo_sparse_mat) :: trw
-    integer             :: int_err(5) 
+    integer(psb_ipk_) :: int_err(5) 
     character(len=20)   :: name, ch_err
 
 

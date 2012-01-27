@@ -38,16 +38,16 @@ subroutine isr(n,x,dir)
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
   !
   !     .. Scalar Arguments ..
-  integer, intent(in) :: n, dir 
-  integer ::  x(n)
+  integer(psb_ipk_), intent(in) :: n, dir 
+  integer(psb_ipk_) ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  integer :: xk, piv, xt
-  integer i, j, ilx, iux, istp, lpiv
-  integer n1, n2
+  integer(psb_ipk_) :: xk, piv, xt
+  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
+  integer(psb_ipk_) :: n1, n2
 
-  integer, parameter :: maxstack=64,nparms=3,ithrs=16
-  integer            :: istack(nparms,maxstack)
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_) :: istack(nparms,maxstack)
   !     ..
 
   !
@@ -315,10 +315,10 @@ contains
   subroutine iisr_up(n,x)
     implicit none
 
-    integer :: n
-    integer :: x(n)
-    integer :: i,j
-    integer :: xx
+    integer(psb_ipk_) :: n
+    integer(psb_ipk_) :: x(n)
+    integer(psb_ipk_) :: i,j
+    integer(psb_ipk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
@@ -337,10 +337,10 @@ contains
 
   subroutine iisr_dw(n,x)
     implicit none
-    integer :: n
-    integer :: x(n)
-    integer :: i,j
-    integer :: xx
+    integer(psb_ipk_) :: n
+    integer(psb_ipk_) :: x(n)
+    integer(psb_ipk_) :: i,j
+    integer(psb_ipk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then

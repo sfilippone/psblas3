@@ -31,7 +31,7 @@ C
 C 
       INTEGER FUNCTION PSI_EXIST_OVR_ELEM(OVR_ELEM,
      +   DIM_LIST,ELEM_SEARCHED)
-
+      use psb_const_mod
 C    PURPOSE:
 C    == = ====
 C
@@ -54,12 +54,12 @@ C    ELEM_SEARCHED.....:point's  Local index identifier to be searched.
       IMPLICIT NONE
 
 C     ....Scalars parameters....
-      INTEGER DIM_LIST,ELEM_SEARCHED
+      INTEGER(psb_ipk_) :: DIM_LIST,ELEM_SEARCHED
 C     ...Array Parameters....
-      INTEGER OVR_ELEM(DIM_LIST,*)
+      INTEGER(psb_ipk_) :: OVR_ELEM(DIM_LIST,*)
       
 C     ...Local Scalars....
-      INTEGER I
+      INTEGER(psb_ipk_) :: I
 
       I=1
       DO WHILE ((I.LE.DIM_LIST).AND.(OVR_ELEM(I,1).NE.ELEM_SEARCHED))

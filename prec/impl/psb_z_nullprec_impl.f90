@@ -7,10 +7,10 @@ subroutine psb_z_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   type(psb_z_vect_type),intent(inout)  :: x
   complex(psb_dpk_),intent(in)         :: alpha, beta
   type(psb_z_vect_type),intent(inout)  :: y
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   complex(psb_dpk_),intent(inout), optional, target :: work(:)
-  Integer :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow
   character(len=20)  :: name='c_null_prec_apply'
 
   call psb_erractionsave(err_act)
@@ -62,10 +62,10 @@ subroutine psb_z_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   complex(psb_dpk_),intent(inout)      :: x(:)
   complex(psb_dpk_),intent(in)         :: alpha, beta
   complex(psb_dpk_),intent(inout)      :: y(:)
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   complex(psb_dpk_),intent(inout), optional, target :: work(:)
-  Integer :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow
   character(len=20)  :: name='c_null_prec_apply'
 
   call psb_erractionsave(err_act)

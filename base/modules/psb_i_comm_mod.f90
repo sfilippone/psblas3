@@ -34,41 +34,41 @@ module psb_i_comm_mod
   interface psb_ovrl
     subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
       use psb_descriptor_type
-      integer,          intent(inout), target :: x(:,:)
+      integer(psb_ipk_),          intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
-      integer, intent(inout), optional, target  :: work(:)
-      integer, intent(in), optional           :: update,jx,ik,mode
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_), intent(inout), optional, target  :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_iovrlm
     subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      integer, intent(inout), target          :: x(:)
+      integer(psb_ipk_), intent(inout), target          :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
-      integer, intent(inout), optional, target :: work(:)
-      integer, intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_), intent(inout), optional, target :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: update,mode
     end subroutine psb_iovrlv
   end interface
 
   interface psb_halo
     subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
-      integer, intent(inout), target         :: x(:,:)
+      integer(psb_ipk_), intent(inout), target         :: x(:,:)
       type(psb_desc_type), intent(in)        :: desc_a
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
       real(psb_dpk_), intent(in), optional   :: alpha
-      integer, intent(inout), optional, target  :: work(:)
-      integer, intent(in), optional          :: mode,jx,ik,data
+      integer(psb_ipk_), intent(inout), optional, target  :: work(:)
+      integer(psb_ipk_), intent(in), optional          :: mode,jx,ik,data
       character, intent(in), optional        :: tran
     end subroutine psb_ihalom
     subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
       use psb_descriptor_type
-      integer, intent(inout)                 :: x(:)
+      integer(psb_ipk_), intent(inout)                 :: x(:)
       type(psb_desc_type), intent(in)        :: desc_a
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
       real(psb_dpk_), intent(in), optional   :: alpha
-      integer, intent(inout), optional, target :: work(:)
-      integer, intent(in), optional          :: mode,data
+      integer(psb_ipk_), intent(inout), optional, target :: work(:)
+      integer(psb_ipk_), intent(in), optional          :: mode,data
       character, intent(in), optional        :: tran
     end subroutine psb_ihalov
   end interface
@@ -77,38 +77,38 @@ module psb_i_comm_mod
   interface psb_scatter
     subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
-      integer, intent(out)             :: locx(:,:)
-      integer, intent(in)              :: globx(:,:)
+      integer(psb_ipk_), intent(out)             :: locx(:,:)
+      integer(psb_ipk_), intent(in)              :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_iscatterm
     subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
-      integer, intent(out)             :: locx(:)
-      integer, intent(in)              :: globx(:)
+      integer(psb_ipk_), intent(out)             :: locx(:)
+      integer(psb_ipk_), intent(in)              :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_iscatterv
   end interface
 
   interface psb_gather
     subroutine  psb_igatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
-      integer, intent(in)             :: locx(:,:)
-      integer, intent(out)            :: globx(:,:)
+      integer(psb_ipk_), intent(in)             :: locx(:,:)
+      integer(psb_ipk_), intent(out)            :: globx(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_igatherm
     subroutine  psb_igatherv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
-      integer, intent(in)             :: locx(:)
-      integer, intent(out)            :: globx(:)
+      integer(psb_ipk_), intent(in)             :: locx(:)
+      integer(psb_ipk_), intent(out)            :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_igatherv
   end interface
   

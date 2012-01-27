@@ -39,7 +39,7 @@
 !    current (calling) process. 
 ! 
 ! Arguments: 
-!    bndel(:) - integer, allocatable      Array containing the output list              
+!    bndel(:) - integer(psb_ipk_), allocatable      Array containing the output list              
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
@@ -51,12 +51,12 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   use psb_serial_mod
   implicit none
   
-  integer, allocatable :: bndel(:)
+  integer(psb_ipk_), allocatable :: bndel(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
 
-  integer, allocatable :: work(:)
-  integer :: i, j, nr, ns, k, err_act
+  integer(psb_ipk_), allocatable :: work(:)
+  integer(psb_ipk_) :: i, j, nr, ns, k, err_act
   character(len=20)    :: name
 
   info = psb_success_

@@ -45,9 +45,9 @@ subroutine psb_dsymbmm(a,b,c,info)
 
   type(psb_dspmat_type), intent(in)    :: a,b
   type(psb_dspmat_type), intent(out)   :: c
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
   type(psb_d_csr_sparse_mat), allocatable :: ccsr
-  integer               :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_symbmm'
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -92,11 +92,11 @@ subroutine psb_dbase_symbmm(a,b,c,info)
 
   class(psb_d_base_sparse_mat), intent(in) :: a,b
   type(psb_d_csr_sparse_mat), intent(out)  :: c
-  integer, intent(out)                     :: info
-  integer, allocatable  :: itemp(:)
-  integer               :: nze, ma,na,mb,nb
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_ipk_), allocatable  :: itemp(:)
+  integer(psb_ipk_) :: nze, ma,na,mb,nb
   character(len=20)     :: name
-  integer               :: err_act
+  integer(psb_ipk_) :: err_act
   name='psb_symbmm'
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -156,17 +156,18 @@ contains
   subroutine csr_symbmm(a,b,c,itemp,info)
     type(psb_d_csr_sparse_mat), intent(in)  :: a,b
     type(psb_d_csr_sparse_mat), intent(out) :: c
-    integer                                 :: itemp(:) 
-    integer, intent(out)                    :: info
+    integer(psb_ipk_) :: itemp(:) 
+    integer(psb_ipk_), intent(out)                    :: info
     interface 
       subroutine symbmm (n, m, l, ia, ja, diaga, &
            & ib, jb, diagb, ic, jc, diagc, index)
-        integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+        import :: psb_ipk_
+        integer(psb_ipk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
              & diagc,  index(*)
-        integer, allocatable :: ic(:),jc(:)
+        integer(psb_ipk_), allocatable :: ic(:),jc(:)
       end subroutine symbmm
     end interface
-    integer               :: nze, ma,na,mb,nb
+    integer(psb_ipk_) :: nze, ma,na,mb,nb
 
     info = psb_success_
     ma = a%get_nrows()
@@ -184,10 +185,10 @@ contains
   subroutine gen_symbmm(a,b,c,index,info)
     class(psb_d_base_sparse_mat), intent(in)  :: a,b
     type(psb_d_csr_sparse_mat), intent(out) :: c
-    integer               :: index(:),info
-    integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
-    integer               :: nze, ma,na,mb,nb
+    integer(psb_ipk_) :: index(:),info
+    integer(psb_ipk_), allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
+    integer(psb_ipk_) :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
+    integer(psb_ipk_) :: nze, ma,na,mb,nb
 
     ma = a%get_nrows()
     na = a%get_ncols()

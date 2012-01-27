@@ -13,17 +13,17 @@ subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   type(psb_sspmat_type), intent(inout) :: loca
   type(psb_sspmat_type), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: root, dupl
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: root, dupl
   logical, intent(in), optional   :: keepnum,keeploc
 
   type(psb_s_coo_sparse_mat)      :: loc_coo, glob_coo
-  integer :: ictxt,np,me, err_act, icomm, dupl_, nrg, ncg, nzg
-  integer :: ip, ndx,naggrm1,naggrp1, i, j, k
+  integer(psb_ipk_) :: ictxt,np,me, err_act, icomm, dupl_, nrg, ncg, nzg
+  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k
   logical :: keepnum_, keeploc_
-  integer, allocatable :: nzbr(:), idisp(:)
+  integer(psb_ipk_), allocatable :: nzbr(:), idisp(:)
   character(len=20) :: name
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_gather'
   if (psb_get_errstatus().ne.0) return 
@@ -71,12 +71,12 @@ subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call mpi_allgatherv(loc_coo%val,ndx,mpi_real,&
          & glob_coo%val,nzbr,idisp,&
          & mpi_real,icomm,info)
-    if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,mpi_integer,&
+    if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_integer,&
          & glob_coo%ia,nzbr,idisp,&
-         & mpi_integer,icomm,info)
-    if (info == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,mpi_integer,&
+         & psb_mpi_integer,icomm,info)
+    if (info == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_integer,&
          & glob_coo%ja,nzbr,idisp,&
-         & mpi_integer,icomm,info)
+         & psb_mpi_integer,icomm,info)
     
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')

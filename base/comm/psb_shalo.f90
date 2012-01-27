@@ -60,14 +60,14 @@ subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   real(psb_spk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   real(psb_spk_), intent(in), optional    :: alpha
   real(psb_spk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional             :: mode,jx,ik,data
+  integer(psb_ipk_), intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_
   real(psb_spk_),pointer :: iwork(:), xp(:,:)
@@ -282,14 +282,14 @@ subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   real(psb_spk_), intent(inout)          :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   real(psb_spk_), intent(in), optional   :: alpha
   real(psb_spk_), target, optional, intent(inout) :: work(:)
-  integer, intent(in), optional             :: mode,data
+  integer(psb_ipk_), intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: ictxt, np, me, err_act, &
+  integer(psb_ipk_) :: ictxt, np, me, err_act, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   real(psb_spk_),pointer :: iwork(:)
   character                :: tran_
@@ -426,14 +426,14 @@ subroutine  psb_shalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
 
   type(psb_s_vect_type), intent(inout)    :: x
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(out)                    :: info
   real(psb_spk_), intent(in), optional :: alpha
   real(psb_spk_), target, optional, intent(inout)  :: work(:)
-  integer, intent(in), optional           :: mode,data
+  integer(psb_ipk_), intent(in), optional           :: mode,data
   character, intent(in), optional         :: tran
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork,data_
   real(psb_spk_),pointer :: iwork(:)

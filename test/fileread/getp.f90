@@ -41,15 +41,15 @@ contains
   subroutine  get_dparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,ipart,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    integer      :: ictxt
+    integer(psb_ipk_) :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
-    integer      :: iret, istopc,itmax,itrace,ipart,irst
+    integer(psb_ipk_) :: iret, istopc,itmax,itrace,ipart,irst
     character(len=40) :: charbuf
     real(psb_dpk_) :: eps
     character    :: afmt*5
-    integer      :: np, iam
-    integer      :: inparms(40), ip 
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: inparms(40), ip 
 
     call psb_info(ictxt,iam,np)
     if (iam == 0) then
@@ -142,15 +142,15 @@ contains
   subroutine  get_sparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,ipart,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
-    integer      :: ictxt
+    integer(psb_ipk_) :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
-    integer      :: iret, istopc,itmax,itrace,ipart,irst
+    integer(psb_ipk_) :: iret, istopc,itmax,itrace,ipart,irst
     character(len=40) :: charbuf
     real(psb_spk_) :: eps
     character    :: afmt*5
-    integer      :: np, iam
-    integer      :: inparms(40), ip 
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: inparms(40), ip 
 
     call psb_info(ictxt,iam,np)
     if (iam == 0) then

@@ -30,11 +30,12 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       subroutine ibsrch(ipos,key,n,v)
+      use psb_serial_mod
       implicit none
-      integer ipos, key, n
-      integer v(n)
+      integer(psb_ipk_) :: ipos, key, n
+      integer(psb_ipk_) :: v(n)
       
-      integer lb, ub, m
+      integer(psb_ipk_) :: lb, ub, m
       
       
       lb = 1 

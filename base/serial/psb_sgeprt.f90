@@ -55,7 +55,7 @@ subroutine psb_sgeprtn2(fname,a,head)
   character(len=*), optional    :: head
 
   !
-  integer        :: iout, info
+  integer(psb_ipk_) :: iout, info
   logical        :: isopen
   
   ! Search for an unused unit to write
@@ -89,7 +89,7 @@ subroutine psb_sgeprtn1(fname,a,head)
   character(len=*), optional    :: head
 
   !
-  integer        :: iout, info
+  integer(psb_ipk_) :: iout, info
   logical        :: isopen
   
   ! Search for an unused unit to write
@@ -118,11 +118,11 @@ subroutine psb_sgeprt2(iout,a,head)
   use psb_serial_mod, psb_protect_name => psb_sgeprt2
   implicit none 
 
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(in)            :: iout
   real(psb_spk_), intent(in)     :: a(:,:)
   character(len=*), optional     :: head
   character(len=80)              :: frmtv 
-  integer  :: irs,ics,i,j, nmx, ni, nrow, ncol
+  integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nrow, ncol
 
   write(iout,'(a)') '%%MatrixMarket matrix array real general'
   write(iout,'(a)') '% '//trim(head)
@@ -150,11 +150,11 @@ subroutine psb_sgeprt1(iout,a,head)
   use psb_serial_mod, psb_protect_name => psb_sgeprt1
   implicit none 
 
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(in)            :: iout
   real(psb_spk_), intent(in)     :: a(:)
   character(len=*), optional     :: head
   character(len=80)              :: frmtv 
-  integer  :: irs,ics,i,j, nmx, ni, nrow, ncol
+  integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nrow, ncol
 
   write(iout,'(a)') '%%MatrixMarket matrix array real general'
   write(iout,'(a)') '% '//trim(head)

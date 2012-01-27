@@ -40,7 +40,7 @@
 !                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
-!    iprc(:)  - integer, allocatable    Output: process identifiers for the corresponding
+!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
@@ -60,18 +60,18 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer, intent(in) :: idx(:)
-  integer, allocatable, intent(out) ::  iprc(:)
+  integer(psb_ipk_), intent(in) :: idx(:)
+  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(in) :: idxmap
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
 
 
-  integer, allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
+  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
 
-  integer             :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j, nv
-  integer             :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -134,8 +134,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     t3 = psb_wtime()
   end if
 
-  call mpi_allgatherv(idx,hsz(me+1),mpi_integer,&
-       & hproc,hsz,hidx,mpi_integer,&
+  call mpi_allgatherv(idx,hsz(me+1),psb_mpi_integer,&
+       & hproc,hsz,hidx,psb_mpi_integer,&
        & icomm,info)
   if (gettime) then 
     tamx = psb_wtime() - t3
@@ -178,7 +178,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end if
 
   ! Collect all the answers with alltoallv (need sizes) 
-  call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
 
   isz = sum(rvsz) 
 
@@ -192,8 +192,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     rvidx(ip) = j
     j         = j + rvsz(ip)
   end do
-  call mpi_alltoallv(hproc,sdsz,sdidx,mpi_integer,&
-       & answers(:,1),rvsz,rvidx,mpi_integer,&
+  call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_integer,&
+       & answers(:,1),rvsz,rvidx,psb_mpi_integer,&
        & icomm,info)
   if (gettime) then 
     tamx = psb_wtime() - t3 + tamx

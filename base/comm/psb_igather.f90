@@ -35,9 +35,9 @@
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
 ! Arguments:
-!   globx     -  integer,dimension(:,:).          The local matrix into which gather 
+!   globx     -  integer(psb_ipk_),dimension(:,:).          The local matrix into which gather 
 !                                                the distributed pieces.
-!   locx      -  integer,dimension(:,:).          The local piece of the distributed 
+!   locx      -  integer(psb_ipk_),dimension(:,:).          The local piece of the distributed 
 !                                                matrix to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
@@ -50,15 +50,15 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_igatherm
   implicit none
 
-  integer, intent(in)    :: locx(:,:)
-  integer, intent(out)   :: globx(:,:)
+  integer(psb_ipk_), intent(in)    :: locx(:,:)
+  integer(psb_ipk_), intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
        & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
   character(len=20)        :: name, ch_err
@@ -207,9 +207,9 @@ end subroutine psb_igatherm
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
 ! Arguments:
-!   globx     -  integer,dimension(:).            The local vector into which gather the 
+!   globx     -  integer(psb_ipk_),dimension(:).            The local vector into which gather the 
 !                                                  distributed pieces.
-!   locx      -  integer,dimension(:).            The local piece of the ditributed
+!   locx      -  integer(psb_ipk_),dimension(:).            The local piece of the ditributed
 !                                                  vector to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
@@ -221,15 +221,15 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_igatherv
   implicit none
 
-  integer, intent(in)    :: locx(:)
-  integer, intent(out)   :: globx(:)
+  integer(psb_ipk_), intent(in)    :: locx(:)
+  integer(psb_ipk_), intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
        & err_act, n, root, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
 

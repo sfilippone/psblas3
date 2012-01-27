@@ -53,12 +53,12 @@ function psb_snrm2(x, desc_a, info, jx)
 
   real(psb_spk_), intent(in)      ::  x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(in), optional     :: jx
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: jx
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_spk_)                  :: psb_snrm2
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm 
   real(psb_spk_)         :: nrm2, snrm2, dd
 !!$  external scombnrm2
@@ -189,11 +189,11 @@ function psb_snrm2v(x, desc_a, info)
 
   real(psb_spk_), intent(in)      :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_spk_)                  :: psb_snrm2v
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
 !!$  external scombnrm2
@@ -278,10 +278,10 @@ function psb_snrm2_vect(x, desc_a, info)  result(res)
   real(psb_spk_)                        :: res
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_desc_type), intent(in)       :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
 !!$  external dcombnrm2
@@ -417,10 +417,10 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
   real(psb_spk_), intent(in)      :: x(:)
   real(psb_spk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
 !!$  external scombnrm2

@@ -50,7 +50,7 @@ psb_error_mod.o: psb_const_mod.o
 psb_realloc_mod.o:  psb_error_mod.o
 $(UTILS_MODS): $(BASIC_MODS)
 
-psi_comm_buffers_mod.o: psb_const_mod.o
+psb_string_mod.o psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
 
@@ -72,7 +72,7 @@ psb_d_csc_mat_mod.o psb_d_csr_mat_mod.o: psb_d_base_mat_mod.o
 psb_c_csc_mat_mod.o psb_c_csr_mat_mod.o: psb_c_base_mat_mod.o 
 psb_z_csc_mat_mod.o psb_z_csr_mat_mod.o: psb_z_base_mat_mod.o 
 psb_mat_mod.o: psb_vect_mod.o psb_s_mat_mod.o psb_d_mat_mod.o psb_c_mat_mod.o psb_z_mat_mod.o
-error.o psb_realloc_mod.o : psb_error_mod.o 
+error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o
 psb_spmat_type.o: psb_string_mod.o psb_sort_mod.o
 psi_i_mod.o: psb_desc_type.o 

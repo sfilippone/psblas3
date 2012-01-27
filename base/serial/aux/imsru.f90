@@ -35,11 +35,11 @@
 subroutine imsru(n,x,idir,nout)
   use psb_serial_mod
   implicit none
-  integer :: n, idir,nout
-  integer :: x(n)
+  integer(psb_ipk_) :: n, idir,nout
+  integer(psb_ipk_) :: x(n)
   
   
-  integer :: k
+  integer(psb_ipk_) :: k
 
   nout = 0 
   if (n<0) then 

@@ -51,9 +51,9 @@ module psb_gen_block_map_mod
   use psb_indx_map_mod
   
   type, extends(psb_indx_map) :: psb_gen_block_map
-    integer :: min_glob_row   = -1
-    integer :: max_glob_row   = -1
-    integer, allocatable :: loc_to_glob(:), srt_l2g(:,:), vnl(:)
+    integer(psb_ipk_) :: min_glob_row   = -1
+    integer(psb_ipk_) :: max_glob_row   = -1
+    integer(psb_ipk_), allocatable :: loc_to_glob(:), srt_l2g(:,:), vnl(:)
   contains
 
     procedure, pass(idxmap)  :: gen_block_map_init => block_init
@@ -130,11 +130,11 @@ contains
   subroutine block_l2gs1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer  :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
@@ -149,9 +149,9 @@ contains
   subroutine block_l2gs2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -164,11 +164,11 @@ contains
   subroutine block_l2gv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i
+    integer(psb_ipk_) :: i
     logical :: owned_
     info = 0
 
@@ -221,12 +221,12 @@ contains
   subroutine block_l2gv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -242,11 +242,11 @@ contains
   subroutine block_g2ls1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
     info = 0
 
     if (present(mask)) then 
@@ -262,9 +262,9 @@ contains
   subroutine block_g2ls2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -279,12 +279,12 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i, nv, is
-    integer :: ictxt, iam, np
+    integer(psb_ipk_) :: i, nv, is
+    integer(psb_ipk_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -385,13 +385,13 @@ contains
   subroutine block_g2lv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -408,11 +408,11 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     
-    integer :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
 
     info = 0
     if (present(mask)) then 
@@ -427,9 +427,9 @@ contains
   subroutine block_g2ls2_ins(idxin,idxout,idxmap,info,mask)
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     
     idxout = idxin
@@ -443,10 +443,10 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: i, nv, is, ix
+    integer(psb_ipk_) :: i, nv, is, ix
 
     info = 0
     is = size(idx)
@@ -533,11 +533,11 @@ contains
   subroutine block_g2lv2_ins(idxin,idxout,idxmap,info,mask)
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -554,11 +554,11 @@ contains
     use psb_penv_mod
     use psb_sort_mod
     implicit none 
-    integer, intent(in) :: idx(:)
-    integer, allocatable, intent(out) ::  iprc(:)
+    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_gen_block_map), intent(in) :: idxmap
-    integer, intent(out) :: info
-    integer :: ictxt, iam, np, nv, ip, i
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: ictxt, iam, np, nv, ip, i
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -582,11 +582,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(in)  :: ictxt, nl
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(in)  :: ictxt, nl
+    integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, ntot
-    integer, allocatable :: vnl(:)
+    integer(psb_ipk_) :: iam, np, i, ntot
+    integer(psb_ipk_), allocatable :: vnl(:)
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -642,9 +642,9 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(out) :: info
     
-    integer :: nhal, ictxt, iam, np 
+    integer(psb_ipk_) :: nhal, ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()
@@ -677,8 +677,8 @@ contains
     implicit none 
     class(psb_gen_block_map), intent(in)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='block_clone'
     logical, parameter :: debug=.false.
 

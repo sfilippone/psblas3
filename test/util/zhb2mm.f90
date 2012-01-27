@@ -39,7 +39,7 @@ program zhb2mm
   use psb_util_mod
   type(psb_zspmat_type) :: a
   
-  integer    :: info
+  integer(psb_ipk_) :: info
   character(len=72)  :: mtitle
 
   

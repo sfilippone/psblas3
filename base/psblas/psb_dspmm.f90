@@ -73,24 +73,24 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(inout), target  :: y(:,:)
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout)  :: work(:)
   character, intent(in), optional          :: trans
-  integer, intent(in), optional            :: k, jx, jy
+  integer(psb_ipk_), intent(in), optional            :: k, jx, jy
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
        & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1, ip, idx
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   real(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
   real(psb_dpk_), allocatable  :: xvsave(:,:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmm'
   if (psb_errstatus_fatal()) return 
@@ -426,23 +426,23 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(inout), target  :: y(:)
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout)       :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
   real(psb_dpk_), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmv'
   if (psb_errstatus_fatal()) return 
@@ -687,23 +687,23 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_d_vect_type), intent(inout)     :: y
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout)       :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
   real(psb_dpk_), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmv'
   if (psb_errstatus_fatal()) return 

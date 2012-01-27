@@ -42,8 +42,8 @@
 !    ja(:)    - integer                        The column indices of the points.
 !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
 !    info     - integer.                       Return code.
-!    ila(:)   - integer, optional              The row indices in local numbering
-!    jla(:)   - integer, optional              The col indices in local numbering
+!    ila(:)   - integer(psb_ipk_), optional              The row indices in local numbering
+!    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
 !
 subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   use psb_base_mod, psb_protect_name => psb_cdinsrc
@@ -52,18 +52,18 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout) :: desc_a
-  Integer, intent(in)                :: nz,ia(:),ja(:)
-  integer, intent(out)               :: info
-  integer, optional, intent(out)     :: ila(:), jla(:)
+  integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
 
   !LOCALS.....
 
-  integer :: ictxt,dectype,mglob, nglob
-  integer                :: np, me
-  integer                :: nrow,ncol, err_act
+  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
-  integer, parameter     :: relocsz=200
-  integer, allocatable   :: ila_(:), jla_(:)
+  integer(psb_ipk_), parameter     :: relocsz=200
+  integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
   character(len=20)      :: name
 
   info = psb_success_
@@ -164,7 +164,7 @@ end subroutine psb_cdinsrc
 !    ja(:)    - integer                        The column indices of the points.
 !    desc     - type(psb_desc_type).         The communication descriptor 
 !    info     - integer.                       Return code.
-!    jla(:)   - integer, optional              The col indices in local numbering
+!    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
 !    mask(:)  - logical, optional, target
 !
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
@@ -174,19 +174,19 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout) :: desc
-  Integer, intent(in)                :: nz,ja(:)
-  integer, intent(out)               :: info
-  integer, optional, intent(out)     :: jla(:)
+  integer(psb_ipk_), intent(in)                :: nz,ja(:)
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(out)     :: jla(:)
   logical, optional, target, intent(in) :: mask(:) 
 
   !LOCALS.....
 
-  integer :: ictxt,dectype,mglob, nglob
-  integer                :: np, me
-  integer                :: nrow,ncol, err_act
+  integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
-  integer, parameter     :: relocsz=200
-  integer, allocatable   :: ila_(:), jla_(:)
+  integer(psb_ipk_), parameter     :: relocsz=200
+  integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
   logical, allocatable, target  :: mask__(:) 
   logical, pointer       :: mask_(:) 
   character(len=20)      :: name

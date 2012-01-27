@@ -8,10 +8,10 @@ subroutine psb_z_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   type(psb_z_vect_type),intent(inout)   :: x
   complex(psb_dpk_),intent(in)         :: alpha, beta
   type(psb_z_vect_type),intent(inout)   :: y
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_dpk_),intent(inout), optional, target :: work(:)
-  Integer :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow
   character(len=20)  :: name='z_diag_prec_apply'
   complex(psb_dpk_), pointer :: ww(:)
   class(psb_z_base_vect_type), allocatable :: dw
@@ -92,10 +92,10 @@ subroutine psb_z_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   complex(psb_dpk_),intent(inout)      :: x(:)
   complex(psb_dpk_),intent(in)         :: alpha, beta
   complex(psb_dpk_),intent(inout)      :: y(:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_dpk_),intent(inout), optional, target :: work(:)
-  Integer :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow
   character :: trans_
   character(len=20)  :: name='z_diag_prec_apply'
   complex(psb_dpk_), pointer :: ww(:)
@@ -191,12 +191,12 @@ subroutine psb_z_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   type(psb_zspmat_type), intent(in), target :: a
   type(psb_desc_type), intent(in), target   :: desc_a
   class(psb_z_diag_prec_type),intent(inout) :: prec
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   character, intent(in), optional           :: upd
   character(len=*), intent(in), optional    :: afmt
   class(psb_z_base_sparse_mat), intent(in), optional :: amold
   class(psb_z_base_vect_type), intent(in), optional  :: vmold
-  Integer :: err_act, nrow,i
+  integer(psb_ipk_) :: err_act, nrow,i
   character(len=20)  :: name='z_diag_precbld'
 
   call psb_erractionsave(err_act)

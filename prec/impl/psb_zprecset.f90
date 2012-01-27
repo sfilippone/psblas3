@@ -35,8 +35,8 @@ subroutine psb_zprecseti(p,what,val,info)
   use psb_prec_mod, psb_protect_name => psb_zprecseti
   implicit none
   type(psb_zprec_type), intent(inout)    :: p
-  integer                                :: what, val 
-  integer, intent(out)                   :: info
+  integer(psb_ipk_) :: what, val 
+  integer(psb_ipk_), intent(out)                   :: info
   character(len=20) :: name='precset'
 
   info = psb_success_
@@ -60,9 +60,9 @@ subroutine psb_zprecsetr(p,what,val,info)
   use psb_prec_mod, psb_protect_name => psb_zprecsetr
   implicit none
   type(psb_zprec_type), intent(inout)    :: p
-  integer                                :: what
+  integer(psb_ipk_) :: what
   real(psb_dpk_)                       :: val 
-  integer, intent(out)                   :: info
+  integer(psb_ipk_), intent(out)                   :: info
   character(len=20) :: name='precset'
 
   info = psb_success_

@@ -56,10 +56,10 @@ program df_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver paramters
-  integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
+  integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps,cond
@@ -67,16 +67,16 @@ program df_sample
   character(len=5)   :: afmt
   character(len=20)  :: name
   character(len=2)   :: filefmt
-  integer, parameter :: iunit=12
-  integer   :: iparm(20)
+  integer(psb_ipk_), parameter :: iunit=12
+  integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer            :: i,info,j,m_problem
-  integer            :: internal, m,ii,nnzero
+  integer(psb_ipk_) :: i,info,j,m_problem
+  integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
-  integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:), perm(:)
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
+  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
   character(len=40)  :: fname, fnout
 
 
@@ -94,6 +94,7 @@ program df_sample
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(2)
+  call psb_cd_set_large_threshold(2)
   !
   ! Hello world
   !

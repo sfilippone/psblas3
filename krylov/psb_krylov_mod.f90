@@ -42,7 +42,7 @@ Module psb_krylov_mod
     
     Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_sspmat_type, psb_spk_
       use psb_prec_mod,only : psb_sprec_type
       
       character(len=*)                   :: method
@@ -52,17 +52,17 @@ Module psb_krylov_mod
       Real(psb_spk_), Intent(in)       :: b(:)
       Real(psb_spk_), Intent(inout)    :: x(:)
       Real(psb_spk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)     :: iter
       Real(psb_spk_), Optional, Intent(out) :: err,cond
     end Subroutine psb_skrylov
     Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, &
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_sspmat_type, &
            & psb_spk_, psb_s_vect_type
-      use psb_prec_mod,only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       
       character(len=*)                      :: method
       Type(psb_sspmat_type), Intent(in)     :: a
@@ -71,16 +71,16 @@ Module psb_krylov_mod
       type(psb_s_vect_type), Intent(inout)  :: b
       type(psb_s_vect_type), Intent(inout)  :: x
       Real(psb_spk_), Intent(in)            :: eps
-      integer, intent(out)                  :: info
-      Integer, Optional, Intent(in)         :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)        :: iter
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
       Real(psb_spk_), Optional, Intent(out) :: err,cond
 
     end Subroutine psb_skrylov_vect
     Subroutine psb_ckrylov(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_mod,only : psb_cprec_type
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_cspmat_type, psb_spk_
+      use psb_prec_mod, only : psb_cprec_type
       character(len=*)                   :: method
       Type(psb_cspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -88,17 +88,17 @@ Module psb_krylov_mod
       complex(psb_spk_), Intent(in)      :: b(:)
       complex(psb_spk_), Intent(inout)   :: x(:)
       Real(psb_spk_), Intent(in)         :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)     :: iter
       Real(psb_spk_), Optional, Intent(out) :: err
     end Subroutine psb_ckrylov
     Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, &
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_cspmat_type, &
            & psb_spk_, psb_c_vect_type
-      use psb_prec_mod,only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       
       character(len=*)                      :: method
       Type(psb_cspmat_type), Intent(in)     :: a
@@ -107,17 +107,17 @@ Module psb_krylov_mod
       type(psb_c_vect_type), Intent(inout)  :: b
       type(psb_c_vect_type), Intent(inout)  :: x
       Real(psb_spk_), Intent(in)            :: eps
-      integer, intent(out)                  :: info
-      Integer, Optional, Intent(in)         :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)        :: iter
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
       Real(psb_spk_), Optional, Intent(out) :: err,cond
 
     end Subroutine psb_ckrylov_vect
     Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_mod,only : psb_dprec_type
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_prec_mod, only : psb_dprec_type
       
       character(len=*)                   :: method
       Type(psb_dspmat_type), Intent(in)  :: a
@@ -126,18 +126,18 @@ Module psb_krylov_mod
       Real(psb_dpk_), Intent(in)         :: b(:)
       Real(psb_dpk_), Intent(inout)      :: x(:)
       Real(psb_dpk_), Intent(in)         :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)     :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err,cond
 
     end Subroutine psb_dkrylov
     Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, &
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_dspmat_type, &
            & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod,only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       
       character(len=*)                      :: method
       Type(psb_dspmat_type), Intent(in)     :: a
@@ -146,16 +146,16 @@ Module psb_krylov_mod
       type(psb_d_vect_type), Intent(inout)  :: b
       type(psb_d_vect_type), Intent(inout)  :: x
       Real(psb_dpk_), Intent(in)            :: eps
-      integer, intent(out)                  :: info
-      Integer, Optional, Intent(in)         :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)        :: iter
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err,cond
 
     end Subroutine psb_dkrylov_vect
     Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_mod,only : psb_zprec_type
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_zspmat_type, psb_dpk_
+      use psb_prec_mod, only : psb_zprec_type
       character(len=*)                   :: method
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
@@ -163,17 +163,17 @@ Module psb_krylov_mod
       complex(psb_dpk_), Intent(in)    :: b(:)
       complex(psb_dpk_), Intent(inout) :: x(:)
       Real(psb_dpk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)     :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end Subroutine psb_zkrylov
     Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & itmax,iter,err,itrace,irst,istop,cond)
       
-      use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, &
+      use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_zspmat_type, &
            & psb_dpk_, psb_z_vect_type
-      use psb_prec_mod,only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       
       character(len=*)                      :: method
       Type(psb_zspmat_type), Intent(in)     :: a
@@ -182,9 +182,9 @@ Module psb_krylov_mod
       type(psb_z_vect_type), Intent(inout)  :: b
       type(psb_z_vect_type), Intent(inout)  :: x
       Real(psb_dpk_), Intent(in)            :: eps
-      integer, intent(out)                  :: info
-      Integer, Optional, Intent(in)         :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)        :: iter
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), Optional, Intent(in)         :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)        :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err,cond
 
     end Subroutine psb_zkrylov_vect

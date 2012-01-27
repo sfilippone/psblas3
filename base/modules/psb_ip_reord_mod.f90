@@ -57,12 +57,12 @@ module psb_ip_reord_mod
 contains
   
   subroutine psb_ip_reord_i1(n,x,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
-    integer             :: x(*)
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
+    integer(psb_ipk_) :: x(*)
     
-    integer :: lswap, lp, k
-    integer :: swap
+    integer(psb_ipk_) :: lswap, lp, k
+    integer(psb_ipk_) :: swap
 
     lp = iaux(0)
     k  = 1
@@ -86,11 +86,11 @@ contains
 
   
   subroutine psb_ip_reord_s1(n,x,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_spk_)      :: x(*)
     
-    integer :: lswap, lp, k
+    integer(psb_ipk_) :: lswap, lp, k
     real(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -114,11 +114,11 @@ contains
   end subroutine psb_ip_reord_s1
   
   subroutine psb_ip_reord_d1(n,x,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)      :: x(*)
     
-    integer :: lswap, lp, k
+    integer(psb_ipk_) :: lswap, lp, k
     real(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -144,11 +144,11 @@ contains
 
   
   subroutine psb_ip_reord_c1(n,x,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_spk_)   :: x(*)
     
-    integer :: lswap, lp, k
+    integer(psb_ipk_) :: lswap, lp, k
     complex(psb_spk_) :: swap
 
     lp = iaux(0)
@@ -172,11 +172,11 @@ contains
   end subroutine psb_ip_reord_c1
   
   subroutine psb_ip_reord_z1(n,x,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_dpk_)   :: x(*)
     
-    integer :: lswap, lp, k
+    integer(psb_ipk_) :: lswap, lp, k
     complex(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -201,13 +201,13 @@ contains
 
   
   subroutine psb_ip_reord_i1i1(n,x,indx,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
-    integer             :: x(*)
-    integer             :: indx(*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
+    integer(psb_ipk_) :: x(*)
+    integer(psb_ipk_) :: indx(*) 
     
-    integer :: lswap, lp, k, ixswap
-    integer :: swap
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: swap
 
     lp = iaux(0)
     k  = 1
@@ -234,13 +234,13 @@ contains
 
   
   subroutine psb_ip_reord_s1i1(n,x,indx,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_spk_)      :: x(*)
-    integer             :: indx(*) 
+    integer(psb_ipk_) :: indx(*) 
 
     
-    integer :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
     real(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -267,12 +267,12 @@ contains
   end subroutine psb_ip_reord_s1i1
   
   subroutine psb_ip_reord_d1i1(n,x,indx,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)      :: x(*)
-    integer             :: indx(*) 
+    integer(psb_ipk_) :: indx(*) 
     
-    integer :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
     real(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -301,12 +301,12 @@ contains
 
   
   subroutine psb_ip_reord_c1i1(n,x,indx,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_spk_)   :: x(*)
-    integer             :: indx(*) 
+    integer(psb_ipk_) :: indx(*) 
     
-    integer :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
     complex(psb_spk_) :: swap
 
     lp = iaux(0)
@@ -333,12 +333,12 @@ contains
   end subroutine psb_ip_reord_c1i1
   
   subroutine psb_ip_reord_z1i1(n,x,indx,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_dpk_)   :: x(*)
-    integer             :: indx(*) 
+    integer(psb_ipk_) :: indx(*) 
     
-    integer :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
     complex(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -366,13 +366,13 @@ contains
 
 
   subroutine psb_ip_reord_s1i2(n,x,i1,i2,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_spk_)      :: x(*)
-    integer             :: i1(*), i2(*) 
+    integer(psb_ipk_) :: i1(*), i2(*) 
 
     
-    integer :: lswap, lp, k, isw1, isw2
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2
     real(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -402,13 +402,13 @@ contains
   end subroutine psb_ip_reord_s1i2
   
   subroutine psb_ip_reord_d1i2(n,x,i1,i2,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)      :: x(*)
-    integer             :: i1(*), i2(*) 
+    integer(psb_ipk_) :: i1(*), i2(*) 
 
     
-    integer :: lswap, lp, k, isw1, isw2
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2
     real(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -438,13 +438,13 @@ contains
   end subroutine psb_ip_reord_d1i2
   
   subroutine psb_ip_reord_c1i2(n,x,i1,i2,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_spk_)   :: x(*)
-    integer             :: i1(*), i2(*) 
+    integer(psb_ipk_) :: i1(*), i2(*) 
 
     
-    integer :: lswap, lp, k, isw1, isw2
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2
     complex(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -474,13 +474,13 @@ contains
   end subroutine psb_ip_reord_c1i2
   
   subroutine psb_ip_reord_z1i2(n,x,i1,i2,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_dpk_)   :: x(*)
-    integer             :: i1(*), i2(*) 
+    integer(psb_ipk_) :: i1(*), i2(*) 
 
     
-    integer :: lswap, lp, k, isw1, isw2
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2
     complex(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -511,13 +511,13 @@ contains
 
  
   subroutine psb_ip_reord_s1i3(n,x,i1,i2,i3,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_spk_)      :: x(*)
-    integer             :: i1(*), i2(*), i3(*)  
+    integer(psb_ipk_) :: i1(*), i2(*), i3(*)  
 
     
-    integer :: lswap, lp, k, isw1, isw2, isw3
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2, isw3
     real(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -550,13 +550,13 @@ contains
   end subroutine psb_ip_reord_s1i3
   
   subroutine psb_ip_reord_d1i3(n,x,i1,i2,i3,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)      :: x(*)
-    integer             :: i1(*), i2(*),i3(*)
+    integer(psb_ipk_) :: i1(*), i2(*),i3(*)
 
     
-    integer :: lswap, lp, k, isw1, isw2,isw3
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2,isw3
     real(psb_dpk_)  :: swap
 
     lp = iaux(0)
@@ -589,13 +589,13 @@ contains
   end subroutine psb_ip_reord_d1i3
   
   subroutine psb_ip_reord_c1i3(n,x,i1,i2,i3,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_spk_)   :: x(*)
-    integer             :: i1(*), i2(*), i3(*) 
+    integer(psb_ipk_) :: i1(*), i2(*), i3(*) 
 
     
-    integer :: lswap, lp, k, isw1, isw2, isw3
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2, isw3
     complex(psb_spk_)  :: swap
 
     lp = iaux(0)
@@ -628,13 +628,13 @@ contains
   end subroutine psb_ip_reord_c1i3
   
   subroutine psb_ip_reord_z1i3(n,x,i1,i2,i3,iaux)
-    integer, intent(in) :: n
-    integer             :: iaux(0:*) 
+    integer(psb_ipk_), intent(in) :: n
+    integer(psb_ipk_) :: iaux(0:*) 
     complex(psb_dpk_)   :: x(*)
-    integer             :: i1(*), i2(*), i3(*)
+    integer(psb_ipk_) :: i1(*), i2(*), i3(*)
 
     
-    integer :: lswap, lp, k, isw1, isw2, isw3
+    integer(psb_ipk_) :: lswap, lp, k, isw1, isw2, isw3
     complex(psb_dpk_)  :: swap
 
     lp = iaux(0)

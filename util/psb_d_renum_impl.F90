@@ -4,10 +4,10 @@ subroutine psb_d_mat_renums(alg,mat,info,perm)
   implicit none 
   character(len=*), intent(in) :: alg
   type(psb_dspmat_type), intent(inout) :: mat
-  integer, intent(out) :: info
-  integer, allocatable, optional, intent(out) :: perm(:)
+  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), allocatable, optional, intent(out) :: perm(:)
   
-  integer            :: err_act, nr, nc, ialg
+  integer(psb_ipk_) :: err_act, nr, nc, ialg
   character(len=20)  :: name
 
   info = psb_success_
@@ -51,12 +51,12 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
   use psb_base_mod
   use psb_renum_mod, psb_protect_name => psb_d_mat_renum
   implicit none 
-  integer, intent(in) :: alg
+  integer(psb_ipk_), intent(in) :: alg
   type(psb_dspmat_type), intent(inout) :: mat
-  integer, intent(out) :: info
-  integer, allocatable, optional, intent(out) :: perm(:)
+  integer(psb_ipk_), intent(out) :: info
+  integer(psb_ipk_), allocatable, optional, intent(out) :: perm(:)
   
-  integer            :: err_act, nr, nc, i
+  integer(psb_ipk_) :: err_act, nr, nc, i
   character(len=20)  :: name
 
   info = psb_success_
@@ -124,18 +124,18 @@ contains
     use psb_gps_mod
     implicit none 
     type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(out) :: info
-    integer, allocatable, optional, intent(out) :: operm(:)
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_), allocatable, optional, intent(out) :: operm(:)
 
     ! 
     class(psb_d_base_sparse_mat), allocatable :: aa
     type(psb_d_csr_sparse_mat)  :: acsr
     type(psb_d_coo_sparse_mat)  :: acoo
     
-    integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)           :: name
-    integer, allocatable :: ndstk(:,:), iold(:), ndeg(:), perm(:) 
-    integer :: i, j, k, ideg, nr, ibw, ipf, idpth
+    integer(psb_ipk_), allocatable :: ndstk(:,:), iold(:), ndeg(:), perm(:) 
+    integer(psb_ipk_) :: i, j, k, ideg, nr, ibw, ipf, idpth
 
     info = psb_success_
     name = 'mat_renum_gps'
@@ -219,8 +219,8 @@ contains
     use psb_base_mod    
     implicit none 
     type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(out) :: info
-    integer, allocatable, optional, intent(out) :: operm(:)
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_), allocatable, optional, intent(out) :: operm(:)
 
     ! 
 #if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
@@ -239,10 +239,10 @@ contains
     class(psb_d_base_sparse_mat), allocatable :: aa
     type(psb_d_coo_sparse_mat)  :: acoo
 
-    integer, allocatable :: perm(:) 
-    integer :: err_act
+    integer(psb_ipk_), allocatable :: perm(:) 
+    integer(psb_ipk_) :: err_act
     character(len=20)           :: name
-    integer :: i, j, k, ideg, nr, ibw, ipf, idpth, nz
+    integer(psb_ipk_) :: i, j, k, ideg, nr, ibw, ipf, idpth, nz
 
     info = psb_success_
     name = 'mat_renum_amd'
@@ -327,14 +327,14 @@ subroutine psb_d_cmp_bwpf(mat,bwl,bwu,prf,info)
   use psb_renum_mod, psb_protect_name => psb_d_cmp_bwpf
   implicit none 
   type(psb_dspmat_type), intent(in) :: mat
-  integer, intent(out) :: bwl, bwu
-  integer, intent(out) :: prf
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: bwl, bwu
+  integer(psb_ipk_), intent(out) :: prf
+  integer(psb_ipk_), intent(out) :: info
   !
-  integer, allocatable :: irow(:), icol(:)
+  integer(psb_ipk_), allocatable :: irow(:), icol(:)
   real(psb_dpk_), allocatable :: val(:)
-  integer :: nz
-  integer :: i, j, lrbu, lrbl
+  integer(psb_ipk_) :: nz
+  integer(psb_ipk_) :: i, j, lrbu, lrbl
   
   info = psb_success_
   bwl = 0

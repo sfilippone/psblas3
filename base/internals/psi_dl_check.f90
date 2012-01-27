@@ -51,10 +51,10 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
   use psb_descriptor_type
   implicit none
 
-  integer  :: np,dl_lda,length_dl(0:np)
-  integer  :: dep_list(dl_lda,0:np)
+  integer(psb_ipk_) :: np,dl_lda,length_dl(0:np)
+  integer(psb_ipk_) :: dep_list(dl_lda,0:np)
   ! locals
-  integer  :: proc, proc2, i, j
+  integer(psb_ipk_) :: proc, proc2, i, j
 
 
   ! ...if j is in  dep_list of process i 

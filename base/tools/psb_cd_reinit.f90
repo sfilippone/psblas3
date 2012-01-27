@@ -39,14 +39,14 @@ Subroutine psb_cd_reinit(desc,info)
 
   !     .. Array Arguments ..
   Type(psb_desc_type), Intent(inout) :: desc
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
 
-  integer   icomm, err_act
+  integer(psb_ipk_) :: icomm, err_act
 
   !     .. Local Scalars ..
-  Integer ::  np, me, ictxt
-  Integer, allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) ::  np, me, ictxt
+  integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name, ch_err
 
   name='psb_cd_reinit'

@@ -38,29 +38,29 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   !     .. Array Arguments ..
   Type(psb_desc_type), Intent(in), target :: desc_a
-  integer, intent(in)                     :: in_list(:)
+  integer(psb_ipk_), intent(in)                     :: in_list(:)
   Type(psb_desc_type), Intent(out)        :: desc_ov
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(out)                    :: info
   logical, intent(in), optional, target   :: mask(:)
-  integer, intent(in),optional            :: extype
+  integer(psb_ipk_), intent(in),optional            :: extype
 
   !     .. Local Scalars ..
-  Integer ::  i, j, np, me,m,nnzero,&
+  integer(psb_ipk_) ::  i, j, np, me,m,nnzero,&
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
-  Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
+  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, nl, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
-  integer :: icomm, err_act
+  integer(psb_ipk_) :: icomm, err_act
 
-  Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
-  Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
+  integer(psb_ipk_), allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
+  integer(psb_ipk_),allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
-  Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
+  integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   logical, allocatable, target :: lmask(:)
   logical, pointer     :: mask_(:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name, ch_err
 
   name='psb_cd_lstext'

@@ -39,16 +39,16 @@ subroutine zalsr(n,x,dir)
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
   !
   !     .. Scalar Arguments ..
-  integer, intent(in) :: n, dir 
+  integer(psb_ipk_), intent(in) :: n, dir 
   complex(psb_dpk_) ::  x(n)
   !     ..
   !     .. Local Scalars ..
   complex(psb_dpk_) :: xk, piv, xt
-  integer i, j, ilx, iux, istp, lpiv
-  integer n1, n2
+  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
+  integer(psb_ipk_) :: n1, n2
 
-  integer, parameter :: maxstack=64,nparms=3,ithrs=16
-  integer            :: istack(nparms,maxstack)
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_) :: istack(nparms,maxstack)
   !     ..
 
   !
@@ -316,9 +316,9 @@ contains
   subroutine izalsr_up(n,x)
     use zalcmp_mod
     implicit none
-    integer :: n
+    integer(psb_ipk_) :: n
     complex(psb_dpk_) :: x(n)
-    integer :: i,j
+    integer(psb_ipk_) :: i,j
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
@@ -339,9 +339,9 @@ contains
   subroutine izalsr_dw(n,x)
     use zalcmp_mod
     implicit none
-    integer :: n
+    integer(psb_ipk_) :: n
     complex(psb_dpk_) :: x(n)
-    integer :: i,j
+    integer(psb_ipk_) :: i,j
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1

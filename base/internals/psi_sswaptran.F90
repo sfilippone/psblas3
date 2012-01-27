@@ -101,17 +101,17 @@ subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: flag, n
-  integer, intent(out)     :: info
+  integer(psb_ipk_), intent(in)      :: flag, n
+  integer(psb_ipk_), intent(out)     :: info
   real(psb_spk_)         :: y(:,:), beta
   real(psb_spk_), target :: work(:)
   type(psb_desc_type),target       :: desc_a
-  integer, optional         :: data
+  integer(psb_ipk_), optional         :: data
 
   ! locals
-  integer  :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
-  integer, pointer :: d_idx(:)
-  integer :: int_err(5)
+  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
+  integer(psb_ipk_), pointer :: d_idx(:)
+  integer(psb_ipk_) :: int_err(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -175,20 +175,20 @@ subroutine psi_stranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: ictxt,icomm,flag,n
-  integer, intent(out)     :: info
+  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag,n
+  integer(psb_ipk_), intent(out)     :: info
   real(psb_spk_)         :: y(:,:), beta
   real(psb_spk_), target :: work(:)
-  integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
+  integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer  :: np, me, nesd, nerv,&
+  integer(psb_ipk_) :: np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
        & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, data_
-  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer :: int_err(5)
+  integer(psb_ipk_) :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -596,17 +596,17 @@ subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: flag
-  integer, intent(out)     :: info
+  integer(psb_ipk_), intent(in)      :: flag
+  integer(psb_ipk_), intent(out)     :: info
   real(psb_spk_)         :: y(:), beta
   real(psb_spk_), target :: work(:)
   type(psb_desc_type),target  :: desc_a
-  integer, optional    :: data
+  integer(psb_ipk_), optional    :: data
 
   ! locals
-  integer  :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
-  integer, pointer :: d_idx(:)
-  integer :: int_err(5)
+  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
+  integer(psb_ipk_), pointer :: d_idx(:)
+  integer(psb_ipk_) :: int_err(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -671,20 +671,20 @@ subroutine psi_stranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: ictxt,icomm,flag
-  integer, intent(out)     :: info
+  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+  integer(psb_ipk_), intent(out)     :: info
   real(psb_spk_)         :: y(:), beta
   real(psb_spk_), target :: work(:)
-  integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
+  integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer  :: np, me, nesd, nerv,&
+  integer(psb_ipk_) :: np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
        & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, data_, n 
-  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer :: int_err(5)
+  integer(psb_ipk_) :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -1038,18 +1038,18 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   include 'mpif.h'
 #endif
 
-  integer, intent(in)         :: flag
-  integer, intent(out)        :: info
+  integer(psb_ipk_), intent(in)         :: flag
+  integer(psb_ipk_), intent(out)        :: info
   class(psb_s_base_vect_type) :: y
   real(psb_spk_)           :: beta
   real(psb_spk_), target   :: work(:)
   type(psb_desc_type),target  :: desc_a
-  integer, optional    :: data
+  integer(psb_ipk_), optional    :: data
 
   ! locals
-  integer  :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
-  integer, pointer :: d_idx(:)
-  integer :: int_err(5)
+  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
+  integer(psb_ipk_), pointer :: d_idx(:)
+  integer(psb_ipk_) :: int_err(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -1116,21 +1116,21 @@ subroutine psi_stranidx_vect(ictxt,icomm,flag,beta,y,idx,&
   include 'mpif.h'
 #endif
 
-  integer, intent(in)      :: ictxt,icomm,flag
-  integer, intent(out)     :: info
+  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+  integer(psb_ipk_), intent(out)     :: info
   class(psb_s_base_vect_type) :: y
   real(psb_spk_)         :: beta
   real(psb_spk_), target :: work(:)
-  integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
+  integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer  :: np, me, nesd, nerv,&
+  integer(psb_ipk_) :: np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
        & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, data_, n 
-  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer :: int_err(5)
+  integer(psb_ipk_) :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.

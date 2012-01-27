@@ -107,21 +107,21 @@ subroutine psb_cbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   complex(psb_spk_), intent(in)      :: b(:)
   complex(psb_spk_), intent(inout)   :: x(:)
   real(psb_spk_), intent(in)         :: eps
-  integer, intent(out)               :: info
-  integer, optional, intent(in)      :: itmax, itrace, istop
-  integer, optional, intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(in)      :: itmax, itrace, istop
+  integer(psb_ipk_), optional, intent(out)     :: iter
   real(psb_spk_), optional, intent(out) :: err
 !!$   local data
   complex(psb_spk_), allocatable, target  :: aux(:),wwrk(:,:)
   complex(psb_spk_), pointer  :: ww(:), q(:),&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
-  integer           :: int_err(5)
-  integer       ::itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) ::itmax_, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: exchange=.true., noexchange=.false.  
-  integer, parameter :: irmax = 8
-  integer            :: itx, isvch, ictxt
+  integer(psb_ipk_), parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, isvch, ictxt
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma
   type(psb_itconv_type) :: stopdat
   real(psb_dpk_)        :: derr
@@ -349,22 +349,22 @@ subroutine psb_cbicg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type), Intent(inout) :: b
   type(psb_c_vect_type), Intent(inout) :: x
   real(psb_spk_), intent(in)           :: eps
-  integer, intent(out)                 :: info
-  integer, optional, intent(in)        :: itmax, itrace, istop
-  integer, optional, intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), optional, intent(in)        :: itmax, itrace, istop
+  integer(psb_ipk_), optional, intent(out)       :: iter
   real(psb_spk_), optional, intent(out) :: err
 !!$   local data
   complex(psb_spk_), allocatable, target   :: aux(:)
   type(psb_c_vect_type), allocatable, target :: wwrk(:)
   type(psb_c_vect_type), pointer  :: ww, q, r, p,&
        & zt, pt, z, rt, qt
-  integer           :: int_err(5)
-  integer       :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: exchange=.true., noexchange=.false.  
-  integer, parameter :: irmax = 8
-  integer            :: itx, isvch, ictxt
+  integer(psb_ipk_), parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, isvch, ictxt
   complex(psb_spk_)     :: alpha, beta, rho, rho_old, sigma
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type) :: stopdat

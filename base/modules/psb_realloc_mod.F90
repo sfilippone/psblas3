@@ -124,12 +124,12 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,allocatable, intent(in)  :: vin(:)
-    Integer,allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_),allocatable, intent(in)  :: vin(:)
+    integer(psb_ipk_),allocatable, intent(out) :: vout(:)
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -175,12 +175,12 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer, allocatable, intent(in)  :: vin(:,:)
-    Integer, allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_), allocatable, intent(in)  :: vin(:,:)
+    integer(psb_ipk_), allocatable, intent(out) :: vout(:,:)
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -229,10 +229,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_spk_), allocatable, intent(in)  :: vin(:)
     real(psb_spk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -279,10 +279,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_spk_), allocatable, intent(in)  :: vin(:,:)
     real(psb_spk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -331,10 +331,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_dpk_), allocatable, intent(in)  :: vin(:)
     real(psb_dpk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -381,10 +381,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_dpk_), allocatable, intent(in)  :: vin(:,:)
     real(psb_dpk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -433,10 +433,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_spk_), allocatable, intent(in)  :: vin(:)
     complex(psb_spk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -483,10 +483,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_spk_), allocatable, intent(in)  :: vin(:,:)
     complex(psb_spk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -535,10 +535,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_dpk_), allocatable, intent(in)  :: vin(:)
     complex(psb_dpk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -584,10 +584,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_dpk_), allocatable, intent(in)  :: vin(:,:)
     complex(psb_dpk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -634,12 +634,12 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer, intent(in)               :: vin(:)
-    Integer, allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_), intent(in)               :: vin(:)
+    integer(psb_ipk_), allocatable, intent(out) :: vout(:)
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -681,12 +681,12 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer, intent(in)               :: vin(:,:)
-    Integer, allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_), intent(in)               :: vin(:,:)
+    integer(psb_ipk_), allocatable, intent(out) :: vout(:,:)
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -733,10 +733,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_spk_), intent(in)               :: vin(:)
     real(psb_spk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -781,10 +781,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_spk_), intent(in)               :: vin(:,:)
     real(psb_spk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -831,10 +831,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_dpk_), intent(in)               :: vin(:)
     real(psb_dpk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -878,10 +878,10 @@ Contains
     ! ...Subroutine Arguments  
     real(psb_dpk_), intent(in)               :: vin(:,:)
     real(psb_dpk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -928,10 +928,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_spk_), intent(in)               :: vin(:)
     complex(psb_spk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -976,10 +976,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_spk_), intent(in)               :: vin(:,:)
     complex(psb_spk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -1026,10 +1026,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_dpk_), intent(in)               :: vin(:)
     complex(psb_dpk_), allocatable, intent(out) :: vout(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act,lb
+    integer(psb_ipk_) :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -1073,10 +1073,10 @@ Contains
     ! ...Subroutine Arguments  
     complex(psb_dpk_), intent(in)               :: vin(:,:)
     complex(psb_dpk_), allocatable, intent(out) :: vout(:,:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act, lb1, lb2 
+    integer(psb_ipk_) :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -1119,8 +1119,8 @@ Contains
 
   
   function psb_isize1d(vin)
-    integer :: psb_isize1d
-    integer, allocatable, intent(in) :: vin(:)
+    integer(psb_ipk_) :: psb_isize1d
+    integer(psb_ipk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
       psb_isize1d = 0
@@ -1130,10 +1130,10 @@ Contains
   end function psb_isize1d
 
   function psb_isize2d(vin,dim)
-    integer :: psb_isize2d
-    integer, allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_) :: psb_isize2d
+    integer(psb_ipk_), allocatable, intent(in) :: vin(:,:)
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
     if (.not.allocated(vin)) then 
       psb_isize2d = 0
@@ -1149,7 +1149,7 @@ Contains
   
 #if !defined(LONG_INTEGERS)  
   function psb_i8size1d(vin)
-    integer :: psb_i8size1d
+    integer(psb_ipk_) :: psb_i8size1d
     integer(psb_long_int_k_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
@@ -1160,10 +1160,10 @@ Contains
   end function psb_i8size1d
 
   function psb_i8size2d(vin,dim)
-    integer :: psb_i8size2d
+    integer(psb_ipk_) :: psb_i8size2d
     integer(psb_long_int_k_), allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
     if (.not.allocated(vin)) then 
       psb_i8size2d = 0
@@ -1179,7 +1179,7 @@ Contains
 #endif
   
   function psb_ssize1d(vin)
-    integer :: psb_ssize1d
+    integer(psb_ipk_) :: psb_ssize1d
     real(psb_spk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
@@ -1190,10 +1190,10 @@ Contains
   end function psb_ssize1d
 
   function psb_ssize2d(vin,dim)
-    integer :: psb_ssize2d
+    integer(psb_ipk_) :: psb_ssize2d
     real(psb_spk_), allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
 
     if (.not.allocated(vin)) then 
@@ -1209,7 +1209,7 @@ Contains
   end function psb_ssize2d
 
   function psb_dsize1d(vin)
-    integer :: psb_dsize1d
+    integer(psb_ipk_) :: psb_dsize1d
     real(psb_dpk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
@@ -1220,10 +1220,10 @@ Contains
   end function psb_dsize1d
 
   function psb_dsize2d(vin,dim)
-    integer :: psb_dsize2d
+    integer(psb_ipk_) :: psb_dsize2d
     real(psb_dpk_), allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
 
     if (.not.allocated(vin)) then 
@@ -1240,7 +1240,7 @@ Contains
 
   
   function psb_csize1d(vin)
-    integer :: psb_csize1d
+    integer(psb_ipk_) :: psb_csize1d
     complex(psb_spk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
@@ -1251,10 +1251,10 @@ Contains
   end function psb_csize1d
 
   function psb_csize2d(vin,dim)
-    integer :: psb_csize2d
+    integer(psb_ipk_) :: psb_csize2d
     complex(psb_spk_), allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
     if (.not.allocated(vin)) then 
       psb_csize2d = 0
@@ -1269,7 +1269,7 @@ Contains
   end function psb_csize2d
   
   function psb_zsize1d(vin)
-    integer :: psb_zsize1d
+    integer(psb_ipk_) :: psb_zsize1d
     complex(psb_dpk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
@@ -1280,10 +1280,10 @@ Contains
   end function psb_zsize1d
 
   function psb_zsize2d(vin,dim)
-    integer :: psb_zsize2d
+    integer(psb_ipk_) :: psb_zsize2d
     complex(psb_dpk_), allocatable, intent(in) :: vin(:,:)
-    integer, optional :: dim
-    integer :: dim_
+    integer(psb_ipk_), optional :: dim
+    integer(psb_ipk_) :: dim_
 
     if (.not.allocated(vin)) then 
       psb_zsize2d = 0
@@ -1302,15 +1302,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
-    Integer,allocatable, intent(inout) :: v(:)
-    integer         :: info
-    integer, optional, intent(in) :: pad
-    integer, optional, intent(in) :: addsz,newsz
+    integer(psb_ipk_),Intent(in)                 :: len
+    integer(psb_ipk_),allocatable, intent(inout) :: v(:)
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in) :: pad
+    integer(psb_ipk_), optional, intent(in) :: addsz,newsz
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1361,15 +1361,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
+    integer(psb_ipk_),Intent(in)                 :: len
     Integer(psb_long_int_k_),allocatable, intent(inout) :: v(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     integer(psb_long_int_k_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: addsz,newsz
+    integer(psb_ipk_), optional, intent(in) :: addsz,newsz
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1419,15 +1419,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
+    integer(psb_ipk_),Intent(in)                 :: len
     real(psb_spk_),allocatable, intent(inout) :: v(:)
-    integer         :: info
-    integer, optional, intent(in)          :: addsz,newsz
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in)          :: addsz,newsz
     real(psb_spk_), optional, intent(in) :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1477,15 +1477,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
+    integer(psb_ipk_),Intent(in)                 :: len
     real(psb_dpk_),allocatable, intent(inout) :: v(:)
-    integer         :: info
-    integer, optional, intent(in)          :: addsz,newsz
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in)          :: addsz,newsz
     real(psb_dpk_), optional, intent(in) :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1536,15 +1536,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                             :: len
+    integer(psb_ipk_),Intent(in)                             :: len
     complex(psb_spk_),allocatable, intent(inout) :: v(:)
-    integer                                        :: info
-    integer, optional, intent(in)                  :: addsz,newsz
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in)                  :: addsz,newsz
     complex(psb_spk_), optional, intent(in)      :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1594,15 +1594,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                             :: len
+    integer(psb_ipk_),Intent(in)                             :: len
     complex(psb_dpk_),allocatable, intent(inout) :: v(:)
-    integer                                        :: info
-    integer, optional, intent(in)                  :: addsz,newsz
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in)                  :: addsz,newsz
     complex(psb_dpk_), optional, intent(in)      :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
-    integer :: isz, err_act
+    integer(psb_ipk_) :: isz, err_act
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
@@ -1652,14 +1652,14 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
-    Integer,allocatable, intent(inout) :: rrax(:)
-    integer         :: info
-    integer, optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_),Intent(in)                 :: len
+    integer(psb_ipk_),allocatable, intent(inout) :: rrax(:)
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in) :: pad
+    integer(psb_ipk_), optional, intent(in) :: lb
     ! ...Local Variables
-    Integer,allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,lb_, lbi, ub_
+    integer(psb_ipk_),allocatable  :: tmp(:)
+    integer(psb_ipk_) :: dim, err_act, err,lb_, lbi, ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -1735,14 +1735,14 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
+    integer(psb_ipk_),Intent(in)                 :: len
     Integer(psb_long_int_k_),allocatable, intent(inout) :: rrax(:)
-    integer         :: info
+    integer(psb_ipk_) :: info
     integer(psb_long_int_k_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_), optional, intent(in) :: lb
     ! ...Local Variables
     Integer(psb_long_int_k_),allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,lb_, lbi, ub_
+    integer(psb_ipk_) :: dim, err_act, err,lb_, lbi, ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -1819,15 +1819,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
+    integer(psb_ipk_),Intent(in) :: len
     Real(psb_spk_),allocatable, intent(inout) :: rrax(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_), optional, intent(in) :: lb
 
     ! ...Local Variables
     Real(psb_spk_),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err, lb_, lbi,ub_
+    integer(psb_ipk_) :: dim,err_act,err, lb_, lbi,ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -1893,15 +1893,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
+    integer(psb_ipk_),Intent(in) :: len
     Real(psb_dpk_),allocatable, intent(inout) :: rrax(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     real(psb_dpk_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_), optional, intent(in) :: lb
 
     ! ...Local Variables
     Real(psb_dpk_),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err, lb_, lbi,ub_
+    integer(psb_ipk_) :: dim,err_act,err, lb_, lbi,ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -1968,15 +1968,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
+    integer(psb_ipk_),Intent(in) :: len
     complex(psb_spk_),allocatable, intent(inout):: rrax(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     complex(psb_spk_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_), optional, intent(in) :: lb
 
     ! ...Local Variables
     complex(psb_spk_),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,lb_,ub_,lbi
+    integer(psb_ipk_) :: dim,err_act,err,lb_,ub_,lbi
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -2041,15 +2041,15 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
+    integer(psb_ipk_),Intent(in) :: len
     complex(psb_dpk_),allocatable, intent(inout):: rrax(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     complex(psb_dpk_), optional, intent(in) :: pad
-    integer, optional, intent(in) :: lb
+    integer(psb_ipk_), optional, intent(in) :: lb
 
     ! ...Local Variables
     complex(psb_dpk_),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,lb_,ub_,lbi
+    integer(psb_ipk_) :: dim,err_act,err,lb_,ub_,lbi
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -2115,16 +2115,16 @@ Contains
   Subroutine psb_reallocates2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
+    integer(psb_ipk_),Intent(in) :: len1,len2
     Real(psb_spk_),allocatable :: rrax(:,:)
-    integer :: info
+    integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     Real(psb_spk_),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_) :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2207,16 +2207,16 @@ Contains
   Subroutine psb_reallocated2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
+    integer(psb_ipk_),Intent(in) :: len1,len2
     Real(psb_dpk_),allocatable :: rrax(:,:)
-    integer :: info
+    integer(psb_ipk_) :: info
     real(psb_dpk_), optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     Real(psb_dpk_),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_) :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2299,16 +2299,16 @@ Contains
   Subroutine psb_reallocatec2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
+    integer(psb_ipk_),Intent(in) :: len1,len2
     complex(psb_spk_),allocatable :: rrax(:,:)
-    integer :: info
+    integer(psb_ipk_) :: info
     complex(psb_spk_), optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     complex(psb_spk_),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_) :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2391,16 +2391,16 @@ Contains
   Subroutine psb_reallocatez2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
+    integer(psb_ipk_),Intent(in) :: len1,len2
     complex(psb_dpk_),allocatable :: rrax(:,:)
-    integer :: info
+    integer(psb_ipk_) :: info
     complex(psb_dpk_), optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     complex(psb_dpk_),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_) :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2484,15 +2484,15 @@ Contains
   Subroutine psb_reallocatei2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
-    integer,allocatable :: rrax(:,:)
-    integer :: info
-    integer, optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in) :: len1,len2
+    integer(psb_ipk_),allocatable :: rrax(:,:)
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in) :: pad
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
-    integer,allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_),allocatable  :: tmp(:,:)
+    integer(psb_ipk_) :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2575,15 +2575,15 @@ Contains
   Subroutine psb_reallocatei8_2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len1,len2
+    integer(psb_ipk_),Intent(in) :: len1,len2
     integer(psb_long_int_k_),allocatable :: rrax(:,:)
-    integer :: info
+    integer(psb_ipk_) :: info
     integer(psb_long_int_k_), optional, intent(in) :: pad
-    Integer,Intent(in), optional  :: lb1,lb2
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
     integer(psb_long_int_k_),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_ipk_) :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -2667,12 +2667,12 @@ Contains
     use psb_error_mod
     ! ...Subroutine Arguments  
 
-    Integer,Intent(in) :: len
-    Integer,allocatable, intent(inout) :: rrax(:),y(:)
-    integer :: info
-    integer, optional, intent(in) :: pad
+    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),allocatable, intent(inout) :: rrax(:),y(:)
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional, intent(in) :: pad
     character(len=20)  :: name
-    integer :: err_act, err
+    integer(psb_ipk_) :: err_act, err
 
     name='psb_reallocate2i'
     call psb_erractionsave(err_act)
@@ -2716,12 +2716,12 @@ Contains
   Subroutine psb_reallocate2i1s(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
-    Integer,allocatable, intent(inout)  :: rrax(:),y(:)
+    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),allocatable, intent(inout)  :: rrax(:),y(:)
     Real(psb_spk_),allocatable, intent(inout) :: z(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     character(len=20)  :: name
-    integer :: err_act, err
+    integer(psb_ipk_) :: err_act, err
     logical, parameter :: debug=.false.
 
     name='psb_reallocate2i1s'
@@ -2765,12 +2765,12 @@ Contains
   Subroutine psb_reallocate2i1d(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
-    Integer,allocatable, intent(inout)  :: rrax(:),y(:)
+    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),allocatable, intent(inout)  :: rrax(:),y(:)
     Real(psb_dpk_),allocatable, intent(inout) :: z(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     character(len=20)  :: name
-    integer :: err_act, err
+    integer(psb_ipk_) :: err_act, err
 
     name='psb_reallocate2i1d'
     call psb_erractionsave(err_act)
@@ -2814,12 +2814,12 @@ Contains
   Subroutine psb_reallocate2i1c(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
-    Integer,allocatable, intent(inout) :: rrax(:),y(:)
+    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),allocatable, intent(inout) :: rrax(:),y(:)
     complex(psb_spk_),allocatable, intent(inout) :: z(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     character(len=20)  :: name
-    integer :: err_act, err
+    integer(psb_ipk_) :: err_act, err
 
     name='psb_reallocate2i1c'
     call psb_erractionsave(err_act)
@@ -2861,12 +2861,12 @@ Contains
   Subroutine psb_reallocate2i1z(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
-    Integer,allocatable, intent(inout) :: rrax(:),y(:)
+    integer(psb_ipk_),Intent(in) :: len
+    integer(psb_ipk_),allocatable, intent(inout) :: rrax(:),y(:)
     complex(psb_dpk_),allocatable, intent(inout) :: z(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     character(len=20)  :: name
-    integer :: err_act, err
+    integer(psb_ipk_) :: err_act, err
 
     name='psb_reallocate2i1z'
     call psb_erractionsave(err_act)
@@ -2907,7 +2907,7 @@ Contains
   Subroutine psb_smove_alloc1d(vin,vout,info)
     use psb_error_mod
     real(psb_spk_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -2930,7 +2930,7 @@ Contains
   Subroutine psb_smove_alloc2d(vin,vout,info)
     use psb_error_mod
     real(psb_spk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -2955,7 +2955,7 @@ Contains
   Subroutine psb_dmove_alloc1d(vin,vout,info)
     use psb_error_mod
     real(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -2978,7 +2978,7 @@ Contains
   Subroutine psb_dmove_alloc2d(vin,vout,info)
     use psb_error_mod
     real(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3003,7 +3003,7 @@ Contains
   Subroutine psb_cmove_alloc1d(vin,vout,info)
     use psb_error_mod
     complex(psb_spk_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3026,7 +3026,7 @@ Contains
   Subroutine psb_cmove_alloc2d(vin,vout,info)
     use psb_error_mod
     complex(psb_spk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3051,7 +3051,7 @@ Contains
   Subroutine psb_zmove_alloc1d(vin,vout,info)
     use psb_error_mod
     complex(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3074,7 +3074,7 @@ Contains
   Subroutine psb_zmove_alloc2d(vin,vout,info)
     use psb_error_mod
     complex(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3098,8 +3098,8 @@ Contains
 
   Subroutine psb_imove_alloc1d(vin,vout,info)
     use psb_error_mod
-    integer, allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3121,8 +3121,8 @@ Contains
 
   Subroutine psb_imove_alloc2d(vin,vout,info)
     use psb_error_mod
-    integer, allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3148,7 +3148,7 @@ Contains
   Subroutine psb_i8move_alloc1d(vin,vout,info)
     use psb_error_mod
     integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3171,7 +3171,7 @@ Contains
   Subroutine psb_i8move_alloc2d(vin,vout,info)
     use psb_error_mod
     integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer, intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info 
     !
     ! 
     info=psb_success_

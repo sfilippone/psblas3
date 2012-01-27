@@ -119,21 +119,21 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   complex(psb_dpk_), Intent(in)       :: b(:)
   complex(psb_dpk_), Intent(inout)    :: x(:)
   Real(psb_dpk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   complex(psb_dpk_), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
   complex(psb_dpk_), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
   Real(psb_dpk_) :: tmp
   complex(psb_dpk_) :: rti, rti1, scal
-  Integer       ::litmax, naux, mglob, it,k, itrace_,&
+  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt,istop_, err_act
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   Real(psb_dpk_) :: rni, xni, bni, ani,bn2
   real(psb_dpk_), external :: dznrm2
   real(psb_dpk_)   :: errnum, errden
@@ -476,7 +476,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer            incx, incy, n
+    integer(psb_ipk_) :: incx, incy, n
     real(psb_dpk_)    c
     complex(psb_dpk_)   s
     !     ..
@@ -520,7 +520,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer            i, ix, iy
+    integer(psb_ipk_) :: i, ix, iy
     complex(psb_dpk_)         stemp
     !     ..
     !     .. intrinsic functions ..
@@ -600,9 +600,9 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_z_vect_type), Intent(inout) :: b
   type(psb_z_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   complex(psb_dpk_), allocatable   :: aux(:)
@@ -611,12 +611,12 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_z_vect_type)              :: w, w1, xt
   real(psb_dpk_) :: tmp 
   complex(psb_dpk_) :: scal, gm, rti, rti1
-  Integer       ::litmax, naux, mglob, it,k, itrace_,&
+  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt,istop_, err_act
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt
   real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name
@@ -972,7 +972,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer            incx, incy, n
+    integer(psb_ipk_) :: incx, incy, n
     real(psb_dpk_)    c
     complex(psb_dpk_)   s
     !     ..
@@ -1016,7 +1016,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer            i, ix, iy
+    integer(psb_ipk_) :: i, ix, iy
     complex(psb_dpk_)         stemp
     !     ..
     !     .. intrinsic functions ..

@@ -55,24 +55,24 @@ module psb_z_linmap_mod
   interface psb_map_X2Y
     subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
       use psb_const_mod
-      import :: psb_zlinmap_type
+      import :: psb_ipk_, psb_zlinmap_type
       implicit none 
       type(psb_zlinmap_type), intent(in) :: map
       complex(psb_dpk_), intent(in)     :: alpha,beta
       complex(psb_dpk_), intent(inout)  :: x(:)
       complex(psb_dpk_), intent(out)    :: y(:)
-      integer, intent(out)           :: info 
+      integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_X2Y
     subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work)
       use psb_const_mod
       use psb_z_vect_mod
-      import :: psb_zlinmap_type
+      import :: psb_ipk_, psb_zlinmap_type
       implicit none 
       type(psb_zlinmap_type), intent(in) :: map
       complex(psb_dpk_), intent(in)     :: alpha,beta
       type(psb_z_vect_type), intent(inout)  :: x,y
-      integer, intent(out)           :: info 
+      integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_X2Y_vect
   end interface
@@ -80,24 +80,24 @@ module psb_z_linmap_mod
   interface psb_map_Y2X
     subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
       use psb_const_mod
-      import :: psb_zlinmap_type
+      import :: psb_ipk_, psb_zlinmap_type
       implicit none 
       type(psb_zlinmap_type), intent(in) :: map
       complex(psb_dpk_), intent(in)     :: alpha,beta
       complex(psb_dpk_), intent(inout)  :: x(:)
       complex(psb_dpk_), intent(out)    :: y(:)
-      integer, intent(out)           :: info 
+      integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_Y2X
     subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work)
       use psb_const_mod
       use psb_z_vect_mod
-      import :: psb_zlinmap_type
+      import :: psb_ipk_, psb_zlinmap_type
       implicit none 
       type(psb_zlinmap_type), intent(in) :: map
       complex(psb_dpk_), intent(in)     :: alpha,beta
       type(psb_z_vect_type), intent(inout)  :: x,y
-      integer, intent(out)           :: info 
+      integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_Y2X_vect
   end interface
@@ -118,13 +118,13 @@ module psb_z_linmap_mod
   interface psb_linmap
     function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
       use psb_z_mat_mod, only : psb_zspmat_type
-      import :: psb_zlinmap_type, psb_desc_type
+      import :: psb_ipk_, psb_zlinmap_type, psb_desc_type
       implicit none 
       type(psb_zlinmap_type)            :: psb_z_linmap    
       type(psb_desc_type), target       :: desc_X, desc_Y
       type(psb_zspmat_type), intent(in) :: map_X2Y, map_Y2X
-      integer, intent(in)               :: map_kind
-      integer, intent(in), optional     :: iaggr(:), naggr(:)
+      integer(psb_ipk_), intent(in)               :: map_kind
+      integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
     end function psb_z_linmap
   end interface
 
@@ -166,7 +166,7 @@ contains
     use psb_z_mat_mod
     implicit none
     type(psb_zlinmap_type), intent(inout)  :: map
-    integer, intent(out)                   :: info
+    integer(psb_ipk_), intent(out)                   :: info
     character(len=*), intent(in), optional :: type
     class(psb_z_base_sparse_mat), intent(in), optional :: mold
 
@@ -183,8 +183,8 @@ contains
     type(psb_zlinmap_type), intent(out) :: out_map    
     type(psb_desc_type), target       :: desc_X, desc_Y
     type(psb_zspmat_type), intent(in) :: map_X2Y, map_Y2X
-    integer, intent(in)               :: map_kind
-    integer, intent(in), optional     :: iaggr(:), naggr(:)
+    integer(psb_ipk_), intent(in)               :: map_kind
+    integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
     out_map = psb_linmap(map_kind,desc_X,desc_Y,map_X2Y,map_Y2X,iaggr,naggr)
   end subroutine psb_z_linmap_sub
 
@@ -194,7 +194,7 @@ contains
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_zlinmap_type) :: mapin,mapout
-    integer, intent(out)      :: info 
+    integer(psb_ipk_), intent(out)      :: info 
     
     call psb_move_alloc(mapin%psb_base_linmap_type, &
          & mapout%psb_base_linmap_type,info)
@@ -207,7 +207,7 @@ contains
     use psb_descriptor_type
     implicit none 
     class(psb_zlinmap_type) :: map
-    integer, intent(out)      :: info 
+    integer(psb_ipk_), intent(out)      :: info 
     
     call map%psb_base_linmap_type%free(info)
     

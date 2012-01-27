@@ -57,16 +57,16 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
   !...Parameters....
   type(psb_zspmat_type), intent (inout)   :: a
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
-  integer,optional, intent(in)            :: dupl, upd
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_),optional, intent(in)            :: dupl, upd
   character(len=*), optional, intent(in)         :: afmt
   class(psb_z_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
-  integer               :: int_err(5)
-  integer               :: np,me,n_col, err_act
-  integer               :: spstate
-  integer               :: ictxt,n_row
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: np,me,n_col, err_act
+  integer(psb_ipk_) :: spstate
+  integer(psb_ipk_) :: ictxt,n_row
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 
   info = psb_success_

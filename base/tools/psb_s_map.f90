@@ -45,12 +45,12 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
   real(psb_spk_), intent(in)       :: alpha,beta
   real(psb_spk_), intent(inout)    :: x(:)
   real(psb_spk_), intent(out)      :: y(:)
-  integer, intent(out)                  :: info 
+  integer(psb_ipk_), intent(out)                  :: info 
   real(psb_spk_), optional         :: work(:)
 
   !
   real(psb_spk_), allocatable :: xt(:), yt(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
@@ -117,12 +117,12 @@ subroutine psb_s_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   type(psb_slinmap_type), intent(in)   :: map
   real(psb_spk_), intent(in)        :: alpha,beta
   type(psb_s_vect_type), intent(inout) :: x,y
-  integer, intent(out)                 :: info 
+  integer(psb_ipk_), intent(out)                 :: info 
   real(psb_spk_), optional          :: work(:)
   ! Local
   type(psb_s_vect_type)          :: xt, yt
   real(psb_spk_), allocatable :: xta(:), yta(:)
-  integer                        :: i, j, nr1, nc1,nr2, nc2 ,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, nr, ictxt
   character(len=20), parameter   :: name='psb_map_X2Y'
 
@@ -209,12 +209,12 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
   real(psb_spk_), intent(in)       :: alpha,beta
   real(psb_spk_), intent(inout)    :: x(:)
   real(psb_spk_), intent(out)      :: y(:)
-  integer, intent(out)                :: info 
+  integer(psb_ipk_), intent(out)                :: info 
   real(psb_spk_), optional         :: work(:)
 
   !
   real(psb_spk_), allocatable :: xt(:), yt(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
@@ -280,12 +280,12 @@ subroutine psb_s_map_Y2X_vect(alpha,x,beta,y,map,info,work)
   type(psb_slinmap_type), intent(in)   :: map
   real(psb_spk_), intent(in)        :: alpha,beta
   type(psb_s_vect_type), intent(inout) :: x,y
-  integer, intent(out)                 :: info 
+  integer(psb_ipk_), intent(out)                 :: info 
   real(psb_spk_), optional          :: work(:)
   !
   type(psb_s_vect_type)          :: xt, yt
   real(psb_spk_), allocatable :: xta(:), yta(:)
-  integer                        :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter   :: name='psb_map_Y2X'
 
@@ -363,10 +363,10 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   type(psb_slinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
   type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
-  integer, intent(in)               :: map_kind
-  integer, intent(in), optional     :: iaggr(:), naggr(:)
+  integer(psb_ipk_), intent(in)               :: map_kind
+  integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
   !
-  integer                      :: info
+  integer(psb_ipk_) :: info
   character(len=20), parameter :: name='psb_linmap'
 
   info = psb_success_

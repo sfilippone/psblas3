@@ -38,7 +38,7 @@
 !    
 ! 
 ! Arguments: 
-!    v       - integer, dimension(:).         The array containg the partitioning scheme.
+!    v       - integer(psb_ipk_), dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Return code
@@ -51,18 +51,18 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: ictxt, v(:)
-  integer, intent(in), optional     :: flag
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+  integer(psb_ipk_), intent(in), optional     :: flag
+  integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
   !locals
-  Integer             :: counter,i,j,np,me,loc_row,err,&
+  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,&
        & loc_col,nprocs,m,n,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
-  integer             :: int_err(5),exch(3)
-  Integer, allocatable  :: temp_ovrlap(:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

@@ -59,16 +59,16 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   use psb_realloc_mod
   use psi_mod, psb_protect_name => psi_bld_tmpovrl
   implicit none
-  integer, intent(in)  :: iv(:)
+  integer(psb_ipk_), intent(in)  :: iv(:)
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out)  :: info
+  integer(psb_ipk_), intent(out)  :: info
 
   !locals
-  Integer              :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
+  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, icomm
-  integer, allocatable  :: ov_idx(:),ov_el(:,:)
+  integer(psb_ipk_), allocatable  :: ov_idx(:),ov_el(:,:)
 
-  integer             :: ictxt,n_row, debug_unit, debug_level
+  integer(psb_ipk_) :: ictxt,n_row, debug_unit, debug_level
   character(len=20)   :: name,ch_err
 
   info = psb_success_

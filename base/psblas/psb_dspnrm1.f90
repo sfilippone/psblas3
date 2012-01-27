@@ -53,12 +53,12 @@ function psb_dspnrm1(a,desc_a,info)
   implicit none
 
   type(psb_dspmat_type), intent(in) :: a
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
   type(psb_desc_type), intent(in)    :: desc_a
   real(psb_dpk_)                     :: psb_dspnrm1
 
   ! locals
-  integer                  :: ictxt, np, me, nr,nc,&
+  integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(psb_dpk_)         :: nrm1
   character(len=20)      :: name, ch_err

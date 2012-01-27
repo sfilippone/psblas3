@@ -35,7 +35,7 @@
 !    frees a dense integer matrix structure
 ! 
 ! Arguments: 
-!    x(:,:)   - integer, allocatable                 The dense matrix to be freed.
+!    x(:,:)   - integer(psb_ipk_), allocatable                 The dense matrix to be freed.
 !    desc_a   - type(psb_desc_type).               The communication descriptor.
 !    info     - integer.                             Eventually returns an error code
 subroutine psb_ifree(x, desc_a, info)
@@ -43,12 +43,12 @@ subroutine psb_ifree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  integer, allocatable, intent(inout) :: x(:,:)
+  integer(psb_ipk_), allocatable, intent(inout) :: x(:,:)
   type(psb_desc_type), intent(in)     :: desc_a
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   
   !...locals....
-  integer             :: ictxt,np,me, err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
@@ -137,18 +137,18 @@ end subroutine psb_ifree
 !    frees a dense integer matrix structure
 ! 
 ! Arguments: 
-!    x(:)     - integer, allocatable                 The dense matrix to be freed.
+!    x(:)     - integer(psb_ipk_), allocatable                 The dense matrix to be freed.
 !    desc_a   - type(psb_desc_type).               The communication descriptor.
 !    info     - integer.                             Eventually returns an error code
 subroutine psb_ifreev(x, desc_a,info)
   use psb_base_mod, psb_protect_name => psb_ifreev
   implicit none
   !....parameters...
-  integer, allocatable, intent(inout) :: x(:)
+  integer(psb_ipk_), allocatable, intent(inout) :: x(:)
   type(psb_desc_type), intent(in)     :: desc_a
-  integer, intent(out)                :: info 
+  integer(psb_ipk_), intent(out)                :: info 
   !...locals....
-  integer             :: ictxt,np,me, err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 

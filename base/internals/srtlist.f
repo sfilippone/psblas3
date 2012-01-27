@@ -81,11 +81,12 @@ C
      +  edges,idx,ich,INFO)
       use psb_serial_mod
       IMPLICIT NONE
-      INTEGER  NP, DL_LDA, INFO
-      INTEGER  DEP_LIST(DL_LDA,*), LDL(*),DG(*), DGP(*), IDX(*),
-     +  UPD(*),EDGES(2,*),ICH(*)
-      INTEGER  I,J, NEDGES,IP1,IP2,NCH,IP,IEDGE,I1,IX,IST,ISWAP(2)
-      INTEGER NO_COMM
+      INTEGER(psb_ipk_) ::  NP, DL_LDA, INFO
+      INTEGER(psb_ipk_) ::  DEP_LIST(DL_LDA,*), LDL(*),DG(*), DGP(*),
+     +  IDX(*), UPD(*),EDGES(2,*),ICH(*)
+      INTEGER(psb_ipk_) ::  I,J, NEDGES,IP1,IP2,NCH,IP,IEDGE,
+     +  I1,IX,IST,ISWAP(2)
+      INTEGER(psb_ipk_) :: NO_COMM
       PARAMETER (NO_COMM=-1)
       
       

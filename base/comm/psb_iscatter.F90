@@ -36,8 +36,8 @@
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  integer,dimension(:,:).          The global matrix to scatter.
-!   locx      -  integer,dimension(:,:).          The local piece of the ditributed matrix.
+!   globx     -  integer(psb_ipk_),dimension(:,:).          The global matrix to scatter.
+!   locx      -  integer(psb_ipk_),dimension(:,:).          The local piece of the ditributed matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
@@ -53,19 +53,19 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
   include 'mpif.h'
 #endif
 
-  integer, intent(out)    :: locx(:,:)
-  integer, intent(in)     :: globx(:,:)
+  integer(psb_ipk_), intent(out)    :: locx(:,:)
+  integer(psb_ipk_), intent(in)     :: globx(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-  integer, intent(in), optional    :: iroot
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: iroot
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
-  integer, allocatable :: scatterv(:)
-  integer, allocatable :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable :: scatterv(:)
+  integer(psb_ipk_), allocatable :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -167,8 +167,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     end do
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
-    call mpi_gather(nrow,1,mpi_integer,all_dim,&
-         & 1,mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
+         & 1,psb_mpi_integer,rootrank,icomm,info)
 
     if (me == root) then
       displ(1)=0
@@ -188,8 +188,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & mpi_integer,l_t_g_all,all_dim,&
-         & displ,mpi_integer,rootrank,icomm,info)
+         & psb_mpi_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_integer,rootrank,icomm,info)
 
 
     do c=1, k
@@ -206,8 +206,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
       ! scatter !!!
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & mpi_integer,locx(1,jlocx+c-1),nrow,&
-           & mpi_integer,rootrank,icomm,info)
+           & psb_mpi_integer,locx(1,jlocx+c-1),nrow,&
+           & psb_mpi_integer,rootrank,icomm,info)
 
     end do
 
@@ -268,8 +268,8 @@ end subroutine psb_iscatterm
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  integer,dimension(:).            The global vector to scatter.
-!   locx      -  integer,dimension(:).            The local piece of the ditributed vector.
+!   globx     -  integer(psb_ipk_),dimension(:).            The global vector to scatter.
+!   locx      -  integer(psb_ipk_),dimension(:).            The local piece of the ditributed vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
@@ -285,22 +285,22 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   include 'mpif.h'
 #endif
 
-  integer, intent(out)    :: locx(:)
-  integer, intent(in)     :: globx(:)
+  integer(psb_ipk_), intent(out)    :: locx(:)
+  integer(psb_ipk_), intent(in)     :: globx(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-  integer, intent(in), optional    :: iroot
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
        & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
-  integer, allocatable  :: scatterv(:)
-  integer, allocatable  :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable  :: scatterv(:)
+  integer(psb_ipk_), allocatable  :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)     :: name, ch_err
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_scatterv'
   if (psb_get_errstatus() /= 0) return 
@@ -382,8 +382,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
 
-    call mpi_gather(nrow,1,mpi_integer,all_dim,&
-         & 1,mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
+         & 1,psb_mpi_integer,rootrank,icomm,info)
 
     if(me == root) then
       displ(1)=0
@@ -400,8 +400,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & mpi_integer,l_t_g_all,all_dim,&
-         & displ,mpi_integer,rootrank,icomm,info)
+         & psb_mpi_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_integer,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (me == root) then
@@ -416,8 +416,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & mpi_integer,locx,nrow,&
-         & mpi_integer,rootrank,icomm,info)
+         & psb_mpi_integer,locx,nrow,&
+         & psb_mpi_integer,rootrank,icomm,info)
 
     if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
   end if

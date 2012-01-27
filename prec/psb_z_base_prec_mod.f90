@@ -36,7 +36,7 @@
 module psb_z_base_prec_mod
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_dpk_, psb_long_int_k_,&
+  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_sizeof_int, psb_sizeof_long_int, psb_sizeof_sp, psb_sizeof_dp, &
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus, psb_success_,&
@@ -46,7 +46,7 @@ module psb_z_base_prec_mod
   use psb_prec_const_mod
 
   type psb_z_base_prec_type
-    integer :: ictxt
+    integer(psb_ipk_) :: ictxt
   contains
     procedure, pass(prec) :: set_ctxt  => psb_z_base_set_ctxt
     procedure, pass(prec) :: get_ctxt  => psb_z_base_get_ctxt
@@ -81,10 +81,10 @@ contains
     complex(psb_dpk_),intent(in)          :: alpha, beta
     type(psb_z_vect_type),intent(inout)   :: x
     type(psb_z_vect_type),intent(inout)   :: y
-    integer, intent(out)                  :: info
+    integer(psb_ipk_), intent(out)                  :: info
     character(len=1), optional            :: trans
     complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -117,10 +117,10 @@ contains
     complex(psb_dpk_),intent(in)         :: alpha, beta
     complex(psb_dpk_),intent(inout)      :: x(:)
     complex(psb_dpk_),intent(inout)      :: y(:)
-    integer, intent(out)                 :: info
+    integer(psb_ipk_), intent(out)                 :: info
     character(len=1), optional           :: trans
     complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -150,8 +150,8 @@ contains
     Implicit None
    
     class(psb_z_base_prec_type),intent(inout) :: prec
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precinit'
 
     call psb_erractionsave(err_act)
@@ -182,12 +182,12 @@ contains
     type(psb_zspmat_type), intent(in), target :: a
     type(psb_desc_type), intent(in), target   :: desc_a
     class(psb_z_base_prec_type),intent(inout) :: prec
-    integer, intent(out)                      :: info
+    integer(psb_ipk_), intent(out)                      :: info
     character, intent(in), optional           :: upd
     character(len=*), intent(in), optional    :: afmt
     class(psb_z_base_sparse_mat), intent(in), optional :: amold
     class(psb_z_base_vect_type), intent(in), optional  :: vmold
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precbld'
 
     call psb_erractionsave(err_act)
@@ -216,10 +216,10 @@ contains
     Implicit None
     
     class(psb_z_base_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
-    integer, intent(in)                      :: val 
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: val 
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precseti'
 
     call psb_erractionsave(err_act)
@@ -248,10 +248,10 @@ contains
     Implicit None
     
     class(psb_z_base_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     real(psb_dpk_), intent(in)               :: val 
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precsetr'
 
     call psb_erractionsave(err_act)
@@ -280,10 +280,10 @@ contains
     Implicit None
     
     class(psb_z_base_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     character(len=*), intent(in)             :: val
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precsetc'
 
     call psb_erractionsave(err_act)
@@ -312,9 +312,9 @@ contains
     Implicit None
 
     class(psb_z_base_prec_type), intent(inout) :: prec
-    integer, intent(out)                :: info
+    integer(psb_ipk_), intent(out)                :: info
     
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precfree'
     
     call psb_erractionsave(err_act)
@@ -345,9 +345,9 @@ contains
     Implicit None
 
     class(psb_z_base_prec_type), intent(in) :: prec
-    integer, intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: iout
 
-    Integer :: err_act, nrow, info
+    integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='z_base_precdescr'
 
     call psb_erractionsave(err_act)
@@ -376,9 +376,9 @@ contains
   subroutine psb_z_base_precdump(prec,info,prefix,head)
     implicit none 
     class(psb_z_base_prec_type), intent(in) :: prec
-    integer, intent(out)             :: info
+    integer(psb_ipk_), intent(out)             :: info
     character(len=*), intent(in), optional :: prefix,head
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_base_precdump'
 
     call psb_erractionsave(err_act)
@@ -407,7 +407,7 @@ contains
   subroutine psb_z_base_set_ctxt(prec,ictxt)
     implicit none 
     class(psb_z_base_prec_type), intent(inout) :: prec
-    integer, intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: ictxt
 
     prec%ictxt = ictxt
 
@@ -423,7 +423,7 @@ contains
 
   function psb_z_base_get_ctxt(prec) result(val)
     class(psb_z_base_prec_type), intent(in) :: prec
-    integer :: val
+    integer(psb_ipk_) :: val
     
     val = prec%ictxt
     return

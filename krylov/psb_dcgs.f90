@@ -106,18 +106,18 @@
 !!$  Real(psb_dpk_), Intent(in)       :: b(:)
 !!$  Real(psb_dpk_), Intent(inout)    :: x(:)
 !!$  Real(psb_dpk_), Intent(in)       :: eps
-!!$  integer, intent(out)               :: info
-!!$  Integer, Optional, Intent(in)      :: itmax, itrace,istop
-!!$  Integer, Optional, Intent(out)     :: iter
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace,istop
+!!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$! !$   local data
 !!$  Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
 !!$  Real(psb_dpk_), Pointer  :: ww(:), q(:),&
 !!$       & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
-!!$  Integer       :: itmax_, naux, mglob, it, itrace_,int_err(5),&
+!!$  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
 !!$       & np,me, n_row, n_col,istop_, err_act
-!!$  Integer            :: itx, isvch, ictxt
-!!$  integer            :: debug_level, debug_unit
+!!$  integer(psb_ipk_) :: itx, isvch, ictxt
+!!$  integer(psb_ipk_) :: debug_level, debug_unit
 !!$  Real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
 !!$  type(psb_itconv_type) :: stopdat
 !!$  character(len=20)           :: name
@@ -335,19 +335,19 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), Intent(inout) :: b
   type(psb_d_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   Real(psb_dpk_), allocatable, target   :: aux(:)
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: ww, q, r, p, v,&
        & s, z, f, rt, qt, uv
-  Integer       :: itmax_, naux, mglob, it, itrace_,int_err(5),&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
-  Integer            :: itx, isvch, ictxt
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: itx, isvch, ictxt
+  integer(psb_ipk_) :: debug_level, debug_unit
   Real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
   type(psb_itconv_type) :: stopdat
   character(len=20)           :: name

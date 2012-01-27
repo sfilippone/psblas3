@@ -99,8 +99,8 @@ module psb_base_mat_mod
   !            cannot have duplicate entries.
   ! 
   type  :: psb_base_sparse_mat
-    integer, private     :: m, n
-    integer, private     :: state, duplicate 
+    integer(psb_ipk_), private     :: m, n
+    integer(psb_ipk_), private     :: state, duplicate 
     logical, private     :: triangle, upper, unitd, sorted
   contains 
 
@@ -185,10 +185,10 @@ module psb_base_mat_mod
   !
   interface 
     function psb_base_get_nz_row(idx,a) result(res)
-      import :: psb_base_sparse_mat, psb_long_int_k_
-      integer, intent(in)                    :: idx
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
+      integer(psb_ipk_), intent(in)                    :: idx
       class(psb_base_sparse_mat), intent(in) :: a
-      integer :: res
+      integer(psb_ipk_) :: res
     end function psb_base_get_nz_row
   end interface
   
@@ -199,9 +199,9 @@ module psb_base_mat_mod
   !
   interface 
     function psb_base_get_nzeros(a) result(res)
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
-      integer :: res
+      integer(psb_ipk_) :: res
     end function psb_base_get_nzeros
   end interface
 
@@ -213,9 +213,9 @@ module psb_base_mat_mod
   !    
   interface 
     function psb_base_get_size(a) result(res)
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
-      integer :: res
+      integer(psb_ipk_) :: res
     end function psb_base_get_size
   end interface
 
@@ -225,7 +225,7 @@ module psb_base_mat_mod
   !    
   interface 
     subroutine psb_base_reinit(a,clear)
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_base_reinit
@@ -242,12 +242,12 @@ module psb_base_mat_mod
   !    
   interface 
     subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_base_sparse_mat, psb_long_int_k_
-      integer, intent(in)               :: iout
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
+      integer(psb_ipk_), intent(in)               :: iout
       class(psb_base_sparse_mat), intent(in) :: a   
-      integer, intent(in), optional     :: iv(:)
+      integer(psb_ipk_), intent(in), optional     :: iv(:)
       character(len=*), optional        :: head
-      integer, intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_base_sparse_print
   end interface
 
@@ -272,15 +272,15 @@ module psb_base_mat_mod
   interface 
     subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
-      integer, intent(in)                  :: imin,imax
-      integer, intent(out)                 :: nz
-      integer, allocatable, intent(inout)  :: ia(:), ja(:)
-      integer,intent(out)                  :: info
+      integer(psb_ipk_), intent(in)                  :: imin,imax
+      integer(psb_ipk_), intent(out)                 :: nz
+      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+      integer(psb_ipk_),intent(out)                  :: info
       logical, intent(in), optional        :: append
-      integer, intent(in), optional        :: iren(:)
-      integer, intent(in), optional        :: jmin,jmax, nzin
+      integer(psb_ipk_), intent(in), optional        :: iren(:)
+      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
       logical, intent(in), optional        :: rscale,cscale
     end subroutine psb_base_csgetptn
   end interface
@@ -293,13 +293,13 @@ module psb_base_mat_mod
   !           
   interface 
     subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a   
-      integer, intent(in)                :: idx 
-      integer, intent(out)               :: n   
-      integer, allocatable, intent(out)  :: neigh(:)
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: lev 
+      integer(psb_ipk_), intent(in)                :: idx 
+      integer(psb_ipk_), intent(out)               :: n   
+      integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(in)      :: lev 
     end subroutine psb_base_get_neigh
   end interface
   
@@ -310,10 +310,10 @@ module psb_base_mat_mod
   !
   interface 
     subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
-      import :: psb_base_sparse_mat, psb_long_int_k_
-      integer, intent(in) :: m,n
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
+      integer(psb_ipk_), intent(in) :: m,n
       class(psb_base_sparse_mat), intent(inout) :: a
-      integer, intent(in), optional  :: nz
+      integer(psb_ipk_), intent(in), optional  :: nz
     end subroutine psb_base_allocate_mnnz
   end interface
 
@@ -323,8 +323,8 @@ module psb_base_mat_mod
   !
   interface 
     subroutine psb_base_reallocate_nz(nz,a) 
-      import :: psb_base_sparse_mat, psb_long_int_k_
-      integer, intent(in) :: nz
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
+      integer(psb_ipk_), intent(in) :: nz
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_reallocate_nz
   end interface
@@ -334,7 +334,7 @@ module psb_base_mat_mod
   !
   interface 
     subroutine psb_base_free(a) 
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_free
   end interface
@@ -345,7 +345,7 @@ module psb_base_mat_mod
   !
   interface 
     subroutine psb_base_trim(a) 
-      import :: psb_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_trim
   end interface
@@ -379,7 +379,7 @@ contains
   function psb_base_get_dupl(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
+    integer(psb_ipk_) :: res
     res = a%duplicate
   end function psb_base_get_dupl
  
@@ -387,35 +387,35 @@ contains
   function psb_base_get_state(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
+    integer(psb_ipk_) :: res
     res = a%state
   end function psb_base_get_state
  
   function psb_base_get_nrows(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
+    integer(psb_ipk_) :: res
     res = a%m
   end function psb_base_get_nrows
 
   function psb_base_get_ncols(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
+    integer(psb_ipk_) :: res
     res = a%n
   end function psb_base_get_ncols
 
   subroutine  psb_base_set_nrows(m,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: m
+    integer(psb_ipk_), intent(in) :: m
     a%m = m
   end subroutine psb_base_set_nrows
 
   subroutine  psb_base_set_ncols(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     a%n = n
   end subroutine psb_base_set_ncols
   
@@ -423,7 +423,7 @@ contains
   subroutine  psb_base_set_state(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     a%state = n
   end subroutine psb_base_set_state
 
@@ -431,7 +431,7 @@ contains
   subroutine  psb_base_set_dupl(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     a%duplicate = n
   end subroutine psb_base_set_dupl
 
@@ -673,7 +673,7 @@ contains
     implicit none 
     
     class(psb_base_sparse_mat), intent(inout) :: a
-    integer :: itmp
+    integer(psb_ipk_) :: itmp
 
     itmp        = a%m
     a%m         = a%n

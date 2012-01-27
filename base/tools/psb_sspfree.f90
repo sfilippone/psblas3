@@ -46,9 +46,9 @@ subroutine psb_sspfree(a, desc_a,info)
   !....parameters...
   type(psb_desc_type), intent(in)       :: desc_a
   type(psb_sspmat_type), intent(inout) :: a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
   !...locals....
-  integer             :: ictxt,err_act
+  integer(psb_ipk_) :: ictxt,err_act
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

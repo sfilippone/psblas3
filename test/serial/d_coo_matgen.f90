@@ -10,7 +10,7 @@ program d_coo_matgen
   ! input parameters
   character(len=20) :: kmethd, ptype
   character(len=5)  :: afmt
-  integer   :: idim
+  integer(psb_ipk_) :: idim
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
@@ -24,15 +24,15 @@ program d_coo_matgen
   ! dense matrices
   real(psb_dpk_), allocatable :: b(:), x(:)
   ! blacs parameters
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,itrace, istopc, irst
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
 
   ! other variables
-  integer            :: info, err_act
+  integer(psb_ipk_) :: info, err_act
   character(len=20)  :: name,ch_err
 
   info=psb_success_
@@ -82,10 +82,10 @@ contains
   ! get iteration parameters from standard input
   !
   subroutine  get_parms(ictxt,idim)
-    integer      :: ictxt
-    integer      :: idim
-    integer      :: np, iam
-    integer      :: intbuf(10), ip
+    integer(psb_ipk_) :: ictxt
+    integer(psb_ipk_) :: idim
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: intbuf(10), ip
 
     call psb_info(ictxt, iam, np)
 
@@ -99,7 +99,7 @@ contains
   !  print an error message 
   !  
   subroutine pr_usage(iout)
-    integer :: iout
+    integer(psb_ipk_) :: iout
     write(iout,*)'incorrect parameter(s) found'
     write(iout,*)' usage:  pde90 methd prec dim &
          &[istop itmax itrace]'  
@@ -141,19 +141,19 @@ contains
 !!$    use psb_d_base_mat_mod
     use psb_d_csr_mat_mod  
     implicit none
-    integer                        :: idim
-    integer, parameter             :: nb=20
+    integer(psb_ipk_) :: idim
+    integer(psb_ipk_), parameter             :: nb=20
     real(psb_dpk_), allocatable    :: b(:),xv(:)
     type(psb_desc_type)            :: desc_a
-    integer                        :: ictxt, info
+    integer(psb_ipk_) :: ictxt, info
     character                      :: afmt*5
     type(psb_dspmat_type)   :: a
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
-    integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
-    integer                  :: x,y,z,ia,indx_owner
-    integer                  :: np, iam, nr, nt,nz,isz
-    integer                  :: element
-    integer, allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_ipk_) :: m,n,nnz,glob_row,nlr,i,ii,ib,k
+    integer(psb_ipk_) :: x,y,z,ia,indx_owner
+    integer(psb_ipk_) :: np, iam, nr, nt,nz,isz
+    integer(psb_ipk_) :: element
+    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     type(psb_d_coo_sparse_mat) :: acoo
     type(psb_d_csr_sparse_mat) :: acsr
@@ -164,7 +164,7 @@ contains
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcpy, tmov
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
     external         :: a1, a2, a3, a4, b1, b2, b3
-    integer          :: err_act
+    integer(psb_ipk_) :: err_act
 
     character(len=20)  :: name, ch_err, asbfmt
 

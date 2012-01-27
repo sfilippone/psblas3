@@ -45,12 +45,12 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
   complex(psb_dpk_), intent(in)       :: alpha,beta
   complex(psb_dpk_), intent(inout)    :: x(:)
   complex(psb_dpk_), intent(out)      :: y(:)
-  integer, intent(out)                  :: info 
+  integer(psb_ipk_), intent(out)                  :: info 
   complex(psb_dpk_), optional         :: work(:)
 
   !
   complex(psb_dpk_), allocatable :: xt(:), yt(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
@@ -117,12 +117,12 @@ subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   type(psb_zlinmap_type), intent(in)   :: map
   complex(psb_dpk_), intent(in)        :: alpha,beta
   type(psb_z_vect_type), intent(inout) :: x,y
-  integer, intent(out)                 :: info 
+  integer(psb_ipk_), intent(out)                 :: info 
   complex(psb_dpk_), optional          :: work(:)
   ! Local
   type(psb_z_vect_type)          :: xt, yt
   complex(psb_dpk_), allocatable :: xta(:), yta(:)
-  integer                        :: i, j, nr1, nc1,nr2, nc2 ,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, nr, ictxt
   character(len=20), parameter   :: name='psb_map_X2Y'
 
@@ -209,12 +209,12 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
   complex(psb_dpk_), intent(in)       :: alpha,beta
   complex(psb_dpk_), intent(inout)    :: x(:)
   complex(psb_dpk_), intent(out)      :: y(:)
-  integer, intent(out)                :: info 
+  integer(psb_ipk_), intent(out)                :: info 
   complex(psb_dpk_), optional         :: work(:)
 
   !
   complex(psb_dpk_), allocatable :: xt(:), yt(:)
-  integer                       :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
@@ -280,12 +280,12 @@ subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work)
   type(psb_zlinmap_type), intent(in)   :: map
   complex(psb_dpk_), intent(in)        :: alpha,beta
   type(psb_z_vect_type), intent(inout) :: x,y
-  integer, intent(out)                 :: info 
+  integer(psb_ipk_), intent(out)                 :: info 
   complex(psb_dpk_), optional          :: work(:)
   !
   type(psb_z_vect_type)          :: xt, yt
   complex(psb_dpk_), allocatable :: xta(:), yta(:)
-  integer                        :: i, j, nr1, nc1,nr2, nc2,&
+  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
   character(len=20), parameter   :: name='psb_map_Y2X'
 
@@ -363,10 +363,10 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   type(psb_zlinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
   type(psb_zspmat_type), intent(in) :: map_X2Y, map_Y2X
-  integer, intent(in)               :: map_kind
-  integer, intent(in), optional     :: iaggr(:), naggr(:)
+  integer(psb_ipk_), intent(in)               :: map_kind
+  integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
   !
-  integer                      :: info
+  integer(psb_ipk_) :: info
   character(len=20), parameter :: name='psb_linmap'
 
   info = psb_success_

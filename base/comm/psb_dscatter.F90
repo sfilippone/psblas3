@@ -57,17 +57,17 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   real(psb_dpk_), intent(out)    :: locx(:,:)
   real(psb_dpk_), intent(in)     :: globx(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-  integer, intent(in), optional    :: iroot
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
   real(psb_dpk_), allocatable  :: scatterv(:)
-  integer, allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -169,8 +169,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     end do
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
-    call mpi_gather(nrow,1,mpi_integer,all_dim,&
-         & 1,mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
+         & 1,psb_mpi_integer,rootrank,icomm,info)
 
     if (me == root) then
       displ(1)=0
@@ -190,8 +190,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & mpi_integer,l_t_g_all,all_dim,&
-         & displ,mpi_integer,rootrank,icomm,info)
+         & psb_mpi_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_integer,rootrank,icomm,info)
 
 
     do c=1, k
@@ -291,19 +291,19 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   real(psb_dpk_), intent(out)    :: locx(:)
   real(psb_dpk_), intent(in)     :: globx(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-  integer, intent(in), optional    :: iroot
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
        & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
   real(psb_dpk_), allocatable  :: scatterv(:)
-  integer, allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_scatterv'
   if (psb_get_errstatus() /= 0) return 
@@ -385,8 +385,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
 
-    call mpi_gather(nrow,1,mpi_integer,all_dim,&
-         & 1,mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
+         & 1,psb_mpi_integer,rootrank,icomm,info)
 
     if(me == root) then
       displ(1)=0
@@ -403,8 +403,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & mpi_integer,l_t_g_all,all_dim,&
-         & displ,mpi_integer,rootrank,icomm,info)
+         & psb_mpi_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_integer,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (me == root) then

@@ -28,13 +28,13 @@ module psb_z_diagprec
   
   interface  
     subroutine psb_z_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_z_diag_prec_type), intent(inout)  :: prec
       type(psb_z_vect_type),intent(inout)   :: x
       complex(psb_dpk_),intent(in)         :: alpha, beta
       type(psb_z_vect_type),intent(inout)   :: y
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
       complex(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_z_diag_apply_vect
@@ -42,13 +42,13 @@ module psb_z_diagprec
   
   interface  
     subroutine psb_z_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_z_diag_prec_type), intent(in)  :: prec
       complex(psb_dpk_),intent(inout)      :: x(:)
       complex(psb_dpk_),intent(in)         :: alpha, beta
       complex(psb_dpk_),intent(inout)      :: y(:)
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
       complex(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_z_diag_apply
@@ -56,12 +56,12 @@ module psb_z_diagprec
   
   interface
     subroutine psb_z_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      import :: psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_, &
+      import :: psb_ipk_, psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_, &
            & psb_zspmat_type, psb_z_base_sparse_mat, psb_z_base_vect_type
       type(psb_zspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
       class(psb_z_diag_prec_type),intent(inout) :: prec
-      integer, intent(out)                      :: info
+      integer(psb_ipk_), intent(out)                      :: info
       character, intent(in), optional           :: upd
       character(len=*), intent(in), optional    :: afmt
       class(psb_z_base_sparse_mat), intent(in), optional :: amold
@@ -77,8 +77,8 @@ contains
     Implicit None
     
     class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_diag_precinit'
 
     call psb_erractionsave(err_act)
@@ -103,10 +103,10 @@ contains
     Implicit None
     
     class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
-    integer, intent(in)                      :: val 
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: val 
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_diag_precset'
 
     call psb_erractionsave(err_act)
@@ -130,10 +130,10 @@ contains
     Implicit None
     
     class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     real(psb_dpk_), intent(in)               :: val 
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_diag_precset'
 
     call psb_erractionsave(err_act)
@@ -156,10 +156,10 @@ contains
     Implicit None
     
     class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     character(len=*), intent(in)             :: val
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_diag_precset'
 
     call psb_erractionsave(err_act)
@@ -183,9 +183,9 @@ contains
     Implicit None
 
     class(psb_z_diag_prec_type), intent(inout) :: prec
-    integer, intent(out)                :: info
+    integer(psb_ipk_), intent(out)                :: info
     
-    Integer :: err_act, nrow
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_diag_precset'
     
     call psb_erractionsave(err_act)
@@ -212,12 +212,12 @@ contains
     Implicit None
 
     class(psb_z_diag_prec_type), intent(in) :: prec
-    integer, intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: iout
 
-    Integer :: err_act, nrow, info
+    integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='z_diag_precdescr'
 
-    integer :: iout_
+    integer(psb_ipk_) :: iout_
 
     call psb_erractionsave(err_act)
 

@@ -53,17 +53,17 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
 
   !...parameters....
   type(psb_desc_type), intent(in) ::  desc_a
-  integer, intent(in)                ::  x(:)  
-  integer, intent(out)               ::  y(:), info
+  integer(psb_ipk_), intent(in)                ::  x(:)  
+  integer(psb_ipk_), intent(out)               ::  y(:), info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer                            :: n
+  integer(psb_ipk_) :: n
   character                          :: act
-  integer                            :: int_err(5), err_act
+  integer(psb_ipk_) :: int_err(5), err_act
   logical                            :: owned_
-  integer, parameter                 :: zero=0
+  integer(psb_ipk_), parameter                 :: zero=0
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -172,19 +172,19 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 
   !...parameters....
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(inout)           :: x(:)  
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(inout)           :: x(:)  
+  integer(psb_ipk_), intent(out)             :: info
   logical, intent(in),  optional     :: owned
   character, intent(in), optional  :: iact
 
   !....locals....
-  integer                          :: n
+  integer(psb_ipk_) :: n
   character                        :: act
-  integer                          :: err_act
+  integer(psb_ipk_) :: err_act
   logical                          :: owned_
-  integer, parameter               :: zero=0
+  integer(psb_ipk_), parameter               :: zero=0
   character(len=20)   :: name
-  integer             :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -244,13 +244,13 @@ subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
   use psb_base_mod, psb_protect_name => psb_glob_to_loc2s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer,intent(in)                 ::  x
-  integer,intent(out)                ::  y  
-  integer, intent(out)               ::  info
+  integer(psb_ipk_),intent(in)                 ::  x
+  integer(psb_ipk_),intent(out)                ::  y  
+  integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
 
-  integer  :: iv1(1), iv2(1)
+  integer(psb_ipk_) :: iv1(1), iv2(1)
 
   iv1(1) = x
   call psb_glob_to_loc(iv1,iv2,desc_a,info,iact,owned)
@@ -261,11 +261,11 @@ subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
   use psb_base_mod, psb_protect_name => psb_glob_to_locs
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer,intent(inout)              ::  x  
-  integer, intent(out)               ::  info
+  integer(psb_ipk_),intent(inout)              ::  x  
+  integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
-  integer  :: iv1(1)
+  integer(psb_ipk_) :: iv1(1)
 
   iv1(1) = x
   call psb_glob_to_loc(iv1,desc_a,info,iact,owned)

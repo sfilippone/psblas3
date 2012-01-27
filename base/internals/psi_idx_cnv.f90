@@ -52,17 +52,17 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   use psb_penv_mod
   use psi_mod, psb_protect_name => psi_idx_cnv1
   implicit none
-  integer, intent(in)    :: nv
-  integer, intent(inout) ::  idxin(:)
+  integer(psb_ipk_), intent(in)    :: nv
+  integer(psb_ipk_), intent(inout) ::  idxin(:)
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: ictxt,mglob, nglob,ip,lip,i
-  integer                :: np, me
-  integer                :: nrow,ncol, err_act
-  integer, allocatable   :: itmp(:)
-  integer, parameter     :: relocsz=200
+  integer(psb_ipk_) :: ictxt,mglob, nglob,ip,lip,i
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: nrow,ncol, err_act
+  integer(psb_ipk_), allocatable   :: itmp(:)
+  integer(psb_ipk_), parameter     :: relocsz=200
   character(len=20)      :: name
   logical                :: owned_
 
@@ -188,16 +188,16 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   use psb_penv_mod
   use psi_mod, psb_protect_name => psi_idx_cnv2
   implicit none
-  integer, intent(in)  :: nv, idxin(:)
-  integer, intent(out) :: idxout(:)
+  integer(psb_ipk_), intent(in)  :: nv, idxin(:)
+  integer(psb_ipk_), intent(out) :: idxout(:)
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i,ictxt,mglob, nglob
-  integer                :: np, me
-  integer                :: nrow,ncol, err_act
-  integer, parameter     :: relocsz=200
+  integer(psb_ipk_) :: i,ictxt,mglob, nglob
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: nrow,ncol, err_act
+  integer(psb_ipk_), parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
   logical                :: owned_
@@ -307,14 +307,14 @@ subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
 
   use psi_mod, psb_protect_name => psi_idx_cnvs
   use psb_descriptor_type
-  integer, intent(in)  :: idxin
-  integer, intent(out) :: idxout
+  integer(psb_ipk_), intent(in)  :: idxin
+  integer(psb_ipk_), intent(out) :: idxout
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
   logical  :: mask_(1)
-  integer  :: iout(1) 
+  integer(psb_ipk_) :: iout(1) 
   
   if (present(mask)) then
     mask_ = mask
@@ -332,13 +332,13 @@ subroutine psi_idx_cnvs1(idxin,desc,info,mask,owned)
 
   use psi_mod, psb_protect_name => psi_idx_cnvs1
   use psb_descriptor_type
-  integer, intent(inout)  :: idxin
+  integer(psb_ipk_), intent(inout)  :: idxin
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
   logical  :: mask_(1)
-  integer  :: iout(1) 
+  integer(psb_ipk_) :: iout(1) 
   
   if (present(mask)) then
     mask_ = mask

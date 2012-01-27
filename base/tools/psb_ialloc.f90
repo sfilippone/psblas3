@@ -46,15 +46,15 @@ subroutine psb_ialloc(x, desc_a, info, n, lb)
   implicit none
   
   !....parameters...
-  integer, allocatable, intent(out) :: x(:,:)
+  integer(psb_ipk_), allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, optional, intent(in)     :: n, lb
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), optional, intent(in)     :: n, lb
 
   !locals
-  integer             :: np,me,err,nr,i,j,err_act
-  integer             :: ictxt,n_
-  integer             :: int_err(5), exch(3)
+  integer(psb_ipk_) :: np,me,err,nr,i,j,err_act
+  integer(psb_ipk_) :: ictxt,n_
+  integer(psb_ipk_) :: int_err(5), exch(3)
   character(len=20)   :: name
 
   name='psb_geall'
@@ -179,15 +179,15 @@ subroutine psb_iallocv(x, desc_a, info,n)
   implicit none
 
   !....parameters...
-  integer, allocatable, intent(out) :: x(:)
+  integer(psb_ipk_), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, optional, intent(in)     :: n
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), optional, intent(in)     :: n
 
   !locals
-  integer             :: np,me,nr,i,err_act
-  integer             :: ictxt, int_err(5)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: np,me,nr,i,err_act
+  integer(psb_ipk_) :: ictxt, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

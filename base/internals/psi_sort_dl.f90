@@ -39,11 +39,11 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   use psb_error_mod
   implicit none
 
-  integer :: np,dep_list(:,:), l_dep_list(:)
-  integer :: idg, iupd, idgp, iedges, iidx, iich,ndgmx, isz, err_act
-  integer :: i, info
-  integer, allocatable :: work(:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: np,dep_list(:,:), l_dep_list(:)
+  integer(psb_ipk_) :: idg, iupd, idgp, iedges, iidx, iich,ndgmx, isz, err_act
+  integer(psb_ipk_) :: i, info
+  integer(psb_ipk_), allocatable :: work(:)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
   
   name='psi_sort_dl'

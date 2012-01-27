@@ -42,18 +42,18 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   implicit none
 
   !     ....scalars parameters....
-  integer  :: info, dl_lda
+  integer(psb_ipk_) :: info, dl_lda
   !     .....array parameters....
-  integer  :: desc_data(:), index_in(:)
+  integer(psb_ipk_) :: desc_data(:), index_in(:)
   !     ....local scalars....      
-  integer  :: i,np,me,proc, max_index
-  integer  :: ictxt, err_act
+  integer(psb_ipk_) :: i,np,me,proc, max_index
+  integer(psb_ipk_) :: ictxt, err_act
   !     ...local array...
-  integer  :: int_err(5)
-  integer, allocatable :: counter_recv(:), counter_dl(:)
+  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_), allocatable :: counter_recv(:), counter_dl(:)
 
   !     ...parameters
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
 
   name='psi_compute_size'

@@ -56,19 +56,19 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)              ::  m
-  integer, intent(in)              ::  irw(:)
+  integer(psb_ipk_), intent(in)              ::  m
+  integer(psb_ipk_), intent(in)              ::  irw(:)
   complex(psb_spk_), intent(in)  ::  val(:)
   complex(psb_spk_),intent(inout)      ::  x(:)
   type(psb_desc_type), intent(in)  ::  desc_a
-  integer, intent(out)             ::  info
-  integer, optional, intent(in)    ::  dupl
+  integer(psb_ipk_), intent(out)             ::  info
+  integer(psb_ipk_), optional, intent(in)    ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,&
+  integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np, me, dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -189,19 +189,19 @@ subroutine psb_cins_vect(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)                  :: m
-  integer, intent(in)                  :: irw(:)
+  integer(psb_ipk_), intent(in)                  :: m
+  integer(psb_ipk_), intent(in)                  :: irw(:)
   complex(psb_spk_), intent(in)        :: val(:)
   type(psb_c_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
-  integer, intent(out)                 :: info
-  integer, optional, intent(in)        :: dupl
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), optional, intent(in)        :: dupl
 
   !locals.....
-  integer                :: ictxt,i,&
+  integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np, me, dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -299,19 +299,19 @@ subroutine psb_cins_vect_r2(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)                  :: m
-  integer, intent(in)                  :: irw(:)
+  integer(psb_ipk_), intent(in)                  :: m
+  integer(psb_ipk_), intent(in)                  :: irw(:)
   complex(psb_spk_), intent(in)        :: val(:,:)
   type(psb_c_vect_type), intent(inout) :: x(:)
   type(psb_desc_type), intent(in)      :: desc_a
-  integer, intent(out)                 :: info
-  integer, optional, intent(in)        :: dupl
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), optional, intent(in)        :: dupl
 
   !locals.....
-  integer                :: ictxt,i,&
+  integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5), n
-  integer                :: np, me, dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -462,19 +462,19 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)             ::  m
-  integer, intent(in)             ::  irw(:)
+  integer(psb_ipk_), intent(in)             ::  m
+  integer(psb_ipk_), intent(in)             ::  irw(:)
   complex(psb_spk_), intent(in) ::  val(:,:)
   complex(psb_spk_),intent(inout)     ::  x(:,:)
   type(psb_desc_type), intent(in) ::  desc_a
-  integer, intent(out)            ::  info
-  integer, optional, intent(in)   ::  dupl
+  integer(psb_ipk_), intent(out)            ::  info
+  integer(psb_ipk_), optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,j,n,&
+  integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np,me,dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np,me,dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

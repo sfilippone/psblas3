@@ -120,20 +120,20 @@
 !!$  Real(psb_dpk_), Intent(in)       :: b(:)
 !!$  Real(psb_dpk_), Intent(inout)    :: x(:)
 !!$  Real(psb_dpk_), Intent(in)       :: eps
-!!$  integer, intent(out)               :: info
-!!$  Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-!!$  Integer, Optional, Intent(out)     :: iter
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$! !$   local data
 !!$  Real(psb_dpk_), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
 !!$  Real(psb_dpk_), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
 !!$  Real(psb_dpk_) :: scal, gm, rti, rti1
-!!$  Integer       ::litmax, naux, mglob, it,k, itrace_,&
+!!$  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
 !!$       & np,me, n_row, n_col, nl, int_err(5)
 !!$  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
-!!$  Integer, Parameter :: irmax = 8
-!!$  Integer            :: itx, i, isvch, ictxt,istop_, err_act
-!!$  integer            :: debug_level, debug_unit
+!!$  integer(psb_ipk_), Parameter :: irmax = 8
+!!$  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
+!!$  integer(psb_ipk_) :: debug_level, debug_unit
 !!$  Real(psb_dpk_) :: rni, xni, bni, ani,bn2, dt
 !!$  real(psb_dpk_), external :: dnrm2
 !!$  real(psb_dpk_)   :: errnum, errden
@@ -480,9 +480,9 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), Intent(inout) :: b
   type(psb_d_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   Real(psb_dpk_), allocatable   :: aux(:)
@@ -490,12 +490,12 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), allocatable :: v(:)
   type(psb_d_vect_type)              :: w, w1, xt
   Real(psb_dpk_) :: scal, gm, rti, rti1
-  Integer       ::litmax, naux, mglob, it,k, itrace_,&
+  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt,istop_, err_act
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   Real(psb_dpk_) :: rni, xni, bni, ani,bn2, dt
   real(psb_dpk_), external :: dnrm2
   real(psb_dpk_)   :: errnum, errden

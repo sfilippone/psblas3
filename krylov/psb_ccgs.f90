@@ -106,18 +106,18 @@ Subroutine psb_ccgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Complex(psb_spk_), Intent(in)       :: b(:)
   Complex(psb_spk_), Intent(inout)    :: x(:)
   Real(psb_spk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace,istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace,istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   local data
   Complex(psb_spk_), allocatable, target   :: aux(:),wwrk(:,:)
   Complex(psb_spk_), Pointer  :: ww(:), q(:),&
        & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
-  Integer       :: itmax_, naux, mglob, it, itrace_,int_err(5),&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
-  Integer            :: itx, isvch, ictxt
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: itx, isvch, ictxt
+  integer(psb_ipk_) :: debug_level, debug_unit
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma 
   type(psb_itconv_type) :: stopdat
   real(psb_dpk_)        :: derr
@@ -341,19 +341,19 @@ Subroutine psb_ccgs_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type), Intent(inout) :: b
   type(psb_c_vect_type), Intent(inout) :: x
   Real(psb_spk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   local data
   complex(psb_spk_), allocatable, target   :: aux(:)
   type(psb_c_vect_type), allocatable, target :: wwrk(:)
   type(psb_c_vect_type), pointer  :: ww, q, r, p, v,&
        & s, z, f, rt, qt, uv
-  Integer       :: itmax_, naux, mglob, it, itrace_,int_err(5),&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
-  Integer            :: itx, isvch, ictxt
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: itx, isvch, ictxt
+  integer(psb_ipk_) :: debug_level, debug_unit
   complex(psb_spk_)  :: alpha, beta, rho, rho_old, sigma 
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type) :: stopdat

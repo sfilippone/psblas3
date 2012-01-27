@@ -46,16 +46,18 @@ C
 *                                                                     *
 ***********************************************************************
       LOGICAL FUNCTION ISAPERM(N,IP)               
+      use psb_serial_mod
+      
       implicit none
 
 C     .. Scalar Arguments ..                                                    
-      INTEGER N                                                                 
-C     ..                                                                        
-C     .. Array Arguments ..                                                     
-      INTEGER IP(N)
-C     ..                                                                        
-C     .. Local Scalars ..                                                       
-      INTEGER I,J,M
+      integer(psb_ipk_) :: n                                                                 
+c     ..                                                                        
+c     .. array arguments ..                                                     
+      integer(psb_ipk_) :: ip(n)
+c     ..                                                                        
+c     .. local scalars ..                                                       
+      integer(psb_ipk_) :: i,J,M
 C     ..          
  
       ISAPERM = .TRUE.

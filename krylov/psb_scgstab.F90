@@ -107,29 +107,29 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Real(psb_spk_), Intent(in)       :: b(:)
   Real(psb_spk_), Intent(inout)    :: x(:)
   Real(psb_spk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   Local data
   Real(psb_spk_), allocatable, target   :: aux(:),wwrk(:,:)
   Real(psb_spk_), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
-  Integer       :: itmax_, naux, mglob, it,itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, isvch, ictxt, err_act
-  Integer            :: istop_
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, isvch, ictxt, err_act
+  integer(psb_ipk_) :: istop_
   real(psb_dpk_)     :: derr
   Real(psb_spk_)   :: alpha, beta, omega
   Real(psb_spk_)   :: rho, rho_old, sigma, tau
   type(psb_itconv_type) :: stopdat
 
 #ifdef MPE_KRYLOV
-  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
-  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
+  Integer(psb_ipk_) :: istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
+  Integer(psb_ipk_) :: mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
 #endif
   character(len=20)           :: name
   character(len=*), parameter :: methdname='BiCGStab'
@@ -417,9 +417,9 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   type(psb_s_vect_type), Intent(inout)   :: b
   type(psb_s_vect_type), Intent(inout)   :: x
   Real(psb_spk_), Intent(in)         :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   Local data
   Real(psb_spk_), allocatable, target   :: aux(:),wwrk(:,:)
@@ -427,13 +427,13 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
 !!$       & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   type(psb_s_vect_type) :: q, r, p, v, s, t, z, f
 
-  Integer       :: itmax_, naux, mglob, it,itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, isvch, ictxt, err_act, i
-  Integer            :: istop_
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, isvch, ictxt, err_act, i
+  integer(psb_ipk_) :: istop_
   real(psb_dpk_)     :: derr
   Real(psb_spk_)     :: alpha, beta, rho, rho_old, sigma, omega, tau
   type(psb_itconv_type) :: stopdat

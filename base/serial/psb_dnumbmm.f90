@@ -46,8 +46,8 @@ subroutine psb_dnumbmm(a,b,c)
 
   type(psb_dspmat_type), intent(in) :: a,b
   type(psb_dspmat_type), intent(inout)  :: c
-  integer               :: info
-  integer               :: err_act
+  integer(psb_ipk_) :: info
+  integer(psb_ipk_) :: err_act
   character(len=*), parameter ::  name='psb_numbmm'
 
   call psb_erractionsave(err_act)
@@ -91,12 +91,12 @@ subroutine psb_dbase_numbmm(a,b,c)
 
   class(psb_d_base_sparse_mat), intent(in) :: a,b
   type(psb_d_csr_sparse_mat), intent(inout)  :: c
-  integer, allocatable  :: itemp(:)
-  integer               :: nze, ma,na,mb,nb  
+  integer(psb_ipk_), allocatable  :: itemp(:)
+  integer(psb_ipk_) :: nze, ma,na,mb,nb  
   character(len=20)     :: name
   real(psb_dpk_), allocatable :: temp(:)
-  integer               :: info
-  integer               :: err_act
+  integer(psb_ipk_) :: info
+  integer(psb_ipk_) :: err_act
   name='psb_numbmm'
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -160,8 +160,8 @@ contains
     type(psb_d_csr_sparse_mat), intent(in)  :: a,b
     type(psb_d_csr_sparse_mat), intent(inout) :: c
     real(psb_dpk_)                          :: temp(:)
-    integer, intent(out)                    :: info
-    integer               :: nze, ma,na,mb,nb
+    integer(psb_ipk_), intent(out)                    :: info
+    integer(psb_ipk_) :: nze, ma,na,mb,nb
 
     info = psb_success_
     ma = a%get_nrows()
@@ -179,11 +179,11 @@ contains
   subroutine gen_numbmm(a,b,c,temp,info)
     class(psb_d_base_sparse_mat), intent(in)  :: a,b
     type(psb_d_csr_sparse_mat), intent(inout) :: c
-    integer               :: info
+    integer(psb_ipk_) :: info
     real(psb_dpk_)      :: temp(:)
-    integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
+    integer(psb_ipk_), allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     real(psb_dpk_), allocatable :: aval(:),bval(:)
-    integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
+    integer(psb_ipk_) :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
     real(psb_dpk_)      :: ajj
 
     n = a%get_nrows()

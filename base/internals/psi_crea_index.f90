@@ -43,7 +43,7 @@
 ! desc_a       - type(psb_desc_type)   The descriptor; in this context only the index 
 !                                       mapping parts are used.
 ! index_in(:)  - integer               The index list, build format  
-! index_out(:) - integer, allocatable  The index list, assembled format
+! index_out(:) - integer(psb_ipk_), allocatable  The index list, assembled format
 ! glob_idx     - logical               Whether the input indices are in local or global
 !                                      numbering; the global numbering is used when 
 !                                      converting the overlap exchange lists.
@@ -62,17 +62,17 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   implicit none
 
   type(psb_desc_type), intent(in)     :: desc_a
-  integer, intent(out)                :: info,nxch,nsnd,nrcv
-  integer, intent(in)                 :: index_in(:)
-  integer, allocatable, intent(inout) :: index_out(:)
+  integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
+  integer(psb_ipk_), intent(in)                 :: index_in(:)
+  integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
   logical                             :: glob_idx
 
   !         ....local scalars...      
-  integer    :: ictxt, me, np, mode, err_act, dl_lda
+  integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda
   !         ...parameters...
-  integer, allocatable :: dep_list(:,:), length_dl(:)
-  integer,parameter    :: root=psb_root_,no_comm=-1
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:)
+  integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
 
   info = psb_success_

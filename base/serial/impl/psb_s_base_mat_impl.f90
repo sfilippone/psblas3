@@ -17,9 +17,9 @@ subroutine psb_s_base_cp_to_coo(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(in) :: a
   class(psb_s_coo_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -44,9 +44,9 @@ subroutine psb_s_base_cp_from_coo(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_coo_sparse_mat), intent(in) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
@@ -72,9 +72,9 @@ subroutine psb_s_base_cp_to_fmt(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(in) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -97,9 +97,9 @@ subroutine psb_s_base_cp_from_fmt(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(in) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -123,9 +123,9 @@ subroutine psb_s_base_mv_to_coo(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_coo_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -150,9 +150,9 @@ subroutine psb_s_base_mv_from_coo(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_coo_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
@@ -178,9 +178,9 @@ subroutine psb_s_base_mv_to_fmt(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -203,9 +203,9 @@ subroutine psb_s_base_mv_from_fmt(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   class(psb_s_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat)  :: tmp
@@ -227,11 +227,11 @@ subroutine psb_s_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   real(psb_spk_), intent(in)      :: val(:)
-  integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: gtl(:)
+  integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csput'
   logical, parameter :: debug=.false.
 
@@ -258,16 +258,16 @@ subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   implicit none
 
   class(psb_s_base_sparse_mat), intent(in) :: a
-  integer, intent(in)                  :: imin,imax
-  integer, intent(out)                 :: nz
-  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_), intent(out)                 :: nz
+  integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
   real(psb_spk_), allocatable,  intent(inout)    :: val(:)
-  integer,intent(out)                  :: info
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax, nzin
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -302,13 +302,13 @@ subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
 
   class(psb_s_base_sparse_mat), intent(in) :: a
   class(psb_s_coo_sparse_mat), intent(inout) :: b
-  integer, intent(in)                  :: imin,imax
-  integer,intent(out)                  :: info
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
-  Integer :: err_act, nzin, nzout
+  integer(psb_ipk_) :: err_act, nzin, nzout
   character(len=20)  :: name='csget'
   logical :: append_
   logical, parameter :: debug=.false.
@@ -362,11 +362,11 @@ subroutine psb_s_base_csclip(a,b,info,&
 
   class(psb_s_base_sparse_mat), intent(in) :: a
   class(psb_s_coo_sparse_mat), intent(out) :: b
-  integer,intent(out)                  :: info
-  integer, intent(in), optional        :: imin,imax,jmin,jmax
+  integer(psb_ipk_),intent(out)                  :: info
+  integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
 
-  Integer :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
+  integer(psb_ipk_) :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
   character(len=20)  :: name='csget'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
@@ -446,8 +446,8 @@ subroutine psb_s_base_mold(a,b,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(in)  :: a
   class(psb_s_base_sparse_mat), intent(out), allocatable  :: b
-  integer, intent(out)                    :: info
-  Integer :: err_act
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -474,7 +474,7 @@ subroutine psb_s_base_transp_2mat(a,b)
   class(psb_base_sparse_mat), intent(out)    :: b
 
   type(psb_s_coo_sparse_mat) :: tmp
-  integer err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=*), parameter :: name='s_base_transp'
 
   call psb_erractionsave(err_act)
@@ -512,7 +512,7 @@ subroutine psb_s_base_transc_2mat(a,b)
   class(psb_base_sparse_mat), intent(out)    :: b
 
   type(psb_s_coo_sparse_mat) :: tmp
-  integer err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=*), parameter :: name='s_base_transc'
 
   call psb_erractionsave(err_act)
@@ -549,7 +549,7 @@ subroutine psb_s_base_transp_1mat(a)
   class(psb_s_base_sparse_mat), intent(inout) :: a
 
   type(psb_s_coo_sparse_mat) :: tmp
-  integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=*), parameter :: name='s_base_transp'
 
   call psb_erractionsave(err_act)
@@ -582,7 +582,7 @@ subroutine psb_s_base_transc_1mat(a)
   class(psb_s_base_sparse_mat), intent(inout) :: a
 
   type(psb_s_coo_sparse_mat) :: tmp
-  integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=*), parameter :: name='s_base_transc'
 
   call psb_erractionsave(err_act)
@@ -630,10 +630,10 @@ subroutine psb_s_base_csmm(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_spk_), intent(inout) :: y(:,:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_base_csmm'
   logical, parameter :: debug=.false.
 
@@ -659,10 +659,10 @@ subroutine psb_s_base_csmv(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:)
   real(psb_spk_), intent(inout) :: y(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_base_csmv'
   logical, parameter :: debug=.false.
 
@@ -689,10 +689,10 @@ subroutine psb_s_base_inner_cssm(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_spk_), intent(inout) :: y(:,:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_base_inner_cssm'
   logical, parameter :: debug=.false.
 
@@ -718,10 +718,10 @@ subroutine psb_s_base_inner_cssv(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:)
   real(psb_spk_), intent(inout) :: y(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_base_inner_cssv'
   logical, parameter :: debug=.false.
 
@@ -748,12 +748,12 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
   real(psb_spk_), intent(inout) :: y(:,:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans, scale
   real(psb_spk_), intent(in), optional :: d(:)
 
   real(psb_spk_), allocatable :: tmp(:,:)
-  Integer :: err_act, nar,nac,nc, i
+  integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
@@ -883,12 +883,12 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)    :: alpha, beta, x(:)
   real(psb_spk_), intent(inout) :: y(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   character, optional, intent(in) :: trans, scale
   real(psb_spk_), intent(in), optional :: d(:)
 
   real(psb_spk_), allocatable :: tmp(:)
-  Integer :: err_act, nar,nac,nc, i
+  integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
@@ -1003,10 +1003,10 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 contains
   subroutine inner_vscal(n,d,x,y)
     implicit none 
-    integer, intent(in)         :: n
+    integer(psb_ipk_), intent(in)         :: n
     real(psb_spk_), intent(in)  :: d(*),x(*)
     real(psb_spk_), intent(out) :: y(*)
-    integer :: i
+    integer(psb_ipk_) :: i
 
     do i=1,n
       y(i) = d(i)*x(i) 
@@ -1016,10 +1016,10 @@ contains
 
   subroutine inner_vscal1(n,d,x)
     implicit none 
-    integer, intent(in)         :: n
+    integer(psb_ipk_), intent(in)         :: n
     real(psb_spk_), intent(in)  :: d(*)
     real(psb_spk_), intent(inout) :: x(*)
-    integer :: i
+    integer(psb_ipk_) :: i
 
     do i=1,n
       x(i) = d(i)*x(i) 
@@ -1035,9 +1035,9 @@ subroutine psb_s_base_scals(d,a,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   real(psb_spk_), intent(in)      :: d
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_scals'
   logical, parameter :: debug=.false.
 
@@ -1063,9 +1063,9 @@ subroutine psb_s_base_scal(d,a,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(inout) :: a
   real(psb_spk_), intent(in)      :: d(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_scal'
   logical, parameter :: debug=.false.
 
@@ -1094,7 +1094,7 @@ function psb_s_base_maxval(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='maxval'
   logical, parameter :: debug=.false.
 
@@ -1123,7 +1123,7 @@ function psb_s_base_csnmi(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='csnmi'
   logical, parameter :: debug=.false.
 
@@ -1152,7 +1152,7 @@ function psb_s_base_csnm1(a) result(res)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='csnm1'
   logical, parameter :: debug=.false.
 
@@ -1179,7 +1179,7 @@ subroutine psb_s_base_rowsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1205,7 +1205,7 @@ subroutine psb_s_base_arwsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='arwsum'
   logical, parameter :: debug=.false.
 
@@ -1231,7 +1231,7 @@ subroutine psb_s_base_colsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1257,7 +1257,7 @@ subroutine psb_s_base_aclsum(d,a)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)              :: d(:)
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1285,9 +1285,9 @@ subroutine psb_s_base_get_diag(a,d,info)
   implicit none 
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(out)     :: d(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -1331,7 +1331,7 @@ subroutine psb_s_base_vect_mv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), intent(in)       :: alpha, beta
   class(psb_s_base_vect_type), intent(inout) :: x
   class(psb_s_base_vect_type), intent(inout) :: y
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
 
   ! For the time being we just throw everything back
@@ -1351,13 +1351,13 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)       :: alpha, beta
   class(psb_s_base_vect_type), intent(inout) :: x,y
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans, scale
   class(psb_s_base_vect_type), intent(inout),optional  :: d
 
   real(psb_spk_), allocatable :: tmp(:)
   class(psb_s_base_vect_type), allocatable :: tmpv
-  Integer :: err_act, nar,nac,nc, i
+  integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
   character(len=20)  :: name='s_cssm'
   logical, parameter :: debug=.false.
@@ -1490,10 +1490,10 @@ subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   class(psb_s_base_sparse_mat), intent(in) :: a
   real(psb_spk_), intent(in)       :: alpha, beta
   class(psb_s_base_vect_type), intent(inout) :: x, y
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   character, optional, intent(in)  :: trans
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='s_base_inner_vect_sv'
   logical, parameter :: debug=.false.
 

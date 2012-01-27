@@ -55,19 +55,19 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)             ::  m
-  integer, intent(in)             ::  irw(:)
-  integer, intent(in)             ::  val(:)
-  integer,intent(inout)           ::  x(:)
+  integer(psb_ipk_), intent(in)             ::  m
+  integer(psb_ipk_), intent(in)             ::  irw(:)
+  integer(psb_ipk_), intent(in)             ::  val(:)
+  integer(psb_ipk_),intent(inout)           ::  x(:)
   type(psb_desc_type), intent(in) ::  desc_a
-  integer, intent(out)            ::  info
-  integer, optional, intent(in)   ::  dupl
+  integer(psb_ipk_), intent(out)            ::  info
+  integer(psb_ipk_), optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,&
+  integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np, me, dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -236,19 +236,19 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
   !     must be inserted
 
   !....parameters...
-  integer, intent(in)             ::  m
-  integer, intent(in)             ::  irw(:)
-  integer, intent(in)             ::  val(:,:)
-  integer,intent(inout)           ::  x(:,:)
+  integer(psb_ipk_), intent(in)             ::  m
+  integer(psb_ipk_), intent(in)             ::  irw(:)
+  integer(psb_ipk_), intent(in)             ::  val(:,:)
+  integer(psb_ipk_),intent(inout)           ::  x(:,:)
   type(psb_desc_type), intent(in) ::  desc_a
-  integer, intent(out)            ::  info
-  integer, optional, intent(in)   ::  dupl
+  integer(psb_ipk_), intent(out)            ::  info
+  integer(psb_ipk_), optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,j,n,&
+  integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np,me,dupl_
-  integer, allocatable   :: irl(:)
+  integer(psb_ipk_) :: np,me,dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

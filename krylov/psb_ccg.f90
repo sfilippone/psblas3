@@ -109,17 +109,17 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   complex(psb_spk_), Intent(in)    :: b(:)
   complex(psb_spk_), Intent(inout) :: x(:)
   Real(psb_spk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   Local data
   complex(psb_spk_), allocatable, target   :: aux(:), wwrk(:,:)
   complex(psb_spk_), pointer  :: q(:), p(:), r(:), z(:), w(:)
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma
-  integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_itconv_type)  :: stopdat
   real(psb_dpk_)         :: derr
   character(len=20)      :: name
@@ -297,18 +297,18 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type), Intent(inout) :: b
   type(psb_c_vect_type), Intent(inout) :: x
   Real(psb_spk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 !!$   Local data
   complex(psb_spk_), allocatable, target   :: aux(:)
   type(psb_c_vect_type), allocatable, target :: wwrk(:)
   type(psb_c_vect_type), pointer  :: q, p, r, z, w
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
-  integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5), ieg,nspl, istebz
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
   character(len=20)           :: name

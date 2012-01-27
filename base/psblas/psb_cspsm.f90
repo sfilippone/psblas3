@@ -84,21 +84,21 @@ subroutine  psb_cspsm(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_spk_), intent(inout), target   :: y(:,:)
   type (psb_cspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   complex(psb_spk_), intent(in), optional, target      :: diag(:)
   complex(psb_spk_), optional, target, intent(inout)   :: work(:)
   character, intent(in), optional           :: trans, scale
-  integer, intent(in), optional             :: choice
-  integer, intent(in), optional             :: k, jx, jy
+  integer(psb_ipk_), intent(in), optional             :: choice
+  integer(psb_ipk_), intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lscale
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   complex(psb_spk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
@@ -363,20 +363,20 @@ subroutine  psb_cspsv(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_spk_), intent(inout), target   :: y(:)
   type(psb_cspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   complex(psb_spk_), intent(in), optional, target    :: diag(:)
   complex(psb_spk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional           :: trans, scale
-  integer, intent(in), optional             :: choice
+  integer(psb_ipk_), intent(in), optional             :: choice
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lscale
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   complex(psb_spk_),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
@@ -561,20 +561,20 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_c_vect_type), intent(inout)    :: y
   type(psb_cspmat_type), intent(inout)    :: a
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(out)                    :: info
   type(psb_c_vect_type), intent(inout), optional  :: diag
   complex(psb_spk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional         :: trans, scale
-  integer, intent(in), optional           :: choice
+  integer(psb_ipk_), intent(in), optional           :: choice
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lscale
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   complex(psb_spk_),pointer :: iwork(:), xp(:), yp(:)
   character                :: itrans
   character(len=20)        :: name, ch_err

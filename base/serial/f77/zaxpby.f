@@ -33,11 +33,11 @@ C
       use psb_const_mod
       complex(psb_dpk_), parameter :: one=(1.0d0,0.0d0)
       complex(psb_dpk_), parameter :: zero=(0.0d0,0.0d0)
-      integer n, m, lldx, lldy, info
+      integer(psb_ipk_) :: n, m, lldx, lldy, info
       complex(psb_dpk_) X(lldx,*), Y(lldy,*)
       complex(psb_dpk_) alpha, beta
-      integer i, j
-      integer int_err(5)
+      integer(psb_ipk_) :: i, j
+      integer(psb_ipk_) :: int_err(5)
       character  name*20
       name='zaxpby'
 

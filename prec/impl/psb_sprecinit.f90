@@ -39,7 +39,7 @@ subroutine psb_sprecinit(p,ptype,info)
   implicit none
   type(psb_sprec_type), intent(inout)    :: p
   character(len=*), intent(in)           :: ptype
-  integer, intent(out)                   :: info
+  integer(psb_ipk_), intent(out)                   :: info
 
   info = psb_success_
 

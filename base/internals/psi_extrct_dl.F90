@@ -132,18 +132,18 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 #endif
   !     ....scalar parameters...
   logical :: is_bld, is_upd
-  integer np,dl_lda,mode, info, ictxt
+  integer(psb_ipk_) :: np,dl_lda,mode, info, ictxt
 
   !     ....array parameters....
-  integer ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
-  integer, allocatable :: itmp(:)
+  integer(psb_ipk_) ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
+  integer(psb_ipk_), allocatable :: itmp(:)
   !     .....local arrays....
-  integer int_err(5)
+  integer(psb_ipk_) :: int_err(5)
 
   !     .....local scalars...
-  integer i,me,nprow,pointer_dep_list,proc,j,err_act
-  integer err, icomm
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: i,me,nprow,pointer_dep_list,proc,j,err_act
+  integer(psb_ipk_) :: err, icomm
+  integer(psb_ipk_) :: debug_level, debug_unit
   character  name*20
   name='psi_extrct_dl'
 
@@ -269,8 +269,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     goto 9999
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-  call mpi_allgather(itmp,dl_lda,mpi_integer,&
-       & dep_list,dl_lda,mpi_integer,icomm,info)
+  call mpi_allgather(itmp,dl_lda,psb_mpi_integer,&
+       & dep_list,dl_lda,psb_mpi_integer,icomm,info)
   deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_

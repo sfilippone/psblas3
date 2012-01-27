@@ -97,7 +97,7 @@ contains
     real(psb_dpk_), intent(in)          :: invect(:)
     class(psb_d_vect_type), intent(out) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
-    integer :: info
+    integer(psb_ipk_) :: info
 
     if (present(mold)) then 
       allocate(x%v,stat=info,mold=mold)
@@ -111,10 +111,10 @@ contains
 
 
   subroutine d_vect_bld_n(x,n,mold)
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     class(psb_d_vect_type), intent(out) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
-    integer :: info
+    integer(psb_ipk_) :: info
 
     if (present(mold)) then 
       allocate(x%v,stat=info,mold=mold)
@@ -128,7 +128,7 @@ contains
   function  d_vect_get_vect(x) result(res)
     class(psb_d_vect_type), intent(inout)  :: x
     real(psb_dpk_), allocatable                 :: res(:)
-    integer :: info
+    integer(psb_ipk_) :: info
 
     if (allocated(x%v)) then
       res = x%v%get_vect()
@@ -139,7 +139,7 @@ contains
     class(psb_d_vect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
         
-    integer :: info
+    integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
     
   end subroutine d_vect_set_scal
@@ -148,7 +148,7 @@ contains
     class(psb_d_vect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)         :: val(:)
         
-    integer :: info
+    integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
     
   end subroutine d_vect_set_vect
@@ -157,7 +157,7 @@ contains
   function constructor(x) result(this)
     real(psb_dpk_)   :: x(:)
     type(psb_d_vect_type) :: this
-    integer :: info
+    integer(psb_ipk_) :: info
 
     allocate(psb_d_base_vect_type :: this%v, stat=info)
 
@@ -169,9 +169,9 @@ contains
 
 
   function size_const(n) result(this)
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     type(psb_d_vect_type) :: this
-    integer :: info
+    integer(psb_ipk_) :: info
 
     allocate(psb_d_base_vect_type :: this%v, stat=info)
     call this%asb(n,info)
@@ -181,7 +181,7 @@ contains
   function d_vect_get_nrows(x) result(res)
     implicit none 
     class(psb_d_vect_type), intent(in) :: x
-    integer :: res
+    integer(psb_ipk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%get_nrows()
   end function d_vect_get_nrows
@@ -197,7 +197,7 @@ contains
   function d_vect_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x, y
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
     res = dzero
@@ -210,7 +210,7 @@ contains
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)    :: y(:)
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     
     res = dzero
@@ -222,11 +222,11 @@ contains
   subroutine d_vect_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
-    integer, intent(in)               :: m
+    integer(psb_ipk_), intent(in)               :: m
     class(psb_d_vect_type), intent(inout)  :: x
     class(psb_d_vect_type), intent(inout)  :: y
     real(psb_dpk_), intent (in)       :: alpha, beta
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     if (allocated(x%v).and.allocated(y%v)) then 
       call y%v%axpby(m,alpha,x%v,beta,info)
@@ -239,11 +239,11 @@ contains
   subroutine d_vect_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
-    integer, intent(in)               :: m
+    integer(psb_ipk_), intent(in)               :: m
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_vect_type), intent(inout)  :: y
     real(psb_dpk_), intent (in)       :: alpha, beta
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     if (allocated(y%v)) &
          & call y%v%axpby(m,alpha,x,beta,info)
@@ -256,8 +256,8 @@ contains
     implicit none 
     class(psb_d_vect_type), intent(inout)  :: x
     class(psb_d_vect_type), intent(inout)  :: y
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     if (allocated(x%v).and.allocated(y%v)) &
@@ -270,8 +270,8 @@ contains
     implicit none 
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_vect_type), intent(inout)  :: y
-    integer, intent(out)              :: info
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
 
 
     info = 0
@@ -288,8 +288,8 @@ contains
     real(psb_dpk_), intent(in)         :: y(:)
     real(psb_dpk_), intent(in)         :: x(:)
     class(psb_d_vect_type), intent(inout) :: z
-    integer, intent(out)                  :: info
-    integer :: i, n
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_) :: i, n
 
     info = 0    
     if (allocated(z%v)) &
@@ -304,10 +304,10 @@ contains
     class(psb_d_vect_type), intent(inout)  :: x
     class(psb_d_vect_type), intent(inout)  :: y
     class(psb_d_vect_type), intent(inout)  :: z
-    integer, intent(out)                   :: info    
+    integer(psb_ipk_), intent(out)                   :: info    
     character(len=1), intent(in), optional :: conjgx, conjgy
 
-    integer :: i, n
+    integer(psb_ipk_) :: i, n
 
     info = 0
     if (allocated(x%v).and.allocated(y%v).and.&
@@ -323,8 +323,8 @@ contains
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_vect_type), intent(inout)  :: y
     class(psb_d_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     if (allocated(z%v).and.allocated(y%v)) &
@@ -339,8 +339,8 @@ contains
     real(psb_dpk_), intent(in)        :: y(:)
     class(psb_d_vect_type), intent(inout)  :: x
     class(psb_d_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     
@@ -363,7 +363,7 @@ contains
   function d_vect_nrm2(n,x) result(res)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     
     if (allocated(x%v)) then 
@@ -377,7 +377,7 @@ contains
   function d_vect_amax(n,x) result(res)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
     if (allocated(x%v)) then 
@@ -391,7 +391,7 @@ contains
   function d_vect_asum(n,x) result(res)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
 
     if (allocated(x%v)) then 
@@ -405,10 +405,10 @@ contains
   subroutine d_vect_all(n, x, info, mold)
 
     implicit none 
-    integer, intent(in)                 :: n
+    integer(psb_ipk_), intent(in)                 :: n
     class(psb_d_vect_type), intent(out) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
-    integer, intent(out)                :: info
+    integer(psb_ipk_), intent(out)                :: info
     
     if (present(mold)) then 
       allocate(x%v,stat=info,mold=mold)
@@ -436,9 +436,9 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
-    integer, intent(in)              :: n
+    integer(psb_ipk_), intent(in)              :: n
     class(psb_d_vect_type), intent(inout) :: x
-    integer, intent(out)             :: info
+    integer(psb_ipk_), intent(out)             :: info
 
     if (allocated(x%v)) &
          & call x%v%asb(n,info)
@@ -456,7 +456,7 @@ contains
 
   subroutine d_vect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) :: alpha, beta, y(:)
     class(psb_d_vect_type) :: x
     
@@ -467,7 +467,7 @@ contains
 
   subroutine d_vect_gthzv(n,idx,x,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) ::  y(:)
     class(psb_d_vect_type) :: x
 
@@ -478,7 +478,7 @@ contains
 
   subroutine d_vect_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_vect_type) :: y
     
@@ -492,7 +492,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_vect_type), intent(inout)  :: x
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     info = 0
     if (allocated(x%v)) then 
@@ -506,12 +506,12 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_type), intent(inout)  :: x
-    integer, intent(in)               :: n, dupl
-    integer, intent(in)               :: irl(:)
+    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_dpk_), intent(in)        :: val(:)
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
 
-    integer :: i
+    integer(psb_ipk_) :: i
 
     info = 0
     if (.not.allocated(x%v)) then 
@@ -529,7 +529,7 @@ contains
     class(psb_d_base_vect_type), intent(in) :: mold
     class(psb_d_base_vect_type), allocatable :: tmp
     real(psb_dpk_), allocatable          :: invect(:)
-    integer :: info
+    integer(psb_ipk_) :: info
 
     allocate(tmp,stat=info,mold=mold)
     call x%v%sync()

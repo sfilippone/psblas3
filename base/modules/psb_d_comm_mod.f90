@@ -36,26 +36,26 @@ module psb_d_comm_mod
       use psb_descriptor_type
       real(psb_dpk_), intent(inout), target   :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional           :: update,jx,ik,mode
+      integer(psb_ipk_), intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_dovrlm
     subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(in), optional           :: update,mode
     end subroutine psb_dovrlv
     subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
       use psb_d_vect_mod
       type(psb_d_vect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(in), optional           :: update,mode
     end subroutine psb_dovrl_vect
   end interface
 
@@ -64,20 +64,20 @@ module psb_d_comm_mod
       use psb_descriptor_type
       real(psb_dpk_), intent(inout),target    :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
       real(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,jx,ik,data
+      integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalom
     subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout)           :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
       real(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalov
     subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
@@ -85,10 +85,10 @@ module psb_d_comm_mod
       use psb_d_vect_mod
       type(psb_d_vect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
       real(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalo_vect
   end interface
@@ -100,16 +100,16 @@ module psb_d_comm_mod
       real(psb_dpk_), intent(out)    :: locx(:,:)
       real(psb_dpk_), intent(in)     :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_dscatterm
     subroutine  psb_dscatterv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       real(psb_dpk_), intent(out)    :: locx(:)
       real(psb_dpk_), intent(in)     :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_dscatterv
   end interface
 
@@ -121,8 +121,8 @@ module psb_d_comm_mod
       type(psb_dspmat_type), intent(inout) :: loca
       type(psb_dspmat_type), intent(out)   :: globa
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root,dupl
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_dsp_allgather
     subroutine  psb_dgatherm(globx, locx, desc_a, info, root)
@@ -130,16 +130,16 @@ module psb_d_comm_mod
       real(psb_dpk_), intent(in)    :: locx(:,:)
       real(psb_dpk_), intent(out)   :: globx(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_dgatherm
     subroutine  psb_dgatherv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       real(psb_dpk_), intent(in)    :: locx(:)
       real(psb_dpk_), intent(out)   :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_dgatherv
     subroutine  psb_dgather_vect(globx, locx, desc_a, info, root)
       use psb_descriptor_type
@@ -147,8 +147,8 @@ module psb_d_comm_mod
       type(psb_d_vect_type), intent(inout) :: locx
       real(psb_dpk_), intent(out)     :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_dgather_vect
   end interface
   

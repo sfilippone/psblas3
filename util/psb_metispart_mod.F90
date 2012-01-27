@@ -42,7 +42,7 @@
 !      Input parameters:
 !        TYPE(D_SPMAT) :: A   The input matrix. The coefficients are
 !                             ignored; only the structure is used.
-!        INTEGER       :: NPARTS  How many parts we are requiring to the 
+!        integer(psb_ipk_) :: NPARTS  How many parts we are requiring to the 
 !                                 partition utility
 ! 
 !  DISTR_MTPART(RROOT,CROOT,ICTXT): This subroutine will be called by
@@ -54,10 +54,12 @@
 !      uses information prepared by the previous two subroutines.
 !
 module psb_metispart_mod
+  use psb_base_mod, only : psb_ipk_, psb_sspmat_type, psb_cspmat_type,&
+       & psb_dspmat_type, psb_zspmat_type, psb_err_unit
   public part_graph, build_mtpart, distr_mtpart,&
        & getv_mtpart, free_part
   private 
-  integer, allocatable, save :: graph_vect(:)
+  integer(psb_ipk_), allocatable, save :: graph_vect(:)
 
   interface build_mtpart
     module procedure build_mtpart, d_mat_build_mtpart, s_mat_build_mtpart, z_mat_build_mtpart, c_mat_build_mtpart
@@ -66,10 +68,9 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    use psb_base_mod
-    integer, intent(in)  :: global_indx, n, np
-    integer, intent(out) :: nv
-    integer, intent(out) :: pv(*)
+    integer(psb_ipk_), intent(in)  :: global_indx, n, np
+    integer(psb_ipk_), intent(out) :: nv
+    integer(psb_ipk_), intent(out) :: pv(*)
     
     IF (.not.allocated(graph_vect)) then
        write(psb_err_unit,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
@@ -89,8 +90,8 @@ contains
 
   subroutine distr_mtpart(root, ictxt)
     use psb_base_mod
-    integer    :: root, ictxt
-    integer    :: n, me, np
+    integer(psb_ipk_) :: root, ictxt
+    integer(psb_ipk_) :: n, me, np
 
     call psb_info(ictxt,me,np)
 
@@ -127,7 +128,7 @@ contains
   end subroutine distr_mtpart
   
   subroutine  getv_mtpart(ivg)
-    integer, allocatable, intent(out)  :: ivg(:)
+    integer(psb_ipk_), allocatable, intent(out)  :: ivg(:)
     if (allocated(graph_vect)) then 
       allocate(ivg(size(graph_vect)))
       ivg(:) = graph_vect(:)
@@ -137,7 +138,7 @@ contains
   subroutine d_mat_build_mtpart(a,nparts)
     use psb_base_mod
     type(psb_dspmat_type), intent(in) :: a
-    integer       :: nparts
+    integer(psb_ipk_) :: nparts
     
 
     select type (aa=>a%a) 
@@ -154,7 +155,7 @@ contains
   subroutine s_mat_build_mtpart(a,nparts)
     use psb_base_mod
     type(psb_sspmat_type), intent(in) :: a
-    integer       :: nparts
+    integer(psb_ipk_) :: nparts
     
 
     select type (aa=>a%a) 
@@ -171,7 +172,7 @@ contains
   subroutine z_mat_build_mtpart(a,nparts)
     use psb_base_mod
     type(psb_zspmat_type), intent(in) :: a
-    integer       :: nparts
+    integer(psb_ipk_) :: nparts
     
 
     select type (aa=>a%a) 
@@ -188,7 +189,7 @@ contains
   subroutine c_mat_build_mtpart(a,nparts)
     use psb_base_mod
     type(psb_cspmat_type), intent(in) :: a
-    integer       :: nparts
+    integer(psb_ipk_) :: nparts
     
 
     select type (aa=>a%a) 
@@ -204,20 +205,21 @@ contains
 
   subroutine build_mtpart(n,fida,ia1,ia2,nparts)
     use psb_base_mod
-    integer       :: nparts
-    integer       :: ia1(:), ia2(:)
-    integer       :: n, i,numflag,nedc,wgflag
+    integer(psb_ipk_) :: nparts
+    integer(psb_ipk_) :: ia1(:), ia2(:)
+    integer(psb_ipk_) :: n, i,numflag,nedc,wgflag
     character(len=5)     :: fida
-    integer, parameter :: nb=512
+    integer(psb_ipk_), parameter :: nb=512
     real(psb_dpk_), parameter :: seed=12345.d0
-    integer          :: iopt(10),idummy(2),jdummy(2)
+    integer(psb_ipk_) :: iopt(10),idummy(2),jdummy(2)
 
 #if defined(HAVE_METIS)
     interface 
       subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
            & wgflag,numflag,nparts,iopt,nedc,part)
-        integer :: n,wgflag,numflag,nparts,nedc
-        integer :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
+        import :: psb_ipk_
+        integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
+        integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
       end subroutine METIS_PartGraphRecursive
     end interface    
     
@@ -260,7 +262,7 @@ contains
 
 
   subroutine free_part(info)
-    integer :: info
+    integer(psb_ipk_) :: info
     
     deallocate(graph_vect,stat=info)
     return

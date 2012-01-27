@@ -55,18 +55,18 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   !....parameters...
   type(psb_desc_type), intent(inout)   :: desc_a
   type(psb_dspmat_type), intent(inout) :: a
-  integer, intent(in)                  :: nz,ia(:),ja(:)
+  integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
   real(psb_dpk_), intent(in)         :: val(:)
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   logical, intent(in), optional        :: rebuild
   !locals.....
 
-  integer :: nrow, err_act, ncol, spstate
-  integer                :: ictxt,np,me
+  integer(psb_ipk_) :: nrow, err_act, ncol, spstate
+  integer(psb_ipk_) :: ictxt,np,me
   logical, parameter     :: debug=.false.
-  integer, parameter     :: relocsz=200
+  integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_
-  integer, allocatable   :: ila(:),jla(:)
+  integer(psb_ipk_), allocatable   :: ila(:),jla(:)
   character(len=20)  :: name, ch_err
 
   info = psb_success_
@@ -201,16 +201,16 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   type(psb_desc_type), intent(in)      :: desc_ar
   type(psb_desc_type), intent(inout)   :: desc_ac
   type(psb_dspmat_type), intent(inout) :: a
-  integer, intent(in)                  :: nz,ia(:),ja(:)
+  integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
   real(kind=psb_dpk_), intent(in)      :: val(:)
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   !locals.....
 
-  integer :: nrow, err_act, ncol, spstate
-  integer                :: ictxt,np,me
+  integer(psb_ipk_) :: nrow, err_act, ncol, spstate
+  integer(psb_ipk_) :: ictxt,np,me
   logical, parameter     :: debug=.false.
-  integer, parameter     :: relocsz=200
-  integer, allocatable   :: ila(:),jla(:)
+  integer(psb_ipk_), parameter     :: relocsz=200
+  integer(psb_ipk_), allocatable   :: ila(:),jla(:)
   character(len=20)  :: name, ch_err
 
   info = psb_success_

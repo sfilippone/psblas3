@@ -20,13 +20,12 @@ c == =====================================================================
       use psb_realloc_mod
       use psb_sort_mod, only: psb_msort
 c
-      integer       ia(*), ja(*), diaga,
+      integer(psb_ipk_) ::       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  diagc,
      *  index(*)
-      integer, allocatable :: ic(:),jc(:)
-      integer       :: nze, info
-c$$$      integer, save :: iunit=11
+      integer(psb_ipk_), allocatable :: ic(:),jc(:)
+      integer(psb_ipk_) :: nze, info
 c
 c       symbolic matrix multiply c=a*b
 c
@@ -144,11 +143,11 @@ c$$$      'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
      *  temp)
       use psb_const_mod
 c
-      integer       ia(*), ja(*), diaga,
+      integer(psb_ipk_) :: ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      real(psb_spk_)          a(*), b(*), c(*), temp(*),ajj
+      real(psb_spk_) :: a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c
@@ -217,11 +216,11 @@ c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
      *  temp)
       use psb_const_mod
 c
-      integer       ia(*), ja(*), diaga,
+      integer(psb_ipk_) :: ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      real(psb_dpk_)          a(*), b(*), c(*), temp(*),ajj
+      real(psb_dpk_) :: a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c
@@ -290,11 +289,11 @@ c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
      *  temp)
 c
       use psb_const_mod
-      integer       ia(*), ja(*), diaga,
+      integer(psb_ipk_) :: ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      complex(psb_spk_)       a(*), b(*), c(*), temp(*),ajj
+      complex(psb_spk_) :: a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c
@@ -363,11 +362,11 @@ c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
      *  temp)
 c
       use psb_const_mod
-      integer       ia(*), ja(*), diaga,
+      integer(psb_ipk_) :: ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      complex(psb_dpk_)       a(*), b(*), c(*), temp(*),ajj
+      complex(psb_dpk_) :: a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c

@@ -50,13 +50,13 @@ module psb_descriptor_type
   !
   !|  type psb_desc_type
   !|     class(psb_indx_map), allocatable :: indxmap
-  !|     integer, allocatable  :: halo_index(:), ext_index(:)
-  !|     integer, allocatable  :: bnd_elem(:)
-  !|     integer, allocatable  :: ovrlap_index(:)
-  !|     integer, allocatable  :: ovrlap_elem(:,:)
-  !|     integer, allocatable  :: ovr_mst_idx(:)
-  !|     integer, allocatable  :: lprm(:)
-  !|     integer, allocatable  :: idx_space(:)
+  !|     integer(psb_ipk_), allocatable  :: halo_index(:), ext_index(:)
+  !|     integer(psb_ipk_), allocatable  :: bnd_elem(:)
+  !|     integer(psb_ipk_), allocatable  :: ovrlap_index(:)
+  !|     integer(psb_ipk_), allocatable  :: ovrlap_elem(:,:)
+  !|     integer(psb_ipk_), allocatable  :: ovr_mst_idx(:)
+  !|     integer(psb_ipk_), allocatable  :: lprm(:)
+  !|     integer(psb_ipk_), allocatable  :: idx_space(:)
   !|     type(psb_desc_type), pointer :: base_desc => null()
   !|  end type psb_desc_type
   !
@@ -199,16 +199,16 @@ module psb_descriptor_type
 
 
   type psb_desc_type
-    integer, allocatable  :: halo_index(:)
-    integer, allocatable  :: ext_index(:)
-    integer, allocatable  :: ovrlap_index(:)
-    integer, allocatable  :: ovrlap_elem(:,:)
-    integer, allocatable  :: ovr_mst_idx(:)
-    integer, allocatable  :: bnd_elem(:)
+    integer(psb_ipk_), allocatable  :: halo_index(:)
+    integer(psb_ipk_), allocatable  :: ext_index(:)
+    integer(psb_ipk_), allocatable  :: ovrlap_index(:)
+    integer(psb_ipk_), allocatable  :: ovrlap_elem(:,:)
+    integer(psb_ipk_), allocatable  :: ovr_mst_idx(:)
+    integer(psb_ipk_), allocatable  :: bnd_elem(:)
     class(psb_indx_map), allocatable :: indxmap
-    integer, allocatable  :: lprm(:)
+    integer(psb_ipk_), allocatable  :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
-    integer, allocatable  :: idx_space(:)
+    integer(psb_ipk_), allocatable  :: idx_space(:)
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -244,7 +244,7 @@ module psb_descriptor_type
 
   private :: nullify_desc
 
-  integer, private, save :: cd_large_threshold=psb_default_large_threshold 
+  integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
 contains 
@@ -272,23 +272,26 @@ contains
 
 
   subroutine psb_cd_set_large_threshold(ith)
-    integer, intent(in) :: ith
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ith
     if (ith > 0) then 
       cd_large_threshold = ith
     end if
   end subroutine psb_cd_set_large_threshold
 
-  integer function  psb_cd_get_large_threshold()
-    psb_cd_get_large_threshold = cd_large_threshold 
+  function  psb_cd_get_large_threshold() result(val)
+    implicit none 
+    integer(psb_ipk_) :: val
+    val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
   logical  function  psb_cd_choose_large_state(ictxt,m)
     use psb_penv_mod
 
     implicit none
-    integer, intent(in) :: ictxt,m
+    integer(psb_ipk_), intent(in) :: ictxt,m
     !locals
-    integer             :: np,me
+    integer(psb_ipk_) :: np,me
 
     call psb_info(ictxt, me, np)
     ! 
@@ -302,6 +305,7 @@ contains
   end function psb_cd_choose_large_state
 
   subroutine psb_nullify_desc(desc)
+    implicit none 
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
@@ -310,6 +314,7 @@ contains
   end subroutine psb_nullify_desc
 
   subroutine nullify_desc(desc)
+    implicit none 
     class(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
@@ -318,7 +323,7 @@ contains
   end subroutine nullify_desc
 
   function psb_is_ok_desc(desc) result(val)
-
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
     
@@ -329,7 +334,7 @@ contains
   end function psb_is_ok_desc
 
   function psb_is_valid_desc(desc) result(val)
-
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
     
@@ -340,6 +345,7 @@ contains
   end function psb_is_valid_desc
 
   function psb_is_bld_desc(desc) result(val)
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
@@ -350,6 +356,7 @@ contains
   end function psb_is_bld_desc
 
   function psb_is_upd_desc(desc)  result(val)
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
@@ -360,6 +367,7 @@ contains
   end function psb_is_upd_desc
 
   function psb_is_repl_desc(desc) result(val)
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
@@ -370,6 +378,7 @@ contains
   end function psb_is_repl_desc
 
   function psb_is_ovl_desc(desc) result(val)
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
@@ -381,6 +390,7 @@ contains
 
 
   function psb_is_asb_desc(desc) result(val)
+    implicit none 
     class(psb_desc_type), intent(in) :: desc
     logical                         :: val 
 
@@ -390,82 +400,96 @@ contains
 
   end function psb_is_asb_desc
 
-  integer function psb_cd_get_local_rows(desc)
+  function psb_cd_get_local_rows(desc) result(val)
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_local_rows = desc%indxmap%get_lr()
+      val = desc%indxmap%get_lr()
     else
-      psb_cd_get_local_rows = -1
+      val = -1
     endif
   end function psb_cd_get_local_rows
 
-  integer function psb_cd_get_local_cols(desc)
+  function psb_cd_get_local_cols(desc) result(val)
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_local_cols = desc%indxmap%get_lc()
+      val = desc%indxmap%get_lc()
     else
-      psb_cd_get_local_cols = -1
+      val = -1
     endif
   end function psb_cd_get_local_cols
 
-  integer function psb_cd_get_global_rows(desc)
+  function psb_cd_get_global_rows(desc) result(val)
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
-    
+
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_global_rows = desc%indxmap%get_gr()
+      val = desc%indxmap%get_gr()
     else
-      psb_cd_get_global_rows = -1
+      val = -1
     endif
 
   end function psb_cd_get_global_rows
 
-  integer function psb_cd_get_global_cols(desc)
+  function psb_cd_get_global_cols(desc) result(val)
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (psb_is_ok_desc(desc)) then 
-      psb_cd_get_global_cols = desc%indxmap%get_gc()
+      val = desc%indxmap%get_gc()
     else
-      psb_cd_get_global_cols = -1
+      val = -1
     endif
 
   end function psb_cd_get_global_cols
 
-  integer function psb_cd_get_context(desc)
+  function psb_cd_get_context(desc) result(val)
     use psb_error_mod
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
     if (allocated(desc%indxmap)) then
-      psb_cd_get_context = desc%indxmap%get_ctxt()    
+      val = desc%indxmap%get_ctxt()    
     else
-      psb_cd_get_context = -1
+      val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
       call psb_error()
     end if
   end function psb_cd_get_context
 
-  integer function psb_cd_get_dectype(desc)
+  function psb_cd_get_dectype(desc) result(val)
     use psb_error_mod
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
-      psb_cd_get_dectype = desc%indxmap%get_state()    
+      val = desc%indxmap%get_state()    
     else
-      psb_cd_get_dectype = -1
+      val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_dectype')
       call psb_error()
     end if
 
   end function psb_cd_get_dectype
 
-  integer function psb_cd_get_mpic(desc)
+  function psb_cd_get_mpic(desc) result(val)
     use psb_error_mod
+    implicit none 
+    integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then
-      psb_cd_get_mpic = desc%indxmap%get_mpic()    
+      val = desc%indxmap%get_mpic()    
     else
-      psb_cd_get_mpic = -1
+      val = -1
       call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
       call psb_error()
     end if
@@ -478,7 +502,7 @@ contains
     ! Change state of a descriptor into ovl_build. 
     implicit none
     type(psb_desc_type), intent(inout) :: desc
-    integer                            :: info
+    integer(psb_ipk_) :: info
 
     info = 0
     if (psb_is_asb_desc(desc)) &
@@ -489,10 +513,10 @@ contains
 
   subroutine psb_get_xch_idx(idx,totxch,totsnd,totrcv)
     implicit none 
-    integer, intent(in)  :: idx(:)
-    integer, intent(out) :: totxch,totsnd,totrcv
+    integer(psb_ipk_), intent(in)  :: idx(:)
+    integer(psb_ipk_), intent(out) :: totxch,totsnd,totrcv
 
-    integer :: ip, nerv, nesd
+    integer(psb_ipk_) :: ip, nerv, nesd
     character(len=20), parameter  :: name='psb_get_xch_idx'    
 
     totxch = 0
@@ -524,13 +548,13 @@ contains
     use psb_penv_mod
 
     implicit none
-    integer, intent(in)          :: data
-    integer, pointer             :: ipnt(:)
+    integer(psb_ipk_), intent(in)          :: data
+    integer(psb_ipk_), pointer             :: ipnt(:)
     class(psb_desc_type), target  :: desc
-    integer, intent(out)         :: totxch,idxr,idxs,info
-    
+    integer(psb_ipk_), intent(out)         :: totxch,idxr,idxs,info
+
     !locals
-    integer             :: np,me,ictxt,err_act, debug_level,debug_unit
+    integer(psb_ipk_) :: np,me,ictxt,err_act, debug_level,debug_unit
     logical, parameter  :: debug=.false.,debugprt=.false.
     character(len=20), parameter  :: name='psb_cd_get_list'
 
@@ -601,9 +625,9 @@ contains
     implicit none
     !....parameters...
     class(psb_desc_type), intent(inout) :: desc
-    integer, intent(out)               :: info
+    integer(psb_ipk_), intent(out)               :: info
     !...locals....
-    integer             :: ictxt,np,me, err_act
+    integer(psb_ipk_) :: ictxt,np,me, err_act
     character(len=20)   :: name
 
     if(psb_get_errstatus() /= 0) return 
@@ -622,7 +646,7 @@ contains
       goto 9999
     endif
 
-    
+
     if (.not.allocated(desc%halo_index)) then
       info=298
       call psb_errpush(info,name)
@@ -743,11 +767,11 @@ contains
 
     type(psb_desc_type), intent(inout)  :: desc_in
     type(psb_desc_type), intent(inout)  :: desc_out
-    integer, intent(out)                :: info
+    integer(psb_ipk_), intent(out)                :: info
 
     !locals
-    integer             :: np,me,ictxt, err_act
-    integer             :: debug_level, debug_unit
+    integer(psb_ipk_) :: np,me,ictxt, err_act
+    integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20)   :: name
 
     if (psb_get_errstatus() /= 0) return 
@@ -809,17 +833,17 @@ contains
     use psb_penv_mod
     use psb_realloc_mod
     Implicit None
-    integer, allocatable, intent(out)       :: tmp(:)
-    integer, intent(in)                     :: data
+    integer(psb_ipk_), allocatable, intent(out)       :: tmp(:)
+    integer(psb_ipk_), intent(in)                     :: data
     Type(psb_desc_type), Intent(in), target :: desc
-    integer, intent(out)                    :: info
+    integer(psb_ipk_), intent(out)                    :: info
     logical, intent(in)                     :: toglob
 
     !     .. Local Scalars ..
-    Integer ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
+    integer(psb_ipk_) ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
          & idx, gidx, proc, n_elem_send, n_elem_recv
-    Integer, pointer   :: idxlist(:) 
-    integer              :: debug_level, debug_unit, err_act
+    integer(psb_ipk_), pointer   :: idxlist(:) 
+    integer(psb_ipk_) :: debug_level, debug_unit, err_act
     character(len=20)    :: name
 
     name  = 'psb_cd_get_recv_idx'

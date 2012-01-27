@@ -38,7 +38,7 @@
 !   See also description in base/modules/psb_desc_type.f90
 ! 
 ! Arguments: 
-!    ovr_elem(:,:) - integer, allocatable  Array containing the output list              
+!    ovr_elem(:,:) - integer(psb_ipk_), allocatable  Array containing the output list              
 !    desc_a   - type(psb_desc_type).       The communication descriptor.        
 !    info     - integer.                   return code.
 ! 
@@ -52,21 +52,21 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
   implicit none
 
   !     ...parameter arrays....      
-  integer, intent(in)               :: me, desc_overlap(:)
-  integer, allocatable, intent(out) :: ovr_elem(:,:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in)               :: me, desc_overlap(:)
+  integer(psb_ipk_), allocatable, intent(out) :: ovr_elem(:,:)
+  integer(psb_ipk_), intent(out)              :: info
 
   !     ...local scalars...
-  integer :: i,pnt_new_elem,ret,j
-  integer :: dim_ovr_elem
-  integer :: pairtree(2)
+  integer(psb_ipk_) :: i,pnt_new_elem,ret,j
+  integer(psb_ipk_) :: dim_ovr_elem
+  integer(psb_ipk_) :: pairtree(2)
 
   !     ...external function...
-  integer  :: psi_exist_ovr_elem
+  integer(psb_ipk_) :: psi_exist_ovr_elem
   external :: psi_exist_ovr_elem
 
-  integer  :: nel, ip, ix, iel, insize, err_act, iproc
-  integer, allocatable :: telem(:,:)
+  integer(psb_ipk_) :: nel, ip, ix, iel, insize, err_act, iproc
+  integer(psb_ipk_), allocatable :: telem(:,:)
 
   character(len=20)    :: name
 

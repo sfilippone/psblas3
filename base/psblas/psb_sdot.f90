@@ -60,10 +60,10 @@ function psb_sdot_vect(x, y, desc_a,info) result(res)
   real(psb_spk_)                   :: res
   type(psb_s_vect_type), intent(inout)    :: x, y
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   real(psb_spk_)         :: dot_local
   real(psb_spk_)         :: sdot
@@ -164,12 +164,12 @@ function psb_sdot(x, y,desc_a, info, jx, jy)
 
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in), optional    :: jx, jy
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: jx, jy
+  integer(psb_ipk_), intent(out)             :: info
   real(psb_spk_)                 :: psb_sdot
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   real(psb_spk_)         :: dot_local
   real(psb_spk_)         :: sdot
@@ -317,11 +317,11 @@ function psb_sdotv(x, y,desc_a, info)
 
   real(psb_spk_), intent(in)     :: x(:), y(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   real(psb_spk_)                 :: psb_sdotv
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   real(psb_spk_)         :: dot_local
   real(psb_spk_)         :: sdot
@@ -452,10 +452,10 @@ subroutine psb_sdotvs(res, x, y,desc_a, info)
   real(psb_spk_), intent(in)     :: x(:), y(:)
   real(psb_spk_), intent(out)    :: res
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m
   real(psb_spk_)         :: dot_local
   real(psb_spk_)         :: sdot
@@ -584,10 +584,10 @@ subroutine psb_smdots(res, x, y, desc_a, info)
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   real(psb_spk_), intent(out)    :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   real(psb_spk_),allocatable  :: dot_local(:)
   real(psb_spk_)         :: sdot

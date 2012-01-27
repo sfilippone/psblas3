@@ -72,7 +72,7 @@ program ppde
   ! input parameters
   character(len=20) :: kmethd, ptype
   character(len=5)  :: afmt
-  integer   :: idim
+  integer(psb_ipk_) :: idim
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
@@ -88,15 +88,15 @@ program ppde
   ! dense matrices
   real(psb_dpk_), allocatable :: b(:), x(:)
   ! blacs parameters
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,itrace, istopc, irst
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
 
   ! other variables
-  integer            :: info, i
+  integer(psb_ipk_) :: info, i
   character(len=20)  :: name,ch_err, fname
 
   info=psb_success_
@@ -242,11 +242,11 @@ contains
   ! get iteration parameters from standard input
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
-    integer      :: ictxt
+    integer(psb_ipk_) :: ictxt
     character(len=*) :: kmethd, ptype, afmt
-    integer      :: idim, istopc,itmax,itrace,irst
-    integer      :: np, iam
-    integer      :: intbuf(10), ip
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: intbuf(10), ip
 
     call psb_info(ictxt, iam, np)
 
@@ -324,7 +324,7 @@ contains
   !  print an error message 
   !  
   subroutine pr_usage(iout)
-    integer :: iout
+    integer(psb_ipk_) :: iout
     write(iout,*)'incorrect parameter(s) found'
     write(iout,*)' usage:  pde90 methd prec dim &
          &[istop itmax itrace]'  
@@ -365,21 +365,21 @@ contains
     use psb_base_mod
     use psb_d_ell_mat_mod
     implicit none
-    integer                      :: idim
-    integer, parameter           :: nb=20
+    integer(psb_ipk_) :: idim
+    integer(psb_ipk_), parameter           :: nb=20
     real(psb_dpk_), allocatable  :: b(:),xv(:)
     type(psb_desc_type)          :: desc_a
-    integer                      :: ictxt, info
+    integer(psb_ipk_) :: ictxt, info
     character                    :: afmt*5
     type(psb_dspmat_type)       :: a
     class(psb_d_base_sparse_mat), optional   :: mold
     ! Local 
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
-    integer                  :: ix,iy,iz,ia,indx_owner
-    integer                  :: np, iam, nr, nt
-    integer                  :: element
-    integer, allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_ipk_) :: m,n,nnz,glob_row,nlr,i,ii,ib,k
+    integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
+    integer(psb_ipk_) :: np, iam, nr, nt
+    integer(psb_ipk_) :: element
+    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
 
@@ -389,7 +389,7 @@ contains
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
     external           :: a1, a2, a3, a4, b1, b2, b3
-    integer            :: err_act
+    integer(psb_ipk_) :: err_act
 
     character(len=20)  :: name, ch_err,tmpfmt
 

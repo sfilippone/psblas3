@@ -52,16 +52,16 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   implicit None
   include 'parts.fh'
   !....Parameters...
-  Integer, intent(in)                 :: M,N,ictxt
+  integer(psb_ipk_), intent(in)                 :: M,N,ictxt
   Type(psb_desc_type), intent(out)    :: desc
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
 
   !locals
-  Integer              :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
+  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx 
-  integer              :: int_err(5),exch(3)
-  integer, allocatable  :: prc_v(:), temp_ovrlap(:), loc_idx(:) 
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_ipk_), allocatable  :: prc_v(:), temp_ovrlap(:), loc_idx(:) 
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 

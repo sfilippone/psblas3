@@ -36,26 +36,26 @@ module psb_z_comm_mod
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout), target   :: x(:,:)
       type(psb_desc_type), intent(in)            :: desc_a
-      integer, intent(out)                       :: info
+      integer(psb_ipk_), intent(out)                       :: info
       complex(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional              :: update,jx,ik,mode
+      integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_zovrlm
     subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
-      integer, intent(out)                       :: info
+      integer(psb_ipk_), intent(out)                       :: info
       complex(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional              :: update,mode
+      integer(psb_ipk_), intent(in), optional              :: update,mode
     end subroutine psb_zovrlv
     subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
       use psb_z_vect_mod
       type(psb_z_vect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       complex(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer, intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(in), optional           :: update,mode
     end subroutine psb_zovrl_vect
   end interface psb_ovrl
 
@@ -64,20 +64,20 @@ module psb_z_comm_mod
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)          :: desc_a
-      integer, intent(out)                     :: info
+      integer(psb_ipk_), intent(out)                     :: info
       complex(psb_dpk_), intent(in), optional  :: alpha
       complex(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,jx,ik,data
+      integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalom
     subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout)        :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional :: alpha
       complex(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalov
     subroutine  psb_zhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
@@ -85,10 +85,10 @@ module psb_z_comm_mod
       use psb_z_vect_mod
       type(psb_z_vect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional    :: alpha
       complex(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer, intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalo_vect
   end interface psb_halo
@@ -100,16 +100,16 @@ module psb_z_comm_mod
       complex(psb_dpk_), intent(out) :: locx(:,:)
       complex(psb_dpk_), intent(in)  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_zscatterm
     subroutine  psb_zscatterv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_dpk_), intent(out) :: locx(:)
       complex(psb_dpk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_zscatterv
   end interface
 
@@ -121,8 +121,8 @@ module psb_z_comm_mod
       type(psb_zspmat_type), intent(inout) :: loca
       type(psb_zspmat_type), intent(out)   :: globa
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root,dupl
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_zsp_allgather
     subroutine  psb_zgatherm(globx, locx, desc_a, info, root)
@@ -130,16 +130,16 @@ module psb_z_comm_mod
       complex(psb_dpk_), intent(in)  :: locx(:,:)
       complex(psb_dpk_), intent(out) :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_zgatherm
     subroutine  psb_zgatherv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_dpk_), intent(in)  :: locx(:)
       complex(psb_dpk_), intent(out) :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, intent(in), optional    :: root
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_zgatherv
     subroutine  psb_zgather_vect(globx, locx, desc_a, info, root)
       use psb_descriptor_type
@@ -147,8 +147,8 @@ module psb_z_comm_mod
       type(psb_z_vect_type), intent(inout) :: locx
       complex(psb_dpk_), intent(out)     :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: root
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_zgather_vect
   end interface psb_gather
 

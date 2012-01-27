@@ -31,14 +31,15 @@
 !!$  
 module psb_error_mod
   use psb_const_mod
-  integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1
-  integer, parameter, public :: psb_debug_ext_=1, psb_debug_outer_=2
-  integer, parameter, public :: psb_debug_comp_=3, psb_debug_inner_=4
-  integer, parameter, public :: psb_debug_serial_=8, psb_debug_serial_comp_=9
+
+  integer(psb_ipk_), parameter, public :: psb_act_ret_=0, psb_act_abort_=1
+  integer(psb_ipk_), parameter, public :: psb_debug_ext_=1, psb_debug_outer_=2
+  integer(psb_ipk_), parameter, public :: psb_debug_comp_=3, psb_debug_inner_=4
+  integer(psb_ipk_), parameter, public :: psb_debug_serial_=8, psb_debug_serial_comp_=9
   
-  integer, parameter, public ::  psb_no_err_      = 0
-  integer, parameter, public ::  psb_err_warning_ = 1
-  integer, parameter, public ::  psb_err_fatal_   = 2
+  integer(psb_ipk_), parameter, public ::  psb_no_err_      = 0
+  integer(psb_ipk_), parameter, public ::  psb_err_warning_ = 1
+  integer(psb_ipk_), parameter, public ::  psb_err_fatal_   = 2
   
   !
   !     Error handling 
@@ -59,14 +60,16 @@ module psb_error_mod
     subroutine psb_serror()
     end subroutine psb_serror
     subroutine psb_perror(ictxt)
-      integer, intent(in)     ::  ictxt
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in)     ::  ictxt
     end subroutine psb_perror
   end interface
 
   interface 
     subroutine psb_errcomm(ictxt, err)
-      integer, intent(in)   :: ictxt
-      integer, intent(inout):: err
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in)   :: ictxt
+      integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
   end interface
 
@@ -76,11 +79,11 @@ module psb_error_mod
   type psb_errstack_node
 
     !  the error code
-    integer                  ::   err_code=0         
+    integer(psb_ipk_) ::   err_code=0         
     !  the name of the routine generating the error
     character(len=20)        ::   routine=''       
     !  array of integer data to complete the error msg   
-    integer,dimension(5)     ::   i_err_data=0     
+    integer(psb_ipk_),dimension(5)     ::   i_err_data=0     
     !     real(psb_dpk_)(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
     !     complex(dim=10)          ::   c_err_data=0.c0    !  array of complex data to complete the error msg
     !  array of character data to complete the error msg
@@ -96,16 +99,16 @@ module psb_error_mod
     !  pointer to the top element of the stack
     type(psb_errstack_node), pointer :: top => null()    
     !  number of entries in the stack
-    integer                          :: n_elems=0        
+    integer(psb_ipk_) :: n_elems=0        
 
   end type psb_errstack
 
 
   type(psb_errstack), save :: error_stack         
-  integer, save            :: error_status = psb_no_err_    
-  integer, save            :: verbosity_level = 1 
-  integer, save            :: err_action = psb_act_abort_
-  integer, save            :: debug_level=0, debug_unit, serial_debug_level=0
+  integer(psb_ipk_), save            :: error_status = psb_no_err_    
+  integer(psb_ipk_), save            :: verbosity_level = 1 
+  integer(psb_ipk_), save            :: err_action = psb_act_abort_
+  integer(psb_ipk_), save            :: debug_level=0, debug_unit, serial_debug_level=0
 
 contains
 
@@ -113,7 +116,7 @@ contains
   ! saves action to support error traceback
   ! also changes error action to "return"
   subroutine psb_erractionsave(err_act)
-    integer, intent(out) :: err_act
+    integer(psb_ipk_), intent(out) :: err_act
     err_act    = err_action
     err_action = psb_act_ret_
   end subroutine psb_erractionsave
@@ -121,31 +124,31 @@ contains
 
   ! return the action to take upon error occurrence
   subroutine psb_get_erraction(err_act)
-    integer, intent(out) :: err_act
+    integer(psb_ipk_), intent(out) :: err_act
     err_act=err_action
   end subroutine psb_get_erraction
 
   ! sets the action to take upon error occurrence
   subroutine psb_set_erraction(err_act)
-    integer, intent(in) :: err_act
+    integer(psb_ipk_), intent(in) :: err_act
     err_action=err_act
   end subroutine psb_set_erraction
 
 
   ! restores error action previously saved with psb_erractionsave
   subroutine psb_erractionrestore(err_act)
-    integer, intent(in) :: err_act
+    integer(psb_ipk_), intent(in) :: err_act
     err_action = err_act
   end subroutine psb_erractionrestore
 
 
   function  psb_get_debug_level()
-    integer :: psb_get_debug_level
+    integer(psb_ipk_) :: psb_get_debug_level
     psb_get_debug_level = debug_level
   end function psb_get_debug_level
 
   subroutine psb_set_debug_level(level)
-    integer, intent(in) :: level
+    integer(psb_ipk_), intent(in) :: level
     if (level >= 0) then
       debug_level = level
     else
@@ -154,12 +157,12 @@ contains
   end subroutine psb_set_debug_level
 
   function  psb_get_debug_unit()
-    integer :: psb_get_debug_unit
+    integer(psb_ipk_) :: psb_get_debug_unit
     psb_get_debug_unit = debug_unit
   end function psb_get_debug_unit
 
   subroutine psb_set_debug_unit(unit)
-    integer, intent(in) :: unit
+    integer(psb_ipk_), intent(in) :: unit
     if ((unit >= 0).or.(unit == psb_err_unit)&
          & .or.(unit == psb_out_unit)) then
       debug_unit = unit
@@ -169,12 +172,12 @@ contains
   end subroutine psb_set_debug_unit
 
   function  psb_get_serial_debug_level()
-    integer :: psb_get_serial_debug_level
+    integer(psb_ipk_) :: psb_get_serial_debug_level
     psb_get_serial_debug_level = serial_debug_level
   end function psb_get_serial_debug_level
 
   subroutine psb_set_serial_debug_level(level)
-    integer, intent(in) :: level
+    integer(psb_ipk_), intent(in) :: level
     if (level >= 0) then
       serial_debug_level = level
     else
@@ -186,7 +189,7 @@ contains
 
   ! sets verbosity of the error message
   subroutine psb_set_errverbosity(v)
-    integer, intent(in) :: v
+    integer(psb_ipk_), intent(in) :: v
     verbosity_level=v
   end subroutine psb_set_errverbosity
 
@@ -194,14 +197,14 @@ contains
 
   ! returns number of errors
   function psb_get_numerr()
-    integer :: psb_get_numerr
+    integer(psb_ipk_) :: psb_get_numerr
     psb_get_numerr = error_stack%n_elems
   end function psb_get_numerr
 
 
   ! returns verbosity of the error message
   function psb_get_errverbosity()
-    integer :: psb_get_errverbosity
+    integer(psb_ipk_) :: psb_get_errverbosity
 
     psb_get_errverbosity=verbosity_level
   end function psb_get_errverbosity
@@ -210,12 +213,12 @@ contains
 
   ! checks the status of the error condition
   function psb_get_errstatus()
-    integer :: psb_get_errstatus
+    integer(psb_ipk_) :: psb_get_errstatus
     psb_get_errstatus = error_status
   end function psb_get_errstatus
 
   subroutine  psb_set_errstatus(ircode)
-    integer :: ircode
+    integer(psb_ipk_) :: ircode
     if ((psb_no_err_<=ircode).and.(ircode <= psb_err_fatal_))&
          &  error_status=ircode
   end subroutine psb_set_errstatus
@@ -238,10 +241,10 @@ contains
   ! pushes an error on the error stack
   subroutine psb_stackpush(err_c, r_name, i_err, a_err)
 
-    integer, intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer, optional                ::  i_err(5)
+    integer(psb_ipk_), optional                ::  i_err(5)
 
     type(psb_errstack_node), pointer     ::  new_node
 
@@ -266,10 +269,10 @@ contains
   ! pushes an error on the error stack
   subroutine psb_errpush(err_c, r_name, i_err, a_err)
 
-    integer, intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer, optional                ::  i_err(5)
+    integer(psb_ipk_), optional                ::  i_err(5)
 
     type(psb_errstack_node), pointer     ::  new_node
 
@@ -281,10 +284,10 @@ contains
   ! pushes a warning on the error stack
   subroutine psb_warning_push(err_c, r_name, i_err, a_err)
 
-    integer, intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)              ::  err_c
     character(len=*), intent(in)     ::  r_name
     character(len=*), optional       ::  a_err
-    integer, optional                ::  i_err(5)
+    integer(psb_ipk_), optional                ::  i_err(5)
 
     type(psb_errstack_node), pointer     ::  new_node
 
@@ -298,10 +301,10 @@ contains
   ! pops an error from the error stack
   subroutine psb_errpop(err_c, r_name, i_e_d, a_e_d)
 
-    integer, intent(out)             ::  err_c
+    integer(psb_ipk_), intent(out)             ::  err_c
     character(len=20), intent(out)        ::  r_name
     character(len=40), intent(out)        ::  a_e_d
-    integer, intent(out)             ::  i_e_d(5)
+    integer(psb_ipk_), intent(out)             ::  i_e_d(5)
 
     type(psb_errstack_node), pointer     ::  old_node
 
@@ -323,11 +326,11 @@ contains
   ! prints the error msg associated to a specific error code
   subroutine psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
 
-    integer, intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)              ::  err_c
     character(len=20), intent(in)    ::  r_name
     character(len=40), intent(in)    ::  a_e_d
-    integer, intent(in)              ::  i_e_d(5)
-    integer, optional                ::  me
+    integer(psb_ipk_), intent(in)              ::  i_e_d(5)
+    integer(psb_ipk_), optional                ::  me
 
     if(present(me)) then
       write(psb_err_unit,&

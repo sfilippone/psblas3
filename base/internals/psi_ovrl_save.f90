@@ -39,10 +39,10 @@ subroutine  psi_sovrl_saver1(x,xs,desc_a,info)
   real(psb_spk_), intent(inout)  :: x(:)
   real(psb_spk_), allocatable    :: xs(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_saver1'
@@ -92,10 +92,10 @@ subroutine  psi_sovrl_saver2(x,xs,desc_a,info)
   real(psb_spk_), intent(inout)  :: x(:,:)
   real(psb_spk_), allocatable    :: xs(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_saver2'
@@ -147,10 +147,10 @@ subroutine  psi_dovrl_saver1(x,xs,desc_a,info)
   real(psb_dpk_), intent(inout)  :: x(:)
   real(psb_dpk_), allocatable    :: xs(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver1'
@@ -201,10 +201,10 @@ subroutine  psi_dovrl_saver2(x,xs,desc_a,info)
   real(psb_dpk_), intent(inout)  :: x(:,:)
   real(psb_dpk_), allocatable    :: xs(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver2'
@@ -255,10 +255,10 @@ subroutine  psi_covrl_saver1(x,xs,desc_a,info)
   complex(psb_spk_), intent(inout)  :: x(:)
   complex(psb_spk_), allocatable    :: xs(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_covrl_saver1'
@@ -309,10 +309,10 @@ subroutine  psi_covrl_saver2(x,xs,desc_a,info)
   complex(psb_spk_), intent(inout)  :: x(:,:)
   complex(psb_spk_), allocatable    :: xs(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_covrl_saver2'
@@ -365,10 +365,10 @@ subroutine  psi_zovrl_saver1(x,xs,desc_a,info)
   complex(psb_dpk_), intent(inout)  :: x(:)
   complex(psb_dpk_), allocatable    :: xs(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_saver1'
@@ -420,10 +420,10 @@ subroutine  psi_zovrl_saver2(x,xs,desc_a,info)
   complex(psb_dpk_), intent(inout)  :: x(:,:)
   complex(psb_dpk_), allocatable    :: xs(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_saver2'
@@ -473,13 +473,13 @@ subroutine  psi_iovrl_saver1(x,xs,desc_a,info)
 
   implicit none
 
-  integer, intent(inout)  :: x(:)
-  integer, allocatable    :: xs(:)
+  integer(psb_ipk_), intent(inout)  :: x(:)
+  integer(psb_ipk_), allocatable    :: xs(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_saver1'
@@ -529,13 +529,13 @@ subroutine  psi_iovrl_saver2(x,xs,desc_a,info)
   use psb_penv_mod
   implicit none
 
-  integer, intent(inout)  :: x(:,:)
-  integer, allocatable    :: xs(:,:)
+  integer(psb_ipk_), intent(inout)  :: x(:,:)
+  integer(psb_ipk_), allocatable    :: xs(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz, nc
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_saver2'
@@ -589,10 +589,10 @@ subroutine  psi_sovrl_save_vect(x,xs,desc_a,info)
   class(psb_s_base_vect_type)     :: x
   real(psb_spk_), allocatable     :: xs(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_saver1'
@@ -640,10 +640,10 @@ subroutine  psi_dovrl_save_vect(x,xs,desc_a,info)
   class(psb_d_base_vect_type)     :: x
   real(psb_dpk_), allocatable     :: xs(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver1'
@@ -691,10 +691,10 @@ subroutine  psi_covrl_save_vect(x,xs,desc_a,info)
   class(psb_c_base_vect_type)     :: x
   complex(psb_spk_), allocatable     :: xs(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_saver1'
@@ -742,10 +742,10 @@ subroutine  psi_zovrl_save_vect(x,xs,desc_a,info)
   class(psb_z_base_vect_type)     :: x
   complex(psb_dpk_), allocatable  :: xs(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, isz
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_saver1'

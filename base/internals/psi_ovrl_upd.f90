@@ -37,11 +37,11 @@ subroutine  psi_sovrl_updr1(x,desc_a,update,info)
 
   real(psb_spk_), intent(inout), target :: x(:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_updr1'
@@ -107,11 +107,11 @@ subroutine  psi_sovrl_updr2(x,desc_a,update,info)
 
   real(psb_spk_), intent(inout), target :: x(:,:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_updr2'
@@ -176,11 +176,11 @@ subroutine  psi_dovrl_updr1(x,desc_a,update,info)
 
   real(psb_dpk_), intent(inout), target :: x(:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_updr1'
@@ -246,11 +246,11 @@ subroutine  psi_dovrl_updr2(x,desc_a,update,info)
 
   real(psb_dpk_), intent(inout), target :: x(:,:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_updr2'
@@ -315,11 +315,11 @@ subroutine  psi_covrl_updr1(x,desc_a,update,info)
 
   complex(psb_spk_), intent(inout), target :: x(:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_covrl_updr1'
@@ -385,11 +385,11 @@ subroutine  psi_covrl_updr2(x,desc_a,update,info)
 
   complex(psb_spk_), intent(inout), target :: x(:,:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_covrl_updr2'
@@ -454,11 +454,11 @@ subroutine  psi_zovrl_updr1(x,desc_a,update,info)
 
   complex(psb_dpk_), intent(inout), target :: x(:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_updr1'
@@ -524,11 +524,11 @@ subroutine  psi_zovrl_updr2(x,desc_a,update,info)
 
   complex(psb_dpk_), intent(inout), target :: x(:,:)
   type(psb_desc_type), intent(in)         :: desc_a
-  integer, intent(in)                     :: update
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(in)                     :: update
+  integer(psb_ipk_), intent(out)                    :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_updr2'
@@ -591,13 +591,13 @@ subroutine  psi_iovrl_updr1(x,desc_a,update,info)
 
   implicit none
 
-  integer, intent(inout), target   :: x(:)
+  integer(psb_ipk_), intent(inout), target   :: x(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in)              :: update
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in)              :: update
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_updr1'
@@ -662,13 +662,13 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
 
   implicit none
 
-  integer, intent(inout), target   :: x(:,:)
+  integer(psb_ipk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in)              :: update
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in)              :: update
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer           :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_updr2'
@@ -737,12 +737,12 @@ subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
 
   class(psb_s_base_vect_type)     :: x
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(in)             :: update
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(in)             :: update
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
   real(psb_spk_), allocatable :: xs(:)
-  integer           :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
   character(len=20) :: name, ch_err
 
 
@@ -819,12 +819,12 @@ subroutine  psi_dovrl_upd_vect(x,desc_a,update,info)
 
   class(psb_d_base_vect_type)     :: x
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(in)             :: update
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(in)             :: update
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
   real(psb_dpk_), allocatable :: xs(:)
-  integer           :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
   character(len=20) :: name, ch_err
 
 
@@ -902,12 +902,12 @@ subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
 
   class(psb_c_base_vect_type)     :: x
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(in)             :: update
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(in)             :: update
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
   complex(psb_spk_), allocatable :: xs(:)
-  integer           :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
   character(len=20) :: name, ch_err
 
 
@@ -984,12 +984,12 @@ subroutine  psi_zovrl_upd_vect(x,desc_a,update,info)
 
   class(psb_z_base_vect_type)     :: x
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(in)             :: update
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(in)             :: update
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
   complex(psb_dpk_), allocatable :: xs(:)
-  integer           :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
   character(len=20) :: name, ch_err
 
 

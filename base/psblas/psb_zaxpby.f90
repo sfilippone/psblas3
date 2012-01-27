@@ -39,10 +39,10 @@ subroutine psb_zaxpby_vect(alpha, x, beta, y,&
   type(psb_z_vect_type), intent (inout) ::  y
   complex(psb_dpk_), intent (in)        :: alpha, beta
   type(psb_desc_type), intent (in)      :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, iy, m, iiy, jjy
   character(len=20)        :: name, ch_err
 
@@ -140,15 +140,15 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_zaxpby
   implicit none                    
 
-  integer, intent(in), optional   :: n, jx, jy
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: n, jx, jy
+  integer(psb_ipk_), intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
   complex(psb_dpk_), intent(in)    :: alpha, beta
   complex(psb_dpk_), intent(in)    :: x(:,:)
   complex(psb_dpk_), intent(inout) :: y(:,:)
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
@@ -290,14 +290,14 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_base_mod, psb_protect_name => psb_zaxpbyv
   implicit none                    
 
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
   complex(psb_dpk_), intent(in)    :: alpha, beta
   complex(psb_dpk_), intent(in)    :: x(:)
   complex(psb_dpk_), intent(inout) :: y(:)
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, iy, m, iiy, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.

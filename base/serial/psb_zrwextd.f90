@@ -43,13 +43,13 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
-  integer, intent(in)                          :: nr
+  integer(psb_ipk_), intent(in)                          :: nr
   type(psb_zspmat_type), intent(inout)        :: a
-  integer,intent(out)                          :: info
+  integer(psb_ipk_),intent(out)                          :: info
   type(psb_zspmat_type), intent(in), optional :: b
   logical,intent(in), optional                 :: rowscale
 
-  integer :: i,j,ja,jb,err_act,nza,nzb
+  integer(psb_ipk_) :: i,j,ja,jb,err_act,nza,nzb
   character(len=20)                 :: name, ch_err
   type(psb_z_coo_sparse_mat)        :: actmp
   logical  rowscale_ 
@@ -103,13 +103,13 @@ subroutine psb_zbase_rwextd(nr,a,info,b,rowscale)
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
-  integer, intent(in)                                :: nr
+  integer(psb_ipk_), intent(in)                                :: nr
   class(psb_z_base_sparse_mat), intent(inout)        :: a
-  integer,intent(out)                                :: info
+  integer(psb_ipk_),intent(out)                                :: info
   class(psb_z_base_sparse_mat), intent(in), optional :: b
   logical,intent(in), optional                       :: rowscale
 
-  integer :: i,j,ja,jb,err_act,nza,nzb, ma, mb, na, nb
+  integer(psb_ipk_) :: i,j,ja,jb,err_act,nza,nzb, ma, mb, na, nb
   character(len=20)                 :: name, ch_err
   logical  rowscale_ 
 

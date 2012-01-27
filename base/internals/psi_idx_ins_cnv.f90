@@ -56,17 +56,17 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   use psb_error_mod
   use psb_penv_mod
   implicit none
-  integer, intent(in)    :: nv
-  integer, intent(inout) ::  idxin(:)
+  integer(psb_ipk_), intent(in)    :: nv
+  integer(psb_ipk_), intent(inout) ::  idxin(:)
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
-  integer :: ictxt,mglob, nglob
-  integer                :: np, me
-  integer                :: nrow,ncol, err_act
-  integer                :: pnt_halo, nh, ip, lip,nxt,lipf,i,k,isize
+  integer(psb_ipk_) :: ictxt,mglob, nglob
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: nrow,ncol, err_act
+  integer(psb_ipk_) :: pnt_halo, nh, ip, lip,nxt,lipf,i,k,isize
   logical                :: pnt_h_ok
-  integer, parameter     :: relocsz=200
+  integer(psb_ipk_), parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
 
   info = psb_success_
@@ -192,16 +192,16 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   use psb_error_mod
   use psb_penv_mod
   implicit none
-  integer, intent(in)  :: nv, idxin(:)
-  integer, intent(out) :: idxout(:)
+  integer(psb_ipk_), intent(in)  :: nv, idxin(:)
+  integer(psb_ipk_), intent(out) :: idxout(:)
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
-  integer :: i,ictxt,k,mglob, nglob
-  integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt,lipf
+  integer(psb_ipk_) :: i,ictxt,k,mglob, nglob
+  integer(psb_ipk_) :: np, me, isize
+  integer(psb_ipk_) :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt,lipf
   logical                :: pnt_h_ok
-  integer, parameter     :: relocsz=200
+  integer(psb_ipk_), parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
 
   info = psb_success_
@@ -310,12 +310,12 @@ end subroutine psi_idx_ins_cnv2
 subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs2
   use psb_descriptor_type
-  integer, intent(in)  :: idxin
-  integer, intent(out) :: idxout
+  integer(psb_ipk_), intent(in)  :: idxin
+  integer(psb_ipk_), intent(out) :: idxout
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer  :: iout(1) 
+  integer(psb_ipk_) :: iout(1) 
   logical  :: mask_(1)
   
   if (present(mask)) then 
@@ -381,11 +381,11 @@ end subroutine psi_idx_ins_cnvs2
 subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs1
   use psb_descriptor_type
-  integer, intent(inout)  :: idxin
+  integer(psb_ipk_), intent(inout)  :: idxin
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer  :: iout(1) 
+  integer(psb_ipk_) :: iout(1) 
   logical  :: mask_(1)
   
   if (present(mask)) then 

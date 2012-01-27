@@ -47,7 +47,7 @@ module psb_glist_map_mod
   use psb_list_map_mod
   
   type, extends(psb_list_map) :: psb_glist_map
-    integer, allocatable :: vgp(:)
+    integer(psb_ipk_), allocatable :: vgp(:)
   contains
     procedure, pass(idxmap)  :: glist_map_init   => glist_initvg
     procedure, pass(idxmap)  :: sizeof  => glist_sizeof
@@ -96,10 +96,10 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer, intent(in)  :: ictxt, vg(:)
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(in)  :: ictxt, vg(:)
+    integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, n, nl
+    integer(psb_ipk_) :: iam, np, i, n, nl
     
 
     info = 0
@@ -151,11 +151,11 @@ contains
     use psb_penv_mod
     use psb_sort_mod
     implicit none 
-    integer, intent(in) :: idx(:)
-    integer, allocatable, intent(out) ::  iprc(:)
+    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(in) :: idxmap
-    integer, intent(out) :: info
-    integer :: ictxt, iam, np, nv, i, ngp
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: ictxt, iam, np, nv, i, ngp
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -192,8 +192,8 @@ contains
     implicit none 
     class(psb_glist_map), intent(in)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='glist_clone'
     logical, parameter :: debug=.false.
 

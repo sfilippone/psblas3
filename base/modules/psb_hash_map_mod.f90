@@ -60,8 +60,8 @@ module psb_hash_map_mod
 
   type, extends(psb_indx_map) :: psb_hash_map
 
-  integer              :: hashvsize, hashvmask
-  integer, allocatable :: hashv(:), glb_lc(:,:), loc_to_glob(:)
+  integer(psb_ipk_) :: hashvsize, hashvmask
+  integer(psb_ipk_), allocatable :: hashv(:), glb_lc(:,:), loc_to_glob(:)
   type(psb_hash_type), allocatable  :: hash
 
 contains
@@ -139,7 +139,7 @@ end function hash_sizeof
 subroutine hash_free(idxmap)
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer :: info
+  integer(psb_ipk_) :: info
 
   if (allocated(idxmap%hashv)) &
        & deallocate(idxmap%hashv)
@@ -159,11 +159,11 @@ end subroutine hash_free
 subroutine hash_l2gs1(idx,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(inout) :: idx
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
-  integer  :: idxv(1)
+  integer(psb_ipk_) :: idxv(1)
   info = 0
   if (present(mask)) then 
     if (.not.mask) return
@@ -178,9 +178,9 @@ end subroutine hash_l2gs1
 subroutine hash_l2gs2(idxin,idxout,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(in)    :: idxin
-  integer, intent(out)   :: idxout
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin
+  integer(psb_ipk_), intent(out)   :: idxout
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
 
@@ -193,11 +193,11 @@ end subroutine hash_l2gs2
 subroutine hash_l2gv1(idx,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(inout) :: idx(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i
+  integer(psb_ipk_) :: i
   logical :: owned_
   info = 0
 
@@ -248,12 +248,12 @@ end subroutine hash_l2gv1
 subroutine hash_l2gv2(idxin,idxout,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(in)    :: idxin(:)
-  integer, intent(out)   :: idxout(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin(:)
+  integer(psb_ipk_), intent(out)   :: idxout(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: is, im
+  integer(psb_ipk_) :: is, im
 
   is = size(idxin)
   im = min(is,size(idxout))
@@ -270,11 +270,11 @@ end subroutine hash_l2gv2
 subroutine hash_g2ls1(idx,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(inout) :: idx
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
-  integer :: idxv(1)
+  integer(psb_ipk_) :: idxv(1)
   info = 0
 
   if (present(mask)) then 
@@ -290,9 +290,9 @@ end subroutine hash_g2ls1
 subroutine hash_g2ls2(idxin,idxout,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(in)    :: idxin
-  integer, intent(out)   :: idxout
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin
+  integer(psb_ipk_), intent(out)   :: idxout
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
 
@@ -307,12 +307,12 @@ subroutine hash_g2lv1(idx,idxmap,info,mask,owned)
   use psb_sort_mod
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(inout) :: idx(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i, is, mglob, ip, lip, nrow, ncol, nrm 
-  integer :: ictxt, iam, np
+  integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, nrm 
+  integer(psb_ipk_) :: ictxt, iam, np
   logical :: owned_
 
   info = 0
@@ -421,13 +421,13 @@ end subroutine hash_g2lv1
 subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
   implicit none 
   class(psb_hash_map), intent(in) :: idxmap
-  integer, intent(in)    :: idxin(:)
-  integer, intent(out)   :: idxout(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin(:)
+  integer(psb_ipk_), intent(out)   :: idxout(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
 
-  integer :: is, im
+  integer(psb_ipk_) :: is, im
 
   is = size(idxin)
   im = min(is,size(idxout))
@@ -447,11 +447,11 @@ subroutine hash_g2ls1_ins(idx,idxmap,info,mask)
   use psb_sort_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(inout) :: idx
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
 
-  integer :: idxv(1)
+  integer(psb_ipk_) :: idxv(1)
 
   info = 0
   if (present(mask)) then 
@@ -466,9 +466,9 @@ end subroutine hash_g2ls1_ins
 subroutine hash_g2ls2_ins(idxin,idxout,idxmap,info,mask)
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(in)    :: idxin
-  integer, intent(out)   :: idxout
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin
+  integer(psb_ipk_), intent(out)   :: idxout
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask
 
   idxout = idxin
@@ -484,10 +484,10 @@ subroutine hash_g2lv1_ins(idx,idxmap,info,mask)
   use psb_penv_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(inout) :: idx(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(inout) :: idx(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
-  integer :: i, is, mglob, ip, lip, nrow, ncol, &
+  integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, &
        & nxt, err_act, ictxt, me, np
   character(len=20)      :: name,ch_err
 
@@ -618,11 +618,11 @@ end subroutine hash_g2lv1_ins
 subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask)
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(in)    :: idxin(:)
-  integer, intent(out)   :: idxout(:)
-  integer, intent(out)   :: info 
+  integer(psb_ipk_), intent(in)    :: idxin(:)
+  integer(psb_ipk_), intent(out)   :: idxout(:)
+  integer(psb_ipk_), intent(out)   :: info 
   logical, intent(in), optional :: mask(:)
-  integer :: is, im
+  integer(psb_ipk_) :: is, im
 
   is = size(idxin)
   im = min(is,size(idxout))
@@ -642,11 +642,11 @@ subroutine hash_init_vl(idxmap,ictxt,vl,info)
   use psb_realloc_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(in)  :: ictxt, vl(:)
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+  integer(psb_ipk_), intent(out) :: info
   !  To be implemented
-  integer :: iam, np, i,  nlu, nl, m, nrt,int_err(5)
-  integer, allocatable :: vlu(:)
+  integer(psb_ipk_) :: iam, np, i,  nlu, nl, m, nrt,int_err(5)
+  integer(psb_ipk_), allocatable :: vlu(:)
   character(len=20), parameter :: name='hash_map_init_vl'
 
   info = 0
@@ -706,11 +706,11 @@ subroutine hash_init_vg(idxmap,ictxt,vg,info)
   use psb_error_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(in)  :: ictxt, vg(:)
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(in)  :: ictxt, vg(:)
+  integer(psb_ipk_), intent(out) :: info
   !  To be implemented
-  integer :: iam, np, i, j, nl, n, int_err(5)
-  integer, allocatable :: vlu(:)
+  integer(psb_ipk_) :: iam, np, i, j, nl, n, int_err(5)
+  integer(psb_ipk_), allocatable :: vlu(:)
 
   info = 0
   call psb_info(ictxt,iam,np) 
@@ -761,10 +761,10 @@ subroutine hash_init_vlu(idxmap,ictxt,ntot,nl,vlu,info)
   use psb_realloc_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(in)  :: ictxt, vlu(:), nl, ntot
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(in)  :: ictxt, vlu(:), nl, ntot
+  integer(psb_ipk_), intent(out) :: info
   !  To be implemented
-  integer :: iam, np, i, j, lc2, nlu, m, nrt,int_err(5)
+  integer(psb_ipk_) :: iam, np, i, j, lc2, nlu, m, nrt,int_err(5)
   character(len=20), parameter :: name='hash_map_init_vlu'
 
   info = 0
@@ -815,10 +815,10 @@ subroutine hash_bld_g2l_map(idxmap,info)
   use psb_realloc_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
   !  To be implemented
-  integer :: ictxt, iam, np, i, j, m, nl
-  integer :: key, ih, nh, idx, nbits, hsize, hmask
+  integer(psb_ipk_) :: ictxt, iam, np, i, j, m, nl
+  integer(psb_ipk_) :: key, ih, nh, idx, nbits, hsize, hmask
   character(len=20), parameter :: name='hash_map_init_vlu'
 
   info = 0
@@ -917,9 +917,9 @@ subroutine hash_asb(idxmap,info)
   use psb_sort_mod
   implicit none 
   class(psb_hash_map), intent(inout) :: idxmap
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
 
-  integer :: nhal, ictxt, iam, np 
+  integer(psb_ipk_) :: nhal, ictxt, iam, np 
 
   info = 0 
   ictxt = idxmap%get_ctxt()
@@ -953,10 +953,10 @@ end function hash_get_fmt
 
 subroutine hash_inner_cnvs1(x,hashmask,hashv,glb_lc,nrm)
 
-  integer, intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
-  integer, intent(inout) :: x
-  integer, intent(in)    :: nrm
-  integer :: ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_), intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(inout) :: x
+  integer(psb_ipk_), intent(in)    :: nrm
+  integer(psb_ipk_) :: ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -999,11 +999,11 @@ subroutine hash_inner_cnvs1(x,hashmask,hashv,glb_lc,nrm)
 end subroutine hash_inner_cnvs1
 
 subroutine hash_inner_cnvs2(x,y,hashmask,hashv,glb_lc,nrm)
-  integer, intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
-  integer, intent(in)  :: x
-  integer, intent(out) :: y
-  integer, intent(in)  :: nrm
-  integer :: ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)  :: x
+  integer(psb_ipk_), intent(out) :: y
+  integer(psb_ipk_), intent(in)  :: nrm
+  integer(psb_ipk_) :: ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -1047,12 +1047,12 @@ end subroutine hash_inner_cnvs2
 
 
 subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
-  integer, intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in), optional  :: mask(:)
-  integer, intent(in), optional  :: nrm
-  integer, intent(inout) :: x(:)
+  integer(psb_ipk_), intent(in), optional  :: nrm
+  integer(psb_ipk_), intent(inout) :: x(:)
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -1138,13 +1138,13 @@ subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
 end subroutine hash_inner_cnv1
 
 subroutine hash_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask,nrm)
-  integer, intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in), optional :: mask(:)
-  integer, intent(in), optional :: nrm
-  integer, intent(in)  :: x(:)
-  integer, intent(out) :: y(:)
+  integer(psb_ipk_), intent(in), optional :: nrm
+  integer(psb_ipk_), intent(in)  :: x(:)
+  integer(psb_ipk_), intent(out) :: y(:)
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -1245,8 +1245,8 @@ end subroutine hash_inner_cnv2
     implicit none 
     class(psb_hash_map), intent(in)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='hash_clone'
     logical, parameter :: debug=.false.
 

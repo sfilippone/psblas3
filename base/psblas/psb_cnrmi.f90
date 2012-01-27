@@ -46,12 +46,12 @@ function psb_cnrmi(a,desc_a,info)
   implicit none
 
   type(psb_cspmat_type), intent(in)   :: a
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_spk_)                    :: psb_cnrmi
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(psb_spk_)         :: nrmi
   character(len=20)        :: name, ch_err

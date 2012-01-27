@@ -37,17 +37,17 @@ subroutine sasrx(n,x,indx,dir,flag)
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
   !
   !     .. Scalar Arguments ..
-  integer, intent(in) :: n, dir, flag
+  integer(psb_ipk_), intent(in) :: n, dir, flag
   real(psb_spk_) ::  x(n)
-  integer ::  indx(n)
+  integer(psb_ipk_) ::  indx(n)
   !     ..
   !     .. Local Scalars ..
   real(psb_spk_) :: piv, xt, xk
-  integer i, j, ilx, iux, istp, lpiv
-  integer ixt, n1, n2
+  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
+  integer(psb_ipk_) :: ixt, n1, n2
 
-  integer, parameter :: maxstack=64,nparms=3,ithrs=16
-  integer            :: istack(nparms,maxstack)
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_) :: istack(nparms,maxstack)
   !     ..
 
   select case(flag)
@@ -355,10 +355,10 @@ contains
 
   subroutine isasrx_up(n,x,indx)
     implicit none
-    integer :: n
+    integer(psb_ipk_) :: n
     real(psb_spk_) :: x(n)
-    integer :: indx(n)
-    integer :: i,j,ix
+    integer(psb_ipk_) :: indx(n)
+    integer(psb_ipk_) :: i,j,ix
     real(psb_spk_) :: xx,xax
 
     do j=n-1,1,-1
@@ -382,10 +382,10 @@ contains
 
   subroutine isasrx_dw(n,x,indx)
     implicit none
-    integer :: n
+    integer(psb_ipk_) :: n
     real(psb_spk_) :: x(n)
-    integer :: indx(n)
-    integer :: i,j,ix
+    integer(psb_ipk_) :: indx(n)
+    integer(psb_ipk_) :: i,j,ix
     real(psb_spk_) :: xx,xax
 
     do j=n-1,1,-1

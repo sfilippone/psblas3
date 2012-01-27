@@ -117,21 +117,21 @@ Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   complex(psb_dpk_), Intent(in)    :: b(:)
   complex(psb_dpk_), Intent(inout) :: x(:)
   Real(psb_dpk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   complex(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
   complex(psb_dpk_), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
-  Integer       :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt,istop_,j, int_err(5)
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_,j, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   complex(psb_dpk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   type(psb_itconv_type)        :: stopdat
@@ -421,9 +421,9 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_z_vect_type), Intent(inout) :: b
   type(psb_z_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
   complex(psb_dpk_), allocatable, target   :: aux(:), gamma(:),&
@@ -432,12 +432,12 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_z_vect_type), Pointer  :: ww, q, r, rt0, p, v, &
        & s, t, z, f
 
-  Integer       :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt,istop_,j, k, int_err(5)
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_), Parameter :: irmax = 8
+  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_,j, k, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   complex(psb_dpk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   real(psb_dpk_)     :: derr  

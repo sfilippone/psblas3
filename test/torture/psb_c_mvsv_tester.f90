@@ -7,24 +7,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 1+1i 2+2i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,1.e0), (2,2)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(6.e0,3.e0), (12,9)/)! reference cy after 
@@ -83,24 +83,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 0+1i 2+6i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (0.e0,1.e0), (2,6)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(6.e0,6.e0), (9,18)/)! reference cy after 
@@ -159,24 +159,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=1
     ! 1+1i 3+2i
     ! 0+3i 2+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (3.e0,2.e0), (0.e0,3.e0), (2,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(6.e0,-12.e0), (18,-6)/)! reference cy after 
@@ -235,24 +235,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1+1i 0+0i
     ! 3+3i 6+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (3.e0,3.e0), (6,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(3.e0,3.e0), (27,9)/)! reference cy after 
@@ -311,24 +311,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1+1i 0+0i
     ! 1+2i 2+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,2.e0), (2,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(6.e0,9.e0), (6,0)/)! reference cy after 
@@ -387,24 +387,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1+1i 1+0i
     ! 0+0i 2+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 1, 2/)
-    integer :: JA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 2, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,0.e0), (2,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(3.e0,-3.e0), (9,0)/)! reference cy after 
@@ -463,24 +463,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 5+1i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 1/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 1/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (5,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(4.e0,1.e0), (8,1)/)! reference cy after 
@@ -539,24 +539,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=1
     ! 1+1i 1+0i
     ! 0+1i 0+1i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (1.e0,0.e0), (0.e0,1.e0), (0,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(4.e0,2.e0), (4,1)/)! reference cy after 
@@ -615,24 +615,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=1
     ! 1+1i 0+2i
     ! 0+3i 2+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (0.e0,2.e0), (0.e0,3.e0), (2,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(4.e0,-4.e0), (5,-2)/)! reference cy after 
@@ -691,24 +691,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1+1i 1+0i
     ! 0+0i 3+1i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 1, 2/)
-    integer :: JA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 2, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,0.e0), (3,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(2.e0,1.e0), (3,1)/)! reference cy after 
@@ -767,24 +767,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1+1i 0+1i
     ! 0+1i 3+5i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (0.e0,1.e0), (0.e0,1.e0), (3,5)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(1.e0,2.e0), (3,6)/)! reference cy after 
@@ -843,24 +843,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1+1i 0+1i
     ! 0+0i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 1/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 1/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (0,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(1.e0,-1.e0), (0,-1)/)! reference cy after 
@@ -919,24 +919,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 0+0i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (1,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(2.e0,-1.e0), (2,0)/)! reference cy after 
@@ -995,24 +995,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=1
     ! 1+1i 3+0i
     ! 1+3i 0+2i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (3.e0,0.e0), (1.e0,3.e0), (0,2)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(1.e0,-4.e0), (0,-2)/)! reference cy after 
@@ -1071,24 +1071,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 1+2i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 1/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 1/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (1,2)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(1.e0,3.e0), (3,0)/)! reference cy after 
@@ -1147,24 +1147,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1+1i 1+0i
     ! 2+0i 1+1i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (1.e0,0.e0), (2.e0,0.e0), (1,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-2.e0,-1.e0), (-3,-1)/)! reference cy after 
@@ -1223,24 +1223,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1+1i 1+3i
     ! 0+0i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 1/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 1/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (1,3)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-1.e0,-1.e0), (-1,-3)/)! reference cy after 
@@ -1299,24 +1299,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1+1i 1+0i
     ! 0+1i 5+1i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (1.e0,0.e0), (0.e0,1.e0), (5,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-1.e0,2.e0), (-6,1)/)! reference cy after 
@@ -1375,24 +1375,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=1
     ! 1+1i 0+0i
     ! 3+1i 2+4i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (3.e0,1.e0), (2,4)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(0.e0,-3.e0), (-12,-15)/)! reference cy after 
@@ -1451,24 +1451,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=1
     ! 1+1i 0+1i
     ! 0+0i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 1/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 1/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/(1.e0,1.e0), (0,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(0.e0,-3.e0), (3,-3)/)! reference cy after 
@@ -1527,24 +1527,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=1
     ! 1+1i 1+0i
     ! 1+1i 0+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 1, 2/)
-    integer :: JA(3)=(/1, 2, 1/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 2, 1/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,0.e0), (1,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-3.e0,6.e0), (0,0)/)! reference cy after 
@@ -1603,24 +1603,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1+1i 0+0i
     ! 0+2i 0+2i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (0.e0,2.e0), (0,2)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-3.e0,-3.e0), (0,-12)/)! reference cy after 
@@ -1679,24 +1679,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1+1i 0+0i
     ! 1+3i 3+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,1.e0), (1.e0,3.e0), (3,0)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-6.e0,-12.e0), (-9,0)/)! reference cy after 
@@ -1755,24 +1755,24 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
-    integer :: incy=1
+    integer(psb_ipk_) :: incx=1
+    integer(psb_ipk_) :: incy=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1+1i 3+1i
     ! 0+1i 3+1i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=4
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(4)=(/1, 1, 2, 2/)
-    integer :: JA(4)=(/1, 2, 1, 2/)
+    integer(psb_ipk_) :: nnz=4
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(4)=(/1, 1, 2, 2/)
+    integer(psb_ipk_) :: JA(4)=(/1, 2, 1, 2/)
     complex*8 :: VA(4)=(/(1.e0,1.e0), (3.e0,1.e0), (0.e0,1.e0), (3,1)/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/(-3.e0,6.e0), (-18,6)/)! reference cy after 
@@ -1831,23 +1831,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1 0
     ! 1 1
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/1, 1, 1/)
     complex*8 :: x(2)=(/3, 6/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 
@@ -1910,23 +1910,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 0+2i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (0.e0,2.e0), (1,0)/)
     complex*8 :: x(2)=(/(3.e0,6.e0), (3,0)/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 
@@ -1989,23 +1989,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=3
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 0+4i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (0.e0,4.e0), (1,0)/)
     complex*8 :: x(2)=(/(3.e0,-12.e0), (3,0)/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 
@@ -2068,23 +2068,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 0+1i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (0.e0,1.e0), (1,0)/)
     complex*8 :: x(2)=(/(1.e0,0.e0), (1,1)/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2147,23 +2147,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1 0
     ! 0 1
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/1, 1/)
     complex*8 :: x(2)=(/1, 1/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2226,23 +2226,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=1
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 3+3i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (3.e0,3.e0), (1,0)/)
     complex*8 :: x(2)=(/(4.e0,-3.e0), (1,0)/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2305,23 +2305,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1 0
     ! 5 1
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/1, 5, 1/)
     complex*8 :: x(2)=(/-1, -6/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2384,23 +2384,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 1+2i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (1.e0,2.e0), (1,0)/)
     complex*8 :: x(2)=(/(-2.e0,-2.e0), (-1,0)/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2463,23 +2463,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-1
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 0+4i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (0.e0,4.e0), (1,0)/)
     complex*8 :: x(2)=(/(-1.e0,4.e0), (-1,0)/)! reference x 
     complex*8 :: cy(2)=(/1, 1/)! reference cy after 
@@ -2542,23 +2542,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='n'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1+0i 0+0i
     ! 1+1i 1+0i
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=3
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(3)=(/1, 2, 2/)
-    integer :: JA(3)=(/1, 1, 2/)
+    integer(psb_ipk_) :: nnz=3
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(3)=(/1, 2, 2/)
+    integer(psb_ipk_) :: JA(3)=(/1, 1, 2/)
     complex*8 :: VA(3)=(/(1.e0,0.e0), (1.e0,1.e0), (1,0)/)
     complex*8 :: x(2)=(/(-3.e0,0.e0), (-6,-3)/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 
@@ -2621,23 +2621,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='t'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1 0
     ! 0 1
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/1, 1/)
     complex*8 :: x(2)=(/-3, -3/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 
@@ -2700,23 +2700,23 @@ contains
     character(len=*) :: afmt
     type(psb_cspmat_type) :: a
     type(psb_desc_type)   :: desc_a
-    integer            :: ictxt, iam=-1, np=-1
-    integer            :: info=-1
+    integer(psb_ipk_) :: ictxt, iam=-1, np=-1
+    integer(psb_ipk_) :: info=-1
 
-    integer::res,istat=0,i
+    integer(psb_ipk_) ::res,istat=0,i
     character::transa='c'
-    integer :: incx=1
+    integer(psb_ipk_) :: incx=1
     complex*8 :: alpha=-3
     complex*8 :: beta=0
     ! 1 0
     ! 0 1
 
     ! declaration of VA,IA,JA 
-    integer :: nnz=2
-    integer :: m=2
-    integer :: k=2
-    integer :: IA(2)=(/1, 2/)
-    integer :: JA(2)=(/1, 2/)
+    integer(psb_ipk_) :: nnz=2
+    integer(psb_ipk_) :: m=2
+    integer(psb_ipk_) :: k=2
+    integer(psb_ipk_) :: IA(2)=(/1, 2/)
+    integer(psb_ipk_) :: JA(2)=(/1, 2/)
     complex*8 :: VA(2)=(/1, 1/)
     complex*8 :: x(2)=(/-3, -3/)! reference x 
     complex*8 :: cy(2)=(/9, 9/)! reference cy after 

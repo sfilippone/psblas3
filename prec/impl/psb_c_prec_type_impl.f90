@@ -39,13 +39,13 @@ subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans,work)
   class(psb_cprec_type), intent(inout) :: prec
   type(psb_c_vect_type),intent(inout)  :: x
   type(psb_c_vect_type),intent(inout)  :: y
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
 
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
   name = 'psb_c_apply2v'
@@ -112,14 +112,14 @@ subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans,work)
   type(psb_desc_type),intent(in)       :: desc_data
   class(psb_cprec_type), intent(inout) :: prec
   type(psb_c_vect_type),intent(inout)  :: x
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
 
   type(psb_c_vect_type)       :: ww
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
   name = 'psb_c_apply1v'
@@ -189,13 +189,13 @@ subroutine psb_c_apply2v(prec,x,y,desc_data,info,trans,work)
   class(psb_cprec_type), intent(in) :: prec
   complex(psb_spk_),intent(inout)   :: x(:)
   complex(psb_spk_),intent(inout)   :: y(:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
 
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
   name='psb_c_apply2v'
@@ -259,11 +259,11 @@ subroutine psb_c_apply1v(prec,x,desc_data,info,trans)
   type(psb_desc_type),intent(in)    :: desc_data
   class(psb_cprec_type), intent(in) :: prec
   complex(psb_spk_),intent(inout)   :: x(:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
 
   character     :: trans_
-  integer :: ictxt,np,me, err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   complex(psb_spk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
   name='psb_c_apply1v'

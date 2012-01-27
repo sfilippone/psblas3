@@ -37,13 +37,13 @@ subroutine dmsr(n,x,idir)
   use psb_ip_reord_mod
   implicit none
 
-  integer :: n, idir
+  integer(psb_ipk_) :: n, idir
   real(psb_dpk_) :: x(n)
   
   
-  integer, allocatable :: iaux(:)
+  integer(psb_ipk_), allocatable :: iaux(:)
   
-  integer :: lswap, iret, info, lp, k
+  integer(psb_ipk_) :: lswap, iret, info, lp, k
   real(psb_dpk_) :: swap
 
   if (n<0) then 

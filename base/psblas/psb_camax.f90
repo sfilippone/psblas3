@@ -51,12 +51,12 @@ function psb_camax(x,desc_a, info, jx)
 
   complex(psb_spk_), intent(in)    :: x(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-  integer, optional, intent(in)    :: jx
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)    :: jx
   real(psb_spk_)                   :: psb_camax
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, icamax
   real(psb_spk_)         :: amax
   character(len=20)        :: name, ch_err
@@ -181,11 +181,11 @@ function psb_camaxv (x,desc_a, info)
 
   complex(psb_spk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   real(psb_spk_)                  :: psb_camaxv
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, icamax
   real(psb_spk_)         :: amax
   complex(psb_spk_)      :: cmax
@@ -269,10 +269,10 @@ function psb_camax_vect(x, desc_a, info) result(res)
   real(psb_spk_)                        :: res
   type(psb_c_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, isamax
   real(psb_spk_)         :: amax
   character(len=20)      :: name, ch_err
@@ -397,11 +397,11 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   complex(psb_spk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
   real(psb_spk_), intent(out)     :: res
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, icamax
   real(psb_spk_)         :: amax
   character(len=20)        :: name, ch_err
@@ -522,12 +522,12 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
 
   complex(psb_spk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, optional, intent(in)   :: jx
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), optional, intent(in)   :: jx
   real(psb_spk_), intent(out)     :: res(:)
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, i, k, icamax
   real(psb_spk_)         :: amax
   character(len=20)        :: name, ch_err

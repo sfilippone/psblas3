@@ -53,12 +53,12 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
   real(psb_spk_), intent(in)    :: locx(:,:)
   real(psb_spk_), intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
        & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
   character(len=20)        :: name, ch_err
@@ -224,12 +224,12 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   real(psb_spk_), intent(in)    :: locx(:)
   real(psb_spk_), intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
        & err_act, n, root, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
 
@@ -335,12 +335,12 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
   type(psb_s_vect_type), intent(inout) :: locx
   real(psb_spk_), intent(out)       :: globx(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, intent(in), optional     :: iroot
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
        & err_act, n, root, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
   real(psb_spk_), allocatable :: llocx(:)

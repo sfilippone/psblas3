@@ -33,8 +33,8 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   use psb_base_mod
   implicit none
   type(psb_zspmat_type), intent(out)    :: a
-  integer, intent(out)                   :: iret
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), intent(out)                   :: iret
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
   complex(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
   character(len=72), optional, intent(out) :: mtitle
@@ -42,11 +42,11 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   character  :: rhstype*3,type*3,key*8
   character(len=72) :: mtitle_
   character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
-  integer        :: indcrd,  ptrcrd, totcrd,&
+  integer(psb_ipk_) :: indcrd,  ptrcrd, totcrd,&
        & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
   type(psb_z_csc_sparse_mat) :: acsc
   type(psb_z_coo_sparse_mat) :: acoo
-  integer                     :: ircode, i,nzr,infile, info
+  integer(psb_ipk_) :: ircode, i,nzr,infile, info
   character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
   character(len=*), parameter :: fmt11='(a3,11x,2i14)'
   character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
@@ -238,18 +238,18 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   use psb_base_mod
   implicit none
   type(psb_zspmat_type), intent(in), target :: a
-  integer, intent(out)        :: iret
+  integer(psb_ipk_), intent(out)        :: iret
   character(len=*), optional, intent(in) :: mtitle
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
   character(len=*), optional, intent(in) :: key
   complex(psb_dpk_), optional             :: rhs(:), g(:), x(:)
-  integer                     :: iout
+  integer(psb_ipk_) :: iout
 
   character(len=*), parameter::  ptrfmt='(10I8)',indfmt='(10I8)'
-  integer, parameter :: jptr=10,jind=10
+  integer(psb_ipk_), parameter :: jptr=10,jind=10
   character(len=*), parameter::  valfmt='(4E20.12)',rhsfmt='(4E20.12)'
-  integer, parameter :: jval=2,jrhs=2
+  integer(psb_ipk_), parameter :: jval=2,jrhs=2
   character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
   character(len=*), parameter :: fmt11='(a3,11x,2i14)'
   character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
@@ -260,7 +260,7 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
   character  :: rhstype*3,type*3
 
-  integer    :: i,indcrd,ptrcrd,rhscrd,totcrd,valcrd,&
+  integer(psb_ipk_) :: i,indcrd,ptrcrd,rhscrd,totcrd,valcrd,&
        & nrow,ncol,nnzero, neltvl, nrhs, nrhsix
 
   iret = 0

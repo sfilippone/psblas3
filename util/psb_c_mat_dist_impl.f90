@@ -54,9 +54,9 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   !         !   .....user passed subroutine.....
   !         subroutine parts(global_indx,n,np,pv,nv)
   !           implicit none
-  !           integer, intent(in)  :: global_indx, n, np
-  !           integer, intent(out) :: nv
-  !           integer, intent(out) :: pv(*)
+  !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+  !           integer(psb_ipk_), intent(out) :: nv
+  !           integer(psb_ipk_), intent(out) :: pv(*)
   !
   !       end subroutine parts
   !       end interface
@@ -67,7 +67,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   !        usually nv=1; if nv >1 then we have an overlap in the data
   !        distribution.
   !
-  !  integer                                  :: ictxt
+  !  integer(psb_ipk_) :: ictxt
   !     on entry: blacs context.
   !     on exit : unchanged.
   !
@@ -83,7 +83,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   !     on entry: fresh variable.
   !     on exit : this will contain the local right hand side.
   !
-  !  integer, optional    :: inroot
+  !  integer(psb_ipk_), optional    :: inroot
   !     on entry: specifies processor holding a_glob. default: 0
   !     on exit : unchanged.
   !
@@ -94,36 +94,37 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   ! parameters
   type(psb_cspmat_type)      :: a_glob
   complex(psb_spk_)          :: b_glob(:)
-  integer                    :: ictxt
+  integer(psb_ipk_) :: ictxt
   type(psb_cspmat_type)      :: a
   type(psb_c_vect_type)      :: b
   type(psb_desc_type)        :: desc_a
-  integer, intent(out)       :: info
-  integer, optional          :: inroot
+  integer(psb_ipk_), intent(out)       :: info
+  integer(psb_ipk_), optional          :: inroot
   character(len=5), optional :: fmt
   class(psb_c_base_sparse_mat), optional :: mold
 
-  integer                    :: v(:)
+  integer(psb_ipk_) :: v(:)
   interface 
     subroutine parts(global_indx,n,np,pv,nv)
+      import :: psb_ipk_
       implicit none
-      integer, intent(in)  :: global_indx, n, np
-      integer, intent(out) :: nv
-      integer, intent(out) :: pv(*) 
+      integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      integer(psb_ipk_), intent(out) :: nv
+      integer(psb_ipk_), intent(out) :: pv(*) 
     end subroutine parts
   end interface
   optional                  :: parts, v
 
   ! local variables
   logical                   :: use_parts, use_v
-  integer                     :: np, iam
-  integer                     :: length_row, i_count, j_count,&
+  integer(psb_ipk_) :: np, iam
+  integer(psb_ipk_) :: length_row, i_count, j_count,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-  integer, allocatable          :: iwork(:)
-  integer, allocatable          :: irow(:),icol(:)
+  integer(psb_ipk_), allocatable          :: iwork(:)
+  integer(psb_ipk_), allocatable          :: irow(:),icol(:)
   complex(psb_spk_), allocatable :: val(:)
-  integer, parameter          :: nb=30
+  integer(psb_ipk_), parameter          :: nb=30
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
 

@@ -68,17 +68,17 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psi_mod
   implicit none
 
-  integer, intent(inout), target  :: x(:,:)
+  integer(psb_ipk_), intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional   :: update,jx,ik,mode
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), optional, target, intent(inout) :: work(:)
+  integer(psb_ipk_), intent(in), optional   :: update,jx,ik,mode
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork
-  integer,  pointer  :: iwork(:), xp(:,:)
+  integer(psb_ipk_),  pointer  :: iwork(:), xp(:,:)
   logical            :: do_swap
   character(len=20)  :: name, ch_err
   logical            :: aliw
@@ -269,17 +269,17 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
   use psi_mod
   implicit none
 
-  integer, intent(inout), target  :: x(:)
+  integer(psb_ipk_), intent(inout), target  :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional   :: update,mode
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), optional, target, intent(inout) :: work(:)
+  integer(psb_ipk_), intent(in), optional   :: update,mode
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork
-  integer,pointer          :: iwork(:)
+  integer(psb_ipk_),pointer          :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw

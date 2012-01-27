@@ -1,15 +1,15 @@
 subroutine psb_s_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
   use psb_const_mod
-  integer, intent(out)              :: nz
-  integer, intent(out)              :: iz(:)
+  integer(psb_ipk_), intent(out)              :: nz
+  integer(psb_ipk_), intent(out)              :: iz(:)
   real(psb_spk_), intent (out)      :: z(:)
-  integer, intent(in)               :: nx, ny
-  integer, intent(in)               :: ix(:), iy(:)
+  integer(psb_ipk_), intent(in)               :: nx, ny
+  integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
   real(psb_spk_), intent (in)       :: x(:), y(:)
   real(psb_spk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
-  integer        :: i,j,k, ipx, ipy, isz
+  integer(psb_ipk_) :: i,j,k, ipx, ipy, isz
   real(psb_spk_) :: acc
 
   info=psb_success_
@@ -101,12 +101,12 @@ end subroutine psb_s_nspaxpby
 
 function psb_s_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
   use psb_const_mod
-  integer, intent(in) :: nv1,nv2
-  integer, intent(in) :: iv1(*), iv2(*)
+  integer(psb_ipk_), intent(in) :: nv1,nv2
+  integer(psb_ipk_), intent(in) :: iv1(*), iv2(*)
   real(psb_spk_), intent(in) :: v1(*),v2(*)
   real(psb_spk_)      :: dot
 
-  integer :: i,j,k, ip1, ip2
+  integer(psb_ipk_) :: i,j,k, ip1, ip2
 
   dot = szero 
   ip1 = 1
@@ -130,16 +130,16 @@ end function psb_s_spdot_srtd
 
 subroutine psb_d_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
   use psb_const_mod
-  integer, intent(out)              :: nz
-  integer, intent(out)              :: iz(:)
+  integer(psb_ipk_), intent(out)              :: nz
+  integer(psb_ipk_), intent(out)              :: iz(:)
   real(psb_dpk_), intent (out)      :: z(:)
-  integer, intent(in)               :: nx, ny
-  integer, intent(in)               :: ix(:), iy(:)
+  integer(psb_ipk_), intent(in)               :: nx, ny
+  integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
   real(psb_dpk_), intent (in)       :: x(:), y(:)
   real(psb_dpk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
-  integer        :: i,j,k, ipx, ipy, isz
+  integer(psb_ipk_) :: i,j,k, ipx, ipy, isz
   real(psb_dpk_) :: acc
 
   info=psb_success_
@@ -233,12 +233,12 @@ end subroutine psb_d_nspaxpby
 
 function psb_d_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
   use psb_const_mod
-  integer, intent(in) :: nv1,nv2
-  integer, intent(in) :: iv1(*), iv2(*)
+  integer(psb_ipk_), intent(in) :: nv1,nv2
+  integer(psb_ipk_), intent(in) :: iv1(*), iv2(*)
   real(psb_dpk_), intent(in) :: v1(*), v2(*)
   real(psb_dpk_)      :: dot
 
-  integer :: i,j,k, ip1, ip2, im1, im2, ix1, ix2
+  integer(psb_ipk_) :: i,j,k, ip1, ip2, im1, im2, ix1, ix2
 
   dot = dzero 
   ip1 = 1
@@ -276,16 +276,16 @@ end function psb_d_spdot_srtd
 
 subroutine psb_c_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
   use psb_const_mod
-  integer, intent(out)              :: nz
-  integer, intent(out)              :: iz(:)
+  integer(psb_ipk_), intent(out)              :: nz
+  integer(psb_ipk_), intent(out)              :: iz(:)
   complex(psb_spk_), intent (out)      :: z(:)
-  integer, intent(in)               :: nx, ny
-  integer, intent(in)               :: ix(:), iy(:)
+  integer(psb_ipk_), intent(in)               :: nx, ny
+  integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
   complex(psb_spk_), intent (in)       :: x(:), y(:)
   complex(psb_spk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
-  integer        :: i,j,k, ipx, ipy, isz
+  integer(psb_ipk_) :: i,j,k, ipx, ipy, isz
   complex(psb_spk_) :: acc
 
   info=psb_success_
@@ -377,12 +377,12 @@ end subroutine psb_c_nspaxpby
 
 function psb_c_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
   use psb_const_mod
-  integer, intent(in) :: nv1,nv2
-  integer, intent(in) :: iv1(*), iv2(*)
+  integer(psb_ipk_), intent(in) :: nv1,nv2
+  integer(psb_ipk_), intent(in) :: iv1(*), iv2(*)
   complex(psb_spk_), intent(in) :: v1(*),v2(*)
   complex(psb_spk_)      :: dot
 
-  integer :: i,j,k, ip1, ip2
+  integer(psb_ipk_) :: i,j,k, ip1, ip2
 
   dot = czero 
   ip1 = 1
@@ -406,16 +406,16 @@ end function psb_c_spdot_srtd
 
 subroutine psb_z_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
   use psb_const_mod
-  integer, intent(out)              :: nz
-  integer, intent(out)              :: iz(:)
+  integer(psb_ipk_), intent(out)              :: nz
+  integer(psb_ipk_), intent(out)              :: iz(:)
   complex(psb_dpk_), intent (out)      :: z(:)
-  integer, intent(in)               :: nx, ny
-  integer, intent(in)               :: ix(:), iy(:)
+  integer(psb_ipk_), intent(in)               :: nx, ny
+  integer(psb_ipk_), intent(in)               :: ix(:), iy(:)
   complex(psb_dpk_), intent (in)       :: x(:), y(:)
   complex(psb_dpk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
-  integer        :: i,j,k, ipx, ipy, isz
+  integer(psb_ipk_) :: i,j,k, ipx, ipy, isz
   complex(psb_dpk_) :: acc
 
   info=psb_success_
@@ -507,12 +507,12 @@ end subroutine psb_z_nspaxpby
 
 function psb_z_spdot_srtd(nv1,iv1,v1,nv2,iv2,v2) result(dot) 
   use psb_const_mod
-  integer, intent(in) :: nv1,nv2
-  integer, intent(in) :: iv1(*), iv2(*)
+  integer(psb_ipk_), intent(in) :: nv1,nv2
+  integer(psb_ipk_), intent(in) :: iv1(*), iv2(*)
   complex(psb_dpk_), intent(in) :: v1(*),v2(*)
   complex(psb_dpk_)      :: dot
 
-  integer :: i,j,k, ip1, ip2
+  integer(psb_ipk_) :: i,j,k, ip1, ip2
 
   dot = zzero 
   ip1 = 1

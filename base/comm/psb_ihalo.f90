@@ -37,7 +37,7 @@
 !    distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x         -  integer,dimension(:,:).       The local part of the dense matrix.
+!   x         -  integer(psb_ipk_),dimension(:,:).       The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
 !   alpha     -  real(optional).               Scale factor.
@@ -59,19 +59,19 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psi_mod
   implicit none
 
-  integer, intent(inout), target           :: x(:,:)
+  integer(psb_ipk_), intent(inout), target           :: x(:,:)
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), intent(in), optional     :: alpha
-  integer, intent(inout), optional, target :: work(:)
-  integer, intent(in), optional            :: mode,jx,ik,data
+  integer(psb_ipk_), intent(inout), optional, target :: work(:)
+  integer(psb_ipk_), intent(in), optional            :: mode,jx,ik,data
   character, intent(in), optional          :: tran
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, k, maxk, liwork,&
        & imode, err,data_
-  integer, pointer         :: xp(:,:), iwork(:)
+  integer(psb_ipk_), pointer         :: xp(:,:), iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -261,7 +261,7 @@ end subroutine psb_ihalom
 !    distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x         -  integer,dimension(:).         The local part of the dense matrix.
+!   x         -  integer(psb_ipk_),dimension(:).         The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
 !   alpha     -  real(optional).               Scale factor.
@@ -283,19 +283,19 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psi_mod
   implicit none
 
-  integer, intent(inout)                   :: x(:)
+  integer(psb_ipk_), intent(inout)                   :: x(:)
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), intent(in), optional     :: alpha
-  integer, intent(inout), optional, target :: work(:)
-  integer, intent(in), optional            :: mode,data
+  integer(psb_ipk_), intent(inout), optional, target :: work(:)
+  integer(psb_ipk_), intent(in), optional            :: mode,data
   character, intent(in), optional          :: tran
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork, data_
-  integer,pointer          :: iwork(:)
+  integer(psb_ipk_),pointer          :: iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw

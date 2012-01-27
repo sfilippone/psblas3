@@ -71,12 +71,12 @@ module psb_c_prec_type
 
   interface 
     subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
+      import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
       type(psb_desc_type),intent(in)       :: desc_data
       class(psb_cprec_type), intent(inout) :: prec
       type(psb_c_vect_type),intent(inout)  :: x
       type(psb_c_vect_type),intent(inout)  :: y
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
       character(len=1), optional           :: trans
       complex(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_c_apply2_vect
@@ -84,11 +84,11 @@ module psb_c_prec_type
   
   interface 
     subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
+      import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
         type(psb_desc_type),intent(in)       :: desc_data
       class(psb_cprec_type), intent(inout) :: prec
       type(psb_c_vect_type),intent(inout)  :: x
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
       character(len=1), optional           :: trans
       complex(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_c_apply1_vect
@@ -96,12 +96,12 @@ module psb_c_prec_type
   
   interface
     subroutine psb_c_apply2v(prec,x,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
+      import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_cprec_type), intent(in) :: prec
       complex(psb_spk_),intent(inout)   :: x(:)
       complex(psb_spk_),intent(inout)   :: y(:)
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
       complex(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_c_apply2v
@@ -109,11 +109,11 @@ module psb_c_prec_type
   
   interface 
     subroutine psb_c_apply1v(prec,x,desc_data,info,trans)
-      import :: psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
+      import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_cprec_type), intent(in) :: prec
       complex(psb_spk_),intent(inout)   :: x(:)
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
     end subroutine psb_c_apply1v
   end interface
@@ -122,8 +122,8 @@ contains
 
   subroutine psb_cfile_prec_descr(p,iout)
     type(psb_cprec_type), intent(in) :: p
-    integer, intent(in), optional    :: iout
-    integer :: iout_,info
+    integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_) :: iout_,info
     character(len=20) :: name='prec_descr' 
     
     if (present(iout)) then 
@@ -143,7 +143,7 @@ contains
   subroutine psb_c_prec_dump(prec,info,prefix,head)
     implicit none 
     type(psb_cprec_type), intent(in) :: prec
-    integer, intent(out)             :: info
+    integer(psb_ipk_), intent(out)             :: info
     character(len=*), intent(in), optional :: prefix,head
     !  len of prefix_ 
 
@@ -163,8 +163,8 @@ contains
 
   subroutine psb_c_precfree(p,info)
     type(psb_cprec_type), intent(inout) :: p
-    integer, intent(out)                :: info
-    integer             :: me, err_act,i
+    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_) :: me, err_act,i
     character(len=20)   :: name
     if(psb_get_errstatus() /= 0) return 
     info=psb_success_
@@ -199,7 +199,7 @@ contains
   function psb_cprec_sizeof(prec) result(val)
     type(psb_cprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
-    integer             :: i
+    integer(psb_ipk_) :: i
     
     val = 0
     if (allocated(prec%prec)) then 

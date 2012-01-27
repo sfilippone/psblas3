@@ -46,10 +46,10 @@ logical function psb_isaperm(n,eip)
   use psb_sort_mod, psb_protect_name => psb_isaperm
   implicit none
 
-  integer, intent(in) :: n                                                      
-  integer, intent(in) :: eip(n)
-  integer, allocatable :: ip(:)
-  integer i,j,m, info
+  integer(psb_ipk_), intent(in) :: n                                                      
+  integer(psb_ipk_), intent(in) :: eip(n)
+  integer(psb_ipk_), allocatable :: ip(:)
+  integer(psb_ipk_) :: i,j,m, info
 
 
   psb_isaperm = .true.
@@ -100,10 +100,10 @@ end function psb_isaperm
 function  psb_iblsrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_iblsrch
   implicit none
-  integer ipos, key, n
-  integer v(n)
+  integer(psb_ipk_) :: ipos, key, n
+  integer(psb_ipk_) :: v(n)
 
-  integer lb, ub, m
+  integer(psb_ipk_) :: lb, ub, m
 
   if (n < 5) then 
     ! don't bother with binary search for very
@@ -142,10 +142,10 @@ end function psb_iblsrch
 function  psb_ibsrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_ibsrch
   implicit none
-  integer ipos, key, n
-  integer v(n)
+  integer(psb_ipk_) :: ipos, key, n
+  integer(psb_ipk_) :: v(n)
 
-  integer lb, ub, m
+  integer(psb_ipk_) :: lb, ub, m
 
   lb = 1 
   ub = n
@@ -168,10 +168,10 @@ end function psb_ibsrch
 function psb_issrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_issrch
   implicit none
-  integer ipos, key, n
-  integer v(n)
+  integer(psb_ipk_) :: ipos, key, n
+  integer(psb_ipk_) :: v(n)
 
-  integer i
+  integer(psb_ipk_) :: i
 
   ipos = -1 
   do i=1,n
@@ -189,11 +189,11 @@ subroutine imsort(x,ix,dir,flag)
   use psb_sort_mod, psb_protect_name => imsort
   use psb_error_mod
   implicit none 
-  integer, intent(inout)           :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout)           :: x(:) 
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -251,10 +251,10 @@ subroutine smsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_spk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -311,10 +311,10 @@ subroutine dmsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -371,10 +371,10 @@ subroutine camsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -431,10 +431,10 @@ subroutine zamsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -491,11 +491,11 @@ subroutine imsort_u(x,nout,dir)
   use psb_sort_mod, psb_protect_name => imsort_u
   use psb_error_mod
   implicit none 
-  integer, intent(inout)           :: x(:) 
-  integer, intent(out)             :: nout
-  integer, optional, intent(in)    :: dir
+  integer(psb_ipk_), intent(inout)           :: x(:) 
+  integer(psb_ipk_), intent(out)             :: nout
+  integer(psb_ipk_), optional, intent(in)    :: dir
 
-  integer  :: dir_, n, err_act
+  integer(psb_ipk_) :: dir_, n, err_act
 
   character(len=20)  :: name
 
@@ -532,11 +532,11 @@ subroutine iqsort(x,ix,dir,flag)
   use psb_sort_mod, psb_protect_name => iqsort
   use psb_error_mod
   implicit none 
-  integer, intent(inout)           :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout)           :: x(:) 
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -610,10 +610,10 @@ subroutine sqsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_spk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -686,10 +686,10 @@ subroutine dqsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -763,10 +763,10 @@ subroutine cqsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -853,10 +853,10 @@ subroutine zqsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act
 
   character(len=20)  :: name
 
@@ -944,13 +944,13 @@ subroutine ihsort(x,ix,dir,flag)
   use psb_sort_mod, psb_protect_name => ihsort
   use psb_error_mod
   implicit none 
-  integer, intent(inout)           :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout)           :: x(:) 
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer  :: dir_, flag_, n, i, l, err_act,info
-  integer  :: key
-  integer  :: index
+  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: key
+  integer(psb_ipk_) :: index
 
   character(len=20)  :: name
 
@@ -1054,12 +1054,12 @@ subroutine shsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_spk_), intent(inout)    :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer        :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
   real(psb_spk_) :: key
-  integer        :: index
+  integer(psb_ipk_) :: index
 
   character(len=20)  :: name
 
@@ -1163,12 +1163,12 @@ subroutine dhsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer          :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
   real(psb_dpk_) :: key
-  integer          :: index
+  integer(psb_ipk_) :: index
 
   character(len=20)  :: name
 
@@ -1272,12 +1272,12 @@ subroutine chsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout) :: x(:) 
-  integer, optional, intent(in)    :: dir, flag
-  integer, optional, intent(inout) :: ix(:)
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer           :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
   complex(psb_spk_) :: key
-  integer           :: index
+  integer(psb_ipk_) :: index
 
   character(len=20) :: name
 
@@ -1381,12 +1381,12 @@ subroutine zhsort(x,ix,dir,flag)
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout) :: x(:) 
-  integer, optional, intent(in)      :: dir, flag
-  integer, optional, intent(inout)   :: ix(:)
+  integer(psb_ipk_), optional, intent(in)      :: dir, flag
+  integer(psb_ipk_), optional, intent(inout)   :: ix(:)
 
-  integer             :: dir_, flag_, n, i, l, err_act,info
+  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
   complex(psb_dpk_) :: key
-  integer             :: index
+  integer(psb_ipk_) :: index
 
   character(len=20)  :: name
 
@@ -1489,7 +1489,7 @@ function  psb_howmany_int_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_int_heap
   implicit none 
   type(psb_int_heap), intent(in) :: heap
-  integer :: psb_howmany_int_heap
+  integer(psb_ipk_) :: psb_howmany_int_heap
   psb_howmany_int_heap = heap%last
 end function psb_howmany_int_heap
 
@@ -1498,8 +1498,8 @@ subroutine psb_init_int_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_int_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -1524,8 +1524,8 @@ subroutine psb_dump_int_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_int_heap
   implicit none 
   type(psb_int_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -1551,9 +1551,9 @@ subroutine psb_insert_int_heap(key,heap,info)
   use psb_realloc_mod
   implicit none 
 
-  integer, intent(in)               :: key
+  integer(psb_ipk_), intent(in)               :: key
   type(psb_int_heap), intent(inout) :: heap
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -1580,7 +1580,7 @@ subroutine psb_int_heap_get_first(key,heap,info)
   implicit none 
 
   type(psb_int_heap), intent(inout) :: heap
-  integer, intent(out)              :: key,info
+  integer(psb_ipk_), intent(out)              :: key,info
 
   info = psb_success_
 
@@ -1594,7 +1594,7 @@ function  psb_howmany_real_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_real_idx_heap
   implicit none 
   type(psb_real_idx_heap), intent(in) :: heap
-  integer :: psb_howmany_real_idx_heap
+  integer(psb_ipk_) :: psb_howmany_real_idx_heap
   psb_howmany_real_idx_heap = heap%last
 end function psb_howmany_real_idx_heap
 
@@ -1603,8 +1603,8 @@ subroutine psb_init_real_idx_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_real_idx_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -1630,8 +1630,8 @@ subroutine psb_dump_real_idx_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_real_idx_heap
   implicit none 
   type(psb_real_idx_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -1662,9 +1662,9 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
   implicit none 
 
   real(psb_spk_), intent(in)      :: key
-  integer, intent(in)               :: index
+  integer(psb_ipk_), intent(in)               :: index
   type(psb_real_idx_heap), intent(inout) :: heap
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -1693,7 +1693,7 @@ subroutine psb_real_idx_heap_get_first(key,index,heap,info)
   implicit none 
 
   type(psb_real_idx_heap), intent(inout) :: heap
-  integer, intent(out)              :: index,info
+  integer(psb_ipk_), intent(out)              :: index,info
   real(psb_spk_), intent(out)     :: key
 
   info = psb_success_
@@ -1709,7 +1709,7 @@ function  psb_howmany_double_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_double_idx_heap
   implicit none 
   type(psb_double_idx_heap), intent(in) :: heap
-  integer :: psb_howmany_double_idx_heap
+  integer(psb_ipk_) :: psb_howmany_double_idx_heap
   psb_howmany_double_idx_heap = heap%last
 end function psb_howmany_double_idx_heap
 
@@ -1718,8 +1718,8 @@ subroutine psb_init_double_idx_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_double_idx_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -1745,8 +1745,8 @@ subroutine psb_dump_double_idx_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_double_idx_heap
   implicit none 
   type(psb_double_idx_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -1777,9 +1777,9 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
   implicit none 
 
   real(psb_dpk_), intent(in)      :: key
-  integer, intent(in)               :: index
+  integer(psb_ipk_), intent(in)               :: index
   type(psb_double_idx_heap), intent(inout) :: heap
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -1808,7 +1808,7 @@ subroutine psb_double_idx_heap_get_first(key,index,heap,info)
   implicit none 
 
   type(psb_double_idx_heap), intent(inout) :: heap
-  integer, intent(out)              :: index,info
+  integer(psb_ipk_), intent(out)              :: index,info
   real(psb_dpk_), intent(out)     :: key
 
   info = psb_success_
@@ -1823,7 +1823,7 @@ function  psb_howmany_int_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_int_idx_heap
   implicit none 
   type(psb_int_idx_heap), intent(in) :: heap
-  integer :: psb_howmany_int_idx_heap
+  integer(psb_ipk_) :: psb_howmany_int_idx_heap
   psb_howmany_int_idx_heap = heap%last
 end function psb_howmany_int_idx_heap
 
@@ -1832,8 +1832,8 @@ subroutine psb_init_int_idx_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_int_idx_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -1859,8 +1859,8 @@ subroutine psb_dump_int_idx_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_int_idx_heap
   implicit none 
   type(psb_int_idx_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -1890,10 +1890,10 @@ subroutine psb_insert_int_idx_heap(key,index,heap,info)
   use psb_realloc_mod
   implicit none 
 
-  integer, intent(in)                   :: key
-  integer, intent(in)                   :: index
+  integer(psb_ipk_), intent(in)                   :: key
+  integer(psb_ipk_), intent(in)                   :: index
   type(psb_int_idx_heap), intent(inout) :: heap
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -1922,8 +1922,8 @@ subroutine psb_int_idx_heap_get_first(key,index,heap,info)
   implicit none 
 
   type(psb_int_idx_heap), intent(inout) :: heap
-  integer, intent(out)                  :: index,info
-  integer, intent(out)                  :: key
+  integer(psb_ipk_), intent(out)                  :: index,info
+  integer(psb_ipk_), intent(out)                  :: key
 
   info = psb_success_
 
@@ -1939,7 +1939,7 @@ function  psb_howmany_scomplex_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_scomplex_idx_heap
   implicit none 
   type(psb_scomplex_idx_heap), intent(in) :: heap
-  integer :: psb_howmany_scomplex_idx_heap
+  integer(psb_ipk_) :: psb_howmany_scomplex_idx_heap
   psb_howmany_scomplex_idx_heap = heap%last
 end function psb_howmany_scomplex_idx_heap
 
@@ -1948,8 +1948,8 @@ subroutine psb_init_scomplex_idx_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_scomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -1976,8 +1976,8 @@ subroutine psb_dump_scomplex_idx_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_scomplex_idx_heap
   implicit none 
   type(psb_scomplex_idx_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -2008,9 +2008,9 @@ subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
   implicit none 
 
   complex(psb_spk_), intent(in)              :: key
-  integer, intent(in)                        :: index
+  integer(psb_ipk_), intent(in)                        :: index
   type(psb_scomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)                       :: info
+  integer(psb_ipk_), intent(out)                       :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -2038,7 +2038,7 @@ subroutine psb_scomplex_idx_heap_get_first(key,index,heap,info)
   implicit none 
 
   type(psb_scomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)                       :: index,info
+  integer(psb_ipk_), intent(out)                       :: index,info
   complex(psb_spk_), intent(out)           :: key
 
 
@@ -2056,7 +2056,7 @@ function  psb_howmany_dcomplex_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_dcomplex_idx_heap
   implicit none 
   type(psb_dcomplex_idx_heap), intent(in) :: heap
-  integer :: psb_howmany_dcomplex_idx_heap
+  integer(psb_ipk_) :: psb_howmany_dcomplex_idx_heap
   psb_howmany_dcomplex_idx_heap = heap%last
 end function psb_howmany_dcomplex_idx_heap
 
@@ -2065,8 +2065,8 @@ subroutine psb_init_dcomplex_idx_heap(heap,info,dir)
   use psb_realloc_mod
   implicit none 
   type(psb_dcomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: dir
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: dir
 
   info = psb_success_
   heap%last=0
@@ -2093,8 +2093,8 @@ subroutine psb_dump_dcomplex_idx_heap(iout,heap,info)
   use psb_sort_mod, psb_protect_name => psb_dump_dcomplex_idx_heap
   implicit none 
   type(psb_dcomplex_idx_heap), intent(in) :: heap
-  integer, intent(out)           :: info
-  integer, intent(in)            :: iout
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), intent(in)            :: iout
 
   info = psb_success_
   if (iout < 0) then
@@ -2125,9 +2125,9 @@ subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
   implicit none 
 
   complex(psb_dpk_), intent(in)            :: key
-  integer, intent(in)                        :: index
+  integer(psb_ipk_), intent(in)                        :: index
   type(psb_dcomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)                       :: info
+  integer(psb_ipk_), intent(out)                       :: info
 
   info = psb_success_
   if (heap%last < 0) then 
@@ -2155,7 +2155,7 @@ subroutine psb_dcomplex_idx_heap_get_first(key,index,heap,info)
   implicit none 
 
   type(psb_dcomplex_idx_heap), intent(inout) :: heap
-  integer, intent(out)                       :: index,info
+  integer(psb_ipk_), intent(out)                       :: index,info
   complex(psb_dpk_), intent(out)           :: key
 
 
@@ -2186,11 +2186,11 @@ subroutine psi_insert_int_heap(key,last,heap,dir,info)
   !   heap: the heap
   !   dir:  sorting direction
 
-  integer, intent(in)     :: key,dir
-  integer, intent(inout)  :: heap(:),last
-  integer, intent(out)    :: info
-  integer                 :: i, i2
-  integer                 :: temp
+  integer(psb_ipk_), intent(in)     :: key,dir
+  integer(psb_ipk_), intent(inout)  :: heap(:),last
+  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_ipk_) :: i, i2
+  integer(psb_ipk_) :: temp
 
   info = psb_success_
   if (last < 0) then 
@@ -2283,13 +2283,13 @@ subroutine psi_int_heap_get_first(key,last,heap,dir,info)
   use psb_sort_mod, psb_protect_name => psi_int_heap_get_first
   implicit none 
 
-  integer, intent(inout)  :: key,last
-  integer, intent(in)     :: dir
-  integer, intent(inout)  :: heap(:)
-  integer, intent(out)    :: info
+  integer(psb_ipk_), intent(inout)  :: key,last
+  integer(psb_ipk_), intent(in)     :: dir
+  integer(psb_ipk_), intent(inout)  :: heap(:)
+  integer(psb_ipk_), intent(out)    :: info
 
-  integer                 :: i, j
-  integer                 :: temp
+  integer(psb_ipk_) :: i, j
+  integer(psb_ipk_) :: temp
 
 
   info = psb_success_
@@ -2415,11 +2415,11 @@ subroutine psi_insert_real_heap(key,last,heap,dir,info)
   !   dir:  sorting direction
 
   real(psb_spk_), intent(in)    :: key
-  integer, intent(in)           :: dir
+  integer(psb_ipk_), intent(in)           :: dir
   real(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(inout)        :: last
-  integer, intent(out)          :: info
-  integer                       :: i, i2
+  integer(psb_ipk_), intent(inout)        :: last
+  integer(psb_ipk_), intent(out)          :: info
+  integer(psb_ipk_) :: i, i2
   real(psb_spk_)                :: temp
 
   info = psb_success_
@@ -2514,12 +2514,12 @@ subroutine psi_real_heap_get_first(key,last,heap,dir,info)
   implicit none 
 
   real(psb_spk_), intent(inout) :: key
-  integer, intent(inout)        :: last
-  integer, intent(in)           :: dir
+  integer(psb_ipk_), intent(inout)        :: last
+  integer(psb_ipk_), intent(in)           :: dir
   real(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(out)          :: info
+  integer(psb_ipk_), intent(out)          :: info
 
-  integer               :: i, j
+  integer(psb_ipk_) :: i, j
   real(psb_spk_)        :: temp
 
 
@@ -2645,11 +2645,11 @@ subroutine psi_insert_double_heap(key,last,heap,dir,info)
   !   dir:  sorting direction
 
   real(psb_dpk_), intent(in)    :: key
-  integer, intent(in)             :: dir
+  integer(psb_ipk_), intent(in)             :: dir
   real(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(inout)          :: last
-  integer, intent(out)            :: info
-  integer                         :: i, i2
+  integer(psb_ipk_), intent(inout)          :: last
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_) :: i, i2
   real(psb_dpk_)                :: temp
 
   info = psb_success_
@@ -2744,12 +2744,12 @@ subroutine psi_double_heap_get_first(key,last,heap,dir,info)
   implicit none 
 
   real(psb_dpk_), intent(inout) :: key
-  integer, intent(inout)          :: last
-  integer, intent(in)             :: dir
+  integer(psb_ipk_), intent(inout)          :: last
+  integer(psb_ipk_), intent(in)             :: dir
   real(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  integer                 :: i, j
+  integer(psb_ipk_) :: i, j
   real(psb_dpk_)        :: temp
 
 
@@ -2877,11 +2877,11 @@ subroutine psi_insert_scomplex_heap(key,last,heap,dir,info)
   !   dir:  sorting direction
 
   complex(psb_spk_), intent(in)    :: key
-  integer, intent(in)              :: dir
+  integer(psb_ipk_), intent(in)              :: dir
   complex(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(inout)           :: last
-  integer, intent(out)             :: info
-  integer                          :: i, i2
+  integer(psb_ipk_), intent(inout)           :: last
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_) :: i, i2
   complex(psb_spk_)                :: temp
 
   info = psb_success_
@@ -2976,12 +2976,12 @@ subroutine psi_scomplex_heap_get_first(key,last,heap,dir,info)
   implicit none 
 
   complex(psb_spk_), intent(inout) :: key
-  integer, intent(inout)           :: last
-  integer, intent(in)              :: dir
+  integer(psb_ipk_), intent(inout)           :: last
+  integer(psb_ipk_), intent(in)              :: dir
   complex(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
-  integer                  :: i, j
+  integer(psb_ipk_) :: i, j
   complex(psb_spk_)        :: temp
 
 
@@ -3107,11 +3107,11 @@ subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
   !   dir:  sorting direction
 
   complex(psb_dpk_), intent(in)    :: key
-  integer, intent(in)                :: dir
+  integer(psb_ipk_), intent(in)                :: dir
   complex(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(inout)             :: last
-  integer, intent(out)               :: info
-  integer                            :: i, i2
+  integer(psb_ipk_), intent(inout)             :: last
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_) :: i, i2
   complex(psb_dpk_)                :: temp
 
   info = psb_success_
@@ -3206,12 +3206,12 @@ subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
   implicit none 
 
   complex(psb_dpk_), intent(inout) :: key
-  integer, intent(inout)             :: last
-  integer, intent(in)                :: dir
+  integer(psb_ipk_), intent(inout)             :: last
+  integer(psb_ipk_), intent(in)                :: dir
   complex(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
 
-  integer                    :: i, j
+  integer(psb_ipk_) :: i, j
   complex(psb_dpk_)        :: temp
 
 
@@ -3340,13 +3340,13 @@ subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
   !   idxs: the indices
   !   dir:  sorting direction
 
-  integer, intent(in)     :: key
-  integer, intent(in)     :: index,dir
-  integer, intent(inout)  :: heap(:),last
-  integer, intent(inout)  :: idxs(:)
-  integer, intent(out)    :: info
-  integer                 :: i, i2, itemp
-  integer                 :: temp 
+  integer(psb_ipk_), intent(in)     :: key
+  integer(psb_ipk_), intent(in)     :: index,dir
+  integer(psb_ipk_), intent(inout)  :: heap(:),last
+  integer(psb_ipk_), intent(inout)  :: idxs(:)
+  integer(psb_ipk_), intent(out)    :: info
+  integer(psb_ipk_) :: i, i2, itemp
+  integer(psb_ipk_) :: temp 
 
   info = psb_success_
   if (last < 0) then 
@@ -3453,14 +3453,14 @@ subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   use psb_sort_mod, psb_protect_name => psi_int_idx_heap_get_first
   implicit none 
 
-  integer, intent(inout) :: heap(:)
-  integer, intent(out)   :: index,info
-  integer, intent(inout) :: last,idxs(:)
-  integer, intent(in)    :: dir
-  integer, intent(out)   :: key
+  integer(psb_ipk_), intent(inout) :: heap(:)
+  integer(psb_ipk_), intent(out)   :: index,info
+  integer(psb_ipk_), intent(inout) :: last,idxs(:)
+  integer(psb_ipk_), intent(in)    :: dir
+  integer(psb_ipk_), intent(out)   :: key
 
-  integer                :: i, j,itemp
-  integer                :: temp
+  integer(psb_ipk_) :: i, j,itemp
+  integer(psb_ipk_) :: temp
 
   info = psb_success_
   if (last <= 0) then 
@@ -3600,11 +3600,11 @@ subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   real(psb_spk_), intent(in)     :: key
-  integer, intent(in)            :: index,dir
+  integer(psb_ipk_), intent(in)            :: index,dir
   real(psb_spk_), intent(inout)  :: heap(:)
-  integer, intent(inout)         :: idxs(:),last
-  integer, intent(out)           :: info
-  integer                        :: i, i2, itemp
+  integer(psb_ipk_), intent(inout)         :: idxs(:),last
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_) :: i, i2, itemp
   real(psb_spk_)                 :: temp 
 
   info = psb_success_
@@ -3713,12 +3713,12 @@ subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   implicit none 
 
   real(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(out)          :: index,info
-  integer, intent(inout)        :: last,idxs(:)
-  integer, intent(in)           :: dir
+  integer(psb_ipk_), intent(out)          :: index,info
+  integer(psb_ipk_), intent(inout)        :: last,idxs(:)
+  integer(psb_ipk_), intent(in)           :: dir
   real(psb_spk_), intent(out)   :: key
 
-  integer                       :: i, j,itemp
+  integer(psb_ipk_) :: i, j,itemp
   real(psb_spk_)                :: temp
 
   info = psb_success_
@@ -3860,11 +3860,11 @@ subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   real(psb_dpk_), intent(in)     :: key
-  integer, intent(in)              :: index,dir
+  integer(psb_ipk_), intent(in)              :: index,dir
   real(psb_dpk_), intent(inout)  :: heap(:)
-  integer, intent(inout)           :: idxs(:),last
-  integer, intent(out)             :: info
-  integer                          :: i, i2, itemp
+  integer(psb_ipk_), intent(inout)           :: idxs(:),last
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_) :: i, i2, itemp
   real(psb_dpk_)                 :: temp 
 
   info = psb_success_
@@ -3973,12 +3973,12 @@ subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   implicit none 
 
   real(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(out)            :: index,info
-  integer, intent(inout)          :: last,idxs(:)
-  integer, intent(in)             :: dir
+  integer(psb_ipk_), intent(out)            :: index,info
+  integer(psb_ipk_), intent(inout)          :: last,idxs(:)
+  integer(psb_ipk_), intent(in)             :: dir
   real(psb_dpk_), intent(out)   :: key
 
-  integer                         :: i, j,itemp
+  integer(psb_ipk_) :: i, j,itemp
   real(psb_dpk_)                :: temp
 
   info = psb_success_
@@ -4120,11 +4120,11 @@ subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   complex(psb_spk_), intent(in)    :: key
-  integer, intent(in)              :: index,dir
+  integer(psb_ipk_), intent(in)              :: index,dir
   complex(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(inout)           :: idxs(:),last
-  integer, intent(out)             :: info
-  integer                          :: i, i2, itemp
+  integer(psb_ipk_), intent(inout)           :: idxs(:),last
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_) :: i, i2, itemp
   complex(psb_spk_)                :: temp 
 
   info = psb_success_
@@ -4233,12 +4233,12 @@ subroutine psi_scomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   implicit none 
 
   complex(psb_spk_), intent(inout) :: heap(:)
-  integer, intent(out)             :: index,info
-  integer, intent(inout)           :: last,idxs(:)
-  integer, intent(in)              :: dir
+  integer(psb_ipk_), intent(out)             :: index,info
+  integer(psb_ipk_), intent(inout)           :: last,idxs(:)
+  integer(psb_ipk_), intent(in)              :: dir
   complex(psb_spk_), intent(out)   :: key
 
-  integer                          :: i, j, itemp
+  integer(psb_ipk_) :: i, j, itemp
   complex(psb_spk_)                :: temp
 
   info = psb_success_
@@ -4380,11 +4380,11 @@ subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
   !   dir:  sorting direction
 
   complex(psb_dpk_), intent(in)    :: key
-  integer, intent(in)                :: index,dir
+  integer(psb_ipk_), intent(in)                :: index,dir
   complex(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(inout)             :: idxs(:),last
-  integer, intent(out)               :: info
-  integer                            :: i, i2, itemp
+  integer(psb_ipk_), intent(inout)             :: idxs(:),last
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_) :: i, i2, itemp
   complex(psb_dpk_)                :: temp 
 
   info = psb_success_
@@ -4493,12 +4493,12 @@ subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   implicit none 
 
   complex(psb_dpk_), intent(inout) :: heap(:)
-  integer, intent(out)               :: index,info
-  integer, intent(inout)             :: last,idxs(:)
-  integer, intent(in)                :: dir
+  integer(psb_ipk_), intent(out)               :: index,info
+  integer(psb_ipk_), intent(inout)             :: last,idxs(:)
+  integer(psb_ipk_), intent(in)                :: dir
   complex(psb_dpk_), intent(out)   :: key
 
-  integer                            :: i, j, itemp
+  integer(psb_ipk_) :: i, j, itemp
   complex(psb_dpk_)                :: temp
 
   info = psb_success_

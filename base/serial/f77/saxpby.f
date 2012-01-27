@@ -31,12 +31,11 @@ C
 C 
       subroutine  saxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       use psb_const_mod
-
       integer n, m, lldx, lldy, info
       real(psb_spk_) X(lldx,*), Y(lldy,*)
       real(psb_spk_) alpha, beta
-      integer i, j
-      integer int_err(5)
+      integer(psb_ipk_) :: i, j
+      integer(psb_ipk_) :: int_err(5)
       character  name*20
       name='saxpby'
 

@@ -54,17 +54,17 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
 #endif
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc_a
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
   logical, intent(in), optional      :: ext_hv
 
   !....Locals....
-  integer          ::  int_err(5)
-  integer,allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
+  integer(psb_ipk_) ::  int_err(5)
+  integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer             ::  i,np,me, n_col, dectype, err_act, icomm
-  integer             :: ictxt,n_row
+  integer(psb_ipk_) ::  i,np,me, n_col, dectype, err_act, icomm
+  integer(psb_ipk_) :: ictxt,n_row
   logical             :: ext_hv_
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_

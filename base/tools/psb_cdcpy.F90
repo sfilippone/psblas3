@@ -46,11 +46,11 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 
   type(psb_desc_type), intent(in)  :: desc_in
   type(psb_desc_type), intent(out) :: desc_out
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   !locals
-  integer             :: np,me,ictxt, err_act
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: np,me,ictxt, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   debug_unit  = psb_get_debug_unit()

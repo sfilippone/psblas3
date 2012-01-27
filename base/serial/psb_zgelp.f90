@@ -47,16 +47,16 @@ subroutine psb_zgelp(trans,iperm,x,info)
   implicit none
 
   complex(psb_dpk_), intent(inout) ::  x(:,:)
-  integer, intent(in)           ::  iperm(:)
-  integer, intent(out)          ::  info
+  integer(psb_ipk_), intent(in)           ::  iperm(:)
+  integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         :: trans
 
   ! local variables
   complex(psb_dpk_),allocatable :: temp(:)
-  integer                       :: int_err(5), i1sz, i2sz, err_act,i,j
-  integer, allocatable          :: itemp(:)
+  integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
+  integer(psb_ipk_), allocatable          :: itemp(:)
   complex(psb_dpk_),parameter   :: one=1
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   character(len=20)   :: name, ch_err
   name = 'psb_zgelp'
@@ -179,16 +179,16 @@ subroutine psb_zgelpv(trans,iperm,x,info)
   implicit none
 
   complex(psb_dpk_), intent(inout) ::  x(:)
-  integer, intent(in)           ::  iperm(:)
-  integer, intent(out)          ::  info
+  integer(psb_ipk_), intent(in)           ::  iperm(:)
+  integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         ::  trans
 
   ! local variables
-  integer :: int_err(5), i1sz, err_act, i
+  integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
   complex(psb_dpk_),allocatable ::  temp(:)
-  integer, allocatable          :: itemp(:)
+  integer(psb_ipk_), allocatable          :: itemp(:)
   complex(psb_dpk_),parameter   :: one=1
-  integer                    :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   character(len=20)   :: name, ch_err
   name = 'psb_zgelpv'

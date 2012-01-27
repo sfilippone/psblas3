@@ -31,117 +31,118 @@
 !!$  
 module psb_iv_tools_mod
   use psb_const_mod
-
+  use psb_descriptor_type
+  
 
   interface  psb_geall
     subroutine psb_ialloc(x, desc_a, info,n, lb)
-      use psb_descriptor_type
-      integer, allocatable, intent(out) :: x(:,:)
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_), allocatable, intent(out) :: x(:,:)
       type(psb_desc_type), intent(in)   :: desc_a
-      integer, intent(out)              :: info
-      integer, optional, intent(in)     :: n, lb
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional, intent(in)     :: n, lb
     end subroutine psb_ialloc
     subroutine psb_iallocv(x, desc_a,info,n)
-      use psb_descriptor_type
-      integer, allocatable, intent(out) :: x(:)
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_), allocatable, intent(out) :: x(:)
       type(psb_desc_type), intent(in)   :: desc_a
-      integer, intent(out)              :: info
-      integer, optional, intent(in)     :: n
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional, intent(in)     :: n
     end subroutine psb_iallocv
   end interface
 
 
   interface psb_geasb
     subroutine psb_iasb(x, desc_a, info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in) ::  desc_a
-      integer, allocatable, intent(inout)  ::  x(:,:)
-      integer, intent(out)            ::  info
+      integer(psb_ipk_), allocatable, intent(inout)  ::  x(:,:)
+      integer(psb_ipk_), intent(out)            ::  info
     end subroutine psb_iasb
     subroutine psb_iasbv(x, desc_a, info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in) ::  desc_a
-      integer, allocatable, intent(inout)   ::  x(:)
-      integer, intent(out)        ::  info
+      integer(psb_ipk_), allocatable, intent(inout)   ::  x(:)
+      integer(psb_ipk_), intent(out)        ::  info
     end subroutine psb_iasbv
   end interface
 
 
   interface psb_gefree
     subroutine psb_ifree(x, desc_a, info)
-      use psb_descriptor_type
-      integer,allocatable, intent(inout) :: x(:,:)
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_),allocatable, intent(inout) :: x(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_ifree
     subroutine psb_ifreev(x, desc_a, info)
-      use psb_descriptor_type
-      integer, allocatable, intent(inout) :: x(:)
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_), allocatable, intent(inout) :: x(:)
       type(psb_desc_type), intent(in)     :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ifreev
   end interface
 
   interface psb_geins
     subroutine psb_iinsi(m,irw,val, x,desc_a,info,dupl)
-      use psb_descriptor_type
-      integer, intent(in)              ::  m
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_), intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
-      integer,intent(inout)                  ::  x(:,:)
-      integer, intent(in)              ::  irw(:)
-      integer, intent(in)              ::  val(:,:)
-      integer, intent(out)             ::  info
-      integer, optional, intent(in)    ::  dupl
+      integer(psb_ipk_),intent(inout)                  ::  x(:,:)
+      integer(psb_ipk_), intent(in)              ::  irw(:)
+      integer(psb_ipk_), intent(in)              ::  val(:,:)
+      integer(psb_ipk_), intent(out)             ::  info
+      integer(psb_ipk_), optional, intent(in)    ::  dupl
     end subroutine psb_iinsi
     subroutine psb_iinsvi(m, irw,val, x,desc_a,info,dupl)
-      use psb_descriptor_type
-      integer, intent(in)             ::  m
+      import :: psb_ipk_, psb_desc_type
+      integer(psb_ipk_), intent(in)             ::  m
       type(psb_desc_type), intent(in) ::  desc_a
-      integer,intent(inout)                 ::  x(:)
-      integer, intent(in)             ::  irw(:)
-      integer, intent(in)             ::  val(:)
-      integer, intent(out)            ::  info
-      integer, optional, intent(in)   ::  dupl
+      integer(psb_ipk_),intent(inout)                 ::  x(:)
+      integer(psb_ipk_), intent(in)             ::  irw(:)
+      integer(psb_ipk_), intent(in)             ::  val(:)
+      integer(psb_ipk_), intent(out)            ::  info
+      integer(psb_ipk_), optional, intent(in)   ::  dupl
     end subroutine psb_iinsvi
   end interface
 
 
   interface psb_glob_to_loc
     subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(in)                 ::  x(:)  
-      integer,intent(out)                ::  y(:)  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(in)                 ::  x(:)  
+      integer(psb_ipk_),intent(out)                ::  y(:)  
+      integer(psb_ipk_), intent(out)               ::  info
       logical, intent(in),  optional     :: owned
       character, intent(in), optional    ::  iact
     end subroutine psb_glob_to_loc2
     subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(inout)              ::  x(:)  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(inout)              ::  x(:)  
+      integer(psb_ipk_), intent(out)               ::  info
       logical, intent(in),  optional     :: owned
       character, intent(in), optional    ::  iact
     end subroutine psb_glob_to_loc
     subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(in)                 ::  x
-      integer,intent(out)                ::  y  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(in)                 ::  x
+      integer(psb_ipk_),intent(out)                ::  y  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
       logical, intent(in),  optional     :: owned
 
     end subroutine psb_glob_to_loc2s
 
     subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(inout)              ::  x  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(inout)              ::  x  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
       logical, intent(in),  optional     :: owned
     end subroutine psb_glob_to_locs
@@ -149,35 +150,35 @@ module psb_iv_tools_mod
 
   interface psb_loc_to_glob
     subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(in)                 ::  x(:)  
-      integer,intent(out)                ::  y(:)  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(in)                 ::  x(:)  
+      integer(psb_ipk_),intent(out)                ::  y(:)  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
     end subroutine psb_loc_to_glob2
     subroutine psb_loc_to_glob(x,desc_a,info,iact)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(inout)              ::  x(:)  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(inout)              ::  x(:)  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
     end subroutine psb_loc_to_glob
     subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(in)                 ::  x
-      integer,intent(out)                ::  y  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(in)                 ::  x
+      integer(psb_ipk_),intent(out)                ::  y  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
 
     end subroutine psb_loc_to_glob2s
     subroutine psb_loc_to_globs(x,desc_a,info,iact)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
-      integer,intent(inout)              ::  x  
-      integer, intent(out)               ::  info
+      integer(psb_ipk_),intent(inout)              ::  x  
+      integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
     end subroutine psb_loc_to_globs
 
@@ -203,13 +204,12 @@ module psb_iv_tools_mod
 contains
 
   function psb_is_owned(idx,desc)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: idx
     type(psb_desc_type), intent(in) :: desc
     logical :: psb_is_owned
     logical :: res
-    integer :: info
+    integer(psb_ipk_) :: info
 
     call psb_owned_index(res,idx,desc,info)
     if (info /= psb_success_) res=.false.
@@ -217,13 +217,12 @@ contains
   end function psb_is_owned
 
   function psb_is_local(idx,desc)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: idx
     type(psb_desc_type), intent(in) :: desc
     logical :: psb_is_local
     logical :: res
-    integer :: info
+    integer(psb_ipk_) :: info
 
     call psb_local_index(res,idx,desc,info)
     if (info /= psb_success_) res=.false.
@@ -231,14 +230,13 @@ contains
   end function psb_is_local
 
   subroutine psb_owned_index(res,idx,desc,info)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: idx
     type(psb_desc_type), intent(in) :: desc
     logical, intent(out) :: res
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(out) :: info
 
-    integer :: lx
+    integer(psb_ipk_) :: lx
 
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
 
@@ -246,13 +244,12 @@ contains
   end subroutine psb_owned_index
 
   subroutine psb_owned_index_v(res,idx,desc,info)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx(:)
+    integer(psb_ipk_), intent(in) :: idx(:)
     type(psb_desc_type), intent(in) :: desc
     logical, intent(out) :: res(:)
-    integer, intent(out) :: info
-    integer, allocatable  :: lx(:)
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_), allocatable  :: lx(:)
 
     allocate(lx(size(idx)),stat=info)
     res=.false.
@@ -263,14 +260,13 @@ contains
   end subroutine psb_owned_index_v
 
   subroutine psb_local_index(res,idx,desc,info)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx
+    integer(psb_ipk_), intent(in) :: idx
     type(psb_desc_type), intent(in) :: desc
     logical, intent(out) :: res
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(out) :: info
 
-    integer :: lx
+    integer(psb_ipk_) :: lx
 
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
 
@@ -278,13 +274,12 @@ contains
   end subroutine psb_local_index
 
   subroutine psb_local_index_v(res,idx,desc,info)
-    use psb_descriptor_type
     implicit none 
-    integer, intent(in) :: idx(:)
+    integer(psb_ipk_), intent(in) :: idx(:)
     type(psb_desc_type), intent(in) :: desc
     logical, intent(out) :: res(:)
-    integer, intent(out) :: info    
-    integer, allocatable  :: lx(:)
+    integer(psb_ipk_), intent(out) :: info    
+    integer(psb_ipk_), allocatable  :: lx(:)
 
     allocate(lx(size(idx)),stat=info)
     res=.false.
@@ -308,113 +303,112 @@ module psb_cd_if_tools_mod
     
   interface psb_cd_set_bld
     subroutine psb_cd_set_bld(desc,info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc
-      integer                            :: info
+      integer(psb_ipk_) :: info
     end subroutine psb_cd_set_bld
   end interface
 
   interface psb_cd_set_ovl_bld
     subroutine psb_cd_set_ovl_bld(desc,info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc
-      integer                            :: info
+      integer(psb_ipk_) :: info
     end subroutine psb_cd_set_ovl_bld
   end interface
 
   interface psb_cd_reinit
     Subroutine psb_cd_reinit(desc,info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       Implicit None
 
       !     .. Array Arguments ..
       Type(psb_desc_type), Intent(inout) :: desc
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end Subroutine psb_cd_reinit
   end interface
 
   interface psb_cdcpy
     subroutine psb_cdcpy(desc_in, desc_out, info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
 
       implicit none
       !....parameters...
 
       type(psb_desc_type), intent(in)  :: desc_in
       type(psb_desc_type), intent(out) :: desc_out
-      integer, intent(out)             :: info
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine psb_cdcpy
   end interface
 
 
   interface psb_cdprt
     subroutine psb_cdprt(iout,desc_p,glob,short)
-      use psb_const_mod
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    :: desc_p
-      integer, intent(in)                :: iout
+      integer(psb_ipk_), intent(in)                :: iout
       logical, intent(in), optional      :: glob,short
     end subroutine psb_cdprt
   end interface
 
   interface psb_cdins
     subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a
-      integer, intent(in)                :: nz,ia(:),ja(:)
-      integer, intent(out)               :: info
-      integer, optional, intent(out)     :: ila(:), jla(:)
+      integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
     end subroutine psb_cdinsrc
     subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc
-      integer, intent(in)                :: nz,ja(:)
-      integer, intent(out)               :: info
-      integer, optional, intent(out)     :: jla(:)
+      integer(psb_ipk_), intent(in)                :: nz,ja(:)
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(out)     :: jla(:)
       logical, optional, target, intent(in) :: mask(:)
     end subroutine psb_cdinsc
   end interface
 
   interface psb_cdbldext
     Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       Implicit None
       Type(psb_desc_type), Intent(in), target :: desc_a
-      integer, intent(in)                     :: in_list(:)
+      integer(psb_ipk_), intent(in)                     :: in_list(:)
       Type(psb_desc_type), Intent(out)        :: desc_ov
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       logical, intent(in), optional, target   :: mask(:)
-      integer, intent(in),optional            :: extype
+      integer(psb_ipk_), intent(in),optional            :: extype
     end Subroutine psb_cd_lstext
   end interface
 
 
   interface psb_cdren
     subroutine psb_cdren(trans,iperm,desc_a,info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout)    :: desc_a
-      integer, intent(inout)                :: iperm(:)
+      integer(psb_ipk_), intent(inout)                :: iperm(:)
       character, intent(in)                 :: trans
-      integer, intent(out)                  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_cdren
   end interface
 
   interface psb_get_overlap
     subroutine psb_get_ovrlap(ovrel,desc,info)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit none 
-      integer, allocatable, intent(out) :: ovrel(:)
+      integer(psb_ipk_), allocatable, intent(out) :: ovrel(:)
       type(psb_desc_type), intent(in) :: desc
-      integer, intent(out)            :: info
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_get_ovrlap
   end interface
 
   interface psb_icdasb
     subroutine psb_icdasb(desc,info,ext_hv)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       Type(psb_desc_type), intent(inout) :: desc
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
       logical, intent(in),optional       :: ext_hv
     end subroutine psb_icdasb
   end interface
@@ -429,13 +423,13 @@ module psb_cd_tools_mod
   interface psb_cdall
 
     subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck)
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit None
       include 'parts.fh'
-      Integer, intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
-      integer, intent(in)               :: flag
+      integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
+      integer(psb_ipk_), intent(in)               :: flag
       logical, intent(in)               :: repl, globalcheck
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
       
       optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck
@@ -453,33 +447,31 @@ module psb_cd_tools_mod
 
   interface 
     subroutine psb_cd_switch_ovl_indxmap(desc,info) 
-      use psb_descriptor_type
+      import :: psb_ipk_, psb_desc_type
       implicit None
       include 'parts.fh'
       type(psb_desc_type), intent(inout) :: desc
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_cd_switch_ovl_indxmap
   end interface
 
 contains
 
   subroutine psb_get_boundary(bndel,desc,info)
-    use psb_descriptor_type
     use psi_mod, only : psi_crea_bnd_elem
     implicit none 
-    integer, allocatable, intent(out) :: bndel(:)
+    integer(psb_ipk_), allocatable, intent(out) :: bndel(:)
     type(psb_desc_type), intent(in) :: desc
-    integer, intent(out)            :: info
+    integer(psb_ipk_), intent(out)            :: info
 
     call psi_crea_bnd_elem(bndel,desc,info)
 
   end subroutine psb_get_boundary
 
   subroutine psb_cdasb(desc,info)
-    use psb_descriptor_type
 
     Type(psb_desc_type), intent(inout) :: desc
-    integer, intent(out)               :: info
+    integer(psb_ipk_), intent(out)               :: info
 
     call psb_icdasb(desc,info,ext_hv=.false.)
   end subroutine psb_cdasb

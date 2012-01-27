@@ -30,69 +30,69 @@
 !!$ 
 !!$  
 module psi_serial_mod
-
+  use psb_const_mod, only : psb_ipk_, psb_spk_, psb_dpk_
   interface psb_gelp
     ! 2-D version
     subroutine psb_sgelp(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_spk_), intent(inout)      ::  x(:,:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_sgelp
     ! 1-D version
     subroutine psb_sgelpv(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_spk_), intent(inout)    ::  x(:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)              :: trans
     end subroutine psb_sgelpv
     subroutine psb_dgelp(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_dpk_), intent(inout)      ::  x(:,:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_dgelp
     ! 1-D version
     subroutine psb_dgelpv(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_dpk_), intent(inout)    ::  x(:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)              :: trans
     end subroutine psb_dgelpv
     ! 2-D version
     subroutine psb_cgelp(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_spk_), intent(inout)      ::  x(:,:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_cgelp
     ! 1-D version
     subroutine psb_cgelpv(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_spk_), intent(inout)    ::  x(:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)              :: trans
     end subroutine psb_cgelpv
     ! 2-D version
     subroutine psb_zgelp(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_dpk_), intent(inout)      ::  x(:,:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_zgelp
     ! 1-D version
     subroutine psb_zgelpv(trans,iperm,x,info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_dpk_), intent(inout)    ::  x(:)
-      integer, intent(in)                  ::  iperm(:)
-      integer, intent(out)                 ::  info
+      integer(psb_ipk_), intent(in)                  ::  iperm(:)
+      integer(psb_ipk_), intent(out)                 ::  info
       character, intent(in)              :: trans
     end subroutine psb_zgelpv
   end interface
@@ -101,77 +101,78 @@ module psi_serial_mod
 
   interface psi_gth
     subroutine psi_igthv(n,idx,alpha,x,beta,y)
-      integer :: n, idx(:)
-      integer :: x(:), y(:), alpha, beta
+      import :: psb_ipk_, psb_spk_, psb_dpk_ 
+      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_ipk_) :: x(:), y(:), alpha, beta
     end subroutine psi_igthv
     subroutine psi_sgthv(n,idx,alpha,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_spk_) :: x(:), y(:), alpha, beta
     end subroutine psi_sgthv
     subroutine psi_dgthv(n,idx,alpha,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_dpk_) :: x(:), y(:), alpha, beta
     end subroutine psi_dgthv
     subroutine psi_cgthv(n,idx,alpha,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_) :: x(:), y(:),alpha,beta
     end subroutine psi_cgthv
     subroutine psi_zgthv(n,idx,alpha,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_dpk_) :: x(:), y(:),alpha,beta
     end subroutine psi_zgthv
     subroutine psi_sgthzmv(n,k,idx,x,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       real(psb_spk_) :: x(:,:), y(:)
     end subroutine psi_sgthzmv
     subroutine psi_dgthzmv(n,k,idx,x,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       real(psb_dpk_) :: x(:,:), y(:)
     end subroutine psi_dgthzmv
     subroutine psi_igthzmv(n,k,idx,x,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
-      integer :: x(:,:), y(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_ipk_) :: x(:,:), y(:)
     end subroutine psi_igthzmv
     subroutine psi_cgthzmv(n,k,idx,x,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       complex(psb_spk_) :: x(:,:), y(:)
     end subroutine psi_cgthzmv
     subroutine psi_zgthzmv(n,k,idx,x,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       complex(psb_dpk_) :: x(:,:), y(:)
     end subroutine psi_zgthzmv
     subroutine psi_sgthzv(n,idx,x,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_spk_) :: x(:), y(:)
     end subroutine psi_sgthzv
     subroutine psi_dgthzv(n,idx,x,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_dpk_) :: x(:), y(:)
     end subroutine psi_dgthzv
     subroutine psi_igthzv(n,idx,x,y)
-      use psb_const_mod
-      integer :: n, idx(:)
-      integer :: x(:), y(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_ipk_) :: x(:), y(:)
     end subroutine psi_igthzv
     subroutine psi_cgthzv(n,idx,x,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_) :: x(:), y(:)
     end subroutine psi_cgthzv
     subroutine psi_zgthzv(n,idx,x,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_dpk_) :: x(:), y(:)
     end subroutine psi_zgthzv
   end interface
@@ -179,53 +180,53 @@ module psi_serial_mod
 
   interface psi_sct
     subroutine psi_ssctmv(n,k,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       real(psb_spk_) :: beta, x(:), y(:,:)
     end subroutine psi_ssctmv
     subroutine psi_ssctv(n,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_spk_) :: beta, x(:), y(:)
     end subroutine psi_ssctv
     subroutine psi_dsctmv(n,k,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       real(psb_dpk_) :: beta, x(:), y(:,:)
     end subroutine psi_dsctmv
     subroutine psi_dsctv(n,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       real(psb_dpk_) :: beta, x(:), y(:)
     end subroutine psi_dsctv
     subroutine psi_isctmv(n,k,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
-      integer :: beta, x(:), y(:,:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_ipk_) :: beta, x(:), y(:,:)
     end subroutine psi_isctmv
     subroutine psi_isctv(n,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
-      integer :: beta, x(:), y(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
+      integer(psb_ipk_) :: beta, x(:), y(:)
     end subroutine psi_isctv
     subroutine psi_csctmv(n,k,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       complex(psb_spk_) :: beta, x(:), y(:,:)
     end subroutine psi_csctmv
     subroutine psi_csctv(n,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_spk_) :: beta, x(:), y(:)
     end subroutine psi_csctv
     subroutine psi_zsctmv(n,k,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, k, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, k, idx(:)
       complex(psb_dpk_) :: beta, x(:), y(:,:)
     end subroutine psi_zsctmv
     subroutine psi_zsctv(n,idx,x,beta,y)
-      use psb_const_mod
-      integer :: n, idx(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_) :: n, idx(:)
       complex(psb_dpk_) :: beta, x(:), y(:)
     end subroutine psi_zsctv
   end interface
@@ -233,69 +234,69 @@ module psi_serial_mod
 
   interface psb_geaxpby
     subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m
       real(psb_spk_), intent (in)       ::  x(:)
       real(psb_spk_), intent (inout)    ::  y(:)
       real(psb_spk_), intent (in)       :: alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_saxpbyv
     subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m, n
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m, n
       real(psb_spk_), intent (in)       ::  x(:,:)
       real(psb_spk_), intent (inout)    ::  y(:,:)
       real(psb_spk_), intent (in)       ::  alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_saxpby
     subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m
       real(psb_dpk_), intent (in)       ::  x(:)
       real(psb_dpk_), intent (inout)    ::  y(:)
       real(psb_dpk_), intent (in)       :: alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_daxpbyv
     subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m, n
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m, n
       real(psb_dpk_), intent (in)       ::  x(:,:)
       real(psb_dpk_), intent (inout)    ::  y(:,:)
       real(psb_dpk_), intent (in)       ::  alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_daxpby
     subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m
       complex(psb_spk_), intent (in)    ::  x(:)
       complex(psb_spk_), intent (inout) ::  y(:)
       complex(psb_spk_), intent (in)    :: alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_caxpbyv
     subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       implicit none 
-      integer, intent(in)               :: m, n
+      integer(psb_ipk_), intent(in)               :: m, n
       complex(psb_spk_), intent (in)    ::  x(:,:)
       complex(psb_spk_), intent (inout) ::  y(:,:)
       complex(psb_spk_), intent (in)    ::  alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_caxpby
     subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m
       complex(psb_dpk_), intent (in)    ::  x(:)
       complex(psb_dpk_), intent (inout) ::  y(:)
       complex(psb_dpk_), intent (in)    :: alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_zaxpbyv
     subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
-      use psb_const_mod
-      integer, intent(in)               :: m, n
+      import :: psb_ipk_, psb_spk_, psb_dpk_ 
+      integer(psb_ipk_), intent(in)               :: m, n
       complex(psb_dpk_), intent (in)    ::  x(:,:)
       complex(psb_dpk_), intent (inout) ::  y(:,:)
       complex(psb_dpk_), intent (in)    ::  alpha, beta
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_zaxpby
   end interface
 

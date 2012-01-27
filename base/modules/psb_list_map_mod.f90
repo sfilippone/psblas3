@@ -45,8 +45,8 @@ module psb_list_map_mod
   use psb_indx_map_mod
   
   type, extends(psb_indx_map) :: psb_list_map
-    integer :: pnt_h          = -1 
-    integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
+    integer(psb_ipk_) :: pnt_h          = -1 
+    integer(psb_ipk_), allocatable :: loc_to_glob(:), glob_to_loc(:)
   contains
     procedure, pass(idxmap)  :: init_vl    => list_initvl
 
@@ -120,11 +120,11 @@ contains
   subroutine list_l2gs1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer  :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
@@ -139,9 +139,9 @@ contains
   subroutine list_l2gs2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -154,11 +154,11 @@ contains
   subroutine list_l2gv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i
+    integer(psb_ipk_) :: i
     logical :: owned_
     info = 0
 
@@ -209,12 +209,12 @@ contains
   subroutine list_l2gv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -228,11 +228,11 @@ contains
   subroutine list_g2ls1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
     info = 0
 
     if (present(mask)) then 
@@ -248,9 +248,9 @@ contains
   subroutine list_g2ls2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
@@ -264,11 +264,11 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer :: i, is, ix
+    integer(psb_ipk_) :: i, is, ix
     logical :: owned_
 
     info = 0
@@ -329,13 +329,13 @@ contains
   subroutine list_g2lv2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_list_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -352,11 +352,11 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     
-    integer :: idxv(1)
+    integer(psb_ipk_) :: idxv(1)
 
     info = 0
     if (present(mask)) then 
@@ -371,9 +371,9 @@ contains
   subroutine list_g2ls2_ins(idxin,idxout,idxmap,info,mask)
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     
     idxout = idxin
@@ -387,10 +387,10 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: i, is, ix
+    integer(psb_ipk_) :: i, is, ix
 
     info = 0
     is = size(idx)
@@ -466,11 +466,11 @@ contains
   subroutine list_g2lv2_ins(idxin,idxout,idxmap,info,mask)
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer :: is, im
+    integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
@@ -488,10 +488,10 @@ contains
 !!$    use psb_error_mod
 !!$    implicit none 
 !!$    class(psb_list_map), intent(inout) :: idxmap
-!!$    integer, intent(in)  :: ictxt, vg(:)
-!!$    integer, intent(out) :: info
+!!$    integer(psb_ipk_), intent(in)  :: ictxt, vg(:)
+!!$    integer(psb_ipk_), intent(out) :: info
 !!$    !  To be implemented
-!!$    integer :: iam, np, i, j, n, nl
+!!$    integer(psb_ipk_) :: iam, np, i, j, n, nl
 !!$    
 !!$
 !!$    info = 0
@@ -544,10 +544,10 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(in)  :: ictxt, vl(:)
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+    integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer :: iam, np, i, ix, nl, n, nrt
+    integer(psb_ipk_) :: iam, np, i, ix, nl, n, nrt
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -608,9 +608,9 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(out) :: info
     
-    integer :: nhal, ictxt, iam, np 
+    integer(psb_ipk_) :: nhal, ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()
@@ -637,8 +637,8 @@ contains
     implicit none 
     class(psb_list_map), intent(in)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='list_clone'
     logical, parameter :: debug=.false.
 

@@ -69,11 +69,12 @@
 !
 !
 subroutine msort_up(n,k,l,iret)
+  use psb_serial_mod
   implicit none
-  integer n, iret
-  integer k(n),l(0:n+1)
+  integer(psb_ipk_) :: n, iret
+  integer(psb_ipk_) :: k(n),l(0:n+1)
   !
-  integer p,q,s,t
+  integer(psb_ipk_) :: p,q,s,t
   intrinsic iabs,isign
   !     ..
   iret = 0

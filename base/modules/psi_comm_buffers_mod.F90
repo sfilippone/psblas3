@@ -2,20 +2,20 @@
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
-  integer, parameter :: mpi_success=0
-  integer, parameter :: mpi_request_null=0
-  integer, parameter :: mpi_status_size=1
-  integer, parameter :: mpi_integer          = 1
-  integer, parameter :: mpi_integer8         = 2
-  integer, parameter :: mpi_real             = 3
-  integer, parameter :: mpi_double_precision = 4
-  integer, parameter :: mpi_complex          = 5   
-  integer, parameter :: mpi_double_complex   = 6 
-  integer, parameter :: mpi_character        = 7
-  integer, parameter :: mpi_logical          = 8
-  integer, parameter :: mpi_integer2         = 9
-  integer, parameter :: mpi_comm_null        = -1
-  integer, parameter :: mpi_comm_world       = 1
+  integer(psb_ipk_), parameter :: mpi_success=0
+  integer(psb_ipk_), parameter :: mpi_request_null=0
+  integer(psb_ipk_), parameter :: mpi_status_size=1
+  integer(psb_ipk_), parameter :: mpi_integer          = 1
+  integer(psb_ipk_), parameter :: mpi_integer8         = 2
+  integer(psb_ipk_), parameter :: mpi_real             = 3
+  integer(psb_ipk_), parameter :: mpi_double_precision = 4
+  integer(psb_ipk_), parameter :: mpi_complex          = 5   
+  integer(psb_ipk_), parameter :: mpi_double_complex   = 6 
+  integer(psb_ipk_), parameter :: mpi_character        = 7
+  integer(psb_ipk_), parameter :: mpi_logical          = 8
+  integer(psb_ipk_), parameter :: mpi_integer2         = 9
+  integer(psb_ipk_), parameter :: mpi_comm_null        = -1
+  integer(psb_ipk_), parameter :: mpi_comm_world       = 1
   
   real(psb_dpk_), external :: mpi_wtime
 end module mpi
@@ -24,22 +24,22 @@ end module mpi
 module psi_comm_buffers_mod
   use psb_const_mod
 
-  integer, private, parameter:: psb_int_type      = 987543
-  integer, private, parameter:: psb_real_type     = psb_int_type      + 1
-  integer, private, parameter:: psb_double_type   = psb_real_type     + 1
-  integer, private, parameter:: psb_complex_type  = psb_double_type   + 1
-  integer, private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
-  integer, private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
-  integer, private, parameter:: psb_char_type     = psb_logical_type  + 1
-  integer, private, parameter:: psb_int8_type     = psb_char_type     + 1
-  integer, private, parameter:: psb_int2_type     = psb_int8_type     + 1
+  integer(psb_ipk_), private, parameter:: psb_int_type      = 987543
+  integer(psb_ipk_), private, parameter:: psb_real_type     = psb_int_type      + 1
+  integer(psb_ipk_), private, parameter:: psb_double_type   = psb_real_type     + 1
+  integer(psb_ipk_), private, parameter:: psb_complex_type  = psb_double_type   + 1
+  integer(psb_ipk_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
+  integer(psb_ipk_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
+  integer(psb_ipk_), private, parameter:: psb_char_type     = psb_logical_type  + 1
+  integer(psb_ipk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
+  integer(psb_ipk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
 
 
   type psb_buffer_node
-    integer :: request
-    integer :: icontxt 
-    integer :: buffer_type
-    integer(psb_int_k_), allocatable      :: intbuf(:)
+    integer(psb_ipk_) :: request
+    integer(psb_ipk_) :: icontxt 
+    integer(psb_ipk_) :: buffer_type
+    integer(psb_ipk_), allocatable      :: intbuf(:)
     integer(psb_long_int_k_), allocatable :: int8buf(:)
     integer(2), allocatable               :: int2buf(:)
     real(psb_spk_), allocatable           :: realbuf(:)
@@ -78,7 +78,7 @@ contains
   subroutine psb_init_queue(mesg_queue,info)
     implicit none 
     type(psb_buffer_queue), intent(inout) :: mesg_queue
-    integer, intent(out)                  :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
     info = 0
     if ((.not.associated(mesg_queue%head)).and.&
@@ -107,8 +107,8 @@ contains
     include 'mpif.h'
 #endif
     type(psb_buffer_node), intent(inout) :: node
-    integer, intent(out) :: info 
-    integer :: status(mpi_status_size)
+    integer(psb_ipk_), intent(out) :: info 
+    integer(psb_ipk_) :: status(mpi_status_size)
 
     call mpi_wait(node%request,status,info)
   end subroutine psb_wait_buffer
@@ -123,8 +123,8 @@ contains
 #endif
     type(psb_buffer_node), intent(inout) :: node
     logical, intent(out) :: flag
-    integer, intent(out) :: info 
-    integer :: status(mpi_status_size)
+    integer(psb_ipk_), intent(out) :: info 
+    integer(psb_ipk_) :: status(mpi_status_size)
 
     call mpi_test(node%request,flag,status,info)
   end subroutine psb_test_buffer
@@ -132,8 +132,8 @@ contains
 
   subroutine psb_close_context(mesg_queue,icontxt)
     type(psb_buffer_queue), intent(inout) :: mesg_queue
-    integer, intent(in) :: icontxt
-    integer :: info
+    integer(psb_ipk_), intent(in) :: icontxt
+    integer(psb_ipk_) :: info
     type(psb_buffer_node), pointer :: node, nextnode
 
     node => mesg_queue%head
@@ -151,7 +151,7 @@ contains
   subroutine psb_close_all_context(mesg_queue)
     type(psb_buffer_queue), intent(inout) :: mesg_queue
     type(psb_buffer_node), pointer :: node, nextnode
-    integer :: info
+    integer(psb_ipk_) :: info
     
     node => mesg_queue%head
     do 
@@ -202,7 +202,7 @@ contains
   subroutine psb_test_nodes(mesg_queue)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node, nextnode
-    integer :: info
+    integer(psb_ipk_) :: info
     logical :: flag
     
     node => mesg_queue%head
@@ -235,11 +235,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
-    integer(psb_int_k_), allocatable, intent(inout) :: buffer(:)
+    integer(psb_ipk_) :: icontxt, tag, dest
+    integer(psb_ipk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -270,11 +270,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     integer(psb_long_int_k_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -306,11 +306,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     integer(2), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -342,11 +342,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     real(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -376,11 +376,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     real(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -410,11 +410,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     complex(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -444,11 +444,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     complex(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -479,11 +479,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     logical, allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -514,11 +514,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer :: icontxt, tag, dest
+    integer(psb_ipk_) :: icontxt, tag, dest
     character(len=1), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer :: info
+    integer(psb_ipk_) :: info
     
     allocate(node, stat=info)
     if (info /= 0) then 

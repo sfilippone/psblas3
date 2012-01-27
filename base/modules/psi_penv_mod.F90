@@ -28,17 +28,17 @@ module psi_penv_mod
 
 
 #if defined(SERIAL_MPI)
-  integer, private, save :: nctxt=0
+  integer(psb_ipk_), private, save :: nctxt=0
 
 #else 
 
-  integer, save :: mpi_iamx_op, mpi_iamn_op
-  integer, save :: mpi_i8amx_op, mpi_i8amn_op
-  integer, save :: mpi_samx_op, mpi_samn_op
-  integer, save :: mpi_damx_op, mpi_damn_op
-  integer, save :: mpi_camx_op, mpi_camn_op
-  integer, save :: mpi_zamx_op, mpi_zamn_op
-  integer, save :: mpi_snrm2_op, mpi_dnrm2_op
+  integer(psb_ipk_), save :: mpi_iamx_op, mpi_iamn_op
+  integer(psb_ipk_), save :: mpi_i8amx_op, mpi_i8amn_op
+  integer(psb_ipk_), save :: mpi_samx_op, mpi_samn_op
+  integer(psb_ipk_), save :: mpi_damx_op, mpi_damn_op
+  integer(psb_ipk_), save :: mpi_camx_op, mpi_camn_op
+  integer(psb_ipk_), save :: mpi_zamx_op, mpi_zamn_op
+  integer(psb_ipk_), save :: mpi_snrm2_op, mpi_dnrm2_op
 
   type(psb_buffer_queue), save :: psb_mesg_queue 
 
@@ -65,7 +65,7 @@ contains
     use psb_const_mod
     real(psb_dpk_) :: dv(2) 
     real(psb_spk_) :: sv(2) 
-    integer        :: iv(2)
+    integer(psb_ipk_) :: iv(2)
     integer(psb_long_int_k_) :: ilv(2)
 
     call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
@@ -83,7 +83,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer info
+    integer(psb_ipk_) :: info
     info  = 0 
 
 #if defined(LONG_INTEGERS)
@@ -124,14 +124,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(out) :: ictxt
-    integer, intent(in), optional :: np, basectxt, ids(:)
+    integer(psb_ipk_), intent(out) :: ictxt
+    integer(psb_ipk_), intent(in), optional :: np, basectxt, ids(:)
 
 
-    integer :: i, isnullcomm
-    integer, allocatable :: iids(:) 
+    integer(psb_ipk_) :: i, isnullcomm
+    integer(psb_ipk_), allocatable :: iids(:) 
     logical :: initialized    
-    integer :: np_, npavail, iam, info, basecomm, basegroup, newgroup
+    integer(psb_ipk_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
     character(len=20), parameter :: name='psb_init'
 
     call psb_set_debug_unit(psb_err_unit)
@@ -249,10 +249,10 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(inout) :: ictxt
+    integer(psb_ipk_), intent(inout) :: ictxt
     logical, intent(in), optional :: close
     logical  :: close_
-    integer  :: info
+    integer(psb_ipk_) :: info
     character(len=20), parameter :: name='psb_exit'
 
     info = 0
@@ -300,9 +300,9 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in) :: ictxt
+    integer(psb_ipk_), intent(in) :: ictxt
 
-    integer :: info
+    integer(psb_ipk_) :: info
 #if !defined(SERIAL_MPI)
     if (ictxt /= mpi_comm_null) then 
       call mpi_barrier(ictxt, info)
@@ -328,10 +328,10 @@ contains
   subroutine psb_abort(ictxt,errc)
     use psi_comm_buffers_mod 
 
-    integer, intent(in) :: ictxt
-    integer, intent(in), optional :: errc
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(in), optional :: errc
     
-    integer :: code, info 
+    integer(psb_ipk_) :: code, info 
 
 #if defined(SERIAL_MPI) 
     stop 
@@ -358,9 +358,9 @@ contains
     include 'mpif.h'
 #endif
 
-    integer, intent(in)  :: ictxt
-    integer, intent(out) :: iam, np
-    integer              :: info
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(out) :: iam, np
+    integer(psb_ipk_) :: info
 
 #if defined(SERIAL_MPI) 
     iam = 0
@@ -381,26 +381,26 @@ contains
 
 
   subroutine psb_set_coher(ictxt,isvch)
-    integer :: ictxt, isvch
+    integer(psb_ipk_) :: ictxt, isvch
     ! Ensure global repeatability for convergence checks.
     ! Do nothing. Obsolete.
   end subroutine psb_set_coher
 
   subroutine psb_restore_coher(ictxt,isvch)
-    integer :: ictxt, isvch
+    integer(psb_ipk_) :: ictxt, isvch
     ! Ensure global coherence for convergence checks.
     ! Do nothing. Obsolete.
 
   end subroutine psb_restore_coher
 
   subroutine psb_get_mpicomm(ictxt,comm)
-    integer :: ictxt, comm
+    integer(psb_ipk_) :: ictxt, comm
 
     comm = ictxt
   end subroutine psb_get_mpicomm
 
   subroutine psb_get_rank(rank,ictxt,id)
-    integer :: rank,ictxt,id
+    integer(psb_ipk_) :: rank,ictxt,id
 
     rank = id
   end subroutine psb_get_rank
@@ -412,9 +412,9 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
   subroutine psi_iamx_op(inv, outv,len,type) 
-    integer :: inv(*),outv(*)
-    integer :: len,type
-    integer :: i
+    integer(psb_ipk_) :: inv(*),outv(*)
+    integer(psb_ipk_) :: len,type
+    integer(psb_ipk_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -422,9 +422,9 @@ contains
   end subroutine psi_iamx_op
 
   subroutine psi_iamn_op(inv, outv,len,type) 
-    integer :: inv(*),outv(*)
-    integer :: len,type
-    integer :: i
+    integer(psb_ipk_) :: inv(*),outv(*)
+    integer(psb_ipk_) :: len,type
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
@@ -432,8 +432,8 @@ contains
 
   subroutine psi_i8amx_op(inv, outv,len,type) 
     integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer :: len,type
-    integer :: i
+    integer(psb_ipk_) :: len,type
+    integer(psb_ipk_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -449,8 +449,8 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer :: len,type
-    integer :: i
+    integer(psb_ipk_) :: len,type
+    integer(psb_ipk_) :: i
     if (type /= mpi_integer8) then 
       write(psb_err_unit,*) 'Invalid type !!!'
     end if
@@ -460,88 +460,88 @@ contains
   end subroutine psi_i8amn_op
 
   subroutine psi_samx_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samx_op
 
   subroutine psi_samn_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samn_op
 
   subroutine psi_damx_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damx_op
 
   subroutine psi_damn_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damn_op
 
   subroutine psi_camx_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camx_op
 
   subroutine psi_camn_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camn_op
 
   subroutine psi_zamx_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_zamx_op
 
   subroutine psi_zamn_op(vin,vinout,len,itype)
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
@@ -549,11 +549,11 @@ contains
 
   subroutine psi_snrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     real(psb_spk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )
@@ -568,11 +568,11 @@ contains
 
   subroutine psi_dnrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer, intent(in)           :: len, itype
+    integer(psb_ipk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer :: i
+    integer(psb_ipk_) :: i
     real(psb_dpk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )

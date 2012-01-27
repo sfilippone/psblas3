@@ -41,13 +41,13 @@ Module psb_base_inner_krylov_mod
     module procedure psb_d_end_conv
   end interface
 
-  integer, parameter :: psb_ik_bni_=1, psb_ik_rni_=2, psb_ik_ani_=3
-  integer, parameter :: psb_ik_xni_=4, psb_ik_bn2_=5, psb_ik_xn2_=6
-  integer, parameter :: psb_ik_errnum_=7, psb_ik_errden_=8, psb_ik_eps_=9, psb_ik_rn2_=10
-  integer, parameter :: psb_ik_stopc_=1, psb_ik_trace_=2, psb_ik_itmax_=3
-  integer, parameter :: psb_ik_ivsz_=16
+  integer(psb_ipk_), parameter :: psb_ik_bni_=1, psb_ik_rni_=2, psb_ik_ani_=3
+  integer(psb_ipk_), parameter :: psb_ik_xni_=4, psb_ik_bn2_=5, psb_ik_xn2_=6
+  integer(psb_ipk_), parameter :: psb_ik_errnum_=7, psb_ik_errden_=8, psb_ik_eps_=9, psb_ik_rn2_=10
+  integer(psb_ipk_), parameter :: psb_ik_stopc_=1, psb_ik_trace_=2, psb_ik_itmax_=3
+  integer(psb_ipk_), parameter :: psb_ik_ivsz_=16
   type psb_itconv_type
-    integer        :: controls(psb_ik_ivsz_)
+    integer(psb_ipk_) :: controls(psb_ik_ivsz_)
     real(psb_dpk_) :: values(psb_ik_ivsz_)
   end type psb_itconv_type
 
@@ -58,7 +58,7 @@ contains
     implicit none 
     character(len=*), intent(in)   :: methdname
     character(len=*), parameter    :: fmt='(a18,1x,a4,3(2x,a15))'
-    integer, parameter             :: outlen=18 
+    integer(psb_ipk_), parameter             :: outlen=18 
     character(len=len(methdname))  :: mname
     character(len=outlen)          :: outname
 
@@ -73,10 +73,10 @@ contains
     !use psb_base_mod
     implicit none 
     character(len=*), intent(in)  :: methdname
-    integer, intent(in)           :: me, itx, itrace
+    integer(psb_ipk_), intent(in)           :: me, itx, itrace
     real(psb_dpk_), intent(in)    :: errnum, errden, eps
     character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es15.9))'
-    integer, parameter            :: outlen=18 
+    integer(psb_ipk_), parameter            :: outlen=18 
     character(len=len(methdname)) :: mname
     character(len=outlen)         :: outname
 
@@ -96,10 +96,10 @@ contains
     !use psb_base_mod
     implicit none 
     character(len=*), intent(in) :: methdname
-    integer, intent(in)          :: me, it
+    integer(psb_ipk_), intent(in)          :: me, it
     real(psb_dpk_), intent(in) :: errnum, errden, eps
     real(psb_dpk_), optional, intent(out) :: err
-    integer, optional, intent(out)  :: iter
+    integer(psb_ipk_), optional, intent(out)  :: iter
 
     character(len=*), parameter  :: fmt='(a,2x,es15.9,1x,a,1x,i4,1x,a)'
     character(len=*), parameter  :: fmt1='(a,3(2x,es15.9))'
@@ -134,14 +134,14 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
-    integer, intent(in)             :: it
+    integer(psb_ipk_), intent(in)             :: it
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
-    integer, intent(out)            :: info
+    integer(psb_ipk_), intent(out)            :: info
     real(psb_dpk_), optional, intent(out) :: err
-    integer, optional, intent(out)  :: iter
+    integer(psb_ipk_), optional, intent(out)  :: iter
 
-    integer                         :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     real(psb_dpk_)                  :: errnum, errden, eps
     character(len=20)               :: name
 

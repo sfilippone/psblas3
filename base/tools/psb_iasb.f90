@@ -39,7 +39,7 @@
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:,:)  - integer,allocatable                The matrix to be assembled.
+!    x(:,:)  - integer(psb_ipk_),allocatable                The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).             The communication descriptor.
 !    info    - integer.                           return code
 subroutine psb_iasb(x, desc_a, info)
@@ -47,13 +47,13 @@ subroutine psb_iasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in)     ::  desc_a
-  integer, allocatable, intent(inout) ::  x(:,:)
-  integer, intent(out)                ::  info
+  integer(psb_ipk_), allocatable, intent(inout) ::  x(:,:)
+  integer(psb_ipk_), intent(out)                ::  info
 
   ! local variables
-  integer :: ictxt,np,me,nrow,ncol,err_act
-  integer :: int_err(5), i1sz, i2sz
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me,nrow,ncol,err_act
+  integer(psb_ipk_) :: int_err(5), i1sz, i2sz
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
   if(psb_get_errstatus() /= 0) return 
@@ -173,7 +173,7 @@ end subroutine psb_iasb
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:)    - integer,allocatable                The matrix to be assembled.
+!    x(:)    - integer(psb_ipk_),allocatable                The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).             The communication descriptor.
 !    info    - integer.                           return code
 subroutine psb_iasbv(x, desc_a, info)
@@ -181,13 +181,13 @@ subroutine psb_iasbv(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in)     ::  desc_a
-  integer, allocatable, intent(inout) ::  x(:)
-  integer, intent(out)                ::  info
+  integer(psb_ipk_), allocatable, intent(inout) ::  x(:)
+  integer(psb_ipk_), intent(out)                ::  info
 
   ! local variables
-  integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol, err_act
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
   info = psb_success_

@@ -19,14 +19,14 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
   real(psb_dpk_), intent(inout)       :: y(:)
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer   :: i,j,k,m,n, nnz, ir, jc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_csmv'
   logical, parameter :: debug=.false.
 
@@ -88,13 +88,13 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
 contains
   subroutine psb_d_cxx_csmv_inner(m,n,alpha,irp,ja,val,is_triangle,is_unit,&
        & x,beta,y,tra) 
-    integer, intent(in)             :: m,n,irp(*),ja(*)
+    integer(psb_ipk_), intent(in)             :: m,n,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(*),val(*)
     real(psb_dpk_), intent(inout)   :: y(*)
     logical, intent(in)             :: is_triangle,is_unit,tra
 
 
-    integer   :: i,j,k, ir, jc
+    integer(psb_ipk_) :: i,j,k, ir, jc
     real(psb_dpk_) :: acc
 
     if (alpha == dzero) then
@@ -316,14 +316,14 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
   real(psb_dpk_), intent(inout)       :: y(:,:)
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_), allocatable  :: acc(:)
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_csmm'
   logical, parameter :: debug=.false.
 
@@ -391,13 +391,13 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
 contains
   subroutine psb_d_cxx_csmm_inner(m,n,nc,alpha,irp,ja,val,&
        & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,acc) 
-    integer, intent(in)             :: m,n,ldx,ldy,nc,irp(*),ja(*)
+    integer(psb_ipk_), intent(in)             :: m,n,ldx,ldy,nc,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(ldx,*),val(*)
     real(psb_dpk_), intent(inout)   :: y(ldy,*)
     logical, intent(in)             :: is_triangle,is_unit,tra
 
     real(psb_dpk_), intent(inout)   :: acc(*)
-    integer   :: i,j,k, ir, jc
+    integer(psb_ipk_) :: i,j,k, ir, jc
 
 
     if (alpha == dzero) then
@@ -617,15 +617,15 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
   real(psb_dpk_), intent(inout)       :: y(:)
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer   :: i,j,k,m,n, nnz, ir, jc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:)
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_cssv'
   logical, parameter :: debug=.false.
 
@@ -721,12 +721,12 @@ contains
   subroutine inner_cxxsv(tra,lower,unit,n,irp,ja,val,x,y) 
     implicit none 
     logical, intent(in)                 :: tra,lower,unit  
-    integer, intent(in)                 :: irp(*), ja(*),n
+    integer(psb_ipk_), intent(in)                 :: irp(*), ja(*),n
     real(psb_dpk_), intent(in)          :: val(*)
     real(psb_dpk_), intent(in)          :: x(*)
     real(psb_dpk_), intent(out)         :: y(*)
 
-    integer :: i,j,k,m, ir, jc
+    integer(psb_ipk_) :: i,j,k,m, ir, jc
     real(psb_dpk_) :: acc
 
     if (.not.tra) then 
@@ -832,15 +832,15 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
   real(psb_dpk_), intent(inout)       :: y(:,:)
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_cssm'
   logical, parameter :: debug=.false.
 
@@ -931,11 +931,11 @@ contains
        & irp,ja,val,x,ldx,y,ldy,info) 
     implicit none 
     logical, intent(in)                 :: tra,lower,unit
-    integer, intent(in)                 :: nr,nc,ldx,ldy,irp(*),ja(*)
+    integer(psb_ipk_), intent(in)                 :: nr,nc,ldx,ldy,irp(*),ja(*)
     real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
     real(psb_dpk_), intent(out)         :: y(ldy,*)
-    integer, intent(out)                :: info
-    integer :: i,j,k,m, ir, jc
+    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_) :: i,j,k,m, ir, jc
     real(psb_dpk_), allocatable  :: acc(:)
 
     info = psb_success_
@@ -1047,10 +1047,10 @@ function psb_d_cxx_csnmi(a) result(res)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
-  integer   :: i,j,k,m,n, nr, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nr, ir, jc, nc
   real(psb_dpk_) :: acc
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_csnmi'
   logical, parameter :: debug=.false.
 
@@ -1076,11 +1076,11 @@ function psb_d_cxx_csnm1(a) result(res)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc, info
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_csnm1'
   logical, parameter :: debug=.false.
 
@@ -1111,11 +1111,11 @@ subroutine psb_d_cxx_rowsum(d,a)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  Integer :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info, int_err(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1159,11 +1159,11 @@ subroutine psb_d_cxx_arwsum(d,a)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  Integer :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info, int_err(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1207,11 +1207,11 @@ subroutine psb_d_cxx_colsum(d,a)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  Integer :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info, int_err(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1258,11 +1258,11 @@ subroutine psb_d_cxx_aclsum(d,a)
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
 
-  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  Integer :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info, int_err(5)
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1310,9 +1310,9 @@ subroutine psb_d_cxx_get_diag(a,d,info)
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)     :: d(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act, mnm, i, j, k
+  integer(psb_ipk_) :: err_act, mnm, i, j, k
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -1358,9 +1358,9 @@ subroutine psb_d_cxx_scal(d,a,info)
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: err_act,mnm, i, j, m
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1400,9 +1400,9 @@ subroutine psb_d_cxx_scals(d,a,info)
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  Integer :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: err_act,mnm, i, j, m
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1447,9 +1447,9 @@ subroutine  psb_d_cxx_reallocate_nz(nz,a)
   use psb_base_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_reallocate_nz
   implicit none 
-  integer, intent(in) :: nz
+  integer(psb_ipk_), intent(in) :: nz
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='d_cxx_reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1484,8 +1484,8 @@ subroutine psb_d_cxx_mold(a,b,info)
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in)  :: a
   class(psb_d_base_sparse_mat), intent(out), allocatable  :: b
-  integer, intent(out)                    :: info
-  Integer :: err_act
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1511,10 +1511,10 @@ subroutine  psb_d_cxx_allocate_mnnz(m,n,a,nz)
   use psb_base_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_allocate_mnnz
   implicit none 
-  integer, intent(in) :: m,n
+  integer(psb_ipk_), intent(in) :: m,n
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  integer, intent(in), optional :: nz
-  Integer :: err_act, info, nz_
+  integer(psb_ipk_), intent(in), optional :: nz
+  integer(psb_ipk_) :: err_act, info, nz_
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -1576,17 +1576,17 @@ subroutine psb_d_cxx_csgetptn(imin,imax,a,nz,ia,ja,info,&
   implicit none
 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
-  integer, intent(in)                  :: imin,imax
-  integer, intent(out)                 :: nz
-  integer, allocatable, intent(inout)  :: ia(:), ja(:)
-  integer,intent(out)                  :: info
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_), intent(out)                 :: nz
+  integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax, nzin
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
 
   logical :: append_, rscale_, cscale_ 
-  integer :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -1670,15 +1670,15 @@ contains
     implicit none
 
     class(psb_d_cxx_sparse_mat), intent(in)    :: a
-    integer                              :: imin,imax,jmin,jmax
-    integer, intent(out)                 :: nz
-    integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    integer, intent(in)                  :: nzin
+    integer(psb_ipk_) :: imin,imax,jmin,jmax
+    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+    integer(psb_ipk_), intent(in)                  :: nzin
     logical, intent(in)                  :: append
-    integer                              :: info
-    integer, optional                    :: iren(:)
-    integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
-    integer  :: debug_level, debug_unit
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional                    :: iren(:)
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
+    integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='cxx_getptn'
 
     debug_unit  = psb_get_debug_unit()
@@ -1743,18 +1743,18 @@ subroutine psb_d_cxx_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   implicit none
 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
-  integer, intent(in)                  :: imin,imax
-  integer, intent(out)                 :: nz
-  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_), intent(out)                 :: nz
+  integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
   real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-  integer,intent(out)                  :: info
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax, nzin
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
 
   logical :: append_, rscale_, cscale_ 
-  integer :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -1839,16 +1839,16 @@ contains
     implicit none
 
     class(psb_d_cxx_sparse_mat), intent(in)    :: a
-    integer                              :: imin,imax,jmin,jmax
-    integer, intent(out)                 :: nz
-    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer(psb_ipk_) :: imin,imax,jmin,jmax
+    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-    integer, intent(in)                  :: nzin
+    integer(psb_ipk_), intent(in)                  :: nzin
     logical, intent(in)                  :: append
-    integer                              :: info
-    integer, optional                    :: iren(:)
-    integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
-    integer  :: debug_level, debug_unit
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional                    :: iren(:)
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
+    integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getrow'
 
     debug_unit  = psb_get_debug_unit()
@@ -1916,13 +1916,13 @@ subroutine psb_d_cxx_csgetblk(imin,imax,a,b,info,&
 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   class(psb_d_coo_sparse_mat), intent(inout) :: b
-  integer, intent(in)                  :: imin,imax
-  integer,intent(out)                  :: info
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
-  Integer :: err_act, nzin, nzout
+  integer(psb_ipk_) :: err_act, nzin, nzout
   character(len=20)  :: name='csget'
   logical :: append_
   logical, parameter :: debug=.false.
@@ -1974,15 +1974,15 @@ subroutine psb_d_cxx_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
-  integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
-  integer, intent(out)            :: info
-  integer, intent(in), optional   :: gtl(:)
+  integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
 
-  Integer            :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_csput'
   logical, parameter :: debug=.false.
-  integer            :: nza, i,j,k, nzl, isza, int_err(5)
+  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, int_err(5)
 
 
   call psb_erractionsave(err_act)
@@ -2061,14 +2061,14 @@ contains
     implicit none 
 
     class(psb_d_cxx_sparse_mat), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax
-    integer, intent(in) :: ia(:),ja(:)
+    integer(psb_ipk_), intent(in) :: nz, imin,imax,jmin,jmax
+    integer(psb_ipk_), intent(in) :: ia(:),ja(:)
     real(psb_dpk_), intent(in) :: val(:)
-    integer, intent(out) :: info
-    integer, intent(in), optional  :: gtl(:)
-    integer  :: i,ir,ic, ilr, ilc, ip, &
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_), intent(in), optional  :: gtl(:)
+    integer(psb_ipk_) :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nr,nc,nnz,dupl,ng
-    integer              :: debug_level, debug_unit
+    integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20)    :: name='d_cxx_srch_upd'
 
     info = psb_success_
@@ -2257,7 +2257,7 @@ subroutine psb_d_cxx_reinit(a,clear)
   class(psb_d_cxx_sparse_mat), intent(inout) :: a   
   logical, intent(in), optional :: clear
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reinit'
   logical  :: clear_
   logical, parameter :: debug=.false.
@@ -2303,7 +2303,7 @@ subroutine  psb_d_cxx_trim(a)
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_trim
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  Integer :: err_act, info, nz, m 
+  integer(psb_ipk_) :: err_act, info, nz, m 
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -2336,19 +2336,19 @@ subroutine psb_d_cxx_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_print
   implicit none 
 
-  integer, intent(in)               :: iout
+  integer(psb_ipk_), intent(in)               :: iout
   class(psb_d_cxx_sparse_mat), intent(in) :: a   
-  integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
+  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_ipk_), intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
-  integer, intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='d_cxx_print'
   logical, parameter :: debug=.false.
 
   character(len=80)                 :: frmtv 
-  integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
+  integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
   if (present(eirs)) then 
     irs = eirs
@@ -2420,15 +2420,15 @@ subroutine psb_d_cp_cxx_from_coo(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(in)    :: b
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)                        :: info
 
   type(psb_d_coo_sparse_mat)   :: tmp
-  integer, allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
    info = psb_success_
@@ -2447,14 +2447,14 @@ subroutine psb_d_cp_cxx_to_coo(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(in)  :: a
   class(psb_d_coo_sparse_mat), intent(inout) :: b
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
 
-  integer, allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
-  Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, idl,err_act
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2487,14 +2487,14 @@ subroutine psb_d_mv_cxx_to_coo(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(inout)   :: b
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)                        :: info
 
-  integer, allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, nc,i,j,irw, idl,err_act
-  Integer, Parameter  :: maxtry=8
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, idl,err_act
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2529,14 +2529,14 @@ subroutine psb_d_mv_cxx_from_coo(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(inout) :: b
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)                        :: info
 
-  integer, allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2616,14 +2616,14 @@ subroutine psb_d_mv_cxx_to_fmt(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   class(psb_d_base_sparse_mat), intent(inout)  :: b
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)                        :: info
 
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2654,14 +2654,14 @@ subroutine psb_d_cp_cxx_to_fmt(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(in)   :: a
   class(psb_d_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)                       :: info
+  integer(psb_ipk_), intent(out)                       :: info
 
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2692,14 +2692,14 @@ subroutine psb_d_mv_cxx_from_fmt(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout)  :: a
   class(psb_d_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)                         :: info
+  integer(psb_ipk_), intent(out)                         :: info
 
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2731,14 +2731,14 @@ subroutine psb_d_cp_cxx_from_fmt(a,b,info)
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   class(psb_d_base_sparse_mat), intent(in)   :: b
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)                        :: info
 
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  Integer             :: nz, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: nz, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
   info = psb_success_
@@ -2769,7 +2769,7 @@ subroutine psb_d_cxx_cp_from(a,b)
   type(psb_d_cxx_sparse_mat), intent(in)   :: b
 
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='cp_from'
   logical, parameter :: debug=.false.
 
@@ -2808,7 +2808,7 @@ subroutine psb_d_cxx_mv_from(a,b)
   type(psb_d_cxx_sparse_mat), intent(inout) :: b
 
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='mv_from'
   logical, parameter :: debug=.false.
 

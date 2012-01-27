@@ -36,14 +36,14 @@ module psb_d_prec_mod
 
   interface psb_precbld
     subroutine psb_dprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      import :: psb_desc_type, psb_dspmat_type,&
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type,&
            & psb_d_base_sparse_mat, psb_dpk_, psb_d_base_vect_type, &
            & psb_dprec_type
       implicit none
       type(psb_dspmat_type), intent(in), target  :: a
       type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_dprec_type), intent(inout)        :: prec
-      integer, intent(out)                       :: info
+      integer(psb_ipk_), intent(out)                       :: info
       character, intent(in),optional             :: upd
       character(len=*), intent(in), optional     :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: amold
@@ -53,37 +53,37 @@ module psb_d_prec_mod
 
   interface psb_precinit
     subroutine psb_dprecinit(prec,ptype,info)
-      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
       implicit none
       type(psb_dprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_dprecinit
   end interface
 
   interface psb_precset
     subroutine psb_dprecseti(prec,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
       implicit none
       type(psb_dprec_type), intent(inout)    :: prec
-      integer                                :: what, val 
-      integer, intent(out)                   :: info
+      integer(psb_ipk_) :: what, val 
+      integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_dprecseti
     subroutine psb_dprecsetr(prec,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type, psb_dpk_, psb_dprec_type
       implicit none
       type(psb_dprec_type), intent(inout)    :: prec
-      integer                                :: what
+      integer(psb_ipk_) :: what
       real(psb_dpk_)                       :: val 
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_dprecsetr
   end interface
 
   interface psb_ilu_fct
     subroutine psb_dilu_fct(a,l,u,d,info,blck)
-      import :: psb_desc_type, psb_dspmat_type, &
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type, &
            & psb_d_csr_sparse_mat, psb_dpk_
-      integer, intent(out)                ::     info
+      integer(psb_ipk_), intent(out)                ::     info
       type(psb_dspmat_type),intent(in)    :: a
       type(psb_d_csr_sparse_mat),intent(inout) :: l,u
       type(psb_dspmat_type),intent(in), optional, target :: blck

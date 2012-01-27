@@ -38,18 +38,19 @@
 !
 module psb_gps_mod
   !
+  use psb_base_mod, only : psb_ipk_
   public psb_gps_reduce
   !
   ! COMMON /GRA/ N, IDPTH, IDEG
   !
   private
   ! common /CC/ XCC,SIZEG,STPT
-  INTEGER, save :: xcc,n,idpth,ideg
-  INTEGER,allocatable,SAVE ::SIZEG(:),STPT(:)
+  integer(psb_ipk_), save :: xcc,n,idpth,ideg
+  integer(psb_ipk_),allocatable,SAVE ::SIZEG(:),STPT(:)
   !
   ! COMMON /LVLW/ NHIGH,NLOW,NACUM
-  INTEGER,allocatable,target,save :: NHIGH(:),NLOW(:),NACUM(:),AUX(:)
-  INTEGER,PARAMETER :: INIT=500
+  integer(psb_ipk_),allocatable,target,save :: NHIGH(:),NLOW(:),NACUM(:),AUX(:)
+  integer(psb_ipk_),PARAMETER :: INIT=500
   !
 CONTAINS
   !
@@ -109,17 +110,17 @@ CONTAINS
     !               ARE AT MOST 100 LEVELS.
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
     use psb_base_mod
-    INTEGER NDSTK
-    INTEGER STNODE, RVNODE, RENUM, STNUM, CCSTOR, SBNUM
+    INTEGER(psb_ipk_) :: NDSTK
+    INTEGER(psb_ipk_) :: STNODE, RVNODE, RENUM, STNUM, CCSTOR, SBNUM
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 CONNECTED COMPONENTS.
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
     DIMENSION CCSTOR(NR), IOLD(NR)
     DIMENSION NDSTK(NR,IDEGE), LVL(NR), LVLS1(NR), LVLS2(NR), RENUM(NR+1), NDEG(NR)
-!!$    integer :: stnode, rvnode, stnum, sbnum
-!!$    integer :: ndstk(nr,iedge), iold(nr), renum(nr+1), ndeg(nr) 
-!!$    integer :: lvl(nr), lvls1(nr), lvls2(nr), ccstor(nr)    
+!!$    integer(psb_ipk_) :: stnode, rvnode, stnum, sbnum
+!!$    integer(psb_ipk_) :: ndstk(nr,iedge), iold(nr), renum(nr+1), ndeg(nr) 
+!!$    integer(psb_ipk_) :: lvl(nr), lvls1(nr), lvls2(nr), ccstor(nr)    
 
     n     = nr
     ideg  = idege
@@ -224,7 +225,7 @@ CONTAINS
     !  IT IN THE ARRAY NDEG.  THE BANDWIDTH AND PROFILE FOR THE ORIGINAL
     !  OR INPUT RENUMBERING OF THE GRAPH IS COMPUTED ALSO.
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
-    INTEGER NDSTK
+    INTEGER(psb_ipk_) :: NDSTK
     ! COMMON /GRA/ N, IDPTH, IDEG
     DIMENSION NDSTK(NR,IDEG), NDEG(N), IOLD(N)
 
@@ -259,12 +260,12 @@ CONTAINS
     !               =1 IF WIDTH OF LVLS1 <= WIDTH OF LVLS2, OTHERWISE =2
     !  LVL,IWK-     WORKING STORAGE
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
-    INTEGER NDSTK
-    INTEGER FLAG, SND, SND1, SND2
+    INTEGER(psb_ipk_) :: NDSTK
+    INTEGER(psb_ipk_) :: FLAG, SND, SND1, SND2
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THE LAST LEVEL HAS AT MOST 100 NODES.
     ! COMMON /CC/ NDLST(100)
-    INTEGER,POINTER :: NDLST(:)
+    integer(psb_ipk_),POINTER :: NDLST(:)
     DIMENSION NDSTK(NR,IDEG), NDEG(1), LVL(N), LVLS1(N), LVLS2(N),IWK(N)
     !
     NDLST => AUX
@@ -335,7 +336,7 @@ CONTAINS
     !  IBORT-       INPUT PARAM WHICH TRIGGERS EARLY RETURN IF
     !               MAXLW BECOMES >= IBORT
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
-    INTEGER NDSTK
+    INTEGER(psb_ipk_) :: NDSTK
     DIMENSION NDSTK(NR,IDEG), LVL(N), IWK(N), NDEG(N)
     MAXLW = 0
     ITOP = LVLN
@@ -370,7 +371,7 @@ CONTAINS
     ! SORTDG SORTS STK2 BY DEGREE OF THE NODE AND ADDS IT TO THE END
     ! OF STK1 IN ORDER OF LOWEST TO HIGHEST DEGREE.  X1 AND X2 ARE THE
     ! NUMBER OF NODES IN STK1 AND STK2 RESPECTIVELY.
-    INTEGER X1, X2, STK1, STK2, TEMP
+    INTEGER(psb_ipk_) :: X1, X2, STK1, STK2, TEMP
     ! COMMON /GRA/ N, IDPTH, IDEG
     DIMENSION NDEG(N), STK1(X1+X2), STK2(X2)
     IND = X2
@@ -406,7 +407,7 @@ CONTAINS
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
     use psb_base_mod
     DIMENSION LVL(N), LVLS1(N), LVLS2(N)
-    INTEGER :: SZ
+    integer(psb_ipk_) :: SZ
     !-----------------------------------------------------
     SZ=SIZE(NACUM)
     IF(SZ < IDPTH) THEN
@@ -430,16 +431,17 @@ CONTAINS
     RETURN
   END SUBROUTINE SETUP
   !
-  INTEGER FUNCTION SORT2()
+  FUNCTION SORT2() result(val)
+    INTEGER(psb_ipk_) ::  val
     ! SORT2 SORTS SIZEG AND STPT INTO DESCENDING ORDER ACCORDING TO
     ! VALUES OF SIZEG. XCC=NUMBER OF ENTRIES IN EACH ARRAY
-    INTEGER TEMP
+    INTEGER(psb_ipk_) :: TEMP
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 CONNECTED COMPONENTS.
     !COMMON /CC/ XCC, SIZEG(50), STPT(50)
 
-    SORT2 = 0
+    VAL = 0
     IF (XCC == 0) RETURN
-    SORT2 = 1
+    VAL = 1
     IND = XCC
 10  ITEST = 0
     IND = IND - 1
@@ -475,14 +477,14 @@ CONTAINS
     ! STPT(I)-     INDEX INTO CCSTORE OF 1ST NODE IN ITH CON COMPT
     ! ISDIR-       FLAG WHICH INDICATES WHICH WAY THE LARGEST CONNECTED
     !              COMPONENT FELL.  =+1 IF LOW AND -1 IF HIGH
-    INTEGER CCSTOR, ENDC
+    INTEGER(psb_ipk_) :: CCSTOR, ENDC
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 COMPONENTS AND
     ! THAT THERE ARE AT MOST 100 LEVELS.
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
     DIMENSION LVLS1(N), LVLS2(N), CCSTOR(N)
-    INTEGER :: SZ
+    integer(psb_ipk_) :: SZ
     ! FOR EACH CONNECTED COMPONENT DO
     DO 80 I=1,XCC
        J = STPT(I)
@@ -563,8 +565,8 @@ CONTAINS
     !  IPFA-        WORKING STORAGE USED TO COMPUTE PROFILE AND BANDWIDTH
     !  ISDIR-       INDICATES STEP DIRECTION USED IN NUMBERING(+1 OR -1)
     ! USE INTEGER*2 NDSTK  WITH AN IBM 360 OR 370.
-    INTEGER NDSTK
-    INTEGER SND, XA, XB, XC, XD, CX, ENDC,RENUM, TEST
+    INTEGER(psb_ipk_) :: NDSTK
+    INTEGER(psb_ipk_) :: SND, XA, XB, XC, XD, CX, ENDC,RENUM, TEST
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! THE STORAGE IN COMMON BLOCKS CC AND LVLW IS NOW FREE AND CAN
     ! BE USED FOR STACKS.
@@ -572,8 +574,8 @@ CONTAINS
     !COMMON /CC/ STKD(100)
     DIMENSION IPFA(N)
     DIMENSION NDSTK(NR,IDEG), LVLS2(N), NDEG(N), RENUM(N+1), LVLST(N),LSTPT(N)
-    INTEGER,POINTER :: STKA(:),STKB(:),STKC(:),STKD(:)
-    INTEGER :: SZ1,SZ2
+    integer(psb_ipk_),POINTER :: STKA(:),STKB(:),STKC(:),STKD(:)
+    integer(psb_ipk_) :: SZ1,SZ2
     !
     STKA => NHIGH
     STKB => NLOW
@@ -751,8 +753,8 @@ CONTAINS
     ! PERFORM ON FLY REALLOCATION OF POINTER VET INCREASING
     ! ITS SIZE FROM SZ1 TO SZ2
     IMPLICIT NONE
-    INTEGER,allocatable  :: VET(:)
-    INTEGER :: SZ1,SZ2,INFO
+    integer(psb_ipk_),allocatable  :: VET(:)
+    integer(psb_ipk_) :: SZ1,SZ2,INFO
     
     call psb_realloc(sz2,vet,info)
     IF(INFO /= psb_success_) THEN

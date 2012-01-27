@@ -48,144 +48,151 @@ module psb_sort_mod
   !  The up/down constant are defined in pairs having 
   !  opposite values. We make use of this fact in the heapsort routine.
   !
-  integer, parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
-  integer, parameter :: psb_lsort_up_     = 2, psb_lsort_down_    = -2
-  integer, parameter :: psb_asort_up_     = 3, psb_asort_down_    = -3
-  integer, parameter :: psb_alsort_up_    = 4, psb_alsort_down_   = -4
-  integer, parameter :: psb_sort_ovw_idx_ = 0, psb_sort_keep_idx_ =  1
-  integer, parameter :: psb_heap_resize   = 200
+  integer(psb_ipk_), parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
+  integer(psb_ipk_), parameter :: psb_lsort_up_     = 2, psb_lsort_down_    = -2
+  integer(psb_ipk_), parameter :: psb_asort_up_     = 3, psb_asort_down_    = -3
+  integer(psb_ipk_), parameter :: psb_alsort_up_    = 4, psb_alsort_down_   = -4
+  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_ = 0, psb_sort_keep_idx_ =  1
+  integer(psb_ipk_), parameter :: psb_heap_resize   = 200
 
   type psb_int_heap
-    integer              :: last, dir
-    integer, allocatable :: keys(:)
+    integer(psb_ipk_) :: last, dir
+    integer(psb_ipk_), allocatable :: keys(:)
   end type psb_int_heap
   type psb_int_idx_heap
-    integer              :: last, dir
-    integer, allocatable :: keys(:)
-    integer, allocatable :: idxs(:)
+    integer(psb_ipk_) :: last, dir
+    integer(psb_ipk_), allocatable :: keys(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_int_idx_heap
   type psb_real_idx_heap
-    integer                     :: last, dir
+    integer(psb_ipk_) :: last, dir
     real(psb_spk_), allocatable :: keys(:)
-    integer, allocatable        :: idxs(:)
+    integer(psb_ipk_), allocatable        :: idxs(:)
   end type psb_real_idx_heap
   type psb_double_idx_heap
-    integer                     :: last, dir
+    integer(psb_ipk_) :: last, dir
     real(psb_dpk_), allocatable :: keys(:)
-    integer, allocatable        :: idxs(:)
+    integer(psb_ipk_), allocatable        :: idxs(:)
   end type psb_double_idx_heap
   type psb_scomplex_idx_heap
-    integer                        :: last, dir
+    integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable :: keys(:)
-    integer, allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable           :: idxs(:)
   end type psb_scomplex_idx_heap
   type psb_dcomplex_idx_heap
-    integer                        :: last, dir
+    integer(psb_ipk_) :: last, dir
     complex(psb_dpk_), allocatable :: keys(:)
-    integer, allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable           :: idxs(:)
   end type psb_dcomplex_idx_heap
 
 
   interface psb_iblsrch
     function  psb_iblsrch(key,n,v) result(ipos)
-      integer ipos, key, n
-      integer v(n)
+      import :: psb_ipk_
+      integer(psb_ipk_) :: ipos, key, n
+      integer(psb_ipk_) :: v(n)
     end function psb_iblsrch
   end interface
 
   interface psb_ibsrch
     function  psb_ibsrch(key,n,v) result(ipos)
-      integer ipos, key, n
-      integer v(n)
+      import :: psb_ipk_
+      integer(psb_ipk_) :: ipos, key, n
+      integer(psb_ipk_) :: v(n)
     end function psb_ibsrch
   end interface
 
   interface psb_issrch
     function psb_issrch(key,n,v) result(ipos)
+      import :: psb_ipk_
       implicit none
-      integer ipos, key, n
-      integer v(n)
+      integer(psb_ipk_) :: ipos, key, n
+      integer(psb_ipk_) :: v(n)
     end function psb_issrch
   end interface
 
   interface psb_isaperm
     logical function psb_isaperm(n,eip)               
-      integer, intent(in) :: n                                                      
-      integer, intent(in) :: eip(n)
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in) :: n                                                      
+      integer(psb_ipk_), intent(in) :: eip(n)
     end function psb_isaperm
   end interface
 
 
   interface psb_msort
     subroutine imsort(x,ix,dir,flag)
-      integer, intent(inout)           :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine imsort
     subroutine smsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_spk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine smsort
     subroutine dmsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_dpk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine dmsort
     subroutine camsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_spk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine camsort
     subroutine zamsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_dpk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine zamsort
   end interface
 
 
   interface psb_msort_unique
     subroutine imsort_u(x,nout,dir)
-      integer, intent(inout)           :: x(:) 
-      integer, intent(out)             :: nout
-      integer, optional, intent(in)    :: dir
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), intent(out)             :: nout
+      integer(psb_ipk_), optional, intent(in)    :: dir
     end subroutine imsort_u
   end interface
 
   interface psb_qsort
     subroutine iqsort(x,ix,dir,flag)
-      integer, intent(inout)           :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine iqsort
     subroutine sqsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_spk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine sqsort
     subroutine dqsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_dpk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine dqsort
     subroutine cqsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_spk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine cqsort
     subroutine zqsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_dpk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine zqsort
   end interface
   
@@ -193,237 +200,256 @@ module psb_sort_mod
   interface psb_hsort
 !!$    module procedure ihsort, shsort, chsort, dhsort, zhsort
     subroutine ihsort(x,ix,dir,flag)
-      use psb_const_mod
-      integer, intent(inout)           :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine ihsort
     subroutine shsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_spk_), intent(inout)    :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine shsort
     subroutine dhsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       real(psb_dpk_), intent(inout)  :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine dhsort
     subroutine chsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_spk_), intent(inout) :: x(:) 
-      integer, optional, intent(in)    :: dir, flag
-      integer, optional, intent(inout) :: ix(:)
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine chsort
     subroutine zhsort(x,ix,dir,flag)
-      use psb_const_mod
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       complex(psb_dpk_), intent(inout) :: x(:) 
-      integer, optional, intent(in)      :: dir, flag
-      integer, optional, intent(inout)   :: ix(:)
+      integer(psb_ipk_), optional, intent(in)      :: dir, flag
+      integer(psb_ipk_), optional, intent(inout)   :: ix(:)
     end subroutine zhsort
   end interface
 
 
   interface psb_howmany_heap
     function  psb_howmany_int_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_heap
       type(psb_int_heap), intent(in) :: heap
-      integer :: psb_howmany_int_heap
+      integer(psb_ipk_) :: psb_howmany_int_heap
     end function psb_howmany_int_heap
     function  psb_howmany_real_idx_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_real_idx_heap
       type(psb_real_idx_heap), intent(in) :: heap
-      integer :: psb_howmany_real_idx_heap
+      integer(psb_ipk_) :: psb_howmany_real_idx_heap
     end function psb_howmany_real_idx_heap
     function  psb_howmany_double_idx_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_double_idx_heap
       type(psb_double_idx_heap), intent(in) :: heap
-      integer :: psb_howmany_double_idx_heap
+      integer(psb_ipk_) :: psb_howmany_double_idx_heap
     end function psb_howmany_double_idx_heap
     function  psb_howmany_int_idx_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
       type(psb_int_idx_heap), intent(in) :: heap
-      integer :: psb_howmany_int_idx_heap
+      integer(psb_ipk_) :: psb_howmany_int_idx_heap
     end function psb_howmany_int_idx_heap
     function  psb_howmany_scomplex_idx_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_scomplex_idx_heap
       type(psb_scomplex_idx_heap), intent(in) :: heap
-      integer :: psb_howmany_scomplex_idx_heap
+      integer(psb_ipk_) :: psb_howmany_scomplex_idx_heap
     end function psb_howmany_scomplex_idx_heap
     function  psb_howmany_dcomplex_idx_heap(heap)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_dcomplex_idx_heap
       type(psb_dcomplex_idx_heap), intent(in) :: heap
-      integer :: psb_howmany_dcomplex_idx_heap
+      integer(psb_ipk_) :: psb_howmany_dcomplex_idx_heap
     end function psb_howmany_dcomplex_idx_heap
   end interface
  
 
   interface psb_init_heap
     subroutine psb_init_int_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_heap
       type(psb_int_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_int_heap
     subroutine psb_init_real_idx_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_real_idx_heap
       type(psb_real_idx_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_real_idx_heap
     subroutine psb_init_int_idx_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
       type(psb_int_idx_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_int_idx_heap
     subroutine psb_init_scomplex_idx_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_scomplex_idx_heap
       type(psb_scomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_scomplex_idx_heap
     subroutine psb_init_dcomplex_idx_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_dcomplex_idx_heap
       type(psb_dcomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_dcomplex_idx_heap
     subroutine psb_init_double_idx_heap(heap,info,dir)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_double_idx_heap
       type(psb_double_idx_heap), intent(inout) :: heap
-      integer, intent(out)            :: info
-      integer, intent(in), optional   :: dir
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_double_idx_heap
   end interface
 
 
   interface psb_dump_heap
     subroutine psb_dump_int_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_heap
       type(psb_int_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_int_heap
     subroutine psb_dump_real_idx_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_real_idx_heap
       type(psb_real_idx_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_real_idx_heap
     subroutine psb_dump_double_idx_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_double_idx_heap
       type(psb_double_idx_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_double_idx_heap
     subroutine psb_dump_int_idx_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
       type(psb_int_idx_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_int_idx_heap
     subroutine psb_dump_scomplex_idx_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_scomplex_idx_heap
       type(psb_scomplex_idx_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_scomplex_idx_heap
     subroutine psb_dump_dcomplex_idx_heap(iout,heap,info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_dcomplex_idx_heap
       type(psb_dcomplex_idx_heap), intent(in) :: heap
-      integer, intent(out)           :: info
-      integer, intent(in)            :: iout
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_dcomplex_idx_heap
   end interface
 
 
   interface psb_insert_heap
     subroutine psb_insert_int_heap(key,heap,info)
-      import :: psb_int_heap
-      integer, intent(in)               :: key
+      import :: psb_int_heap, psb_ipk_
+      integer(psb_ipk_), intent(in)               :: key
       type(psb_int_heap), intent(inout) :: heap
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_insert_int_heap
     subroutine psb_insert_int_idx_heap(key,index,heap,info)
-      import :: psb_dpk_, psb_int_idx_heap
-      integer, intent(in)                   :: key
-      integer, intent(in)                   :: index
+      import :: psb_dpk_, psb_int_idx_heap, psb_ipk_
+      integer(psb_ipk_), intent(in)                   :: key
+      integer(psb_ipk_), intent(in)                   :: index
       type(psb_int_idx_heap), intent(inout) :: heap
-      integer, intent(out)                  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_insert_int_idx_heap
     subroutine psb_insert_real_idx_heap(key,index,heap,info)
-      import :: psb_spk_, psb_real_idx_heap
+      import :: psb_spk_, psb_real_idx_heap, psb_ipk_
       real(psb_spk_), intent(in)      :: key
-      integer, intent(in)               :: index
+      integer(psb_ipk_), intent(in)               :: index
       type(psb_real_idx_heap), intent(inout) :: heap
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_insert_real_idx_heap
     subroutine psb_insert_double_idx_heap(key,index,heap,info)
-      import :: psb_dpk_, psb_double_idx_heap
+      import :: psb_dpk_, psb_double_idx_heap, psb_ipk_
       real(psb_dpk_), intent(in)      :: key
-      integer, intent(in)               :: index
+      integer(psb_ipk_), intent(in)               :: index
       type(psb_double_idx_heap), intent(inout) :: heap
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_insert_double_idx_heap
     subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
-      import :: psb_spk_, psb_scomplex_idx_heap
+      import :: psb_spk_, psb_scomplex_idx_heap, psb_ipk_
       complex(psb_spk_), intent(in)              :: key
-      integer, intent(in)                        :: index
+      integer(psb_ipk_), intent(in)                        :: index
       type(psb_scomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)                       :: info
+      integer(psb_ipk_), intent(out)                       :: info
     end subroutine psb_insert_scomplex_idx_heap
     subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
-      import :: psb_dpk_, psb_dcomplex_idx_heap
+      import :: psb_dpk_, psb_dcomplex_idx_heap, psb_ipk_
       complex(psb_dpk_), intent(in)            :: key
-      integer, intent(in)                        :: index
+      integer(psb_ipk_), intent(in)                        :: index
       type(psb_dcomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)                       :: info
+      integer(psb_ipk_), intent(out)                       :: info
     end subroutine psb_insert_dcomplex_idx_heap
   end interface
 
   interface psb_heap_get_first
     subroutine psb_int_heap_get_first(key,heap,info)
-      import :: psb_int_heap
+      import :: psb_int_heap, psb_ipk_
       type(psb_int_heap), intent(inout) :: heap
-      integer, intent(out)              :: key,info
+      integer(psb_ipk_), intent(out)              :: key,info
     end subroutine psb_int_heap_get_first
     subroutine psb_int_idx_heap_get_first(key,index,heap,info)
-      import :: psb_int_idx_heap
+      import :: psb_int_idx_heap, psb_ipk_
       type(psb_int_idx_heap), intent(inout) :: heap
-      integer, intent(out)                  :: index,info
-      integer, intent(out)                  :: key
+      integer(psb_ipk_), intent(out)                  :: index,info
+      integer(psb_ipk_), intent(out)                  :: key
     end subroutine psb_int_idx_heap_get_first
     subroutine psb_real_idx_heap_get_first(key,index,heap,info)
-      import :: psb_spk_, psb_real_idx_heap
+      import :: psb_spk_, psb_real_idx_heap, psb_ipk_
       type(psb_real_idx_heap), intent(inout) :: heap
-      integer, intent(out)              :: index,info
+      integer(psb_ipk_), intent(out)              :: index,info
       real(psb_spk_), intent(out)     :: key
     end subroutine psb_real_idx_heap_get_first
     subroutine psb_double_idx_heap_get_first(key,index,heap,info)
-      import :: psb_dpk_, psb_double_idx_heap
+      import :: psb_dpk_, psb_double_idx_heap, psb_ipk_
       type(psb_double_idx_heap), intent(inout) :: heap
-      integer, intent(out)              :: index,info
+      integer(psb_ipk_), intent(out)              :: index,info
       real(psb_dpk_), intent(out)     :: key
     end subroutine psb_double_idx_heap_get_first
     subroutine psb_scomplex_idx_heap_get_first(key,index,heap,info)
-      import :: psb_spk_, psb_scomplex_idx_heap
+      import :: psb_spk_, psb_scomplex_idx_heap, psb_ipk_
       type(psb_scomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)                       :: index,info
+      integer(psb_ipk_), intent(out)                       :: index,info
       complex(psb_spk_), intent(out)           :: key
     end subroutine psb_scomplex_idx_heap_get_first
     
     subroutine psb_dcomplex_idx_heap_get_first(key,index,heap,info)
-      import :: psb_dpk_, psb_dcomplex_idx_heap
+      import :: psb_dpk_, psb_dcomplex_idx_heap, psb_ipk_
       type(psb_dcomplex_idx_heap), intent(inout) :: heap
-      integer, intent(out)                       :: index,info
+      integer(psb_ipk_), intent(out)                       :: index,info
       complex(psb_dpk_), intent(out)           :: key
     end subroutine psb_dcomplex_idx_heap_get_first
   end interface
 
   interface 
     subroutine psi_insert_int_heap(key,last,heap,dir,info)
+      import :: psb_ipk_
       implicit none 
       
       !  
@@ -433,215 +459,218 @@ module psb_sort_mod
       !   heap: the heap
       !   dir:  sorting direction
       
-      integer, intent(in)     :: key,dir
-      integer, intent(inout)  :: heap(:),last
-      integer, intent(out)    :: info
+      integer(psb_ipk_), intent(in)     :: key,dir
+      integer(psb_ipk_), intent(inout)  :: heap(:),last
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_insert_int_heap
   end interface
   
   interface 
     subroutine psi_int_heap_get_first(key,last,heap,dir,info)
+      import :: psb_ipk_
       implicit none 
-      
-      integer, intent(inout)  :: key,last
-      integer, intent(in)     :: dir
-      integer, intent(inout)  :: heap(:)
-      integer, intent(out)    :: info
+     
+      integer(psb_ipk_), intent(inout)  :: key,last
+      integer(psb_ipk_), intent(in)     :: dir
+      integer(psb_ipk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_int_heap_get_first
   end interface
   
   interface 
     subroutine psi_insert_real_heap(key,last,heap,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(in)    :: key
-      integer, intent(in)           :: dir
+      integer(psb_ipk_), intent(in)           :: dir
       real(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(inout)        :: last
-      integer, intent(out)          :: info
+      integer(psb_ipk_), intent(inout)        :: last
+      integer(psb_ipk_), intent(out)          :: info
     end subroutine psi_insert_real_heap
   end interface
   
   interface 
     subroutine psi_real_heap_get_first(key,last,heap,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(inout) :: key
-      integer, intent(inout)        :: last
-      integer, intent(in)           :: dir
+      integer(psb_ipk_), intent(inout)        :: last
+      integer(psb_ipk_), intent(in)           :: dir
       real(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(out)          :: info
+      integer(psb_ipk_), intent(out)          :: info
     end subroutine psi_real_heap_get_first
   end interface
   
   interface 
     subroutine psi_insert_double_heap(key,last,heap,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)    :: key
-      integer, intent(in)             :: dir
+      integer(psb_ipk_), intent(in)             :: dir
       real(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(inout)          :: last
-      integer, intent(out)            :: info
+      integer(psb_ipk_), intent(inout)          :: last
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_insert_double_heap
   end interface
   
   interface 
     subroutine psi_double_heap_get_first(key,last,heap,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(inout) :: key
-      integer, intent(inout)          :: last
-      integer, intent(in)             :: dir
+      integer(psb_ipk_), intent(inout)          :: last
+      integer(psb_ipk_), intent(in)             :: dir
       real(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(out)            :: info
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_double_heap_get_first
   end interface
   
   interface 
     subroutine psi_insert_scomplex_heap(key,last,heap,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       complex(psb_spk_), intent(in)    :: key
-      integer, intent(in)              :: dir
+      integer(psb_ipk_), intent(in)              :: dir
       complex(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(inout)           :: last
-      integer, intent(out)             :: info
+      integer(psb_ipk_), intent(inout)           :: last
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_insert_scomplex_heap
   end interface
   
   interface 
     subroutine psi_scomplex_heap_get_first(key,last,heap,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       complex(psb_spk_), intent(inout) :: key
-      integer, intent(inout)           :: last
-      integer, intent(in)              :: dir
+      integer(psb_ipk_), intent(inout)           :: last
+      integer(psb_ipk_), intent(in)              :: dir
       complex(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(out)             :: info
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_scomplex_heap_get_first
   end interface
   
   interface 
     subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       complex(psb_dpk_), intent(in)    :: key
-      integer, intent(in)                :: dir
+      integer(psb_ipk_), intent(in)                :: dir
       complex(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(inout)             :: last
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(inout)             :: last
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psi_insert_dcomplex_heap
   end interface
   
   interface 
     subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       complex(psb_dpk_), intent(inout) :: key
-      integer, intent(inout)             :: last
-      integer, intent(in)                :: dir
+      integer(psb_ipk_), intent(inout)             :: last
+      integer(psb_ipk_), intent(in)                :: dir
       complex(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psi_dcomplex_heap_get_first
   end interface
 
   interface 
     subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
-      integer, intent(in)     :: key
-      integer, intent(in)     :: index,dir
-      integer, intent(inout)  :: heap(:),last
-      integer, intent(inout)  :: idxs(:)
-      integer, intent(out)    :: info
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(in)     :: key
+      integer(psb_ipk_), intent(in)     :: index,dir
+      integer(psb_ipk_), intent(inout)  :: heap(:),last
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_insert_int_idx_heap
   end interface
   
   interface 
     subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      integer, intent(inout) :: heap(:)
-      integer, intent(out)   :: index,info
-      integer, intent(inout) :: last,idxs(:)
-      integer, intent(in)    :: dir
-      integer, intent(out)   :: key
+      import :: psb_ipk_
+      integer(psb_ipk_), intent(inout) :: heap(:)
+      integer(psb_ipk_), intent(out)   :: index,info
+      integer(psb_ipk_), intent(inout) :: last,idxs(:)
+      integer(psb_ipk_), intent(in)    :: dir
+      integer(psb_ipk_), intent(out)   :: key
     end subroutine psi_int_idx_heap_get_first
   end interface
   
   interface 
     subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(in)     :: key
-      integer, intent(in)            :: index,dir
+      integer(psb_ipk_), intent(in)            :: index,dir
       real(psb_spk_), intent(inout)  :: heap(:)
-      integer, intent(inout)         :: idxs(:),last
-      integer, intent(out)           :: info
+      integer(psb_ipk_), intent(inout)         :: idxs(:),last
+      integer(psb_ipk_), intent(out)           :: info
     end subroutine psi_insert_real_idx_heap
   end interface
   
   interface 
     subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(out)          :: index,info
-      integer, intent(inout)        :: last,idxs(:)
-      integer, intent(in)           :: dir
+      integer(psb_ipk_), intent(out)          :: index,info
+      integer(psb_ipk_), intent(inout)        :: last,idxs(:)
+      integer(psb_ipk_), intent(in)           :: dir
       real(psb_spk_), intent(out)   :: key
     end subroutine psi_real_idx_heap_get_first
   end interface
 
   interface 
     subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)     :: key
-      integer, intent(in)              :: index,dir
+      integer(psb_ipk_), intent(in)              :: index,dir
       real(psb_dpk_), intent(inout)  :: heap(:)
-      integer, intent(inout)           :: idxs(:),last
-      integer, intent(out)             :: info
+      integer(psb_ipk_), intent(inout)           :: idxs(:),last
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_insert_double_idx_heap
   end interface
   
   interface 
     subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(out)            :: index,info
-      integer, intent(inout)          :: last,idxs(:)
-      integer, intent(in)             :: dir
+      integer(psb_ipk_), intent(out)            :: index,info
+      integer(psb_ipk_), intent(inout)          :: last,idxs(:)
+      integer(psb_ipk_), intent(in)             :: dir
       real(psb_dpk_), intent(out)   :: key
     end subroutine psi_double_idx_heap_get_first
   end interface
 
   interface 
     subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       complex(psb_spk_), intent(in)    :: key
-      integer, intent(in)              :: index,dir
+      integer(psb_ipk_), intent(in)              :: index,dir
       complex(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(inout)           :: idxs(:),last
-      integer, intent(out)             :: info
+      integer(psb_ipk_), intent(inout)           :: idxs(:),last
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_insert_scomplex_idx_heap
   end interface
 
   interface 
     subroutine psi_scomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      import :: psb_spk_
+      import :: psb_spk_, psb_ipk_
       complex(psb_spk_), intent(inout) :: heap(:)
-      integer, intent(out)             :: index,info
-      integer, intent(inout)           :: last,idxs(:)
-      integer, intent(in)              :: dir
+      integer(psb_ipk_), intent(out)             :: index,info
+      integer(psb_ipk_), intent(inout)           :: last,idxs(:)
+      integer(psb_ipk_), intent(in)              :: dir
       complex(psb_spk_), intent(out)   :: key
     end subroutine psi_scomplex_idx_heap_get_first
   end interface
 
   interface 
     subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       complex(psb_dpk_), intent(in)    :: key
-      integer, intent(in)                :: index,dir
+      integer(psb_ipk_), intent(in)                :: index,dir
       complex(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(inout)             :: idxs(:),last
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(inout)             :: idxs(:),last
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psi_insert_dcomplex_idx_heap
   end interface
 
   interface 
     subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      import :: psb_dpk_
+      import :: psb_dpk_, psb_ipk_
       complex(psb_dpk_), intent(inout) :: heap(:)
-      integer, intent(out)               :: index,info
-      integer, intent(inout)             :: last,idxs(:)
-      integer, intent(in)                :: dir
+      integer(psb_ipk_), intent(out)               :: index,info
+      integer(psb_ipk_), intent(inout)             :: last,idxs(:)
+      integer(psb_ipk_), intent(in)                :: dir
       complex(psb_dpk_), intent(out)   :: key
     end subroutine psi_dcomplex_idx_heap_get_first
   end interface
@@ -658,7 +687,7 @@ contains
   subroutine psb_free_int_heap(heap,info)
     implicit none 
     type(psb_int_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
@@ -668,7 +697,7 @@ contains
   subroutine psb_free_real_idx_heap(heap,info)
     implicit none 
     type(psb_real_idx_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
@@ -679,7 +708,7 @@ contains
   subroutine psb_free_double_idx_heap(heap,info)
     implicit none 
     type(psb_double_idx_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
@@ -690,7 +719,7 @@ contains
   subroutine psb_free_int_idx_heap(heap,info)
     implicit none 
     type(psb_int_idx_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
@@ -701,7 +730,7 @@ contains
   subroutine psb_free_scomplex_idx_heap(heap,info)
     implicit none 
     type(psb_scomplex_idx_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
@@ -712,7 +741,7 @@ contains
   subroutine psb_free_dcomplex_idx_heap(heap,info)
     implicit none 
     type(psb_dcomplex_idx_heap), intent(inout) :: heap
-    integer, intent(out)           :: info
+    integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)

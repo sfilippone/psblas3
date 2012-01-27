@@ -60,10 +60,10 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
   complex(psb_dpk_)                    :: res
   type(psb_z_vect_type), intent(inout) :: x, y
   type(psb_desc_type), intent(in)      :: desc_a
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   complex(psb_dpk_)         :: dot_local
   character(len=20)      :: name, ch_err
@@ -163,12 +163,12 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
 
   complex(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in), optional    :: jx, jy
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: jx, jy
+  integer(psb_ipk_), intent(out)             :: info
   complex(psb_dpk_)              :: psb_zdot
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   complex(psb_dpk_)         :: dot_local
   complex(psb_dpk_)         :: zdotc
@@ -316,11 +316,11 @@ function psb_zdotv(x, y,desc_a, info)
 
   complex(psb_dpk_), intent(in)  :: x(:), y(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   complex(psb_dpk_)              :: psb_zdotv
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   complex(psb_dpk_)         :: dot_local
   complex(psb_dpk_)         :: zdotc
@@ -451,10 +451,10 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   complex(psb_dpk_), intent(in)     :: x(:), y(:)
   complex(psb_dpk_), intent(out)    :: res
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m
   complex(psb_dpk_)         :: dot_local
   complex(psb_dpk_)         :: zdotc
@@ -583,10 +583,10 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   complex(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
   complex(psb_dpk_), intent(out)    :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   complex(psb_dpk_),allocatable  :: dot_local(:)
   complex(psb_dpk_)         :: zdotc

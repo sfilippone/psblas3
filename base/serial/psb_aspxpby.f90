@@ -1,12 +1,12 @@
 subroutine psb_s_aspxpby(alpha, nx, ix, x, beta, y, info)
   use psb_const_mod
-  integer, intent(in)               :: nx
-  integer, intent(in)               :: ix(:)
+  integer(psb_ipk_), intent(in)               :: nx
+  integer(psb_ipk_), intent(in)               :: ix(:)
   real(psb_spk_), intent (in)       :: x(:)
   real(psb_spk_), intent (inout)    :: y(:)
   real(psb_spk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
-  integer :: i, ip 
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: i, ip 
 
   info=psb_success_
 
@@ -49,13 +49,13 @@ end subroutine psb_s_aspxpby
 
 subroutine psb_d_aspxpby(alpha, nx, ix, x, beta, y, info)
   use psb_const_mod
-  integer, intent(in)               :: nx
-  integer, intent(in)               :: ix(:)
+  integer(psb_ipk_), intent(in)               :: nx
+  integer(psb_ipk_), intent(in)               :: ix(:)
   real(psb_dpk_), intent (in)       :: x(:)
   real(psb_dpk_), intent (inout)    :: y(:)
   real(psb_dpk_), intent (in)       :: alpha, beta
-  integer, intent(out)              :: info
-  integer :: i, ip 
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: i, ip 
 
   info=psb_success_
   
@@ -97,13 +97,13 @@ subroutine psb_d_aspxpby(alpha, nx, ix, x, beta, y, info)
 end subroutine psb_d_aspxpby
 subroutine psb_c_aspxpby(alpha, nx, ix, x, beta, y, info)
   use psb_const_mod
-  integer, intent(in)               :: nx
-  integer, intent(in)               :: ix(:)
+  integer(psb_ipk_), intent(in)               :: nx
+  integer(psb_ipk_), intent(in)               :: ix(:)
   complex(psb_spk_), intent (in)    :: x(:)
   complex(psb_spk_), intent (inout) :: y(:)
   complex(psb_spk_), intent (in)    :: alpha, beta
-  integer, intent(out)              :: info
-  integer :: i, ip 
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: i, ip 
 
   info=psb_success_
   
@@ -146,13 +146,13 @@ end subroutine psb_c_aspxpby
 
 subroutine psb_z_aspxpby(alpha, nx, ix, x, beta, y, info)
   use psb_const_mod
-  integer, intent(in)               :: nx
-  integer, intent(in)               :: ix(:)
+  integer(psb_ipk_), intent(in)               :: nx
+  integer(psb_ipk_), intent(in)               :: ix(:)
   complex(psb_dpk_), intent (in)    :: x(:)
   complex(psb_dpk_), intent (inout) :: y(:)
   complex(psb_dpk_), intent (in)    :: alpha, beta
-  integer, intent(out)              :: info
-  integer :: i, ip 
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: i, ip 
 
   info=psb_success_
   

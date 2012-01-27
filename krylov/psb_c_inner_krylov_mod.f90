@@ -52,15 +52,15 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
-    integer, intent(in)               :: stopc, trace, itmax
+    integer(psb_ipk_), intent(in)               :: stopc, trace, itmax
     type(psb_cspmat_type), intent(in) :: a
     complex(psb_spk_), intent(in)     :: b(:)
     real(psb_spk_), intent(in)        :: eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
 
-    integer                           :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
     info = psb_success_
@@ -122,14 +122,14 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
-    integer, intent(in)             :: it
+    integer(psb_ipk_), intent(in)             :: it
     complex(psb_spk_), intent(in)   :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     logical                         :: psb_c_check_conv
-    integer, intent(out)            :: info
+    integer(psb_ipk_), intent(out)            :: info
 
-    integer                         :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_
@@ -197,15 +197,15 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
-    integer, intent(in)               :: stopc, trace,itmax
+    integer(psb_ipk_), intent(in)               :: stopc, trace,itmax
     type(psb_cspmat_type), intent(in) :: a
     real(psb_spk_), intent(in)        :: eps
     type(psb_c_vect_type), intent(inout)  :: b
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
 
-    integer                           :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
     info = psb_success_
@@ -266,14 +266,14 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)     :: methdname
-    integer, intent(in)              :: it
+    integer(psb_ipk_), intent(in)              :: it
     type(psb_c_vect_type), intent(inout) :: x, r
     type(psb_desc_type), intent(in)  :: desc_a
     type(psb_itconv_type)            :: stopdat
     logical                          :: res
-    integer, intent(out)             :: info
+    integer(psb_ipk_), intent(out)             :: info
 
-    integer                         :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act
     character(len=20)               :: name
 
     info = psb_success_

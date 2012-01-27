@@ -55,13 +55,13 @@ module psb_hash_mod
   ! Allocatable scalars would be a nice solution...
   !
   type psb_hash_type
-    integer :: nbits, hsize, hmask, nk
-    integer, allocatable :: table(:,:)
+    integer(psb_ipk_) :: nbits, hsize, hmask, nk
+    integer(psb_ipk_), allocatable :: table(:,:)
     integer(psb_long_int_k_) :: nsrch, nacc
   end type psb_hash_type
 
 
-  integer, parameter  :: HashDuplicate = 123, HashOK=0, HashOutOfMemory=-512,&
+  integer(psb_ipk_), parameter  :: HashDuplicate = 123, HashOK=0, HashOutOfMemory=-512,&
        & HashFreeEntry = -1, HashNotFound = -256
 
   interface psb_hash_init
@@ -88,14 +88,18 @@ module psb_hash_mod
 contains
 
   
+  !
+  ! This is based on the djb2 hashing algorithm
+  ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
+  !
   function hashval(key) result(val)
-    integer, intent(in)  :: key
-    integer, parameter :: ival=5381, mask=2147483647
-    integer :: key_, val, i
+    integer(psb_ipk_), intent(in)  :: key
+    integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
+    integer(psb_ipk_) :: key_, val, i
 
     key_ = key
     val  = ival 
-    do i=1, 4
+    do i=1, psb_sizeof_int
       val  = val * 33 + iand(key_,255)
       key_ = ishft(key_,-8)
     end do
@@ -141,7 +145,7 @@ contains
     use psb_realloc_mod
     type(psb_hash_type) :: hashin
     type(psb_hash_type) :: hashout
-    integer, intent(out)  :: info 
+    integer(psb_ipk_), intent(out)  :: info 
 
     info = HashOk
     hashout%nbits = hashin%nbits
@@ -158,7 +162,7 @@ contains
     use psb_realloc_mod
     type(psb_hash_type) :: hashin
     type(psb_hash_type) :: hashout
-    integer, intent(out)  :: info 
+    integer(psb_ipk_), intent(out)  :: info 
 
     info = HashOk
     hashout%nbits = hashin%nbits
@@ -174,7 +178,7 @@ contains
   subroutine CloneHashTable(hashin,hashout,info)
     type(psb_hash_type), pointer :: hashin
     type(psb_hash_type), pointer :: hashout
-    integer, intent(out)  :: info 
+    integer(psb_ipk_), intent(out)  :: info 
     
     if (associated(hashout)) then 
       deallocate(hashout,stat=info)
@@ -189,11 +193,11 @@ contains
   end subroutine CloneHashTable
 
   subroutine psb_hash_init_V(v,hash,info)
-    integer, intent(in)     :: v(:)
+    integer(psb_ipk_), intent(in)     :: v(:)
     type(psb_hash_type), intent(out) :: hash
-    integer, intent(out)    :: info 
+    integer(psb_ipk_), intent(out)    :: info 
 
-    integer :: i,j,nbits, nv
+    integer(psb_ipk_) :: i,j,nbits, nv
 
     info  = psb_success_
     nv    = size(v)
@@ -210,17 +214,19 @@ contains
   end subroutine psb_hash_init_V
 
   subroutine psb_hash_init_n(nv,hash,info)
-    integer, intent(in)     :: nv
+    integer(psb_ipk_), intent(in)     :: nv
     type(psb_hash_type), intent(out) :: hash
-    integer, intent(out)    :: info 
+    integer(psb_ipk_), intent(out)    :: info 
 
-    integer :: hsize,nbits
+    integer(psb_ipk_) :: hsize,nbits
 
     info  = psb_success_
     nbits = 12
     hsize = 2**nbits
     !
     ! Figure out the smallest power of 2 bigger than NV
+    ! Note: in our intended usage NV will be the size of the
+    ! local index space, NOT the global index space.
     !
     do 
       if (hsize < 0) then 
@@ -232,7 +238,6 @@ contains
       nbits = nbits + 1
       hsize = hsize * 2 
     end do
-
     hash%nbits = nbits
     hash%hsize = hsize
     hash%hmask = hsize-1
@@ -251,9 +256,9 @@ contains
 
   subroutine psb_hash_realloc(hash,info)
     type(psb_hash_type), intent(inout) :: hash
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(out)   :: info 
     type(psb_hash_type)    :: nhash
-    integer :: key, val, nextval,i
+    integer(psb_ipk_) :: key, val, nextval,i
 
     info = HashOk
     
@@ -278,11 +283,11 @@ contains
   end subroutine psb_hash_realloc
     
   recursive subroutine psb_hash_searchinskey(key,val,nextval,hash,info)
-    integer, intent(in)   :: key,nextval
+    integer(psb_ipk_), intent(in)   :: key,nextval
     type(psb_hash_type)   :: hash
-    integer, intent(out)  :: val, info 
+    integer(psb_ipk_), intent(out)  :: val, info 
 
-    integer :: hsize,hmask, hk, hd
+    integer(psb_ipk_) :: hsize,hmask, hk, hd
 
     info  = HashOK
     hsize = hash%hsize
@@ -334,11 +339,11 @@ contains
   end subroutine psb_hash_searchinskey
 
   subroutine psb_hash_searchkey(key,val,hash,info)
-    integer, intent(in)   :: key
+    integer(psb_ipk_), intent(in)   :: key
     type(psb_hash_type)   :: hash
-    integer, intent(out)  :: val, info 
+    integer(psb_ipk_), intent(out)  :: val, info 
 
-    integer :: hsize,hmask, hk, hd
+    integer(psb_ipk_) :: hsize,hmask, hk, hd
 
     info  = HashOK
     if (.not.allocated(hash%table) ) then 

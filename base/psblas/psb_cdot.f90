@@ -60,10 +60,10 @@ function psb_cdot_vect(x, y, desc_a,info) result(res)
   complex(psb_spk_)                   :: res
   type(psb_c_vect_type), intent(inout)    :: x, y
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   complex(psb_spk_)         :: dot_local
   character(len=20)      :: name, ch_err
@@ -160,12 +160,12 @@ function psb_cdot(x, y,desc_a, info, jx, jy)
 
   complex(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in), optional    :: jx, jy
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: jx, jy
+  integer(psb_ipk_), intent(out)             :: info
   complex(psb_spk_)              :: psb_cdot
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   complex(psb_spk_)        :: dot_local
   complex(psb_spk_)        :: cdotc
@@ -310,11 +310,11 @@ function psb_cdotv(x, y,desc_a, info)
 
   complex(psb_spk_), intent(in)  :: x(:), y(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   complex(psb_spk_)              :: psb_cdotv
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, nr
   complex(psb_spk_)         :: dot_local
   complex(psb_spk_)         :: cdotc
@@ -445,10 +445,10 @@ subroutine psb_cdotvs(res, x, y,desc_a, info)
   complex(psb_spk_), intent(in)     :: x(:), y(:)
   complex(psb_spk_), intent(out)    :: res
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m,nr
   complex(psb_spk_)         :: dot_local
   complex(psb_spk_)         :: cdotc
@@ -577,10 +577,10 @@ subroutine psb_cmdots(res, x, y, desc_a, info)
   complex(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   complex(psb_spk_), intent(out)    :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k, nr
   complex(psb_spk_),allocatable  :: dot_local(:)
   complex(psb_spk_)         :: cdotc

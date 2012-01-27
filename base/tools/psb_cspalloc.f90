@@ -48,15 +48,15 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   !....parameters...
   type(psb_desc_type), intent(in) :: desc_a
   type(psb_cspmat_type), intent(inout) :: a
-  integer, intent(out)               :: info
-  integer, optional, intent(in)      :: nnz
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(in)      :: nnz
 
   !locals
-  integer             :: ictxt, dectype
-  integer             :: np,me,loc_row,loc_col,&
+  integer(psb_ipk_) :: ictxt, dectype
+  integer(psb_ipk_) :: np,me,loc_row,loc_col,&
        &  length_ia1,length_ia2, err_act,m,n
-  integer             :: int_err(5)
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 

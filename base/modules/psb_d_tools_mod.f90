@@ -29,71 +29,86 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-
 Module psb_d_tools_mod
+  use psb_descriptor_type, only : psb_desc_type, psb_dpk_, psb_ipk_
+  use psb_d_vect_mod, only : psb_d_base_vect_type, psb_d_vect_type
+  use psb_d_mat_mod, only : psb_dspmat_type, psb_d_base_sparse_mat
 
   interface  psb_geall
     subroutine psb_dalloc(x, desc_a, info, n, lb)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       implicit none
-      real(psb_dpk_), allocatable, intent(out) :: x(:,:)
+      real(psb_dpk_), allocatable, intent(out)    :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer,intent(out)             :: info
-      integer, optional, intent(in)   :: n, lb
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: n, lb
     end subroutine psb_dalloc
     subroutine psb_dallocv(x, desc_a,info,n)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      real(psb_dpk_), allocatable, intent(out)       :: x(:)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      real(psb_dpk_), allocatable, intent(out)    :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer,intent(out)             :: info
-      integer, optional, intent(in)   :: n
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_dallocv
     subroutine psb_dalloc_vect(x, desc_a,info,n)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_d_vect_type), intent(out)  :: x
       type(psb_desc_type), intent(in) :: desc_a
-      integer,intent(out)             :: info
-      integer, optional, intent(in)   :: n
+      integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_dalloc_vect
     subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_d_vect_type), allocatable, intent(out)  :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer,intent(out)             :: info
-      integer, optional, intent(in)   :: n, lb
+      integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)   :: n, lb
     end subroutine psb_dalloc_vect_r2
   end interface
 
+
   interface psb_geasb
     subroutine psb_dasb(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in) ::  desc_a
       real(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
-      integer, intent(out)            ::  info
+      integer(psb_ipk_), intent(out)            ::  info
     end subroutine psb_dasb
     subroutine psb_dasbv(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in) ::  desc_a
-      real(psb_dpk_), allocatable, intent(inout) :: x(:)
-      integer, intent(out)            ::  info
+      real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
+      integer(psb_ipk_), intent(out)        ::  info
     end subroutine psb_dasbv
     subroutine psb_dasb_vect(x, desc_a, info,mold, scratch)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
-      type(psb_desc_type), intent(in)      :: desc_a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(in)      ::  desc_a
       type(psb_d_vect_type), intent(inout) :: x
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 ::  info
       class(psb_d_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
     end subroutine psb_dasb_vect
     subroutine psb_dasb_vect_r2(x, desc_a, info,mold, scratch)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
-      type(psb_desc_type), intent(in)      :: desc_a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(in)      ::  desc_a
       type(psb_d_vect_type), intent(inout) :: x(:)
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 ::  info
       class(psb_d_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
     end subroutine psb_dasb_vect_r2
@@ -102,125 +117,141 @@ Module psb_d_tools_mod
   interface psb_sphalo
     Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
-      Type(psb_dspmat_type),Intent(in)    :: a
-      Type(psb_dspmat_type),Intent(inout) :: blk
-      Type(psb_desc_type),Intent(in),target :: desc_a
-      integer, intent(out)                :: info
-      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
-      character(len=5), optional          :: outfmt 
-      integer, intent(in), optional       :: data
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      Type(psb_dspmat_type),Intent(in)       :: a
+      Type(psb_dspmat_type),Intent(inout)    :: blk
+      Type(psb_desc_type),Intent(in), target :: desc_a
+      integer(psb_ipk_), intent(out)                   :: info
+      logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional             :: outfmt 
+      integer(psb_ipk_), intent(in), optional          :: data
     end Subroutine psb_dsphalo
   end interface
 
   interface psb_gefree
     subroutine psb_dfree(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       real(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)            :: info
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_dfree
     subroutine psb_dfreev(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       real(psb_dpk_),allocatable, intent(inout)        :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer, intent(out)       :: info
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_dfreev
     subroutine psb_dfree_vect(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in)  ::  desc_a
       type(psb_d_vect_type), intent(inout) :: x
-      integer, intent(out)             ::  info
+      integer(psb_ipk_), intent(out)             ::  info
     end subroutine psb_dfree_vect
     subroutine psb_dfree_vect_r2(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in)  ::  desc_a
       type(psb_d_vect_type), allocatable, intent(inout) :: x(:)
-      integer, intent(out)             ::  info
+      integer(psb_ipk_), intent(out)             ::  info
     end subroutine psb_dfree_vect_r2
   end interface
 
+
   interface psb_geins
-    subroutine psb_dinsi(m,irw,val, x,desc_a,info,dupl)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      integer, intent(in)              ::  m
+    subroutine psb_dinsi(m,irw,val, x, desc_a,info,dupl)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      integer(psb_ipk_), intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
-      real(psb_dpk_),intent(inout)     ::  x(:,:)
-      integer, intent(in)              ::  irw(:)
-      real(psb_dpk_), intent(in)       ::  val(:,:)
-      integer, intent(out)             ::  info
-      integer, optional, intent(in)    ::  dupl
+      real(psb_dpk_),intent(inout)      ::  x(:,:)
+      integer(psb_ipk_), intent(in)              ::  irw(:)
+      real(psb_dpk_), intent(in)  ::  val(:,:)
+      integer(psb_ipk_), intent(out)             ::  info
+      integer(psb_ipk_), optional, intent(in)    ::  dupl
     end subroutine psb_dinsi
-    subroutine psb_dinsvi(m,irw,val,x,desc_a,info,dupl)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      integer, intent(in)              ::  m
+    subroutine psb_dinsvi(m, irw,val, x,desc_a,info,dupl)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      integer(psb_ipk_), intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
-      real(psb_dpk_),intent(inout)     ::  x(:)
-      integer, intent(in)              ::  irw(:)
-      real(psb_dpk_), intent(in)       ::  val(:)
-      integer, intent(out)             ::  info
-      integer, optional, intent(in)    ::  dupl
+      real(psb_dpk_),intent(inout)      ::  x(:)
+      integer(psb_ipk_), intent(in)              ::  irw(:)
+      real(psb_dpk_), intent(in)  ::  val(:)
+      integer(psb_ipk_), intent(out)             ::  info
+      integer(psb_ipk_), optional, intent(in)    ::  dupl
     end subroutine psb_dinsvi
     subroutine psb_dins_vect(m,irw,val,x,desc_a,info,dupl)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
-      integer, intent(in)              :: m
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_d_vect_type), intent(inout) :: x
-      integer, intent(in)              :: irw(:)
-      real(psb_dpk_), intent(in)       :: val(:)
-      integer, intent(out)             :: info
-      integer, optional, intent(in)    :: dupl
+      integer(psb_ipk_), intent(in)              :: irw(:)
+      real(psb_dpk_), intent(in)    :: val(:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)    :: dupl
     end subroutine psb_dins_vect
     subroutine psb_dins_vect_r2(m,irw,val,x,desc_a,info,dupl)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_d_vect_mod
-      integer, intent(in)              :: m
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_d_vect_type), intent(inout) :: x(:)
-      integer, intent(in)              :: irw(:)
-      real(psb_dpk_), intent(in)       :: val(:,:)
-      integer, intent(out)             :: info
-      integer, optional, intent(in)    :: dupl
+      integer(psb_ipk_), intent(in)              :: irw(:)
+      real(psb_dpk_), intent(in)    :: val(:,:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)    :: dupl
     end subroutine psb_dins_vect_r2
   end interface
 
-
   interface psb_cdbldext
     Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info,extype)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      Use psb_mat_mod, only : psb_dspmat_type
-      integer, intent(in)                     :: novr
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      integer(psb_ipk_), intent(in)                     :: novr
       Type(psb_dspmat_type), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
-      integer, intent(out)                    :: info
-      integer, intent(in),optional            :: extype
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_), intent(in),optional            :: extype
     end Subroutine psb_dcdbldext
   end interface
 
   interface psb_spall
     subroutine psb_dspalloc(a, desc_a, info, nnz)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
-      type(psb_desc_type), intent(in)       :: desc_a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(in) :: desc_a
       type(psb_dspmat_type), intent(inout) :: a
-      integer, intent(out)                :: info
-      integer, optional, intent(in)       :: nnz
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(in)      :: nnz
     end subroutine psb_dspalloc
   end interface
 
   interface psb_spasb
     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl,mold)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type, psb_d_base_sparse_mat
-      type(psb_dspmat_type), intent (inout)  :: a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_dspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
-      integer, intent(out)                    :: info
-      integer,optional, intent(in)            :: dupl, upd
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_),optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_dspasb
@@ -228,47 +259,51 @@ Module psb_d_tools_mod
 
   interface psb_spfree
     subroutine psb_dspfree(a, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
-      type(psb_desc_type), intent(in)       :: desc_a
-      type(psb_dspmat_type), intent(inout) :: a
-      integer, intent(out)                  :: info
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(in) :: desc_a
+      type(psb_dspmat_type), intent(inout)       ::a
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dspfree
   end interface
 
 
   interface psb_spins
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_dspmat_type), intent(inout) :: a
-      integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(psb_dpk_), intent(in)         :: val(:)
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
+      real(psb_dpk_), intent(in)      :: val(:)
+      integer(psb_ipk_), intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
     end subroutine psb_dspins
     subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
-      type(psb_dspmat_type), intent(inout) :: a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
-      integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(psb_dpk_), intent(in)           :: val(:)
-      integer, intent(out)                 :: info
+      type(psb_dspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)                  :: nz,ia(:),ja(:)
+      real(psb_dpk_), intent(in)        :: val(:)
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_dspins_2desc
   end interface
 
 
   interface psb_sprn
     subroutine psb_dsprn(a, desc_a,info,clear)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_dspmat_type
-      type(psb_desc_type), intent(in)       :: desc_a
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type, &
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(in)      :: desc_a
       type(psb_dspmat_type), intent(inout) :: a
-      integer, intent(out)                  :: info
-      logical, intent(in), optional         :: clear
+      integer(psb_ipk_), intent(out)                 :: info
+      logical, intent(in), optional        :: clear
     end subroutine psb_dsprn
   end interface
 

@@ -37,14 +37,14 @@ subroutine imsr(n,x,idir)
   use psb_ip_reord_mod
   implicit none
 
-  integer :: n, idir
-  integer :: x(n)
+  integer(psb_ipk_) :: n, idir
+  integer(psb_ipk_) :: x(n)
   
   
-  integer, allocatable :: iaux(:)
+  integer(psb_ipk_), allocatable :: iaux(:)
   
-  integer :: iswap, iret, info, lp, k
-  integer :: lswap
+  integer(psb_ipk_) :: iswap, iret, info, lp, k
+  integer(psb_ipk_) :: lswap
 
   if (n<0) then 
     return

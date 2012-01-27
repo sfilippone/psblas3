@@ -8,10 +8,10 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   use psi_mod
   implicit None
   include 'parts.fh'
-  Integer, intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
-  integer, intent(in)               :: flag
+  integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
+  integer(psb_ipk_), intent(in)               :: flag
   logical, intent(in)               :: repl, globalcheck
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
   optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck
@@ -20,35 +20,35 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     subroutine psb_cdals(m, n, parts, ictxt, desc, info)
       use psb_descriptor_type
       include 'parts.fh'
-      Integer, intent(in)                 :: m,n,ictxt
+      integer(psb_ipk_), intent(in)                 :: m,n,ictxt
       Type(psb_desc_type), intent(out)    :: desc
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_cdals
     subroutine psb_cdalv(v, ictxt, desc, info, flag)
       use psb_descriptor_type
-      Integer, intent(in)               :: ictxt, v(:)
-      integer, intent(in), optional     :: flag
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+      integer(psb_ipk_), intent(in), optional     :: flag
+      integer(psb_ipk_), intent(out)              :: info
       Type(psb_desc_type), intent(out)  :: desc
     end subroutine psb_cdalv
     subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       use psb_descriptor_type
       implicit None
-      Integer, intent(in)               :: ictxt, v(:)
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+      integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
       logical, intent(in), optional     :: globalcheck
     end subroutine psb_cd_inloc
     subroutine psb_cdrep(m, ictxt, desc,info)
       use psb_descriptor_type
-      Integer, intent(in)               :: m,ictxt
+      integer(psb_ipk_), intent(in)               :: m,ictxt
       Type(psb_desc_type), intent(out)  :: desc
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_cdrep
   end interface
   character(len=20)   :: name
-  integer :: err_act, n_, flag_, i, me, np, nlp, nnv, lr
-  integer, allocatable :: itmpsz(:) 
+  integer(psb_ipk_) :: err_act, n_, flag_, i, me, np, nlp, nnv, lr
+  integer(psb_ipk_), allocatable :: itmpsz(:) 
 
 
 

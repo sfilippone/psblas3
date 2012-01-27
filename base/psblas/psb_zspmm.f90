@@ -73,24 +73,24 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_dpk_), intent(inout), target  :: y(:,:)
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   complex(psb_dpk_), optional, target, intent(inout)  :: work(:)
   character, intent(in), optional          :: trans
-  integer, intent(in), optional            :: k, jx, jy
+  integer(psb_ipk_), intent(in), optional            :: k, jx, jy
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
        & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1, ip, idx
-  integer, parameter               :: nb=4
+  integer(psb_ipk_), parameter               :: nb=4
   complex(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
   complex(psb_dpk_), allocatable :: xvsave(:,:)
   character                        :: trans_
   character(len=20)                :: name, ch_err
   logical                          :: aliw, doswap_
-  integer                          :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_zspmm'
   if(psb_get_errstatus() /= 0) return 
@@ -425,23 +425,23 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   complex(psb_dpk_), intent(inout), target  :: y(:)
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
-  integer, parameter           :: nb=4
+  integer(psb_ipk_), parameter           :: nb=4
   complex(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
   complex(psb_dpk_), allocatable :: xvsave(:)  
   character                    :: trans_
   character(len=20)            :: name, ch_err
   logical                      :: aliw, doswap_
-  integer                      :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_zspmv'
   if(psb_get_errstatus() /= 0) return 
@@ -685,23 +685,23 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_z_vect_type), intent(inout)     :: y
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
-  integer, intent(out)                     :: info
+  integer(psb_ipk_), intent(out)                     :: info
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
-  integer, parameter       :: nb=4
+  integer(psb_ipk_), parameter       :: nb=4
   complex(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
   complex(psb_dpk_), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
-  integer                  :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_zspmv'
   if (psb_errstatus_fatal()) return 

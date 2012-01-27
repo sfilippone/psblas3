@@ -33,7 +33,7 @@ subroutine psb_cd_set_ovl_bld(desc,info)
   use psb_base_mod, psb_protect_name => psb_cd_set_ovl_bld
   implicit none
   type(psb_desc_type), intent(inout) :: desc
-  integer                            :: info
+  integer(psb_ipk_) :: info
 
   call psb_cd_set_bld(desc,info) 
   if (info == psb_success_) then 
@@ -52,9 +52,9 @@ subroutine psb_cd_set_bld(desc,info)
   use psi_mod
   implicit none
   type(psb_desc_type), intent(inout) :: desc
-  integer                            :: info
+  integer(psb_ipk_) :: info
   !locals
-  integer             :: np,me,ictxt, err_act,idx,gidx,lidx,nc
+  integer(psb_ipk_) :: np,me,ictxt, err_act,idx,gidx,lidx,nc
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name
   if (debug) write(psb_err_unit,*) me,'Entered CDCPY'

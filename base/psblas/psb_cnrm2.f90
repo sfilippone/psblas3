@@ -53,12 +53,12 @@ function psb_cnrm2(x, desc_a, info, jx)
 
   complex(psb_spk_), intent(in)      ::  x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(in), optional     :: jx
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: jx
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_spk_)                  :: psb_cnrm2
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 
@@ -190,11 +190,11 @@ function psb_cnrm2v(x, desc_a, info)
 
   complex(psb_spk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_spk_)                  :: psb_cnrm2v
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 
@@ -281,10 +281,10 @@ function psb_cnrm2_vect(x, desc_a, info)  result(res)
   real(psb_spk_)                        :: res
   type(psb_c_vect_type), intent (inout) :: x
   type(psb_desc_type), intent(in)       :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
 !!$  external dcombnrm2
@@ -419,10 +419,10 @@ subroutine psb_cnrm2vs(res, x, desc_a, info)
   complex(psb_spk_), intent(in)   :: x(:)
   real(psb_spk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 

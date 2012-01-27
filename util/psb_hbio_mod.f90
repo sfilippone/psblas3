@@ -31,44 +31,49 @@
 !!$  
 module psb_hbio_mod
 
+  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_,&
+       & psb_sspmat_type, psb_cspmat_type, &
+       & psb_dspmat_type, psb_zspmat_type
+
+
   public hb_read, hb_write
   interface hb_read
     subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_base_mod, only : psb_sspmat_type, psb_spk_
+      import :: psb_sspmat_type, psb_spk_, psb_ipk_
       implicit none
       type(psb_sspmat_type), intent(out)     :: a
-      integer, intent(out)                   :: iret
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       real(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
       character(len=72), optional, intent(out) :: mtitle
     end subroutine shb_read
     subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_
+      import :: psb_dspmat_type, psb_dpk_, psb_ipk_
       implicit none
       type(psb_dspmat_type), intent(out)     :: a
-      integer, intent(out)                   :: iret
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       real(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
       character(len=72), optional, intent(out) :: mtitle
     end subroutine dhb_read
     subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_base_mod, only : psb_cspmat_type, psb_spk_
+      import :: psb_cspmat_type, psb_spk_, psb_ipk_
       implicit none
       type(psb_cspmat_type), intent(out)     :: a
-      integer, intent(out)                   :: iret
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       complex(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
       character(len=72), optional, intent(out) :: mtitle
     end subroutine chb_read
     subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-      use psb_base_mod, only : psb_zspmat_type, psb_dpk_
+      import :: psb_zspmat_type, psb_dpk_, psb_ipk_
       implicit none
       type(psb_zspmat_type), intent(out)     :: a
-      integer, intent(out)                   :: iret
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), intent(out)                   :: iret
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       complex(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
       character(len=72), optional, intent(out) :: mtitle
@@ -77,45 +82,45 @@ module psb_hbio_mod
 
   interface hb_write
     subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_base_mod, only : psb_sspmat_type, psb_spk_
+      import :: psb_sspmat_type, psb_spk_, psb_ipk_
       implicit none
       type(psb_sspmat_type), intent(inout)  :: a
-      integer, intent(out)        :: iret
+      integer(psb_ipk_), intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       character(len=*), optional, intent(in) :: key
       real(psb_spk_), optional             :: rhs(:), g(:), x(:)
     end subroutine shb_write
     subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_
+      import :: psb_dspmat_type, psb_dpk_, psb_ipk_
       implicit none
       type(psb_dspmat_type), intent(inout)  :: a
-      integer, intent(out)        :: iret
+      integer(psb_ipk_), intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       character(len=*), optional, intent(in) :: key
       real(psb_dpk_), optional             :: rhs(:), g(:), x(:)
     end subroutine dhb_write
     subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_base_mod, only : psb_cspmat_type, psb_spk_
+      import :: psb_cspmat_type, psb_spk_, psb_ipk_
       implicit none
       type(psb_cspmat_type), intent(inout)  :: a
-      integer, intent(out)        :: iret
+      integer(psb_ipk_), intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       character(len=*), optional, intent(in) :: key
       complex(psb_spk_), optional             :: rhs(:), g(:), x(:)
     end subroutine chb_write
     subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-      use psb_base_mod, only : psb_zspmat_type, psb_dpk_
+      import :: psb_zspmat_type, psb_dpk_, psb_ipk_
       implicit none
       type(psb_zspmat_type), intent(inout)  :: a
-      integer, intent(out)        :: iret
+      integer(psb_ipk_), intent(out)        :: iret
       character(len=*), optional, intent(in) :: mtitle
-      integer, optional, intent(in)          :: iunit
+      integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
       character(len=*), optional, intent(in) :: key
       complex(psb_dpk_), optional             :: rhs(:), g(:), x(:)

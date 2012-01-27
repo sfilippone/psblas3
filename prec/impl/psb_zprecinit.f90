@@ -40,7 +40,7 @@ subroutine psb_zprecinit(p,ptype,info)
 
   type(psb_zprec_type), intent(inout)    :: p
   character(len=*), intent(in)           :: ptype
-  integer, intent(out)                   :: info
+  integer(psb_ipk_), intent(out)                   :: info
 
   info = psb_success_
 

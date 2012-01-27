@@ -30,6 +30,11 @@
 !!$ 
 !!$  
 module psb_mat_dist_mod
+  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_, psb_desc_type, &
+       & psb_sspmat_type, psb_cspmat_type, psb_dspmat_type, psb_zspmat_type, &
+       & psb_s_base_sparse_mat, psb_c_base_sparse_mat, &
+       &  psb_d_base_sparse_mat, psb_z_base_sparse_mat, &
+       & psb_s_vect_type, psb_d_vect_type, psb_c_vect_type, psb_z_vect_type
 
   interface psb_matdist
     subroutine smatdist(a_glob, a, ictxt, desc_a,&
@@ -57,9 +62,9 @@ module psb_mat_dist_mod
       !         !   .....user passed subroutine.....
       !         subroutine parts(global_indx,n,np,pv,nv)
       !           implicit none
-      !           integer, intent(in)  :: global_indx, n, np
-      !           integer, intent(out) :: nv
-      !           integer, intent(out) :: pv(*)
+      !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      !           integer(psb_ipk_), intent(out) :: nv
+      !           integer(psb_ipk_), intent(out) :: pv(*)
       !
       !       end subroutine parts
       !       end interface
@@ -70,7 +75,7 @@ module psb_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer                                  :: ictxt
+      !  integer(psb_ipk_) :: ictxt
       !     on entry: blacs context.
       !     on exit : unchanged.
       !
@@ -86,33 +91,34 @@ module psb_mat_dist_mod
       !     on entry: fresh variable.
       !     on exit : this will contain the local right hand side.
       !
-      !  integer, optional    :: inroot
+      !  integer(psb_ipk_), optional    :: inroot
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_base_mod, only : psb_sspmat_type, psb_desc_type, psb_spk_,&
+      import :: psb_ipk_, psb_sspmat_type, psb_desc_type, psb_spk_,&
            & psb_s_base_sparse_mat, psb_s_vect_type
       implicit none
 
       ! parameters
       type(psb_sspmat_type)      :: a_glob
       real(psb_spk_)             :: b_glob(:)
-      integer                    :: ictxt
+      integer(psb_ipk_) :: ictxt
       type(psb_sspmat_type)      :: a
       type(psb_s_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
-      integer, intent(out)       :: info
-      integer, optional          :: inroot
+      integer(psb_ipk_), intent(out)       :: info
+      integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_s_base_sparse_mat), optional :: mold
  
-      integer                    :: v(:)
+      integer(psb_ipk_) :: v(:)
       interface 
         subroutine parts(global_indx,n,np,pv,nv)
+          import :: psb_ipk_
           implicit none
-          integer, intent(in)  :: global_indx, n, np
-          integer, intent(out) :: nv
-          integer, intent(out) :: pv(*) 
+          integer(psb_ipk_), intent(in)  :: global_indx, n, np
+          integer(psb_ipk_), intent(out) :: nv
+          integer(psb_ipk_), intent(out) :: pv(*) 
         end subroutine parts
       end interface
       optional                  :: parts, v
@@ -143,9 +149,9 @@ module psb_mat_dist_mod
       !         !   .....user passed subroutine.....
       !         subroutine parts(global_indx,n,np,pv,nv)
       !           implicit none
-      !           integer, intent(in)  :: global_indx, n, np
-      !           integer, intent(out) :: nv
-      !           integer, intent(out) :: pv(*)
+      !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      !           integer(psb_ipk_), intent(out) :: nv
+      !           integer(psb_ipk_), intent(out) :: pv(*)
       !
       !       end subroutine parts
       !       end interface
@@ -156,7 +162,7 @@ module psb_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer                                  :: ictxt
+      !  integer(psb_ipk_) :: ictxt
       !     on entry: blacs context.
       !     on exit : unchanged.
       !
@@ -172,33 +178,34 @@ module psb_mat_dist_mod
       !     on entry: fresh variable.
       !     on exit : this will contain the local right hand side.
       !
-      !  integer, optional    :: inroot
+      !  integer(psb_ipk_), optional    :: inroot
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_desc_type,&
+      import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_desc_type,&
            & psb_d_base_sparse_mat, psb_d_vect_type
       implicit none
 
       ! parameters
       type(psb_dspmat_type)      :: a_glob
       real(psb_dpk_)             :: b_glob(:)
-      integer                    :: ictxt
+      integer(psb_ipk_) :: ictxt
       type(psb_dspmat_type)      :: a
       type(psb_d_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
-      integer, intent(out)       :: info
-      integer, optional          :: inroot
+      integer(psb_ipk_), intent(out)       :: info
+      integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_d_base_sparse_mat), optional :: mold
 
-      integer                    :: v(:)
+      integer(psb_ipk_) :: v(:)
       interface 
         subroutine parts(global_indx,n,np,pv,nv)
+          import :: psb_ipk_
           implicit none
-          integer, intent(in)  :: global_indx, n, np
-          integer, intent(out) :: nv
-          integer, intent(out) :: pv(*) 
+          integer(psb_ipk_), intent(in)  :: global_indx, n, np
+          integer(psb_ipk_), intent(out) :: nv
+          integer(psb_ipk_), intent(out) :: pv(*) 
         end subroutine parts
       end interface
       optional                  :: parts, v
@@ -230,9 +237,9 @@ module psb_mat_dist_mod
       !         !   .....user passed subroutine.....
       !         subroutine parts(global_indx,n,np,pv,nv)
       !           implicit none
-      !           integer, intent(in)  :: global_indx, n, np
-      !           integer, intent(out) :: nv
-      !           integer, intent(out) :: pv(*)
+      !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      !           integer(psb_ipk_), intent(out) :: nv
+      !           integer(psb_ipk_), intent(out) :: pv(*)
       !
       !       end subroutine parts
       !       end interface
@@ -243,7 +250,7 @@ module psb_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer                                  :: ictxt
+      !  integer(psb_ipk_) :: ictxt
       !     on entry: blacs context.
       !     on exit : unchanged.
       !
@@ -259,33 +266,34 @@ module psb_mat_dist_mod
       !     on entry: fresh variable.
       !     on exit : this will contain the local right hand side.
       !
-      !  integer, optional    :: inroot
+      !  integer(psb_ipk_), optional    :: inroot
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_base_mod, only : psb_cspmat_type, psb_spk_, psb_desc_type,&
+      import :: psb_ipk_, psb_cspmat_type, psb_spk_, psb_desc_type,&
            & psb_c_base_sparse_mat, psb_c_vect_type
       implicit none
 
       ! parameters
       type(psb_cspmat_type)      :: a_glob
       complex(psb_spk_)          :: b_glob(:)
-      integer                    :: ictxt
+      integer(psb_ipk_) :: ictxt
       type(psb_cspmat_type)      :: a
       type(psb_c_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
-      integer, intent(out)       :: info
-      integer, optional          :: inroot
+      integer(psb_ipk_), intent(out)       :: info
+      integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_c_base_sparse_mat), optional :: mold
 
-      integer                    :: v(:)
+      integer(psb_ipk_) :: v(:)
       interface 
         subroutine parts(global_indx,n,np,pv,nv)
+          import :: psb_ipk_
           implicit none
-          integer, intent(in)  :: global_indx, n, np
-          integer, intent(out) :: nv
-          integer, intent(out) :: pv(*) 
+          integer(psb_ipk_), intent(in)  :: global_indx, n, np
+          integer(psb_ipk_), intent(out) :: nv
+          integer(psb_ipk_), intent(out) :: pv(*) 
         end subroutine parts
       end interface
       optional                  :: parts, v
@@ -317,9 +325,9 @@ module psb_mat_dist_mod
       !         !   .....user passed subroutine.....
       !         subroutine parts(global_indx,n,np,pv,nv)
       !           implicit none
-      !           integer, intent(in)  :: global_indx, n, np
-      !           integer, intent(out) :: nv
-      !           integer, intent(out) :: pv(*)
+      !           integer(psb_ipk_), intent(in)  :: global_indx, n, np
+      !           integer(psb_ipk_), intent(out) :: nv
+      !           integer(psb_ipk_), intent(out) :: pv(*)
       !
       !       end subroutine parts
       !       end interface
@@ -330,7 +338,7 @@ module psb_mat_dist_mod
       !        usually nv=1; if nv >1 then we have an overlap in the data
       !        distribution.
       !
-      !  integer                                  :: ictxt
+      !  integer(psb_ipk_) :: ictxt
       !     on entry: blacs context.
       !     on exit : unchanged.
       !
@@ -346,33 +354,34 @@ module psb_mat_dist_mod
       !     on entry: fresh variable.
       !     on exit : this will contain the local right hand side.
       !
-      !  integer, optional    :: inroot
+      !  integer(psb_ipk_), optional    :: inroot
       !     on entry: specifies processor holding a_glob. default: 0
       !     on exit : unchanged.
       !
-      use psb_base_mod, only : psb_zspmat_type, psb_dpk_, psb_desc_type,&
+      import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
            & psb_z_base_sparse_mat, psb_z_vect_type
       implicit none
 
       ! parameters
       type(psb_zspmat_type)      :: a_glob
       complex(psb_dpk_)          :: b_glob(:)
-      integer                    :: ictxt
+      integer(psb_ipk_) :: ictxt
       type(psb_zspmat_type)      :: a
       type(psb_z_vect_type)      :: b
       type(psb_desc_type)        :: desc_a
-      integer, intent(out)       :: info
-      integer, optional          :: inroot
+      integer(psb_ipk_), intent(out)       :: info
+      integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_z_base_sparse_mat), optional :: mold
 
-      integer                    :: v(:)
+      integer(psb_ipk_) :: v(:)
       interface 
         subroutine parts(global_indx,n,np,pv,nv)
+          import :: psb_ipk_
           implicit none
-          integer, intent(in)  :: global_indx, n, np
-          integer, intent(out) :: nv
-          integer, intent(out) :: pv(*) 
+          integer(psb_ipk_), intent(in)  :: global_indx, n, np
+          integer(psb_ipk_), intent(out) :: nv
+          integer(psb_ipk_), intent(out) :: pv(*) 
         end subroutine parts
       end interface
       optional                  :: parts, v

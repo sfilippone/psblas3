@@ -44,11 +44,11 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
   use psb_base_mod, psb_protect_name => psb_cdprt
   implicit none 
   type(psb_desc_type), intent(in)    :: desc_p
-  integer, intent(in)                :: iout
+  integer(psb_ipk_), intent(in)                :: iout
   logical, intent(in), optional      :: glob,short
   logical :: lshort, lglob
 
-  integer :: m, n_row, n_col,counter,idx,n_elem_recv,n_elem_send,&
+  integer(psb_ipk_) :: m, n_row, n_col,counter,idx,n_elem_recv,n_elem_send,&
        & proc,i
 
   if (present(glob)) then 

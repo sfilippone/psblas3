@@ -4,10 +4,10 @@ subroutine psb_c_bjac_dump(prec,info,prefix,head)
   use psb_c_bjacprec, psb_protect_name => psb_c_bjac_dump
   implicit none 
   class(psb_c_bjac_prec_type), intent(in) :: prec
-  integer, intent(out)                    :: info
+  integer(psb_ipk_), intent(out)                    :: info
   character(len=*), intent(in), optional  :: prefix,head
-  integer :: i, j, il1, iln, lname, lev
-  integer :: ictxt,iam, np
+  integer(psb_ipk_) :: i, j, il1, iln, lname, lev
+  integer(psb_ipk_) :: ictxt,iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
 
@@ -48,16 +48,16 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   complex(psb_spk_),intent(in)         :: alpha,beta
   type(psb_c_vect_type),intent(inout)   :: x
   type(psb_c_vect_type),intent(inout)   :: y
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
 
   ! Local variables
-  integer :: n_row,n_col
+  integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
   type(psb_c_vect_type) :: wv, wv1
-  integer :: ictxt,np,me, err_act, int_err(5)
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me, err_act, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='c_bjac_prec_apply'
   character(len=20)  :: ch_err
@@ -206,15 +206,15 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   complex(psb_spk_),intent(in)         :: alpha,beta
   complex(psb_spk_),intent(inout)      :: x(:)
   complex(psb_spk_),intent(inout)      :: y(:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
 
   ! Local variables
-  integer :: n_row,n_col
+  integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
-  integer :: ictxt,np,me, err_act, int_err(5)
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me, err_act, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='c_bjac_prec_apply'
   character(len=20)  :: ch_err
@@ -356,8 +356,8 @@ subroutine psb_c_bjac_precinit(prec,info)
   Implicit None
 
   class(psb_c_bjac_prec_type),intent(inout) :: prec
-  integer, intent(out)                     :: info
-  Integer :: err_act, nrow
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_ipk_) :: err_act, nrow
   character(len=20)  :: name='c_bjac_precinit'
 
   call psb_erractionsave(err_act)
@@ -399,20 +399,20 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   type(psb_cspmat_type), intent(in), target :: a
   type(psb_desc_type), intent(in), target   :: desc_a
   class(psb_c_bjac_prec_type),intent(inout) :: prec
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   character, intent(in), optional           :: upd
   character(len=*), intent(in), optional    :: afmt
   class(psb_c_base_sparse_mat), intent(in), optional :: amold
   class(psb_c_base_vect_type), intent(in), optional  :: vmold
 
   !     .. Local Scalars ..                                                       
-  integer  ::    i, m
-  integer  ::    int_err(5)
+  integer(psb_ipk_) ::    i, m
+  integer(psb_ipk_) ::    int_err(5)
   character ::        trans, unitd
   type(psb_c_csr_sparse_mat), allocatable  :: lf, uf
   complex(psb_spk_), allocatable :: dd(:)
-  integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
-  integer :: ictxt,np,me
+  integer(psb_ipk_) :: nztota,  err_act, n_row, nrow_a,n_col, nhalo
+  integer(psb_ipk_) :: ictxt,np,me
   character(len=20)  :: name='c_bjac_precbld'
   character(len=20)  :: ch_err
 
@@ -552,10 +552,10 @@ subroutine psb_c_bjac_precseti(prec,what,val,info)
   Implicit None
 
   class(psb_c_bjac_prec_type),intent(inout) :: prec
-  integer, intent(in)                      :: what 
-  integer, intent(in)                      :: val 
-  integer, intent(out)                     :: info
-  Integer :: err_act, nrow
+  integer(psb_ipk_), intent(in)                      :: what 
+  integer(psb_ipk_), intent(in)                      :: val 
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_ipk_) :: err_act, nrow
   character(len=20)  :: name='c_bjac_precset'
 
   call psb_erractionsave(err_act)

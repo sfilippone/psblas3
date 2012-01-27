@@ -91,9 +91,9 @@
 !!$  Real(psb_dpk_), Intent(in)       :: b(:)
 !!$  Real(psb_dpk_), Intent(inout)    :: x(:)
 !!$  Real(psb_dpk_), Intent(in)       :: eps
-!!$  integer, intent(out)               :: info
-!!$  Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-!!$  Integer, Optional, Intent(out)     :: iter
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$  Real(psb_dpk_), Optional, Intent(out) :: err,cond
 !!$
 !!$  interface 
@@ -107,9 +107,9 @@
 !!$      real(psb_dpk_), intent(inout)    :: x(:)
 !!$      real(psb_dpk_), intent(in)       :: eps
 !!$      class(psb_dprec_type), intent(in)   :: prec
-!!$      integer, intent(out)               :: info
-!!$      integer, optional, intent(in)      :: itmax, itrace,istop
-!!$      integer, optional, intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
 !!$      real(psb_dpk_), optional, intent(out) :: err,cond
 !!$    end subroutine psb_dcg
 !!$    subroutine psb_dbicg(a,prec,b,x,eps,&
@@ -122,9 +122,9 @@
 !!$      real(psb_dpk_), intent(inout)      :: x(:)
 !!$      real(psb_dpk_), intent(in)         :: eps
 !!$      class(psb_dprec_type), intent(in)   :: prec
-!!$      integer, intent(out)               :: info
-!!$      integer, optional, intent(in)      :: itmax, itrace,istop
-!!$      integer, optional, intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
 !!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dbicg
 !!$    subroutine psb_dcgstab(a,prec,b,x,eps,&
@@ -137,9 +137,9 @@
 !!$      real(psb_dpk_), intent(inout)    :: x(:)
 !!$      real(psb_dpk_), intent(in)       :: eps
 !!$      class(psb_dprec_type), intent(in)   :: prec
-!!$      integer, intent(out)               :: info
-!!$      integer, optional, intent(in)      :: itmax, itrace,istop
-!!$      integer, optional, intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
 !!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dcgstab
 !!$    Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
@@ -152,9 +152,9 @@
 !!$      Real(psb_dpk_), Intent(in)       :: b(:)
 !!$      Real(psb_dpk_), Intent(inout)    :: x(:)
 !!$      Real(psb_dpk_), Intent(in)       :: eps
-!!$      integer, intent(out)               :: info
-!!$      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-!!$      Integer, Optional, Intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$      integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$      Real(psb_dpk_), Optional, Intent(out) :: err
 !!$    end subroutine psb_dcgstabl
 !!$    Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
@@ -167,9 +167,9 @@
 !!$      Real(psb_dpk_), Intent(in)       :: b(:)
 !!$      Real(psb_dpk_), Intent(inout)    :: x(:)
 !!$      Real(psb_dpk_), Intent(in)       :: eps
-!!$      integer, intent(out)               :: info
-!!$      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-!!$      Integer, Optional, Intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$      integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$      Real(psb_dpk_), Optional, Intent(out) :: err
 !!$    end subroutine psb_drgmres
 !!$    subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
@@ -182,13 +182,13 @@
 !!$      real(psb_dpk_), intent(in)       :: b(:)
 !!$      real(psb_dpk_), intent(inout)    :: x(:)
 !!$      real(psb_dpk_), intent(in)       :: eps
-!!$      integer, intent(out)               :: info
-!!$      integer, optional, intent(in)      :: itmax, itrace,istop
-!!$      integer, optional, intent(out)     :: iter
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
 !!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dcgs
 !!$  end interface
-!!$  integer                            :: ictxt,me,np,err_act
+!!$  integer(psb_ipk_) :: ictxt,me,np,err_act
 !!$  character(len=20)             :: name
 !!$
 !!$  info = psb_success_
@@ -258,110 +258,104 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), Intent(inout) :: b
   type(psb_d_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err,cond
 
   interface 
     subroutine psb_dcg_vect(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type,&
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_desc_type), intent(in)      :: desc_a
       class(psb_dprec_type), intent(inout) :: prec
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       real(psb_dpk_), intent(in)           :: eps
-      integer, intent(out)                 :: info
-      integer, optional, intent(in)        :: itmax, itrace,istop
-      integer, optional, intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
+      integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err,cond
     end subroutine psb_dcg_vect
     subroutine psb_dbicg_vect(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type,&
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_desc_type), intent(in)      :: desc_a
       class(psb_dprec_type), intent(inout) :: prec
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       real(psb_dpk_), intent(in)           :: eps
-      integer, intent(out)                 :: info
-      integer, optional, intent(in)        :: itmax, itrace,istop
-      integer, optional, intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
+      integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dbicg_vect
     subroutine psb_dcgstab_vect(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type,&
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_desc_type), intent(in)      :: desc_a
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       real(psb_dpk_), intent(in)           :: eps
       class(psb_dprec_type), intent(inout) :: prec
-      integer, intent(out)                 :: info
-      integer, optional, intent(in)        :: itmax, itrace,istop
-      integer, optional, intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
+      integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgstab_vect
     Subroutine psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, &
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       Type(psb_dspmat_type), Intent(in)    :: a
       Type(psb_desc_type), Intent(in)      :: desc_a
       class(psb_dprec_type), intent(inout) :: prec
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       Real(psb_dpk_), Intent(in)           :: eps
-      integer, intent(out)                 :: info
-      Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_dcgstabl_vect
     Subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type,&
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       Type(psb_dspmat_type), Intent(in)    :: a
       Type(psb_desc_type), Intent(in)      :: desc_a
       class(psb_dprec_type), intent(inout) :: prec
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       Real(psb_dpk_), Intent(in)           :: eps
-      integer, intent(out)                 :: info
-      Integer, Optional, Intent(in)        :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_drgmres_vect
     subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type,&
-           & psb_dpk_, psb_d_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_desc_type), intent(in)      :: desc_a 
       class(psb_dprec_type), intent(inout) :: prec
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x
       real(psb_dpk_), intent(in)           :: eps
-      integer, intent(out)                 :: info
-      integer, optional, intent(in)        :: itmax, itrace,istop
-      integer, optional, intent(out)       :: iter
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
+      integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgs_vect
   end interface
-  integer                            :: ictxt,me,np,err_act
+  integer(psb_ipk_) :: ictxt,me,np,err_act
   character(len=20)             :: name
 
   info = psb_success_

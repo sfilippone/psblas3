@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psb_string_mod
-
+  use psb_const_mod, only : psb_ipk_
   public psb_tolower, psb_toupper, psb_touppers
   interface psb_tolower
     module procedure psb_tolowerc
@@ -53,11 +53,11 @@ contains
   function idx_bsrch(key,v) result(ipos)
 
     implicit none
-    integer :: ipos
+    integer(psb_ipk_) :: ipos
     character key
     character(len=*)  v
 
-    integer lb, ub, m
+    integer(psb_ipk_) :: lb, ub, m
 
 
     lb = 1 
@@ -83,7 +83,7 @@ contains
   function  psb_tolowerc(string)
     character(len=*), intent(in)  :: string
     character(len=len(string))    :: psb_tolowerc
-    integer  :: i,k
+    integer(psb_ipk_) :: i,k
 
     do i=1,len(string)
       k = idx_bsrch(string(i:i),ucase)
@@ -99,7 +99,7 @@ contains
   function  psb_toupperc(string)
     character(len=*), intent(in)  :: string
     character(len=len(string))    :: psb_toupperc
-    integer  :: i,k
+    integer(psb_ipk_) :: i,k
 
     do i=1,len(string)
       k = idx_bsrch(string(i:i),lcase)
@@ -114,7 +114,7 @@ contains
   subroutine   psb_sub_toupperc(string,strout)
     character(len=*), intent(in)  :: string
     character(len=*), intent(out)  :: strout
-    integer  :: i,k
+    integer(psb_ipk_) :: i,k
 
     do i=1,len(string)
       k = idx_bsrch(string(i:i),lcase)

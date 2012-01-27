@@ -54,12 +54,12 @@ function psb_zamax (x,desc_a, info, jx)
 
   complex(psb_dpk_), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, optional, intent(in)     :: jx
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), optional, intent(in)     :: jx
   real(psb_dpk_)                  :: psb_zamax
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, izamax
   real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
@@ -145,10 +145,10 @@ function psb_zamax_vect(x, desc_a, info) result(res)
   real(psb_dpk_)                        :: res
   type(psb_z_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer, intent(out)                  :: info
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, isamax
   real(psb_dpk_)         :: amax
   character(len=20)      :: name, ch_err
@@ -274,11 +274,11 @@ function psb_zamaxv (x,desc_a, info)
 
   complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_dpk_)                  :: psb_zamaxv
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, izamax
   real(psb_dpk_)         :: amax
   complex(psb_dpk_)      :: cmax
@@ -401,11 +401,11 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
 
   complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(out)              :: info
   real(psb_dpk_), intent(out)     :: res
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, izamax
   real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
@@ -525,12 +525,12 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
 
   complex(psb_dpk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, intent(out)              :: info
-  integer, optional, intent(in)     :: jx
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), optional, intent(in)     :: jx
   real(psb_dpk_), intent(out)     :: res(:)
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, i, k, izamax
   real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err

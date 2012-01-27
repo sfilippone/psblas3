@@ -57,12 +57,12 @@ function psb_sxdot(x, y,desc_a, info, jx, jy)
 
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(in), optional    :: jx, jy
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(in), optional    :: jx, jy
+  integer(psb_ipk_), intent(out)             :: info
   real(psb_dpk_)                 :: psb_sxdot
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: sxdot
@@ -210,11 +210,11 @@ function psb_sxdotv(x, y,desc_a, info)
 
   real(psb_spk_), intent(in)     :: x(:), y(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
   real(psb_dpk_)                 :: psb_sxdotv
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: sxdot
@@ -295,10 +295,10 @@ end function psb_sxdotv
 function sxdot(n,x,ix,y,iy)
   use psb_const_mod
   real(psb_dpk_) :: sxdot
-  integer :: n,ix,iy
+  integer(psb_ipk_) :: n,ix,iy
   real(psb_spk_) :: x(*),y(*)
   real(psb_dpk_) :: tmp
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if ((ix /= 1).or.(iy /= 1)) then 
     write(psb_err_unit,*) 'WARNING unimplemented case in SXDOT'
@@ -366,10 +366,10 @@ subroutine psb_sxdotvs(res, x, y,desc_a, info)
   real(psb_spk_), intent(in)     :: x(:), y(:)
   real(psb_dpk_), intent(out)    :: res
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: sxdot
@@ -498,10 +498,10 @@ subroutine psb_sxmdots(res, x, y, desc_a, info)
   real(psb_spk_), intent(in)     :: x(:,:), y(:,:)
   real(psb_dpk_), intent(out)    :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer(psb_ipk_), intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me, idx, ndm,&
+  integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   real(psb_dpk_),allocatable  :: dot_local(:)
   real(psb_dpk_)         :: sxdot

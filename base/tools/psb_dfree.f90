@@ -45,10 +45,10 @@ subroutine psb_dfree(x, desc_a, info)
   !....parameters...
   real(psb_dpk_),allocatable, intent(inout)  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  integer             :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
 
@@ -115,9 +115,9 @@ subroutine psb_dfreev(x, desc_a, info)
   !....parameters...
   real(psb_dpk_),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info 
+  integer(psb_ipk_), intent(out)            :: info 
   !...locals....
-  integer             :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
 
@@ -172,9 +172,9 @@ subroutine psb_dfree_vect(x, desc_a, info)
   !....parameters...
   type(psb_d_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info 
+  integer(psb_ipk_), intent(out)             :: info 
   !...locals....
-  integer             :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me,err_act
   character(len=20)   :: name
 
 
@@ -230,9 +230,9 @@ subroutine psb_dfree_vect_r2(x, desc_a, info)
   !....parameters...
   type(psb_d_vect_type), allocatable, intent(inout) :: x(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info 
+  integer(psb_ipk_), intent(out)             :: info 
   !...locals....
-  integer             :: ictxt,np,me,err_act, i
+  integer(psb_ipk_) :: ictxt,np,me,err_act, i
   character(len=20)   :: name
 
 

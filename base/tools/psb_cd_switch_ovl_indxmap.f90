@@ -42,14 +42,14 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
 
   !     .. Array Arguments ..
   Type(psb_desc_type), Intent(inout) :: desc
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
 
   !     .. Local Scalars ..
-  Integer ::  i, j, np, me, mglob, ictxt, n_row, n_col
-  integer :: icomm, err_act
+  integer(psb_ipk_) ::  i, j, np, me, mglob, ictxt, n_row, n_col
+  integer(psb_ipk_) :: icomm, err_act
 
-  integer, allocatable :: vl(:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_), allocatable :: vl(:)
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name, ch_err
 
   name='cd_switch_ovl_indxmap'

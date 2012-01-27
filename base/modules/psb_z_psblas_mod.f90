@@ -30,235 +30,255 @@
 !!$ 
 !!$  
 module psb_z_psblas_mod
+  use psb_descriptor_type, only : psb_desc_type, psb_dpk_, psb_ipk_
+  use psb_z_vect_mod, only : psb_z_vect_type
+  use psb_z_mat_mod, only : psb_zspmat_type
 
   interface psb_gedot
     function psb_zdot_vect(x, y, desc_a,info) result(res)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                    :: res
       type(psb_z_vect_type), intent(inout) :: x, y
       type(psb_desc_type), intent(in)      :: desc_a
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end function psb_zdot_vect
     function psb_zdotv(x, y, desc_a,info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdotv
       complex(psb_dpk_), intent(in)    :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end function psb_zdotv
     function psb_zdot(x, y, desc_a, info, jx, jy) 
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdot
       complex(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer, optional, intent(in)      :: jx, jy
-      integer, intent(out)               :: info
+      integer(psb_ipk_), optional, intent(in)      :: jx, jy
+      integer(psb_ipk_), intent(out)               :: info
     end function psb_zdot
   end interface
 
 
   interface psb_gedots
-    subroutine  psb_zdotvs(res,x, y, desc_a, info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+    subroutine  psb_zdotvs(res,x, y, desc_a, info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type 
       complex(psb_dpk_), intent(out)      :: res
       complex(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_zdotvs
-    subroutine  psb_zmdots(res,x, y, desc_a,info) 
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+    subroutine  psb_zmdots(res,x, y, desc_a,info)
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type 
       complex(psb_dpk_), intent(out)      :: res(:)
       complex(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_zmdots
   end interface
 
   interface psb_geaxpby
     subroutine psb_zaxpby_vect(alpha, x, beta, y,&
          & desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_z_vect_type), intent (inout) :: x
       type(psb_z_vect_type), intent (inout) :: y
       complex(psb_dpk_), intent (in)        :: alpha, beta
       type(psb_desc_type), intent (in)      :: desc_a
-      integer, intent(out)                  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_zaxpby_vect
     subroutine psb_zaxpbyv(alpha, x, beta, y,&
          & desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_), intent (in)       ::  x(:)
       complex(psb_dpk_), intent (inout)    ::  y(:)
       complex(psb_dpk_), intent (in)       :: alpha, beta
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_zaxpbyv
     subroutine psb_zaxpby(alpha, x, beta, y,&
          & desc_a, info, n, jx, jy)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_), intent (in)       ::  x(:,:)
       complex(psb_dpk_), intent (inout)    ::  y(:,:)
       complex(psb_dpk_), intent (in)       ::  alpha, beta
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, optional, intent(in) :: n, jx, jy
-      integer, intent(out)                :: info
+      integer(psb_ipk_), optional, intent(in) :: n, jx, jy
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_zaxpby
   end interface
 
   interface psb_geamax
     function psb_zamax(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_zamax
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, optional, intent (in)      :: jx
-      integer, intent(out)                :: info
+      integer(psb_ipk_), optional, intent (in)      :: jx
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_zamax
     function psb_zamaxv(x, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_zamaxv
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_zamaxv
     function psb_zamax_vect(x, desc_a, info) result(res)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                        :: res
       type(psb_z_vect_type), intent (inout) :: x
       type(psb_desc_type), intent (in)      :: desc_a
-      integer, intent(out)                  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end function psb_zamax_vect
   end interface
 
   interface psb_geamaxs
     subroutine  psb_zamaxvs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)    :: x(:)
       type(psb_desc_type), intent (in)  :: desc_a
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_zamaxvs
     subroutine  psb_zmamaxs(res,x,desc_a,info,jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)       :: res(:)
       complex(psb_dpk_), intent (in)     :: x(:,:)
       type(psb_desc_type), intent (in)   :: desc_a
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: jx
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), optional, intent(in)      :: jx
     end subroutine psb_zmamaxs
   end interface
 
   interface psb_geasum
     function psb_zasum_vect(x, desc_a, info) result(res)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                        :: res
       type(psb_z_vect_type), intent (inout) :: x
       type(psb_desc_type), intent (in)      :: desc_a
-      integer, intent(out)                  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end function psb_zasum_vect
     function psb_zasum(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_zasum
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, optional, intent (in)      :: jx
-      integer, intent(out)                :: info
+      integer(psb_ipk_), optional, intent (in)      :: jx
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_zasum
     function psb_zasumv(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_zasumv
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_zasumv
   end interface
 
   interface psb_geasums
     subroutine  psb_zasumvs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_zasumvs
     subroutine  psb_zmasum(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res(:)
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_zmasum
   end interface
 
 
   interface psb_genrm2
     function psb_znrm2(x, desc_a, info, jx)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_znrm2
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, optional, intent (in)      :: jx
-      integer, intent(out)                :: info
+      integer(psb_ipk_), optional, intent (in)      :: jx
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_znrm2
     function psb_znrm2v(x, desc_a, info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_znrm2v
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_znrm2v
     function psb_znrm2_vect(x, desc_a, info) result(res)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                      :: res
       type(psb_z_vect_type), intent (inout)   :: x
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_znrm2_vect
   end interface
 
   interface psb_genrm2s
     subroutine  psb_znrm2vs(res,x,desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_znrm2vs
   end interface
 
 
   interface psb_spnrmi
     function psb_znrmi(a, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                    :: psb_znrmi
       type(psb_zspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end function psb_znrmi
   end interface
 
   interface psb_spnrm1
     function psb_zspnrm1(a, desc_a,info)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                      :: psb_zspnrm1
       type(psb_zspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)    :: desc_a
-      integer, intent(out)                :: info
+      integer(psb_ipk_), intent(out)                :: info
     end function psb_zspnrm1
   end interface
 
   interface psb_spmm
     subroutine psb_zspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(in)        :: a
       complex(psb_dpk_), intent(inout), target :: x(:,:)
       complex(psb_dpk_), intent(inout), target :: y(:,:)
@@ -266,14 +286,14 @@ module psb_z_psblas_mod
       type(psb_desc_type), intent(in)          :: desc_a
       character, optional, intent(in)          :: trans
       complex(psb_dpk_), optional, intent(inout),target :: work(:)
-      integer, optional, intent(in)        :: k, jx, jy
+      integer(psb_ipk_), optional, intent(in)        :: k, jx, jy
       logical, optional, intent(in)        :: doswap
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_zspmm
     subroutine psb_zspmv(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(in)        :: a
       complex(psb_dpk_), intent(inout), target :: x(:)
       complex(psb_dpk_), intent(inout), target :: y(:)
@@ -282,13 +302,12 @@ module psb_z_psblas_mod
       character, optional, intent(in)          :: trans
       complex(psb_dpk_), optional, intent(inout),target :: work(:)
       logical, optional, intent(in)        :: doswap
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_zspmv
     subroutine psb_zspmv_vect(alpha, a, x, beta, y,&
          & desc_a, info, trans, work,doswap)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_z_vect_mod, only : psb_z_vect_type
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(in)    :: a
       type(psb_z_vect_type), intent(inout) :: x
       type(psb_z_vect_type), intent(inout) :: y
@@ -297,7 +316,7 @@ module psb_z_psblas_mod
       character, optional, intent(in)      :: trans
       complex(psb_dpk_), optional, intent(inout),target :: work(:)
       logical, optional, intent(in)        :: doswap
-      integer, intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_zspmv_vect
   end interface
 
@@ -305,52 +324,51 @@ module psb_z_psblas_mod
     subroutine psb_zspsm(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,& 
          & diag, n, jx, jy, work)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(in)        :: t
       complex(psb_dpk_), intent(in), target    :: x(:,:)
       complex(psb_dpk_), intent(inout), target :: y(:,:)
       complex(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_desc_type), intent(in)          :: desc_a
       character, optional, intent(in)          :: trans, scale
-      integer, optional, intent(in)            :: n, jx, jy
-      integer, optional, intent(in)            :: choice
+      integer(psb_ipk_), optional, intent(in)            :: n, jx, jy
+      integer(psb_ipk_), optional, intent(in)            :: choice
       complex(psb_dpk_), optional, intent(in), target :: diag(:)
       complex(psb_dpk_), optional, intent(inout), target :: work(:)
-      integer, intent(out)               :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_zspsm
     subroutine psb_zspsv(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_ 
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(in)        :: t
       complex(psb_dpk_), intent(in), target    :: x(:)
       complex(psb_dpk_), intent(inout), target :: y(:)
       complex(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_desc_type), intent(in)          :: desc_a
       character, optional, intent(in)          :: trans, scale
-      integer, optional, intent(in)            :: choice
+      integer(psb_ipk_), optional, intent(in)            :: choice
       complex(psb_dpk_), optional, intent(in), target :: diag(:)
       complex(psb_dpk_), optional, intent(inout), target :: work(:)
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_zspsv
     subroutine psb_zspsv_vect(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,& 
          & diag, work)
-      use psb_descriptor_type, only : psb_desc_type, psb_dpk_ 
-      use psb_z_vect_mod, only : psb_z_vect_type
-      use psb_mat_mod, only : psb_zspmat_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_z_vect_type, psb_zspmat_type
       type(psb_zspmat_type), intent(inout)   :: t
       type(psb_z_vect_type), intent(inout)   :: x
       type(psb_z_vect_type), intent(inout)   :: y
       complex(psb_dpk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
       character, optional, intent(in)        :: trans, scale
-      integer, optional, intent(in)          :: choice
+      integer(psb_ipk_), optional, intent(in)          :: choice
       type(psb_z_vect_type), intent(inout), optional :: diag
       complex(psb_dpk_), optional, intent(inout), target :: work(:)
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_zspsv_vect
   end interface
 

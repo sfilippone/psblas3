@@ -70,24 +70,24 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Type(psb_dspmat_type),Intent(in)    :: a
   Type(psb_dspmat_type),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in), target :: desc_a
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
   character(len=5), optional          :: outfmt 
-  integer, intent(in), optional       :: data
+  integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  Integer    :: np,me,counter,proc,i, &
+  integer(psb_ipk_) :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr
-  Integer :: l1, icomm, err_act
-  Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
+  integer(psb_ipk_) :: l1, icomm, err_act
+  integer(psb_ipk_), allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
   real(psb_dpk_), allocatable :: valsnd(:)
   type(psb_d_coo_sparse_mat), allocatable :: acoo
-  integer, pointer  :: idxv(:)
+  integer(psb_ipk_), pointer  :: idxv(:)
   logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
-  integer           :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 

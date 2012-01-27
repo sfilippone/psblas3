@@ -37,7 +37,7 @@
 !    is equal to the largest index found on any process. 
 ! 
 ! Arguments: 
-!    v       - integer, dimension(:).         The array containg the partitioning scheme.
+!    v       - integer(psb_ipk_), dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
@@ -49,20 +49,20 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: ictxt, v(:)
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+  integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
   logical, intent(in), optional     :: globalcheck
 
   !locals
-  Integer             :: i,j,np,me,loc_row,err,&
+  integer(psb_ipk_) :: i,j,np,me,loc_row,err,&
        & loc_col,nprocs,n, k,glx,nlu,&
        & idx, flag_, err_act,m, novrl, norphan,&
        & npr_ov, itmpov, i_pnt, nrt
-  integer              :: int_err(5),exch(3)
-  Integer, allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
+  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
        & nov(:), ov_idx(:,:)
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   logical              :: check_, islarge
   character(len=20)    :: name
 

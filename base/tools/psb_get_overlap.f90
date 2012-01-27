@@ -38,18 +38,18 @@
 !    current (calling) process. 
 ! 
 ! Arguments: 
-!    ovrel(:) - integer, allocatable      Array containing the output list              
+!    ovrel(:) - integer(psb_ipk_), allocatable      Array containing the output list              
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !
 subroutine psb_get_ovrlap(ovrel,desc,info)
   use psb_base_mod, psb_protect_name => psb_get_ovrlap
   implicit none 
-  integer, allocatable, intent(out) :: ovrel(:)
+  integer(psb_ipk_), allocatable, intent(out) :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out)            :: info
+  integer(psb_ipk_), intent(out)            :: info
 
-  integer  :: i,j, err_act
+  integer(psb_ipk_) :: i,j, err_act
   character(len=20)    :: name
 
   info = psb_success_

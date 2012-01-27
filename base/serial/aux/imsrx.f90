@@ -36,14 +36,14 @@ subroutine imsrx(n,x,indx,idir,flag)
   use psb_serial_mod
   use psb_ip_reord_mod
   implicit none
-  integer :: n,idir,flag
-  integer :: x(n)
-  integer :: indx(n)
+  integer(psb_ipk_) :: n,idir,flag
+  integer(psb_ipk_) :: x(n)
+  integer(psb_ipk_) :: indx(n)
 
-  integer, allocatable :: iaux(:)
+  integer(psb_ipk_), allocatable :: iaux(:)
 
-  integer :: iswap, iret, info, lp, k
-  integer :: lswap, ixswap
+  integer(psb_ipk_) :: iswap, iret, info, lp, k
+  integer(psb_ipk_) :: lswap, ixswap
 
   if (n<0) then 
     return

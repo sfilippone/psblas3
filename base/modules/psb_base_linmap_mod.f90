@@ -41,8 +41,8 @@ module psb_base_linmap_mod
   
 
   type psb_base_linmap_type
-    integer :: kind
-    integer, allocatable  :: iaggr(:), naggr(:)
+    integer(psb_ipk_) :: kind
+    integer(psb_ipk_), allocatable  :: iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
   contains
@@ -67,7 +67,7 @@ contains
   function base_get_kind(map) result(val)
     implicit none
     class(psb_base_linmap_type), intent(in) :: map
-    Integer                      :: val
+    integer(psb_ipk_) :: val
   
     val = map%kind
   end function base_get_kind
@@ -75,7 +75,7 @@ contains
 
   subroutine base_set_kind(map_kind,map)    
     implicit none
-    integer, intent(in)          :: map_kind
+    integer(psb_ipk_), intent(in)          :: map_kind
     class(psb_base_linmap_type), intent(inout) :: map
 
     map%kind = map_kind
@@ -141,7 +141,7 @@ contains
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_base_linmap_type) :: mapin,mapout
-    integer, intent(out)       :: info 
+    integer(psb_ipk_), intent(out)       :: info 
     
     mapout%kind = mapin%kind
     call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)
@@ -158,7 +158,7 @@ contains
   subroutine  base_free(map,info)
     implicit none 
     class(psb_base_linmap_type) :: map
-    integer, intent(out)       :: info 
+    integer(psb_ipk_), intent(out)       :: info 
     
     if (allocated(map%iaggr)) &
          & deallocate(map%iaggr,stat=info)

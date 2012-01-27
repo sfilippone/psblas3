@@ -47,16 +47,16 @@ subroutine psb_sgelp(trans,iperm,x,info)
   implicit none
 
   real(psb_spk_), intent(inout) ::  x(:,:)
-  integer, intent(in)           ::  iperm(:)
-  integer, intent(out)          ::  info
+  integer(psb_ipk_), intent(in)           ::  iperm(:)
+  integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         :: trans
   ! local variables
-  integer                    :: ictxt
+  integer(psb_ipk_) :: ictxt
   real(psb_spk_),allocatable :: temp(:)
-  integer                    :: int_err(5), i1sz, i2sz, err_act,i,j
-  integer, allocatable       :: itemp(:)
+  integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
+  integer(psb_ipk_), allocatable       :: itemp(:)
   real(psb_spk_),parameter   :: one=1
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   character(len=20)   :: name, ch_err
   name = 'psb_sgelp'
@@ -179,17 +179,17 @@ subroutine psb_sgelpv(trans,iperm,x,info)
   implicit none
 
   real(psb_spk_), intent(inout) ::  x(:)
-  integer, intent(in)           ::  iperm(:)
-  integer, intent(out)          ::  info
+  integer(psb_ipk_), intent(in)           ::  iperm(:)
+  integer(psb_ipk_), intent(out)          ::  info
   character, intent(in)         ::  trans
 
   ! local variables
-  integer :: ictxt
-  integer :: int_err(5), i1sz, err_act, i
+  integer(psb_ipk_) :: ictxt
+  integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
   real(psb_spk_),allocatable  ::  temp(:)
-  integer, allocatable        :: itemp(:)
+  integer(psb_ipk_), allocatable        :: itemp(:)
   real(psb_spk_),parameter    :: one=1
-  integer                     :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
 
   character(len=20)   :: name, ch_err
   name = 'psb_sgelpv'

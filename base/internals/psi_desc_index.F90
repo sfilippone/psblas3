@@ -41,7 +41,7 @@
 ! desc_a       - type(psb_desc_type)   The descriptor; in this context only the index 
 !                                       mapping parts are used.
 ! index_in(:)  - integer               The index list, build format  
-! index_out(:) - integer, allocatable  The index list, assembled format
+! index_out(:) - integer(psb_ipk_), allocatable  The index list, assembled format
 ! glob_idx     - logical               Whether the input indices are in local or global
 !                                      numbering; the global numbering is used when 
 !                                      converting the overlap exchange lists.
@@ -116,24 +116,24 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
 
   !    ...array parameters.....
   type(psb_desc_type) :: desc
-  integer         :: index_in(:),dep_list(:)
-  integer,allocatable  :: desc_index(:)
-  integer         :: length_dl,nsnd,nrcv,info
+  integer(psb_ipk_) :: index_in(:),dep_list(:)
+  integer(psb_ipk_),allocatable  :: desc_index(:)
+  integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
   logical         :: isglob_in
   !    ....local scalars...        
-  integer :: j,me,np,i,proc
+  integer(psb_ipk_) :: j,me,np,i,proc
   !    ...parameters...
-  integer :: ictxt
-  integer, parameter  :: no_comm=-1
+  integer(psb_ipk_) :: ictxt
+  integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
-  integer,allocatable  :: brvindx(:),rvsz(:),&
+  integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
 
-  integer :: ihinsz,ntot,k,err_act,nidx,&
+  integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
        & idxr, idxs, iszs, iszr, nesd, nerv, icomm
 
   logical,parameter :: usempi=.true.
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name
 
   info = psb_success_
@@ -183,7 +183,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
@@ -289,8 +289,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,mpi_integer,&
-       & rcvbuf,rvsz,brvindx,mpi_integer,icomm,info)
+  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_integer,&
+       & rcvbuf,rvsz,brvindx,psb_mpi_integer,icomm,info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999

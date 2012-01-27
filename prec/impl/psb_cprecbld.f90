@@ -38,19 +38,19 @@ subroutine psb_cprecbld(a,desc_a,p,info,upd,amold,afmt,vmold)
   type(psb_cspmat_type), intent(in), target  :: a
   type(psb_desc_type), intent(in), target    :: desc_a
   type(psb_cprec_type),intent(inout)         :: p
-  integer, intent(out)                       :: info
+  integer(psb_ipk_), intent(out)                       :: info
   character, intent(in), optional            :: upd
   character(len=*), intent(in), optional    :: afmt
   class(psb_c_base_sparse_mat), intent(in), optional :: amold
   class(psb_c_base_vect_type), intent(in), optional  :: vmold
 
   ! Local scalars
-  Integer      :: err, n_row, n_col,ictxt,&
+  integer(psb_ipk_) :: err, n_row, n_col,ictxt,&
        & me,np,mglob, err_act
-  integer      :: int_err(5)
+  integer(psb_ipk_) :: int_err(5)
   character    :: upd_
 
-  integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
+  integer(psb_ipk_),parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 

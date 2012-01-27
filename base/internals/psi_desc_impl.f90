@@ -35,11 +35,11 @@ subroutine psi_renum_index(iperm,idx,info)
   use psb_serial_mod 
   implicit none 
 
-  integer, intent(out)   :: info
-  integer, intent(in)    :: iperm(:)
-  integer, intent(inout) :: idx(:)
+  integer(psb_ipk_), intent(out)   :: info
+  integer(psb_ipk_), intent(in)    :: iperm(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
 
-  integer :: i,j,k,nh
+  integer(psb_ipk_) :: i,j,k,nh
 
   i=1
   k=idx(i)
@@ -67,18 +67,18 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
   implicit none
 
   !     ....scalars parameters....
-  integer, intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
+  integer(psb_ipk_), intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
   type(psb_desc_type), intent(inout) :: cdesc
-  integer, intent(out)               :: info
+  integer(psb_ipk_), intent(out)               :: info
 
   !     ....local scalars....      
-  integer  :: np,me
-  integer  :: ictxt, err_act,nxch,nsnd,nrcv,j,k
+  integer(psb_ipk_) :: np,me
+  integer(psb_ipk_) :: ictxt, err_act,nxch,nsnd,nrcv,j,k
   !     ...local array...
-  integer, allocatable  :: idx_out(:), tmp_mst_idx(:)
+  integer(psb_ipk_), allocatable  :: idx_out(:), tmp_mst_idx(:)
 
   !     ...parameters
-  integer :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: debug=.false.
   character(len=20)  :: name
 
@@ -201,10 +201,10 @@ end subroutine psi_cnv_dsc
 subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)
   use psi_mod, psi_protect_name => psi_inner_cnvs
 
-  integer, intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
-  integer, intent(inout) :: x
+  integer(psb_ipk_), intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(inout) :: x
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -245,11 +245,11 @@ end subroutine psi_inner_cnvs
 
 subroutine psi_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
   use psi_mod, psi_protect_name =>  psi_inner_cnvs2
-  integer, intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
-  integer, intent(in)  :: x
-  integer, intent(out) :: y
+  integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)  :: x
+  integer(psb_ipk_), intent(out) :: y
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -291,11 +291,11 @@ end subroutine psi_inner_cnvs2
 
 subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
   use psi_mod, psi_protect_name =>  psi_inner_cnv1
-  integer, intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in), optional    :: mask(:)
-  integer, intent(inout) :: x(:)
+  integer(psb_ipk_), intent(inout) :: x(:)
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -372,12 +372,12 @@ end subroutine psi_inner_cnv1
 
 subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
   use psi_mod, psi_protect_name =>  psi_inner_cnv2
-  integer, intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
+  integer(psb_ipk_), intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
   logical, intent(in),optional  :: mask(:)
-  integer, intent(in)  :: x(:)
-  integer, intent(out) :: y(:)
+  integer(psb_ipk_), intent(in)  :: x(:)
+  integer(psb_ipk_), intent(out) :: y(:)
 
-  integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+  integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
   !
   ! When a large descriptor is assembled the indices 
   ! are kept in a (hashed) list of ordered lists. 
@@ -465,11 +465,11 @@ subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
   implicit none
 
   !     ....scalars parameters....
-  integer, intent(in)               :: me, ovrlap_elem(:,:)
-  integer, allocatable, intent(out) :: mst_idx(:) 
-  integer, intent(out)              :: info
+  integer(psb_ipk_), intent(in)               :: me, ovrlap_elem(:,:)
+  integer(psb_ipk_), allocatable, intent(out) :: mst_idx(:) 
+  integer(psb_ipk_), intent(out)              :: info
 
-  integer  :: i, j, proc, nov,isz, ip, err_act, idx
+  integer(psb_ipk_) :: i, j, proc, nov,isz, ip, err_act, idx
   character(len=20)  :: name
 
   name='psi_bld_ovr_mst'

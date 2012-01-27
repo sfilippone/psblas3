@@ -39,7 +39,7 @@
 ! Arguments: 
 !    trans    - character.                     Whether iperm or its transpose 
 !                                              should be applied.
-!    iperm    - integer,dimension(:).          The renumbering scheme.
+!    iperm    - integer(psb_ipk_),dimension(:).          The renumbering scheme.
 !    desc_a   - type(psb_desc_type).         The communication descriptor
 !                                              to be updated.
 !    info     - integer.                       Return code
@@ -52,14 +52,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
 
   !...parameters....
   type(psb_desc_type), intent(inout)  :: desc_a
-  integer, intent(inout)              :: iperm(:)
+  integer(psb_ipk_), intent(inout)              :: iperm(:)
   character, intent(in)               :: trans
-  integer, intent(out)                :: info
+  integer(psb_ipk_), intent(out)                :: info
   !....locals....
-  integer              :: i,j,np,me, n_col, kh, nh
-  integer              :: dectype
-  integer              :: ictxt,n_row, int_err(5), err_act
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: i,j,np,me, n_col, kh, nh
+  integer(psb_ipk_) :: dectype
+  integer(psb_ipk_) :: ictxt,n_row, int_err(5), err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 

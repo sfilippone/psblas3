@@ -39,7 +39,7 @@ program zmm2hb
   use psb_util_mod
   type(psb_zspmat_type) :: a
   
-  integer info
+  integer(psb_ipk_) :: info
 
   call mm_mat_read(a,info)
 

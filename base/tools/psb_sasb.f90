@@ -48,12 +48,12 @@ subroutine psb_sasb(x, desc_a, info)
 
   type(psb_desc_type), intent(in) ::  desc_a
   real(psb_spk_), allocatable, intent(inout)       ::  x(:,:)
-  integer, intent(out)            ::  info
+  integer(psb_ipk_), intent(out)            ::  info
 
   ! local variables
-  integer :: ictxt,np,me,nrow,ncol, err_act
-  integer :: i1sz, i2sz
-  integer             :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz, i2sz
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
@@ -181,12 +181,12 @@ subroutine psb_sasbv(x, desc_a, info)
 
   type(psb_desc_type), intent(in) ::  desc_a
   real(psb_spk_), allocatable, intent(inout)   ::  x(:)
-  integer, intent(out)        ::  info
+  integer(psb_ipk_), intent(out)        ::  info
 
   ! local variables
-  integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol, err_act
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
   info = psb_success_
@@ -256,15 +256,15 @@ subroutine psb_sasb_vect(x, desc_a, info, mold, scratch)
 
   type(psb_desc_type), intent(in)      ::  desc_a
   type(psb_s_vect_type), intent(inout) ::  x
-  integer, intent(out)                 ::  info
+  integer(psb_ipk_), intent(out)                 ::  info
   class(psb_s_base_vect_type), intent(in), optional :: mold
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
   logical :: scratch_
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
   info = psb_success_
@@ -336,15 +336,15 @@ subroutine psb_sasb_vect_r2(x, desc_a, info, mold, scratch)
 
   type(psb_desc_type), intent(in)      ::  desc_a
   type(psb_s_vect_type), intent(inout) ::  x(:)
-  integer, intent(out)                 ::  info
+  integer(psb_ipk_), intent(out)                 ::  info
   class(psb_s_base_vect_type), intent(in), optional :: mold
   logical, intent(in), optional        :: scratch
 
   ! local variables
-  integer :: ictxt,np,me, i, n 
-  integer :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: ictxt,np,me, i, n 
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
   logical :: scratch_
-  integer              :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
   info = psb_success_

@@ -47,7 +47,7 @@ psb_c_bjacprec.o psb_c_diagprec.o psb_c_nullprec.o: psb_prec_mod.o psb_c_base_pr
 psb_z_bjacprec.o psb_z_diagprec.o psb_z_nullprec.o: psb_prec_mod.o psb_z_base_prec_mod.o 
 
 veryclean: clean
-	/bin/rm -f $(LIBNAME)
+	/bin/rm -f $(LIBNAME) *$(.mod)
 
 iclean:
 	cd impl && $(MAKE) clean

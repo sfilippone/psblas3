@@ -71,11 +71,11 @@
 subroutine camsort_up(n,k,l,iret)
   use cacmp_mod
   implicit none
-  integer n, iret
+  integer(psb_ipk_) :: n, iret
   complex(psb_spk_)  k(n)
-  integer l(0:n+1)
+  integer(psb_ipk_) :: l(0:n+1)
   !
-  integer p,q,s,t
+  integer(psb_ipk_) :: p,q,s,t
   intrinsic iabs,isign
   !     ..
   iret = 0

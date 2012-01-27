@@ -3,7 +3,7 @@ module psb_d_bjacprec
   use psb_d_base_prec_mod
   
   type, extends(psb_d_base_prec_type)   :: psb_d_bjac_prec_type
-    integer, allocatable                :: iprcparm(:)
+    integer(psb_ipk_), allocatable                :: iprcparm(:)
     type(psb_dspmat_type), allocatable  :: av(:)
     type(psb_d_vect_type), allocatable  :: dv
   contains
@@ -31,22 +31,22 @@ module psb_d_bjacprec
   
   interface  
     subroutine psb_d_bjac_dump(prec,info,prefix,head)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
       class(psb_d_bjac_prec_type), intent(in) :: prec
-      integer, intent(out)                    :: info
+      integer(psb_ipk_), intent(out)                    :: info
       character(len=*), intent(in), optional  :: prefix,head
     end subroutine psb_d_bjac_dump
   end interface
 
   interface  
     subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_d_bjac_prec_type), intent(inout)  :: prec
       real(psb_dpk_),intent(in)         :: alpha,beta
       type(psb_d_vect_type),intent(inout)   :: x
       type(psb_d_vect_type),intent(inout)   :: y
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_bjac_apply_vect
@@ -54,14 +54,14 @@ module psb_d_bjacprec
 
   interface
     subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
       
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_d_bjac_prec_type), intent(in)  :: prec
       real(psb_dpk_),intent(in)         :: alpha,beta
       real(psb_dpk_),intent(inout)      :: x(:)
       real(psb_dpk_),intent(inout)      :: y(:)
-      integer, intent(out)              :: info
+      integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
       real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_bjac_apply
@@ -69,20 +69,20 @@ module psb_d_bjacprec
   
   interface
     subroutine psb_d_bjac_precinit(prec,info)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
       class(psb_d_bjac_prec_type),intent(inout) :: prec
-      integer, intent(out)                     :: info
+      integer(psb_ipk_), intent(out)                     :: info
     end subroutine psb_d_bjac_precinit
   end interface
   
   interface
     subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_, &
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_, &
            & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type
       type(psb_dspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
       class(psb_d_bjac_prec_type),intent(inout) :: prec
-      integer, intent(out)                      :: info
+      integer(psb_ipk_), intent(out)                      :: info
       character, intent(in), optional           :: upd
       character(len=*), intent(in), optional    :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: amold
@@ -92,39 +92,39 @@ module psb_d_bjacprec
   
   interface
     subroutine psb_d_bjac_precseti(prec,what,val,info)
-      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
       class(psb_d_bjac_prec_type),intent(inout) :: prec
-      integer, intent(in)                      :: what 
-      integer, intent(in)                      :: val 
-      integer, intent(out)                     :: info
+      integer(psb_ipk_), intent(in)                      :: what 
+      integer(psb_ipk_), intent(in)                      :: val 
+      integer(psb_ipk_), intent(out)                     :: info
     end subroutine psb_d_bjac_precseti
   end interface
   
 !!$  interface
 !!$    subroutine psb_d_bjac_precsetr(prec,what,val,info)
-!!$      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+!!$      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
 !!$      class(psb_d_bjac_prec_type),intent(inout) :: prec
-!!$      integer, intent(in)                      :: what 
+!!$      integer(psb_ipk_), intent(in)                      :: what 
 !!$      real(psb_dpk_), intent(in)               :: val 
-!!$      integer, intent(out)                     :: info
+!!$      integer(psb_ipk_), intent(out)                     :: info
 !!$    end subroutine psb_d_bjac_precsetr
 !!$  end interface
 !!$  
 !!$  interface
 !!$    subroutine psb_d_bjac_precsetc(prec,what,val,info)
-!!$      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+!!$      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
 !!$      class(psb_d_bjac_prec_type),intent(inout) :: prec
-!!$      integer, intent(in)                      :: what 
+!!$      integer(psb_ipk_), intent(in)                      :: what 
 !!$      character(len=*), intent(in)             :: val
-!!$      integer, intent(out)                     :: info
+!!$      integer(psb_ipk_), intent(out)                     :: info
 !!$    end subroutine psb_d_bjac_precsetc
 !!$  end interface
 !!$  
 !!$  interface 
 !!$    subroutine psb_d_bjac_precfree(prec,info)
-!!$      import :: psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
+!!$      import :: psb_ipk_, psb_desc_type, psb_d_bjac_prec_type, psb_d_vect_type, psb_dpk_
 !!$      class(psb_d_bjac_prec_type), intent(inout) :: prec
-!!$      integer, intent(out)                :: info
+!!$      integer(psb_ipk_), intent(out)                :: info
 !!$    end subroutine psb_d_bjac_precfree
 !!$  end interface 
 
@@ -135,11 +135,11 @@ contains
     Implicit None
 
     class(psb_d_bjac_prec_type), intent(in) :: prec
-    integer, intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: iout
 
-    Integer :: err_act, nrow, info
+    integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='d_bjac_precdescr'
-    integer :: iout_
+    integer(psb_ipk_) :: iout_
 
     call psb_erractionsave(err_act)
 
@@ -211,10 +211,10 @@ contains
     Implicit None
 
     class(psb_d_bjac_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     real(psb_dpk_), intent(in)               :: val 
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='d_bjac_precset'
 
     call psb_erractionsave(err_act)
@@ -238,10 +238,10 @@ contains
     Implicit None
 
     class(psb_d_bjac_prec_type),intent(inout) :: prec
-    integer, intent(in)                      :: what 
+    integer(psb_ipk_), intent(in)                      :: what 
     character(len=*), intent(in)             :: val
-    integer, intent(out)                     :: info
-    Integer :: err_act, nrow
+    integer(psb_ipk_), intent(out)                     :: info
+    integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='d_bjac_precset'
 
     call psb_erractionsave(err_act)
@@ -265,9 +265,9 @@ contains
     Implicit None
 
     class(psb_d_bjac_prec_type), intent(inout) :: prec
-    integer, intent(out)                :: info
+    integer(psb_ipk_), intent(out)                :: info
 
-    Integer :: err_act, i
+    integer(psb_ipk_) :: err_act, i
     character(len=20)  :: name='d_bjac_precfree'
 
     call psb_erractionsave(err_act)

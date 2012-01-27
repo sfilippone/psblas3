@@ -88,13 +88,13 @@ module psb_indx_map_mod
 
   type      :: psb_indx_map
 
-    integer :: state          = psb_desc_null_
-    integer :: ictxt          = -1
-    integer :: mpic           = -1
-    integer :: global_rows    = -1
-    integer :: global_cols    = -1
-    integer :: local_rows     = -1
-    integer :: local_cols     = -1
+    integer(psb_ipk_) :: state          = psb_desc_null_
+    integer(psb_ipk_) :: ictxt          = -1
+    integer(psb_ipk_) :: mpic           = -1
+    integer(psb_ipk_) :: global_rows    = -1
+    integer(psb_ipk_) :: global_cols    = -1
+    integer(psb_ipk_) :: local_rows     = -1
+    integer(psb_ipk_) :: local_cols     = -1
 
   contains
 
@@ -169,12 +169,12 @@ module psb_indx_map_mod
 
   interface 
     subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
-      import :: psb_indx_map
+      import :: psb_indx_map, psb_ipk_
       implicit none 
-      integer, intent(in) :: idx(:)
-      integer, allocatable, intent(out) ::  iprc(:)
+      integer(psb_ipk_), intent(in) :: idx(:)
+      integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
       class(psb_indx_map), intent(in) :: idxmap
-      integer, intent(out) :: info
+      integer(psb_ipk_), intent(out) :: info
     end subroutine psb_indx_map_fnd_owner
   end interface
 
@@ -191,7 +191,7 @@ contains
   function base_get_state(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%state
 
@@ -201,7 +201,7 @@ contains
   function base_get_gr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%global_rows
 
@@ -211,7 +211,7 @@ contains
   function base_get_gc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%global_cols
 
@@ -221,7 +221,7 @@ contains
   function base_get_lr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%local_rows
 
@@ -231,7 +231,7 @@ contains
   function base_get_lc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%local_cols
 
@@ -241,7 +241,7 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%ictxt
 
@@ -251,7 +251,7 @@ contains
   function base_get_mpic(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer :: val
+    integer(psb_ipk_) :: val
 
     val = idxmap%mpic
 
@@ -261,7 +261,7 @@ contains
   subroutine base_set_state(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%state = val
   end subroutine base_set_state
@@ -269,7 +269,7 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%ictxt = val
   end subroutine base_set_ctxt
@@ -277,7 +277,7 @@ contains
   subroutine base_set_gr(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_rows = val
   end subroutine base_set_gr
@@ -285,7 +285,7 @@ contains
   subroutine base_set_gc(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_cols = val
   end subroutine base_set_gc
@@ -293,7 +293,7 @@ contains
   subroutine base_set_lr(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%local_rows = val
   end subroutine base_set_lr
@@ -301,7 +301,7 @@ contains
   subroutine base_set_lc(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%local_cols = val
   end subroutine base_set_lc
@@ -309,7 +309,7 @@ contains
   subroutine base_set_mpic(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: val
+    integer(psb_ipk_), intent(in)  :: val
 
     idxmap%mpic = val
   end subroutine base_set_mpic
@@ -390,11 +390,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
 
@@ -416,13 +416,13 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
 
@@ -445,11 +445,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
 
@@ -470,12 +470,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_l2g'
     logical, parameter :: debug=.false.
 
@@ -498,11 +498,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l'
     logical, parameter :: debug=.false.
 
@@ -524,13 +524,13 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l'
     logical, parameter :: debug=.false.
 
@@ -553,11 +553,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l'
     logical, parameter :: debug=.false.
 
@@ -579,13 +579,13 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l'
     logical, parameter :: debug=.false.
 
@@ -610,10 +610,10 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
 
@@ -635,12 +635,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin
-    integer, intent(out)   :: idxout
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
 
@@ -663,11 +663,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(inout) :: idx(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
 
@@ -689,11 +689,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)    :: idxin(:)
-    integer, intent(out)   :: idxout(:)
-    integer, intent(out)   :: info 
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
 
@@ -716,9 +716,9 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(out) :: info
+    integer(psb_ipk_), intent(out) :: info
 
-    Integer :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_asb'
     logical, parameter :: debug=.false.
 
@@ -773,9 +773,9 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer, intent(in)  :: ictxt, vl(:)
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_init_vl'
     logical, parameter :: debug=.false.
 
@@ -798,8 +798,8 @@ contains
     implicit none 
     class(psb_indx_map), intent(in)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
-    integer, intent(out) :: info
-    Integer :: err_act
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_clone'
     logical, parameter :: debug=.false.
 

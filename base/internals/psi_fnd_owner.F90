@@ -40,7 +40,7 @@
 !                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
-!    iprc(:)  - integer, allocatable    Output: process identifiers for the corresponding
+!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
 !                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
@@ -61,19 +61,19 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer, intent(in) :: nv
-  integer, intent(in) :: idx(:)
-  integer, allocatable, intent(out) ::  iprc(:)
+  integer(psb_ipk_), intent(in) :: nv
+  integer(psb_ipk_), intent(in) :: idx(:)
+  integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   type(psb_desc_type), intent(in) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
 
 
-  integer, allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
+  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
 
-  integer             :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j
-  integer             :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name

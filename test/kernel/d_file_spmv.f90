@@ -50,10 +50,10 @@ program d_file_spmv
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver paramters
-  integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
+  integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nr
   integer(psb_long_int_k_) :: amatsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps,cond
@@ -61,18 +61,18 @@ program d_file_spmv
   character(len=5)   :: afmt
   character(len=20)  :: name
   character(len=2)   :: filefmt
-  integer, parameter :: iunit=12
-  integer, parameter :: times=10
-  integer   :: iparm(20)
+  integer(psb_ipk_), parameter :: iunit=12
+  integer(psb_ipk_), parameter :: times=10
+  integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer            :: i,info,j,m_problem
-  integer            :: internal, m,ii,nnzero
+  integer(psb_ipk_) :: i,info,j,m_problem
+  integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, r_amax, b_amax,&
        &scale,resmx,resmxp, flops, bdwdth
   real(psb_dpk_) :: tt1, tt2, tflops
-  integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:)
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
+  integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
 
 
   call psb_init(ictxt)

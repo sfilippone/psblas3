@@ -35,29 +35,29 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_prec_const_mod
 
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
+  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_ipk_, psb_long_int_k_,&
        & psb_err_unit, psb_inp_unit, psb_out_unit
 
-  integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
+  integer(psb_ipk_), parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
 
   ! Entries in iprcparm: preconditioner type, factorization type,
   ! prolongation type, restriction type, renumbering algorithm,
   ! number of overlap layers, pointer to SuperLU factors, 
   ! levels of fill in for ILU(N), 
-  integer, parameter :: psb_p_type_=1, psb_f_type_=2
-  integer, parameter :: psb_ilu_fill_in_=8
+  integer(psb_ipk_), parameter :: psb_p_type_=1, psb_f_type_=2
+  integer(psb_ipk_), parameter :: psb_ilu_fill_in_=8
   !Renumbering. SEE BELOW
-  integer, parameter :: psb_renum_none_=0, psb_renum_glb_=1, psb_renum_gps_=2
-  integer, parameter :: psb_ifpsz=10
+  integer(psb_ipk_), parameter :: psb_renum_none_=0, psb_renum_glb_=1, psb_renum_gps_=2
+  integer(psb_ipk_), parameter :: psb_ifpsz=10
   ! Entries in rprcparm: ILU(E) epsilon, smoother omega
-  integer, parameter :: psb_fact_eps_=1
-  integer, parameter :: psb_rfpsz=4
+  integer(psb_ipk_), parameter :: psb_fact_eps_=1
+  integer(psb_ipk_), parameter :: psb_rfpsz=4
   ! Factorization types: none, ILU(N), ILU(E)
-  integer, parameter :: psb_f_none_=0,psb_f_ilu_n_=1
+  integer(psb_ipk_), parameter :: psb_f_none_=0,psb_f_ilu_n_=1
   ! Fields for sparse matrices ensembles: 
-  integer, parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
-  integer, parameter :: psb_max_avsz=psb_bp_ilu_avsz
+  integer(psb_ipk_), parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
+  integer(psb_ipk_), parameter :: psb_max_avsz=psb_bp_ilu_avsz
 
 
   interface psb_check_def
@@ -70,7 +70,7 @@ contains
 
   function pr_to_str(iprec)
 
-    integer, intent(in)  :: iprec
+    integer(psb_ipk_), intent(in)  :: iprec
     character(len=10)     :: pr_to_str
 
     select case(iprec)
@@ -88,14 +88,14 @@ contains
 
 
   function is_legal_prec(ip)
-    integer, intent(in) :: ip
+    integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_prec
 
     is_legal_prec = ((ip>=psb_noprec_).and.(ip<=psb_bjac_))
     return
   end function is_legal_prec
   function is_legal_ml_fact(ip)
-    integer, intent(in) :: ip
+    integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_fact
 
     is_legal_ml_fact = (ip == psb_f_ilu_n_)
@@ -111,12 +111,13 @@ contains
 
 
   subroutine psb_icheck_def(ip,name,id,is_legal)
-    integer, intent(inout) :: ip
-    integer, intent(in)    :: id
+    integer(psb_ipk_), intent(inout) :: ip
+    integer(psb_ipk_), intent(in)    :: id
     character(len=*), intent(in) :: name
     interface 
       function is_legal(i)
-        integer, intent(in) :: i
+        import :: psb_ipk_
+        integer(psb_ipk_), intent(in) :: i
         logical             :: is_legal
       end function is_legal
     end interface
@@ -133,7 +134,7 @@ contains
     character(len=*), intent(in) :: name
     interface 
       function is_legal(i)
-        use psb_const_mod
+        import :: psb_ipk_, psb_spk_
         real(psb_spk_), intent(in) :: i
         logical             :: is_legal
       end function is_legal
@@ -151,7 +152,7 @@ contains
     character(len=*), intent(in) :: name
     interface 
       function is_legal(i)
-        use psb_const_mod
+        import :: psb_ipk_, psb_spk_, psb_dpk_
         real(psb_dpk_), intent(in) :: i
         logical             :: is_legal
       end function is_legal

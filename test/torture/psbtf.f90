@@ -9,9 +9,9 @@ program main
   use psb_base_mod
   use psb_mvsv_tester
   implicit none
-  integer, parameter :: psb_fidasize_=16
-  integer :: res,passed=0,failed=0;
-  integer            :: ictxt, iam=-1, np=-1
+  integer(psb_ipk_), parameter :: psb_fidasize_=16
+  integer(psb_ipk_) :: res,passed=0,failed=0;
+  integer(psb_ipk_) :: ictxt, iam=-1, np=-1
   character(len=psb_fidasize_) :: afmt
 
   write(psb_out_unit,*) 'Format ?'

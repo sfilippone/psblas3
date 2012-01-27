@@ -109,19 +109,19 @@ subroutine psb_scg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop,cond)
   Real(psb_spk_), Intent(in)       :: b(:)
   Real(psb_spk_), Intent(inout)    :: x(:)
   Real(psb_spk_), Intent(in)       :: eps
-  integer, intent(out)               :: info
-  Integer, Optional, Intent(in)      :: itmax, itrace, istop
-  Integer, Optional, Intent(out)     :: iter
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err,cond
 !!$   Local data
   real(psb_spk_), allocatable, target   :: aux(:), wwrk(:,:), td(:),tu(:),eig(:),ewrk(:)
-  integer, allocatable :: ibl(:), ispl(:), iwrk(:)
+  integer(psb_ipk_), allocatable :: ibl(:), ispl(:), iwrk(:)
   real(psb_spk_), pointer  :: q(:), p(:), r(:), z(:), w(:)
   real(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
-  integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5), ieg,nspl, istebz
   real(psb_dpk_)     :: derr  
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_itconv_type)       :: stopdat
   logical                     :: do_cond
   character(len=20)           :: name
@@ -339,19 +339,19 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type), Intent(inout) :: b
   type(psb_s_vect_type), Intent(inout) :: x
   Real(psb_spk_), Intent(in)           :: eps
-  integer, intent(out)                 :: info
-  Integer, Optional, Intent(in)        :: itmax, itrace, istop
-  Integer, Optional, Intent(out)       :: iter
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err,cond
 !!$   Local data
   real(psb_spk_), allocatable, target   :: aux(:), td(:),tu(:),eig(:),ewrk(:)
-  integer, allocatable :: ibl(:), ispl(:), iwrk(:)
+  integer(psb_ipk_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_s_vect_type), allocatable, target :: wwrk(:)
   type(psb_s_vect_type), pointer  :: q, p, r, z, w
   real(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
-  integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5), ieg,nspl, istebz
-  integer            :: debug_level, debug_unit
+  integer(psb_ipk_) :: debug_level, debug_unit
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
   logical                     :: do_cond

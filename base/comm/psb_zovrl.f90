@@ -71,12 +71,12 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   complex(psb_dpk_), intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   complex(psb_dpk_), optional, target, intent(inout)  :: work(:)
-  integer, intent(in), optional             :: update,jx,ik,mode
+  integer(psb_ipk_), intent(in), optional             :: update,jx,ik,mode
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork
   complex(psb_dpk_),pointer :: iwork(:), xp(:,:)
@@ -271,12 +271,12 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
 
   complex(psb_dpk_), intent(inout), target  :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)                      :: info
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional             :: update,mode
+  integer(psb_ipk_), intent(in), optional             :: update,mode
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork
   complex(psb_dpk_),pointer :: iwork(:)
@@ -396,12 +396,12 @@ subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
 
   type(psb_z_vect_type), intent(inout)   :: x
   type(psb_desc_type), intent(in)        :: desc_a
-  integer, intent(out)                   :: info
+  integer(psb_ipk_), intent(out)                   :: info
   complex(psb_dpk_), optional, target, intent(inout) :: work(:)
-  integer, intent(in), optional          :: update,mode
+  integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer                  :: ictxt, np, me, &
+  integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork
   complex(psb_dpk_),pointer :: iwork(:)

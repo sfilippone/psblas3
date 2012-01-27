@@ -54,14 +54,14 @@ subroutine psi_bld_tmphalo(desc,info)
   use psi_mod, psb_protect_name => psi_bld_tmphalo
   implicit none
   type(psb_desc_type), intent(inout) :: desc
-  integer, intent(out) :: info
+  integer(psb_ipk_), intent(out) :: info
 
-  integer,allocatable :: helem(:),hproc(:)
-  integer,allocatable :: tmphl(:)
+  integer(psb_ipk_),allocatable :: helem(:),hproc(:)
+  integer(psb_ipk_),allocatable :: tmphl(:)
 
-  integer          ::  i,j,np,me,lhalo,nhalo,&
+  integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&
        & n_col, err_act,  key, ih, nh, idx, nk,icomm
-  integer             :: ictxt,n_row
+  integer(psb_ipk_) :: ictxt,n_row
   character(len=20)   :: name,ch_err
 
   info = psb_success_

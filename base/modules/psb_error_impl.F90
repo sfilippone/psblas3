@@ -2,9 +2,9 @@
 subroutine psb_errcomm(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer, intent(in)   :: ictxt
-  integer, intent(inout):: err
-  integer :: temp(2)
+  integer(psb_ipk_), intent(in)   :: ictxt
+  integer(psb_ipk_), intent(inout):: err
+  integer(psb_ipk_) :: temp(2)
   
   call psb_amx(ictxt, err)
 
@@ -15,10 +15,10 @@ subroutine psb_serror()
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer                 ::  err_c
+  integer(psb_ipk_) ::  err_c
   character(len=20)       ::  r_name
   character(len=40)       ::  a_e_d
-  integer                 ::  i_e_d(5)
+  integer(psb_ipk_) ::  i_e_d(5)
 
   if (psb_errstatus_fatal()) then
     if(psb_get_errverbosity() > 1) then
@@ -53,12 +53,12 @@ subroutine psb_perror(ictxt)
   use psb_error_mod
   use psb_penv_mod
   implicit none 
-  integer, intent(in)     :: ictxt
-  integer                 :: err_c
+  integer(psb_ipk_), intent(in)     :: ictxt
+  integer(psb_ipk_) :: err_c
   character(len=20)       :: r_name
   character(len=40)       :: a_e_d
-  integer                 :: i_e_d(5)
-  integer                 :: iam, np
+  integer(psb_ipk_) :: i_e_d(5)
+  integer(psb_ipk_) :: iam, np
 
   call psb_info(ictxt,iam,np)
   

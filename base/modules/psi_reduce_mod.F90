@@ -98,11 +98,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_, dat_
-    integer :: iam, np, info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_, dat_
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -132,12 +132,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -175,12 +175,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -218,12 +218,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) ::  dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -253,12 +253,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -296,12 +296,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -342,12 +342,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -377,12 +377,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -420,12 +420,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -462,12 +462,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -497,12 +497,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -541,12 +541,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -590,11 +590,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_, dat_
-    integer :: iam, np, info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_, dat_
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -624,12 +624,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -667,12 +667,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -710,12 +710,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) ::  dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -745,12 +745,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -788,12 +788,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -834,12 +834,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -869,12 +869,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -912,12 +912,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -954,12 +954,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -989,12 +989,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1033,12 +1033,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1084,12 +1084,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -1120,12 +1120,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1163,12 +1163,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1208,12 +1208,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -1244,12 +1244,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1287,12 +1287,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1333,12 +1333,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -1368,12 +1368,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1411,12 +1411,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1453,12 +1453,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -1488,12 +1488,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1532,12 +1532,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1575,12 +1575,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -1610,12 +1610,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1653,12 +1653,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1695,12 +1695,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -1730,12 +1730,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1774,12 +1774,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1825,12 +1825,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -1861,12 +1861,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -1904,12 +1904,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -1949,12 +1949,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -1985,12 +1985,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2028,12 +2028,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2074,12 +2074,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -2109,12 +2109,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2152,12 +2152,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2194,12 +2194,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -2229,12 +2229,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2273,12 +2273,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2316,12 +2316,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -2351,12 +2351,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2394,12 +2394,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2436,12 +2436,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -2471,12 +2471,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2515,12 +2515,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2565,12 +2565,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_) :: dat_
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -2601,12 +2601,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2644,12 +2644,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
-    integer, allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_), intent(in)              :: ictxt
+    integer(psb_ipk_), intent(inout)  :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
+    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2689,12 +2689,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(2), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(2) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -2725,12 +2725,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(2), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(2), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2767,12 +2767,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(2), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(2), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2813,12 +2813,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 #if !defined(SERIAL_MPI)
 
@@ -2849,12 +2849,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -2892,12 +2892,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -2938,12 +2938,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -2973,12 +2973,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -3016,12 +3016,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -3058,12 +3058,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -3093,12 +3093,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -3137,12 +3137,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -3180,12 +3180,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -3215,12 +3215,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -3258,12 +3258,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_spk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_spk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -3300,12 +3300,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -3335,12 +3335,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -3379,12 +3379,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
 
@@ -3426,12 +3426,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)            :: ictxt
+    integer(psb_ipk_), intent(in)            :: ictxt
     real(psb_spk_), intent(inout)  :: dat
-    integer, intent(in), optional  :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional  :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -3460,12 +3460,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)            :: ictxt
+    integer(psb_ipk_), intent(in)            :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
-    integer, intent(in), optional  :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional  :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_) :: dat_
-    integer :: iam, np, info
+    integer(psb_ipk_) :: iam, np, info
 
 
 #if !defined(SERIAL_MPI)
@@ -3495,12 +3495,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)              :: ictxt
+    integer(psb_ipk_), intent(in)              :: ictxt
     real(psb_spk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional    :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional    :: root
+    integer(psb_ipk_) :: root_
     real(psb_spk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)
@@ -3541,12 +3541,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in)            :: ictxt
+    integer(psb_ipk_), intent(in)            :: ictxt
     real(psb_dpk_), intent(inout)  :: dat(:)
-    integer, intent(in), optional  :: root
-    integer :: root_
+    integer(psb_ipk_), intent(in), optional  :: root
+    integer(psb_ipk_) :: root_
     real(psb_dpk_), allocatable :: dat_(:)
-    integer :: iam, np,  info
+    integer(psb_ipk_) :: iam, np,  info
 
 
 #if !defined(SERIAL_MPI)

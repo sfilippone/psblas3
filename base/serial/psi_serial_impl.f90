@@ -45,11 +45,11 @@ subroutine psi_igthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
-  integer :: x(:), y(:), alpha, beta
+  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_ipk_) :: x(:), y(:), alpha, beta
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
   if (beta == izero) then 
     if (alpha == izero) then 
       do i=1,n
@@ -101,11 +101,11 @@ subroutine psi_sgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_spk_) :: x(:), y(:), alpha, beta
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
   if (beta == szero) then 
     if (alpha == szero) then 
       do i=1,n
@@ -157,11 +157,11 @@ subroutine psi_dgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_dpk_) :: x(:), y(:), alpha, beta
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
   if (beta == dzero) then 
     if (alpha == dzero) then 
       do i=1,n
@@ -213,11 +213,11 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_spk_) :: x(:), y(:),alpha,beta
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
   if (beta == czero) then 
     if (alpha == czero) then 
       do i=1,n
@@ -269,11 +269,11 @@ subroutine psi_zgthv(n,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_dpk_) :: x(:), y(:),alpha,beta
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
   if (beta == zzero) then 
     if (alpha == zzero) then 
       do i=1,n
@@ -327,11 +327,11 @@ subroutine psi_sgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   real(psb_spk_) :: x(:,:), y(:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   pt=0
   do j=1,k
@@ -348,11 +348,11 @@ subroutine psi_dgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   real(psb_dpk_) :: x(:,:), y(:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   pt=0
   do j=1,k
@@ -370,11 +370,11 @@ subroutine psi_igthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
-  integer :: x(:,:), y(:)
+  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_ipk_) :: x(:,:), y(:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   pt=0
   do j=1,k
@@ -392,11 +392,11 @@ subroutine psi_cgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   complex(psb_spk_) :: x(:,:), y(:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   pt=0
   do j=1,k
@@ -413,11 +413,11 @@ subroutine psi_zgthzmv(n,k,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   complex(psb_dpk_) :: x(:,:), y(:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   pt=0
   do j=1,k
@@ -434,11 +434,11 @@ subroutine psi_sgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_spk_) :: x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   do i=1,n
     y(i)=x(idx(i))
@@ -451,11 +451,11 @@ subroutine psi_dgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_dpk_) :: x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   do i=1,n
     y(i)=x(idx(i))
@@ -468,11 +468,11 @@ subroutine psi_igthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
-  integer :: x(:), y(:)
+  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_ipk_) :: x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   do i=1,n
     y(i)=x(idx(i))
@@ -485,11 +485,11 @@ subroutine psi_cgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_spk_) :: x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   do i=1,n
     y(i)=x(idx(i))
@@ -502,11 +502,11 @@ subroutine psi_zgthzv(n,idx,x,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_dpk_) :: x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   do i=1,n
     y(i)=x(idx(i))
@@ -520,11 +520,11 @@ subroutine psi_ssctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   real(psb_spk_) :: beta, x(:), y(:,:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   if (beta == szero) then
     pt=0
@@ -558,11 +558,11 @@ subroutine psi_ssctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_spk_) :: beta, x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if (beta == szero) then
     do i=1,n
@@ -588,11 +588,11 @@ subroutine psi_dsctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   real(psb_dpk_) :: beta, x(:), y(:,:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   if (beta == dzero) then
     pt=0
@@ -626,11 +626,11 @@ subroutine psi_dsctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   real(psb_dpk_) :: beta, x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if (beta == dzero) then
     do i=1,n
@@ -655,11 +655,11 @@ subroutine psi_isctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
-  integer :: beta, x(:), y(:,:)
+  integer(psb_ipk_) :: n, k, idx(:)
+  integer(psb_ipk_) :: beta, x(:), y(:,:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   if (beta == izero) then
     pt=0
@@ -693,11 +693,11 @@ subroutine psi_isctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
-  integer :: beta, x(:), y(:)
+  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_ipk_) :: beta, x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if (beta == izero) then
     do i=1,n
@@ -719,11 +719,11 @@ subroutine psi_csctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   complex(psb_spk_) :: beta, x(:), y(:,:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   if (beta == czero) then
     pt=0
@@ -758,11 +758,11 @@ subroutine psi_csctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_spk_) :: beta, x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if (beta == czero) then
     do i=1,n
@@ -784,11 +784,11 @@ subroutine psi_zsctmv(n,k,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, k, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   complex(psb_dpk_) :: beta, x(:), y(:,:)
 
   ! Locals
-  integer :: i, j, pt
+  integer(psb_ipk_) :: i, j, pt
 
   if (beta == zzero) then
     pt=0
@@ -823,11 +823,11 @@ subroutine psi_zsctv(n,idx,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer :: n, idx(:)
+  integer(psb_ipk_) :: n, idx(:)
   complex(psb_dpk_) :: beta, x(:), y(:)
 
   ! Locals
-  integer :: i
+  integer(psb_ipk_) :: i
 
   if (beta == zzero) then
     do i=1,n
@@ -850,12 +850,12 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   use psb_error_mod
   implicit none 
 
-  integer, intent(in)               :: m
+  integer(psb_ipk_), intent(in)               :: m
   real(psb_spk_), intent (in)       ::  x(:)
   real(psb_spk_), intent (inout)    ::  y(:)
   real(psb_spk_), intent (in)       :: alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -898,12 +898,12 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m, n
+  integer(psb_ipk_), intent(in)               :: m, n
   real(psb_spk_), intent (in)       ::  x(:,:)
   real(psb_spk_), intent (inout)    ::  y(:,:)
   real(psb_spk_), intent (in)       ::  alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -952,12 +952,12 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m
+  integer(psb_ipk_), intent(in)               :: m
   real(psb_dpk_), intent (in)       ::  x(:)
   real(psb_dpk_), intent (inout)    ::  y(:)
   real(psb_dpk_), intent (in)       :: alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1000,12 +1000,12 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m, n
+  integer(psb_ipk_), intent(in)               :: m, n
   real(psb_dpk_), intent (in)       ::  x(:,:)
   real(psb_dpk_), intent (inout)    ::  y(:,:)
   real(psb_dpk_), intent (in)       ::  alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1053,12 +1053,12 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m
+  integer(psb_ipk_), intent(in)               :: m
   complex(psb_spk_), intent (in)       ::  x(:)
   complex(psb_spk_), intent (inout)    ::  y(:)
   complex(psb_spk_), intent (in)       :: alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1101,12 +1101,12 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m, n
+  integer(psb_ipk_), intent(in)               :: m, n
   complex(psb_spk_), intent (in)       ::  x(:,:)
   complex(psb_spk_), intent (inout)    ::  y(:,:)
   complex(psb_spk_), intent (in)       ::  alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1154,12 +1154,12 @@ subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m
+  integer(psb_ipk_), intent(in)               :: m
   complex(psb_dpk_), intent (in)       ::  x(:)
   complex(psb_dpk_), intent (inout)    ::  y(:)
   complex(psb_dpk_), intent (in)       :: alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1202,12 +1202,12 @@ subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer, intent(in)               :: m, n
+  integer(psb_ipk_), intent(in)               :: m, n
   complex(psb_dpk_), intent (in)       ::  x(:,:)
   complex(psb_dpk_), intent (inout)    ::  y(:,:)
   complex(psb_dpk_), intent (in)       ::  alpha, beta
-  integer, intent(out)                :: info
-  integer                  :: err_act
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'

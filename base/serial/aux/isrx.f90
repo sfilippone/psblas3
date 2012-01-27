@@ -37,16 +37,16 @@ subroutine isrx(n,x,indx,dir,flag)
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
   !
   !     .. Scalar Arguments ..
-  integer, intent(in) :: n, dir, flag
-  integer ::  x(n), indx(n)
+  integer(psb_ipk_), intent(in) :: n, dir, flag
+  integer(psb_ipk_) ::  x(n), indx(n)
   !     ..
   !     .. Local Scalars ..
-  integer :: piv, xk, xt
-  integer i, j, ilx, iux, istp, lpiv
-  integer ixt, n1, n2
+  integer(psb_ipk_) :: piv, xk, xt
+  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
+  integer(psb_ipk_) :: ixt, n1, n2
 
-  integer, parameter :: maxstack=64,nparms=3,ithrs=16
-  integer            :: istack(nparms,maxstack)
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_) :: istack(nparms,maxstack)
   !     ..
 
   select case(flag)
@@ -357,11 +357,11 @@ contains
 
   subroutine iisrx_up(n,x,indx)
     implicit none
-    integer :: n
-    integer :: x(n)
-    integer :: indx(n)
-    integer :: i,j,ix
-    integer :: xx
+    integer(psb_ipk_) :: n
+    integer(psb_ipk_) :: x(n)
+    integer(psb_ipk_) :: indx(n)
+    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
@@ -383,11 +383,11 @@ contains
 
   subroutine iisrx_dw(n,x,indx)
     implicit none
-    integer :: n
-    integer :: x(n)
-    integer :: indx(n)
-    integer :: i,j,ix
-    integer :: xx
+    integer(psb_ipk_) :: n
+    integer(psb_ipk_) :: x(n)
+    integer(psb_ipk_) :: indx(n)
+    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then

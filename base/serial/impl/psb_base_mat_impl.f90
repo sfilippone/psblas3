@@ -2,11 +2,11 @@ function psb_base_get_nz_row(idx,a) result(res)
   use psb_error_mod
   use psb_base_mat_mod, psb_protect_name => psb_base_get_nz_row
   implicit none 
-  integer, intent(in)                    :: idx
+  integer(psb_ipk_), intent(in)                    :: idx
   class(psb_base_sparse_mat), intent(in) :: a
-  integer :: res
+  integer(psb_ipk_) :: res
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='base_get_nz_row'
   logical, parameter :: debug=.false.
 
@@ -29,9 +29,9 @@ function psb_base_get_nzeros(a) result(res)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(in) :: a
-  integer :: res
+  integer(psb_ipk_) :: res
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='base_get_nzeros'
   logical, parameter :: debug=.false.
 
@@ -54,9 +54,9 @@ function psb_base_get_size(a) result(res)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(in) :: a
-  integer :: res
+  integer(psb_ipk_) :: res
 
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='get_size'
   logical, parameter :: debug=.false.
 
@@ -82,7 +82,7 @@ subroutine psb_base_reinit(a,clear)
   class(psb_base_sparse_mat), intent(inout) :: a   
   logical, intent(in), optional :: clear
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reinit'
   logical, parameter :: debug=.false.
 
@@ -105,14 +105,14 @@ subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   use psb_error_mod
   implicit none 
 
-  integer, intent(in)               :: iout
+  integer(psb_ipk_), intent(in)               :: iout
   class(psb_base_sparse_mat), intent(in) :: a   
-  integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
+  integer(psb_ipk_), intent(in), optional     :: iv(:)
+  integer(psb_ipk_), intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
-  integer, intent(in), optional     :: ivr(:), ivc(:)
+  integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
-  Integer :: err_act, info
+  integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='sparse_print'
   logical, parameter :: debug=.false.
 
@@ -139,15 +139,15 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   implicit none
 
   class(psb_base_sparse_mat), intent(in) :: a
-  integer, intent(in)                  :: imin,imax
-  integer, intent(out)                 :: nz
-  integer, allocatable, intent(inout)  :: ia(:), ja(:)
-  integer,intent(out)                  :: info
+  integer(psb_ipk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_), intent(out)                 :: nz
+  integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
+  integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
-  integer, intent(in), optional        :: iren(:)
-  integer, intent(in), optional        :: jmin,jmax, nzin
+  integer(psb_ipk_), intent(in), optional        :: iren(:)
+  integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -172,15 +172,15 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   use psb_sort_mod
   implicit none 
   class(psb_base_sparse_mat), intent(in) :: a   
-  integer, intent(in)                :: idx 
-  integer, intent(out)               :: n   
-  integer, allocatable, intent(out)  :: neigh(:)
-  integer, intent(out)               :: info
-  integer, optional, intent(in)      :: lev 
+  integer(psb_ipk_), intent(in)                :: idx 
+  integer(psb_ipk_), intent(out)               :: n   
+  integer(psb_ipk_), allocatable, intent(out)  :: neigh(:)
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), optional, intent(in)      :: lev 
 
-  integer :: lev_, i, nl, ifl,ill,&
+  integer(psb_ipk_) :: lev_, i, nl, ifl,ill,&
        &  n1, err_act, nn, nidx,ntl,ma
-  integer, allocatable :: ia(:), ja(:)
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
   character(len=20)  :: name='get_neigh'
   logical, parameter :: debug=.false.
 
@@ -248,10 +248,10 @@ subroutine  psb_base_allocate_mnnz(m,n,a,nz)
   use psb_base_mat_mod, psb_protect_name => psb_base_allocate_mnnz
   use psb_error_mod
   implicit none 
-  integer, intent(in) :: m,n
+  integer(psb_ipk_), intent(in) :: m,n
   class(psb_base_sparse_mat), intent(inout) :: a
-  integer, intent(in), optional  :: nz
-  Integer :: err_act
+  integer(psb_ipk_), intent(in), optional  :: nz
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -272,9 +272,9 @@ subroutine  psb_base_reallocate_nz(nz,a)
   use psb_base_mat_mod, psb_protect_name => psb_base_reallocate_nz
   use psb_error_mod
   implicit none 
-  integer, intent(in) :: nz
+  integer(psb_ipk_), intent(in) :: nz
   class(psb_base_sparse_mat), intent(inout) :: a
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -296,7 +296,7 @@ subroutine  psb_base_free(a)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(inout) :: a
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='free'
   logical, parameter :: debug=.false.
 
@@ -318,7 +318,7 @@ subroutine  psb_base_trim(a)
   use psb_error_mod
   implicit none 
   class(psb_base_sparse_mat), intent(inout) :: a
-  Integer :: err_act
+  integer(psb_ipk_) :: err_act
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 

@@ -74,6 +74,13 @@ module psb_d_base_vect_mod
     ! version is only a placeholder. 
     !
     procedure, pass(x) :: sync     => d_base_sync
+    procedure, pass(x) :: is_host  => d_base_is_host
+    procedure, pass(x) :: is_dev   => d_base_is_dev
+    procedure, pass(x) :: is_sync  => d_base_is_sync
+    procedure, pass(x) :: set_host => d_base_set_host
+    procedure, pass(x) :: set_dev  => d_base_set_dev
+    procedure, pass(x) :: set_sync => d_base_set_sync
+
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => d_base_get_nrows
@@ -140,7 +147,7 @@ contains
   function constructor(x) result(this)
     real(psb_dpk_)   :: x(:)
     type(psb_d_base_vect_type) :: this
-    integer :: info
+    integer(psb_ipk_) :: info
 
     this%v = x
     call this%asb(size(x),info)
@@ -148,9 +155,9 @@ contains
     
   
   function size_const(n) result(this)
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     type(psb_d_base_vect_type) :: this
-    integer :: info
+    integer(psb_ipk_) :: info
 
     call this%asb(n,info)
 
@@ -164,7 +171,7 @@ contains
     use psb_realloc_mod
     real(psb_dpk_), intent(in) :: this(:)
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer :: info
+    integer(psb_ipk_) :: info
 
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then 
@@ -180,9 +187,9 @@ contains
   !
   subroutine d_base_bld_n(x,n)
     use psb_realloc_mod
-    integer, intent(in) :: n
+    integer(psb_ipk_), intent(in) :: n
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer :: info
+    integer(psb_ipk_) :: info
 
     call psb_realloc(n,x%v,info)
     call x%asb(n,info)
@@ -193,9 +200,9 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
-    integer, intent(in)               :: n
+    integer(psb_ipk_), intent(in)               :: n
     class(psb_d_base_vect_type), intent(out)    :: x
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     call psb_realloc(n,x%v,info)
     
@@ -208,12 +215,12 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_d_base_vect_type), intent(inout)  :: x
-    integer, intent(in)               :: n, dupl
-    integer, intent(in)               :: irl(:)
+    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_dpk_), intent(in)        :: val(:)
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
 
-    integer :: i
+    integer(psb_ipk_) :: i
 
     info = 0
     if (psb_errstatus_fatal()) return 
@@ -283,9 +290,9 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
-    integer, intent(in)              :: n
+    integer(psb_ipk_), intent(in)              :: n
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer, intent(out)             :: info
+    integer(psb_ipk_), intent(out)             :: info
     
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
@@ -300,7 +307,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_base_vect_type), intent(inout)  :: x
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
@@ -312,15 +319,58 @@ contains
   
 
   !
-  ! The base version of SYNC does nothing, it's just
+  ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
   ! 
   subroutine d_base_sync(x)
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x
     
-    
   end subroutine d_base_sync
+
+
+  subroutine d_base_set_host(x)
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    
+  end subroutine d_base_set_host
+
+  subroutine d_base_set_dev(x)
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    
+  end subroutine d_base_set_dev
+
+  subroutine d_base_set_sync(x)
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    
+  end subroutine d_base_set_sync
+
+  function d_base_is_dev(x) result(res)
+    implicit none 
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical  :: res
+  
+    res = .false.
+  end function d_base_is_dev
+  
+  function d_base_is_host(x) result(res)
+    implicit none 
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical  :: res
+
+    res = .true.
+  end function d_base_is_host
+
+  function d_base_is_sync(x) result(res)
+    implicit none 
+    class(psb_d_base_vect_type), intent(in) :: x
+    logical  :: res
+
+    res = .true.
+  end function d_base_is_sync
+
 
   !
   ! Size info. 
@@ -329,7 +379,7 @@ contains
   function d_base_get_nrows(x) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(in) :: x
-    integer :: res
+    integer(psb_ipk_) :: res
 
     res = 0
     if (allocated(x%v)) res = size(x%v)
@@ -355,7 +405,7 @@ contains
   function  d_base_get_vect(x) result(res)
     class(psb_d_base_vect_type), intent(inout) :: x
     real(psb_dpk_), allocatable                 :: res(:)
-    integer :: info
+    integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
     call x%sync()
@@ -374,7 +424,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
         
-    integer :: info
+    integer(psb_ipk_) :: info
     x%v = val
     
   end subroutine d_base_set_scal
@@ -382,8 +432,8 @@ contains
   subroutine d_base_set_vect(x,val)
     class(psb_d_base_vect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val(:)
-    integer :: nr
-    integer :: info
+    integer(psb_ipk_) :: nr
+    integer(psb_ipk_) :: info
 
     if (allocated(x%v)) then 
       nr = min(size(x%v),size(val))
@@ -400,7 +450,7 @@ contains
   function d_base_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x, y
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     real(psb_dpk_), external      :: ddot
     
@@ -428,7 +478,7 @@ contains
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x
     real(psb_dpk_), intent(in)    :: y(:)
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     real(psb_dpk_), external      :: ddot
     
@@ -442,11 +492,11 @@ contains
   subroutine d_base_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
-    integer, intent(in)               :: m
+    integer(psb_ipk_), intent(in)               :: m
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
     real(psb_dpk_), intent (in)       :: alpha, beta
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     select type(xx => x)
     type is (psb_d_base_vect_type)
@@ -460,11 +510,11 @@ contains
   subroutine d_base_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
-    integer, intent(in)               :: m
+    integer(psb_ipk_), intent(in)               :: m
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: y
     real(psb_dpk_), intent (in)       :: alpha, beta
-    integer, intent(out)              :: info
+    integer(psb_ipk_), intent(out)              :: info
     
     call psb_geaxpby(m,alpha,x,beta,y%v,info)
     
@@ -485,8 +535,8 @@ contains
     implicit none 
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     select type(xx => x)
@@ -506,8 +556,8 @@ contains
     implicit none 
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: y
-    integer, intent(out)              :: info
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
 
     info = 0
     n = min(size(y%v), size(x))
@@ -525,8 +575,8 @@ contains
     real(psb_dpk_), intent(in)        :: y(:)
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
 
     info = 0    
     n = min(size(z%v), size(x), size(y))
@@ -594,9 +644,9 @@ contains
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_d_base_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info    
+    integer(psb_ipk_), intent(out)              :: info    
     character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer :: i, n
+    integer(psb_ipk_) :: i, n
     logical :: conjgx_, conjgy_
 
     info = 0
@@ -622,8 +672,8 @@ contains
     real(psb_dpk_), intent(in)        :: x(:)
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_d_base_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     
@@ -638,8 +688,8 @@ contains
     real(psb_dpk_), intent(in)        :: y(:)
     class(psb_d_base_vect_type), intent(inout)  :: x
     class(psb_d_base_vect_type), intent(inout)  :: z
-    integer, intent(out)              :: info    
-    integer :: i, n
+    integer(psb_ipk_), intent(out)              :: info    
+    integer(psb_ipk_) :: i, n
 
     info = 0
     
@@ -669,7 +719,7 @@ contains
   function d_base_nrm2(n,x) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     real(psb_dpk_), external      :: dnrm2
     
@@ -680,7 +730,7 @@ contains
   function d_base_amax(n,x) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     
     res =  maxval(abs(x%v(1:n)))
@@ -690,7 +740,7 @@ contains
   function d_base_asum(n,x) result(res)
     implicit none 
     class(psb_d_base_vect_type), intent(inout) :: x
-    integer, intent(in)           :: n
+    integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     
     res =  sum(abs(x%v(1:n)))
@@ -704,7 +754,7 @@ contains
 
   subroutine d_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) :: alpha, beta, y(:)
     class(psb_d_base_vect_type) :: x
     
@@ -717,7 +767,7 @@ contains
   ! 
   subroutine d_base_gthzv(n,idx,x,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) ::  y(:)
     class(psb_d_base_vect_type) :: x
     
@@ -733,12 +783,13 @@ contains
   
   subroutine d_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
-    integer :: n, idx(:)
+    integer(psb_ipk_) :: n, idx(:)
     real(psb_dpk_) :: beta, x(:)
     class(psb_d_base_vect_type) :: y
     
     call y%sync()
     call psi_sct(n,idx,x,beta,y%v)
+    call y%set_host()
 
   end subroutine d_base_sctb
 

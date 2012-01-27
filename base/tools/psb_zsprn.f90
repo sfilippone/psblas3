@@ -49,13 +49,13 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   !....Parameters...
   Type(psb_desc_type), intent(in)      :: desc_a
   Type(psb_zspmat_type), intent(inout) :: a
-  integer, intent(out)                 :: info
+  integer(psb_ipk_), intent(out)                 :: info
   logical, intent(in), optional        :: clear
 
   !locals
-  Integer             :: ictxt,np,me,err,err_act
-  integer             :: debug_level, debug_unit
-  integer             :: int_err(5)
+  integer(psb_ipk_) :: ictxt,np,me,err,err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_) :: int_err(5)
   character(len=20)   :: name
   logical             :: clear_
 

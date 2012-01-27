@@ -33,10 +33,10 @@ subroutine mm_svet_read(b, info, iunit, filename)
   use psb_base_mod
   implicit none
   real(psb_spk_), allocatable, intent(out)  :: b(:,:)
-  integer, intent(out)        :: info
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
-  integer              :: nrow, ncol, i,root, np,  me,  ircode, j,infile
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j,infile
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
 
@@ -105,10 +105,10 @@ subroutine mm_svet2_write(b, header, info, iunit, filename)
   implicit none
   real(psb_spk_), intent(in)  :: b(:,:)
   character(len=*), intent(in) :: header
-  integer, intent(out)        :: info
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
-  integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
 
   character(len=80)                 :: frmtv 
 
@@ -161,10 +161,10 @@ subroutine mm_svet1_write(b, header, info, iunit, filename)
   implicit none
   real(psb_spk_), intent(in)  :: b(:)
   character(len=*), intent(in) :: header
-  integer, intent(out)        :: info
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
-  integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
 
   character(len=80)                 :: frmtv 
 
@@ -217,13 +217,13 @@ subroutine smm_mat_read(a, info, iunit, filename)
   use psb_base_mod
   implicit none
   type(psb_sspmat_type), intent(out)  :: a
-  integer, intent(out)        :: info
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
   character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
   character(1024)      :: line
-  integer        :: nrow, ncol, nnzero
-  integer        :: ircode, i,nzr,infile
+  integer(psb_ipk_) :: nrow, ncol, nnzero
+  integer(psb_ipk_) :: ircode, i,nzr,infile
   type(psb_s_coo_sparse_mat), allocatable :: acoo
 
   info = psb_success_
@@ -322,11 +322,11 @@ subroutine smm_mat_write(a,mtitle,info,iunit,filename)
   use psb_base_mod
   implicit none
   type(psb_sspmat_type), intent(in)  :: a
-  integer, intent(out)        :: info
+  integer(psb_ipk_), intent(out)        :: info
   character(len=*), intent(in) :: mtitle
-  integer, optional, intent(in)          :: iunit
+  integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
-  integer                     :: iout
+  integer(psb_ipk_) :: iout
 
 
   info = psb_success_
