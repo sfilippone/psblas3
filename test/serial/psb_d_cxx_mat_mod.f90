@@ -96,12 +96,11 @@ module psb_d_cxx_mat_mod
   end interface
   
   interface
-    subroutine psb_d_cxx_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    subroutine psb_d_cxx_print(iout,a,iv,head,ivr,ivc)
       import :: psb_d_cxx_sparse_mat, psb_ipk_
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_d_cxx_sparse_mat), intent(in) :: a   
       integer(psb_ipk_), intent(in), optional     :: iv(:)
-      integer(psb_ipk_), intent(in), optional     :: eirs,eics
       character(len=*), optional        :: head
       integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_d_cxx_print

@@ -382,7 +382,7 @@ subroutine  psb_d_cyy_trim(a)
   info = psb_success_
 end subroutine psb_d_cyy_trim
 
-subroutine psb_d_cyy_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_d_cyy_print(iout,a,iv,head,ivr,ivc)
   use psb_base_mod
   use psb_d_cyy_mat_mod, psb_protect_name => psb_d_cyy_print
   implicit none 
@@ -390,7 +390,6 @@ subroutine psb_d_cyy_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_d_cyy_sparse_mat), intent(in) :: a   
   integer(psb_ipk_), intent(in), optional     :: iv(:)
-  integer(psb_ipk_), intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
