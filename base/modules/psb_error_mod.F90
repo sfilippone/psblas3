@@ -65,13 +65,13 @@ module psb_error_mod
     end subroutine psb_perror
   end interface
 
-  interface 
+  interface psb_errcomm
     subroutine psb_errcomm(ictxt, err)
       import :: psb_mpik_, psb_ipk_
       integer(psb_mpik_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
-  end interface
+  end interface psb_errcomm
 
 #if defined(LONG_INTEGERS)
   interface psb_error
