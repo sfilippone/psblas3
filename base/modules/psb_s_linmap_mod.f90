@@ -54,8 +54,7 @@ module psb_s_linmap_mod
 
   interface psb_map_X2Y
     subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      import ::  psb_slinmap_type
+      import :: psb_ipk_, psb_spk_, psb_slinmap_type
       implicit none 
       type(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
@@ -65,9 +64,8 @@ module psb_s_linmap_mod
       real(psb_spk_), optional       :: work(:)
     end subroutine psb_s_map_X2Y
     subroutine psb_s_map_X2Y_vect(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      use psb_s_vect_mod
-      import ::  psb_slinmap_type
+      use psb_s_vect_mod, only : psb_s_vect_type
+      import :: psb_ipk_, psb_spk_, psb_slinmap_type
       implicit none 
       type(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
@@ -79,8 +77,7 @@ module psb_s_linmap_mod
 
   interface psb_map_Y2X
     subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      import ::  psb_slinmap_type
+      import :: psb_ipk_, psb_spk_, psb_slinmap_type
       implicit none 
       type(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
@@ -90,9 +87,8 @@ module psb_s_linmap_mod
       real(psb_spk_), optional       :: work(:)
     end subroutine psb_s_map_Y2X
     subroutine psb_s_map_Y2X_vect(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      use psb_s_vect_mod
-      import ::  psb_slinmap_type
+      use psb_s_vect_mod, only : psb_s_vect_type
+      import :: psb_ipk_, psb_spk_, psb_slinmap_type
       implicit none 
       type(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
@@ -129,6 +125,8 @@ module psb_s_linmap_mod
   end interface
 
   private :: s_map_sizeof, s_is_asb, s_free
+
+
 
 
 
