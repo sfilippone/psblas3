@@ -57,6 +57,33 @@ module psb_realloc_mod
     module procedure psb_reallocate1c
     module procedure psb_reallocatez2
     module procedure psb_reallocatec2
+#if defined(LONG_INTEGERS)
+    module procedure psb_rp1i1
+    module procedure psb_rp1i2i2
+    module procedure psb_ri1p2i2
+    module procedure psb_rp1p2i2
+
+    module procedure psb_rp1s1
+    module procedure psb_rp1i2s2
+    module procedure psb_ri1p2s2
+    module procedure psb_rp1p2s2
+
+    module procedure psb_rp1d1
+    module procedure psb_rp1i2d2
+    module procedure psb_ri1p2d2
+    module procedure psb_rp1p2d2
+
+    module procedure psb_rp1c1
+    module procedure psb_rp1i2c2
+    module procedure psb_ri1p2c2
+    module procedure psb_rp1p2c2
+
+    module procedure psb_rp1z1
+    module procedure psb_rp1i2z2
+    module procedure psb_ri1p2z2
+    module procedure psb_rp1p2z2
+
+#endif
   end Interface
 
   interface psb_move_alloc
@@ -1681,7 +1708,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name,&
+           & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -1693,7 +1721,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1706,7 +1735,8 @@ Contains
       allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
         goto 9999
       end if
     endif
@@ -1764,7 +1794,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name, &
+           & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -1776,7 +1807,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1789,7 +1821,8 @@ Contains
       allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='integer')
         goto 9999
       end if
     endif
@@ -1843,7 +1876,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_spk_)')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -1855,7 +1889,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_spk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_spk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1866,7 +1901,8 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_spk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_spk_)')
         goto 9999
       end if
     endif
@@ -1917,7 +1953,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -1929,7 +1966,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1940,7 +1978,8 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -1991,7 +2030,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -2003,7 +2043,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_spk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -2014,7 +2055,8 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_spk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
         goto 9999
       end if
     endif
@@ -2064,7 +2106,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -2076,7 +2119,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -2087,7 +2131,8 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -2146,12 +2191,14 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='real(psb_spk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='real(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='real(psb_spk_)')
       goto 9999
     end if
 
@@ -2166,7 +2213,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_spk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_spk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2179,7 +2227,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_spk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_spk_)')
         goto 9999
       end if
     endif
@@ -2238,12 +2287,14 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -2258,7 +2309,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2271,7 +2323,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -2330,12 +2383,14 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='complex(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='complex(psb_spk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
       goto 9999
     end if
 
@@ -2350,7 +2405,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_spk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2363,7 +2419,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_spk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='complex(psb_spk_)')
         goto 9999
       end if
     endif
@@ -2422,12 +2479,14 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='complex(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='complex(psb_dpk_)')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
 
@@ -2442,7 +2501,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2455,7 +2515,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='complex(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -2514,12 +2575,14 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
 
@@ -2533,7 +2596,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='integer')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2546,7 +2610,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='integer')
         goto 9999
       end if
     endif
@@ -2605,12 +2670,14 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name, &
+           & i_err=(/len1,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='integer')
+      call psb_errpush(err,name, &
+           & i_err=(/len2,izero,izero,izero,izero/),a_err='integer')
       goto 9999
     end if
 
@@ -2624,7 +2691,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+          call psb_errpush(err,name, &
+               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='integer')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -2637,7 +2705,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+        call psb_errpush(err,name, &
+             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='integer')
         goto 9999
       end if
     endif
@@ -3193,4 +3262,330 @@ Contains
 #endif
   end Subroutine psb_i8move_alloc2d
 #endif
+
+#if defined(LONG_INTEGERS)
+    Subroutine psb_rp1i1(len,rrax,info,pad,lb)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len
+      integer(psb_ipk_),allocatable, intent(inout) :: rrax(:)
+      integer(psb_ipk_) :: info
+      integer(psb_ipk_), optional, intent(in) :: pad
+      integer(psb_mpik_), optional, intent(in) :: lb
+      
+      integer(psb_ipk_) :: ilen, ilb
+
+      ilen=len
+      if (present(lb)) then 
+        ilb=lb
+      else
+        ilb = 1
+      end if
+      call psb_realloc(ilen,rrax,info,lb=ilb,pad=pad)
+      
+    end Subroutine psb_rp1i1
+
+
+    subroutine  psb_rp1i2i2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_ipk_),Intent(in) :: len2
+      integer(psb_ipk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      integer(psb_ipk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      call psb_realloc(len1_,len2,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1i2i2
+
+    subroutine  psb_ri1p2i2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),Intent(in) :: len1
+      integer(psb_ipk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      integer(psb_ipk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len2_ = len2
+      call psb_realloc(len1,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_ri1p2i2
+
+    subroutine  psb_rp1p2i2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      integer(psb_ipk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      len2_ = len2
+      call psb_realloc(len1_,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1p2i2
+
+    Subroutine psb_rp1s1(len,rrax,info,pad,lb)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len
+      real(psb_spk_),allocatable, intent(inout) :: rrax(:)
+      integer(psb_ipk_) :: info
+      real(psb_spk_), optional, intent(in) :: pad
+      integer(psb_mpik_), optional, intent(in) :: lb
+      
+      integer(psb_ipk_) :: ilen, ilb
+
+      ilen=len
+      if (present(lb)) then 
+        ilb=lb
+      else
+        ilb = 1
+      end if
+      call psb_realloc(ilen,rrax,info,lb=ilb,pad=pad)
+      
+    end Subroutine psb_rp1s1
+
+    subroutine  psb_rp1i2s2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_ipk_),Intent(in) :: len2
+      real(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      call psb_realloc(len1_,len2,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1i2s2
+
+    subroutine  psb_ri1p2s2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),Intent(in) :: len1
+      real(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len2_ = len2
+      call psb_realloc(len1,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_ri1p2s2
+
+    subroutine  psb_rp1p2s2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_mpik_),Intent(in) :: len2
+      real(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      len2_ = len2
+      call psb_realloc(len1_,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1p2s2
+
+
+
+    Subroutine psb_rp1d1(len,rrax,info,pad,lb)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len
+      Real(psb_dpk_),allocatable, intent(inout) :: rrax(:)
+      integer(psb_ipk_) :: info
+      real(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_mpik_), optional, intent(in) :: lb
+      
+      integer(psb_ipk_) :: ilen, ilb
+
+      ilen=len
+      if (present(lb)) then 
+        ilb=lb
+      else
+        ilb = 1
+      end if
+      call psb_realloc(ilen,rrax,info,lb=ilb,pad=pad)
+      
+    end Subroutine psb_rp1d1
+
+
+    subroutine  psb_rp1i2d2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_ipk_),Intent(in) :: len2
+      Real(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      call psb_realloc(len1_,len2,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1i2d2
+
+    subroutine  psb_ri1p2d2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),Intent(in) :: len1
+      Real(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len2_ = len2
+      call psb_realloc(len1,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_ri1p2d2
+
+    subroutine  psb_rp1p2d2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_mpik_),Intent(in) :: len2
+      Real(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      real(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      len2_ = len2
+      call psb_realloc(len1_,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1p2d2
+
+
+
+    Subroutine psb_rp1c1(len,rrax,info,pad,lb)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len
+      complex(psb_spk_),allocatable, intent(inout) :: rrax(:)
+      integer(psb_ipk_) :: info
+      complex(psb_spk_), optional, intent(in) :: pad
+      integer(psb_mpik_), optional, intent(in) :: lb
+      
+      integer(psb_ipk_) :: ilen, ilb
+
+      ilen=len
+      if (present(lb)) then 
+        ilb=lb
+      else
+        ilb = 1
+      end if
+      call psb_realloc(ilen,rrax,info,lb=ilb,pad=pad)
+      
+    end Subroutine psb_rp1c1
+
+    subroutine  psb_rp1i2c2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_ipk_),Intent(in) :: len2
+      complex(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      call psb_realloc(len1_,len2,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1i2c2
+
+    subroutine  psb_ri1p2c2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),Intent(in) :: len1
+      complex(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len2_ = len2
+      call psb_realloc(len1,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_ri1p2c2
+
+    subroutine  psb_rp1p2c2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_mpik_),Intent(in) :: len2
+      complex(psb_spk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_spk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      len2_ = len2
+      call psb_realloc(len1_,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1p2c2
+
+
+    Subroutine psb_rp1z1(len,rrax,info,pad,lb)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len
+      Complex(psb_dpk_),allocatable, intent(inout) :: rrax(:)
+      integer(psb_ipk_) :: info
+      complex(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_mpik_), optional, intent(in) :: lb
+      
+      integer(psb_ipk_) :: ilen, ilb
+
+      ilen=len
+      if (present(lb)) then 
+        ilb=lb
+      else
+        ilb = 1
+      end if
+      call psb_realloc(ilen,rrax,info,lb=ilb,pad=pad)
+      
+    end Subroutine psb_rp1z1
+
+    subroutine  psb_rp1i2z2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_ipk_),Intent(in) :: len2
+      Complex(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      call psb_realloc(len1_,len2,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1i2z2
+
+    subroutine  psb_ri1p2z2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len2
+      integer(psb_ipk_),Intent(in) :: len1
+      Complex(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len2_ = len2
+      call psb_realloc(len1,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_ri1p2z2
+
+    subroutine  psb_rp1p2z2(len1,len2,rrax,info,pad,lb1,lb2)
+      ! ...Subroutine Arguments  
+      integer(psb_mpik_),Intent(in) :: len1
+      integer(psb_mpik_),Intent(in) :: len2
+      Complex(psb_dpk_),allocatable :: rrax(:,:)
+      integer(psb_ipk_) :: info
+      complex(psb_dpk_), optional, intent(in) :: pad
+      integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+      
+      integer(psb_ipk_) :: len1_, len2_
+      len1_ = len1
+      len2_ = len2
+      call psb_realloc(len1_,len2_,rrax,info,pad,lb1,lb2)
+    end subroutine psb_rp1p2z2
+
+#endif
+
 end module psb_realloc_mod
