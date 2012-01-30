@@ -39,39 +39,34 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x(:,:) -  real                       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    x(:,:) -  real               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    jx     -  integer(optional).    The column offset.
 !
-function psb_samax (x,desc_a, info, jx)
-  use psb_penv_mod 
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+function psb_samax(x,desc_a, info, jx) result(res)
+  use psb_base_mod, psb_protect_name => psb_samax
+
   implicit none
 
-  real(psb_spk_), intent(in)      :: x(:,:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_), optional, intent(in)     :: jx
-  real(psb_spk_)                  :: psb_samax
+  real(psb_spk_), intent(in)    :: x(:,:)
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)    :: jx
+  real(psb_spk_)                   :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, isamax
-  real(psb_spk_)         :: amax
-  character(len=20)        :: name, ch_err
+       & err_act, iix, jjx, ix, ijx, m, ldx
+  character(len=20)      :: name, ch_err
 
   name='psb_samax'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -79,42 +74,40 @@ function psb_samax (x,desc_a, info, jx)
     call psb_errpush(info,name)
     goto 9999 
   endif
-
+  
   ix = 1
   if (present(jx)) then
-    ijx = jx
+     ijx = jx
   else
-    ijx = 1
+     ijx = 1
   endif
 
   m = desc_a%get_global_rows()
+  ldx = size(x,1)
 
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=psb_err_from_subroutine_
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
+     info=psb_err_ix_n1_iy_n1_unsupported_
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    imax=isamax(desc_a%get_local_rows()-iix+1,x(iix,jjx),1)
-    amax=abs(x(iix+imax-1,jjx))
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx))
   else 
-    amax = szero
+    res = szero
   end if
-
+  
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  psb_samax=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -123,8 +116,8 @@ function psb_samax (x,desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 end function psb_samax
@@ -162,7 +155,7 @@ end function psb_samax
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
 !
 ! Function: psb_samaxv
 !    Searches the absolute max of X.
@@ -170,27 +163,24 @@ end function psb_samax
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    x(:)   -  real                       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  real               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
-function psb_samaxv (x,desc_a, info)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+function psb_samaxv (x,desc_a, info) result(res)
+  use psb_base_mod, psb_protect_name => psb_samaxv
+
   implicit none
 
-  real(psb_spk_), intent(in)      :: x(:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  real(psb_spk_)                  :: psb_samaxv
+  real(psb_spk_), intent(in)   :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  real(psb_spk_)                  :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax, isamax
-  real(psb_spk_)         :: amax
+       & err_act, iix, jjx, jx, ix, m, ldx
+
   character(len=20)        :: name, ch_err
 
   name='psb_samaxv'
@@ -198,7 +188,6 @@ function psb_samaxv (x,desc_a, info)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -208,38 +197,36 @@ function psb_samaxv (x,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  
   ix = 1
   jx = 1
 
   m = desc_a%get_global_rows()
+  ldx = size(x,1)
 
-  call psb_chkvect(m,1,size(x,1),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=psb_err_from_subroutine_
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
+     info=psb_err_ix_n1_iy_n1_unsupported_
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    imax=isamax(desc_a%get_local_rows()-iix+1,x(iix),1)
-    amax=abs(x(iix+imax-1))
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x)
   else 
-    amax = szero
+    res = szero
   end if
-
+  
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  psb_samaxv=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -248,8 +235,8 @@ function psb_samaxv (x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 end function psb_samaxv
@@ -267,20 +254,18 @@ function psb_samax_vect(x, desc_a, info) result(res)
   real(psb_spk_)                        :: res
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
+  integer(psb_ipk_), intent(out)         :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax, isamax
-  real(psb_spk_)         :: amax
-  character(len=20)        :: name, ch_err
+       & err_act, iix, jjx, jx, ix, m
+  character(len=20)      :: name, ch_err
 
   name='psb_samaxv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -300,8 +285,7 @@ function psb_samax_vect(x, desc_a, info) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -317,15 +301,13 @@ function psb_samax_vect(x, desc_a, info) result(res)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    amax=x%amax(desc_a%get_local_rows())
+    res = x%amax(desc_a%get_local_rows())
   else 
-    amax = szero
+    res = szero
   end if
 
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  res=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -382,35 +364,34 @@ end function psb_samax_vect
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x(:,:) -  real                       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    res    -  real                 The result.
+!    x(:,:) -  real              The input vector.
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset.
 !
-subroutine psb_samaxvs (res,x,desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_samaxvs 
+subroutine psb_samaxvs(res,x,desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_samaxvs
+
   implicit none
 
-  real(psb_spk_), intent(in)      :: x(:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  real(psb_spk_), intent(out)     :: res
+  real(psb_spk_), intent(in)   :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  real(psb_spk_), intent(out)      :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, isamax
-  real(psb_spk_)         :: amax
-  character(len=20)        :: name, ch_err
+       & err_act, iix, jjx, ix, ijx, m, ldx
+  character(len=20)      :: name, ch_err
 
   name='psb_samaxvs'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -423,33 +404,30 @@ subroutine psb_samaxvs (res,x,desc_a, info)
   ijx=1
 
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  ldx=size(x,1)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=psb_err_from_subroutine_
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
+     info=psb_err_ix_n1_iy_n1_unsupported_
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    imax=isamax(desc_a%get_local_rows()-iix+1,x(iix),1)
-    amax=abs(x(iix+imax-1))
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x)
   else 
-    amax = szero
+    res = szero
   end if
-
+  
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  res = amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -458,8 +436,8 @@ subroutine psb_samaxvs (res,x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 end subroutine psb_samaxvs
@@ -503,33 +481,31 @@ end subroutine psb_samaxvs
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    res(:) -  real                     The result.
-!    x(:,:) -  real                     The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                 Return code
+!    res(:) -  real.                The result.
+!    x(:,:) -  real              The input vector.
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
 !
-subroutine psb_smamaxs (res,x,desc_a, info,jx)
-  use psb_base_mod, psb_protect_name => psb_smamaxs 
+subroutine psb_smamaxs(res,x,desc_a, info,jx)
+  use psb_base_mod, psb_protect_name => psb_smamaxs
+
   implicit none
 
-  real(psb_spk_), intent(in)      :: x(:,:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_), optional, intent(in)     :: jx
-  real(psb_spk_), intent(out) :: res(:)
+  real(psb_spk_), intent(in)   :: x(:,:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), optional, intent(in)   :: jx
+  real(psb_spk_), intent(out)     :: res(:)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, i, k, isamax
-  real(psb_spk_)         :: amax
+       & err_act, iix, jjx, ix, ijx, m, ldx, i, k
   character(len=20)        :: name, ch_err
 
   name='psb_smamaxs'
   if (psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-
-  amax=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -549,8 +525,8 @@ subroutine psb_smamaxs (res,x,desc_a, info,jx)
 
   m = desc_a%get_global_rows()
   k  = min(size(x,2),size(res,1))
-
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  ldx = size(x,1)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
@@ -564,19 +540,17 @@ subroutine psb_smamaxs (res,x,desc_a, info,jx)
      goto 9999
   end if
 
+  res(1:k) = szero
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-     do i=1,k
-        imax=isamax(desc_a%get_local_rows()-iix+1,x(iix,jjx+i-1),1)
-        res(i)=abs(x(iix+imax-1,jjx+i-1))
-     end do
-  else 
-    amax = szero
+    do i=1,k
+      res(i) = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx+i-1))
+    end do
   end if
   
   ! compute global max
   call psb_amx(ictxt, res(1:k))
-
+  
   call psb_erractionrestore(err_act)
   return  
 

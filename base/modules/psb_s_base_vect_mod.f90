@@ -150,7 +150,7 @@ contains
     integer(psb_ipk_) :: info
 
     this%v = x
-    call this%asb(size(x),info)
+    call this%asb(size(x,kind=psb_ipk_),info)
   end function constructor
     
   

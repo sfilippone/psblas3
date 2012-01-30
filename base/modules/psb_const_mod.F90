@@ -44,6 +44,9 @@ module psb_const_mod
   ! This is an 8-byte  integer, and normally different from default integer. 
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
+  ! This is always a 4-byte integer, for MPI-related stuff
+  integer, parameter  :: mpindig=8
+  integer, parameter  :: psb_mpik_ = selected_int_kind(mpindig)
   !
   ! These must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
   ! and MPI_REAL

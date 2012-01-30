@@ -527,8 +527,8 @@ contains
     if (allocated(a%ia)) deallocate(a%ia)
     if (allocated(a%val)) deallocate(a%val)
     call a%set_null()
-    call a%set_nrows(0)
-    call a%set_ncols(0)
+    call a%set_nrows(izero)
+    call a%set_ncols(izero)
     
     return
 

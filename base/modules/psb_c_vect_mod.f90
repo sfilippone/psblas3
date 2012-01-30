@@ -163,7 +163,7 @@ contains
 
     if (info == 0) call this%v%bld(x)
 
-    call this%asb(size(x),info)
+    call this%asb(size(x,kind=psb_ipk_),info)
 
   end function constructor
 

@@ -44,37 +44,27 @@
 !    info   -  integer.               Return code
 !    jx     -  integer(optional).     The column offset.
 !
-function psb_zasum (x,desc_a, info, jx)
+function psb_zasum (x,desc_a, info, jx) result(res)
+  use psb_base_mod, psb_protect_name => psb_zasum
 
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), optional, intent(in)     :: jx
-  real(psb_dpk_)                  :: psb_zasum
+  real(psb_dpk_)                  :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, iix, jjx, ix, ijx, m, i, idx, ndm
-  real(psb_dpk_)         :: asum, dzasum
+       & err_act, iix, jjx, ix, ijx, m, i, idx, ndm, ldx
   character(len=20)        :: name, ch_err
-  complex(psb_dpk_)      :: cmax
-  double complex    ::         zdum
-  double precision  ::  cabs1
-  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasum'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  asum=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -93,9 +83,9 @@ function psb_zasum (x,desc_a, info, jx)
   endif
 
   m = desc_a%get_global_rows()
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -110,29 +100,21 @@ function psb_zasum (x,desc_a, info, jx)
   end if
 
   ! compute local max
-  if ((m /= 0)) then
-    if(desc_a%get_local_rows() > 0) then
-      asum=dzasum(desc_a%get_local_rows()-iix+1,x(iix:,jjx),ione)
+  if(desc_a%get_local_rows() > 0) then
+    res = psb_asum(desc_a%get_local_rows()-iix+1,x(:,jjx))
 
-      ! adjust asum because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx,jjx))
-      end do
+    ! adjust res because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx  = desc_a%ovrlap_elem(i,1)
+      ndm  = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*psb_nrm1(x(idx,jjx))
+    end do
 
-
-    else
-      asum=0.d0
-    end if
-    ! compute global sum
-    call psb_sum(ictxt, asum)
   else
-     asum=0.d0
+    res = dzero
   end if
-  
-
-  psb_zasum=asum
+  ! compute global sum
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -141,31 +123,25 @@ function psb_zasum (x,desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_zasum
 
 
 function psb_zasum_vect(x, desc_a, info) result(res)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_z_vect_mod
+  use psb_base_mod, psb_protect_name => psb_zasum_vect
   implicit none
 
   real(psb_dpk_)                        :: res
   type(psb_z_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
+  integer(psb_ipk_), intent(out)        :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax
-  real(psb_dpk_)         :: asum
   character(len=20)        :: name, ch_err
 
   name='psb_zasumv'
@@ -173,7 +149,6 @@ function psb_zasum_vect(x, desc_a, info) result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  asum=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -195,8 +170,7 @@ function psb_zasum_vect(x, desc_a, info) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -212,15 +186,13 @@ function psb_zasum_vect(x, desc_a, info) result(res)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    asum=x%asum(desc_a%get_local_rows())
+    res = x%asum(desc_a%get_local_rows())
   else 
-    asum = dzero
+    res = dzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, asum)
-
-  res=asum
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -233,7 +205,7 @@ function psb_zasum_vect(x, desc_a, info) result(res)
     return
   end if
   return
-  
+
 end function psb_zasum_vect
 
 
@@ -280,36 +252,25 @@ end function psb_zasum_vect
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_zasumv(x,desc_a, info)
+function psb_zasumv(x,desc_a, info) result(res)
+  use psb_base_mod, psb_protect_name => psb_zasumv
 
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  real(psb_dpk_)                  :: psb_zasumv
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  real(psb_dpk_)                  :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, i, idx, ndm
-  real(psb_dpk_)         :: asum, dzasum
+       & err_act, iix, jjx, jx, ix, m, i, idx, ndm, ldx
   character(len=20)        :: name, ch_err
-  complex(psb_dpk_)      :: cmax
-  double complex    ::         zdum
-  double precision  ::  cabs1
-  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasumv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-
-  asum=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -324,9 +285,9 @@ function psb_zasumv(x,desc_a, info)
   jx=1
 
   m = desc_a%get_global_rows()
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -341,30 +302,22 @@ function psb_zasumv(x,desc_a, info)
   end if
 
   ! compute local max
-  if ((m /= 0)) then
-    if(desc_a%get_local_rows() > 0) then
-      asum=dzasum(desc_a%get_local_rows(),x,ione)
+  if(desc_a%get_local_rows() > 0) then
+    res = psb_asum(desc_a%get_local_rows(),x)
 
-      ! adjust asum because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx))
-      end do
+    ! adjust asum because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx = desc_a%ovrlap_elem(i,1)
+      ndm = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*psb_nrm1(x(idx))
+    end do
 
-      ! compute global sum
-      call psb_sum(ictxt, asum)
-
-    else
-      asum=0.d0
-      ! compute global sum
-      call psb_sum(ictxt, asum)
-    end if
   else
-    asum=0.d0
+    res = dzero
   end if
 
-  psb_zasumv=asum
+  ! compute global sum
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -426,29 +379,23 @@ end function psb_zasumv
 !
 subroutine psb_zasumvs(res,x,desc_a, info)
   use psb_base_mod, psb_protect_name => psb_zasumvs
+
   implicit none
 
-  complex(psb_dpk_), intent(in)   :: x(:)
-  real(psb_dpk_), intent(out)     :: res
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
+  complex(psb_dpk_), intent(in)    :: x(:)
+  real(psb_dpk_), intent(out)      :: res
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)   :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, jx, m, i, idx, ndm
-  real(psb_dpk_)         :: asum, dzasum
+       & err_act, iix, jjx, ix, jx, m, i, idx, ndm, ldx
   character(len=20)        :: name, ch_err
-  complex(psb_dpk_)      :: cmax
-  double complex    ::         zdum
-  double precision  ::  cabs1
-  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasumvs'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-
-  asum=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -463,9 +410,9 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   jx = 1
 
   m = desc_a%get_global_rows()
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -480,31 +427,22 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   end if
 
   ! compute local max
-  if ((m /= 0)) then
-    if(desc_a%get_local_rows() > 0) then
-      asum=dzasum(desc_a%get_local_rows(),x,ione)
+  if(desc_a%get_local_rows() > 0) then
+    res = psb_asum(desc_a%get_local_rows(),x)
 
-      ! adjust asum because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx))
-      end do
+    ! adjust asum because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx = desc_a%ovrlap_elem(i,1)
+      ndm = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*psb_nrm1(x(idx))
+    end do
 
-      ! compute global sum
-      call psb_sum(ictxt,asum)
-
-    else
-      asum=0.d0
-      ! compute global sum
-      call psb_sum(ictxt, asum)
-    end if
   else
-    asum=0.d0
+    res = dzero
   end if
 
-
-  res = asum
+  ! compute global sum
+  call psb_sum(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  

@@ -44,7 +44,7 @@
 !    info   -  integer.              Return code
 !    jx     -  integer(optional).    The column offset.
 !
-function psb_camax(x,desc_a, info, jx)
+function psb_camax(x,desc_a, info, jx) result(res)
   use psb_base_mod, psb_protect_name => psb_camax
 
   implicit none
@@ -53,25 +53,20 @@ function psb_camax(x,desc_a, info, jx)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)             :: info
   integer(psb_ipk_), optional, intent(in)    :: jx
-  real(psb_spk_)                   :: psb_camax
+  real(psb_spk_)                   :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, icamax
-  real(psb_spk_)         :: amax
-  character(len=20)        :: name, ch_err
-  complex ::  cdum
-  real    ::  cabs1
-  cabs1( cdum ) = abs( real( cdum ) ) + abs( aimag( cdum ) )
+       & err_act, iix, jjx, ix, ijx, m, ldx
+  character(len=20)      :: name, ch_err
 
   name='psb_camax'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -88,8 +83,9 @@ function psb_camax(x,desc_a, info, jx)
   endif
 
   m = desc_a%get_global_rows()
+  ldx = size(x,1)
 
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
@@ -105,16 +101,13 @@ function psb_camax(x,desc_a, info, jx)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-     imax=icamax(desc_a%get_local_rows()-iix+1,x(iix,jjx),1)
-     amax=cabs1(x(iix+imax-1,jjx))
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx))
   else 
-    amax = szero
+    res = szero
   end if
   
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  psb_camax=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -174,32 +167,27 @@ end function psb_camax
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_camaxv (x,desc_a, info)
+function psb_camaxv (x,desc_a, info) result(res)
   use psb_base_mod, psb_protect_name => psb_camaxv
 
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-  real(psb_spk_)                  :: psb_camaxv
+  integer(psb_ipk_), intent(out)  :: info
+  real(psb_spk_)                  :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax, icamax
-  real(psb_spk_)         :: amax
-  complex(psb_spk_)      :: cmax
+       & err_act, iix, jjx, jx, ix, m, ldx
+
   character(len=20)        :: name, ch_err
-  complex ::         cdum
-  real    ::  cabs1
-  cabs1( cdum ) = abs( real( cdum ) ) + abs( aimag( cdum ) )
 
   name='psb_camaxv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -214,8 +202,9 @@ function psb_camaxv (x,desc_a, info)
   jx = 1
 
   m = desc_a%get_global_rows()
+  ldx = size(x,1)
 
-  call psb_chkvect(m,1,size(x,1),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
@@ -231,17 +220,13 @@ function psb_camaxv (x,desc_a, info)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-     imax=icamax(desc_a%get_local_rows()-iix+1,x(iix),1)
-     cmax=(x(iix+imax-1))
-     amax=cabs1(cmax)
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x)
   else 
-    amax = szero
+    res = szero
   end if
   
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  psb_camaxv=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -269,12 +254,11 @@ function psb_camax_vect(x, desc_a, info) result(res)
   real(psb_spk_)                        :: res
   type(psb_c_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
+  integer(psb_ipk_), intent(out)         :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax, isamax
-  real(psb_spk_)         :: amax
+       & err_act, iix, jjx, jx, ix, m
   character(len=20)      :: name, ch_err
 
   name='psb_camaxv'
@@ -282,7 +266,6 @@ function psb_camax_vect(x, desc_a, info) result(res)
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=szero
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -302,8 +285,7 @@ function psb_camax_vect(x, desc_a, info) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -319,15 +301,13 @@ function psb_camax_vect(x, desc_a, info) result(res)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-    amax=x%amax(desc_a%get_local_rows())
+    res = x%amax(desc_a%get_local_rows())
   else 
-    amax = szero
+    res = szero
   end if
 
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  res=amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -397,27 +377,21 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   complex(psb_spk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-  real(psb_spk_), intent(out)     :: res
+  integer(psb_ipk_), intent(out)  :: info
+  real(psb_spk_), intent(out)      :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, icamax
-  real(psb_spk_)         :: amax
-  character(len=20)        :: name, ch_err
-  complex(psb_spk_)      :: cmax
-  complex ::         cdum
-  real    ::  cabs1
-  cabs1( cdum ) = abs( real( cdum ) ) + abs( aimag( cdum ) )
+       & err_act, iix, jjx, ix, ijx, m, ldx
+  character(len=20)      :: name, ch_err
 
   name='psb_camaxvs'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
-  amax=0.d0
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -430,7 +404,8 @@ subroutine psb_camaxvs(res,x,desc_a, info)
   ijx=1
 
   m = desc_a%get_global_rows()
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  ldx=size(x,1)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
@@ -446,17 +421,13 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-     imax=icamax(desc_a%get_local_rows()-iix+1,x(iix),1)
-     cmax=(x(iix+imax-1))
-     amax=cabs1(cmax)
+    res = psb_amax(desc_a%get_local_rows()-iix+1,x)
   else 
-    amax = szero
+    res = szero
   end if
   
   ! compute global max
-  call psb_amx(ictxt, amax)
-
-  res = amax
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -528,20 +499,13 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, imax, i, k, icamax
-  real(psb_spk_)         :: amax
+       & err_act, iix, jjx, ix, ijx, m, ldx, i, k
   character(len=20)        :: name, ch_err
-  complex(psb_spk_)      :: cmax
-  complex ::         cdum
-  real    ::  cabs1
-  cabs1( cdum ) = abs( real( cdum ) ) + abs( aimag( cdum ) )
 
   name='psb_cmamaxs'
   if (psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-
-  amax=0.d0
 
   ictxt=desc_a%get_context()
 
@@ -561,8 +525,8 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
 
   m = desc_a%get_global_rows()
   k  = min(size(x,2),size(res,1))
-
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  ldx = size(x,1)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
@@ -576,20 +540,17 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
      goto 9999
   end if
 
+  res(1:k) = szero
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
-     do i=1,k
-        imax=icamax(desc_a%get_local_rows()-iix+1,x(iix,jjx+i-1),1)
-        cmax=(x(iix+imax-1,jjx+i-1))
-        res(i)=cabs1(cmax)
-     end do
-  else 
-    amax = szero
+    do i=1,k
+      res(i) = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx+i-1))
+    end do
   end if
   
   ! compute global max
   call psb_amx(ictxt, res(1:k))
-
+  
   call psb_erractionrestore(err_act)
   return  
 

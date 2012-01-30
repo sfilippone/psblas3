@@ -40,6 +40,63 @@ module psb_serial_mod
        & psb_gth => psi_gth,&
        & psb_sct => psi_sct
 
+  interface psb_nrm1
+    module procedure psb_snrm1, psb_dnrm1, psb_cnrm1, psb_znrm1
+  end interface psb_nrm1
+
+  interface psb_amax
+    function psb_samax_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_spk_), intent(in)  :: x(:)
+      real(psb_spk_)                 :: val
+    end function psb_samax_s
+    function psb_damax_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_dpk_), intent(in)  :: x(:)
+      real(psb_dpk_)                 :: val
+    end function psb_damax_s
+    function psb_camax_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      complex(psb_spk_), intent(in)  :: x(:)
+      real(psb_spk_)                 :: val
+    end function psb_camax_s
+    function psb_zamax_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      complex(psb_dpk_), intent(in)  :: x(:)
+      real(psb_dpk_)                 :: val
+    end function psb_zamax_s
+  end interface psb_amax
+
+  interface psb_asum
+    function psb_sasum_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_spk_), intent(in)  :: x(:)
+      real(psb_spk_)                 :: val
+    end function psb_sasum_s
+    function psb_dasum_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      real(psb_dpk_), intent(in)  :: x(:)
+      real(psb_dpk_)                 :: val
+    end function psb_dasum_s
+    function psb_casum_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      complex(psb_spk_), intent(in)  :: x(:)
+      real(psb_spk_)                 :: val
+    end function psb_casum_s
+    function psb_zasum_s(n, x) result(val)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)  :: n
+      complex(psb_dpk_), intent(in)  :: x(:)
+      real(psb_dpk_)                 :: val
+    end function psb_zasum_s
+  end interface psb_asum
 
   interface psb_symbmm
     subroutine psb_ssymbmm(a,b,c,info)
@@ -479,6 +536,31 @@ module psb_serial_mod
   end interface psb_aspxpby
 
 contains
+
+  elemental function psb_snrm1(x) result(res)
+    real(psb_spk_), intent(in)  :: x
+    real(psb_spk_)              :: val
+    val = abs( x )
+  end function psb_snrm1
+
+  elemental function psb_dnrm1(x) result(res)
+    real(psb_dpk_), intent(in) :: x
+    real(psb_dpk_)             :: val
+    val = abs(  x )
+  end function psb_dnrm1
+
+  elemental function psb_cnrm1(x) result(res)
+    complex(psb_spk_), intent(in)  :: x
+    real(psb_spk_)                 :: val
+    val = abs( real( x ) ) + abs( aimag( x ) )  
+  end function psb_cnrm1
+
+  elemental function psb_znrm1(x) result(res)
+    complex(psb_dpk_), intent(in)  :: x
+    real(psb_dpk_)                 :: val
+    val = abs( real( x ) ) + abs( aimag( x ) )  
+  end function psb_znrm1
+
 
   subroutine psb_scsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
