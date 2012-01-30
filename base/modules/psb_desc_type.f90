@@ -890,7 +890,7 @@ contains
 
       Do j=0,n_elem_recv-1
         idx = idxlist(incnt+psb_elem_recv_+j)
-        call psb_ensure_size((outcnt+3),tmp,info,pad=-1)
+        call psb_ensure_size((outcnt+3),tmp,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')

@@ -131,9 +131,6 @@ module psb_z_linmap_mod
   private :: z_map_sizeof, z_is_asb, z_free
 
 
-
-
-
 contains
 
   function z_map_sizeof(map) result(val)

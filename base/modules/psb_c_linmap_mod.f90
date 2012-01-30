@@ -36,13 +36,13 @@
 !    to different spaces.
 !
 module psb_c_linmap_mod
-
+  
   use psb_const_mod
   use psb_c_mat_mod, only : psb_cspmat_type
   use psb_descriptor_type, only : psb_desc_type
   use psb_base_linmap_mod
-
-
+  
+  
   type, extends(psb_base_linmap_type) ::  psb_clinmap_type 
     type(psb_cspmat_type) :: map_X2Y, map_Y2X
   contains
@@ -75,7 +75,7 @@ module psb_c_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_X2Y_vect
-  end interface
+  end interface psb_map_X2Y
 
   interface psb_map_Y2X
     subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
@@ -100,20 +100,20 @@ module psb_c_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_Y2X_vect
-  end interface
+  end interface psb_map_Y2X
 
 
   interface psb_map_cscnv
     module procedure psb_c_map_cscnv
-  end interface
+  end interface psb_map_cscnv
 
   interface psb_linmap_sub
     module procedure psb_c_linmap_sub
-  end interface
+  end interface psb_linmap_sub
 
   interface psb_move_alloc
     module procedure  psb_clinmap_transfer
-  end interface
+  end interface psb_move_alloc
 
   interface psb_linmap
     function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
@@ -126,7 +126,7 @@ module psb_c_linmap_mod
       integer(psb_ipk_), intent(in)               :: map_kind
       integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
     end function psb_c_linmap
-  end interface
+  end interface psb_linmap
 
   private :: c_map_sizeof, c_is_asb, c_free
 

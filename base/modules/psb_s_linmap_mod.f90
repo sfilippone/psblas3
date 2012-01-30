@@ -132,8 +132,6 @@ module psb_s_linmap_mod
 
 
 
-
-
 contains
 
   function s_map_sizeof(map) result(val)

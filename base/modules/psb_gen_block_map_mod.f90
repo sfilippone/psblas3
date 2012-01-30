@@ -89,6 +89,7 @@ module psb_gen_block_map_mod
        & block_g2lv2, block_g2ls1_ins, block_g2ls2_ins,&
        & block_g2lv1_ins, block_g2lv2_ins, block_clone
 
+  integer(psb_ipk_), private :: laddsz=500
 
 contains
 
@@ -284,7 +285,7 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, nv, is
-    integer(psb_ipk_) :: ictxt, iam, np
+    integer(psb_mpik_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -476,7 +477,7 @@ contains
               ix  = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
               if (ix < 0) then 
                 ix = idxmap%local_cols + 1
-                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=500)
+                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                 if (info /= 0) then 
                   info = -4
                   return
@@ -505,7 +506,7 @@ contains
             ix  = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
             if (ix < 0) then 
               ix = idxmap%local_cols + 1
-              call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=500)
+              call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
               if (info /= 0) then 
                 info = -4
                 return
@@ -582,10 +583,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, nl
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i, ntot
+    integer(psb_mpik_) :: iam, np
+    integer(psb_ipk_) :: i, ntot
     integer(psb_ipk_), allocatable :: vnl(:)
 
     info = 0
@@ -644,7 +647,8 @@ contains
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_ipk_) :: nhal, ictxt, iam, np 
+    integer(psb_ipk_) :: nhal
+    integer(psb_mpik_) :: ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()
