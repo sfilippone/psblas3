@@ -36,16 +36,16 @@
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  real,dimension(:,:).          The global matrix to scatter.
-!   locx      -  real,dimension(:,:).          The local piece of the ditributed matrix.
+!   globx     -  real,dimension(:,:).       The global matrix to scatter.
+!   locx      -  real,dimension(:,:).       The local piece of the distributed matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
-!   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
-!                                              the processes have a copy. Default -1.
-!
-subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot) 
-  use psb_base_mod, psb_protect_name => psb_sscatterm
+!   iroot     -  integer(optional).            The process that owns the global matrix. 
+!                                              If -1 all the processes have a copy. 
+!                                              Default -1
+subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot)
 
+  use psb_base_mod, psb_protect_name => psb_sscatterm
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -62,12 +62,12 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
-       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
-       & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
-       & jlx, myrank, rootrank, c, pos
-  real(psb_spk_), allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, ilx,&
+       & jlx, c, pos
+  real(psb_spk_),allocatable  :: scatterv(:)
+  integer(psb_ipk_), allocatable           :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -89,8 +89,8 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1)=5; ierr(2)=root
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -128,8 +128,8 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot)
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
+  if (info == psb_success_) call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -178,7 +178,7 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, iroot)
         displ(i)=displ(i-1)+all_dim(i-1)
       end do
 
-    ! root has to gather loc_glob from each process
+      ! root has to gather loc_glob from each process
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -270,10 +270,10 @@ end subroutine psb_sscatterm
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  real,dimension(:).            The global vector to scatter.
-!   locx      -  real,dimension(:).            The local piece of the ditributed vector.
+!   globx     -  real,dimension(:).         The global vector to scatter.
+!   locx      -  real,dimension(:).         The local piece of the ditributed vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
-!   info      -  integer.                      Error code.
+!   info      -  integer.                      Return code
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.
 !
@@ -295,12 +295,11 @@ subroutine  psb_sscatterv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
-       & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
-       & rootrank, pos, ilx, jlx
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   real(psb_spk_), allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable         :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable            :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
 
@@ -325,8 +324,8 @@ subroutine  psb_sscatterv(globx, locx, desc_a, info, iroot)
      root = iroot
      if((root < -1).or.(root > np)) then
         info=psb_err_input_value_invalid_i_
-        int_err(1:2)=(/5,root/)
-        call psb_errpush(info,name,i_err=int_err)
+        ierr(1) = 5; ierr(2)=root
+        call psb_errpush(info,name,i_err=ierr)
         goto 9999
      end if
   else
@@ -349,9 +348,9 @@ subroutine  psb_sscatterv(globx, locx, desc_a, info, iroot)
   k = 1
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if (info == psb_success_) &
-       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+       & call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chk(glob)vect'

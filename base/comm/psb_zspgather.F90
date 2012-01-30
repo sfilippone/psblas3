@@ -18,10 +18,12 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   logical, intent(in), optional   :: keepnum,keeploc
 
   type(psb_z_coo_sparse_mat)      :: loc_coo, glob_coo
-  integer(psb_ipk_) :: ictxt,np,me, err_act, icomm, dupl_, nrg, ncg, nzg
+  integer(psb_mpik_) :: ictxt,np,me, icomm, minfo
+  integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k
   logical :: keepnum_, keeploc_
   integer(psb_ipk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
 
@@ -53,12 +55,12 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     allocate(nzbr(np), idisp(np),stat=info)
     if (info /= psb_success_) then 
       info=psb_err_alloc_request_
-      call psb_errpush(info,name,i_err=(/2*np,0,0,0,0/),&
-           & a_err='integer')
+      ierr(1) = 2*np
+      call psb_errpush(info,name,i_err=ierr,a_err='integer')
       goto 9999      
     end if
     call loca%mv_to(loc_coo)
-    nzbr(:)    = 0
+    nzbr(:) = 0
     nzbr(me+1) = loc_coo%get_nzeros()
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
@@ -68,17 +70,18 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
     ndx = nzbr(me+1) 
-    call mpi_allgatherv(loc_coo%val,ndx,mpi_double_complex,&
+    call mpi_allgatherv(loc_coo%val,ndx,mpi_complex,&
          & glob_coo%val,nzbr,idisp,&
-         & mpi_double_complex,icomm,info)
-    if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_integer,&
+         & mpi_complex,icomm,minfo)
+    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_integer,&
          & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_integer,icomm,info)
-    if (info == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_integer,&
+         & psb_mpi_integer,icomm,minfo)
+    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_integer,&
          & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_integer,icomm,info)
+         & psb_mpi_integer,icomm,minfo)
     
-    if (info /= psb_success_) then 
+    if (minfo /= psb_success_) then 
+      info  = minfo
       call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')
       goto 9999
     end if

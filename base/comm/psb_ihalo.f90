@@ -70,7 +70,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, k, maxk, liwork,&
-       & imode, err,data_
+       & imode, err,data_, ldx
   integer(psb_ipk_), pointer         :: xp(:,:), iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
@@ -103,7 +103,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   nrow = desc_a%get_local_rows()
 
   maxk=size(x,2)-ijx+1
-
+  
   if(present(ik)) then
     if(ik > maxk) then
       k=maxk
@@ -133,8 +133,9 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -186,7 +187,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     end if
   end if
 
-  xp => x(iix:size(x,1),jjx:jjx+k-1)
+  xp => x(iix:ldx,jjx:jjx+k-1)
   ! exchange halo elements
   if(tran_ == 'N') then
     call psi_swapdata(imode,k,izero,xp,&
@@ -294,7 +295,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork, data_
+       & err, liwork, data_,ldx
   integer(psb_ipk_),pointer          :: iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
@@ -340,8 +341,9 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
     imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
