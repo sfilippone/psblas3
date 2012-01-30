@@ -55,7 +55,7 @@ module psb_const_mod
   integer(psb_ipk_), parameter  :: psb_spk_ = kind(1.e0)
   integer(psb_ipk_), save       :: psb_sizeof_dp, psb_sizeof_sp
   integer(psb_ipk_), save       :: psb_sizeof_int, psb_sizeof_long_int
-  integer(psb_ipk_), save       :: psb_mpi_integer
+  integer(psb_mpik_), save      :: psb_mpi_integer
   ! 
   ! Version
   !
