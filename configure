@@ -752,6 +752,7 @@ with_library_path
 with_include_path
 with_module_path
 enable_dependency_tracking
+enable_long_integers
 with_blas
 with_lapack
 with_rsb
@@ -1397,6 +1398,7 @@ Optional Features:
                           in serial mode.
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-long-integers  Specify usage of 64 bits integers.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -6587,6 +6589,30 @@ fi
 rm -f conftest*
 fi
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we want long (8 bytes) integers" >&5
+$as_echo_n "checking whether we want long (8 bytes) integers... " >&6; }
+# Check whether --enable-long-integers was given.
+if test "${enable_long_integers+set}" = set; then :
+  enableval=$enable_long_integers;
+pac_cv_long_integers="yes";
+
+
+fi
+
+if test x"$pac_cv_long_integers" == x"yes" ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes." >&5
+$as_echo "yes." >&6; }
+else
+ pac_cv_long_integers="no";
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: no." >&5
+$as_echo "no." >&6; }
+fi
+
+
+if test x"$pac_cv_long_integers" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
+fi
 
 #
 # Tests for support of various Fortran features; some of them are critical,

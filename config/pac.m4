@@ -329,7 +329,7 @@ AC_MSG_RESULT(no)
 
 dnl @synopsis PAC_ARG_SERIAL_MPI
 dnl
-dnl Test for --with-serial-mpi={yes|no}
+dnl Test for --enable-serial
 dnl 
 dnl 
 dnl
@@ -354,6 +354,38 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    AC_MSG_RESULT([yes.])
 else
  pac_cv_serial_mpi="no";
+ AC_MSG_RESULT([no.])
+fi
+]
+)
+
+dnl @synopsis PAC_ARG_LONG_INTEGERS
+dnl
+dnl Test for --enable-long-integers
+dnl 
+dnl 
+dnl
+dnl Example use:
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_LONG_INTEGERS],
+[
+AC_MSG_CHECKING([whether we want long (8 bytes) integers])
+AC_ARG_ENABLE(long-integers,
+AC_HELP_STRING([--enable-long-integers], 
+[Specify usage of 64 bits integers. ]),
+[
+pac_cv_long_integers="yes";
+]
+dnl ,
+dnl [pac_cv_long_integers="no";]
+)
+if test x"$pac_cv_long_integers" == x"yes" ; then
+   AC_MSG_RESULT([yes.])
+else
+ pac_cv_long_integers="no";
  AC_MSG_RESULT([no.])
 fi
 ]
