@@ -205,9 +205,9 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -277,9 +277,9 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
 
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(n,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -304,7 +304,8 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
     if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = czero
 
-    if (info == psb_success_) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == psb_success_) &
+         & call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if (info /= psb_success_) then
@@ -542,9 +543,9 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -582,9 +583,9 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -815,9 +816,9 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -855,9 +856,9 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -881,8 +882,9 @@ subroutine  psb_cspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     ! 
     call psi_ovrl_save(x%v,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,psb_avg_,info)
+
 !!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
-!!$    yp(nrow+1:ncol) = szero
+!!$    yp(nrow+1:ncol) = czero
     
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)

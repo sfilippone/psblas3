@@ -56,23 +56,22 @@
 !  vector and T is a M-by-M distributed triangular matrix.
 !
 ! Arguments:   
-!    alpha   -  real                   The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
-!    x(:,:)  -  real                   The input vector containing the entries of ( X ).
-!    beta    -  real                   The scalar beta.
-!    y(:,:)  -  real                   The input vector containing the entries of ( Y ).
+!    alpha   -  real.               The scalar alpha.
+!    a       -  type(psb_sspmat_type). The sparse matrix containing A.
+!    x(:,:)  -  real                The input vector containing the entries of ( X ).
+!    beta    -  real                The scalar beta.
+!    y(:,:)  -  real                The input vector containing the entries of ( Y ).
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    unitd   -  character(optional).   Specify some type of operation with
+!    scale   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
-!    d(:)    -  real  , optional       Matrix for diagonal scaling.
+!    d(:)    -  real, optional      Matrix for diagonal scaling.
 !    k       -  integer(optional).     The number of right-hand sides.
 !    jx      -  integer(optional).     The column offset for ( X ). Default: 1
 !    jy      -  integer(optional).     The column offset for ( Y ). Default: 1 
-!    work(:) -  real  , optional       Working area.
-!
+!    work(:) -  real, optional      Working area.
 ! 
 subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, k, jx, jy, work)   
@@ -99,7 +98,7 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lscale
-  integer(psb_ipk_), parameter       :: nb=4
+  integer(psb_ipk_), parameter  :: nb=4
   real(psb_spk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
@@ -221,9 +220,9 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -339,19 +338,19 @@ end subroutine psb_sspsm
 !
 !
 ! Arguments:   
-!    alpha   -  real                   The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
-!    x(:)    -  real                   The input vector containing the entries of ( X ).
-!    beta    -  real                   The scalar beta.
-!    y(:)    -  real                   The input vector containing the entries of ( Y ).
+!    alpha   -  real.               The scalar alpha.
+!    a       -  type(psb_sspmat_type). The sparse matrix containing A.
+!    x(:)    -  real                The input vector containing the entries of ( X ).
+!    beta    -  real                The scalar beta.
+!    y(:)    -  real                The input vector containing the entries of ( Y ).
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
 !    scale   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
-!    d(:)    -  real  , optional       Matrix for diagonal scaling.
-!    work(:) -  real  , optional       Working area.
+!    d(:)    -  real, optional      Matrix for diagonal scaling.
+!    work(:) -  real, optional      Working area.
 ! 
 subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
@@ -471,7 +470,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
 
   iwork(1)=0.d0
 
-  if (present(diag)) then
+  if(present(diag)) then
     lld = size(diag)
     id => diag
   else
@@ -484,9 +483,9 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-  if (info == psb_success_)&
-       & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
+  if (info == psb_success_) &
+       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -522,7 +521,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! update overlap elements
-  if (choice_ > 0) then
+  if(choice_ > 0) then
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
          & sone,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
@@ -550,22 +549,23 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   return
 end subroutine psb_sspsv
      
+     
 subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
   use psb_base_mod, psb_protect_name => psb_sspsv_vect
   use psi_mod
   implicit none 
 
-  real(psb_spk_), intent(in)              :: alpha, beta
+  real(psb_spk_), intent(in)           :: alpha, beta
   type(psb_s_vect_type), intent(inout)    :: x
   type(psb_s_vect_type), intent(inout)    :: y
   type(psb_sspmat_type), intent(inout)    :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   type(psb_s_vect_type), intent(inout), optional  :: diag
-  real(psb_spk_), optional, target, intent(inout)        :: work(:)
-  character, intent(in), optional           :: trans, scale
-  integer(psb_ipk_), intent(in), optional             :: choice
+  real(psb_spk_), optional, target, intent(inout) :: work(:)
+  character, intent(in), optional         :: trans, scale
+  integer(psb_ipk_), intent(in), optional           :: choice
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
@@ -684,9 +684,9 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_)&
-       & call psb_chkvect(m,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -749,5 +749,4 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   end if
   return
 end subroutine psb_sspsv_vect
-     
      

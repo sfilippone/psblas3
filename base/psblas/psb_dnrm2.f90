@@ -39,12 +39,12 @@
 !    where sub( X ) denotes X(:,JX).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).     The input vector containing the entries of X.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for X .
+!    x(:,:) -  real              The input vector containing the entries of sub( X ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset for sub( X ).
 !
-function psb_dnrm2(x, desc_a, info, jx)  
+function psb_dnrm2(x, desc_a, info, jx)  result(res)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
@@ -55,17 +55,16 @@ function psb_dnrm2(x, desc_a, info, jx)
   type(psb_desc_type), intent(in)   :: desc_a
   integer(psb_ipk_), intent(in), optional     :: jx
   integer(psb_ipk_), intent(out)              :: info
-  real(psb_dpk_)                  :: psb_dnrm2
+  real(psb_dpk_)                  :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm 
-  real(psb_dpk_)         :: nrm2, dnrm2, dd
-!!$  external dcombnrm2
-  character(len=20)        :: name, ch_err
+       & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm, ldx
+  real(psb_dpk_)         :: dnrm2, dd
+  character(len=20)      :: name, ch_err
 
   name='psb_dnrm2'
-  if (psb_errstatus_fatal()) return 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -86,7 +85,8 @@ function psb_dnrm2(x, desc_a, info, jx)
   endif
 
   m = desc_a%get_global_rows()
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  ldx = size(x,1)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -99,29 +99,22 @@ function psb_dnrm2(x, desc_a, info, jx)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if (desc_a%get_local_rows() > 0) then 
-      ndim = desc_a%get_local_rows()
-      nrm2 = dnrm2( ndim, x(iix:,jjx), ione )
+  if (desc_a%get_local_rows() > 0) then 
+    ndim = desc_a%get_local_rows()
+    res  = dnrm2( int(ndim,kind=psb_mpik_), x(iix:,jjx), int(ione,kind=psb_mpik_) )
 
-      ! adjust  because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
-        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx,jjx))/nrm2)**2) 
-      end do
-    else 	    
-      nrm2 = dzero
-    end if
+    ! adjust  because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx = desc_a%ovrlap_elem(i,1)
+      ndm = desc_a%ovrlap_elem(i,2)
+      dd  = real(ndm-1)/real(ndm)
+      res = res * sqrt(sone - dd*(abs(x(idx,jjx))/res)**2) 
+    end do
   else 	    
-    nrm2 = dzero
+    res = dzero
   end if
 
-!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  call psb_nrm2(ictxt,nrm2)
-
-  psb_dnrm2 = nrm2  
+  call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -176,31 +169,32 @@ end function psb_dnrm2
 !    norm2 := sqrt ( X**T * X)
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  real               The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
-function psb_dnrm2v(x, desc_a, info)  
+function psb_dnrm2v(x, desc_a, info)  result(res)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
 
-  real(psb_dpk_), intent(in)      :: x(:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  real(psb_dpk_)                  :: psb_dnrm2v
+  real(psb_dpk_), intent(in)    :: x(:)
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)   :: info
+  real(psb_dpk_)                   :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
-  real(psb_dpk_)         :: nrm2, dnrm2, dd
-!!$  external dcombnrm2
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+  real(psb_dpk_)         :: dnrm2, dd
+
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2v'
-  if (psb_errstatus_fatal()) return 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -216,8 +210,8 @@ function psb_dnrm2v(x, desc_a, info)
   ix = 1
   jx=1
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
+  ldx = size(x,1) 
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -230,28 +224,22 @@ function psb_dnrm2v(x, desc_a, info)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if (desc_a%get_local_rows() > 0) then 
-      ndim = desc_a%get_local_rows()
-      nrm2 = dnrm2( ndim, x, ione )
-      ! adjust  because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
-        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx))/nrm2)**2) 
-      end do
-    else 	    
-      nrm2 = dzero
-    end if
+  if (desc_a%get_local_rows() > 0) then 
+    ndim = desc_a%get_local_rows()
+    res  = dnrm2( int(ndim,kind=psb_mpik_), x, int(ione,kind=psb_mpik_) )
+    ! adjust  because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx = desc_a%ovrlap_elem(i,1)
+      ndm = desc_a%ovrlap_elem(i,2)
+      dd  = real(ndm-1)/real(ndm)
+      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+    end do
   else 	    
-    nrm2 = dzero
+    res = dzero
   end if
+  
+  call psb_nrm2(ictxt,res)
 
-!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  call psb_nrm2(ictxt,nrm2)
-
-  psb_dnrm2v = nrm2  
 
   call psb_erractionrestore(err_act)
   return  
@@ -267,6 +255,7 @@ function psb_dnrm2v(x, desc_a, info)
 end function psb_dnrm2v
 
 
+
 function psb_dnrm2_vect(x, desc_a, info)  result(res)
   use psb_descriptor_type
   use psb_check_mod
@@ -278,14 +267,14 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
   real(psb_dpk_)                        :: res
   type(psb_d_vect_type), intent (inout) :: x
   type(psb_desc_type), intent(in)       :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
+  integer(psb_ipk_), intent(out)        :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
-  real(psb_dpk_)         :: nrm2, dnrm2, dd
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+  real(psb_dpk_)         :: snrm2, dd
 !!$  external dcombnrm2
-  character(len=20)        :: name, ch_err
+  character(len=20)      :: name, ch_err
 
   name='psb_dnrm2v'
   if (psb_errstatus_fatal()) return 
@@ -311,8 +300,8 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
   ix = 1
   jx=1
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  ldx = x%get_nrows()
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -325,10 +314,9 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if (desc_a%get_local_rows() > 0) then 
-      ndim = desc_a%get_local_rows()
-      nrm2 = x%nrm2(ndim)
+  if (desc_a%get_local_rows() > 0) then 
+    ndim = desc_a%get_local_rows()
+    res  = x%nrm2(ndim)
 !!$      ! adjust  because overlapped elements are computed more than once
 !!$      do i=1,size(desc_a%ovrlap_elem,1)
 !!$        idx = desc_a%ovrlap_elem(i,1)
@@ -336,17 +324,11 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
 !!$        dd  = dble(ndm-1)/dble(ndm)
 !!$        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx))/nrm2)**2) 
 !!$      end do
-    else 	    
-      nrm2 = dzero
-    end if
   else 	    
-    nrm2 = dzero
+    res = dzero
   end if
 
-!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  call psb_nrm2(ictxt,nrm2)
-
-  res = nrm2  
+  call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -360,8 +342,6 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
   end if
   return
 end function psb_dnrm2_vect
-
-
 
 
 
@@ -400,13 +380,13 @@ end function psb_dnrm2_vect
 ! Subroutine: psb_dnrm2vs
 !    Forms the norm2 of a distributed vector,
 !
-!    res := sqrt ( X**T * X)
+!    norm2 := sqrt ( X**T * X)
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res    -  real                  The result.
+!    x(:)   -  real               The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 subroutine psb_dnrm2vs(res, x, desc_a, info)
   use psb_descriptor_type
@@ -415,20 +395,21 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(psb_dpk_), intent(in)      :: x(:)
-  real(psb_dpk_), intent(out)     :: res
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
+  real(psb_dpk_), intent(in)    :: x(:)
+  real(psb_dpk_), intent(out)      :: res
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)   :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
   real(psb_dpk_)         :: nrm2, dnrm2, dd
-!!$  external dcombnrm2
+
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2'
-  if (psb_errstatus_fatal()) return 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -444,8 +425,8 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   ix = 1
   jx = 1
   m = desc_a%get_global_rows()
-
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
+  ldx = size(x,1) 
+  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -458,28 +439,23 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if (desc_a%get_local_rows() > 0) then 
-      ndim = desc_a%get_local_rows()
-      nrm2 = dnrm2( ndim, x, ione )
-      ! adjust  because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
-        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx))/nrm2)**2) 
-      end do
-    else 	    
-      nrm2 = dzero
-    end if
+  if (desc_a%get_local_rows() > 0) then 
+    ndim = desc_a%get_local_rows()
+    res  = dnrm2( int(ndim,kind=psb_mpik_), x, int(ione,kind=psb_mpik_) )
+    
+    ! adjust  because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx = desc_a%ovrlap_elem(i,1)
+      ndm = desc_a%ovrlap_elem(i,2)
+      dd  = real(ndm-1)/real(ndm)
+      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+    end do
   else 	    
-    nrm2 = dzero
+    res = dzero
   end if
 
-!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  call psb_nrm2(ictxt,nrm2)
+  call psb_nrm2(ictxt,res)
 
-  res = nrm2  
 
   call psb_erractionrestore(err_act)
   return  

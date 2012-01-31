@@ -32,28 +32,27 @@
 ! File: psb_cnrmi.f90
 !
 ! Function: psb_cnrmi
-!    Forms the approximated norm of a sparse matrix,                           
+!    Forms the infinity norm of a sparse matrix,                           
 !
-!    normi := max(abs(sum(A(i,j))))                                              
+!    nrmi := max_i(abs(sum(A(i,:))))                                              
 !
 ! Arguments:
-!    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
+!    a      -  type(psb_cspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
-function psb_cnrmi(a,desc_a,info)  
+function psb_cnrmi(a,desc_a,info)  result(res)
   use psb_base_mod, psb_protect_name => psb_cnrmi
   implicit none
 
-  type(psb_cspmat_type), intent(in)   :: a
-  integer(psb_ipk_), intent(out)                :: info
-  type(psb_desc_type), intent(in)     :: desc_a
-  real(psb_spk_)                    :: psb_cnrmi
+  type(psb_cspmat_type), intent(in) :: a
+  integer(psb_ipk_), intent(out)    :: info
+  type(psb_desc_type), intent(in)   :: desc_a
+  real(psb_spk_)                    :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(psb_spk_)         :: nrmi
   character(len=20)        :: name, ch_err
 
   name='psb_cnrmi'
@@ -90,21 +89,19 @@ function psb_cnrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = a%csnmi()
+    res = a%csnmi()
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='psb_csnmi'
+      ch_err='psb_cnrmi'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
   else
-    nrmi = 0.0
+    res = szero
   end if
 
   ! compute global max
-  call psb_amx(ictxt, nrmi)
-
-  psb_cnrmi = nrmi
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  

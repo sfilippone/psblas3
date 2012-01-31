@@ -48,18 +48,18 @@
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha   -  real                   The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
-!    x(:,:)  -  real                   The input vector containing the entries of ( X ).
-!    beta    -  real                   The scalar beta.
-!    y(:,:)  -  real                   The input vector containing the entries of ( Y ).
+!    alpha   -  real                The scalar alpha.
+!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
+!    x(:,:)  -  real                The input vector containing the entries of ( X ).
+!    beta    -  real                The scalar beta.
+!    y(:,:)  -  real                The input vector containing the entries of ( Y ).
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. Default: 'N' 
 !    k       -  integer(optional).     The number of right-hand sides.
 !    jx      -  integer(optional).     The column offset for ( X ). Default:  1
 !    jy      -  integer(optional).     The column offset for ( Y ). Default:  1
-!    work(:) -  real,(optional).       Working area.
+!    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
@@ -84,16 +84,16 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
        & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1, ip, idx
-  integer(psb_ipk_), parameter       :: nb=4
+  integer(psb_ipk_), parameter               :: nb=4
   real(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
-  real(psb_dpk_), allocatable  :: xvsave(:,:)
-  character                :: trans_
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw, doswap_
+  real(psb_dpk_), allocatable :: xvsave(:,:)
+  character                        :: trans_
+  character(len=20)                :: name, ch_err
+  logical                          :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmm'
-  if (psb_errstatus_fatal()) return 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -205,9 +205,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -277,9 +277,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(n,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -304,7 +304,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = dzero
 
-    if (info == psb_success_)&
+    if (info == psb_success_) &
          & call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
@@ -404,15 +404,15 @@ end subroutine psb_dspmm
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha   -  real                   The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
-!    x(:)    -  real                   The input vector containing the entries of ( X ).
-!    beta    -  real                   The scalar beta.
-!    y(:)    -  real                   The input vector containing the entries of ( Y ).
+!    alpha   -  real                The scalar alpha.
+!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
+!    x(:)    -  real                The input vector containing the entries of ( X ).
+!    beta    -  real                The scalar beta.
+!    y(:)    -  real                The input vector containing the entries of ( Y ).
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. Default: 'N' 
-!    work(:) -  real,(optional).       Working area.
+!    trans   -  character(optional).   Whether A or A'. Default:  'N' 
+!    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
@@ -427,7 +427,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), optional, target, intent(inout)       :: work(:)
+  real(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -436,16 +436,16 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
-  integer(psb_ipk_), parameter       :: nb=4
+  integer(psb_ipk_), parameter           :: nb=4
   real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
-  real(psb_dpk_), allocatable :: xvsave(:)
-  character                :: trans_
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw, doswap_
+  real(psb_dpk_), allocatable :: xvsave(:)  
+  character                    :: trans_
+  character(len=20)            :: name, ch_err
+  logical                      :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmv'
-  if (psb_errstatus_fatal()) return 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -543,9 +543,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -583,9 +583,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -682,13 +682,13 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   use psi_mod
   implicit none
 
-  real(psb_dpk_), intent(in)               :: alpha, beta
+  real(psb_dpk_), intent(in)            :: alpha, beta
   type(psb_d_vect_type), intent(inout)     :: x
   type(psb_d_vect_type), intent(inout)     :: y
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), optional, target, intent(inout)       :: work(:)
+  real(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -816,9 +816,9 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_) &
-         & call psb_chkvect(m,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -856,9 +856,9 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
     if (info == psb_success_)&
-         & call psb_chkvect(n,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
@@ -882,6 +882,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     ! 
     call psi_ovrl_save(x%v,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,psb_avg_,info)
+
 !!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
 !!$    yp(nrow+1:ncol) = dzero
     
@@ -909,7 +910,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
       if(info /= psb_success_) then
         info = psb_err_from_subroutine_
-        ch_err='PSI_dSwapTran'
+        ch_err='PSI_SwapTran'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
