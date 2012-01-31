@@ -61,8 +61,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   integer(psb_ipk_) ::  int_err(5)
   integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer(psb_ipk_) ::  i,np,me, n_col, dectype, err_act, icomm
-  integer(psb_ipk_) :: ictxt,n_row
+  integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
+  integer(psb_mpik_) ::  np,me, icomm, ictxt
   logical             :: ext_hv_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
