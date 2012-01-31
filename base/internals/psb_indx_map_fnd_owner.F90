@@ -230,7 +230,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       do
         if (j > size(answers,1)) then 
           ! Last resort attempt.
-          j = psb_ibsrch(ih,size(answers,1),answers(:,1))
+          j = psb_ibsrch(ih,size(answers,1,kind=psb_ipk_),answers(:,1))
           if (j == -1) then 
             write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)

@@ -325,7 +325,7 @@ subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
   end if
 
   iout(1) = idxin
-  call psi_idx_ins_cnv(1,iout,desc,info,mask_)
+  call psi_idx_ins_cnv(ione,iout,desc,info,mask_)
   idxout  = iout(1) 
   return
 
@@ -395,7 +395,7 @@ subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
   end if
 
   iout(1) = idxin
-  call psi_idx_ins_cnv(1,iout,desc,info,mask_)
+  call psi_idx_ins_cnv(ione,iout,desc,info,mask_)
   idxin   = iout(1) 
 
   return

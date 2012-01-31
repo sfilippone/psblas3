@@ -183,7 +183,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,psb_mpi_integer,icomm,info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
