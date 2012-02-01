@@ -56,7 +56,7 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
   type(psb_c_vect_type) :: wv, wv1
-  integer(psb_ipk_) :: ictxt,np,me, err_act, int_err(5)
+  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='c_bjac_prec_apply'
@@ -84,13 +84,13 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   n_col = desc_data%get_local_cols()
 
   if (x%get_nrows() < n_row) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,n_row,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = n_row;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (y%get_nrows() < n_row) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n_row,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = n_row;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (.not.allocated(prec%dv)) then
@@ -186,7 +186,7 @@ subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   return
 
 9999 continue
-  call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
+  call psb_errpush(info,name,i_err=ierr,a_err=ch_err)
   call psb_erractionrestore(err_act)
   if (err_act == psb_act_abort_) then
     call psb_error()
@@ -213,7 +213,7 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:)
-  integer(psb_ipk_) :: ictxt,np,me, err_act, int_err(5)
+  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='c_bjac_prec_apply'
@@ -241,13 +241,13 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   n_col = desc_data%get_local_cols()
 
   if (size(x) < n_row) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,n_row,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = n_row;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y) < n_row) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n_row,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = n_row;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (.not.allocated(prec%dv)) then
@@ -339,7 +339,7 @@ subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   return
 
 9999 continue
-  call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
+  call psb_errpush(info,name,i_err=ierr,a_err=ch_err)
   call psb_erractionrestore(err_act)
   if (err_act == psb_act_abort_) then
     call psb_error()
@@ -407,7 +407,7 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
 
   !     .. Local Scalars ..                                                       
   integer(psb_ipk_) ::    i, m
-  integer(psb_ipk_) ::    int_err(5)
+  integer(psb_ipk_) ::    ierr(5)
   character ::        trans, unitd
   type(psb_c_csr_sparse_mat), allocatable  :: lf, uf
   complex(psb_spk_), allocatable :: dd(:)
@@ -430,9 +430,8 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   m = a%get_nrows()
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1;  ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
   trans = 'N'
