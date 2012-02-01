@@ -62,9 +62,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
        & nov(:), ov_idx(:,:)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  logical              :: check_, islarge
-  character(len=20)    :: name
+  integer(psb_ipk_)  :: debug_level, debug_unit
+  integer(psb_mpik_) :: iictxt
+  logical            :: check_, islarge
+  character(len=20)  :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -77,7 +78,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start',np
-
+  iictxt = ictxt
 
   loc_row = size(v)
   if (.false.) then 
@@ -325,7 +326,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
           if (ov_idx(j,1) == i) exit
           j = j + 1 
         end do
-        call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+        call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -353,9 +354,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(iictxt,m,info)
   class default 
-    call aa%init(ictxt,vl(1:nlu),info)
+    call aa%init(iictxt,vl(1:nlu),info)
   end select
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
@@ -370,31 +371,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     call psb_errpush(info,name)
     goto 9999
   endif
-
-!!$  ! set fields in desc%MATRIX_DATA....
-!!$  desc%matrix_data(psb_n_row_)  = loc_row
-!!$  desc%matrix_data(psb_n_col_)  = loc_row
-
-!!$  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-!!$  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
-!!$  if (info /= psb_success_) then
-!!$    info=psb_err_from_subroutine_
-!!$    call psb_errpush(info,name,a_err='psb_realloc')
-!!$    Goto 9999
-!!$  end if
-!!$  desc%matrix_data(psb_pnt_h_) = 1
-!!$  desc%halo_index(:)           = -1
-!!$  desc%ext_index(:)            = -1
-!!$
-!!$  if (debug_level >= psb_debug_ext_) &
-!!$       & write(debug_unit,*) me,' ',trim(name),': end'
-!!$
-!!$  call psb_cd_set_bld(desc,info)
-!!$  if (info /= psb_success_) then
-!!$    info=psb_err_from_subroutine_
-!!$    call psb_errpush(info,name,a_err='psb_cd_set_bld')
-!!$    Goto 9999
-!!$  end if
 
   call psb_erractionrestore(err_act)
   return

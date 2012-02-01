@@ -59,16 +59,17 @@ module psb_const_mod
   ! 
   ! Version
   !
-  character(len=*), parameter :: psb_version_string_ = "3.0.0"
-  integer(psb_ipk_), parameter          :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter          :: psb_version_minor_  = 0
-  integer(psb_ipk_), parameter          :: psb_patchlevel_     = 0
+  character(len=*), parameter    :: psb_version_string_ = "3.0.0"
+  integer(psb_ipk_), parameter   :: psb_version_major_  = 3
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 0
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
   !     Handy & miscellaneous constants
   !
-  integer(psb_ipk_), parameter             :: izero=0, ione=1
-  integer(psb_ipk_), parameter             :: itwo=2, ithree=3,mone=-1, psb_root_=0
+  integer(psb_ipk_), parameter   :: izero=0, ione=1
+  integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
+  integer(psb_ipk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.e0, sone=1.e0
   real(psb_dpk_), parameter      :: dzero=0.d0, done=1.d0
   complex(psb_spk_), parameter   :: czero=(0.e0,0.0e0)

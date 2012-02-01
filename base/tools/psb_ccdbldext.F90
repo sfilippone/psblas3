@@ -80,16 +80,15 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_), intent(in),optional            :: extype
 
-
   !     .. Local Scalars ..
-  integer(psb_ipk_) ::  i, j, np, me,m,&
-       &  ictxt, lovr, lworks,lworkr, n_row,n_col, n_col_prev, int_err(5),&
+  integer(psb_ipk_) ::  i, j, err_act,m,&
+       &  lovr, lworks,lworkr, n_row,n_col, n_col_prev, &
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
-  integer(psb_ipk_) :: icomm, err_act
+  integer(psb_mpik_) :: icomm, ictxt, me, np, minfo
 
   integer(psb_ipk_), allocatable  :: irow(:), icol(:)
   integer(psb_ipk_), allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
@@ -97,14 +96,21 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
        & t_halo_out(:),temp(:),maskr(:)
   integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name, ch_err
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name, ch_err
 
   name='psb_ccdbldext'
   info  = psb_success_
+  if (psb_errstatus_fatal()) return
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
   Call psb_info(ictxt, me, np)
@@ -125,17 +131,17 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   if (novr<0) then
     info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=novr
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=1; ierr(2)=novr
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
 
   select case(extype_) 
   case(psb_ovt_xhal_,psb_ovt_asov_)
   case default
+    ierr(1)=5; ierr(2)=extype_
     call psb_errpush(psb_err_input_value_invalid_i_,&
-         & name,i_err=(/5,extype_,0,0,0/))
+         & name,i_err=ierr)
     goto 9999
   end select
 
@@ -144,10 +150,10 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
        & ': Calling desccpy'
 
   call psb_cdcpy(desc_a,desc_ov,info)
-  if (info /= psb_success_) then
+
+  if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
-    ch_err='psb_cdcpy'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_cdcpy')
     goto 9999
   end if
 
@@ -220,15 +226,12 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   Allocate(works(lworks),workr(lworkr),t_halo_in(l_tmp_halo),&
        & t_halo_out(l_tmp_halo), temp(lworkr),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  Allocate(orig_ovr(l_tmp_ovr_idx),tmp_ovr_idx(l_tmp_ovr_idx),&
+  if (info == psb_success_) allocate(orig_ovr(l_tmp_ovr_idx),&
+       & tmp_ovr_idx(l_tmp_ovr_idx), &
        & tmp_halo(l_tmp_halo), halo(size(desc_a%halo_index)),stat=info)
+
   if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999      
   end if
   halo(:)        = desc_a%halo_index(:)
@@ -257,7 +260,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         call psb_errpush(info,name)
         goto 9999
       endif
-      call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-1)
+      call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-ione)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -358,7 +361,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
           call psb_errpush(info,name)
           goto 9999
         endif
-        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -370,7 +373,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         tmp_ovr_idx(counter_o+2) = gidx
         tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
-        call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-1)
+        call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -402,7 +405,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
           call psb_errpush(info,name)
           goto 9999
         endif
-        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -464,11 +467,10 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
       !       
-      call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
-      if (info /= psb_success_) then
+      call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,psb_mpi_integer,icomm,minfo)
+      if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='mpi_alltoall'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='mpi_alltoall')
         goto 9999
       end if
       idxs = 0
@@ -491,21 +493,20 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       iszr=sum(rvsz)
       if (max(iszr,1) > lworkr) then 
         call psb_realloc(max(iszr,1),workr,info)
-        if (info /= psb_success_) then
-          info=psb_err_from_subroutine_
-          ch_err='psb_realloc'
-          call psb_errpush(info,name,a_err=ch_err)
+
+        if (psb_errstatus_fatal()) then
+          info=psb_err_alloc_dealloc_
+          call psb_errpush(info,name)
           goto 9999
         end if
         lworkr = max(iszr,1)
       end if
 
       call mpi_alltoallv(works,sdsz,bsdindx,psb_mpi_integer,&
-           & workr,rvsz,brvindx,psb_mpi_integer,icomm,info)
-      if (info /= psb_success_) then
+           & workr,rvsz,brvindx,psb_mpi_integer,icomm,minfo)
+      if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='mpi_alltoallv'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='mpi_alltoallv')
         goto 9999
       end if
 
@@ -561,7 +562,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
           !
           proc_id = temp(i) 
           
-          call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
+          call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-ione)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -622,7 +623,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     !               5. n_col(ov)  current. 
     !
     call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
-    call psb_ensure_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
+    call psb_ensure_size((counter_h+counter_t+1),tmp_halo,info,pad=-ione)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_ensure_size')
       goto 9999
@@ -649,7 +650,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     !               5. n_col(ov)  current. 
     ! 
     call desc_ov%indxmap%set_lr(n_col_prev)
-    call psb_ensure_size((cntov_o+counter_o+1),orig_ovr,info,pad=-1)
+    call psb_ensure_size((cntov_o+counter_o+1),orig_ovr,info,pad=-ione)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_ensure_size')
       goto 9999
@@ -667,7 +668,8 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     call psb_move_alloc(tmp_halo,desc_ov%ext_index,info)
     call psb_move_alloc(t_halo_in,desc_ov%halo_index,info)
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/5,extype_,0,0,0/))
+    ierr(1)=5; ierr(2)=extype_
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -693,10 +695,12 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   if (info == psb_success_)  then 
     if (allocated(irow)) deallocate(irow,stat=info)
-    if ((info == psb_success_).and.allocated(icol)) deallocate(icol,stat=info)
+    if ((info == psb_success_).and.allocated(icol)) &
+         & deallocate(icol,stat=info)
     if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err='deallocate',i_err=(/info,0,0,0,0/))
+      ierr(1) = info
+      call psb_errpush(psb_err_from_subroutine_ai_,name, &
+           & a_err='deallocate',i_err=ierr)
       goto 9999
     end if
   end if

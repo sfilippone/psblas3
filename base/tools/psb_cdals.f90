@@ -62,6 +62,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable  :: prc_v(:), temp_ovrlap(:), loc_idx(:) 
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_mpik_) :: iictxt
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -76,21 +77,20 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np
+  iictxt = ictxt 
   !     ....verify blacs grid correctness..
-
+  
   !... check m and n parameters....
   if (m < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 1
-    int_err(2) = m
+    int_err(1) = 1; int_err(2) = m;
     call psb_errpush(err,name,int_err)
     goto 9999
   else if (n < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 2
-    int_err(2) = n
+    int_err(1) = 2 ;     int_err(2) = n;
     call psb_errpush(err,name,int_err)
     goto 9999
   endif
@@ -100,9 +100,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
   !global check on m and n parameters
   if (me == psb_root_) then
-    exch(1)=m
-    exch(2)=n
-    exch(3)=psb_cd_get_large_threshold()
+    exch(1)=m; exch(2)=n; exch(3)=psb_cd_get_large_threshold()
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
   else
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
@@ -125,9 +123,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   ! count local rows number
   loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
-!!$  allocate(desc%matrix_data(psb_mdata_size_),&
-!!$       & temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
-!!$  desc%matrix_data(:) = 0
   allocate(temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
 
   if (info /= psb_success_) then     
@@ -229,7 +224,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         if (prc_v(j) == me) then
           ! this point belongs to me
           k = k + 1 
-          call psb_ensure_size((k+1),loc_idx,info,pad=-1)
+          call psb_ensure_size((k+1),loc_idx,info,pad=-ione)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -238,7 +233,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           loc_idx(k) = i 
 
           if (nprocs > 1)  then
-            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
             if (info /= psb_success_) then
               info=psb_err_from_subroutine_
               call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -269,9 +264,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(iictxt,m,info)
   class default 
-    call aa%init(ictxt,loc_idx(1:k),info)
+    call aa%init(iictxt,loc_idx(1:k),info)
   end select
 
 
@@ -288,16 +283,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     call psb_errpush(err,name)
     Goto 9999
   endif
-
-!!$  ! set fields in desc%MATRIX_DATA....
-!!$  desc%matrix_data(psb_n_row_)  = loc_row
-!!$  desc%matrix_data(psb_n_col_)  = loc_row
-
-!!$  write(0,*) me,'CDALS: after init ', &
-!!$       & desc%indxmap%get_gr(), &
-!!$       & desc%indxmap%get_gc(), &
-!!$       & desc%indxmap%get_lr(), &
-!!$       & desc%indxmap%get_lc() 
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

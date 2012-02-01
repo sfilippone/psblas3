@@ -9,8 +9,25 @@ module psi_bcast_mod
          & psb_zbcasts, psb_zbcastv, psb_zbcastm,&
          & psb_sbcasts, psb_sbcastv, psb_sbcastm,&
          & psb_cbcasts, psb_cbcastv, psb_cbcastm,&
-         & psb_hbcasts, psb_hbcastv, psb_lbcasts, psb_lbcastv
-  end interface
+         & psb_hbcasts, psb_hbcastv,&
+         & psb_lbcasts, psb_lbcastv
+  end interface psb_bcast
+
+#if defined(LONG_INTEGERS)
+  interface psb_bcast
+    module procedure psb_ibcasts_ic, psb_ibcastv_ic, psb_ibcastm_ic,&
+         & psb_dbcasts_ic, psb_dbcastv_ic, psb_dbcastm_ic,&
+         & psb_zbcasts_ic, psb_zbcastv_ic, psb_zbcastm_ic,&
+         & psb_sbcasts_ic, psb_sbcastv_ic, psb_sbcastm_ic,&
+         & psb_cbcasts_ic, psb_cbcastv_ic, psb_cbcastm_ic,&
+         & psb_hbcasts_ic, psb_hbcastv_ic, &
+         & psb_lbcasts_ic, psb_lbcastv_ic
+  end interface psb_bcast
+#else 
+  interface psb_bcast
+    module procedure psb_i8bcasts, psb_i8bcastv, psb_i8bcastm
+  end interface psb_bcast
+#endif
 
 contains
 
@@ -534,5 +551,421 @@ contains
 #endif    
 
   end subroutine psb_lbcastv
+
+
+#if !defined(LONG_INTEGERS)
+
+  subroutine psb_i8bcasts(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_long_int_k_), intent(inout)   :: dat
+    integer(psb_mpik_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iam, np, root_,  info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call mpi_bcast(dat,1,mpi_integer8,root_,ictxt,info)
+#endif    
+  end subroutine psb_i8bcasts
+
+  subroutine psb_i8bcastv(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_long_int_k_), intent(inout) :: dat(:)
+    integer(psb_mpik_), intent(in), optional  :: root
+
+    integer(psb_mpik_) :: iam, np, root_,  info
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
+#endif    
+  end subroutine psb_ibcastv
+
+  subroutine psb_ibcastm(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_long_int_k_), intent(inout) :: dat(:,:)
+    integer(psb_mpik_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iam, np, root_,  info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
+#endif    
+  end subroutine psb_ibcastm
+
+#endif
+
+
+#if defined(LONG_INTEGERS)
+
+  subroutine psb_ibcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)      :: ictxt
+    integer(psb_ipk_), intent(inout)   :: dat
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_ibcasts_ic
+
+  subroutine psb_ibcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    integer(psb_ipk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional  :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_ibcastv_ic
+
+  subroutine psb_ibcastm_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    integer(psb_ipk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_ibcastm_ic
+
+
+  subroutine psb_sbcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)      :: ictxt
+    real(psb_spk_), intent(inout)   :: dat
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_sbcasts_ic
+
+
+  subroutine psb_sbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    real(psb_spk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_sbcastv_ic
+
+  subroutine psb_sbcastm_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    real(psb_spk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_sbcastm_ic
+
+
+  subroutine psb_dbcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)      :: ictxt
+    real(psb_dpk_), intent(inout)   :: dat
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_dbcasts_ic
+
+
+  subroutine psb_dbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    real(psb_dpk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_dbcastv_ic
+
+  subroutine psb_dbcastm_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    real(psb_dpk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_dbcastm_ic
+
+  subroutine psb_cbcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)      :: ictxt
+    complex(psb_spk_), intent(inout)   :: dat
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_cbcasts_ic
+
+  subroutine psb_cbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    complex(psb_spk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_cbcastv_ic
+
+  subroutine psb_cbcastm_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    complex(psb_spk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_cbcastm_ic
+
+  subroutine psb_zbcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)      :: ictxt
+    complex(psb_dpk_), intent(inout)   :: dat
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_zbcasts_ic
+
+  subroutine psb_zbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    complex(psb_dpk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_zbcastv_ic
+
+  subroutine psb_zbcastm_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ictxt
+    complex(psb_dpk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), intent(in), optional :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_zbcastm_ic
+
+
+  subroutine psb_hbcasts_ic(ictxt,dat,root,length)
+    implicit none 
+    integer(psb_ipk_), intent(in)             :: ictxt
+    character(len=*), intent(inout) :: dat
+    integer(psb_ipk_), intent(in), optional   :: root,length
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_hbcasts_ic
+
+  subroutine psb_hbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)             :: ictxt
+    character(len=*), intent(inout) :: dat(:)
+    integer(psb_ipk_), intent(in), optional   :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_hbcastv_ic
+
+  subroutine psb_lbcasts_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)             :: ictxt
+    logical, intent(inout)          :: dat
+    integer(psb_ipk_), intent(in), optional   :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_lbcasts_ic
+
+
+  subroutine psb_lbcastv_ic(ictxt,dat,root)
+    implicit none 
+    integer(psb_ipk_), intent(in)             :: ictxt
+    logical, intent(inout)          :: dat(:)
+    integer(psb_ipk_), intent(in), optional   :: root
+
+    integer(psb_mpik_) :: iictxt, root_
+
+    iictxt = ictxt 
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call psb_bcast(iictxt,dat,root_)
+  end subroutine psb_lbcastv_ic
+#endif
+
 
 end module psi_bcast_mod
