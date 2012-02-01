@@ -188,8 +188,6 @@ Subroutine psb_ccgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     itrace_ = 0
   End If
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
   
   itx   = 0
 
@@ -313,8 +311,6 @@ Subroutine psb_ccgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
   call psb_erractionrestore(err_act)
   return
 
@@ -434,9 +430,6 @@ Subroutine psb_ccgs_vect(a,prec,b,x,eps,desc_a,info,&
     itrace_ = 0
   End If
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-  
   itx   = 0
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
@@ -555,8 +548,6 @@ Subroutine psb_ccgs_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
   call psb_erractionrestore(err_act)
   return
 

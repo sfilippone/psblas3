@@ -199,8 +199,6 @@
 !!$
 !!$  itx=0
 !!$
-!!$  ! Ensure global coherence for convergence checks.
-!!$  call psb_set_coher(ictxt,isvch)
 !!$
 !!$  restart: do 
 !!$! !$   
@@ -304,9 +302,6 @@
 !!$    call psb_errpush(info,name)
 !!$    goto 9999
 !!$  end if
-!!$
-!!$  ! restore external global coherence behaviour
-!!$  call psb_restore_coher(ictxt,isvch)
 !!$
 !!$  call psb_erractionrestore(err_act)
 !!$  return
@@ -436,9 +431,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
 
   itx=0
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-
   restart: do 
 !!$   
 !!$    r0 = b-Ax0
@@ -542,9 +534,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return

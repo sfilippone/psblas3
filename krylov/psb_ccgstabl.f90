@@ -232,9 +232,6 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   ww  => wwrk(:,9)
   rt0 => wwrk(:,10)
   
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   if (info /= psb_success_) Then 
@@ -396,8 +393,6 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
      goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
   call psb_erractionrestore(err_act)
   return
 
@@ -553,9 +548,6 @@ Subroutine psb_ccgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   ww  => wwrk(9)
   rt0 => wwrk(10)
   
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   if (info /= psb_success_) Then 
@@ -720,8 +712,6 @@ Subroutine psb_ccgstabl_vect(a,prec,b,x,eps,desc_a,info,&
      goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
   call psb_erractionrestore(err_act)
   return
 

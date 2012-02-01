@@ -142,8 +142,6 @@
 !!$  n_row = desc_a%get_local_rows()
 !!$  n_col = desc_a%get_local_cols()
 !!$
-!!$  ! Ensure global coherence for convergence checks.
-!!$  call psb_set_coher(ictxt,isvch)
 !!$
 !!$
 !!$  if (present(istop)) then 
@@ -313,8 +311,6 @@
 !!$    call psb_errpush(info,name)
 !!$    goto 9999
 !!$  end if
-!!$  ! restore external global coherence behaviour
-!!$  call psb_restore_coher(ictxt,isvch)
 !!$
 !!$  call psb_erractionrestore(err_act)
 !!$  return
@@ -378,8 +374,6 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
   n_row = desc_a%get_local_rows()
   n_col = desc_a%get_local_cols()
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
@@ -559,8 +553,6 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name)
     goto 9999
   end if
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return

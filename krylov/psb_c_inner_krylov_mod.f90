@@ -60,7 +60,7 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
     character(len=20)                 :: name
 
     info = psb_success_
@@ -90,7 +90,8 @@ contains
 
     case default
       info=psb_err_invalid_istop_
-      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      ierr(1) = stopc
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999      
     end select
     if (info /= psb_success_) then
@@ -118,7 +119,7 @@ contains
   end subroutine psb_c_init_conv
 
 
-  function psb_c_check_conv(methdname,it,x,r,desc_a,stopdat,info)
+  function psb_c_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
@@ -126,7 +127,7 @@ contains
     complex(psb_spk_), intent(in)   :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
-    logical                         :: psb_c_check_conv
+    logical                         :: res
     integer(psb_ipk_), intent(out)            :: info
 
     integer(psb_ipk_) :: ictxt, me, np, err_act
@@ -138,7 +139,8 @@ contains
 
     ictxt = desc_a%get_context()
     call psb_info(ictxt,me,np)
-    psb_c_check_conv = .false. 
+
+    res = .false. 
 
     select case(stopdat%controls(psb_ik_stopc_)) 
     case(1)
@@ -165,18 +167,17 @@ contains
     end if
 
     if (stopdat%values(psb_ik_errden_) == dzero) then 
-      psb_c_check_conv = (stopdat%values(psb_ik_errnum_) <=&
-           & stopdat%values(psb_ik_eps_))
+      res = (stopdat%values(psb_ik_errnum_) <= stopdat%values(psb_ik_eps_))
     else
-      psb_c_check_conv = (stopdat%values(psb_ik_errnum_) <=&
+      res = (stopdat%values(psb_ik_errnum_) <= &
            & stopdat%values(psb_ik_eps_)*stopdat%values(psb_ik_errden_))
     end if
 
-    psb_c_check_conv = (psb_c_check_conv.or.(stopdat%controls(psb_ik_itmax_) <= it))
+    res = (res.or.(stopdat%controls(psb_ik_itmax_) <= it))
 
     if ( (stopdat%controls(psb_ik_trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.psb_c_check_conv)) then 
-      call log_conv(methdname,me,it,1,stopdat%values(psb_ik_errnum_),&
+         & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.res)) then 
+      call log_conv(methdname,me,it,ione,stopdat%values(psb_ik_errnum_),&
            & stopdat%values(psb_ik_errden_),stopdat%values(psb_ik_eps_))
     end if
 
@@ -205,7 +206,7 @@ contains
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
     character(len=20)                 :: name
 
     info = psb_success_
@@ -218,7 +219,7 @@ contains
     call psb_info(ictxt, me, np)
 
     stopdat%controls(:) = 0
-    stopdat%values(:)   = szero
+    stopdat%values(:)   = dzero
 
     stopdat%controls(psb_ik_stopc_) = stopc
     stopdat%controls(psb_ik_trace_) = trace
@@ -235,7 +236,8 @@ contains
 
     case default
       info=psb_err_invalid_istop_
-      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      ierr(1) = stopc
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999      
     end select
     if (info /= psb_success_) then
@@ -244,7 +246,7 @@ contains
     end if
 
     stopdat%values(psb_ik_eps_)    = eps
-    stopdat%values(psb_ik_errnum_) = szero
+    stopdat%values(psb_ik_errnum_) = dzero
     stopdat%values(psb_ik_errden_) = done
 
     if ((stopdat%controls(psb_ik_trace_) > 0).and. (me == 0))&
@@ -322,7 +324,7 @@ contains
 
     if ( (stopdat%controls(psb_ik_trace_) > 0).and.&
          & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.res)) then 
-      call log_conv(methdname,me,it,1,stopdat%values(psb_ik_errnum_),&
+      call log_conv(methdname,me,it,ione,stopdat%values(psb_ik_errnum_),&
            & stopdat%values(psb_ik_errden_),stopdat%values(psb_ik_eps_))
     end if
 

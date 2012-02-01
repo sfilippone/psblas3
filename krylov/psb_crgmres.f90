@@ -239,8 +239,6 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
        & ' Size of V,W,W1 ',size(v),size(v,1),&
        & size(w),size(w,1),size(w1),size(w1,1), size(v(:,1))
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -455,9 +453,6 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return
@@ -737,8 +732,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
        & ' Size of V,W,W1 ',v(1)%get_nrows(),size(v),&
        & w%get_nrows(),w1%get_nrows()
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -952,9 +945,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return

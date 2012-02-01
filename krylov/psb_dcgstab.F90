@@ -222,8 +222,6 @@
 !!$     itrace_ = 0
 !!$  End If
 !!$  
-!!$  ! Ensure global coherence for convergence checks.
-!!$  call psb_set_coher(ictxt,isvch)
 !!$
 !!$  itx   = 0
 !!$  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
@@ -407,8 +405,6 @@
 !!$  call mpi_Pcontrol(2,info)
 !!$  call mpi_Pcontrol(0,info)
 !!$#endif
-!!$  ! restore external global coherence behaviour
-!!$  call psb_restore_coher(ictxt,isvch)
 !!$
 !!$  call psb_erractionrestore(err_act)
 !!$  return
@@ -543,9 +539,6 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   Else
     itrace_ = 0
   End If
-
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   itx   = 0
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
@@ -716,8 +709,6 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
     call psb_errpush(info,name)
     goto 9999
   end if
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return

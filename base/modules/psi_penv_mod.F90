@@ -21,7 +21,7 @@ module psi_penv_mod
   interface psb_barrier
     module procedure  psb_barrier
   end interface
-
+  
 #if defined(LONG_INTEGERS)
   interface psb_init
     module procedure  psb_init_ipk
@@ -42,6 +42,7 @@ module psi_penv_mod
   interface psb_barrier
     module procedure  psb_barrier_ipk
   end interface
+
 #endif
 
   interface psb_wtime
@@ -469,20 +470,6 @@ contains
 
   end subroutine psb_info
 
-
-
-  subroutine psb_set_coher(ictxt,isvch)
-    integer(psb_mpik_) :: ictxt, isvch
-    ! Ensure global repeatability for convergence checks.
-    ! Do nothing. Obsolete.
-  end subroutine psb_set_coher
-
-  subroutine psb_restore_coher(ictxt,isvch)
-    integer(psb_mpik_) :: ictxt, isvch
-    ! Ensure global coherence for convergence checks.
-    ! Do nothing. Obsolete.
-
-  end subroutine psb_restore_coher
 
   subroutine psb_get_mpicomm(ictxt,comm)
     integer(psb_mpik_) :: ictxt, comm
