@@ -169,7 +169,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idx = 0
   idxs = 0
   idxr = 0
-  call acoo%allocate(0,a%get_ncols(),info)
+  call acoo%allocate(izero,a%get_ncols(),info)
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
     proc=idxv(counter)
@@ -298,7 +298,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
   l1  = 0
-  call acoo%set_nrows(0)
+  call acoo%set_nrows(izero)
   !
   irmin = huge(irmin)
   icmin = huge(icmin)
