@@ -46,11 +46,12 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
 
   !     .. Local Scalars ..
   integer(psb_ipk_) ::  i, j, np, me, mglob, ictxt, n_row, n_col
-  integer(psb_ipk_) :: icomm, err_act
+  integer(psb_ipk_) :: err_act
 
   integer(psb_ipk_), allocatable :: vl(:)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name, ch_err
+  integer(psb_ipk_)  :: debug_level, debug_unit, ierr(5)
+  integer(psb_mpik_) :: iictxt
+  character(len=20)  :: name, ch_err
 
   name='cd_switch_ovl_indxmap'
   info  = psb_success_
@@ -59,13 +60,12 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   debug_level = psb_get_debug_level()
 
   ictxt = desc%get_context()
-  icomm = desc%get_mpic()
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),&
        & ': start'
-
+  iictxt = ictxt 
   mglob  = desc%get_global_rows() 
   n_row  = desc%get_local_rows()
   n_col  = desc%get_local_cols()
@@ -81,10 +81,10 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   end do
   call desc%indxmap%l2g(vl(1:n_col),info)
 
-!!$  write(0,*) 'from l2g' ,info,n_row,n_Col
   if (info /= psb_success_) then
+    ierr(1)=info
     call psb_errpush(psb_err_from_subroutine_ai_,name,&
-         & a_err='map%l2g',i_err=(/info,0,0,0,0/))
+         & a_err='map%l2g',i_err=ierr)
     goto 9999
   end if
 
@@ -97,19 +97,15 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
     allocate(psb_list_map :: desc%indxmap, stat=info)
   end if
   
-!!$  write(0,*) 'from allocate indxmap' ,info
   if (info == psb_success_)&
-       & call desc%indxmap%init(ictxt,vl(1:n_row),info)
-!!$  write(0,*) 'from indxmap%init' ,info
+       & call desc%indxmap%init(iictxt,vl(1:n_row),info)
   if (info == psb_success_) call psb_cd_set_bld(desc,info)
-!!$  write(0,*) 'from cd_Set_bld' ,info
-!!$  write(0,*) 'into g2l_ins' ,info,vl(n_row+1:n_col)
   if (info == psb_success_) &
        & call  desc%indxmap%g2l_ins(vl(n_row+1:n_col),info)
-!!$  write(0,*) 'from g2l_ins' ,info,vl(n_row+1:n_col)
   if (info /= psb_success_) then
+    ierr(1) = info
     call psb_errpush(psb_err_from_subroutine_ai_,name,&
-         & a_err='allocate/init',i_err=(/info,0,0,0,0/))
+         & a_err='allocate/init',i_err=ierr)
     goto 9999
   end if
   if (n_row /= desc%indxmap%get_lr()) then 
