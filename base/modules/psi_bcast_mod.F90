@@ -604,9 +604,9 @@ contains
     call psb_info(ictxt,iam,np)
     call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
 #endif    
-  end subroutine psb_ibcastv
+  end subroutine psb_i8bcastv
 
-  subroutine psb_ibcastm(ictxt,dat,root)
+  subroutine psb_i8bcastm(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -630,7 +630,7 @@ contains
     call psb_info(ictxt,iam,np)
     call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
 #endif    
-  end subroutine psb_ibcastm
+  end subroutine psb_i8bcastm
 
 #endif
 
