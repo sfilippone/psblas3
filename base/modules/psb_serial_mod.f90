@@ -562,6 +562,243 @@ contains
   end function psb_znrm1
 
 
+  subroutine crot( n, cx, incx, cy, incy, c, s )
+    !
+    !  -- lapack auxiliary routine (version 3.0) --
+    !     univ. of tennessee, univ. of california berkeley, nag ltd.,
+    !     courant institute, argonne national lab, and rice university
+    !     october 31, 1992
+    !
+    !     .. scalar arguments ..
+    integer(psb_mpik_) :: incx, incy, n
+    real(psb_spk_)    c
+    complex(psb_spk_)   s
+    !     ..
+    !     .. array arguments ..
+    complex(psb_spk_) cx( * ), cy( * )
+    !     ..
+    !
+    !  purpose
+    !  == = ====
+    !
+    !  zrot   applies a plane rotation, where the cos (c) is real and the
+    !  sin (s) is complex, and the vectors cx and cy are complex.
+    !
+    !  arguments
+    !  == = ======
+    !
+    !  n       (input) integer
+    !          the number of elements in the vectors cx and cy.
+    !
+    !  cx      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector x.
+    !          on output, cx is overwritten with c*x + s*y.
+    !
+    !  incx    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  cy      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector y.
+    !          on output, cy is overwritten with -conjg(s)*x + c*y.
+    !
+    !  incy    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  c       (input) double precision
+    !  s       (input) complex*16
+    !          c and s define a rotation
+    !             [  c          s  ]
+    !             [ -conjg(s)   c  ]
+    !          where c*c + s*conjg(s) = 1.0.
+    !
+    ! == = ==================================================================
+    !
+    !     .. local scalars ..
+    integer(psb_mpik_) :: i, ix, iy
+    complex(psb_spk_)         stemp
+    !     ..
+    !     .. intrinsic functions ..
+    !     ..
+    !     .. executable statements ..
+    !
+    if( n <= 0 ) return
+    if( incx == 1 .and. incy == 1 ) then 
+      !
+      !     code for both increments equal to 1
+      !
+      do  i = 1, n
+        stemp = c*cx(i) + s*cy(i)
+        cy(i) = c*cy(i) - conjg(s)*cx(i)
+        cx(i) = stemp
+      end do
+    else
+      !
+      !     code for unequal increments or equal increments not equal to 1
+      !
+      ix = 1
+      iy = 1
+      if( incx < 0 )ix = ( -n+1 )*incx + 1
+      if( incy < 0 )iy = ( -n+1 )*incy + 1
+      do  i = 1, n
+        stemp  = c*cx(ix) + s*cy(iy)
+        cy(iy) = c*cy(iy) - conjg(s)*cx(ix)
+        cx(ix) = stemp
+        ix = ix + incx
+        iy = iy + incy
+      end do
+    end if
+    return
+  end subroutine crot
+  !
+  !
+  subroutine crotg(ca,cb,c,s)
+    complex(psb_spk_) ca,cb,s
+    real(psb_spk_) c
+    real(psb_spk_) norm,scale
+    complex(psb_spk_) alpha
+    !
+    if (cabs(ca) == 0.0) then 
+      !
+      c = 0.0d0
+      s = (1.0,0.0)
+      ca = cb
+      return
+    end if
+    !
+
+    scale = cabs(ca) + cabs(cb)
+    norm = scale*sqrt((cabs(ca/cmplx(scale,0.0)))**2 +&
+         &   (cabs(cb/cmplx(scale,0.0)))**2)
+    alpha = ca /cabs(ca)
+    c = cabs(ca) / norm
+    s = alpha * conjg(cb) / norm
+    ca = alpha * norm
+    !
+
+    return
+  end subroutine crotg
+
+
+
+  subroutine zrot( n, cx, incx, cy, incy, c, s )
+    !
+    !  -- lapack auxiliary routine (version 3.0) --
+    !     univ. of tennessee, univ. of california berkeley, nag ltd.,
+    !     courant institute, argonne national lab, and rice university
+    !     october 31, 1992
+    !
+    !     .. scalar arguments ..
+    integer(psb_mpik_) :: incx, incy, n
+    real(psb_dpk_)    c
+    complex(psb_dpk_)   s
+    !     ..
+    !     .. array arguments ..
+    complex(psb_dpk_) cx( * ), cy( * )
+    !     ..
+    !
+    !  purpose
+    !  == = ====
+    !
+    !  zrot   applies a plane rotation, where the cos (c) is real and the
+    !  sin (s) is complex, and the vectors cx and cy are complex.
+    !
+    !  arguments
+    !  == = ======
+    !
+    !  n       (input) integer
+    !          the number of elements in the vectors cx and cy.
+    !
+    !  cx      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector x.
+    !          on output, cx is overwritten with c*x + s*y.
+    !
+    !  incx    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  cy      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector y.
+    !          on output, cy is overwritten with -conjg(s)*x + c*y.
+    !
+    !  incy    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  c       (input) double precision
+    !  s       (input) complex*16
+    !          c and s define a rotation
+    !             [  c          s  ]
+    !             [ -conjg(s)   c  ]
+    !          where c*c + s*conjg(s) = 1.0.
+    !
+    ! == = ==================================================================
+    !
+    !     .. local scalars ..
+    integer(psb_mpik_) :: i, ix, iy
+    complex(psb_dpk_)         stemp
+    !     ..
+    !     .. intrinsic functions ..
+    intrinsic          dconjg
+    !     ..
+    !     .. executable statements ..
+    !
+    if( n <= 0 ) return
+    if( incx == 1 .and. incy == 1 ) then 
+      !
+      !     code for both increments equal to 1
+      !
+      do  i = 1, n
+        stemp = c*cx(i) + s*cy(i)
+        cy(i) = c*cy(i) - dconjg(s)*cx(i)
+        cx(i) = stemp
+      end do
+    else
+      !
+      !     code for unequal increments or equal increments not equal to 1
+      !
+      ix = 1
+      iy = 1
+      if( incx < 0 )ix = ( -n+1 )*incx + 1
+      if( incy < 0 )iy = ( -n+1 )*incy + 1
+      do  i = 1, n
+        stemp  = c*cx(ix) + s*cy(iy)
+        cy(iy) = c*cy(iy) - dconjg(s)*cx(ix)
+        cx(ix) = stemp
+        ix = ix + incx
+        iy = iy + incy
+      end do
+    end if
+    return
+    return
+  end subroutine zrot
+  !
+  !
+  subroutine zrotg(ca,cb,c,s)
+    complex(psb_dpk_) ca,cb,s
+    real(psb_dpk_) c
+    real(psb_dpk_) norm,scale
+    complex(psb_dpk_) alpha
+    !
+    if (cdabs(ca) == 0.0d0) then 
+      !
+      c = 0.0d0
+      s = (1.0d0,0.0d0)
+      ca = cb
+      return
+    end if
+    !
+
+    scale = cdabs(ca) + cdabs(cb)
+    norm = scale*dsqrt((cdabs(ca/cmplx(scale,0.0d0,kind=psb_dpk_)))**2 +&
+         &   (cdabs(cb/cmplx(scale,0.0d0,kind=psb_dpk_)))**2)
+    alpha = ca /cdabs(ca)
+    c = cdabs(ca) / norm
+    s = alpha * conjg(cb) / norm
+    ca = alpha * norm
+    !
+
+    return
+  end subroutine zrotg
+
+
   subroutine psb_scsprt(iout,a,iv,head,ivr,ivc)
     use psb_mat_mod
     integer(psb_ipk_), intent(in)       :: iout

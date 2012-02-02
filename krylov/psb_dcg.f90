@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_zcg.f90
+! File:  psb_dcg.f90
 !!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !!$ C                                                                      C
 !!$ C  References:                                                         C
@@ -55,19 +55,19 @@
 !!$ C                                                                      C
 !!$ C                                                                      C
 !!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-! File:  psb_zcg.f90
+! File:  psb_dcg.f90
 !
-! Subroutine: psb_zcg
+! Subroutine: psb_dcg
 !    This subroutine implements the Conjugate Gradient method.
 !
 !
 ! Arguments:
 !
-!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
-!    prec   -  class(psb_zprec_type)       Input: preconditioner
-!    b(:)   -  complex                    Input: vector containing the
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  class(psb_dprec_type)       Input: preconditioner
+!    b(:)   -  real                    Input: vector containing the
 !                                         right hand side B
-!    x(:)   -  complex                    Input/Output: vector containing the
+!    x(:)   -  real                    Input/Output: vector containing the
 !                                         initial guess and final solution X.
 !    eps    -  real                       Input: Stopping tolerance; the iteration is
 !                                         stopped when the error estimate |err| <= eps
@@ -95,223 +95,223 @@
 !                                         estimate of) residual. 
 ! 
 !
-subroutine psb_zcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
-  use psb_base_mod
-  use psb_prec_mod
-  use psb_z_inner_krylov_mod
-  use psb_krylov_mod
-  implicit none
+!!$subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+!!$  use psb_base_mod
+!!$  use psb_prec_mod
+!!$  use psb_d_krylov_conv_mod
+!!$  use psb_krylov_mod
+!!$  implicit none
+!!$
+!!$! =  Parameters 
+!!$  Type(psb_dspmat_type), Intent(in)  :: a
+!!$  class(psb_dprec_type), Intent(in)   :: prec 
+!!$  Type(psb_desc_type), Intent(in)    :: desc_a
+!!$  real(psb_dpk_), Intent(in)    :: b(:)
+!!$  real(psb_dpk_), Intent(inout) :: x(:)
+!!$  Real(psb_dpk_), Intent(in)       :: eps
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
+!!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
+!!$  Real(psb_dpk_), Optional, Intent(out) :: err
+!!$! =   Local data
+!!$  real(psb_dpk_), allocatable, target   :: aux(:), wwrk(:,:)
+!!$  real(psb_dpk_), pointer  :: q(:), p(:), r(:), z(:), w(:)
+!!$  real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma
+!!$  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+!!$       & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
+!!$  integer(psb_ipk_) :: debug_level, debug_unit
+!!$  type(psb_itconv_type)  :: stopdat
+!!$  real(psb_dpk_)         :: derr
+!!$  character(len=20)      :: name
+!!$  character(len=*), parameter :: methdname='CG'
+!!$
+!!$  info = psb_success_
+!!$  name = 'psb_dcg'
+!!$  call psb_erractionsave(err_act)
+!!$  debug_unit  = psb_get_debug_unit()
+!!$  debug_level = psb_get_debug_level()
+!!$
+!!$  ictxt = desc_a%get_context()
+!!$
+!!$  call psb_info(ictxt, me, np)
+!!$
+!!$
+!!$  mglob = desc_a%get_global_rows()
+!!$  n_row = desc_a%get_local_rows()
+!!$  n_col = desc_a%get_local_cols()
+!!$
+!!$  if (present(istop)) then 
+!!$    istop_ = istop 
+!!$  else
+!!$    istop_ = 2
+!!$  endif
+!!$
+!!$  call psb_chkvect(mglob,ione,size(x,ione),ione,ione,desc_a,info)
+!!$  if (info == psb_success_) call psb_chkvect(mglob,ione,size(b,ione),ione,ione,desc_a,info)
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_    
+!!$    call psb_errpush(info,name,a_err='psb_chkvect on X/B')
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  naux=4*n_col
+!!$  allocate(aux(naux), stat=info)
+!!$  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=psb_err_invalid_input_)
+!!$  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
+!!$  if (info /= psb_success_) then 
+!!$    info=psb_err_from_subroutine_non_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  p  => wwrk(:,1)
+!!$  q  => wwrk(:,2)
+!!$  r  => wwrk(:,3)
+!!$  z  => wwrk(:,4) 
+!!$  w  => wwrk(:,5)
+!!$
+!!$
+!!$  if (present(itmax)) then 
+!!$    itmax_ = itmax
+!!$  else
+!!$    itmax_ = 1000
+!!$  endif
+!!$
+!!$  if (present(itrace)) then
+!!$    itrace_ = itrace
+!!$  else
+!!$    itrace_ = 0
+!!$  end if
+!!$
+!!$  itx=0
+!!$
+!!$  restart: do 
+!!$! =   
+!!$! =    r0 = b-Ax0
+!!$! =   
+!!$    if (itx>= itmax_) exit restart 
+!!$
+!!$    it = 0
+!!$    call psb_geaxpby(done,b,dzero,r,desc_a,info)
+!!$    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+!!$    if (info /= psb_success_) then 
+!!$      info=psb_err_from_subroutine_non_
+!!$      call psb_errpush(info,name)
+!!$      goto 9999
+!!$    end if
+!!$
+!!$    rho = dzero
+!!$    
+!!$    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+!!$    if (info /= psb_success_) Then 
+!!$      call psb_errpush(psb_err_from_subroutine_non_,name)
+!!$      goto 9999
+!!$    End If
+!!$
+!!$    iteration:  do 
+!!$
+!!$      it   = it + 1
+!!$      itx = itx + 1
+!!$
+!!$      call prec%apply(r,z,desc_a,info,work=aux)
+!!$      rho_old = rho
+!!$      rho     = psb_gedot(r,z,desc_a,info)
+!!$
+!!$      if (it == 1) then
+!!$        call psb_geaxpby(done,z,dzero,p,desc_a,info)
+!!$      else
+!!$        if (rho_old == dzero) then
+!!$          if (debug_level >= psb_debug_ext_)&
+!!$               & write(debug_unit,*) me,' ',trim(name),&
+!!$               & ': CG Iteration breakdown rho'
+!!$          exit iteration
+!!$        endif
+!!$        beta = rho/rho_old
+!!$        call psb_geaxpby(done,z,beta,p,desc_a,info)
+!!$      end if
+!!$
+!!$      call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
+!!$      sigma = psb_gedot(p,q,desc_a,info)
+!!$      if (sigma == dzero) then
+!!$          if (debug_level >= psb_debug_ext_)&
+!!$               & write(debug_unit,*) me,' ',trim(name),&
+!!$               & ': CG Iteration breakdown sigma'
+!!$        exit iteration
+!!$      endif
+!!$
+!!$      alpha = rho/sigma
+!!$      call psb_geaxpby(alpha,p,done,x,desc_a,info)
+!!$      call psb_geaxpby(-alpha,q,done,r,desc_a,info)
+!!$
+!!$      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+!!$      if (info /= psb_success_) Then 
+!!$        call psb_errpush(psb_err_from_subroutine_non_,name)
+!!$        goto 9999
+!!$      End If
+!!$
+!!$    end do iteration
+!!$  end do restart
+!!$
+!!$  call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
+!!$
+!!$  if (present(err)) then 
+!!$    err = derr
+!!$  end if
+!!$
+!!$  call psb_gefree(wwrk,desc_a,info)
+!!$  if (info /= psb_success_) then 
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$  if (err_act == psb_act_abort_) then
+!!$    call psb_error()
+!!$    return
+!!$  end if
+!!$  return
+!!$
+!!$end subroutine psb_dcg
+!!$
 
-!!$  Parameters 
-  Type(psb_zspmat_type), Intent(in)  :: a
-  class(psb_zprec_type), Intent(in)   :: prec 
-  Type(psb_desc_type), Intent(in)    :: desc_a
-  complex(psb_dpk_), Intent(in)    :: b(:)
-  complex(psb_dpk_), Intent(inout) :: x(:)
-  Real(psb_dpk_), Intent(in)       :: eps
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
-  integer(psb_ipk_), Optional, Intent(out)     :: iter
-  Real(psb_dpk_), Optional, Intent(out) :: err
-!!$   Local data
-  complex(psb_dpk_), allocatable, target   :: aux(:), wwrk(:,:)
-  complex(psb_dpk_), pointer  :: q(:), p(:), r(:), z(:), w(:)
-  complex(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma
-  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
-       & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  type(psb_itconv_type)       :: stopdat
-  character(len=20)           :: name
-  character(len=*), parameter :: methdname='CG'
-
-  info = psb_success_
-  name = 'psb_zcg'
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
-
-  ictxt = desc_a%get_context()
-
-  call psb_info(ictxt, me, np)
-
-
-  mglob = desc_a%get_global_rows()
-  n_row = desc_a%get_local_rows()
-  n_col = desc_a%get_local_cols()
-
-  if (present(istop)) then 
-    istop_ = istop 
-  else
-    istop_ = 2
-  endif
-
-  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_    
-    call psb_errpush(info,name,a_err='psb_chkvect on X/B')
-    goto 9999
-  end if
-
-  naux=4*n_col
-  allocate(aux(naux), stat=info)
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=psb_err_invalid_input_)
-  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
-  if (info /= psb_success_) then 
-    info=psb_err_from_subroutine_non_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  p  => wwrk(:,1)
-  q  => wwrk(:,2)
-  r  => wwrk(:,3)
-  z  => wwrk(:,4) 
-  w  => wwrk(:,5)
-
-
-  if (present(itmax)) then 
-    itmax_ = itmax
-  else
-    itmax_ = 1000
-  endif
-
-  if (present(itrace)) then
-    itrace_ = itrace
-  else
-    itrace_ = 0
-  end if
-
-  itx=0
-
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-
-  restart: do 
-!!$   
-!!$    r0 = b-Ax0
-!!$   
-    if (itx>= itmax_) exit restart 
-
-    it = 0
-    call psb_geaxpby(zone,b,zzero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
-    if (info /= psb_success_) then 
-      info=psb_err_from_subroutine_non_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    rho = zzero
-    
-    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-    if (info /= psb_success_) Then 
-      call psb_errpush(psb_err_from_subroutine_non_,name)
-      goto 9999
-    End If
-
-    iteration:  do 
-
-      it   = it + 1
-      itx = itx + 1
-
-      call prec%apply(r,z,desc_a,info,work=aux)
-      rho_old = rho
-      rho     = psb_gedot(r,z,desc_a,info)
-
-      if (it == 1) then
-        call psb_geaxpby(zone,z,zzero,p,desc_a,info)
-      else
-        if (rho_old == zzero) then
-          if (debug_level >= psb_debug_ext_)&
-               & write(debug_unit,*) me,' ',trim(name),&
-               & ': CG Iteration breakdown rho'
-          exit iteration
-        endif
-        beta = rho/rho_old
-        call psb_geaxpby(zone,z,beta,p,desc_a,info)
-      end if
-
-      call psb_spmm(zone,a,p,zzero,q,desc_a,info,work=aux)
-      sigma = psb_gedot(p,q,desc_a,info)
-      if (sigma == zzero) then
-          if (debug_level >= psb_debug_ext_)&
-               & write(debug_unit,*) me,' ',trim(name),&
-               & ': CG Iteration breakdown sigma'
-        exit iteration
-      endif
-
-      alpha = rho/sigma
-      call psb_geaxpby(alpha,p,zone,x,desc_a,info)
-      call psb_geaxpby(-alpha,q,zone,r,desc_a,info)
-
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      if (info /= psb_success_) Then 
-        call psb_errpush(psb_err_from_subroutine_non_,name)
-        goto 9999
-      End If
-
-    end do iteration
-  end do restart
-
-  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
-
-  call psb_gefree(wwrk,desc_a,info)
-  if (info /= psb_success_) then 
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-  return
-
-end subroutine psb_zcg
-
-
-
-subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
+subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_inner_krylov_mod
+  use psb_d_krylov_conv_mod
   use psb_krylov_mod
   implicit none
-  type(psb_zspmat_type), intent(in)    :: a
+  type(psb_dspmat_type), intent(in)    :: a
   Type(psb_desc_type), Intent(in)      :: desc_a
-  class(psb_zprec_type), intent(inout) :: prec
-  type(psb_z_vect_type), Intent(inout) :: b
-  type(psb_z_vect_type), Intent(inout) :: x
+  class(psb_dprec_type), intent(inout) :: prec
+  type(psb_d_vect_type), Intent(inout) :: b
+  type(psb_d_vect_type), Intent(inout) :: x
   Real(psb_dpk_), Intent(in)           :: eps
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
-!!$   Local data
-  complex(psb_dpk_), allocatable, target   :: aux(:)
-  type(psb_z_vect_type), allocatable, target :: wwrk(:)
-  type(psb_z_vect_type), pointer  :: q, p, r, z, w
-  complex(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
+! =   Local data
+  real(psb_dpk_), allocatable, target   :: aux(:)
+  type(psb_d_vect_type), allocatable, target :: wwrk(:)
+  type(psb_d_vect_type), pointer  :: q, p, r, z, w
+  real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
   integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
-       & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5), ieg,nspl, istebz
+       &  n_col, n_row,err_act, int_err(5), ieg,nspl, istebz
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_) :: np, me, ictxt
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
 
   info = psb_success_
-  name = 'psb_zcg'
+  name = 'psb_dcg'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -342,9 +342,9 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
     istop_ = 2
   endif
 
-  call psb_chkvect(mglob,1,x%get_nrows(),1,1,desc_a,info)
+  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
   if (info == psb_success_)&
-       & call psb_chkvect(mglob,1,b%get_nrows(),1,1,desc_a,info)
+       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
@@ -353,7 +353,7 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
 
   naux=4*n_col
   allocate(aux(naux), stat=info)
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5)
+  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v)  
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_
@@ -383,25 +383,23 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
 
   itx=0
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   restart: do 
-!!$   
-!!$    r0 = b-Ax0
-!!$   
+! =   
+! =    r0 = b-Ax0
+! =   
     if (itx>= itmax_) exit restart 
 
     it = 0
-    call psb_geaxpby(zone,b,zzero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
+    call psb_geaxpby(done,b,dzero,r,desc_a,info)
+    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
 
-    rho = zzero
+    rho = dzero
     
     call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
     if (info /= psb_success_) Then 
@@ -419,21 +417,21 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
       rho     = psb_gedot(r,z,desc_a,info)
 
       if (it == 1) then
-        call psb_geaxpby(zone,z,zzero,p,desc_a,info)
+        call psb_geaxpby(done,z,dzero,p,desc_a,info)
       else
-        if (rho_old == zzero) then
+        if (rho_old == dzero) then
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
                & ': CG Iteration breakdown rho'
           exit iteration
         endif
         beta = rho/rho_old
-        call psb_geaxpby(zone,z,beta,p,desc_a,info)
+        call psb_geaxpby(done,z,beta,p,desc_a,info)
       end if
 
-      call psb_spmm(zone,a,p,zzero,q,desc_a,info,work=aux)
+      call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
       sigma = psb_gedot(p,q,desc_a,info)
-      if (sigma == zzero) then
+      if (sigma == dzero) then
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
                & ': CG Iteration breakdown sigma'
@@ -442,8 +440,8 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
       alpha_old = alpha
       alpha = rho/sigma
 
-      call psb_geaxpby(alpha,p,zone,x,desc_a,info)
-      call psb_geaxpby(-alpha,q,zone,r,desc_a,info)
+      call psb_geaxpby(alpha,p,done,x,desc_a,info)
+      call psb_geaxpby(-alpha,q,done,r,desc_a,info)
 
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
       if (info /= psb_success_) Then 
@@ -464,9 +462,6 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
   call psb_erractionrestore(err_act)
   return
 
@@ -478,5 +473,5 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
   return
 
-end subroutine psb_zcg_vect
+end subroutine psb_dcg_vect
 

@@ -32,9 +32,12 @@
 !
 ! File: psb_krylov_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
+!
+
+  !
   ! Subroutine: psb_skrylov
   ! 
-  !    Front-end for the Krylov subspace iterations, real version
+  !    Front-end for the Krylov subspace iterations, realversion
   !    
   ! Arguments:
   !
@@ -48,13 +51,14 @@
   !                                           
   !    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
   !    prec   -  class(psb_sprec_type)       Input: preconditioner
-  !    b      -  real,dimension(:)            Input: vector containing the
+  !    b      -  real,dimension(:)         Input: vector containing the
   !                                           right hand side B
-  !    x      -  real,dimension(:)            Input/Output: vector containing the
+  !    x      -  real,dimension(:)         Input/Output: vector containing the
   !                                           initial guess and final solution X.
   !    eps    -  real                         Input: Stopping tolerance; the iteration is
   !                                           stopped when the error
-  !                                           estimate  |err| <= eps
+  !                                           estimate |err| <= eps
+  !                                           
   !    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
   !    info   -  integer.                     Output: Return code
   !
@@ -75,176 +79,170 @@
   !                                           where r is the (preconditioned, recursive
   !                                           estimate of) residual 
   ! 
-
-Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond)
-
-  use psb_base_mod
-  use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
-  use psb_krylov_mod, psb_protect_name => psb_skrylov
-  character(len=*)                   :: method
-  Type(psb_sspmat_type), Intent(in)  :: a
-  Type(psb_desc_type), Intent(in)    :: desc_a
-  class(psb_sprec_type), intent(in)   :: prec 
-  Real(psb_spk_), Intent(in)       :: b(:)
-  Real(psb_spk_), Intent(inout)    :: x(:)
-  Real(psb_spk_), Intent(in)       :: eps
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
-  integer(psb_ipk_), Optional, Intent(out)     :: iter
-  Real(psb_spk_), Optional, Intent(out) :: err,cond
-
-
-  interface 
-    subroutine psb_scg(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
-      class(psb_sprec_type), intent(in)   :: prec
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)     :: iter
-      real(psb_spk_), optional, intent(out) :: err,cond
-    end subroutine psb_scg
-
-    subroutine psb_sbicg(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
-      class(psb_sprec_type), intent(in)   :: prec
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)     :: iter
-      real(psb_spk_), optional, intent(out) :: err
-    end subroutine psb_sbicg
-
-    subroutine psb_scgstab(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
-      class(psb_sprec_type), intent(in)   :: prec
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)     :: iter
-      real(psb_spk_), optional, intent(out) :: err
-    end subroutine psb_scgstab
-
-    Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err, itrace,irst,istop)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      Type(psb_sspmat_type), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
-      class(psb_sprec_type), intent(in)   :: prec
-      Real(psb_spk_), Intent(in)       :: b(:)
-      Real(psb_spk_), Intent(inout)    :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
-      integer(psb_ipk_), Optional, Intent(out)     :: iter
-      Real(psb_spk_), Optional, Intent(out) :: err
-    end subroutine psb_scgstabl
-    Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      Type(psb_sspmat_type), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
-      class(psb_sprec_type), intent(in)   :: prec 
-      Real(psb_spk_), Intent(in)       :: b(:)
-      Real(psb_spk_), Intent(inout)    :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
-      integer(psb_ipk_), Optional, Intent(out)     :: iter
-      Real(psb_spk_), Optional, Intent(out) :: err
-    end subroutine psb_srgmres
-    subroutine psb_scgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-      import :: psb_ipk_, psb_spk_, psb_desc_type, &
-           & psb_sspmat_type, psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a 
-      class(psb_sprec_type), intent(in)   :: prec 
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)     :: iter
-      real(psb_spk_), optional, intent(out) :: err
-    end subroutine psb_scgs
-  end interface
-
-  integer(psb_ipk_) :: ictxt,me,np,err_act
-  character(len=20)             :: name
-
-
-  info = psb_success_
-  name = 'psb_krylov'
-  call psb_erractionsave(err_act)
-
-
-  ictxt=desc_a%get_context()
-
-  call psb_info(ictxt, me, np)
-
-  select case(psb_toupper(method))
-  case('CG') 
-    call  psb_scg(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop,cond)
-  case('CGS') 
-    call  psb_scgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-  case('BICG') 
-    call  psb_sbicg(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-  case('BICGSTAB') 
-    call  psb_scgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-  case('RGMRES')
-    call  psb_srgmres(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
-  case('BICGSTABL')
-    call  psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
-  case default
-    if (me == 0) write(psb_err_unit,*) trim(name),': Warning: Unknown method  ',method,&
-         & ', defaulting to BiCGSTAB'
-    call  psb_scgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-  end select
-
-  if(info /= psb_success_) then
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
-
-end subroutine psb_skrylov
+!!$Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
+!!$  use psb_base_mod
+!!$  use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_sprec_type, psb_zprec_type
+!!$  use psb_krylov_mod, psb_protect_name => psb_skrylov
+!!$  character(len=*)                   :: method
+!!$  Type(psb_sspmat_type), Intent(in)  :: a
+!!$  Type(psb_desc_type), Intent(in)    :: desc_a
+!!$  class(psb_sprec_type), intent(in)   :: prec 
+!!$  real(psb_spk_), Intent(in)      :: b(:)
+!!$  real(psb_spk_), Intent(inout)   :: x(:)
+!!$  Real(psb_spk_), Intent(in)         :: eps
+!!$  integer(psb_ipk_), intent(out)               :: info
+!!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
+!!$  Real(psb_spk_), Optional, Intent(out) :: err
+!!$  interface 
+!!$    subroutine psb_scg(a,prec,b,x,eps,&
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      type(psb_sspmat_type), intent(in)  :: a
+!!$      type(psb_desc_type), intent(in)    :: desc_a
+!!$      real(psb_spk_), intent(in)    :: b(:)
+!!$      real(psb_spk_), intent(inout) :: x(:)
+!!$      real(psb_spk_), intent(in)       :: eps
+!!$      class(psb_sprec_type), intent(in)   :: prec
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
+!!$      real(psb_spk_), optional, intent(out) :: err
+!!$    end subroutine psb_scg
+!!$    subroutine psb_sbicg(a,prec,b,x,eps,&
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      type(psb_sspmat_type), intent(in)  :: a
+!!$      type(psb_desc_type), intent(in)    :: desc_a
+!!$      real(psb_spk_), intent(in)      :: b(:)
+!!$      real(psb_spk_), intent(inout)   :: x(:)
+!!$      real(psb_spk_), intent(in)         :: eps
+!!$      class(psb_sprec_type), intent(in)   :: prec
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
+!!$      real(psb_spk_), optional, intent(out) :: err
+!!$    end subroutine psb_sbicg
+!!$    subroutine psb_scgstab(a,prec,b,x,eps,&
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      type(psb_sspmat_type), intent(in)  :: a
+!!$      type(psb_desc_type), intent(in)    :: desc_a
+!!$      real(psb_spk_), intent(in)       :: b(:)
+!!$      real(psb_spk_), intent(inout)    :: x(:)
+!!$      real(psb_spk_), intent(in)       :: eps
+!!$      class(psb_sprec_type), intent(in)   :: prec
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
+!!$      real(psb_spk_), optional, intent(out) :: err
+!!$    end subroutine psb_scgstab
+!!$    Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,irst,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      Type(psb_sspmat_type), Intent(in)  :: a
+!!$      Type(psb_desc_type), Intent(in)    :: desc_a
+!!$      class(psb_sprec_type), intent(in)   :: prec 
+!!$      real(psb_spk_), Intent(in)    :: b(:)
+!!$      real(psb_spk_), Intent(inout) :: x(:)
+!!$      Real(psb_spk_), Intent(in)       :: eps
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$      integer(psb_ipk_), Optional, Intent(out)     :: iter
+!!$      Real(psb_spk_), Optional, Intent(out) :: err
+!!$    end subroutine psb_scgstabl
+!!$    Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,irst,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      Type(psb_sspmat_type), Intent(in)  :: a
+!!$      Type(psb_desc_type), Intent(in)    :: desc_a
+!!$      class(psb_sprec_type), intent(in)   :: prec 
+!!$      real(psb_spk_), Intent(in)    :: b(:)
+!!$      real(psb_spk_), Intent(inout) :: x(:)
+!!$      Real(psb_spk_), Intent(in)       :: eps
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
+!!$      integer(psb_ipk_), Optional, Intent(out)     :: iter
+!!$      Real(psb_spk_), Optional, Intent(out) :: err
+!!$    end subroutine psb_srgmres
+!!$    subroutine psb_scgs(a,prec,b,x,eps,&
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+!!$           & psb_sspmat_type, psb_sprec_type
+!!$      type(psb_sspmat_type), intent(in)  :: a
+!!$      type(psb_desc_type), intent(in)    :: desc_a
+!!$      real(psb_spk_), intent(in)       :: b(:)
+!!$      real(psb_spk_), intent(inout)    :: x(:)
+!!$      real(psb_spk_), intent(in)       :: eps
+!!$      class(psb_sprec_type), intent(in)   :: prec
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
+!!$      integer(psb_ipk_), optional, intent(out)     :: iter
+!!$      real(psb_spk_), optional, intent(out) :: err
+!!$    end subroutine psb_scgs
+!!$  end interface
+!!$
+!!$
+!!$  integer(psb_ipk_) :: ictxt,me,np,err_act
+!!$  character(len=20)             :: name
+!!$
+!!$  info = psb_success_
+!!$  name = 'psb_krylov'
+!!$  call psb_erractionsave(err_act)
+!!$
+!!$
+!!$  ictxt=desc_a%get_context()
+!!$
+!!$  call psb_info(ictxt, me, np)
+!!$
+!!$
+!!$  select case(psb_toupper(method))
+!!$  case('CG') 
+!!$    call  psb_scg(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,istop)
+!!$  case('CGS') 
+!!$    call  psb_scgs(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,istop)
+!!$  case('BICG') 
+!!$    call  psb_sbicg(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,istop)
+!!$  case('BICGSTAB') 
+!!$    call  psb_scgstab(a,prec,b,x,eps,desc_a,info,&
+!!$         & itmax,iter,err,itrace,istop)
+!!$  case('RGMRES')
+!!$    call  psb_srgmres(a,prec,b,x,eps,desc_a,info,&
+!!$         & itmax,iter,err,itrace,irst,istop)
+!!$  case('BICGSTABL')
+!!$    call  psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,irst,istop)
+!!$  case default
+!!$    if (me == 0) write(psb_err_unit,*) trim(name),': Warning: Unknown method  ',method,&
+!!$         & ', defaulting to BiCGSTAB'
+!!$    call  psb_scgstab(a,prec,b,x,eps,desc_a,info,&
+!!$         &itmax,iter,err,itrace,istop)
+!!$  end select
+!!$
+!!$  if(info /= psb_success_) then
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$  if (err_act == psb_act_abort_) then
+!!$    call psb_error(ictxt)
+!!$    return
+!!$  end if
+!!$
+!!$end subroutine psb_skrylov
 
 Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop,cond)
@@ -412,4 +410,3 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
 end subroutine psb_skrylov_vect
 
-  

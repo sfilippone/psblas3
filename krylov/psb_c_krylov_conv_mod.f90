@@ -30,12 +30,12 @@
 !!$ 
 !!$  
 !
-! File: psb_krylov_mod.f90
+! File: psb_krylov_conv_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
 !
-Module psb_c_inner_krylov_mod
+Module psb_c_krylov_conv_mod
 
-  use psb_base_inner_krylov_mod
+  use psb_base_krylov_conv_mod
 
   interface psb_init_conv
     module procedure psb_c_init_conv, psb_c_init_conv_vect
@@ -340,4 +340,4 @@ contains
 
   end function psb_c_check_conv_vect
 
-end module psb_c_inner_krylov_mod
+end module psb_c_krylov_conv_mod

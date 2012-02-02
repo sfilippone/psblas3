@@ -30,31 +30,31 @@
 !!$ 
 !!$  
 !
-! File: psb_krylov_mod.f90
+! File: psb_krylov_conv_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
 !
-Module psb_d_inner_krylov_mod
+Module psb_z_krylov_conv_mod
 
-  use psb_base_inner_krylov_mod
+  use psb_base_krylov_conv_mod
 
   interface psb_init_conv
-    module procedure psb_d_init_conv, psb_d_init_conv_vect
+    module procedure psb_z_init_conv, psb_z_init_conv_vect
   end interface
 
   interface psb_check_conv
-    module procedure psb_d_check_conv, psb_d_check_conv_vect
+    module procedure psb_z_check_conv, psb_z_check_conv_vect
   end interface
 
 
 contains
 
-  subroutine psb_d_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_z_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace, itmax
-    type(psb_dspmat_type), intent(in) :: a
-    real(psb_dpk_), intent(in)     :: b(:)
+    type(psb_zspmat_type), intent(in) :: a
+    complex(psb_dpk_), intent(in)     :: b(:)
     real(psb_dpk_), intent(in)        :: eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
@@ -116,15 +116,15 @@ contains
       return
     end if
 
-  end subroutine psb_d_init_conv
+  end subroutine psb_z_init_conv
 
 
-  function psb_d_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_z_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer(psb_ipk_), intent(in)             :: it
-    real(psb_dpk_), intent(in)   :: x(:), r(:)
+    complex(psb_dpk_), intent(in)   :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     logical                         :: res
@@ -191,17 +191,17 @@ contains
       return
     end if
 
-  end function psb_d_check_conv
+  end function psb_z_check_conv
 
 
-  subroutine psb_d_init_conv_vect(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_z_init_conv_vect(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace,itmax
-    type(psb_dspmat_type), intent(in) :: a
+    type(psb_zspmat_type), intent(in) :: a
     real(psb_dpk_), intent(in)        :: eps
-    type(psb_d_vect_type), intent(inout)  :: b
+    type(psb_z_vect_type), intent(inout)  :: b
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
@@ -262,14 +262,14 @@ contains
       return
     end if
 
-  end subroutine psb_d_init_conv_vect
+  end subroutine psb_z_init_conv_vect
 
-  function psb_d_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_z_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)     :: methdname
     integer(psb_ipk_), intent(in)              :: it
-    type(psb_d_vect_type), intent(inout) :: x, r
+    type(psb_z_vect_type), intent(inout) :: x, r
     type(psb_desc_type), intent(in)  :: desc_a
     type(psb_itconv_type)            :: stopdat
     logical                          :: res
@@ -338,6 +338,6 @@ contains
       return
     end if
 
-  end function psb_d_check_conv_vect
+  end function psb_z_check_conv_vect
 
-end module psb_d_inner_krylov_mod
+end module psb_z_krylov_conv_mod
