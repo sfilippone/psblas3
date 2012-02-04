@@ -366,7 +366,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+            call psb_geins(ione,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
             if(info /= psb_success_) then
               info=psb_err_from_subroutine_
@@ -397,7 +397,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+            call psb_geins(ione,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
             if(info /= psb_success_) then
               info=psb_err_from_subroutine_

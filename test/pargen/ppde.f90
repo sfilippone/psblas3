@@ -92,7 +92,7 @@ program ppde
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
-
+  integer(psb_mpik_) :: iict
   ! other variables
   integer(psb_ipk_) :: info, i
   character(len=20)  :: name,ch_err
@@ -101,9 +101,10 @@ program ppde
   info=psb_success_
 
   
-  call psb_init(ictxt)
+  call psb_init(iict)
+  ictxt = iict
   call psb_info(ictxt,iam,np)
-
+  write(0,*) 'Fromt init/info',iam,np
   if (iam < 0) then 
     ! This should not happen, but just in case
     call psb_exit(ictxt)
@@ -111,7 +112,7 @@ program ppde
   endif
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -148,7 +149,7 @@ program ppde
 !!$  call psb_cdcpy(desc_a,desc_b,info)
 !!$  call psb_set_debug_level(9999)
 
-  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
+  call psb_cdbldext(a,desc_a,itwo,desc_b,info,extype=psb_ovt_asov_)
   if (info /= 0) then 
     write(0,*) 'Error from bldext'
     call psb_abort(ictxt)
@@ -317,7 +318,7 @@ contains
         write(psb_out_unit,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
-        call pr_usage(0)      
+        call pr_usage(izero)      
         call psb_abort(ictxt)
         stop 1
       endif

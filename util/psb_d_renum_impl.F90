@@ -56,7 +56,7 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
   integer(psb_ipk_), intent(out) :: info
   integer(psb_ipk_), allocatable, optional, intent(out) :: perm(:)
   
-  integer(psb_ipk_) :: err_act, nr, nc, i
+  integer(psb_ipk_) :: err_act, nr, nc, i, ierr(5)
   character(len=20)  :: name
 
   info = psb_success_
@@ -69,7 +69,8 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
   nc = mat%get_ncols()
   if (nr /= nc) then 
     info = psb_err_rectangular_mat_unsupported_
-    call psb_errpush(info,name,i_err=(/nr,nc,0,0,0/))
+    ierr(1) = nr; ierr(2) = nc;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -96,7 +97,8 @@ subroutine psb_d_mat_renum(alg,mat,info,perm)
     endif
   case default
     info = psb_err_input_value_invalid_i_
-    call psb_errpush(info,name,i_err=(/1,alg,0,0,0/))
+    ierr(1) = 1; ierr(2) = alg;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end select
   

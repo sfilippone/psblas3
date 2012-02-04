@@ -45,6 +45,28 @@ module psi_p2p_mod
 #endif
 
 
+#if defined(LONG_INTEGERS)
+  interface psb_snd
+    module procedure psb_isnds_ic, psb_isndv_ic, psb_isndm_ic, &
+         & psb_ssnds_ic, psb_ssndv_ic, psb_ssndm_ic,&
+         & psb_dsnds_ic, psb_dsndv_ic, psb_dsndm_ic,&
+         & psb_csnds_ic, psb_csndv_ic, psb_csndm_ic,&
+         & psb_zsnds_ic, psb_zsndv_ic, psb_zsndm_ic,&
+         & psb_lsnds_ic, psb_lsndv_ic, &
+         & psb_lsndm_ic, psb_hsnds_ic
+  end interface
+
+  interface psb_rcv
+    module procedure psb_ircvs_ic, psb_ircvv_ic, psb_ircvm_ic, &
+         & psb_srcvs_ic, psb_srcvv_ic, psb_srcvm_ic,&
+         & psb_drcvs_ic, psb_drcvv_ic, psb_drcvm_ic,&
+         & psb_crcvs_ic, psb_crcvv_ic, psb_crcvm_ic,&
+         & psb_zrcvs_ic, psb_zrcvv_ic, psb_zrcvm_ic,&
+         & psb_lrcvs_ic, psb_lrcvv_ic, &
+         & psb_lrcvm_ic, psb_hrcvs_ic
+  end interface
+
+#endif
 
   integer(psb_mpik_), private, parameter:: psb_int_tag      = 543987
   integer(psb_mpik_), private, parameter:: psb_real_tag     = psb_int_tag      + 1
@@ -1539,5 +1561,566 @@ contains
   end subroutine psb_i2rcvm
 
 #endif
+
+
+! 
+! Integer * 8 aliases. 
+! 
+
+#if defined(LONG_INTEGERS)
+  ! !!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  ! Point-to-point SND
+  !
+  ! !!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine psb_isnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_isnds_ic
+
+  subroutine psb_isndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_isndv_ic
+
+  subroutine psb_isndm_ic(ictxt,dat,dst,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_isndm_ic
+
+  subroutine psb_ssnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_ssnds_ic
+
+  subroutine psb_ssndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_ssndv_ic
+
+  subroutine psb_ssndm_ic(ictxt,dat,dst,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_ssndm_ic
+
+
+  subroutine psb_dsnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_dsnds_ic
+
+  subroutine psb_dsndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_dsndv_ic
+
+  subroutine psb_dsndm_ic(ictxt,dat,dst,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_dsndm_ic
+
+
+  subroutine psb_csnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_csnds_ic
+
+  subroutine psb_csndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_csndv_ic
+
+  subroutine psb_csndm_ic(ictxt,dat,dst,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_csndm_ic
+
+
+  subroutine psb_zsnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_zsnds_ic
+
+  subroutine psb_zsndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_zsndv_ic
+
+  subroutine psb_zsndm_ic(ictxt,dat,dst,m)
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_zsndm_ic
+
+
+  subroutine psb_lsnds_ic(ictxt,dat,dst)
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_lsnds_ic
+
+  subroutine psb_lsndv_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(in)  :: dat(:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_lsndv_ic
+
+  subroutine psb_lsndm_ic(ictxt,dat,dst,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(in)  :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_lsndm_ic
+
+
+  subroutine psb_hsnds_ic(ictxt,dat,dst)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    character(len=*), intent(in)  :: dat
+    integer(psb_ipk_), intent(in)  :: dst
+    
+    integer(psb_mpik_) :: iictxt, idst 
+
+    iictxt = ictxt
+    idst   = dst 
+    call psb_snd(iictxt, dat, idst)
+
+  end subroutine psb_hsnds_ic
+
+
+  ! !!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  ! Point-to-point RCV
+  !
+  ! !!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine psb_ircvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_ircvs_ic
+
+  subroutine psb_ircvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_ircvv_ic
+
+  subroutine psb_ircvm_ic(ictxt,dat,src,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_ircvm_ic
+
+  subroutine psb_srcvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_srcvs_ic
+
+  subroutine psb_srcvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_srcvv_ic
+
+  subroutine psb_srcvm_ic(ictxt,dat,src,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_spk_), intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_srcvm_ic
+
+
+  subroutine psb_drcvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_drcvs_ic
+
+  subroutine psb_drcvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_drcvv_ic
+
+  subroutine psb_drcvm_ic(ictxt,dat,src,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    real(psb_dpk_), intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_drcvm_ic
+
+
+  subroutine psb_crcvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_crcvs_ic
+
+  subroutine psb_crcvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_crcvv_ic
+
+  subroutine psb_crcvm_ic(ictxt,dat,src,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_spk_), intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_crcvm_ic
+
+
+  subroutine psb_zrcvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_zrcvs_ic
+
+  subroutine psb_zrcvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_zrcvv_ic
+
+  subroutine psb_zrcvm_ic(ictxt,dat,src,m)
+    integer(psb_ipk_), intent(in)  :: ictxt
+    complex(psb_dpk_), intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_zrcvm_ic
+
+
+  subroutine psb_lrcvs_ic(ictxt,dat,src)
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_lrcvs_ic
+
+  subroutine psb_lrcvv_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(out) :: dat(:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_lrcvv_ic
+
+  subroutine psb_lrcvm_ic(ictxt,dat,src,m)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    logical, intent(out) :: dat(:,:)
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_lrcvm_ic
+
+
+  subroutine psb_hrcvs_ic(ictxt,dat,src)
+
+    integer(psb_ipk_), intent(in)  :: ictxt
+    character(len=*), intent(out) :: dat
+    integer(psb_ipk_), intent(in)  :: src
+    
+    integer(psb_mpik_) :: iictxt, isrc 
+
+    iictxt = ictxt
+    isrc   = src 
+    call psb_rcv(iictxt, dat, isrc)
+
+  end subroutine psb_hrcvs_ic
+
+
+#endif
+
 
 end module psi_p2p_mod

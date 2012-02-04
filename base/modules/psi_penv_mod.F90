@@ -3,23 +3,23 @@ module psi_penv_mod
   use psi_comm_buffers_mod, only : psb_buffer_queue
 
   interface psb_init
-    module procedure  psb_init
+    module procedure  psb_init_mpik
   end interface
 
   interface psb_exit
-    module procedure  psb_exit
+    module procedure  psb_exit_mpik
   end interface
 
   interface psb_abort
-    module procedure  psb_abort
+    module procedure  psb_abort_mpik
   end interface
 
   interface psb_info
-    module procedure psb_info
+    module procedure psb_info_mpik
   end interface
 
   interface psb_barrier
-    module procedure  psb_barrier
+    module procedure  psb_barrier_mpik
   end interface
   
 #if defined(LONG_INTEGERS)
@@ -204,7 +204,7 @@ contains
 
 #endif
 
-  subroutine psb_init(ictxt,np,basectxt,ids)
+  subroutine psb_init_mpik(ictxt,np,basectxt,ids)
     use psi_comm_buffers_mod 
     use psb_const_mod
     use psb_error_mod
@@ -329,9 +329,9 @@ contains
 ! !$      endif
 ! !$    endif
 
-  end subroutine psb_init
+  end subroutine psb_init_mpik
 
-  subroutine psb_exit(ictxt,close)
+  subroutine psb_exit_mpik(ictxt,close)
     use psi_comm_buffers_mod 
 ! !$    use psb_rsb_mod
 #ifdef MPI_MOD
@@ -381,10 +381,10 @@ contains
 #endif
 
 
-  end subroutine psb_exit
+  end subroutine psb_exit_mpik
 
 
-  subroutine psb_barrier(ictxt)
+  subroutine psb_barrier_mpik(ictxt)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -401,7 +401,7 @@ contains
     end if
 #endif    
 
-  end subroutine psb_barrier
+  end subroutine psb_barrier_mpik
 
   function psb_wtime()
     use psb_const_mod
@@ -417,7 +417,7 @@ contains
     psb_wtime = mpi_wtime()
   end function psb_wtime
 
-  subroutine psb_abort(ictxt,errc)
+  subroutine psb_abort_mpik(ictxt,errc)
     use psi_comm_buffers_mod 
 
     integer(psb_mpik_), intent(in) :: ictxt
@@ -437,10 +437,10 @@ contains
     call mpi_abort(ictxt,code,info)
 #endif    
 
-  end subroutine psb_abort
+  end subroutine psb_abort_mpik
 
 
-  subroutine psb_info(ictxt,iam,np)
+  subroutine psb_info_mpik(ictxt,iam,np)
     use psi_comm_buffers_mod 
 #ifdef MPI_MOD
     use mpi
@@ -468,7 +468,7 @@ contains
     end if
 #endif    
 
-  end subroutine psb_info
+  end subroutine psb_info_mpik
 
 
   subroutine psb_get_mpicomm(ictxt,comm)
