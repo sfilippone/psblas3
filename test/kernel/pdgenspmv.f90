@@ -109,7 +109,7 @@ program pdgen
   endif
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -146,7 +146,7 @@ program pdgen
 !!$  call psb_cdcpy(desc_a,desc_b,info)
 !!$  call psb_set_debug_level(9999)
 
-  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
+  call psb_cdbldext(a,desc_a,itwo,desc_b,info,extype=psb_ovt_asov_)
   if (info /= 0) then 
     write(0,*) 'Error from bldext'
     call psb_abort(ictxt)
