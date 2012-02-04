@@ -36,13 +36,13 @@
 !   The user callable routine is defined in the psb_tools_mod module.
 ! 
 ! Arguments: 
-!    desc_a  - type(psb_desc_type).    The communication descriptor.
+!    desc  - type(psb_desc_type).    The communication descriptor.
 !    info    - integer.                return code.
 !    ext_hv  - logical                 Essentially this distinguishes a call 
 !                                      coming from the build of an extended
 !                                      halo descriptor with respect to a normal call. 
 !
-subroutine psb_icdasb(desc_a,info,ext_hv)
+subroutine psb_icdasb(desc,info,ext_hv)
   use psb_base_mod, psb_protect_name => psb_icdasb
   use psi_mod
 #ifdef MPI_MOD
@@ -53,7 +53,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   include 'mpif.h'
 #endif
   !...Parameters....
-  type(psb_desc_type), intent(inout) :: desc_a
+  type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out)               :: info
   logical, intent(in), optional      :: ext_hv
 
@@ -75,10 +75,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt   = desc_a%get_context()
-  dectype = desc_a%get_dectype()
-  n_row   = desc_a%get_local_rows()
-  n_col   = desc_a%get_local_cols()
+  ictxt   = desc%get_context()
+  dectype = desc%get_dectype()
+  n_row   = desc%get_local_rows()
+  n_col   = desc%get_local_cols()
   call psb_get_mpicomm(ictxt,icomm )
 
   ! check on blacs grid 
@@ -89,7 +89,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     goto 9999
   endif
 
-  if (.not.psb_is_ok_desc(desc_a)) then 
+  if (.not.psb_is_ok_desc(desc)) then 
     info = psb_err_spmat_invalid_state_
     int_err(1) = dectype
     call psb_errpush(info,name)
@@ -113,22 +113,22 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit, *) me,' ',trim(name),': start'
 
-  if (allocated(desc_a%indxmap)) then 
-    call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
+  if (allocated(desc%indxmap)) then 
+    call psi_ldsc_pre_halo(desc,ext_hv_,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='ldsc_pre_halo')
       goto 9999
     end if
 
     ! Take out the lists for ovrlap, halo and ext...
-    call psb_move_alloc(desc_a%ovrlap_index,ovrlap_index,info)
-    call psb_move_alloc(desc_a%halo_index,halo_index,info)
-    call psb_move_alloc(desc_a%ext_index,ext_index,info)
+    call psb_move_alloc(desc%ovrlap_index,ovrlap_index,info)
+    call psb_move_alloc(desc%halo_index,halo_index,info)
+    call psb_move_alloc(desc%ext_index,ext_index,info)
 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': Final conversion'
     ! Then convert and put them back where they belong.    
-    call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
+    call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc,info) 
 
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cnv_dsc')
@@ -142,16 +142,15 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       goto 9999
     end if
 
-    call desc_a%indxmap%asb(info)
+    call desc%indxmap%asb(info)
+    if (info == psb_success_) then 
+      if (allocated(desc%indxmap%tempvg)) &
+           & deallocate(desc%indxmap%tempvg,stat=info)
+    end if
     if (info /= psb_success_) then 
       write(0,*) 'Error from internal indxmap asb ',info
       info = psb_success_
     end if
-
-!!$    desc_a%matrix_data(psb_n_row_) = desc_a%indxmap%get_lr()    
-!!$    desc_a%matrix_data(psb_n_col_) = desc_a%indxmap%get_lc()
-!!$    ! Ok, register into MATRIX_DATA 
-!!$    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
   else
     info = psb_err_spmat_invalid_state_

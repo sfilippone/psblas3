@@ -95,7 +95,11 @@ module psb_indx_map_mod
     integer(psb_ipk_) :: global_cols    = -1
     integer(psb_ipk_) :: local_rows     = -1
     integer(psb_ipk_) :: local_cols     = -1
-
+    
+    procedure(psb_parts), nopass, pointer  :: parts => null()
+    integer(psb_ipk_), allocatable :: tempvg(:)
+    integer(psb_ipk_), allocatable :: oracle(:,:)
+    
   contains
 
     procedure, pass(idxmap)  :: get_state => base_get_state

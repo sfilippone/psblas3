@@ -86,12 +86,6 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 
   if (allocated(desc_in%indxmap)) then 
 
-!!$    if (allocated(desc_out%indxmap)) then 
-!!$      ! This should never happen
-!!$      call desc_out%indxmap%free()
-!!$      deallocate(desc_out%indxmap)
-!!$    end if
-!!$    write(debug_unit,*) me,' ',trim(name),': Calling allocate(SOURCE = )'
 #ifdef SOURCE_WORKAROUND
     call desc_in%indxmap%clone(desc_out%indxmap,info)
 #else 

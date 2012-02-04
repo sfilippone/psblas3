@@ -144,11 +144,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   endif
-!!$  desc%matrix_data(psb_m_)        = m
-!!$  desc%matrix_data(psb_n_)        = n
-!!$  ! This has to be set BEFORE any call to SET_BLD
-!!$  desc%matrix_data(psb_ctxt_)     = ictxt
-!!$  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
@@ -181,6 +176,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   else
     if (psb_cd_choose_large_state(ictxt,m)) then 
       allocate(psb_hash_map :: desc%indxmap, stat=info)
+      if (info == 0) allocate(desc%indxmap%tempvg(m),stat=info)
+      if (info ==0) desc%indxmap%tempvg(1:m) = v(1:m) - flag_
     else 
       allocate(psb_glist_map :: desc%indxmap, stat=info)
     end if
@@ -211,10 +208,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     goto 9999
   endif
 
-!!$  ! set fields in desc%MATRIX_DATA....
-!!$  desc%matrix_data(psb_n_row_)  = loc_row
-!!$  desc%matrix_data(psb_n_col_)  = loc_row
-!!$
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
 

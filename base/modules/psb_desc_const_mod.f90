@@ -119,4 +119,12 @@ module psb_desc_const_mod
   integer(psb_ipk_), parameter :: psb_ovrlp_elem_to_=2, psb_ovrlp_elem_=0
   integer(psb_ipk_), parameter :: psb_n_dom_ovr_=1
 
+  interface 
+    subroutine psb_parts(glob_index,nrow,np,pv,nv)
+      import :: psb_ipk_
+      integer(psb_ipk_), intent (in)  :: glob_index,np,nrow
+      integer(psb_ipk_), intent (out) :: nv, pv(*)
+    end subroutine psb_parts
+  end interface
+  
 end module psb_desc_const_mod

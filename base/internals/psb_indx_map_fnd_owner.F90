@@ -70,7 +70,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
 
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
-       & last_ih, last_j, nv
+       & last_ih, last_j, nv, mglob, nresp
   integer(psb_ipk_) :: ictxt,np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
@@ -82,12 +82,13 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   ictxt   = idxmap%get_ctxt()
   icomm   = idxmap%get_mpic()
+  mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
 
-  
+
   call psb_info(ictxt, me, np)
-  
+
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -104,169 +105,197 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end if
 
   nv = size(idx)
-  !
-  ! The basic idea is very simple. 
-  ! First we collect (to all) all the requests. 
-  Allocate(hidx(np+1),hsz(np),&
-       & sdsz(0:np-1),sdidx(0:np-1),&
-       & rvsz(0:np-1),rvidx(0:np-1),&
-       & stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
-    goto 9999      
-  end if
-
-  hsz       = 0
-  hsz(me+1) = nv
-  call psb_amx(ictxt,hsz)
-  hidx(1)   = 0
-  do i=1, np
-    hidx(i+1) = hidx(i) + hsz(i)
-  end do
-  hsize = hidx(np+1)
-  Allocate(helem(hsize),hproc(hsize),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  if (gettime) then 
-    t3 = psb_wtime()
-  end if
-
-  call mpi_allgatherv(idx,hsz(me+1),psb_mpi_integer,&
-       & hproc,hsz,hidx,psb_mpi_integer,&
-       & icomm,info)
-  if (gettime) then 
-    tamx = psb_wtime() - t3
-  end if
-
-  ! Second, we figure out locally whether we own the indices (whoever is 
-  ! asking for them). 
-  if (gettime) then 
-    t3 = psb_wtime()
-  end if
-
-  call idxmap%g2l(hproc(1:hsize),helem(1:hsize),info,owned=.true.)
-  if (gettime) then 
-    tidx = psb_wtime()-t3
-  end if
-  if (info == psb_err_iarray_outside_bounds_) info = psb_success_
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_idx_cnv')
-    goto 9999      
-  end if
-
-  ! Third: we build the answers for those indices we own,
-  ! with a section for each process asking. 
-  hidx = hidx +1 
-  j    = 0
-  do ip = 0, np-1
-    sdidx(ip) = j
-    sdsz(ip)  = 0
-    do i=hidx(ip+1), hidx(ip+1+1)-1
-      if ((0 < helem(i)).and. (helem(i) <= n_row)) then 
-        j        = j + 1 
-        hproc(j) = hproc(i)
-        sdsz(ip) = sdsz(ip) + 1
-      end if
-    end do
-  end do
-
-  if (gettime) then 
-    t3 = psb_wtime()
-  end if
-
-  ! Collect all the answers with alltoallv (need sizes) 
-  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
-
-  isz = sum(rvsz) 
-
-  allocate(answers(isz,2),idxsrch(nv,2),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
-  j = 0
-  do ip=0, np-1
-    rvidx(ip) = j
-    j         = j + rvsz(ip)
-  end do
-  call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_integer,&
-       & answers(:,1),rvsz,rvidx,psb_mpi_integer,&
-       & icomm,info)
-  if (gettime) then 
-    tamx = psb_wtime() - t3 + tamx
-  end if
-  j = 1
-  do ip = 0,np-1
-    do k=1,rvsz(ip)
-      answers(j,2) = ip
-      j = j + 1 
-    end do
-  end do
-  ! Sort the answers and the requests, so we can
-  ! match them efficiently
-  call psb_msort(answers(:,1),ix=answers(:,2),&
-       & flag=psb_sort_keep_idx_)
-  idxsrch(1:nv,1) = idx(1:nv)
-  call psb_msort(idxsrch(1:nv,1),ix=idxsrch(1:nv,2))
-
-  ! Now  extract the answers for our local query
   call psb_realloc(nv,iprc,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
-  last_ih = -1 
-  last_j  = -1
-  j = 1
-  do i=1, nv 
-    ih = idxsrch(i,1)
-    if (ih == last_ih) then 
-      iprc(idxsrch(i,2)) = answers(last_j,2)
-    else
 
-      do
-        if (j > size(answers,1)) then 
-          ! Last resort attempt.
-          j = psb_ibsrch(ih,size(answers,1),answers(:,1))
-          if (j == -1) then 
-            write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
-                 & 'not found : ',size(answers,1),':',answers(:,1)
-            info = psb_err_internal_error_
-            call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
-            goto 9999      
-          end if
-        end if
-        if (answers(j,1) == ih) exit
-        if (answers(j,1) > ih) then 
-          k = j 
-          j = psb_ibsrch(ih,k,answers(1:k,1))
-          if (j == -1) then 
-            write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
-                 & 'not found : ',size(answers,1),':',answers(:,1)
-            info = psb_err_internal_error_
-            call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
-            goto 9999      
-          end if
-        end if
-
-        j = j + 1 
-      end do
-      ! Note that the answers here are given in order
-      ! of sending process, so we are implicitly getting
-      ! the max process index in case of overlap. 
-      last_ih = ih 
-      do 
-        last_j = j 
-        iprc(idxsrch(i,2)) = answers(j,2)
-        j = j + 1 
-        if (j > size(answers,1)) exit
-        if (answers(j,1) /= ih) exit
-      end do
+  if (associated(idxmap%parts)) then 
+    ! Use function shortcut
+!!$    write(0,*) me,trim(name),' indxmap%parts shortcut'
+    Allocate(hidx(np), stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+      goto 9999      
     end if
-  end do
+    do i=1, nv
+      call idxmap%parts(idx(i),mglob,np,hidx,nresp)
+      if (nresp > 0) then
+        iprc(i) = hidx(1)
+      else
+        iprc(i) = -1 
+      end if
+    end do
+
+  else if (allocated(idxmap%tempvg)) then 
+!!$    write(0,*) me,trim(name),' indxmap%tempvg shortcut'
+    ! Use temporary vector 
+    do i=1, nv 
+      iprc(i) = idxmap%tempvg(idx(i))
+    end do
+
+  else
+
+    !
+    ! The basic idea is very simple. 
+    ! First we collect (to all) all the requests. 
+    Allocate(hidx(np+1),hsz(np),&
+         & sdsz(0:np-1),sdidx(0:np-1),&
+         & rvsz(0:np-1),rvidx(0:np-1),&
+         & stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
+      goto 9999      
+    end if
+
+    hsz       = 0
+    hsz(me+1) = nv
+    call psb_amx(ictxt,hsz)
+    hidx(1)   = 0
+    do i=1, np
+      hidx(i+1) = hidx(i) + hsz(i)
+    end do
+    hsize = hidx(np+1)
+    Allocate(helem(hsize),hproc(hsize),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
+
+    if (gettime) then 
+      t3 = psb_wtime()
+    end if
+
+    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_integer,&
+         & hproc,hsz,hidx,psb_mpi_integer,&
+         & icomm,info)
+    if (gettime) then 
+      tamx = psb_wtime() - t3
+    end if
+
+    ! Second, we figure out locally whether we own the indices (whoever is 
+    ! asking for them). 
+    if (gettime) then 
+      t3 = psb_wtime()
+    end if
+
+    call idxmap%g2l(hproc(1:hsize),helem(1:hsize),info,owned=.true.)
+    if (gettime) then 
+      tidx = psb_wtime()-t3
+    end if
+    if (info == psb_err_iarray_outside_bounds_) info = psb_success_
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_idx_cnv')
+      goto 9999      
+    end if
+
+    ! Third: we build the answers for those indices we own,
+    ! with a section for each process asking. 
+    hidx = hidx +1 
+    j    = 0
+    do ip = 0, np-1
+      sdidx(ip) = j
+      sdsz(ip)  = 0
+      do i=hidx(ip+1), hidx(ip+1+1)-1
+        if ((0 < helem(i)).and. (helem(i) <= n_row)) then 
+          j        = j + 1 
+          hproc(j) = hproc(i)
+          sdsz(ip) = sdsz(ip) + 1
+        end if
+      end do
+    end do
+
+    if (gettime) then 
+      t3 = psb_wtime()
+    end if
+
+    ! Collect all the answers with alltoallv (need sizes) 
+    call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
+
+    isz = sum(rvsz) 
+
+    allocate(answers(isz,2),idxsrch(nv,2),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
+    j = 0
+    do ip=0, np-1
+      rvidx(ip) = j
+      j         = j + rvsz(ip)
+    end do
+    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_integer,&
+         & answers(:,1),rvsz,rvidx,psb_mpi_integer,&
+         & icomm,info)
+    if (gettime) then 
+      tamx = psb_wtime() - t3 + tamx
+    end if
+    j = 1
+    do ip = 0,np-1
+      do k=1,rvsz(ip)
+        answers(j,2) = ip
+        j = j + 1 
+      end do
+    end do
+    ! Sort the answers and the requests, so we can
+    ! match them efficiently
+    call psb_msort(answers(:,1),ix=answers(:,2),&
+         & flag=psb_sort_keep_idx_)
+    idxsrch(1:nv,1) = idx(1:nv)
+    call psb_msort(idxsrch(1:nv,1),ix=idxsrch(1:nv,2))
+
+    ! Now  extract the answers for our local query
+    last_ih = -1 
+    last_j  = -1
+    j = 1
+    do i=1, nv 
+      ih = idxsrch(i,1)
+      if (ih == last_ih) then 
+        iprc(idxsrch(i,2)) = answers(last_j,2)
+      else
+
+        do
+          if (j > size(answers,1)) then 
+            ! Last resort attempt.
+            j = psb_ibsrch(ih,size(answers,1),answers(:,1))
+            if (j == -1) then 
+              write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
+                   & 'not found : ',size(answers,1),':',answers(:,1)
+              info = psb_err_internal_error_
+              call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
+              goto 9999      
+            end if
+          end if
+          if (answers(j,1) == ih) exit
+          if (answers(j,1) > ih) then 
+            k = j 
+            j = psb_ibsrch(ih,k,answers(1:k,1))
+            if (j == -1) then 
+              write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
+                   & 'not found : ',size(answers,1),':',answers(:,1)
+              info = psb_err_internal_error_
+              call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
+              goto 9999      
+            end if
+          end if
+
+          j = j + 1 
+        end do
+        ! Note that the answers here are given in order
+        ! of sending process, so we are implicitly getting
+        ! the max process index in case of overlap. 
+        last_ih = ih 
+        do 
+          last_j = j 
+          iprc(idxsrch(i,2)) = answers(j,2)
+          j = j + 1 
+          if (j > size(answers,1)) exit
+          if (answers(j,1) /= ih) exit
+        end do
+      end if
+    end do
+  end if
 
   if (gettime) then 
     call psb_barrier(ictxt)
