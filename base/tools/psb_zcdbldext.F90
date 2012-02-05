@@ -94,7 +94,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer(psb_ipk_), allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   integer(psb_ipk_),allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
-  integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
+  integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
@@ -467,7 +467,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
       !       
-      call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,psb_mpi_integer,icomm,minfo)
+      call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoall')

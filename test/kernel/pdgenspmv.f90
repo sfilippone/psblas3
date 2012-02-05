@@ -157,7 +157,6 @@ program pdgen
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   do i=1,times 
-    write(0,*) 'Iteration ',i,' of ',times
     call psb_spmm(done,a,xxv,dzero,bv,desc_a,info,'n')
   end do
   call psb_barrier(ictxt)

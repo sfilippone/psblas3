@@ -499,12 +499,12 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
     call psb_errpush(info,name)
   end if
 
-  err=info
+  err = info
   call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
+  if (err /= 0) goto 9999
 
-  if(present(alpha)) then
-    if(alpha /= done) then
+  if (present(alpha)) then
+    if (alpha /= done) then
       call x%scal(alpha)
     end if
   end if
