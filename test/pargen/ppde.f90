@@ -102,7 +102,7 @@ program ppde
   
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
-  write(0,*) 'Fromt init/info',iam,np
+
   if (iam < 0) then 
     ! This should not happen, but just in case
     call psb_exit(ictxt)
