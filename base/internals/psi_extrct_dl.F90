@@ -271,8 +271,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     goto 9999
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-  call mpi_allgather(itmp,dl_lda,psb_mpi_integer,&
-       & dep_list,dl_lda,psb_mpi_integer,icomm,info)
+  call mpi_allgather(itmp,dl_lda,psb_mpi_ipk_integer,&
+       & dep_list,dl_lda,psb_mpi_ipk_integer,icomm,info)
   deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_

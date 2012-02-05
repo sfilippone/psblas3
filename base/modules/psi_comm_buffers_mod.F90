@@ -5,15 +5,15 @@ module mpi
   integer(psb_mpik_), parameter :: mpi_success          = 0
   integer(psb_mpik_), parameter :: mpi_request_null     = 0
   integer(psb_mpik_), parameter :: mpi_status_size      = 1
-  integer(psb_mpik_), parameter :: mpi_integer          = 1
-  integer(psb_mpik_), parameter :: mpi_integer8         = 2
+  integer(psb_mpik_), parameter :: psb_mpi_def_integer          = 1
+  integer(psb_mpik_), parameter :: psb_mpi_lng_integer         = 2
   integer(psb_mpik_), parameter :: mpi_real             = 3
   integer(psb_mpik_), parameter :: mpi_double_precision = 4
   integer(psb_mpik_), parameter :: mpi_complex          = 5   
   integer(psb_mpik_), parameter :: mpi_double_complex   = 6 
   integer(psb_mpik_), parameter :: mpi_character        = 7
   integer(psb_mpik_), parameter :: mpi_logical          = 8
-  integer(psb_mpik_), parameter :: mpi_integer2         = 9
+  integer(psb_mpik_), parameter :: psb_mpi_def_integer2         = 9
   integer(psb_mpik_), parameter :: mpi_comm_null        = -1
   integer(psb_mpik_), parameter :: mpi_comm_world       = 1
   
@@ -257,7 +257,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_integer,&
+    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_ipk_integer,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -294,7 +294,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int8buf,size(node%int8buf),mpi_integer8,&
+    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_lng_integer,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -332,7 +332,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int2buf,size(node%int2buf),mpi_integer2,&
+    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_def_integer2,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)

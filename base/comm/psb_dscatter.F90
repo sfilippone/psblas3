@@ -169,8 +169,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     end do
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
-    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
-         & 1,psb_mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
+         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     if (me == root) then
       displ(1)=0
@@ -190,8 +190,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
 
 
     do c=1, k
@@ -383,8 +383,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
 
-    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
-         & 1,psb_mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
+         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     if(me == root) then
       displ(1)=0
@@ -401,8 +401,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (me == root) then

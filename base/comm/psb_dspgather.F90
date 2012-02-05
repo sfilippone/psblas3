@@ -73,12 +73,12 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call mpi_allgatherv(loc_coo%val,ndx,mpi_complex,&
          & glob_coo%val,nzbr,idisp,&
          & mpi_complex,icomm,minfo)
-    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_integer,&
+    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_integer,icomm,minfo)
-    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_integer,&
+         & psb_mpi_ipk_integer,icomm,minfo)
+    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_integer,icomm,minfo)
+         & psb_mpi_ipk_integer,icomm,minfo)
     
     if (minfo /= psb_success_) then 
       info  = minfo

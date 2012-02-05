@@ -60,7 +60,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_integer,root_,ictxt,info)
+    call mpi_bcast(dat,1,psb_mpi_ipk_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcasts
 
@@ -85,7 +85,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcastv
 
@@ -111,7 +111,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcastm
 
@@ -577,7 +577,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,mpi_integer8,root_,ictxt,info)
+    call mpi_bcast(dat,1,psb_mpi_lng_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcasts
 
@@ -602,7 +602,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcastv
 
@@ -628,7 +628,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),mpi_integer8,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcastm
 

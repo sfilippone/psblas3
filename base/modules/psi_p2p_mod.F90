@@ -847,7 +847,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_integer,src,psb_int_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_ircvs
@@ -870,7 +870,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_integer,src,psb_int_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -901,13 +901,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,psb_mpi_integer,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_ipk_integer,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_integer,src,psb_int_tag,ictxt,status,info)
+      call mpi_recv(dat,size(dat),psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
       write(psb_err_unit,*) 'Error in psb_recv', info
@@ -1403,7 +1403,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_integer8,src,psb_int8_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_lng_integer,src,psb_int8_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_i8rcvs
@@ -1425,7 +1425,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_integer8,src,psb_int8_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_lng_integer,src,psb_int8_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1455,13 +1455,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_integer8,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_lng_integer,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int8_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_integer8,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_lng_integer,src,&
            & psb_int8_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1492,7 +1492,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_integer2,src,psb_int2_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_def_integer2,src,psb_int2_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_i2rcvs
@@ -1514,7 +1514,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_integer2,src,psb_int2_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_def_integer2,src,psb_int2_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1544,13 +1544,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_integer2,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_def_integer2,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int2_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_integer2,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_def_integer2,src,&
            & psb_int2_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 

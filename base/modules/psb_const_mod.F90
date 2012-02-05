@@ -34,14 +34,14 @@ module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
 #endif
-  ! This is the default integer
+  ! This is the default PSBLAS integer, can be 4 or 8 bytes.
 #if defined(LONG_INTEGERS)
   integer, parameter  :: ndig=12
 #else  
   integer, parameter  :: ndig=8
 #endif
   integer, parameter  :: psb_ipk_ = selected_int_kind(ndig)
-  ! This is an 8-byte  integer, and normally different from default integer. 
+  ! This is always an 8-byte  integer.
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   ! This is always a 4-byte integer, for MPI-related stuff
@@ -55,7 +55,12 @@ module psb_const_mod
   integer(psb_ipk_), parameter  :: psb_spk_ = kind(1.e0)
   integer(psb_ipk_), save       :: psb_sizeof_dp, psb_sizeof_sp
   integer(psb_ipk_), save       :: psb_sizeof_int, psb_sizeof_long_int
-  integer(psb_mpik_), save      :: psb_mpi_integer
+  !
+  ! Integer type identifiers for MPI operations. 
+  !
+  integer(psb_mpik_), save      :: psb_mpi_ipk_integer
+  integer(psb_mpik_), save      :: psb_mpi_def_integer
+  integer(psb_mpik_), save      :: psb_mpi_lng_integer
   ! 
   ! Version
   !

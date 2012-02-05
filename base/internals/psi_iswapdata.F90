@@ -302,8 +302,8 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & psb_mpi_integer,rcvbuf,rvsz,&
-         & brvidx,psb_mpi_integer,icomm,iret)
+         & psb_mpi_ipk_integer,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_ipk_integer,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -363,7 +363,7 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
-             & psb_mpi_integer,prcid(i),&
+             & psb_mpi_ipk_integer,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -388,11 +388,11 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),n*nesd,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
              & p2ptag,icomm,iret)
         end if
 
@@ -801,8 +801,8 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & psb_mpi_integer,rcvbuf,rvsz,&
-         & brvidx,psb_mpi_integer,icomm,iret)
+         & psb_mpi_ipk_integer,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_ipk_integer,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -859,7 +859,7 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-             & psb_mpi_integer,prcid(i),&
+             & psb_mpi_ipk_integer,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -884,11 +884,11 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),nesd,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
@@ -1238,8 +1238,8 @@ end subroutine psi_iswapidxv
 !!$
 !!$    ! swap elements using mpi_alltoallv
 !!$    call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-!!$         & psb_mpi_integer,rcvbuf,rvsz,&
-!!$         & brvidx,psb_mpi_integer,icomm,iret)
+!!$         & psb_mpi_ipk_integer,rcvbuf,rvsz,&
+!!$         & brvidx,psb_mpi_ipk_integer,icomm,iret)
 !!$    if(iret /= mpi_success) then
 !!$      ierr(1) = iret
 !!$      info=psb_err_mpi_error_
@@ -1296,7 +1296,7 @@ end subroutine psi_iswapidxv
 !!$      if ((nerv>0).and.(proc_to_comm /= me)) then 
 !!$        p2ptag = psb_int_swap_tag
 !!$        call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-!!$             & psb_mpi_integer,prcid(i),&
+!!$             & psb_mpi_ipk_integer,prcid(i),&
 !!$             & p2ptag, icomm,rvhd(i),iret)
 !!$      end if
 !!$      rcv_pt = rcv_pt + nerv
@@ -1321,11 +1321,11 @@ end subroutine psi_iswapidxv
 !!$      if ((nesd>0).and.(proc_to_comm /= me)) then 
 !!$        if (usersend) then 
 !!$          call mpi_rsend(sndbuf(snd_pt),nesd,&
-!!$               & psb_mpi_integer,prcid(i),&
+!!$               & psb_mpi_ipk_integer,prcid(i),&
 !!$               & p2ptag,icomm,iret)
 !!$        else
 !!$          call mpi_send(sndbuf(snd_pt),nesd,&
-!!$               & psb_mpi_integer,prcid(i),&
+!!$               & psb_mpi_ipk_integer,prcid(i),&
 !!$               & p2ptag,icomm,iret)
 !!$        end if
 !!$

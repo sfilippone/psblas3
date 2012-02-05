@@ -134,8 +134,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     t3 = psb_wtime()
   end if
 
-  call mpi_allgatherv(idx,hsz(me+1),psb_mpi_integer,&
-       & hproc,hsz,hidx,psb_mpi_integer,&
+  call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_integer,&
+       & hproc,hsz,hidx,psb_mpi_ipk_integer,&
        & icomm,info)
   if (gettime) then 
     tamx = psb_wtime() - t3
@@ -178,7 +178,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end if
 
   ! Collect all the answers with alltoallv (need sizes) 
-  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_ipk_integer,rvsz,1,psb_mpi_def_integer,icomm,info)
 
   isz = sum(rvsz) 
 
@@ -192,8 +192,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     rvidx(ip) = j
     j         = j + rvsz(ip)
   end do
-  call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_integer,&
-       & answers(:,1),rvsz,rvidx,psb_mpi_integer,&
+  call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_integer,&
+       & answers(:,1),rvsz,rvidx,psb_mpi_ipk_integer,&
        & icomm,info)
   if (gettime) then 
     tamx = psb_wtime() - t3 + tamx

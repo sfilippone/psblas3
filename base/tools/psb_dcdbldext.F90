@@ -467,7 +467,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
       !       
-      call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,minfo)
+      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoall')
@@ -502,8 +502,8 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
         lworkr = max(iszr,1)
       end if
 
-      call mpi_alltoallv(works,sdsz,bsdindx,psb_mpi_integer,&
-           & workr,rvsz,brvindx,psb_mpi_integer,icomm,minfo)
+      call mpi_alltoallv(works,sdsz,bsdindx,psb_mpi_ipk_integer,&
+           & workr,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoallv')

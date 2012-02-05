@@ -109,10 +109,13 @@ contains
     integer(psb_mpik_) :: info
 
 #if defined(LONG_INTEGERS)
-    psb_mpi_integer = mpi_integer8
+    psb_mpi_ipk_integer = mpi_integer8
 #else
-    psb_mpi_integer = mpi_integer
+    psb_mpi_ipk_integer = mpi_integer
 #endif
+    psb_mpi_def_integer = mpi_integer
+    psb_mpi_lng_integer = mpi_integer8
+
 
 #if defined(SERIAL_MPI)
 #else 
@@ -495,6 +498,8 @@ contains
   !
   ! Base binary  operations
   !
+  ! Note: len & type are always default integer.
+  !
   ! !!!!!!!!!!!!!!!!!!!!!!
   subroutine psi_iamx_op(inv, outv,len,type) 
     integer(psb_ipk_) :: inv(*),outv(*)
@@ -536,7 +541,7 @@ contains
     integer(psb_long_int_k_) :: inv(*),outv(*)
     integer(psb_mpik_) :: len,type
     integer(psb_mpik_) :: i
-    if (type /= mpi_integer8) then 
+    if (type /= psb_mpi_lng_integer) then 
       write(psb_err_unit,*) 'Invalid type !!!'
     end if
     do i=1, len
