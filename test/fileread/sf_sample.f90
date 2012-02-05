@@ -93,7 +93,7 @@ program sf_sample
   name='sf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -143,7 +143,7 @@ program sf_sample
 !!$    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)

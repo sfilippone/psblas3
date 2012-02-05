@@ -93,8 +93,8 @@ program df_sample
   name='df_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
-  call psb_cd_set_large_threshold(2)
+  call psb_set_errverbosity(itwo)
+  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -141,10 +141,10 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_amd_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
