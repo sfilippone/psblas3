@@ -4,7 +4,6 @@ subroutine psb_errcomm(ictxt, err)
   use psb_penv_mod
   integer(psb_mpik_), intent(in)   :: ictxt
   integer(psb_ipk_), intent(inout):: err
-  integer(psb_ipk_) :: temp(2)
   
   call psb_amx(ictxt, err)
 

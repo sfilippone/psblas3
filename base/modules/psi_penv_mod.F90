@@ -137,23 +137,30 @@ contains
 #if defined(LONG_INTEGERS)
   subroutine psb_init_ipk(ictxt,np,basectxt,ids)
     integer(psb_ipk_), intent(out) :: ictxt
-    integer(psb_ipk_), intent(in), optional :: np, basectxt
+    integer(psb_ipk_), intent(in), optional :: np, basectxt, ids(:)
 
     integer(psb_mpik_) :: iictxt
     integer(psb_mpik_) :: inp, ibasectxt
-    
+    integer(psb_mpik_), allocatable :: ids_(:)
+
+    if (present(ids)) then 
+      allocate(ids_(size(ids)))
+      ids_ = ids
+    else
+      allocate(ids_(0))
+    end if
     if (present(np).and.present(basectxt)) then 
       inp       = np
       ibasectxt = basectxt
-      call psb_init(iictxt,np=inp,basectxt=ibasectxt)
+      call psb_init(iictxt,np=inp,basectxt=ibasectxt,ids=ids_)
     else if (present(np)) then 
       inp       = np
-      call psb_init(iictxt,np=inp)
+      call psb_init(iictxt,np=inp,ids=ids_)
     else if (present(basectxt)) then 
       ibasectxt = basectxt
-      call psb_init(iictxt,basectxt=ibasectxt)
+      call psb_init(iictxt,basectxt=ibasectxt,ids=ids_)
     else
-      call psb_init(iictxt)
+      call psb_init(iictxt,ids=ids_)
     end if
     ictxt = iictxt
   end subroutine psb_init_ipk
@@ -491,8 +498,8 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!
   subroutine psi_iamx_op(inv, outv,len,type) 
     integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_ipk_) :: len,type
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -501,8 +508,8 @@ contains
 
   subroutine psi_iamn_op(inv, outv,len,type) 
     integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_ipk_) :: len,type
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
@@ -510,8 +517,8 @@ contains
 
   subroutine psi_i8amx_op(inv, outv,len,type) 
     integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer(psb_ipk_) :: len,type
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -527,8 +534,8 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer(psb_ipk_) :: len,type
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
     if (type /= mpi_integer8) then 
       write(psb_err_unit,*) 'Invalid type !!!'
     end if
@@ -538,88 +545,88 @@ contains
   end subroutine psi_i8amn_op
 
   subroutine psi_samx_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samx_op
 
   subroutine psi_samn_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samn_op
 
   subroutine psi_damx_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damx_op
 
   subroutine psi_damn_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damn_op
 
   subroutine psi_camx_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camx_op
 
   subroutine psi_camn_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camn_op
 
   subroutine psi_zamx_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_zamx_op
 
   subroutine psi_zamn_op(vin,vinout,len,itype)
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
@@ -627,11 +634,11 @@ contains
 
   subroutine psi_snrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     real(psb_spk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )
@@ -646,11 +653,11 @@ contains
 
   subroutine psi_dnrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer(psb_ipk_), intent(in)           :: len, itype
+    integer(psb_mpik_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_ipk_) :: i
+    integer(psb_mpik_) :: i
     real(psb_dpk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )

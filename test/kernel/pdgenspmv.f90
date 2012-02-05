@@ -152,12 +152,12 @@ program pdgen
     call psb_abort(ictxt)
   end if
 
-
   call xxv%set(done)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   do i=1,times 
+    write(0,*) 'Iteration ',i,' of ',times
     call psb_spmm(done,a,xxv,dzero,bv,desc_a,info,'n')
   end do
   call psb_barrier(ictxt)
@@ -380,6 +380,7 @@ contains
 
     nt = nr
     call psb_sum(ictxt,nt) 
+    write(0,*) iam,' Going to generate ',nt
     if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
     call psb_barrier(ictxt)
     t0 = psb_wtime()
@@ -392,6 +393,7 @@ contains
     call psb_barrier(ictxt)
     talc = psb_wtime()-t0
 
+    write(0,*) iam,' Done allocation'
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='allocation rout.'
@@ -417,7 +419,7 @@ contains
 
 
     call psb_loc_to_glob(myidx,desc_a,info)
-
+    write(0,*) iam,' Done loc_to_glob'
     ! loop over rows belonging to current process in a block
     ! distribution.
 
@@ -426,6 +428,7 @@ contains
     do ii=1, nlr,nb
       ib = min(nb,nlr-ii+1) 
       element = 1
+      write(0,*) iam,' iteration ',ii
       do k=1,ib
         i=ii+k-1
         ! local matrix pointer 
@@ -528,7 +531,7 @@ contains
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xxv,desc_a,info)
       if(info /= psb_success_) exit
     end do
-
+    write(0,*) iam,' end loop'
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -538,10 +541,11 @@ contains
     end if
 
     deallocate(val,irow,icol)
-
+    write(0,*) iam,' Going for cdasb'
     call psb_barrier(ictxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
+    write(0,*) iam,' Done cdasb'
     if (info == psb_success_) &
          & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
@@ -551,6 +555,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    write(0,*) iam,' Done cdasb/spasb'
     if (info == psb_success_) call psb_geasb(xxv,desc_a,info)
     if (info == psb_success_) call psb_geasb(bv,desc_a,info)
     if(info /= psb_success_) then

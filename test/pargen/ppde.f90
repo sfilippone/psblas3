@@ -92,7 +92,6 @@ program ppde
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
-  integer(psb_mpik_) :: iict
   ! other variables
   integer(psb_ipk_) :: info, i
   character(len=20)  :: name,ch_err
@@ -101,8 +100,7 @@ program ppde
   info=psb_success_
 
   
-  call psb_init(iict)
-  ictxt = iict
+  call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
   write(0,*) 'Fromt init/info',iam,np
   if (iam < 0) then 
