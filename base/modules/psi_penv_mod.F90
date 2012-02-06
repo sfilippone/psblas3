@@ -56,6 +56,7 @@ module psi_penv_mod
 #else 
 
   integer(psb_mpik_), save :: mpi_iamx_op, mpi_iamn_op
+  integer(psb_mpik_), save :: mpi_i4amx_op, mpi_i4amn_op
   integer(psb_mpik_), save :: mpi_i8amx_op, mpi_i8amn_op
   integer(psb_mpik_), save :: mpi_samx_op, mpi_samn_op
   integer(psb_mpik_), save :: mpi_damx_op, mpi_damn_op
@@ -69,6 +70,7 @@ module psi_penv_mod
 
   private :: psi_get_sizes,  psi_register_mpi_extras
   private :: psi_iamx_op, psi_iamn_op 
+  private :: psi_i4amx_op, psi_i4amn_op 
   private :: psi_i8amx_op, psi_i8amn_op 
   private :: psi_samx_op, psi_samn_op 
   private :: psi_damx_op, psi_damn_op 
@@ -121,6 +123,8 @@ contains
 #else 
     if (info == 0) call mpi_op_create(psi_iamx_op,.true.,mpi_iamx_op,info)
     if (info == 0) call mpi_op_create(psi_iamn_op,.true.,mpi_iamn_op,info)
+    if (info == 0) call mpi_op_create(psi_i4amx_op,.true.,mpi_i4amx_op,info)
+    if (info == 0) call mpi_op_create(psi_i4amn_op,.true.,mpi_i4amn_op,info)
     if (info == 0) call mpi_op_create(psi_i8amx_op,.true.,mpi_i8amx_op,info)
     if (info == 0) call mpi_op_create(psi_i8amn_op,.true.,mpi_i8amn_op,info)
     if (info == 0) call mpi_op_create(psi_samx_op,.true.,mpi_samx_op,info)
@@ -520,6 +524,26 @@ contains
     end do
   end subroutine psi_iamn_op
 
+  subroutine psi_i4amx_op(inv, outv,len,type) 
+    integer(psb_mpik_) :: inv(*),outv(*)
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i4amx_op
+
+  subroutine psi_i4amn_op(inv, outv,len,type) 
+    integer(psb_mpik_) :: inv(*),outv(*)
+    integer(psb_mpik_) :: len,type
+    integer(psb_mpik_) :: i
+
+    do i=1, len
+      if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
+    end do
+  end subroutine psi_i4amn_op
+
   subroutine psi_i8amx_op(inv, outv,len,type) 
     integer(psb_long_int_k_) :: inv(*),outv(*)
     integer(psb_mpik_) :: len,type
@@ -531,19 +555,10 @@ contains
   end subroutine psi_i8amx_op
 
   subroutine psi_i8amn_op(inv, outv,len,type) 
-#ifdef MPI_MOD
-    use mpi
-#endif
-    implicit none 
-#ifdef MPI_H
-    include 'mpif.h'
-#endif
     integer(psb_long_int_k_) :: inv(*),outv(*)
     integer(psb_mpik_) :: len,type
     integer(psb_mpik_) :: i
-    if (type /= psb_mpi_lng_integer) then 
-      write(psb_err_unit,*) 'Invalid type !!!'
-    end if
+
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
