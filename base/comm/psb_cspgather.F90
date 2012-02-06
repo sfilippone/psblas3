@@ -22,7 +22,7 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k
   logical :: keepnum_, keeploc_
-  integer(psb_ipk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit

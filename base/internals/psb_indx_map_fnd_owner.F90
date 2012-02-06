@@ -66,12 +66,14 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), intent(out) :: info
 
 
-  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
-
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
+  integer(psb_ipk_), allocatable :: helem(:),hproc(:),&
+       & answers(:,:),idxsrch(:,:)
+  integer(psb_mpik_), allocatable :: hsz(:),hidx(:), &
+       & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
+  integer(psb_mpik_) :: icomm, minfo
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,hsize,ip,isz,k,j,&
        & last_ih, last_j, nv
-  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_mpik_) :: ictxt,np,me
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -136,7 +138,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
   call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_integer,&
        & hproc,hsz,hidx,psb_mpi_ipk_integer,&
-       & icomm,info)
+       & icomm,minfo)
   if (gettime) then 
     tamx = psb_wtime() - t3
   end if
@@ -178,7 +180,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end if
 
   ! Collect all the answers with alltoallv (need sizes) 
-  call mpi_alltoall(sdsz,1,psb_mpi_ipk_integer,rvsz,1,psb_mpi_def_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,&
+       & rvsz,1,psb_mpi_def_integer,icomm,minfo)
 
   isz = sum(rvsz) 
 
@@ -194,7 +197,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   end do
   call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_integer,&
        & answers(:,1),rvsz,rvidx,psb_mpi_ipk_integer,&
-       & icomm,info)
+       & icomm,minfo)
   if (gettime) then 
     tamx = psb_wtime() - t3 + tamx
   end if
