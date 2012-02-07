@@ -24,6 +24,16 @@ module psi_p2p_mod
   end interface
 
 
+#if defined(LONG_INTEGERS)
+  interface psb_snd
+    module procedure psb_i4snds, psb_i4sndv, psb_i4sndm
+  end interface
+
+  interface psb_rcv
+    module procedure psb_i4rcvs, psb_i4rcvv, psb_i4rcvm
+  end interface
+#endif
+
 #if !defined(LONG_INTEGERS)
   interface psb_snd
     module procedure psb_i8snds, psb_i8sndv, psb_i8sndm
@@ -77,6 +87,7 @@ module psi_p2p_mod
   integer(psb_mpik_), private, parameter:: psb_char_tag     = psb_logical_tag  + 1
   integer(psb_mpik_), private, parameter:: psb_int8_tag     = psb_char_tag     + 1
   integer(psb_mpik_), private, parameter:: psb_int2_tag     = psb_int8_tag     + 1
+  integer(psb_mpik_), private, parameter:: psb_int4_tag     = psb_int2_tag     + 1
 
   integer(psb_mpik_),  parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
   integer(psb_mpik_),  parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
@@ -87,6 +98,7 @@ module psi_p2p_mod
   integer(psb_mpik_),  parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
   integer(psb_mpik_),  parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
   integer(psb_mpik_),  parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
+  integer(psb_mpik_),  parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
 
 
 contains
@@ -644,6 +656,96 @@ contains
     call psi_snd(ictxt,psb_char_tag,dst,dat_,psb_mesg_queue)
 #endif    
   end subroutine psb_hsnds
+
+#if defined(LONG_INTEGERS)
+  subroutine psb_i4snds(ictxt,dat,dst)
+    use psi_comm_buffers_mod 
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(in)  :: dat
+    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpik_), allocatable :: dat_(:)
+    integer(psb_mpik_) :: info 
+#if defined(SERIAL_MPI) 
+    ! do nothing
+#else
+    allocate(dat_(1), stat=info)
+    dat_(1) = dat
+    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+#endif    
+  end subroutine psb_i4snds
+
+  subroutine psb_i4sndv(ictxt,dat,dst)
+    use psi_comm_buffers_mod 
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(in)  :: dat(:)
+    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpik_), allocatable :: dat_(:)
+    integer(psb_mpik_) :: info 
+
+#if defined(SERIAL_MPI) 
+#else
+    allocate(dat_(size(dat)), stat=info)
+    dat_(:) = dat(:)
+    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+#endif    
+
+  end subroutine psb_i4sndv
+
+  subroutine psb_i4sndm(ictxt,dat,dst,m)
+    use psi_comm_buffers_mod 
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(in)  :: dat(:,:)
+    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpik_), intent(in), optional :: m
+    integer(psb_mpik_), allocatable :: dat_(:)
+    integer(psb_mpik_) :: info 
+    integer(psb_mpik_) :: i,j,k,m_,n_
+
+#if defined(SERIAL_MPI) 
+#else
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    end if
+    n_ = size(dat,2)
+    allocate(dat_(m_*n_), stat=info)
+    k=1
+    do j=1,n_
+      do i=1, m_
+        dat_(k) = dat(i,j)
+        k = k + 1
+      end do
+    end do
+    call psi_snd(ictxt,psb_int4_tag,dst,dat_,psb_mesg_queue)
+#endif    
+  end subroutine psb_i4sndm
+
+#endif
+
 
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8snds(ictxt,dat,dst)
@@ -1383,6 +1485,95 @@ contains
 #endif    
   end subroutine psb_hrcvs
 
+
+#if defined(LONG_INTEGERS)
+
+  subroutine psb_i4rcvs(ictxt,dat,src)
+    use psi_comm_buffers_mod 
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(out)  :: dat
+    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpik_) :: info 
+    integer(psb_mpik_) :: status(mpi_status_size)
+#if defined(SERIAL_MPI) 
+    ! do nothing
+#else
+    call mpi_recv(dat,1,psb_mpi_def_integer,src,psb_int4_tag,ictxt,status,info)
+    call psb_test_nodes(psb_mesg_queue)
+#endif    
+  end subroutine psb_i4rcvs
+
+  subroutine psb_i4rcvv(ictxt,dat,src)
+    use psi_comm_buffers_mod 
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(out)  :: dat(:)
+    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpik_) :: info 
+    integer(psb_mpik_) :: status(mpi_status_size)
+#if defined(SERIAL_MPI) 
+#else
+    call mpi_recv(dat,size(dat),psb_mpi_def_integer,src,psb_int4_tag,ictxt,status,info)
+    call psb_test_nodes(psb_mesg_queue)
+#endif    
+
+  end subroutine psb_i4rcvv
+
+  subroutine psb_i4rcvm(ictxt,dat,src,m)
+    use psi_comm_buffers_mod 
+
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpik_), intent(out)  :: dat(:,:)
+    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpik_), intent(in), optional :: m
+    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpik_) :: i,j,k
+    integer(psb_mpik_) :: status(mpi_status_size)
+#if defined(SERIAL_MPI) 
+    ! What should we do here?? 
+#else
+    if (present(m)) then 
+      m_ = m
+      ld = size(dat,1)
+      n_ = size(dat,2)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_def_integer,mp_rcv_type,info)
+      if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
+      if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
+           & psb_int4_tag,ictxt,status,info)
+      if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
+    else
+      call mpi_recv(dat,size(dat),psb_mpi_def_integer,src,&
+           & psb_int4_tag,ictxt,status,info)
+    end if
+    if (info /= mpi_success) then 
+      write(psb_err_unit,*) 'Error in psb_recv', info
+    end if
+    call psb_test_nodes(psb_mesg_queue)
+#endif    
+  end subroutine psb_i4rcvm
+
+#endif
 
 #if !defined(LONG_INTEGERS)
 
