@@ -47,6 +47,7 @@ module psb_z_prec_type
     procedure, pass(prec)               :: psb_z_apply1v
     generic, public                     :: apply => psb_z_apply2v, psb_z_apply1v,&
          & psb_z_apply1_vect, psb_z_apply2_vect
+    procedure, pass(prec)               :: sizeof => psb_zprec_sizeof
   end type psb_zprec_type
 
   interface psb_precfree
@@ -195,9 +196,9 @@ contains
     type(psb_zprec_type), intent(inout) :: p
 
   end subroutine psb_nullify_cprec
-
+  
   function psb_zprec_sizeof(prec) result(val)
-    type(psb_zprec_type), intent(in) :: prec
+    class(psb_zprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer(psb_ipk_) :: i
     

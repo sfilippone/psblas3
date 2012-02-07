@@ -259,9 +259,9 @@ program zf_sample
   resmx  = psb_genrm2(r_col,desc_a,info)
   resmxp = psb_geamax(r_col,desc_a,info)
 
-  amatsize = psb_sizeof(a)
-  descsize = psb_sizeof(desc_a)
-  precsize = psb_sizeof(prec)
+  amatsize = a%sizeof()
+  descsize = desc_a%sizeof()
+  precsize = prec%sizeof()
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)

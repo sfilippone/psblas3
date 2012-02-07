@@ -195,9 +195,9 @@ program ppde
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
-  amatsize = psb_sizeof(a)
-  descsize = psb_sizeof(desc_a)
-  precsize = psb_sizeof(prec)
+  amatsize = a%sizeof()
+  descsize = desc_a%sizeof()
+  precsize = prec%sizeof()
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
