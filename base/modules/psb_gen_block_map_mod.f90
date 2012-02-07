@@ -660,7 +660,7 @@ contains
     call psb_realloc(nhal,2,idxmap%srt_l2g,info)
     idxmap%srt_l2g(1:nhal,1) = idxmap%loc_to_glob(1:nhal)
 
-    call psb_qsort(idxmap%srt_l2g(:,1),&
+    call psb_msort(idxmap%srt_l2g(:,1),&
          & ix=idxmap%srt_l2g(:,2),dir=psb_sort_up_)
 
     call idxmap%set_state(psb_desc_asb_)
