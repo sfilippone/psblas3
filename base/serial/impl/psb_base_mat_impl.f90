@@ -100,7 +100,7 @@ subroutine psb_base_reinit(a,clear)
 
 end subroutine psb_base_reinit
 
-subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
   use psb_base_mat_mod, psb_protect_name => psb_base_sparse_print
   use psb_error_mod
   implicit none 
@@ -108,7 +108,6 @@ subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   integer(psb_ipk_), intent(in)               :: iout
   class(psb_base_sparse_mat), intent(in) :: a   
   integer(psb_ipk_), intent(in), optional     :: iv(:)
-  integer(psb_ipk_), intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
