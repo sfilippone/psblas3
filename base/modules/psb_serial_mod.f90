@@ -539,26 +539,26 @@ contains
 
   elemental function psb_snrm1(x) result(res)
     real(psb_spk_), intent(in)  :: x
-    real(psb_spk_)              :: val
-    val = abs( x )
+    real(psb_spk_)              :: res
+    res = abs( x )
   end function psb_snrm1
 
   elemental function psb_dnrm1(x) result(res)
     real(psb_dpk_), intent(in) :: x
-    real(psb_dpk_)             :: val
-    val = abs(  x )
+    real(psb_dpk_)             :: res
+    res = abs(  x )
   end function psb_dnrm1
 
   elemental function psb_cnrm1(x) result(res)
     complex(psb_spk_), intent(in)  :: x
-    real(psb_spk_)                 :: val
-    val = abs( real( x ) ) + abs( aimag( x ) )  
+    real(psb_spk_)                 :: res
+    res = abs( real( x ) ) + abs( aimag( x ) )  
   end function psb_cnrm1
 
   elemental function psb_znrm1(x) result(res)
     complex(psb_dpk_), intent(in)  :: x
-    real(psb_dpk_)                 :: val
-    val = abs( real( x ) ) + abs( aimag( x ) )  
+    real(psb_dpk_)                 :: res
+    res = abs( real( x ) ) + abs( aimag( x ) )  
   end function psb_znrm1
 
 
