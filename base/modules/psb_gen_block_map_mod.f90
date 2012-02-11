@@ -480,16 +480,21 @@ contains
               nxt = nv + 1 
               ip = idx(i) 
               call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-              
-              if (lip == nxt) then 
-                ! We have added one item
-                call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=500)
-                if (info /= 0) then 
-                  info = -4
-                  return
+              if (info >= 0) then 
+                if (lip == nxt) then 
+                  ! We have added one item
+                  call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=500)
+                  if (info /= 0) then 
+                    info = -4
+                    return
+                  end if
+                  idxmap%local_cols       = nxt + idxmap%local_rows
+                  idxmap%loc_to_glob(nxt) = idx(i)
                 end if
-                idxmap%local_cols       = nxt + idxmap%local_rows
-                idxmap%loc_to_glob(nxt) = idx(i)
+                info = psb_success_
+              else
+                info = -5
+                return
               end if
               idx(i)  = lip + idxmap%local_rows
             else 
@@ -502,7 +507,7 @@ contains
       else if (.not.present(mask)) then 
 
         do i=1, is
-          
+
           if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
@@ -510,16 +515,22 @@ contains
             nxt = nv + 1 
             ip = idx(i) 
             call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-            
-            if (lip == nxt) then 
-              ! We have added one item
-              call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=500)
-              if (info /= 0) then 
-                info = -4
-                return
+
+            if (info >= 0) then 
+              if (lip == nxt) then 
+                ! We have added one item
+                call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=500)
+                if (info /= 0) then 
+                  info = -4
+                  return
+                end if
+                idxmap%local_cols       = nxt + idxmap%local_rows
+                idxmap%loc_to_glob(nxt) = idx(i)
               end if
-              idxmap%local_cols       = nxt + idxmap%local_rows
-              idxmap%loc_to_glob(nxt) = idx(i)
+              info = psb_success_
+            else
+              info = -5
+              return
             end if
             idx(i)  = lip + idxmap%local_rows
           else 
