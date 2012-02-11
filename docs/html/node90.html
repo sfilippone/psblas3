@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_errpush -- Pushes an error code onto the error stack</TITLE>
-<META NAME="description" CONTENT="psb_errpush -- Pushes an error code onto the error stack">
+<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,95 +20,69 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node91.html">
 <LINK REL="previous" HREF="node89.html">
-<LINK REL="up" HREF="node89.html">
+<LINK REL="up" HREF="node83.html">
 <LINK REL="next" HREF="node91.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1313"
+<A NAME="tex2html1345"
   HREF="node91.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1309"
-  HREF="node89.html">
+<A NAME="tex2html1341"
+  HREF="node83.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1303"
+<A NAME="tex2html1335"
   HREF="node89.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1311"
+<A NAME="tex2html1343"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1314"
-  HREF="node91.html">psb_error   Prints</A>
-<B> Up:</B> <A NAME="tex2html1310"
-  HREF="node89.html">Error handling</A>
-<B> Previous:</B> <A NAME="tex2html1304"
-  HREF="node89.html">Error handling</A>
- &nbsp; <B>  <A NAME="tex2html1312"
+<B> Next:</B> <A NAME="tex2html1346"
+  HREF="node91.html">psb_abort   Abort</A>
+<B> Up:</B> <A NAME="tex2html1342"
+  HREF="node83.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1336"
+  HREF="node89.html">psb_wtime   Wall</A>
+ &nbsp; <B>  <A NAME="tex2html1344"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00091000000000000000">
-psb_errpush -- Pushes an error code onto the error
-  stack</A>
+<H2><A NAME="SECTION00087000000000000000">
+psb_barrier -- Sinchronization point  parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_errpush(err_c, r_name, i_err, a_err)
+call psb_barrier(icontxt)
 </PRE>
 
 <P>
+This subroutine acts as an explicit synchronization point for  the  PSBLAS
+parallel virtual  machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>err_c</STRONG></DT>
-<DD>the error code
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Scope: <B>local</B> 
+Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer.
+Specified as: an integer variable.
 </DD>
-<DT><STRONG>r_name</STRONG></DT>
-<DD>the soutine where the error has been caught.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a string.
-<BR></DD>
-<DT><STRONG>i_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: an integer array
-<BR></DD>
-<DT><STRONG>a_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: a string.
-<BR></DD>
 </DL>
 
 <P>

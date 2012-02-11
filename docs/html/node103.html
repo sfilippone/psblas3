@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
-<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
+<TITLE>psb_set_errverbosity -- Sets the verbosity of error messages.</TITLE>
+<META NAME="description" CONTENT="psb_set_errverbosity -- Sets the verbosity of error messages.">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,125 +26,59 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1474"
+<A NAME="tex2html1503"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1470"
+<A NAME="tex2html1499"
   HREF="node100.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1464"
+<A NAME="tex2html1493"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1472"
+<A NAME="tex2html1501"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1475"
-  HREF="node104.html">psb_precdescr   Prints</A>
-<B> Up:</B> <A NAME="tex2html1471"
-  HREF="node100.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1465"
-  HREF="node102.html">psb_precbld   Builds</A>
- &nbsp; <B>  <A NAME="tex2html1473"
+<B> Next:</B> <A NAME="tex2html1504"
+  HREF="node104.html">psb_set_erraction   Set</A>
+<B> Up:</B> <A NAME="tex2html1500"
+  HREF="node100.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1494"
+  HREF="node102.html">psb_error   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1502"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000113000000000000000">
-psb_precaply -- Preconditioner application routine</A>
+<H2><A NAME="SECTION00093000000000000000">
+psb_set_errverbosity -- Sets the verbosity of error
+  messages.</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precaply(prec,x,y,desc_a,info,trans,work)
-call psb_precaply(prec,x,desc_a,info,trans)
+call psb_set_errverbosity(v)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-Scope: <B>local</B> 
+<DT><STRONG>v</STRONG></DT>
+<DD>the verbosity level
+<BR>
+Scope: <B>global</B>
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the source vector.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>Scope:  
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character.
-</DD>
-<DT><STRONG>work</STRONG></DT>
-<DD>an optional work space
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the destination vector.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+Specified as: an integer.
 </DD>
 </DL>
 

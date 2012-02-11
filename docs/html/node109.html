@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>About this document ...</TITLE>
-<META NAME="description" CONTENT="About this document ...">
+<TITLE>mm_vet_read -- Read a dense vector from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_vet_read -- Read a dense vector from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,52 +18,98 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node110.html">
 <LINK REL="previous" HREF="node108.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="up" HREF="node105.html">
+<LINK REL="next" HREF="node110.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_g.png"> 
-<A NAME="tex2html1539"
-  HREF="userhtml.html">
+<A NAME="tex2html1578"
+  HREF="node110.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1574"
+  HREF="node105.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1535"
+<A NAME="tex2html1568"
   HREF="node108.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1541"
+<A NAME="tex2html1576"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Up:</B> <A NAME="tex2html1540"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1536"
-  HREF="node108.html">Bibliography</A>
- &nbsp; <B>  <A NAME="tex2html1542"
+<B> Next:</B> <A NAME="tex2html1579"
+  HREF="node110.html">mm_mat_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1575"
+  HREF="node105.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1569"
+  HREF="node108.html">mm_mat_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1577"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000140000000000000000">
-About this document ...</A>
-</H1>
- <P>
-This document was generated using the
-<A HREF="http://www.latex2html.org/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 2008 (1.71)
+<H2><A NAME="SECTION000104000000000000000">
+mm_vet_read -- Read a dense vector from a
+  file in the MatrixMarket format</A>
+</H2>
+
+<PRE>
+call mm_vet_read(b, iret, iunit, filename)
+</PRE>
+
 <P>
-Copyright &#169; 1993, 1994, 1995, 1996,
-<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
-Computer Based Learning Unit, University of Leeds.
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
 <BR>
-Copyright &#169; 1997, 1998, 1999,
-<A HREF="http://www.maths.mq.edu.au/~ross/">Ross Moore</A>, 
-Mathematics Department, Macquarie University, Sydney.
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
 <P>
-The command line arguments were: <BR>
- <STRONG>latex2html</STRONG> <TT>-local_icons -noaddress -dir ../../html userhtml.tex</TT>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>required</B> 
+<BR>
+An  array of type real or complex, rank 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
 <P>
-The translation was initiated by Salvatore Filippone on 2011-12-15
 <BR><HR>
 
 </BODY>

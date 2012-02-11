@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
+<TITLE>psb_cdasb -- Communication descriptor assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_cdasb -- Communication descriptor assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node59.html">
 <LINK REL="previous" HREF="node57.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node59.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html913"
+<A NAME="tex2html947"
   HREF="node59.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html909"
-  HREF="node44.html">
+<A NAME="tex2html943"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html903"
+<A NAME="tex2html937"
   HREF="node57.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html911"
+<A NAME="tex2html945"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html914"
-  HREF="node59.html">psb_gefree   Frees</A>
-<B> Up:</B> <A NAME="tex2html910"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html904"
-  HREF="node57.html">psb_geins   Dense</A>
- &nbsp; <B>  <A NAME="tex2html912"
+<B> Next:</B> <A NAME="tex2html948"
+  HREF="node59.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html944"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html938"
+  HREF="node57.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html946"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000714000000000000000">
-psb_geasb -- Assembly a dense matrix</A>
+<H2><A NAME="SECTION00073000000000000000">
+psb_cdasb -- Communication descriptor assembly routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info)
+call psb_cdasb(desc_a, info)
 </PRE>
 
 <P>
@@ -69,16 +69,16 @@ call psb_geasb(x, desc_a, info)
 <DD>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
 </DL>
 
 <P>
@@ -86,18 +86,17 @@ Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be assembled.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -110,6 +109,15 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>On exit from this routine the descriptor is in the assembled
+  state. 
+</LI>
+</OL>
+
+<P>
 <BR><HR>
 
 </BODY>

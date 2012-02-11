@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_local_cols -- Get number of local cols</TITLE>
-<META NAME="description" CONTENT="get_local_cols -- Get number of local cols">
+<TITLE>psb_cd_set_large_threshold -- Set threshold for index mapping switch</TITLE>
+<META NAME="description" CONTENT="psb_cd_set_large_threshold -- Set threshold for index mapping switch">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,80 +26,65 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html383"
+<A NAME="tex2html410"
   HREF="node18.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html379"
+<A NAME="tex2html406"
   HREF="node15.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html373"
+<A NAME="tex2html400"
   HREF="node16.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html381"
+<A NAME="tex2html408"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html384"
-  HREF="node18.html">get_global_rows   Get</A>
-<B> Up:</B> <A NAME="tex2html380"
-  HREF="node15.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html374"
-  HREF="node16.html">get_local_rows   Get</A>
- &nbsp; <B>  <A NAME="tex2html382"
+<B> Next:</B> <A NAME="tex2html411"
+  HREF="node18.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html407"
+  HREF="node15.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html401"
+  HREF="node16.html">psb_cd_get_large_threshold   Get</A>
+ &nbsp; <B>  <A NAME="tex2html409"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045200000000000000">
-get_local_cols -- Get number of local cols</A>
+<H3><A NAME="SECTION00042200000000000000">
+psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
 </H3>
 
-<P>
 <PRE>
-nc = desc%get_local_cols()
+call psb_cd_set_large_threshold(ith)
 </PRE>
 
 <P>
 <DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>ith</STRONG></DT>
+<DD>the new threshold for communication descriptors.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an integer value greater than zero.
 </DD>
 </DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of local cols, i.e. the number of
-  indices used by the current process, including both local and halo
-  indices; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>, 
-  it is equal to  <!-- MATH
- $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$
- -->
-<IMG
- WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img11.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert +\vert{\cal H}_i\vert$">. The
-  returned value is specific to the calling process. 
-</DD>
-</DL>
+Note: the threshold value is only queried by the library at the time a
+call to <code>psb_cdall</code> is executed, therefore changing the threshold
+has no effect on communication descriptors that have already been
+initialized. Moreover the threshold must have the same value on all
+processes. 
 
 <P>
 <BR><HR>

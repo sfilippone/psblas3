@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_spasb -- Sparse matrix assembly routine</TITLE>
-<META NAME="description" CONTENT="psb_spasb -- Sparse matrix assembly routine">
+<TITLE>psb_gather -- Gather Global Dense Matrix</TITLE>
+<META NAME="description" CONTENT="psb_gather -- Gather Global Dense Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,135 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node54.html">
 <LINK REL="previous" HREF="node52.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node50.html">
 <LINK REL="next" HREF="node54.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html853"
+<A NAME="tex2html862"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html849"
-  HREF="node44.html">
+<A NAME="tex2html858"
+  HREF="node50.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html843"
+<A NAME="tex2html852"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html851"
+<A NAME="tex2html860"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html854"
-  HREF="node54.html">psb_spfree   Frees</A>
-<B> Up:</B> <A NAME="tex2html850"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html844"
-  HREF="node52.html">psb_spins   Insert</A>
- &nbsp; <B>  <A NAME="tex2html852"
+<B> Next:</B> <A NAME="tex2html863"
+  HREF="node54.html">psb_scatter   Scatter</A>
+<B> Up:</B> <A NAME="tex2html859"
+  HREF="node50.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html853"
+  HREF="node52.html">psb_ovrl   Overlap</A>
+ &nbsp; <B>  <A NAME="tex2html861"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00079000000000000000">
-psb_spasb -- Sparse matrix assembly routine</A>
+<H2><A NAME="SECTION00063000000000000000">
+psb_gather -- Gather Global Dense Matrix</A>
 </H2>
 
 <P>
+These subroutines collect the portions of global dense matrix
+distributed over all process into one single array stored on one
+process.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+glob\_x \leftarrow collect(loc\_x_i)
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="163" HEIGHT="28" BORDER="0"
+ SRC="img73.png"
+ ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+where:
+<DL>
+<DT><STRONG><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$glob\_x$"></STRONG></DT>
+<DD>is the global submatrix <!-- MATH
+ $glob\_x_{1:m,1:n}$
+ -->
+<IMG
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
+ ALT="$glob\_x_{1:m,1:n}$">
+</DD>
+<DT><STRONG><IMG
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
+ ALT="$loc\_x_i$"></STRONG></DT>
+<DD>is the local portion of global dense matrix on
+process <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">.
+</DD>
+<DT><STRONG><IMG
+ WIDTH="49" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img77.png"
+ ALT="$collect$"></STRONG></DT>
+<DD>is the collect function.
+</DD>
+</DL>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="2769"></A>
+<TABLE>
+<CAPTION><STRONG>Table 15:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$x_i, y$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Integer</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
 <PRE>
-call psb_spasb(a, desc_a, info, afmt, upd, dupl)
+call psb_gather(glob_x, loc_x, desc_a, info, root)
+call psb_gather(glob_x, loc_x, desc_a, info, root)
 </PRE>
 
 <P>
@@ -68,68 +159,70 @@ call psb_spasb(a, desc_a, info, afmt, upd, dupl)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>loc_x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$glob\_x$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank one or two array containing numbers of the type
+indicated in Table&nbsp;<A HREF="#tab:gather">15</A>.
+</DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DD>contains data structures for communications.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>afmt</STRONG></DT>
-<DD>the storage format for the sparse matrix.
+<DT><STRONG>root</STRONG></DT>
+<DD>The process that holds the global copy. If <IMG
+ WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.png"
+ ALT="$root=-1$"> all
+  the processes will have a copy of the global vector.
 <BR>
-Scope: <B>global</B>.
+Scope: <B>global</B> 
 <BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an array of characters. Defalt:  'CSR'.
-</DD>
-<DT><STRONG>upd</STRONG></DT>
-<DD>Provide for updates to the matrix coefficients.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: integer, possible values: <code>psb_upd_srch_</code>, <code>psb_upd_perm_</code>
+Specified as: an integer variable <!-- MATH
+ $-1\le root\le np-1$
+ -->
+<IMG
+ WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.png"
+ ALT="$-1\le root\le np-1$">, default <IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
+ ALT="$-1$">. 
 </DD>
-<DT><STRONG>dupl</STRONG></DT>
-<DD>How to handle duplicate coefficients.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
-<code>psb_dupl_add_</code>, <code>psb_dupl_err_</code>.
-</DD>
-</DL>
-
-<P>
-<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix to be assembled.
+<DT><STRONG>glob_x</STRONG></DT>
+<DD>The array where the local parts must be gathered.
 <BR>
-Scope:<B>local</B>
+Scope: <B>global</B> 
 <BR>
-Type:<B>required</B>
+Type: <B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: a rank one or two array.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -145,51 +238,28 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>On entry to this routine the descriptor must  be in  the
-  assembled state, i.e. <code>psb_cdasb</code> must already have been called.
-</LI>
-<LI>The sparse matrix may be in either the build or update state;
-</LI>
-<LI>Duplicate entries are detected and handled in both build and
-  update state, with the exception of the error action that is only
-  taken in the build state, i.e. on the first assembly; 
-</LI>
-<LI>If the update choice is <code>psb_upd_perm_</code>, then subsequent
-  calls to <code>psb_spins</code> to update the matrix must be arranged in
-  such a way as to produce exactly the same sequence of coefficient
-  values as encountered at the first assembly; 
-</LI>
-<LI>On exit from this routine the matrix is in the assembled state,
-  and thus is suitable for the computational routines. 
-</LI>
-</OL>
-
-<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html853"
+<A NAME="tex2html862"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html849"
-  HREF="node44.html">
+<A NAME="tex2html858"
+  HREF="node50.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html843"
+<A NAME="tex2html852"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html851"
+<A NAME="tex2html860"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html854"
-  HREF="node54.html">psb_spfree   Frees</A>
-<B> Up:</B> <A NAME="tex2html850"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html844"
-  HREF="node52.html">psb_spins   Insert</A>
- &nbsp; <B>  <A NAME="tex2html852"
+<B> Next:</B> <A NAME="tex2html863"
+  HREF="node54.html">psb_scatter   Scatter</A>
+<B> Up:</B> <A NAME="tex2html859"
+  HREF="node50.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html853"
+  HREF="node52.html">psb_ovrl   Overlap</A>
+ &nbsp; <B>  <A NAME="tex2html861"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

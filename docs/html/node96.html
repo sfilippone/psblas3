@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format</TITLE>
-<META NAME="description" CONTENT="hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format">
+<TITLE>psb_amx -- Global maximum absolute value</TITLE>
+<META NAME="description" CONTENT="psb_amx -- Global maximum absolute value">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,105 +20,101 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node97.html">
 <LINK REL="previous" HREF="node95.html">
-<LINK REL="up" HREF="node94.html">
+<LINK REL="up" HREF="node83.html">
 <LINK REL="next" HREF="node97.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1388"
+<A NAME="tex2html1417"
   HREF="node97.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1384"
-  HREF="node94.html">
+<A NAME="tex2html1413"
+  HREF="node83.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1378"
+<A NAME="tex2html1407"
   HREF="node95.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1386"
+<A NAME="tex2html1415"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1389"
-  HREF="node97.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1385"
-  HREF="node94.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1379"
-  HREF="node95.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1387"
+<B> Next:</B> <A NAME="tex2html1418"
+  HREF="node97.html">psb_amn   Global</A>
+<B> Up:</B> <A NAME="tex2html1414"
+  HREF="node83.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1408"
+  HREF="node95.html">psb_min   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1416"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000102000000000000000">
-hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
+<H2><A NAME="SECTION000813000000000000000">
+psb_amx -- Global maximum absolute value</A>
 </H2>
 
 <P>
 <PRE>
-call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
+call psb_amx(icontxt, dat, root)
 </PRE>
 
 <P>
+This subroutine implements a maximum absolute value reduction
+operation based on the underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix to be written.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Type:<B>required</B>.
+Scope: <B>global</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side.
+<DT><STRONG>dat</STRONG></DT>
+<DD>The local contribution to the global maximum.
 <BR>
-Type: <B>Optional</B> 
+Scope: <B>local</B>.
 <BR>
-An  array of type real or complex, rank 1 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side. 
+Type: <B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
-<DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written to.
+<DT><STRONG>root</STRONG></DT>
+<DD>Process to hold the final value, or <IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
+ ALT="$-1$"> to make it available
+  on all processes.
 <BR>
-Type:<B>optional</B>.
+Scope: <B>global</B>.
 <BR>
-Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default output unit  6 (i.e. standard output
-in Unix jargon) is used. Default: <code>-</code>. 
-</DD>
-<DT><STRONG>iunit</STRONG></DT>
-<DD>The Fortran file unit number.
+Type: <B>optional</B>.
 <BR>
-Type:<B>optional</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
-</DD>
-<DT><STRONG>key</STRONG></DT>
-<DD>Matrix key.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 8 holding the
-matrix key as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 72 holding the
-matrix title as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
+Specified as: an integer value <!-- MATH
+ $-1<= root <= np-1$
+ -->
+<IMG
+ WIDTH="166" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img127.png"
+ ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
+<BR></DD>
 </DL>
 
 <P>
@@ -126,38 +122,55 @@ written to file.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>iret</STRONG></DT>
-<DD>Error code.
+<DT><STRONG>dat</STRONG></DT>
+<DD>On destination process(es), the result of the maximum operation.
 <BR>
-Type: <B>required</B> 
+Scope: <B>global</B>.
 <BR>
-An integer value; 0 means no error has been detected. 
+Type: <B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
 </DL>
 
 <P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>The <code>dat</code> argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+</LI>
+<LI>The <code>dat</code> argument may also be a long integer scalar.
+</LI>
+</OL>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1388"
+<A NAME="tex2html1417"
   HREF="node97.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1384"
-  HREF="node94.html">
+<A NAME="tex2html1413"
+  HREF="node83.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1378"
+<A NAME="tex2html1407"
   HREF="node95.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1386"
+<A NAME="tex2html1415"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1389"
-  HREF="node97.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1385"
-  HREF="node94.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1379"
-  HREF="node95.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1387"
+<B> Next:</B> <A NAME="tex2html1418"
+  HREF="node97.html">psb_amn   Global</A>
+<B> Up:</B> <A NAME="tex2html1414"
+  HREF="node83.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1408"
+  HREF="node95.html">psb_min   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1416"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

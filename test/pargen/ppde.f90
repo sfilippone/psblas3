@@ -148,7 +148,7 @@ program ppde
 !!$  call psb_cdcpy(desc_a,desc_b,info)
 !!$  call psb_set_debug_level(9999)
 
-!!$  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
+  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
   if (info /= 0) then 
     write(0,*) 'Error from bldext'
     call psb_abort(ictxt)
@@ -572,7 +572,6 @@ contains
           irow(element) = glob_row
           element       = element+1
         endif
-
 
       end do
       call psb_spins(element-1,irow,icol,val,a,desc_a,info)

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Parallel environment routines</TITLE>
-<META NAME="description" CONTENT="Parallel environment routines">
+<TITLE>psb_glob_to_loc -- Global to local indices convertion</TITLE>
+<META NAME="description" CONTENT="psb_glob_to_loc -- Global to local indices convertion">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,88 +18,198 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node89.html">
-<LINK REL="previous" HREF="node44.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node73.html">
+<LINK REL="previous" HREF="node71.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node73.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1079"
+<A NAME="tex2html1115"
   HREF="node73.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1075"
-  HREF="userhtml.html">
+<A NAME="tex2html1111"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1069"
+<A NAME="tex2html1105"
   HREF="node71.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1077"
+<A NAME="tex2html1113"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1080"
-  HREF="node73.html">psb_init   Initializes</A>
-<B> Up:</B> <A NAME="tex2html1076"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1070"
-  HREF="node71.html">Sorting utilities</A>
- &nbsp; <B>  <A NAME="tex2html1078"
+<B> Next:</B> <A NAME="tex2html1116"
+  HREF="node73.html">psb_loc_to_glob   Local</A>
+<B> Up:</B> <A NAME="tex2html1112"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1106"
+  HREF="node71.html">psb_gelp   Applies</A>
+ &nbsp; <B>  <A NAME="tex2html1114"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00080000000000000000"></A>
-<A NAME="sec:parenv"></A>
-<BR>
-Parallel environment routines
-</H1>
+<H2><A NAME="SECTION000717000000000000000">
+psb_glob_to_loc -- Global to local indices
+  convertion</A>
+</H2>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<PRE>
+call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
+call psb_glob_to_loc(x, desc_a, info, iact,owned)
+</PRE>
 
-<UL>
-<LI><A NAME="tex2html1081"
-  HREF="node73.html">psb_init -- Initializes PSBLAS parallel environment</A>
-<LI><A NAME="tex2html1082"
-  HREF="node74.html">psb_info -- Return information about  PSBLAS parallel
-  environment</A>
-<LI><A NAME="tex2html1083"
-  HREF="node75.html">psb_exit -- Exit from  PSBLAS parallel environment</A>
-<LI><A NAME="tex2html1084"
-  HREF="node76.html">psb_get_mpicomm -- Get the MPI communicator</A>
-<LI><A NAME="tex2html1085"
-  HREF="node77.html">psb_get_rank -- Get the MPI rank</A>
-<LI><A NAME="tex2html1086"
-  HREF="node78.html">psb_wtime -- Wall clock timing</A>
-<LI><A NAME="tex2html1087"
-  HREF="node79.html">psb_barrier -- Sinchronization point  parallel
-  environment</A>
-<LI><A NAME="tex2html1088"
-  HREF="node80.html">psb_abort -- Abort a computation</A>
-<LI><A NAME="tex2html1089"
-  HREF="node81.html">psb_bcast -- Broadcast data</A>
-<LI><A NAME="tex2html1090"
-  HREF="node82.html">psb_sum -- Global sum</A>
-<LI><A NAME="tex2html1091"
-  HREF="node83.html">psb_max -- Global maximum</A>
-<LI><A NAME="tex2html1092"
-  HREF="node84.html">psb_min -- Global minimum</A>
-<LI><A NAME="tex2html1093"
-  HREF="node85.html">psb_amx -- Global maximum absolute value</A>
-<LI><A NAME="tex2html1094"
-  HREF="node86.html">psb_amn -- Global minimum absolute value</A>
-<LI><A NAME="tex2html1095"
-  HREF="node87.html">psb_snd -- Send data</A>
-<LI><A NAME="tex2html1096"
-  HREF="node88.html">psb_rcv -- Receive data</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>An integer vector of indices to be converted.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in, inout</B>.
+<BR>
+Specified as: a rank one integer array.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
+</DD>
+<DT><STRONG>owned</STRONG></DT>
+<DD>Specfies valid range of input 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+If true, then only indices strictly owned by the current process are
+considered valid, if false then halo indices are also
+accepted. Default: false. 
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>If <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is not present,
+  then <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is overwritten with the translated integer indices. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one integer array.
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>If <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is  present,
+  then <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is overwritten with the translated integer indices, and <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">
+  is left unchanged. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a rank one integer array.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>If an input index is out of range, then the corresponding output
+  index is set to a negative number;
+</LI>
+<LI>The default <code>I</code>gnore means that the negative output is the
+  only action taken on an out-of-range input.
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1115"
+  HREF="node73.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1111"
+  HREF="node55.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1105"
+  HREF="node71.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1113"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1116"
+  HREF="node73.html">psb_loc_to_glob   Local</A>
+<B> Up:</B> <A NAME="tex2html1112"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1106"
+  HREF="node71.html">psb_gelp   Applies</A>
+ &nbsp; <B>  <A NAME="tex2html1114"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

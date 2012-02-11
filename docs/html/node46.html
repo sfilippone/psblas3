@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
-<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
+<TITLE>psb_genrm2s -- Generalized 2-Norm of Vector</TITLE>
+<META NAME="description" CONTENT="psb_genrm2s -- Generalized 2-Norm of Vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,116 +20,163 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node47.html">
 <LINK REL="previous" HREF="node45.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node37.html">
 <LINK REL="next" HREF="node47.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html769"
+<A NAME="tex2html776"
   HREF="node47.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html765"
-  HREF="node44.html">
+<A NAME="tex2html772"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html759"
+<A NAME="tex2html766"
   HREF="node45.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html767"
+<A NAME="tex2html774"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html770"
-  HREF="node47.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html766"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html760"
-  HREF="node45.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html768"
+<B> Next:</B> <A NAME="tex2html777"
+  HREF="node47.html">psb_spnrmi   Infinity</A>
+<B> Up:</B> <A NAME="tex2html773"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html767"
+  HREF="node45.html">psb_genrm2   2-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html775"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00072000000000000000">
-psb_cdins -- Communication descriptor insert routine</A>
+<H2><A NAME="SECTION00059000000000000000">
+psb_genrm2s -- Generalized 2-Norm of Vector</A>
 </H2>
 
 <P>
+This subroutine computes a series of  2-norms on the columns of
+a  dense matrix  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">: 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow \|x(:,i)\|_2
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="125" HEIGHT="28" BORDER="0"
+ SRC="img46.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert x(:,i)\Vert _2 \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+
+<P>
 <PRE>
-call psb_cdins(nz, ia, ja, desc_a, info)
+call psb_genrm2s(res, x, desc_a, info)
 </PRE>
 
 <P>
-This subroutine examines the edges of the graph associated with the
-discretization mesh (and isomorphic to the sparsity pattern of a
-linear system coefficient matrix), storing them as necessary into the
-communication descriptor.
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="1524"></A>
+<TABLE>
+<CAPTION><STRONG>Table 9:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img33.png"
+ ALT="$res$"></TD>
+<TD ALIGN="LEFT"><IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_genrm2s</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_genrm2s</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_genrm2s</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_genrm2s</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of points being inserted.
+<DT><STRONG>x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">. 
+
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
+Type: <B>required</B> 
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img100.png"
- ALT="$nz$">.
+Specified as: a rank one or two array 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90nrm2s">9</A>.
 </DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the indices of the end vertex of the edges  being inserted.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img100.png"
- ALT="$nz$">.
-</DD>
-</DL>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 
 <P>
-<DL>
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the updated communication descriptor.
+<DT><STRONG>res</STRONG></DT>
+<DD>contains the 1-norm of (the columns of) <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>global</B> 
 <BR>
-Type:<B>required</B>.
+Intent: <B>out</B>.
 <BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a long precision real  number.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -143,41 +190,30 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>This routine may only be called if the descriptor is in the
-  build state;
-</LI>
-<LI>This routine automatically ignores edges that do not
-insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process. 
-</LI>
-</OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html769"
+<A NAME="tex2html776"
   HREF="node47.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html765"
-  HREF="node44.html">
+<A NAME="tex2html772"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html759"
+<A NAME="tex2html766"
   HREF="node45.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html767"
+<A NAME="tex2html774"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html770"
-  HREF="node47.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html766"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html760"
-  HREF="node45.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html768"
+<B> Next:</B> <A NAME="tex2html777"
+  HREF="node47.html">psb_spnrmi   Infinity</A>
+<B> Up:</B> <A NAME="tex2html773"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html767"
+  HREF="node45.html">psb_genrm2   2-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html775"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

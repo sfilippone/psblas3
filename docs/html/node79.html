@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
+<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,70 +20,109 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node80.html">
 <LINK REL="previous" HREF="node78.html">
-<LINK REL="up" HREF="node72.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node80.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1179"
+<A NAME="tex2html1199"
   HREF="node80.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1175"
-  HREF="node72.html">
+<A NAME="tex2html1195"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1169"
+<A NAME="tex2html1189"
   HREF="node78.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1177"
+<A NAME="tex2html1197"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1180"
-  HREF="node80.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1176"
-  HREF="node72.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1170"
-  HREF="node78.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1178"
+<B> Next:</B> <A NAME="tex2html1200"
+  HREF="node80.html">psb_sp_getrow   Extract</A>
+<B> Up:</B> <A NAME="tex2html1196"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1190"
+  HREF="node78.html">psb_get_boundary   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1198"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
-  environment</A>
+<H2><A NAME="SECTION000724000000000000000">
+psb_get_overlap -- Extract list of overlap elements</A>
 </H2>
 
 <P>
 <PRE>
-call psb_barrier(icontxt)
+call psb_get_overlap(ovrel, desc, info)
 </PRE>
 
 <P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>global</B>.
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>.
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer variable.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 </DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>ovrel</STRONG></DT>
+<DD>The list of overlap elements on the calling process, in
+  local numbering.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.
+<BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>If there are no overlap elements the output vector is set
+  to the ``not allocated'' state.  
+</LI>
+<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
+  number of overlap elements. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

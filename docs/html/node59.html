@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
+<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,86 +20,84 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node60.html">
 <LINK REL="previous" HREF="node58.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node60.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html925"
+<A NAME="tex2html959"
   HREF="node60.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html921"
-  HREF="node44.html">
+<A NAME="tex2html955"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html915"
+<A NAME="tex2html949"
   HREF="node58.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html923"
+<A NAME="tex2html957"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html926"
-  HREF="node60.html">psb_gelp   Applies</A>
-<B> Up:</B> <A NAME="tex2html922"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html916"
-  HREF="node58.html">psb_geasb   Assembly</A>
- &nbsp; <B>  <A NAME="tex2html924"
+<B> Next:</B> <A NAME="tex2html960"
+  HREF="node60.html">psb_cdfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html956"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html950"
+  HREF="node58.html">psb_cdasb   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html958"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000715000000000000000">
-psb_gefree -- Frees a dense matrix</A>
+<H2><A NAME="SECTION00074000000000000000">
+psb_cdcpy -- Copies a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_gefree(x, desc_a, info)
+call psb_cdcpy(desc_in, desc_out, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to
-  be freed.
+<DT><STRONG>desc_in</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR>
-<P>
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+
+<P>
+</DD>
 </DL>
 
 <P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the communication descriptor copy.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.

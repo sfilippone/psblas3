@@ -1,96 +1,114 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+<!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
+<TITLE>mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node111.html">
 <LINK REL="previous" HREF="node109.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="up" HREF="node105.html">
 <LINK REL="next" HREF="node111.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1498"
+<A NAME="tex2html1588"
   HREF="node111.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="file:/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html1494"
-  HREF="userhtml.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="file:/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html1488"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1584"
+  HREF="node105.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1580"
   HREF="node109.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
-<A NAME="tex2html1496"
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1586"
   HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
- SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1499"
-  HREF="node111.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1495"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1489"
-  HREF="node109.html">psb_precaply   Preconditioner</A>
- &nbsp; <B>  <A NAME="tex2html1497"
+<B> Next:</B> <A NAME="tex2html1589"
+  HREF="node111.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1585"
+  HREF="node105.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1581"
+  HREF="node109.html">mm_vet_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1587"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000870000000000000000">
-psb_precdescr -- Prints a description of current
-  preconditioner</A>
-</H1>
+<H2><A NAME="SECTION000105000000000000000">
+mm_mat_write -- Write a sparse matrix to a
+  file in the MatrixMarket format</A>
+</H2>
 
-<P>
-ifstarssyntaxsyntaxcall psb_precdescrprec
-ifstarssyntaxsyntax*call psb_precdescrprec, iout
-
-<P>
+<PRE>
+call mm_mat_write(a, mtitle, iret, iunit, filename)
+</PRE>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-Scope: <B>local</B> 
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix to be written.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
-<DT><STRONG>iout</STRONG></DT>
-<DD>output unit.
-Scope: <B>local</B> 
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
 <BR>
-Type: <B>optiona</B>
+Type: <B>required</B> 
 <BR>
-Intent: <B>in</B>.
+A charachter variable holding a descriptive title for the matrix to be
+ written to file.
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written to.
 <BR>
-Specified as: an integer number. 
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_init -- Initializes PSBLAS parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_init -- Initializes PSBLAS parallel environment">
+<TITLE>psb_loc_to_glob -- Local to global indices conversion</TITLE>
+<META NAME="description" CONTENT="psb_loc_to_glob -- Local to global indices conversion">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,95 +20,88 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node74.html">
 <LINK REL="previous" HREF="node72.html">
-<LINK REL="up" HREF="node72.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node74.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1107"
+<A NAME="tex2html1127"
   HREF="node74.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1103"
-  HREF="node72.html">
+<A NAME="tex2html1123"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1097"
+<A NAME="tex2html1117"
   HREF="node72.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1105"
+<A NAME="tex2html1125"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1108"
-  HREF="node74.html">psb_info   Return</A>
-<B> Up:</B> <A NAME="tex2html1104"
-  HREF="node72.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1098"
-  HREF="node72.html">Parallel environment routines</A>
- &nbsp; <B>  <A NAME="tex2html1106"
+<B> Next:</B> <A NAME="tex2html1128"
+  HREF="node74.html">psb_is_owned</A>
+<B> Up:</B> <A NAME="tex2html1124"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1118"
+  HREF="node72.html">psb_glob_to_loc   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1126"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00081000000000000000">
-psb_init -- Initializes PSBLAS parallel environment</A>
+<H2><A NAME="SECTION000718000000000000000">
+psb_loc_to_glob -- Local to global indices
+  conversion</A>
 </H2>
 
 <P>
 <PRE>
-call psb_init(icontxt, np, basectxt, ids)
+call psb_loc_to_glob(x, y, desc_a, info, iact)
+call psb_loc_to_glob(x, desc_a, info, iact)
 </PRE>
 
 <P>
-This subroutine initializes the PSBLAS parallel environment, defining
-a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>np</STRONG></DT>
-<DD>Number of processes in the PSBLAS virtual parallel machine.
+<DT><STRONG>x</STRONG></DT>
+<DD>An integer vector of indices to be converted.
 <BR>
-Scope: <B>global</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>optional</B>.
+Type: <B>required</B>
+<BR>
+Intent: <B>in, inout</B>.
+<BR>
+Specified as: a rank one integer array.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value.  Default: use all available processes.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>basectxt</STRONG></DT>
-<DD>the initial communication context. The new context
-  will be defined from the processes participating in the initial one.
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
 <BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value.  Default: use MPI_COMM_WORLD.
-</DD>
-<DT><STRONG>ids</STRONG></DT>
-<DD>Identities of the processes to use for the new context; the
-  argument is ignored when <code>np</code> is not specified. This allows the
-  processes in the new environment to be in an order different from the
-  original one.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array.  Default: use the indices <IMG
- WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img94.png"
- ALT="$(0\dots np-1)$">.  
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
 </DD>
 </DL>
 
@@ -117,60 +110,80 @@ Specified as: an integer array.  Default: use the indices <IMG
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine. Note that this is always a duplicate of
-  <code>basectxt</code>, so that library communications are completely
-  separated from other communication operations.
+<DT><STRONG>x</STRONG></DT>
+<DD>If <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is not present,
+  then <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is overwritten with the translated integer indices. 
+Scope: <B>global</B> 
 <BR>
-Scope: <B>global</B>.
+Type: <B>required</B>
 <BR>
-Type: <B>required</B>.
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one integer array.
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>If <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is not present,
+  then <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> is overwritten with the translated integer indices, and <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">
+  is left unchanged. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: an integer variable.
+Specified as: a rank one integer array.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>A call to this routine must precede any other PSBLAS call. 
-</LI>
-<LI>It is an error to specify a value for <IMG
- WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img122.png"
- ALT="$np$"> greater than the
-  number of processes available in the underlying base parallel
-  environment. 
-</LI>
-</OL>
-
-<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1107"
+<A NAME="tex2html1127"
   HREF="node74.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1103"
-  HREF="node72.html">
+<A NAME="tex2html1123"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1097"
+<A NAME="tex2html1117"
   HREF="node72.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1105"
+<A NAME="tex2html1125"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1108"
-  HREF="node74.html">psb_info   Return</A>
-<B> Up:</B> <A NAME="tex2html1104"
-  HREF="node72.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1098"
-  HREF="node72.html">Parallel environment routines</A>
- &nbsp; <B>  <A NAME="tex2html1106"
+<B> Next:</B> <A NAME="tex2html1128"
+  HREF="node74.html">psb_is_owned</A>
+<B> Up:</B> <A NAME="tex2html1124"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1118"
+  HREF="node72.html">psb_glob_to_loc   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1126"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

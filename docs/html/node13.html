@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Dense Vector Data Structure</TITLE>
-<META NAME="description" CONTENT="Dense Vector Data Structure">
+<TITLE>get_global_rows -- Get number of global rows</TITLE>
+<META NAME="description" CONTENT="get_global_rows -- Get number of global rows">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,49 +19,73 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node14.html">
-<LINK REL="previous" HREF="node11.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node14.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html331"
+<A NAME="tex2html361"
   HREF="node14.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html327"
-  HREF="node8.html">
+<A NAME="tex2html357"
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html321"
+<A NAME="tex2html351"
   HREF="node12.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html329"
+<A NAME="tex2html359"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html332"
-  HREF="node14.html">Preconditioner data structure</A>
-<B> Up:</B> <A NAME="tex2html328"
-  HREF="node8.html">Data Structures</A>
-<B> Previous:</B> <A NAME="tex2html322"
-  HREF="node12.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html330"
+<B> Next:</B> <A NAME="tex2html362"
+  HREF="node14.html">get_global_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html358"
+  HREF="node9.html">Descriptor data structure</A>
+<B> Previous:</B> <A NAME="tex2html352"
+  HREF="node12.html">get_local_cols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html360"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00043000000000000000"></A>
-<A NAME="sec:spmat"></A>
+<H3><A NAME="SECTION00041400000000000000">
+get_global_rows -- Get number of global rows</A>
+</H3>
+
+<P>
+<PRE>
+nr = desc%get_global_rows()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Dense Vector Data Structure
-</H2>
-The vdata<TT>psb_vect_type</TT> data structure
-contains all information about local portion of the sparse matrix and   
-its storage mode. Most  of these fields are set  by the tools
-routines when inserting a new sparse matrix; the user needs only
-choose, if he/she so whishes, a specific matrix storage mode. 
-<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The number of global rows, i.e. the size of the
+  global index space. 
+</DD>
+</DL>
+
 <P>
 <BR><HR>
 

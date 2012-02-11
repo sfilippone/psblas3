@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
-<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
+<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
+<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node69.html">
 <LINK REL="previous" HREF="node67.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node69.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1033"
+<A NAME="tex2html1067"
   HREF="node69.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1029"
-  HREF="node44.html">
+<A NAME="tex2html1063"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1023"
+<A NAME="tex2html1057"
   HREF="node67.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1031"
+<A NAME="tex2html1065"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1034"
-  HREF="node69.html">psb_sp_getrow   Extract</A>
-<B> Up:</B> <A NAME="tex2html1030"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1024"
-  HREF="node67.html">psb_get_boundary   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1032"
+<B> Next:</B> <A NAME="tex2html1068"
+  HREF="node69.html">psb_geasb   Assembly</A>
+<B> Up:</B> <A NAME="tex2html1064"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1058"
+  HREF="node67.html">psb_geall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html1066"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000724000000000000000">
-psb_get_overlap -- Extract list of overlap elements</A>
+<H2><A NAME="SECTION000713000000000000000">
+psb_geins -- Dense matrix insertion routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_overlap(ovrel, desc, info)
+call psb_geins(m, irw, val, x, desc_a, info,dupl)
 </PRE>
 
 <P>
@@ -68,7 +68,54 @@ call psb_get_overlap(ovrel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
+<DT><STRONG>m</STRONG></DT>
+<DD>Number of rows in <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img103.png"
+ ALT="$val$"> to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.
+</DD>
+<DT><STRONG>irw</STRONG></DT>
+<DD>Indices of the rows to be inserted. Specifically, row <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">
+  of <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img103.png"
+ ALT="$val$"> will be inserted into the local row corresponding to the
+  global row index <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img104.png"
+ ALT="$irw(i)$">.
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array.
+</DD>
+<DT><STRONG>val</STRONG></DT>
+<DD>the dense submatrix to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank 1 or 2  array.
+Specified as: an integer value.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -79,6 +126,18 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>How to handle duplicate coefficients.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
+<code>psb_dupl_add_</code>.
+</DD>
 </DL>
 
 <P>
@@ -86,18 +145,17 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ovrel</STRONG></DT>
-<DD>The list of overlap elements on the calling process, in
-  local numbering.
+<DT><STRONG>x</STRONG></DT>
+<DD>the output dense matrix.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
+Specified as: a rank one or two array with the ALLOCATABLE
+attribute, of type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -116,16 +174,38 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>If there are no overlap elements the output vector is set
-  to the ``not allocated'' state.  
+<LI>Dense vectors/matrices do not have an associated state;
 </LI>
-<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
-  number of overlap elements. 
+<LI>Duplicate entries are either overwritten or added, there is no
+  provision for raising an error condition. 
 </LI>
 </OL>
 
 <P>
-<BR><HR>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1067"
+  HREF="node69.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1063"
+  HREF="node55.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1057"
+  HREF="node67.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1065"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1068"
+  HREF="node69.html">psb_geasb   Assembly</A>
+<B> Up:</B> <A NAME="tex2html1064"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1058"
+  HREF="node67.html">psb_geall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html1066"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

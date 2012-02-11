@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Iterative Methods</TITLE>
-<META NAME="description" CONTENT="Iterative Methods">
+<TITLE>Utilities</TITLE>
+<META NAME="description" CONTENT="Utilities">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,7 +18,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node107.html">
+<LINK REL="next" HREF="node111.html">
 <LINK REL="previous" HREF="node100.html">
 <LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node106.html">
@@ -26,41 +26,41 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1496"
+<A NAME="tex2html1525"
   HREF="node106.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1492"
+<A NAME="tex2html1521"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1486"
+<A NAME="tex2html1515"
   HREF="node104.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1494"
+<A NAME="tex2html1523"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1497"
-  HREF="node106.html">psb_krylov   Krylov</A>
-<B> Up:</B> <A NAME="tex2html1493"
+<B> Next:</B> <A NAME="tex2html1526"
+  HREF="node106.html">hb_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1522"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1487"
-  HREF="node104.html">psb_precdescr   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1495"
+<B> Previous:</B> <A NAME="tex2html1516"
+  HREF="node104.html">psb_set_erraction   Set</A>
+ &nbsp; <B>  <A NAME="tex2html1524"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000120000000000000000"></A>
-<A NAME="sec:methods"></A>
+<H1><A NAME="SECTION000100000000000000000"></A>
+<A NAME="sec:util"></A>
 <BR>
-Iterative Methods
+Utilities
 </H1>
 
 <P>
-In this chapter we provide routines for preconditioners and iterative
-methods. The interfaces for Krylov subspace methods are available in
-the module <code>psb_krylov_mod</code>.
+We have some utitlities available for input and output of
+sparsematrices; the interfaces to these routines are available in the
+module <code>psb_util_mod</code>.
 
 <P>
 <BR><HR>
@@ -68,9 +68,21 @@ the module <code>psb_krylov_mod</code>.
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
 <UL>
-<LI><A NAME="tex2html1498"
-  HREF="node106.html">psb_krylov  -- Krylov Methods Driver
-      Routine</A>
+<LI><A NAME="tex2html1527"
+  HREF="node106.html">hb_read -- Read a sparse matrix from a file in the
+  Harwell-Boeing format</A>
+<LI><A NAME="tex2html1528"
+  HREF="node107.html">hb_write -- Write a sparse matrix to a  file
+  in the Harwell-Boeing format</A>
+<LI><A NAME="tex2html1529"
+  HREF="node108.html">mm_mat_read -- Read a sparse matrix from a
+  file in the MatrixMarket format</A>
+<LI><A NAME="tex2html1530"
+  HREF="node109.html">mm_vet_read -- Read a dense vector from a
+  file in the MatrixMarket format</A>
+<LI><A NAME="tex2html1531"
+  HREF="node110.html">mm_mat_write -- Write a sparse matrix to a
+  file in the MatrixMarket format</A>
 </UL>
 <!--End of Table of Child-Links-->
 <BR><HR>

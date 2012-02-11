@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_vet_read -- Read a dense vector from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_vet_read -- Read a dense vector from a file in the MatrixMarket format">
+<TITLE>psb_snd -- Send data</TITLE>
+<META NAME="description" CONTENT="psb_snd -- Send data">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,69 +20,126 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node94.html">
+<LINK REL="up" HREF="node83.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1412"
+<A NAME="tex2html1441"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1408"
-  HREF="node94.html">
+<A NAME="tex2html1437"
+  HREF="node83.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1402"
+<A NAME="tex2html1431"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1410"
+<A NAME="tex2html1439"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1413"
-  HREF="node99.html">mm_mat_write   Write</A>
-<B> Up:</B> <A NAME="tex2html1409"
-  HREF="node94.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1403"
-  HREF="node97.html">mm_mat_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1411"
+<B> Next:</B> <A NAME="tex2html1442"
+  HREF="node99.html">psb_rcv   Receive</A>
+<B> Up:</B> <A NAME="tex2html1438"
+  HREF="node83.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1432"
+  HREF="node97.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1440"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000104000000000000000">
-mm_vet_read -- Read a dense vector from a
-  file in the MatrixMarket format</A>
+<H2><A NAME="SECTION000815000000000000000">
+psb_snd -- Send data</A>
 </H2>
 
+<P>
 <PRE>
-call mm_vet_read(b, iret, iunit, filename)
+call psb_snd(icontxt, dat, dst, m)
 </PRE>
 
 <P>
+This subroutine sends a packet of data to a destination.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous: see usage notes. 
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be read.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Type:<B>optional</B>.
+Scope: <B>global</B>.
 <BR>
-Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default input unit  5 (i.e. standard input
-in Unix jargon) is used. Default: <code>-</code>. 
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
 </DD>
-<DT><STRONG>iunit</STRONG></DT>
-<DD>The Fortran file unit number.
+<DT><STRONG>dat</STRONG></DT>
+<DD>The data to be sent.
 <BR>
-Type:<B>optional</B>.
+Scope: <B>local</B>.
 <BR>
-Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind and  rank must agree on sender and receiver process; if <IMG
+ WIDTH="18" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img128.png"
+ ALT="$m$"> is
+not specified, size must agree as well. 
+</DD>
+<DT><STRONG>dst</STRONG></DT>
+<DD>Destination process.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $0<= dst <= np-1$
+ -->
+<IMG
+ WIDTH="146" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img129.png"
+ ALT="$0&lt;= dst &lt;= np-1$">. 
+<BR></DD>
+<DT><STRONG>m</STRONG></DT>
+<DD>Number of rows.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>Optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $0<= m <= size(dat,1)$
+ -->
+<IMG
+ WIDTH="171" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img130.png"
+ ALT="$0&lt;= m &lt;= size(dat,1)$">. 
+<BR>
+When <IMG
+ WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img131.png"
+ ALT="$dat$"> is a rank 2 array, specifies the number of rows to be sent
+independently of the leading dimension <IMG
+ WIDTH="82" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img132.png"
+ ALT="$size(dat,1)$">; must have the
+same value on sending and receiving processes.
 </DD>
 </DL>
 
@@ -91,26 +148,45 @@ Specified as: an integer value. Only meaningful if filename is not <code>-</code
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side(s).
-<BR>
-Type: <B>required</B> 
-<BR>
-An  array of type real or complex, rank 2 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side, otherwise will be left in the UNALLOCATED state. 
-</DD>
-<DT><STRONG>iret</STRONG></DT>
-<DD>Error code.
-<BR>
-Type: <B>required</B> 
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
 </DL>
 
 <P>
-<BR><HR>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This subroutine implies a synchronization, but only between the
+  calling process and the destination  process <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img133.png"
+ ALT="$dst$">.
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1441"
+  HREF="node99.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1437"
+  HREF="node83.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1431"
+  HREF="node97.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1439"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1442"
+  HREF="node99.html">psb_rcv   Receive</A>
+<B> Up:</B> <A NAME="tex2html1438"
+  HREF="node83.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1432"
+  HREF="node97.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1440"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_global_rows -- Get number of global rows</TITLE>
-<META NAME="description" CONTENT="get_global_rows -- Get number of global rows">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,7 +18,6 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node19.html">
 <LINK REL="previous" HREF="node17.html">
 <LINK REL="up" HREF="node15.html">
 <LINK REL="next" HREF="node19.html">
@@ -26,68 +25,69 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html395"
+<A NAME="tex2html420"
   HREF="node19.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html391"
+<A NAME="tex2html416"
   HREF="node15.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html385"
+<A NAME="tex2html412"
   HREF="node17.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html393"
+<A NAME="tex2html418"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html396"
-  HREF="node19.html">get_global_cols   Get</A>
-<B> Up:</B> <A NAME="tex2html392"
-  HREF="node15.html">Data structure query routines</A>
-<B> Previous:</B> <A NAME="tex2html386"
-  HREF="node17.html">get_local_cols   Get</A>
- &nbsp; <B>  <A NAME="tex2html394"
+<B> Next:</B> <A NAME="tex2html421"
+  HREF="node19.html">Sparse Matrix class</A>
+<B> Up:</B> <A NAME="tex2html417"
+  HREF="node15.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html413"
+  HREF="node17.html">psb_cd_set_large_threshold   Set</A>
+ &nbsp; <B>  <A NAME="tex2html419"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00045300000000000000">
-get_global_rows -- Get number of global rows</A>
+<H3><A NAME="SECTION00042300000000000000"></A>
+<A NAME="sec:cd_constants"></A>
+<BR>
+Named Constants
 </H3>
-
-<P>
-<PRE>
-nr = desc%get_global_rows()
-</PRE>
-
-<P>
 <DL>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
+<DT><STRONG>psb_none_</STRONG></DT>
+<DD>Generic no-op;
 </DD>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DT><STRONG>psb_nohalo_</STRONG></DT>
+<DD>Do not fetch halo elements;
 </DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+<DT><STRONG>psb_halo_</STRONG></DT>
+<DD>Fetch halo elements from neighbouring processes;
 </DD>
-</DL>
+<DT><STRONG>psb_sum_</STRONG></DT>
+<DD>Sum overlapped elements
+</DD>
+<DT><STRONG>psb_avg_</STRONG></DT>
+<DD>Average overlapped elements
+</DD>
+<DT><STRONG>psb_comm_halo_</STRONG></DT>
+<DD>Exchange data based on the <code>halo_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ext_</STRONG></DT>
+<DD>Exchange data based on the <code>ext_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ovr_</STRONG></DT>
+<DD>Exchange data based on the <code>ovrlap_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_mov_</STRONG></DT>
+<DD>Exchange data based on the <code>ovr_mst_idx</code>
+  list;
 
 <P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of global rows in the mesh
 </DD>
 </DL>
 

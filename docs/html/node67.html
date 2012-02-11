@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
-<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
+<TITLE>psb_geall -- Allocates a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geall -- Allocates a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,64 +20,100 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node68.html">
 <LINK REL="previous" HREF="node66.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node68.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1021"
+<A NAME="tex2html1055"
   HREF="node68.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1017"
-  HREF="node44.html">
+<A NAME="tex2html1051"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1011"
+<A NAME="tex2html1045"
   HREF="node66.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1019"
+<A NAME="tex2html1053"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1022"
-  HREF="node68.html">psb_get_overlap   Extract</A>
-<B> Up:</B> <A NAME="tex2html1018"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1012"
-  HREF="node66.html">psb_local_index</A>
- &nbsp; <B>  <A NAME="tex2html1020"
+<B> Next:</B> <A NAME="tex2html1056"
+  HREF="node68.html">psb_geins   Dense</A>
+<B> Up:</B> <A NAME="tex2html1052"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1046"
+  HREF="node66.html">psb_sprn   Reinit</A>
+ &nbsp; <B>  <A NAME="tex2html1054"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000723000000000000000">
-psb_get_boundary -- Extract list of boundary elements</A>
+<H2><A NAME="SECTION000712000000000000000">
+psb_geall -- Allocates a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_boundary(bndel, desc, info)
+call psb_geall(x, desc_a, info, n, lb)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>The communication descriptor.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
+<BR></DD>
+<DT><STRONG>n</STRONG></DT>
+<DD>The number of columns of the dense matrix to be allocated.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: Integer scalar, default <IMG
+ WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
+ ALT="$1$">. It is not a valid argument  if <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is a
+rank-1 array. 
+</DD>
+<DT><STRONG>lb</STRONG></DT>
+<DD>The lower bound for the column index range of the dense matrix to be allocated.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: Integer scalar, default <IMG
+ WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
+ ALT="$1$">. It is not a valid argument if <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is a
+rank-1 array. 
 </DD>
 </DL>
 
@@ -86,9 +122,8 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>bndel</STRONG></DT>
-<DD>The list of boundary elements on the calling process, in
-  local numbering.
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be allocated.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -96,8 +131,8 @@ Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
+Specified as: a rank one or two array with the ALLOCATABLE
+attribute, of type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -111,19 +146,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>If there are no boundary elements (i.e., if the local part of
-  the connectivity graph is self-contained) the output vector is set
-  to the ``not allocated'' state. 
-</LI>
-<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
-  number of boundary elements. 
-</LI>
-</OL>
 
 <P>
 <BR><HR>

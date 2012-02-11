@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_nrows -- Get number of rows in a sparse matrix</TITLE>
-<META NAME="description" CONTENT="get_nrows -- Get number of rows in a sparse matrix">
+<TITLE>get_nnzeros -- Get number of nonzero elements in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_nnzeros -- Get number of nonzero elements in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node24.html">
 <LINK REL="previous" HREF="node22.html">
-<LINK REL="up" HREF="node20.html">
+<LINK REL="up" HREF="node19.html">
 <LINK REL="next" HREF="node24.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html456"
+<A NAME="tex2html489"
   HREF="node24.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html452"
-  HREF="node20.html">
+<A NAME="tex2html485"
+  HREF="node19.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html446"
+<A NAME="tex2html479"
   HREF="node22.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html454"
+<A NAME="tex2html487"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html457"
-  HREF="node24.html">get_ncols   Get</A>
-<B> Up:</B> <A NAME="tex2html453"
-  HREF="node20.html">get_context Get communication context</A>
-<B> Previous:</B> <A NAME="tex2html447"
-  HREF="node22.html">psb_cd_set_large_threshold   Set</A>
- &nbsp; <B>  <A NAME="tex2html455"
+<B> Next:</B> <A NAME="tex2html490"
+  HREF="node24.html">get_size   Get</A>
+<B> Up:</B> <A NAME="tex2html486"
+  HREF="node19.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html480"
+  HREF="node22.html">get_ncols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html488"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00046300000000000000">
-get_nrows -- Get number of  rows in a sparse  matrix</A>
+<H3><A NAME="SECTION00043400000000000000">
+get_nnzeros -- Get number of nonzero elements
+  in a sparse matrix</A>
 </H3>
 
 <P>
 <PRE>
-nr = a%get_nrows()
+nz = a%get_nnzeros()
 </PRE>
 
 <P>
@@ -72,13 +73,7 @@ nr = a%get_nrows()
 <DD>the sparse matrix
 <BR>
 Scope: <B>local</B>
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
-</DD>
+<BR></DD>
 </DL>
 
 <P>
@@ -87,9 +82,19 @@ Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of  rows  of sparse matrix <code>a</code>.
+<DD>The number of nonzero elements stored in sparse matrix <code>a</code>.
 </DD>
 </DL>
+
+<P>
+<B>Notes</B>
+
+<OL>
+<LI>The function value is specific to the storage format of matrix
+  <code>a</code>; some storage formats employ padding, thus the returned
+  value for the same matrix may be different for different storage choices.
+</LI>
+</OL>
 
 <P>
 <BR><HR>

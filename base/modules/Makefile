@@ -93,6 +93,7 @@ psb_hash_map_mod.o psb_list_map_mod.o psb_repl_map_mod.o psb_gen_block_map_mod.o
 psb_glist_map_mod.o: psb_list_map_mod.o
 psb_hash_map_mod.o: psb_hash_mod.o psb_sort_mod.o
 psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
+psb_gen_block_map_mod.o: psb_hash_mod.o
 psb_linmap_mod.o: psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o 
 psb_s_linmap_mod.o: psb_base_linmap_mod.o psb_s_mat_mod.o psb_s_vect_mod.o
 psb_d_linmap_mod.o: psb_base_linmap_mod.o psb_d_mat_mod.o psb_d_vect_mod.o

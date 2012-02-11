@@ -11,10 +11,10 @@ dense matrix operations.  The current implementation of PSBLAS
 addresses a distributed memory execution model operating with message
 passing. 
 
-The PSBLAS library version 3 is internally implemented in
+The PSBLAS library version 3 is  implemented in
  the Fortran~2003~\cite{metcalf} programming language, with reuse and/or
- adaptation of some existing Fortran~77 software, and a handful of C
- routines. 
+ adaptation of  existing Fortran~77 and Fortran~95 software, plus a
+ handful of C  routines. 
 
 The use of Fortran~2003 offers a number of advantages over Fortran~95,
 mostly in the handling of requirements for evolution and adaptation of
@@ -103,7 +103,8 @@ further details on our communication layer see Sec.~\ref{sec:parenv}.
 \ifcase\pdfoutput
 \includegraphics[scale=0.65]{figures/psblas.eps}
 \or
-\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
+%\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
+{\includegraphics[scale=0.65]{figures/psblas}}
 \fi
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
@@ -148,7 +149,7 @@ process generates its own portion. We never require that the entire
 matrix be available on a single node. However, it is possible
 to hold the entire matrix in one process and distribute it
 explicitly\footnote{In our prototype implementation  we provide 
-sample scatter/gather routines.}, even though  the resulting 
+sample scatter/gather routines.}, even though  the resulting memory 
 bottleneck would make this option unattractive in most  cases. 
 
 
@@ -263,11 +264,11 @@ systems solution for block diagonal matrices;
 The following naming scheme has been adopted for all the symbols
 internally defined in the PSBLAS software package:
 \begin{itemize}
-\item all the symbols (i.e. subroutine names, data types...) are
+\item all symbols (i.e. subroutine names, data types...) are
   prefixed by \verb|psb_| 
-\item all the data type names are suffixed by \verb|_type|
-\item all the constant values are suffixed by \verb|_|
-\item all the subroutine names follow the rule \verb|psb_xxname| where
+\item all data type names are suffixed by \verb|_type|
+\item all constants are suffixed by \verb|_|
+\item all top-level subroutine names follow the rule \verb|psb_xxname| where
   \verb|xx| can be either:
   \begin{itemize}
   \item \verb|ge|: the routine is related to dense data, 
@@ -280,7 +281,7 @@ internally defined in the PSBLAS software package:
   dense matrices, sparse matrices and communication descriptors
   respectively.
   Interface overloading allows the usage of the same subroutine
-  interfaces for both real and complex data.
+  names  for both real and complex data.
 \end{itemize}
 In the description of the subroutines, arguments or argument entries
 are classified as:
@@ -360,7 +361,7 @@ follows:
 \item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
 \end{enumerate}
 This is the structure of the sample program
-\verb|test/pargen/ppde90.f90|. 
+\verb|test/pargen/ppde.f90|. 
 
 For a simulation in which the same discretization mesh is used over
 multiple time steps, the following structure may be more appropriate:

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geaxpby -- General Dense Matrix Sum</TITLE>
-<META NAME="description" CONTENT="psb_geaxpby -- General Dense Matrix Sum">
+<TITLE>is_bld, is_upd, is_asb -- Status check</TITLE>
+<META NAME="description" CONTENT="is_bld, is_upd, is_asb -- Status check">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,202 +20,61 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node28.html">
 <LINK REL="previous" HREF="node26.html">
-<LINK REL="up" HREF="node26.html">
+<LINK REL="up" HREF="node19.html">
 <LINK REL="next" HREF="node28.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html514"
+<A NAME="tex2html537"
   HREF="node28.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html510"
-  HREF="node26.html">
+<A NAME="tex2html533"
+  HREF="node19.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html504"
+<A NAME="tex2html527"
   HREF="node26.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html512"
+<A NAME="tex2html535"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html515"
-  HREF="node28.html">psb_gedot   Dot</A>
-<B> Up:</B> <A NAME="tex2html511"
-  HREF="node26.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html505"
-  HREF="node26.html">Computational routines</A>
- &nbsp; <B>  <A NAME="tex2html513"
+<B> Next:</B> <A NAME="tex2html538"
+  HREF="node28.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html534"
+  HREF="node19.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html528"
+  HREF="node26.html">get_fmt   Short</A>
+ &nbsp; <B>  <A NAME="tex2html536"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00051000000000000000">
-psb_geaxpby -- General Dense Matrix Sum</A>
-</H2>
-
-<P>
-This subroutine is an interface to the computational kernel for
-dense matrix sum:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-y \leftarrow  \alpha\> x+ \beta y
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="93" HEIGHT="27" BORDER="0"
- SRC="img26.png"
- ALT="\begin{displaymath}y \leftarrow \alpha\&gt; x+ \beta y \end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P> 
+<H3><A NAME="SECTION00043800000000000000">
+is_bld, is_upd, is_asb  -- Status check</A>
+</H3>
 
 <P>
 <PRE>
-call psb_geaxpby(alpha, x, beta, y, desc_a, info)
+if (a%is_bld()) then 
+if (a%is_upd()) then 
+if (a%is_asb()) then 
 </PRE>
-
-<P>
-<BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1438"></A>
-<TABLE>
-<CAPTION><STRONG>Table 1:</STRONG>
-Data types</CAPTION>
-<TR><TD>
-<DIV ALIGN="CENTER">
-<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">, <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">, <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img29.png"
- ALT="$\alpha$">, <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img30.png"
- ALT="$\beta$"></TD>
-<TD ALIGN="LEFT"><B>Subroutine</B></TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geaxpby</TD>
-</TR>
-</TABLE>
-</DIV>
-</TD></TR>
-</TABLE>
-</DIV><P></P>
-<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>alpha</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img29.png"
- ALT="$\alpha$">.
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix
 <BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank one or two array 
-containing numbers of type 
-specified in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> must be the same of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">. 
-</DD>
-<DT><STRONG>beta</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img30.png"
- ALT="$\beta$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of the global dense matrix
-<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">. 
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one or two array containing numbers of the type 
-indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$"> must be the same of <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">. 
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>contains data structures for communications.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
-</DD>
+Scope: <B>local</B>
+<BR></DD>
 </DL>
 
 <P>
@@ -223,59 +82,14 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of result submatrix <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$">.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A <code>logical</code> value indicating whether the
+  matrix is in the Build, Update or Assembled state, respectively. 
 </DD>
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html514"
-  HREF="node28.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html510"
-  HREF="node26.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html504"
-  HREF="node26.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html512"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html515"
-  HREF="node28.html">psb_gedot   Dot</A>
-<B> Up:</B> <A NAME="tex2html511"
-  HREF="node26.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html505"
-  HREF="node26.html">Computational routines</A>
- &nbsp; <B>  <A NAME="tex2html513"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Computational routines</TITLE>
-<META NAME="description" CONTENT="Computational routines">
+<TITLE>get_fmt -- Short description of the dynamic type</TITLE>
+<META NAME="description" CONTENT="get_fmt -- Short description of the dynamic type">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,75 +18,76 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node39.html">
-<LINK REL="previous" HREF="node8.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node27.html">
+<LINK REL="previous" HREF="node25.html">
+<LINK REL="up" HREF="node19.html">
 <LINK REL="next" HREF="node27.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html490"
+<A NAME="tex2html525"
   HREF="node27.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html486"
-  HREF="userhtml.html">
+<A NAME="tex2html521"
+  HREF="node19.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html480"
+<A NAME="tex2html515"
   HREF="node25.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html488"
+<A NAME="tex2html523"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html491"
-  HREF="node27.html">psb_geaxpby   General</A>
-<B> Up:</B> <A NAME="tex2html487"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html481"
-  HREF="node25.html">get_nnzeros   Get</A>
- &nbsp; <B>  <A NAME="tex2html489"
+<B> Next:</B> <A NAME="tex2html526"
+  HREF="node27.html">is_bld, is_upd, is_asb </A>
+<B> Up:</B> <A NAME="tex2html522"
+  HREF="node19.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html516"
+  HREF="node25.html">sizeof   Get</A>
+ &nbsp; <B>  <A NAME="tex2html524"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00050000000000000000">
-Computational routines</A>
-</H1>
+<H3><A NAME="SECTION00043700000000000000">
+get_fmt  -- Short description of the dynamic type</A>
+</H3>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<PRE>
+write(*,*) a%get_fmt()
+</PRE>
 
-<UL>
-<LI><A NAME="tex2html492"
-  HREF="node27.html">psb_geaxpby -- General Dense Matrix Sum</A>
-<LI><A NAME="tex2html493"
-  HREF="node28.html">psb_gedot -- Dot Product</A>
-<LI><A NAME="tex2html494"
-  HREF="node29.html">psb_gedots -- Generalized Dot Product</A>
-<LI><A NAME="tex2html495"
-  HREF="node30.html">psb_geamax -- Infinity-Norm of Vector</A>
-<LI><A NAME="tex2html496"
-  HREF="node31.html">psb_geamaxs -- Generalized Infinity Norm</A>
-<LI><A NAME="tex2html497"
-  HREF="node32.html">psb_geasum -- 1-Norm of Vector</A>
-<LI><A NAME="tex2html498"
-  HREF="node33.html">psb_geasums -- Generalized 1-Norm of Vector</A>
-<LI><A NAME="tex2html499"
-  HREF="node34.html">psb_genrm2 -- 2-Norm of Vector</A>
-<LI><A NAME="tex2html500"
-  HREF="node35.html">psb_genrm2s -- Generalized 2-Norm of Vector</A>
-<LI><A NAME="tex2html501"
-  HREF="node36.html">psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html502"
-  HREF="node37.html">psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
-<LI><A NAME="tex2html503"
-  HREF="node38.html">psb_spsm -- Triangular System Solve</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix
+<BR>
+Scope: <B>local</B>
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A short string describing the dynamic type of
+  the matrix. Predefined values include <code>NULL</code>, <code>COO</code>,
+  <code>CSR</code> and <code>CSC</code>. 
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>

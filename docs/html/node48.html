@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
+<TITLE>psb_spmm -- Sparse Matrix by Dense Matrix Product</TITLE>
+<META NAME="description" CONTENT="psb_spmm -- Sparse Matrix by Dense Matrix Product">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,84 +20,373 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node49.html">
 <LINK REL="previous" HREF="node47.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node37.html">
 <LINK REL="next" HREF="node49.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html793"
+<A NAME="tex2html800"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html789"
-  HREF="node44.html">
+<A NAME="tex2html796"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html783"
+<A NAME="tex2html790"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html791"
+<A NAME="tex2html798"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html794"
-  HREF="node49.html">psb_cdfree   Frees</A>
-<B> Up:</B> <A NAME="tex2html790"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html784"
-  HREF="node47.html">psb_cdasb   Communication</A>
- &nbsp; <B>  <A NAME="tex2html792"
+<B> Next:</B> <A NAME="tex2html801"
+  HREF="node49.html">psb_spsm   Triangular</A>
+<B> Up:</B> <A NAME="tex2html797"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html791"
+  HREF="node47.html">psb_spnrmi   Infinity</A>
+ &nbsp; <B>  <A NAME="tex2html799"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00074000000000000000">
-psb_cdcpy -- Copies a communication descriptor</A>
+<H2><A NAME="SECTION000511000000000000000">
+psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
 </H2>
 
 <P>
-<PRE>
-call psb_cdcpy(desc_in, desc_out, info)
-</PRE>
+This subroutine computes the Sparse Matrix by Dense Matrix Product:
 
 <P>
+<BR>
+<DIV ALIGN="RIGHT">
+
+<!-- MATH
+ \begin{equation}
+y \leftarrow \alpha P_r A P_c x + \beta y
+\end{equation}
+ -->
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_no_tra"></A><IMG
+ WIDTH="136" HEIGHT="27" BORDER="0"
+ SRC="img48.png"
+ ALT="\begin{displaymath}
+y \leftarrow \alpha P_r A P_c x + \beta y
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(1)</TD></TR>
+</TABLE>
+<BR CLEAR="ALL"></DIV><P></P>
+<BR>
+<DIV ALIGN="RIGHT">
+
+<!-- MATH
+ \begin{equation}
+y \leftarrow \alpha P_r A^T P_c x + \beta y
+\end{equation}
+ -->
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_tra"></A><IMG
+ WIDTH="145" HEIGHT="27" BORDER="0"
+ SRC="img49.png"
+ ALT="\begin{displaymath}
+y \leftarrow \alpha P_r A^T P_c x + \beta y
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(2)</TD></TR>
+</TABLE>
+<BR CLEAR="ALL"></DIV><P></P>
+<BR>
+<DIV ALIGN="RIGHT">
+
+<!-- MATH
+ \begin{equation}
+y \leftarrow \alpha P_r A^H P_c x + \beta y
+\end{equation}
+ -->
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_con"></A><IMG
+ WIDTH="148" HEIGHT="27" BORDER="0"
+ SRC="img50.png"
+ ALT="\begin{displaymath}
+y \leftarrow \alpha P_r A^H P_c x + \beta y
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(3)</TD></TR>
+</TABLE>
+<BR CLEAR="ALL"></DIV><P></P>
+
+<P>
+where:
 <DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DT><STRONG><IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"></STRONG></DT>
+<DD>is the global dense submatrix <IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img51.png"
+ ALT="$x_{:, :}$">
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
+<DT><STRONG><IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"></STRONG></DT>
+<DD>is the global dense submatrix <IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img52.png"
+ ALT="$y_{:, :}$">
 </DD>
-<DT><STRONG>desc_in</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
+<DT><STRONG><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></STRONG></DT>
+<DD>is the global sparse submatrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">
+</DD>
+<DT><STRONG><IMG
+ WIDTH="45" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img53.png"
+ ALT="$P_r, P_c$"></STRONG></DT>
+<DD>are the permutation matrices.
 </DD>
 </DL>
 
 <P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="1526"></A>
+<TABLE>
+<CAPTION><STRONG>Table 11:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">, <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">, <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$">, <IMG
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="$\alpha$">, <IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img28.png"
+ ALT="$\beta$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_spmm</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_spmm</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_spmm</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_spmm</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<PRE>
+call psb_spmm(alpha, a, x, beta, y, desc_a, info)
+call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
+             &amp; trans, work)
+</PRE> 
+
+<P>
 <DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>alpha</STRONG></DT>
+<DD>the scalar <IMG
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="$\alpha$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data type indicated in
+Table&nbsp;<A HREF="#tab:f90spmm">11</A>. 
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the local portion of the sparse matrix
+<IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">. 
+
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as:  a rank one or two array
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90spmm">11</A>.  The rank of <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> must be the same of <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$">. 
+</DD>
+<DT><STRONG>beta</STRONG></DT>
+<DD>the scalar <IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img28.png"
+ ALT="$\beta$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90spmm">11</A>.
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$">. 
+
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one or two array 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90spmm">11</A>. The rank of <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> must be the same of <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">. 
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>indicate what kind of operation to perform.
+<DL>
+<DT><STRONG>trans = N</STRONG></DT>
+<DD>the operation is specified by equation <A HREF="#eq:f90spmm_no_tra">1</A>
+</DD>
+<DT><STRONG>trans = T</STRONG></DT>
+<DD>the operation is specified by equation
+<A HREF="#eq:f90spmm_tra">2</A>
+</DD>
+<DT><STRONG>trans = C</STRONG></DT>
+<DD>the operation is specified by equation
+<A HREF="#eq:f90spmm_con">3</A>
+</DD>
+</DL>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Default: <IMG
+ WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img54.png"
+ ALT="$trans = N$">
+<BR>
+Specified as: a character variable.
+
+<P>
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>work array.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one array of the same type of <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> and <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$"> with
+the TARGET attribute. 
+
+<P>
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the communication descriptor copy.
+<DT><STRONG>y</STRONG></DT>
+<DD>the local portion of result submatrix <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$y$">.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B> 
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an array of rank one or two
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90spmm">11</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -113,7 +402,30 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BR><HR>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html800"
+  HREF="node49.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html796"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html790"
+  HREF="node47.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html798"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html801"
+  HREF="node49.html">psb_spsm   Triangular</A>
+<B> Up:</B> <A NAME="tex2html797"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html791"
+  HREF="node47.html">psb_spnrmi   Infinity</A>
+ &nbsp; <B>  <A NAME="tex2html799"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

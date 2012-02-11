@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_is_local </TITLE>
-<META NAME="description" CONTENT="psb_is_local ">
+<TITLE>psb_spfree -- Frees a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spfree -- Frees a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,65 +20,65 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node66.html">
 <LINK REL="previous" HREF="node64.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node66.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html997"
+<A NAME="tex2html1031"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html993"
-  HREF="node44.html">
+<A NAME="tex2html1027"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html987"
+<A NAME="tex2html1021"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html995"
+<A NAME="tex2html1029"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html998"
-  HREF="node66.html">psb_local_index</A>
-<B> Up:</B> <A NAME="tex2html994"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html988"
-  HREF="node64.html">psb_owned_index</A>
- &nbsp; <B>  <A NAME="tex2html996"
+<B> Next:</B> <A NAME="tex2html1032"
+  HREF="node66.html">psb_sprn   Reinit</A>
+<B> Up:</B> <A NAME="tex2html1028"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1022"
+  HREF="node64.html">psb_spasb   Sparse</A>
+ &nbsp; <B>  <A NAME="tex2html1030"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000721000000000000000">
-psb_is_local </A>
+<H2><A NAME="SECTION000710000000000000000">
+psb_spfree -- Frees a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_is_local(x, desc_a)
+call psb_spfree(a, desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>Integer index.
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be freed.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a scalar integer.
-<BR></DD>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
@@ -97,29 +97,18 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>A logical mask which is true if 
-  <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> is  local to the current process
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
 </DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>This routine returns a <code>.true.</code> value for an index
-  that is local to the current process, including the halo
-  indices
-</LI>
-</OL>
 
 <P>
 <BR><HR>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sizeof -- Memory occupation</TITLE>
-<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
+<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,76 +20,71 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node71.html">
 <LINK REL="previous" HREF="node69.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node71.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1057"
+<A NAME="tex2html1091"
   HREF="node71.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1053"
-  HREF="node44.html">
+<A NAME="tex2html1087"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1047"
+<A NAME="tex2html1081"
   HREF="node69.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1055"
+<A NAME="tex2html1089"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1058"
-  HREF="node71.html">Sorting utilities</A>
-<B> Up:</B> <A NAME="tex2html1054"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1048"
-  HREF="node69.html">psb_sp_getrow   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1056"
+<B> Next:</B> <A NAME="tex2html1092"
+  HREF="node71.html">psb_gelp   Applies</A>
+<B> Up:</B> <A NAME="tex2html1088"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1082"
+  HREF="node69.html">psb_geasb   Assembly</A>
+ &nbsp; <B>  <A NAME="tex2html1090"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000726000000000000000">
-psb_sizeof -- Memory occupation</A>
+<H2><A NAME="SECTION000715000000000000000">
+psb_gefree -- Frees a dense matrix</A>
 </H2>
 
 <P>
-This function computes the memory occupation of a PSBLAS object.
-
-<P>
 <PRE>
-isz = psb_sizeof(a)
-isz = psb_sizeof(desc_a)
-isz = psb_sizeof(prec)
+call psb_gefree(x, desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-<IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">. 
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to
+  be freed.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: a rank one or two array with the ALLOCATABLE
+attribute, of type real, complex or integer.
+<BR>
+<P>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>Communication descriptor.
+<DD>The communication descriptor.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -97,27 +92,25 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation of the object specified in
-  the calling sequence, in bytes.
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
 <BR>
 Scope: <B>local</B> 
 <BR>
-Returned  as: an <code>integer(psb_long_int_k_)</code> number.
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gather -- Gather Global Dense Matrix</TITLE>
-<META NAME="description" CONTENT="psb_gather -- Gather Global Dense Matrix">
+<TITLE>psb_geamaxs -- Generalized Infinity Norm</TITLE>
+<META NAME="description" CONTENT="psb_geamaxs -- Generalized Infinity Norm">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,123 +20,102 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node43.html">
 <LINK REL="previous" HREF="node41.html">
-<LINK REL="up" HREF="node39.html">
+<LINK REL="up" HREF="node37.html">
 <LINK REL="next" HREF="node43.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html696"
+<A NAME="tex2html728"
   HREF="node43.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html692"
-  HREF="node39.html">
+<A NAME="tex2html724"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html686"
+<A NAME="tex2html718"
   HREF="node41.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html694"
+<A NAME="tex2html726"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html697"
-  HREF="node43.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html693"
-  HREF="node39.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html687"
-  HREF="node41.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html695"
+<B> Next:</B> <A NAME="tex2html729"
+  HREF="node43.html">psb_geasum   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html725"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html719"
+  HREF="node41.html">psb_geamax   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html727"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00063000000000000000">
-psb_gather -- Gather Global Dense Matrix</A>
+<H2><A NAME="SECTION00055000000000000000">
+psb_geamaxs -- Generalized Infinity Norm</A>
 </H2>
 
 <P>
-These subroutines collect the portions of global dense matrix
-distributed over all process into one single array stored on one
-process.
-
-<P>
+This subroutine computes a series of  infinity norms on the columns of
+a  dense matrix  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-glob\_x \leftarrow collect(loc\_x_i)
+res(i) \leftarrow \max_k |x(k,i)|
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="163" HEIGHT="28" BORDER="0"
- SRC="img75.png"
- ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
+ WIDTH="147" HEIGHT="36" BORDER="0"
+ SRC="img37.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
-where:
-<DL>
-<DT><STRONG><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
- ALT="$glob\_x$"></STRONG></DT>
-<DD>is the global submatrix <!-- MATH
- $glob\_x_{1:m,1:n}$
- -->
-<IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img77.png"
- ALT="$glob\_x_{1:m,1:n}$">
-</DD>
-<DT><STRONG><IMG
- WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
- ALT="$loc\_x_i$"></STRONG></DT>
-<DD>is the local portion of global dense matrix on
-process <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$">.
-</DD>
-<DT><STRONG><IMG
- WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img79.png"
- ALT="$collect$"></STRONG></DT>
-<DD>is the collect function.
-</DD>
-</DL>
+
+<P>
+<PRE>
+call psb_geamaxs(res, x, desc_a, info)
+</PRE>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2691"></A>
+<DIV ALIGN="CENTER"><A NAME="1520"></A>
 <TABLE>
-<CAPTION><STRONG>Table 15:</STRONG>
+<CAPTION><STRONG>Table 5:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img80.png"
- ALT="$x_i, y$"></TD>
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img33.png"
+ ALT="$res$"></TD>
+<TD ALIGN="LEFT"><IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
-<TR><TD ALIGN="LEFT">Integer</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
-</TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geamaxs</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -146,12 +125,6 @@ Data types</CAPTION>
 <BR>
 
 <P>
-<PRE>
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-</PRE>
-
-<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -159,21 +132,22 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>loc_x</STRONG></DT>
+<DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
- ALT="$glob\_x$">. 
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">. 
 <BR>
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:gather">15</A>.
+Specified as: a rank one or two array 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90mamax">5</A>. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -186,43 +160,20 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>The process that holds the global copy. If <IMG
- WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img81.png"
- ALT="$root=-1$"> all
-  the processes will have a copy of the global vector.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable <!-- MATH
- $-1\le root\le np-1$
- -->
-<IMG
- WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img82.png"
- ALT="$-1\le root\le np-1$">, default <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
- ALT="$-1$">. 
-</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>glob_x</STRONG></DT>
-<DD>The array where the local parts must be gathered.
+<DT><STRONG>res</STRONG></DT>
+<DD>is the infinity norm of the columns of <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Type: <B>required</B>
-<BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one or two array.
+Specified as: a number or a rank-one array  of long precision real numbers. 
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -240,26 +191,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html696"
+<A NAME="tex2html728"
   HREF="node43.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html692"
-  HREF="node39.html">
+<A NAME="tex2html724"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html686"
+<A NAME="tex2html718"
   HREF="node41.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html694"
+<A NAME="tex2html726"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html697"
-  HREF="node43.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html693"
-  HREF="node39.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html687"
-  HREF="node41.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html695"
+<B> Next:</B> <A NAME="tex2html729"
+  HREF="node43.html">psb_geasum   1-Norm</A>
+<B> Up:</B> <A NAME="tex2html725"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html719"
+  HREF="node41.html">psb_geamax   Infinity-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html727"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

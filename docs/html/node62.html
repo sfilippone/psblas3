@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_loc_to_glob -- Local to global indices conversion</TITLE>
-<META NAME="description" CONTENT="psb_loc_to_glob -- Local to global indices conversion">
+<TITLE>psb_spall -- Allocates a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spall -- Allocates a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,67 +20,54 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node63.html">
 <LINK REL="previous" HREF="node61.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node63.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html961"
+<A NAME="tex2html995"
   HREF="node63.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html957"
-  HREF="node44.html">
+<A NAME="tex2html991"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html951"
+<A NAME="tex2html985"
   HREF="node61.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html959"
+<A NAME="tex2html993"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html962"
-  HREF="node63.html">psb_is_owned</A>
-<B> Up:</B> <A NAME="tex2html958"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html952"
-  HREF="node61.html">psb_glob_to_loc   Global</A>
- &nbsp; <B>  <A NAME="tex2html960"
+<B> Next:</B> <A NAME="tex2html996"
+  HREF="node63.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html992"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html986"
+  HREF="node61.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html994"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000718000000000000000">
-psb_loc_to_glob -- Local to global indices
-  conversion</A>
+<H2><A NAME="SECTION00077000000000000000">
+psb_spall -- Allocates a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_loc_to_glob(x, y, desc_a, info, iact)
-call psb_loc_to_glob(x, desc_a, info, iact)
+call psb_spall(a, desc_a, info, nnz)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>An integer vector of indices to be converted.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in, inout</B>.
-<BR>
-Specified as: a rank one integer array.
-<BR></DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
@@ -92,16 +79,17 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
+<DT><STRONG>nnz</STRONG></DT>
+<DD>An estimate of the number of nonzeroes in the local
+  part of the assembled matrix.
 <BR>
-Type: <B>optional</B>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
+Specified as: an integer value. 
 </DD>
 </DL>
 
@@ -110,43 +98,16 @@ Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>If <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$"> is not present,
-  then <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$"> is overwritten with the translated integer indices. 
-Scope: <B>global</B> 
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be allocated.
 <BR>
-Type: <B>required</B>
+Scope:<B>local</B>
 <BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one integer array.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>If <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$"> is not present,
-  then <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$y$"> is overwritten with the translated integer indices, and <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$x$">
-  is left unchanged. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
+Type:<B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one integer array.
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -160,30 +121,47 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>On exit from this routine the sparse matrix  is in the build
+  state.
+</LI>
+<LI>The descriptor may be in either the build or assembled state.
+</LI>
+<LI>Providing a good estimate for the number of nonzeroes <IMG
+ WIDTH="31" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img100.png"
+ ALT="$nnz$"> in
+  the assembled matrix may substantially improve performance in the
+  matrix build phase, as it will reduce or eliminate the need for
+  (potentially multiple) data reallocations. 
+</LI>
+</OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html961"
+<A NAME="tex2html995"
   HREF="node63.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html957"
-  HREF="node44.html">
+<A NAME="tex2html991"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html951"
+<A NAME="tex2html985"
   HREF="node61.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html959"
+<A NAME="tex2html993"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html962"
-  HREF="node63.html">psb_is_owned</A>
-<B> Up:</B> <A NAME="tex2html958"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html952"
-  HREF="node61.html">psb_glob_to_loc   Global</A>
- &nbsp; <B>  <A NAME="tex2html960"
+<B> Next:</B> <A NAME="tex2html996"
+  HREF="node63.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html992"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html986"
+  HREF="node61.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html994"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

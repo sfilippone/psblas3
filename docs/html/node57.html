@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
-<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
+<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
+<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node58.html">
 <LINK REL="previous" HREF="node56.html">
-<LINK REL="up" HREF="node44.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node58.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html901"
+<A NAME="tex2html935"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html897"
-  HREF="node44.html">
+<A NAME="tex2html931"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html891"
+<A NAME="tex2html925"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html899"
+<A NAME="tex2html933"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html902"
-  HREF="node58.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html898"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html892"
-  HREF="node56.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html900"
+<B> Next:</B> <A NAME="tex2html936"
+  HREF="node58.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html932"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html926"
+  HREF="node56.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html934"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000713000000000000000">
-psb_geins -- Dense matrix insertion routine</A>
+<H2><A NAME="SECTION00072000000000000000">
+psb_cdins -- Communication descriptor insert routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geins(m, irw, val, x, desc_a, info,dupl)
+call psb_cdins(nz, ia, ja, desc_a, info)
 </PRE>
+
+<P>
+This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a
+linear system coefficient matrix), storing them as necessary into the
+communication descriptor.
 
 <P>
 <DL>
@@ -68,75 +74,44 @@ call psb_geins(m, irw, val, x, desc_a, info,dupl)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>m</STRONG></DT>
-<DD>Number of rows in <IMG
- WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$val$"> to be inserted.
+<DT><STRONG>nz</STRONG></DT>
+<DD>the number of points being inserted.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer value.
 </DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>Indices of the rows to be inserted. Specifically, row <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$">
-  of <IMG
- WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img105.png"
- ALT="$val$"> will be inserted into the local row corresponding to the
-  global row index <IMG
- WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img106.png"
- ALT="$irw(i)$">.
-Scope:<B>local</B>.
+<DT><STRONG>ia</STRONG></DT>
+<DD>the indices of the starting vertex of the edges  being inserted.
 <BR>
-Type:<B>required</B>.
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer array.
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
 </DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the dense submatrix to be inserted.
+<DT><STRONG>ja</STRONG></DT>
+<DD>the indices of the end vertex of the edges  being inserted.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank 1 or 2  array.
-Specified as: an integer value.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>dupl</STRONG></DT>
-<DD>How to handle duplicate coefficients.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
-<code>psb_dupl_add_</code>.
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
 </DD>
 </DL>
 
@@ -145,18 +120,17 @@ Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the output dense matrix.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the updated communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -169,41 +143,41 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>Dense vectors/matrices do not have an associated state;
+<LI>This routine may only be called if the descriptor is in the
+  build state;
 </LI>
-<LI>Duplicate entries are either overwritten or added, there is no
-  provision for raising an error condition. 
+<LI>This routine automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html901"
+<A NAME="tex2html935"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html897"
-  HREF="node44.html">
+<A NAME="tex2html931"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html891"
+<A NAME="tex2html925"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html899"
+<A NAME="tex2html933"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html902"
-  HREF="node58.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html898"
-  HREF="node44.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html892"
-  HREF="node56.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html900"
+<B> Next:</B> <A NAME="tex2html936"
+  HREF="node58.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html932"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html926"
+  HREF="node56.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html934"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html234"
+<A NAME="tex2html246"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html230"
+<A NAME="tex2html242"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html224"
+<A NAME="tex2html236"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html232"
+<A NAME="tex2html244"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html235"
+<B> Next:</B> <A NAME="tex2html247"
   HREF="node7.html">Programming model</A>
-<B> Up:</B> <A NAME="tex2html231"
+<B> Up:</B> <A NAME="tex2html243"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html225"
+<B> Previous:</B> <A NAME="tex2html237"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html233"
+ &nbsp; <B>  <A NAME="tex2html245"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -62,7 +62,7 @@ space to which there corresponds an index space and a matrix sparsity
 pattern. As an example, consider a cell-centered finite-volume
 discretization of  the Navier-Stokes equations on a simulation domain;
 the index space <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> is isomorphic to the set of cell centers,
 whereas the pattern of the associated linear system matrix is
@@ -73,7 +73,7 @@ by the discretization stencil.
 Thus the first order of business is to establish an index space, and
 this is done with a call to  <code>psb_cdall</code> in which we specify the
 size of the index space <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img16.png"
  ALT="$n$"> and the allocation of the elements of the
 index space to the various processes making up the MPI (virtual)
@@ -82,7 +82,7 @@ parallel machine.
 <P>
 The index space is partitioned among processes, and this creates a
 mapping from the ``global'' numbering <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> to a numbering
 ``local'' to each process; each process <IMG
@@ -97,7 +97,7 @@ mapping from the ``global'' numbering <IMG
  SRC="img17.png"
  ALT="$1\dots n_{\hbox{row}_i}$">, each element of which corresponds to a certain
 element of <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$">. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
@@ -107,7 +107,7 @@ library will translate into the appropriate ``local'' numbering.
 
 <P>
 For  a given index space <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> there are many possible associated
 topologies, i.e. many different discretization stencils; thus the
@@ -174,7 +174,7 @@ follows:
 </LI>
 </OL>
 This is the structure of the sample program
-<code>test/pargen/ppde90.f90</code>. 
+<code>test/pargen/ppde.f90</code>. 
 
 <P>
 For a simulation in which the same discretization mesh is used over
@@ -244,26 +244,26 @@ from optimal.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html234"
+<A NAME="tex2html246"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html230"
+<A NAME="tex2html242"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html224"
+<A NAME="tex2html236"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html232"
+<A NAME="tex2html244"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html235"
+<B> Next:</B> <A NAME="tex2html247"
   HREF="node7.html">Programming model</A>
-<B> Up:</B> <A NAME="tex2html231"
+<B> Up:</B> <A NAME="tex2html243"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html225"
+<B> Previous:</B> <A NAME="tex2html237"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html233"
+ &nbsp; <B>  <A NAME="tex2html245"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

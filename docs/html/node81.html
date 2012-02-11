@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_bcast -- Broadcast data</TITLE>
-<META NAME="description" CONTENT="psb_bcast -- Broadcast data">
+<TITLE>psb_sizeof -- Memory occupation</TITLE>
+<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,143 +20,109 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node82.html">
 <LINK REL="previous" HREF="node80.html">
-<LINK REL="up" HREF="node72.html">
+<LINK REL="up" HREF="node55.html">
 <LINK REL="next" HREF="node82.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1203"
+<A NAME="tex2html1223"
   HREF="node82.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1199"
-  HREF="node72.html">
+<A NAME="tex2html1219"
+  HREF="node55.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1193"
+<A NAME="tex2html1213"
   HREF="node80.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1201"
+<A NAME="tex2html1221"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1204"
-  HREF="node82.html">psb_sum   Global</A>
-<B> Up:</B> <A NAME="tex2html1200"
-  HREF="node72.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1194"
-  HREF="node80.html">psb_abort   Abort</A>
- &nbsp; <B>  <A NAME="tex2html1202"
+<B> Next:</B> <A NAME="tex2html1224"
+  HREF="node82.html">Sorting utilities</A>
+<B> Up:</B> <A NAME="tex2html1220"
+  HREF="node55.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1214"
+  HREF="node80.html">psb_sp_getrow   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1222"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00089000000000000000">
-psb_bcast -- Broadcast data</A>
+<H2><A NAME="SECTION000726000000000000000">
+psb_sizeof -- Memory occupation</A>
 </H2>
 
 <P>
+This function computes the memory occupation of a PSBLAS object.
+
+<P>
 <PRE>
-call psb_bcast(icontxt, dat, root)
+isz = psb_sizeof(a)
+isz = psb_sizeof(desc_a)
+isz = psb_sizeof(prec)
 </PRE>
 
 <P>
-This subroutine implements a broadcast operation based on the
-underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
-</DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On the root process, the data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical variable,
-which may be a scalar or rank 1 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Root process holding data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $0<= root <= np-1$
- -->
+<DT><STRONG>a</STRONG></DT>
+<DD>A sparse matrix
 <IMG
- WIDTH="153" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img128.png"
- ALT="$0&lt;= root &lt;= np-1$">, default 0  </DD>
-</DL>
-
-<P>
-<DL>
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>Communication descriptor.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On processes other than  root, the data to be broadcast.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The memory occupation of the object specified in
+  the calling sequence, in bytes.
 <BR>
-Scope: <B>global</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind, rank and size must agree on all processes.
+Returned  as: an <code>integer(psb_long_int_k_)</code> number.
 </DD>
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1203"
-  HREF="node82.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1199"
-  HREF="node72.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1193"
-  HREF="node80.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1201"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1204"
-  HREF="node82.html">psb_sum   Global</A>
-<B> Up:</B> <A NAME="tex2html1200"
-  HREF="node72.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1194"
-  HREF="node80.html">psb_abort   Abort</A>
- &nbsp; <B>  <A NAME="tex2html1202"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

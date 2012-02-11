@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precbld -- Builds a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precbld -- Builds a preconditioner">
+<TITLE>psb_error -- Prints the error stack content and aborts execution</TITLE>
+<META NAME="description" CONTENT="psb_error -- Prints the error stack content and aborts execution">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,107 +26,59 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1462"
+<A NAME="tex2html1491"
   HREF="node103.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1458"
+<A NAME="tex2html1487"
   HREF="node100.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1452"
+<A NAME="tex2html1481"
   HREF="node101.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1460"
+<A NAME="tex2html1489"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1463"
-  HREF="node103.html">psb_precaply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1459"
-  HREF="node100.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1453"
-  HREF="node101.html">psb_precinit   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1461"
+<B> Next:</B> <A NAME="tex2html1492"
+  HREF="node103.html">psb_set_errverbosity   Sets</A>
+<B> Up:</B> <A NAME="tex2html1488"
+  HREF="node100.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1482"
+  HREF="node101.html">psb_errpush   Pushes</A>
+ &nbsp; <B>  <A NAME="tex2html1490"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000112000000000000000">
-psb_precbld -- Builds a preconditioner</A>
+<H2><A NAME="SECTION00092000000000000000">
+psb_error -- Prints the error stack content and aborts
+  execution</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precbld(a, desc_a, prec, info)
+call psb_error(icontxt)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the system sparse matrix.
-Scope: <B>local</B> 
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
 <BR>
-Type: <B>required</B>
+Scope: <B>global</B> 
 <BR>
-Intent: <B>in</B>, target.
+Type: <B>optional</B>
 <BR>
-Specified as: a sparse matrix data structure spdata<TT>psb_spmat_type</TT>.
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
+Intent: <B>in</B>.
 <BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor. 
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>, target.
-<BR>
-Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+Specified as: an integer.
 </DD>
 </DL>
 

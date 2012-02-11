@@ -141,7 +141,7 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_amd_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
@@ -182,7 +182,7 @@ program df_sample
   ! switch over different partition types
   if (ipart == 0) then 
     call psb_barrier(ictxt)
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block vector")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
       call part_block(i,m_problem,np,ipv,nv)
@@ -193,7 +193,7 @@ program df_sample
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
-      write(psb_out_unit,'("Partition type: graph")')
+      write(psb_out_unit,'("Partition type: graph vector")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
       call build_mtpart(aux_a,np)
@@ -206,7 +206,7 @@ program df_sample
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
 
   else 
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
@@ -219,7 +219,8 @@ program df_sample
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
-
+  write(fnout,'(a,i3.3,a)') 'amat-',iam,'.mtx'
+  call a%print(fname=fnout)
   call psb_amx(ictxt, t2)
 
   if (iam == psb_root_) then

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Data management routines</TITLE>
-<META NAME="description" CONTENT="Data management routines">
+<TITLE>psb_geasums -- Generalized 1-Norm of Vector</TITLE>
+<META NAME="description" CONTENT="psb_geasums -- Generalized 1-Norm of Vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,114 +18,249 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node72.html">
-<LINK REL="previous" HREF="node39.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node45.html">
+<LINK REL="previous" HREF="node43.html">
+<LINK REL="up" HREF="node37.html">
 <LINK REL="next" HREF="node45.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html718"
+<A NAME="tex2html752"
   HREF="node45.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html714"
-  HREF="userhtml.html">
+<A NAME="tex2html748"
+  HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html708"
+<A NAME="tex2html742"
   HREF="node43.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html716"
+<A NAME="tex2html750"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html719"
-  HREF="node45.html">psb_cdall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html715"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html709"
-  HREF="node43.html">psb_scatter   Scatter</A>
- &nbsp; <B>  <A NAME="tex2html717"
+<B> Next:</B> <A NAME="tex2html753"
+  HREF="node45.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html749"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html743"
+  HREF="node43.html">psb_geasum   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html751"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00070000000000000000"></A>
-<A NAME="sec:toolsrout"></A>
-<BR>
-Data management routines
-</H1>
+<H2><A NAME="SECTION00057000000000000000">
+psb_geasums -- Generalized 1-Norm of Vector</A>
+</H2>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">: 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow \max_k |x(k,i)|
+\end{displaymath}
+ -->
 
-<UL>
-<LI><A NAME="tex2html720"
-  HREF="node45.html">psb_cdall -- Allocates a communication descriptor</A>
-<LI><A NAME="tex2html721"
-  HREF="node46.html">psb_cdins -- Communication descriptor insert routine</A>
-<LI><A NAME="tex2html722"
-  HREF="node47.html">psb_cdasb -- Communication descriptor assembly routine</A>
-<LI><A NAME="tex2html723"
-  HREF="node48.html">psb_cdcpy -- Copies a communication descriptor</A>
-<LI><A NAME="tex2html724"
-  HREF="node49.html">psb_cdfree -- Frees a communication descriptor</A>
-<LI><A NAME="tex2html725"
-  HREF="node50.html">psb_cdbldext -- Build an extended  communication
-  descriptor</A>
-<LI><A NAME="tex2html726"
-  HREF="node51.html">psb_spall -- Allocates a sparse matrix</A>
-<LI><A NAME="tex2html727"
-  HREF="node52.html">psb_spins -- Insert a cloud of elements into a sparse
-  matrix</A>
-<LI><A NAME="tex2html728"
-  HREF="node53.html">psb_spasb -- Sparse matrix assembly routine</A>
-<LI><A NAME="tex2html729"
-  HREF="node54.html">psb_spfree -- Frees a sparse matrix</A>
-<LI><A NAME="tex2html730"
-  HREF="node55.html">psb_sprn -- Reinit sparse matrix structure for psblas
-  routines.</A>
-<LI><A NAME="tex2html731"
-  HREF="node56.html">psb_geall -- Allocates a dense matrix</A>
-<LI><A NAME="tex2html732"
-  HREF="node57.html">psb_geins -- Dense matrix insertion routine</A>
-<LI><A NAME="tex2html733"
-  HREF="node58.html">psb_geasb -- Assembly a dense matrix</A>
-<LI><A NAME="tex2html734"
-  HREF="node59.html">psb_gefree -- Frees a dense matrix</A>
-<LI><A NAME="tex2html735"
-  HREF="node60.html">psb_gelp -- Applies a left permutation to a dense
-  matrix</A>
-<LI><A NAME="tex2html736"
-  HREF="node61.html">psb_glob_to_loc -- Global to local indices
-  convertion</A>
-<LI><A NAME="tex2html737"
-  HREF="node62.html">psb_loc_to_glob -- Local to global indices
-  conversion</A>
-<LI><A NAME="tex2html738"
-  HREF="node63.html">psb_is_owned </A>
-<LI><A NAME="tex2html739"
-  HREF="node64.html">psb_owned_index </A>
-<LI><A NAME="tex2html740"
-  HREF="node65.html">psb_is_local </A>
-<LI><A NAME="tex2html741"
-  HREF="node66.html">psb_local_index </A>
-<LI><A NAME="tex2html742"
-  HREF="node67.html">psb_get_boundary -- Extract list of boundary elements</A>
-<LI><A NAME="tex2html743"
-  HREF="node68.html">psb_get_overlap -- Extract list of overlap elements</A>
-<LI><A NAME="tex2html744"
-  HREF="node69.html">psb_sp_getrow -- Extract row(s) from a sparse matrix</A>
-<LI><A NAME="tex2html745"
-  HREF="node70.html">psb_sizeof -- Memory occupation</A>
-<LI><A NAME="tex2html746"
-  HREF="node71.html">Sorting utilities</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
+<IMG
+ WIDTH="147" HEIGHT="36" BORDER="0"
+ SRC="img37.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+This function computes the 1-norm of a vector <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">.
+<BR>
+If <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is a real vector 
+it computes 1-norm as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow  \|x_i\|
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="94" HEIGHT="28" BORDER="0"
+ SRC="img41.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+else if <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is a complex vector then it computes 1-norm  as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="206" HEIGHT="28" BORDER="0"
+ SRC="img42.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+
+<P>
+<PRE>
+call psb_geasums(res, x, desc_a, info)
+</PRE>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="1522"></A>
+<TABLE>
+<CAPTION><STRONG>Table 7:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img33.png"
+ ALT="$res$"></TD>
+<TD ALIGN="LEFT"><IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">. 
+
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank one or two array 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90asums">7</A>.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+
+<P>
+</DD>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>res</STRONG></DT>
+<DD>contains the 1-norm of (the columns of) <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+Short as: a long precision real  number.
+Specified as: a long precision real  number.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html752"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html748"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html742"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html750"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html753"
+  HREF="node45.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html749"
+  HREF="node37.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html743"
+  HREF="node43.html">psb_geasum   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html751"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

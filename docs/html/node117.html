@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+<!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -13,7 +13,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -25,36 +25,32 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1594"
+<A NAME="tex2html1673"
   HREF="node118.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="file:/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html1590"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1669"
   HREF="node116.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="file:/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html1586"
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1665"
   HREF="node116.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
-<A NAME="tex2html1592"
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1671"
   HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
- SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1595"
+<B> Next:</B> <A NAME="tex2html1674"
   HREF="node118.html">Bibliography</A>
-<B> Up:</B> <A NAME="tex2html1591"
+<B> Up:</B> <A NAME="tex2html1670"
   HREF="node116.html">Iterative Methods</A>
-<B> Previous:</B> <A NAME="tex2html1587"
+<B> Previous:</B> <A NAME="tex2html1666"
   HREF="node116.html">Iterative Methods</A>
- &nbsp; <B>  <A NAME="tex2html1593"
+ &nbsp; <B>  <A NAME="tex2html1672"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000521000000000000000"></A><A NAME="krylov"></A>
+<H2><A NAME="SECTION000121000000000000000"></A><A NAME="krylov"></A>
 <BR>
 psb_krylov  -- Krylov Methods Driver
       Routine
@@ -77,7 +73,7 @@ err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
 
 <IMG
  WIDTH="204" HEIGHT="44" BORDER="0"
- SRC="img137.png"
+ SRC="img140.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -93,26 +89,29 @@ err = \frac{\|r_i\|}{\|b\|_2} < eps
 
 <IMG
  WIDTH="121" HEIGHT="44" BORDER="0"
- SRC="img138.png"
+ SRC="img141.png"
  ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert b\Vert _2} &lt; eps \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 according to the value passed through the  istop argument (see
 later). In the above formulae, <IMG
- WIDTH="19" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img139.png"
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img142.png"
  ALT="$x_i$"> is the tentative solution and
 <IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img140.png"
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
  ALT="$r_i=b-Ax_i$"> the corresponding residual at the <IMG
- WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img3.png"
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
  ALT="$i$">-th iteration. 
 
 <P>
-ifstarssyntaxsyntaxcall psb_krylovmethod,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop,cond
+<PRE>
+call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
+     &amp; itmax,iter,err,itrace,irst,istop,cond)
+</PRE>
 
 <P>
 <DL>
@@ -233,23 +232,23 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <IMG
- WIDTH="100" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img141.png"
+ WIDTH="99" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img144.png"
  ALT="$itmax = 1000$">.
 <BR>
 Specified as: an integer variable <IMG
- WIDTH="75" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img142.png"
+ WIDTH="76" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img145.png"
  ALT="$itmax \ge 1$">.
 </DD>
 <DT><STRONG>itrace</STRONG></DT>
 <DD>If <IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img103.png"
+ WIDTH="28" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img106.png"
  ALT="$&gt;0$"> print out an informational message about
   convergence  every <IMG
- WIDTH="46" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img143.png"
+ WIDTH="45" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img146.png"
  ALT="$itrace$"> iterations.
 <BR>
 Scope: <B>global</B> 
@@ -268,8 +267,8 @@ Type: <B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Values: <IMG
- WIDTH="59" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img144.png"
+ WIDTH="60" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img147.png"
  ALT="$irst&gt;0$">. This is employed for the BiCGSTABL or RGMRES
 methods, otherwise it is ignored. 
 
@@ -330,7 +329,7 @@ Returned  as: a real number.
  ALT="$A$">; only
   available with the <IMG
  WIDTH="29" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img145.png"
+ SRC="img148.png"
  ALT="$CG$"> method.
 <BR>
 Scope: <B>global</B> 
@@ -359,32 +358,30 @@ An integer value; 0 means no error has been detected.
 <P>
 
 <P>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1594"
+<A NAME="tex2html1673"
   HREF="node118.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="file:/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html1590"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1669"
   HREF="node116.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="file:/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html1586"
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1665"
   HREF="node116.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
-<A NAME="tex2html1592"
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1671"
   HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
- SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1595"
+<B> Next:</B> <A NAME="tex2html1674"
   HREF="node118.html">Bibliography</A>
-<B> Up:</B> <A NAME="tex2html1591"
+<B> Up:</B> <A NAME="tex2html1670"
   HREF="node116.html">Iterative Methods</A>
-<B> Previous:</B> <A NAME="tex2html1587"
+<B> Previous:</B> <A NAME="tex2html1666"
   HREF="node116.html">Iterative Methods</A>
- &nbsp; <B>  <A NAME="tex2html1593"
+ &nbsp; <B>  <A NAME="tex2html1672"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 
