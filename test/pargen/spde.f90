@@ -38,9 +38,9 @@
 !
 ! The PDE is a general second order equation in 3d
 !
-!   b1 dd(u)  b2 dd(u)    b3 dd(u)    a1 d(u)   a2 d(u)  a3 d(u)  
-! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u  = 0
-!      dxdx     dydy       dzdz        dx       dy         dz   
+!   b1 dd(u)  b2 dd(u)   b3 dd(u)  a1 d(u)    a2 d(u)    a3 d(u)  
+! -   ------ -  ------ -  ------ +  -----  +  ------  +  ------ + a4 u  = 0
+!      dxdx     dydy       dzdz       dx       dy         dz   
 !
 ! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
 !
@@ -365,7 +365,7 @@ contains
     !   discretize the partial diferential equation
     ! 
     !   b1 dd(u)  b2 dd(u)    b3 dd(u)    a1 d(u)   a2 d(u)  a3 d(u)  
-    ! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u 
+    ! -   ------ -  ------ -  ------ +  -----  +  ------  +  ------ + a4 u 
     !      dxdx     dydy       dzdz        dx       dy         dz   
     !
     ! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
@@ -399,7 +399,7 @@ contains
     real(psb_spk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_spk_)         :: deltah, deltah2
+    real(psb_spk_)         :: deltah, sqdeltah, deltah2
     real(psb_spk_),parameter   :: rhs=0.0,one=1.0,zero=0.0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_spk_)   :: a1, a2, a3, a4, b1, b2, b3 
@@ -414,8 +414,9 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    deltah  = 1.d0/(idim-1)
-    deltah2 = deltah*deltah
+    deltah   = 1.0/(idim-1)
+    sqdeltah = deltah*deltah
+    deltah2  = 2.0* deltah
 
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
@@ -507,63 +508,66 @@ contains
         !  term depending on   (x-1,y,z)
         !
         if (ix == 1) then 
-          val(element) = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
+          val(element) = -b1(x,y,z)/sqdeltah-a1(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*(-val(element))
         else
-          val(element)  = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
+          val(element)  = -b1(x,y,z)/sqdeltah-a1(x,y,z)/deltah2
           icol(element) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y-1,z)
         if (iy == 1) then 
-          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
+          val(element)  = -b2(x,y,z)/sqdeltah-a2(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
+          val(element)  = -b2(x,y,z)/sqdeltah-a2(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z-1)
         if (iz == 1) then 
-          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
+          val(element)=-b3(x,y,z)/sqdeltah-a3(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
+          val(element)=-b3(x,y,z)/sqdeltah-a3(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z)
-        val(element)=(2*b1(x,y,z) + 2*b2(x,y,z) + 2*b3(x,y,z))/deltah2&
-             & + (a1(x,y,z) + a2(x,y,z) + a3(x,y,z)+ a4(x,y,z))/deltah
+        val(element)=(2*b1(x,y,z) + 2*b2(x,y,z) + 2*b3(x,y,z))/sqdeltah&
+             & +a4(x,y,z)
         icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
         irow(element) = glob_row
         element       = element+1                  
         !  term depending on     (x,y,z+1)
         if (iz == idim) then 
-          val(element)=-b1(x,y,z)/deltah2
+          val(element)=-b3(x,y,z)/sqdeltah+a3(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b1(x,y,z)/deltah2
+          val(element)=-b3(x,y,z)/sqdeltah+a3(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y+1,z)
         if (iy == idim) then 
-          val(element)=-b2(x,y,z)/deltah2
+          val(element)=-b2(x,y,z)/sqdeltah+a2(x,y,z)/deltah2
           zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(x,y,z)/deltah2
+          val(element)=-b2(x,y,z)/sqdeltah+a2(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x+1,y,z)
-        if (ix<idim) then 
-          val(element)=-b3(x,y,z)/deltah2
+        if (ix==idim) then 
+          val(element)=-b1(x,y,z)/sqdeltah+a1(x,y,z)/deltah2
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+        else
+          val(element)=-b1(x,y,z)/sqdeltah+a1(x,y,z)/deltah2
           icol(element) = (ix)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
@@ -646,43 +650,43 @@ function a1(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) :: a1
   real(psb_spk_) :: x,y,z
-  a1=1.e0
+  a1=1.414e0
 end function a1
 function a2(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a2
   real(psb_spk_) :: x,y,z
-  a2=2.e1*y
+  a2=1.414e0
 end function a2
 function a3(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a3
   real(psb_spk_) :: x,y,z      
-  a3=1.e0
+  a3=1.414e0
 end function a3
 function a4(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a4
   real(psb_spk_) :: x,y,z      
-  a4=1.e0
+  a4=0.e0
 end function a4
 function b1(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b1   
   real(psb_spk_) :: x,y,z
-  b1=1.e0
+  b1=1.e0/60
 end function b1
 function b2(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b2
   real(psb_spk_) :: x,y,z
-  b2=1.e0
+  b2=1.e0/60
 end function b2
 function b3(x,y,z)
   use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b3
   real(psb_spk_) :: x,y,z
-  b3=1.e0
+  b3=1.e0/60
 end function b3
 
 

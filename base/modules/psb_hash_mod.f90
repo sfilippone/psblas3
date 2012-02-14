@@ -370,7 +370,7 @@ contains
       end if
       if (hash%table(hk,1) == HashFreeEntry) then 
         val  = HashFreeEntry
-!!$        info = HashNotFound
+!  !$        info = HashNotFound
         return
       end if
       hk = hk - hd 

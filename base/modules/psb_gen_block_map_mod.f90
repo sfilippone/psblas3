@@ -49,11 +49,13 @@ module psb_gen_block_map_mod
   use psb_const_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
+  use psb_hash_mod
   
   type, extends(psb_indx_map) :: psb_gen_block_map
     integer(psb_ipk_) :: min_glob_row   = -1
     integer(psb_ipk_) :: max_glob_row   = -1
     integer(psb_ipk_), allocatable :: loc_to_glob(:), srt_l2g(:,:), vnl(:)
+    type(psb_hash_type)  :: hash
   contains
 
     procedure, pass(idxmap)  :: gen_block_map_init => block_init
@@ -107,14 +109,14 @@ contains
          & val = val + size(idxmap%srt_l2g)*psb_sizeof_int
     if (allocated(idxmap%vnl)) &
          & val = val + size(idxmap%vnl)*psb_sizeof_int
-
+    val = val + psb_sizeof(idxmap%hash)
   end function block_sizeof
 
 
   subroutine block_free(idxmap)
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
-    
+    integer(psb_ipk_) :: info
     if (allocated(idxmap%loc_to_glob)) &
          & deallocate(idxmap%loc_to_glob)
     if (allocated(idxmap%srt_l2g)) &
@@ -122,7 +124,7 @@ contains
 
     if (allocated(idxmap%srt_l2g)) &
          & deallocate(idxmap%vnl)
-
+    call psb_free(idxmap%hash,info)
     call idxmap%psb_indx_map%free()
 
   end subroutine block_free
@@ -284,7 +286,7 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, nv, is
+    integer(psb_ipk_) :: i, nv, is, ip, lip 
     integer(psb_mpik_) :: ictxt, iam, np
     logical :: owned_
 
@@ -330,9 +332,9 @@ contains
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
-              nv  = idxmap%local_cols-idxmap%local_rows
-              idx(i) = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
-              if (idx(i) > 0) idx(i) = idx(i) + idxmap%local_rows
+              ip = idx(i)
+              call psb_hash_searchkey(ip,lip,idxmap%hash,info)
+              if (lip > 0) idx(i) = lip + idxmap%local_rows
             else 
               idx(i) = -1
             end if
@@ -366,9 +368,9 @@ contains
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
-            nv  = idxmap%local_cols-idxmap%local_rows
-            idx(i) = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
-            if (idx(i) > 0) idx(i) = idx(i) + idxmap%local_rows
+            ip = idx(i)
+            call psb_hash_searchkey(ip,lip,idxmap%hash,info)
+            if (lip > 0) idx(i) = lip + idxmap%local_rows
           else 
             idx(i) = -1
           end if
@@ -448,6 +450,8 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_) :: i, nv, is, ix
+    integer(psb_ipk_) :: ip, lip, nxt
+
 
     info = 0
     is = size(idx)
@@ -474,20 +478,26 @@ contains
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               nv  = idxmap%local_cols-idxmap%local_rows
-              ix  = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
-              if (ix < 0) then 
-                ix = idxmap%local_cols + 1
-                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
-                if (info /= 0) then 
-                  info = -4
-                  return
+              nxt = nv + 1 
+              ip = idx(i) 
+              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+              if (info >= 0) then 
+                if (lip == nxt) then 
+                  ! We have added one item
+                  call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
+                  if (info /= 0) then 
+                    info = -4
+                    return
+                  end if
+                  idxmap%local_cols       = nxt + idxmap%local_rows
+                  idxmap%loc_to_glob(nxt) = idx(i)
                 end if
-                idxmap%local_cols      = ix
-                ix                     = ix - idxmap%local_rows
-                idxmap%loc_to_glob(ix) = idx(i)
+                info = psb_success_
+              else
+                info = -5
+                return
               end if
-              ix                       = ix + idxmap%local_rows
-              idx(i)                   = ix
+              idx(i)  = lip + idxmap%local_rows
             else 
               idx(i) = -1
               info = -1
@@ -498,25 +508,32 @@ contains
       else if (.not.present(mask)) then 
 
         do i=1, is
-          
+
           if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
             nv  = idxmap%local_cols-idxmap%local_rows
-            ix  = psb_issrch(idx(i),nv,idxmap%loc_to_glob)
-            if (ix < 0) then 
-              ix = idxmap%local_cols + 1
-              call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
-              if (info /= 0) then 
-                info = -4
-                return
+            nxt = nv + 1 
+            ip = idx(i) 
+            call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+
+            if (info >= 0) then 
+              if (lip == nxt) then 
+                ! We have added one item
+                call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
+                if (info /= 0) then 
+                  info = -4
+                  return
+                end if
+                idxmap%local_cols       = nxt + idxmap%local_rows
+                idxmap%loc_to_glob(nxt) = idx(i)
               end if
-              idxmap%local_cols      = ix
-              ix                     = ix - idxmap%local_rows
-              idxmap%loc_to_glob(ix) = idx(i)
+              info = psb_success_
+            else
+              info = -5
+              return
             end if
-            ix                       = ix + idxmap%local_rows
-            idx(i)                   = ix
+            idx(i)  = lip + idxmap%local_rows
           else 
             idx(i) = -1
             info = -1
@@ -632,8 +649,8 @@ contains
       info = -2
       return
     end if
+    call psb_hash_init(nl,idxmap%hash,info)
     call idxmap%set_state(psb_desc_bld_)
-    
     
   end subroutine block_init
 
@@ -663,8 +680,8 @@ contains
     call psb_msort(idxmap%srt_l2g(:,1),&
          & ix=idxmap%srt_l2g(:,2),dir=psb_sort_up_)
 
+    call psb_free(idxmap%hash,info)
     call idxmap%set_state(psb_desc_asb_)
-    
   end subroutine block_asb
 
   function block_get_fmt() result(res)
@@ -714,6 +731,9 @@ contains
            &  call psb_safe_ab_cpy(idxmap%vnl,outmap%vnl,info)
       if (info == psb_success_)&
            &  call psb_safe_ab_cpy(idxmap%srt_l2g,outmap%srt_l2g,info)
+      if (info == psb_success_)&
+           &  call psb_hash_copy(idxmap%hash,outmap%hash,info)
+
     class default
       ! This should be impossible 
       info = -1
