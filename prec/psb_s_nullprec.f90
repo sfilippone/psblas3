@@ -4,8 +4,8 @@ module psb_s_nullprec
   
   type, extends(psb_s_base_prec_type) :: psb_s_null_prec_type
   contains
-    procedure, pass(prec) :: c_apply_v => psb_s_null_apply_vect
-    procedure, pass(prec) :: c_apply   => psb_s_null_apply
+    procedure, pass(prec) :: s_apply_v => psb_s_null_apply_vect
+    procedure, pass(prec) :: s_apply   => psb_s_null_apply
     procedure, pass(prec) :: precbld   => psb_s_null_precbld
     procedure, pass(prec) :: precinit  => psb_s_null_precinit
     procedure, pass(prec) :: precseti  => psb_s_null_precseti

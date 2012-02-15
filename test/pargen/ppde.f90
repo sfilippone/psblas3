@@ -81,11 +81,10 @@ program ppde
   type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
-  type(psb_desc_type)   :: desc_a, desc_b
-  ! dense matrices
-  type(psb_d_vect_type)  :: xxv,bv, vtst
-  real(psb_dpk_), allocatable :: tst(:)
-  ! blacs parameters
+  type(psb_desc_type)   :: desc_a
+  ! dense vectors
+  type(psb_d_vect_type) :: xxv,bv
+  ! parallel environment
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
@@ -95,12 +94,12 @@ program ppde
 
   ! other variables
   integer(psb_ipk_) :: info, i
-  character(len=20)  :: name,ch_err
-  character(len=40)  :: fname
+  character(len=20) :: name,ch_err
+  character(len=40) :: fname
 
   info=psb_success_
 
-  
+
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
 
@@ -129,7 +128,9 @@ program ppde
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,bv,xxv,desc_a,ictxt,afmt,info)  
+  call gen_prob3d(ictxt,idim,a,bv,xxv,desc_a,afmt,&
+       & a1,a2,a3,b1,b2,b3,c,g,info)  
+!!$  call create_matrix(idim,a,bv,xxv,desc_a,ictxt,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -140,19 +141,6 @@ program ppde
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-!!$  write(fname,'(a,i0,a)') 'pde-',idim,'.hb'
-!!$  call hb_write(a,info,filename=fname,rhs=b,key='PDEGEN',mtitle='MLD2P4 pdegen Test matrix  ')
-!!$  write(fname,'(a,i2.2,a,i2.2,a)') 'amat-',iam,'-',np,'.mtx'
-!!$  call a%print(fname)
-!!$  call psb_cdprt(20+iam,desc_a,short=.false.)
-!!$  call psb_cdcpy(desc_a,desc_b,info)
-!!$  call psb_set_debug_level(9999)
-
-  call psb_cdbldext(a,desc_a,2,desc_b,info,extype=psb_ovt_asov_)
-  if (info /= 0) then 
-    write(0,*) 'Error from bldext'
-    call psb_abort(ictxt)
-  end if
   !
   !  prepare the preconditioner.
   !  
@@ -213,22 +201,8 @@ program ppde
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
-    write(psb_out_unit,'("Storage type for DESC_B: ",a)') desc_b%indxmap%get_fmt()
   end if
-  
-  !  
-  if (.false.) then 
-    call psb_geall(tst,desc_b, info)
-    call psb_geall(vtst,desc_b, info)
-    vtst%v%v = iam+1
-    call psb_geasb(vtst,desc_b,info)
-    tst = vtst%get_vect()
-    call psb_geasb(tst,desc_b,info)
-    call psb_ovrl(vtst,desc_b,info,update=psb_avg_)
-    call psb_ovrl(tst,desc_b,info,update=psb_avg_)
-    write(0,*) iam,' After ovrl:',vtst%v%v
-    write(0,*) iam,' After ovrl:',tst
-  end if
+
 
   !  
   !  cleanup storage and exit
@@ -370,18 +344,13 @@ contains
     !
     ! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
     !
-    ! Boundary conditions are set in a very simple way, by adding 
-    ! equations of the form
-    !
-    !   u(x,y) = exp(-x^2-y^2-z^2)
     !
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
-    use psb_mat_mod
     implicit none
     integer(psb_ipk_) :: idim
-    integer(psb_ipk_), parameter          :: nb=20
+    integer(psb_ipk_), parameter :: nb=20
     type(psb_d_vect_type)       :: xxv,bv
     type(psb_desc_type)         :: desc_a
     integer(psb_ipk_) :: ictxt, info
@@ -401,9 +370,9 @@ contains
     ! deltat discretization time
     real(psb_dpk_)            :: deltah, sqdeltah, deltah2
     real(psb_dpk_), parameter :: rhs=0.d0,one=1.d0,zero=0.d0
-    real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
+    real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
-    external           :: a1, a2, a3, a4, b1, b2, b3
+    external          :: a1, a2, a3, a4, b1, b2, b3
     integer(psb_ipk_) :: err_act
 
     character(len=20)  :: name, ch_err,tmpfmt
@@ -414,7 +383,7 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    deltah   = 1.d0/(idim-1)
+    deltah   = 1.d0/(idim+2)
     sqdeltah = deltah*deltah
     deltah2  = 2.d0* deltah
 
@@ -500,7 +469,15 @@ contains
         x = ix*deltah
         y = iy*deltah
         z = iz*deltah
-
+        if (glob_row == 1) then 
+          write(0,*) 'Starting from ',ix,iy,iz,x,y,z,deltah
+        end if
+        if (glob_row == nt) then 
+          write(0,*) 'Ending at  ',ix,iy,iz,x,y,z,deltah
+        end if
+        if (i == nlr) then 
+          write(0,*) 'Ending at  ',ix,iy,iz,x,y,z,deltah
+        end if
         ! check on boundary points 
         zt(k) = 0.d0
         ! internal point: build discretization
@@ -596,6 +573,9 @@ contains
     call psb_barrier(ictxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
+    tcdasb = psb_wtime()-t1
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()
     if (info == psb_success_) &
          & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
@@ -627,7 +607,8 @@ contains
            &   tmpfmt
       write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
       write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
-      write(psb_out_unit,'("-assembly    time : ",es12.5)') tasb
+      write(psb_out_unit,'("-desc asbly  time : ",es12.5)') tcdasb
+      write(psb_out_unit,'("- mat asbly  time : ",es12.5)') tasb
       write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
@@ -642,51 +623,63 @@ contains
     end if
     return
   end subroutine create_matrix
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) :: b1
+    real(psb_dpk_), intent(in) :: x,y,z
+    b1=1.414d0
+  end function b1
+  function b2(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  b2
+    real(psb_dpk_), intent(in) :: x,y,z
+    b2=1.414d0
+  end function b2
+  function b3(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  b3
+    real(psb_dpk_), intent(in) :: x,y,z      
+    b3=1.414d0
+  end function b3
+  function c(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  c
+    real(psb_dpk_), intent(in) :: x,y,z      
+    c=0.d0
+  end function c
+  function a1(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a1   
+    real(psb_dpk_), intent(in) :: x,y,z
+    a1=1.d0/80
+  end function a1
+  function a2(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a2
+    real(psb_dpk_), intent(in) :: x,y,z
+    a2=1.d0/80
+  end function a2
+  function a3(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a3
+    real(psb_dpk_), intent(in) :: x,y,z
+    a3=1.d0/80
+  end function a3
+  function g(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done
+    real(psb_dpk_) ::  g
+    real(psb_dpk_), intent(in) :: x,y,z
+    g = dzero
+    if (x == done) then
+      g = done
+    else if (x == dzero) then 
+      g = exp(y**2-z**2)
+    end if
+  end function g
+
 end program ppde
-!
-! functions parametrizing the differential equation 
-!  
-function a1(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) :: a1
-  real(psb_dpk_) :: x,y,z
-  a1=1.414d0
-end function a1
-function a2(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  a2
-  real(psb_dpk_) :: x,y,z
-  a2=1.414d0
-end function a2
-function a3(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  a3
-  real(psb_dpk_) :: x,y,z      
-  a3=1.414d0
-end function a3
-function a4(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  a4
-  real(psb_dpk_) :: x,y,z      
-  a4=0.d0
-end function a4
-function b1(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  b1   
-  real(psb_dpk_) :: x,y,z
-  b1=1.d0/80
-end function b1
-function b2(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  b2
-  real(psb_dpk_) :: x,y,z
-  b2=1.d0/80
-end function b2
-function b3(x,y,z)
-  use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_) ::  b3
-  real(psb_dpk_) :: x,y,z
-  b3=1.d0/80
-end function b3
 
 

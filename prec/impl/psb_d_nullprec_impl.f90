@@ -16,9 +16,6 @@ subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   call psb_erractionsave(err_act)
 
   !
-  ! This is the base version and we should throw an error. 
-  ! Or should it be the NULL preonditioner???
-  !
   info = psb_success_
 
   nrow = desc_data%get_local_rows()

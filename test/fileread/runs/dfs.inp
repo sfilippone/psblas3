@@ -7,7 +7,7 @@ BJAC                Preconditioner NONE  DIAG  BJAC
 CSR                 Storage format CSR COO JAD 
 3                   IPART: Partition method 0: BLK   2: graph (with Metis) 
 2                   ISTOPC
-00800               ITMAX
+02100               ITMAX
 -1                  ITRACE
 30                  IRST     (restart for RGMRES and BiCGSTABL) 
 1.d-6               EPS
