@@ -11,8 +11,8 @@ module psb_d_genpde_mod
     end function d_func_3d
   end interface 
 
-  interface  psb_gen_prob3d
-    subroutine psb_d_gen_prob3d(ictxt,idim,a,bv,xv,desc_a,afmt, &
+  interface  psb_gen_pde3d
+    subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt, &
          & a1,a2,a3,b1,b2,b3,c,g,info,f)
       !
       !   Discretizes the partial differential equation
@@ -39,7 +39,7 @@ module psb_d_genpde_mod
       integer(psb_ipk_)     :: ictxt, info
       character             :: afmt*5
       procedure(d_func_3d), optional :: f
-    end subroutine psb_d_gen_prob3d
+    end subroutine psb_d_gen_pde3d
   end interface
 
 
@@ -51,8 +51,8 @@ module psb_d_genpde_mod
     end function d_func_2d
   end interface 
 
-  interface psb_gen_prob2d
-    subroutine psb_d_gen_prob2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f)
+  interface psb_gen_pde2d
+    subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f)
       !
       !   Discretizes the partial differential equation
       ! 
@@ -78,7 +78,7 @@ module psb_d_genpde_mod
       integer(psb_ipk_)     :: ictxt, info
       character             :: afmt*5
       procedure(d_func_2d), optional :: f
-    end subroutine psb_d_gen_prob2d
+    end subroutine psb_d_gen_pde2d
   end interface
 
 contains

@@ -2,9 +2,9 @@
 !  subroutine to allocate and fill in the coefficient matrix and
 !  the rhs. 
 !
-subroutine psb_s_gen_prob3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,info,f)
+subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,info,f)
   use psb_base_mod
-  use psb_s_genpde_mod, psb_protect_name => psb_s_gen_prob3d
+  use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde3d
   !
   !   Discretizes the partial differential equation
   ! 
@@ -289,7 +289,7 @@ subroutine psb_s_gen_prob3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g
     return
   end if
   return
-end subroutine psb_s_gen_prob3d
+end subroutine psb_s_gen_pde3d
 
 
 
@@ -297,9 +297,9 @@ end subroutine psb_s_gen_prob3d
 !  subroutine to allocate and fill in the coefficient matrix and
 !  the rhs. 
 !
-subroutine psb_s_gen_prob2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f)
+subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f)
   use psb_base_mod
-  use psb_s_genpde_mod, psb_protect_name => psb_s_gen_prob2d
+  use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde2d
   !
   !   Discretizes the partial differential equation
   ! 
@@ -560,4 +560,4 @@ subroutine psb_s_gen_prob2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,
     return
   end if
   return
-end subroutine psb_s_gen_prob2d
+end subroutine psb_s_gen_pde2d

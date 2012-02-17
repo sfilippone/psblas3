@@ -122,13 +122,13 @@ program ppde3d
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_prob3d(ictxt,idim,a,bv,xxv,desc_a,afmt,&
+  call psb_gen_pde3d(ictxt,idim,a,bv,xxv,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_gen_prob3d'
+    ch_err='psb_gen_pde3d'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
