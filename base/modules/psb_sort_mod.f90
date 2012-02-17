@@ -114,7 +114,7 @@ module psb_sort_mod
   interface psb_isaperm
     logical function psb_isaperm(n,eip)               
       import :: psb_ipk_
-      integer(psb_ipk_), intent(in) :: n                                                      
+      integer(psb_ipk_), intent(in) :: n                             
       integer(psb_ipk_), intent(in) :: eip(n)
     end function psb_isaperm
   end interface

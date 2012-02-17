@@ -38,6 +38,7 @@ module psb_util_mod
   use psb_mmio_mod
   use psb_mat_dist_mod
   use psb_renum_mod
-  use psb_d_genmat_mod
+  use psb_d_genpde_mod
+  use psb_s_genpde_mod
 end module psb_util_mod
 

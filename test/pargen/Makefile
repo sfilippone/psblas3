@@ -14,20 +14,31 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: ppde spde
-
-ppde: ppde.o 
-	$(F90LINK)  ppde.o -o ppde $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv ppde $(EXEDIR)
+all: ppde3d spde3d ppde2d spde2d
 
 
-spde: spde.o 
-	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spde $(EXEDIR)
+ppde3d: ppde3d.o 
+	$(F90LINK)  ppde3d.o -o ppde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv ppde3d $(EXEDIR)
+
+
+spde3d: spde3d.o 
+	$(F90LINK) spde3d.o  -o spde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv spde3d $(EXEDIR)
+
+ppde2d: ppde2d.o 
+	$(F90LINK)  ppde2d.o -o ppde2d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv ppde2d $(EXEDIR)
+
+
+spde2d: spde2d.o 
+	$(F90LINK) spde2d.o  -o spde2d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv spde2d $(EXEDIR)
 
 
 clean: 
-	/bin/rm -f ppde.o spde.o  $(EXEDIR)/ppde 
+	/bin/rm -f ppde3d.o spde3d.o  ppde2d.o spde2d.o  \
+	$(EXEDIR)/ppde3d $(EXEDIR)/spde3d $(EXEDIR)/ppde2d $(EXEDIR)/spde2d 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
