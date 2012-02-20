@@ -11,7 +11,7 @@ subroutine psb_c_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
-  integer(psb_ipk_) :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
   character(len=20)  :: name='c_diag_prec_apply'
   complex(psb_spk_), pointer :: ww(:)
   class(psb_c_base_vect_type), allocatable :: dw
@@ -26,13 +26,13 @@ subroutine psb_c_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
   nrow = desc_data%get_local_rows()
   if (x%get_nrows() < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (y%get_nrows() < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (.not.allocated(prec%d)) then
@@ -51,8 +51,9 @@ subroutine psb_c_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   else
     allocate(ww(x%get_nrows()),stat=info)
     if (info /= psb_success_) then 
+      ierr(1) = x%get_nrows()
       call psb_errpush(psb_err_alloc_request_,name,&
-           & i_err=(/x%get_nrows(),0,0,0,0/),a_err='complex(psb_spk_)')
+           & i_err=ierr,a_err='complex(psb_spk_)')
       goto 9999      
     end if
   end if
@@ -63,7 +64,8 @@ subroutine psb_c_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   if (size(work) < x%get_nrows()) then 
     deallocate(ww,stat=info)
     if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Deallocate')
+      call psb_errpush(psb_err_from_subroutine_, &
+           & name,a_err='Deallocate')
       goto 9999      
     end if
   end if
@@ -95,7 +97,7 @@ subroutine psb_c_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
   complex(psb_spk_),intent(inout), optional, target :: work(:)
-  integer(psb_ipk_) :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
   character :: trans_
   character(len=20)  :: name='c_diag_prec_apply'
   complex(psb_spk_), pointer :: ww(:)
@@ -106,13 +108,13 @@ subroutine psb_c_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
   nrow = desc_data%get_local_rows()
   if (size(x) < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y) < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (.not.allocated(prec%d)) then
@@ -136,8 +138,8 @@ subroutine psb_c_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   case('T','C')
   case default
     info=psb_err_iarg_invalid_i_
-    call psb_errpush(info,name,&
-         & i_err=(/6,0,0,0,0/),a_err=trans_)
+    ierr(1) = 6
+    call psb_errpush(info,name,i_err=ierr,a_err=trans_)
     goto 9999
   end select
 
@@ -146,8 +148,9 @@ subroutine psb_c_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   else
     allocate(ww(size(x)),stat=info)
     if (info /= psb_success_) then 
+      ierr(1) = size(x)
       call psb_errpush(psb_err_alloc_request_,name,&
-           & i_err=(/size(x),0,0,0,0/),a_err='complex(psb_spk_)')
+           & i_err=ierr,a_err='complex(psb_spk_)')
       goto 9999      
     end if
   end if

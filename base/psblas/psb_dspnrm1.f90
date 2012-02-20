@@ -29,42 +29,34 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dnrmi.f90
+! File: psb_dnrm1.f90
 !
-! Function: psb_dnrmi
-!    Forms the approximated norm of a sparse matrix,       
+! Function: psb_dnrm1
+!    Forms the  norm1 of a sparse matrix,       
 !
-!    norm1 := max(sum(abs(A(:,j))))                                                 
+!    norm1 := max_j(sum(abs(A(:,j))))                                                 
 !
 ! Arguments:
 !    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
-function psb_dspnrm1(a,desc_a,info)  
-!!$  use psb_descriptor_type
-!!$  use psb_serial_mod
-!!$  use psb_check_mod
-!!$  use psb_error_mod
-!!$  use psb_penv_mod
-!!$  use psb_mat_mod
-!!$  use psb_tools_mod
+function psb_dspnrm1(a,desc_a,info)  result(res)
   use psb_base_mod, psb_protect_name => psb_dspnrm1
   implicit none
 
   type(psb_dspmat_type), intent(in) :: a
-  integer(psb_ipk_), intent(out)               :: info
-  type(psb_desc_type), intent(in)    :: desc_a
-  real(psb_dpk_)                     :: psb_dspnrm1
+  integer(psb_ipk_), intent(out)      :: info
+  type(psb_desc_type), intent(in)     :: desc_a
+  real(psb_dpk_)                      :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(psb_dpk_)         :: nrm1
   character(len=20)      :: name, ch_err
   real(psb_dpk_), allocatable :: v(:)
 
-  name='psb_dnrm1'
+  name='psb_dspnrm1'
   if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -120,14 +112,12 @@ function psb_dspnrm1(a,desc_a,info)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    nrm1 = maxval(v(1:nr))
+    res = maxval(v(1:nr))
   else
-    nrm1 = 0.d0
+    res = dzero 
   end if
   ! compute global max
-  call psb_amx(ictxt, nrm1)
-
-  psb_dspnrm1 = nrm1
+  call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  

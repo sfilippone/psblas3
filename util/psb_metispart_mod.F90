@@ -55,7 +55,7 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_err_unit
+       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, psb_mpik_
   public part_graph, build_mtpart, distr_mtpart,&
        & getv_mtpart, free_part
   private 
@@ -68,7 +68,8 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    integer(psb_ipk_), intent(in)  :: global_indx, n, np
+    integer(psb_ipk_), intent(in)  :: global_indx, n
+    integer(psb_ipk_), intent(in)  :: np
     integer(psb_ipk_), intent(out) :: nv
     integer(psb_ipk_), intent(out) :: pv(*)
     

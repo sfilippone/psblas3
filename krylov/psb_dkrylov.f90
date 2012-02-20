@@ -32,10 +32,12 @@
 !
 ! File: psb_krylov_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
+!
 
+  !
   ! Subroutine: psb_dkrylov
   ! 
-  !    Front-end for the Krylov subspace iterations, real version
+  !    Front-end for the Krylov subspace iterations, realversion
   !    
   ! Arguments:
   !
@@ -49,13 +51,14 @@
   !                                           
   !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
   !    prec   -  class(psb_dprec_type)       Input: preconditioner
-  !    b      -  real,dimension(:)            Input: vector containing the
+  !    b      -  real,dimension(:)         Input: vector containing the
   !                                           right hand side B
-  !    x      -  real,dimension(:)            Input/Output: vector containing the
+  !    x      -  real,dimension(:)         Input/Output: vector containing the
   !                                           initial guess and final solution X.
   !    eps    -  real                         Input: Stopping tolerance; the iteration is
   !                                           stopped when the error
-  !                                           estimate  |err| <= eps
+  !                                           estimate |err| <= eps
+  !                                           
   !    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
   !    info   -  integer.                     Output: Return code
   !
@@ -76,50 +79,45 @@
   !                                           where r is the (preconditioned, recursive
   !                                           estimate of) residual 
   ! 
-
-!!$Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,&
-!!$     & itmax,iter,err,itrace,irst,istop,cond)
-!!$
+!!$Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
 !!$  use psb_base_mod
-!!$  use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
+!!$  use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_dprec_type, psb_zprec_type
 !!$  use psb_krylov_mod, psb_protect_name => psb_dkrylov
-!!$
 !!$  character(len=*)                   :: method
 !!$  Type(psb_dspmat_type), Intent(in)  :: a
 !!$  Type(psb_desc_type), Intent(in)    :: desc_a
 !!$  class(psb_dprec_type), intent(in)   :: prec 
-!!$  Real(psb_dpk_), Intent(in)       :: b(:)
-!!$  Real(psb_dpk_), Intent(inout)    :: x(:)
-!!$  Real(psb_dpk_), Intent(in)       :: eps
+!!$  real(psb_dpk_), Intent(in)      :: b(:)
+!!$  real(psb_dpk_), Intent(inout)   :: x(:)
+!!$  Real(psb_dpk_), Intent(in)         :: eps
 !!$  integer(psb_ipk_), intent(out)               :: info
 !!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
 !!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
-!!$  Real(psb_dpk_), Optional, Intent(out) :: err,cond
-!!$
+!!$  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$  interface 
 !!$    subroutine psb_dcg(a,prec,b,x,eps,&
-!!$         & desc_a,info,itmax,iter,err,itrace,istop,cond)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      type(psb_dspmat_type), intent(in)  :: a
 !!$      type(psb_desc_type), intent(in)    :: desc_a
-!!$      real(psb_dpk_), intent(in)       :: b(:)
-!!$      real(psb_dpk_), intent(inout)    :: x(:)
+!!$      real(psb_dpk_), intent(in)    :: b(:)
+!!$      real(psb_dpk_), intent(inout) :: x(:)
 !!$      real(psb_dpk_), intent(in)       :: eps
 !!$      class(psb_dprec_type), intent(in)   :: prec
 !!$      integer(psb_ipk_), intent(out)               :: info
 !!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
 !!$      integer(psb_ipk_), optional, intent(out)     :: iter
-!!$      real(psb_dpk_), optional, intent(out) :: err,cond
+!!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dcg
 !!$    subroutine psb_dbicg(a,prec,b,x,eps,&
 !!$         & desc_a,info,itmax,iter,err,itrace,istop)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      type(psb_dspmat_type), intent(in)  :: a
 !!$      type(psb_desc_type), intent(in)    :: desc_a
-!!$      real(psb_dpk_), intent(in)         :: b(:)
-!!$      real(psb_dpk_), intent(inout)      :: x(:)
+!!$      real(psb_dpk_), intent(in)      :: b(:)
+!!$      real(psb_dpk_), intent(inout)   :: x(:)
 !!$      real(psb_dpk_), intent(in)         :: eps
 !!$      class(psb_dprec_type), intent(in)   :: prec
 !!$      integer(psb_ipk_), intent(out)               :: info
@@ -129,8 +127,8 @@
 !!$    end subroutine psb_dbicg
 !!$    subroutine psb_dcgstab(a,prec,b,x,eps,&
 !!$         & desc_a,info,itmax,iter,err,itrace,istop)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      type(psb_dspmat_type), intent(in)  :: a
 !!$      type(psb_desc_type), intent(in)    :: desc_a
 !!$      real(psb_dpk_), intent(in)       :: b(:)
@@ -143,14 +141,14 @@
 !!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dcgstab
 !!$    Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err, itrace,irst,istop)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$         &itmax,iter,err,itrace,irst,istop)
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      Type(psb_dspmat_type), Intent(in)  :: a
 !!$      Type(psb_desc_type), Intent(in)    :: desc_a
-!!$      class(psb_dprec_type), intent(in)   :: prec
-!!$      Real(psb_dpk_), Intent(in)       :: b(:)
-!!$      Real(psb_dpk_), Intent(inout)    :: x(:)
+!!$      class(psb_dprec_type), intent(in)   :: prec 
+!!$      real(psb_dpk_), Intent(in)    :: b(:)
+!!$      real(psb_dpk_), Intent(inout) :: x(:)
 !!$      Real(psb_dpk_), Intent(in)       :: eps
 !!$      integer(psb_ipk_), intent(out)               :: info
 !!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
@@ -159,35 +157,37 @@
 !!$    end subroutine psb_dcgstabl
 !!$    Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,irst,istop)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      Type(psb_dspmat_type), Intent(in)  :: a
 !!$      Type(psb_desc_type), Intent(in)    :: desc_a
 !!$      class(psb_dprec_type), intent(in)   :: prec 
-!!$      Real(psb_dpk_), Intent(in)       :: b(:)
-!!$      Real(psb_dpk_), Intent(inout)    :: x(:)
+!!$      real(psb_dpk_), Intent(in)    :: b(:)
+!!$      real(psb_dpk_), Intent(inout) :: x(:)
 !!$      Real(psb_dpk_), Intent(in)       :: eps
 !!$      integer(psb_ipk_), intent(out)               :: info
 !!$      integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
 !!$      integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$      Real(psb_dpk_), Optional, Intent(out) :: err
 !!$    end subroutine psb_drgmres
-!!$    subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,istop)
-!!$      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-!!$      use psb_prec_mod, only : psb_dprec_type
+!!$    subroutine psb_dcgs(a,prec,b,x,eps,&
+!!$         & desc_a,info,itmax,iter,err,itrace,istop)
+!!$      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+!!$           & psb_dspmat_type, psb_dprec_type
 !!$      type(psb_dspmat_type), intent(in)  :: a
-!!$      type(psb_desc_type), intent(in)    :: desc_a 
-!!$      class(psb_dprec_type), intent(in)   :: prec 
+!!$      type(psb_desc_type), intent(in)    :: desc_a
 !!$      real(psb_dpk_), intent(in)       :: b(:)
 !!$      real(psb_dpk_), intent(inout)    :: x(:)
 !!$      real(psb_dpk_), intent(in)       :: eps
+!!$      class(psb_dprec_type), intent(in)   :: prec
 !!$      integer(psb_ipk_), intent(out)               :: info
 !!$      integer(psb_ipk_), optional, intent(in)      :: itmax, itrace,istop
 !!$      integer(psb_ipk_), optional, intent(out)     :: iter
 !!$      real(psb_dpk_), optional, intent(out) :: err
 !!$    end subroutine psb_dcgs
 !!$  end interface
+!!$
+!!$
 !!$  integer(psb_ipk_) :: ictxt,me,np,err_act
 !!$  character(len=20)             :: name
 !!$
@@ -200,10 +200,11 @@
 !!$
 !!$  call psb_info(ictxt, me, np)
 !!$
+!!$
 !!$  select case(psb_toupper(method))
 !!$  case('CG') 
 !!$    call  psb_dcg(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,istop,cond)
+!!$         &itmax,iter,err,itrace,istop)
 !!$  case('CGS') 
 !!$    call  psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,istop)
@@ -212,10 +213,10 @@
 !!$         &itmax,iter,err,itrace,istop)
 !!$  case('BICGSTAB') 
 !!$    call  psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,istop)
+!!$         & itmax,iter,err,itrace,istop)
 !!$  case('RGMRES')
 !!$    call  psb_drgmres(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,irst,istop)
+!!$         & itmax,iter,err,itrace,irst,istop)
 !!$  case('BICGSTABL')
 !!$    call  psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,irst,istop)
@@ -247,8 +248,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop,cond)
 
   use psb_base_mod
-  use psb_prec_mod,only : psb_sprec_type, psb_dprec_type,&
-       & psb_cprec_type, psb_zprec_type
+  use psb_prec_mod,only : psb_dprec_type
   use psb_krylov_mod, psb_protect_name => psb_dkrylov_vect
 
   character(len=*)                     :: method

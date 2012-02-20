@@ -80,8 +80,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr
   integer(psb_ipk_) :: l1, icomm, err_act
-  integer(psb_ipk_), allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
-       & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
+  integer(psb_mpik_), allocatable  :: brvindx(:), &
+       & rvsz(:), bsdindx(:),sdsz(:)
+  integer(psb_ipk_), allocatable  :: iasnd(:), jasnd(:)
   complex(psb_dpk_), allocatable :: valsnd(:)
   type(psb_z_coo_sparse_mat), allocatable :: acoo
   integer(psb_ipk_), pointer  :: idxv(:)
@@ -137,7 +138,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     outfmt_ = 'CSR'
   endif
 
-  Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
+  Allocate(brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
 
   if (info /= psb_success_) then
@@ -169,7 +170,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idx = 0
   idxs = 0
   idxr = 0
-  call acoo%allocate(0,a%get_ncols(),info)
+  call acoo%allocate(izero,a%get_ncols(),info)
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
     proc=idxv(counter)
@@ -188,7 +189,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
-  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,psb_mpi_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_ipk_integer,rvsz,1,psb_mpi_ipk_integer,icomm,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'
@@ -273,10 +274,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_double_complex,&
        & acoo%val,rvsz,brvindx,mpi_double_complex,icomm,info)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_integer,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_integer,icomm,info)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_integer,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_integer,icomm,info)
+  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
+  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'
@@ -298,7 +299,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
   l1  = 0
-  call acoo%set_nrows(0)
+  call acoo%set_nrows(izero)
   !
   irmin = huge(irmin)
   icmin = huge(icmin)
@@ -350,7 +351,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-  Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,&
+  Deallocate(brvindx,bsdindx,rvsz,sdsz,&
        & iasnd,jasnd,valsnd,stat=info)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Done'

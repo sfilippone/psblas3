@@ -4,8 +4,11 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 
-MODOBJS= psb_base_inner_krylov_mod.o \
-	psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o \
+#MODOBJS= psb_base_inner_krylov_mod.o \
+#	psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o \
+#	psb_krylov_mod.o
+MODOBJS= psb_base_krylov_conv_mod.o \
+	psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o \
 	psb_krylov_mod.o
 F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
         psb_dcgstab.o psb_dcg.o psb_dcgs.o \
@@ -30,8 +33,8 @@ lib: $(OBJS)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
 
 
-psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o:  psb_base_inner_krylov_mod.o
-psb_inner_krylov_mod.o: psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o 
+psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o
+psb_krylov_conv_mod.o: psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o 
 $(F90OBJS): $(MODOBJS)
 $(OBJS): $(LIBDIR)/$(PRECMODNAME)$(.mod)  $(LIBDIR)/$(BASEMODNAME)$(.mod)
 
@@ -39,6 +42,5 @@ veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 
 clean:
-	/bin/rm -f $(OBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) *$(.mod)
 
-veryclean: clean

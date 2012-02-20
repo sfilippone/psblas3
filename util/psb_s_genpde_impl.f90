@@ -2,7 +2,8 @@
 !  subroutine to allocate and fill in the coefficient matrix and
 !  the rhs. 
 !
-subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,info,f)
+subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
+     & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold)
   use psb_base_mod
   use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde3d
   !
@@ -21,14 +22,16 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,
   ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
   !
   implicit none
-  procedure(d_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
+  procedure(s_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
   integer(psb_ipk_)     :: idim
   type(psb_sspmat_type) :: a
   type(psb_s_vect_type) :: xv,bv
   type(psb_desc_type)   :: desc_a
   integer(psb_ipk_)     :: ictxt, info
   character             :: afmt*5
-  procedure(d_func_3d), optional :: f
+  procedure(s_func_3d), optional :: f
+  class(psb_s_base_sparse_mat), optional :: amold
+  class(psb_s_base_vect_type), optional :: vmold
 
   ! Local variables.
 
@@ -49,7 +52,7 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,
   real(psb_spk_), parameter :: rhs=0.e0,one=1.e0,zero=0.e0
   real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
   integer(psb_ipk_) :: err_act
-  procedure(d_func_3d), pointer :: f_
+  procedure(s_func_3d), pointer :: f_
   character(len=20)  :: name, ch_err,tmpfmt
 
   info = psb_success_
@@ -62,7 +65,7 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,
   if (present(f)) then 
     f_ => f
   else
-    f_ => d_null_func_3d
+    f_ => s_null_func_3d
   end if
 
   deltah   = 1.e0/(idim+2)
@@ -243,8 +246,13 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,
   tcdasb = psb_wtime()-t1
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  if (info == psb_success_) &
-       & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+  if (info == psb_success_) then 
+    if (present(amold)) then 
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=amold)
+    else
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    end if
+  end if
   call psb_barrier(ictxt)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -252,8 +260,8 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,a3,b1,b2,b3,c,g,
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (info == psb_success_) call psb_geasb(xv,desc_a,info)
-  if (info == psb_success_) call psb_geasb(bv,desc_a,info)
+  if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
+  if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='asb rout.'
@@ -297,7 +305,8 @@ end subroutine psb_s_gen_pde3d
 !  subroutine to allocate and fill in the coefficient matrix and
 !  the rhs. 
 !
-subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f)
+subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
+     & a1,a2,b1,b2,c,g,info,f,amold,vmold)
   use psb_base_mod
   use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde2d
   !
@@ -316,14 +325,16 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f
   ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
   !
   implicit none
-  procedure(d_func_2d)  :: b1,b2,c,a1,a2,g
+  procedure(s_func_2d)  :: b1,b2,c,a1,a2,g
   integer(psb_ipk_)     :: idim
   type(psb_sspmat_type) :: a
   type(psb_s_vect_type) :: xv,bv
   type(psb_desc_type)   :: desc_a
   integer(psb_ipk_)     :: ictxt, info
   character             :: afmt*5
-  procedure(d_func_2d), optional :: f
+  procedure(s_func_2d), optional :: f
+  class(psb_s_base_sparse_mat), optional :: amold
+  class(psb_s_base_vect_type), optional :: vmold
 
   ! Local variables.
 
@@ -344,7 +355,7 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f
   real(psb_spk_), parameter :: rhs=0.e0,one=1.e0,zero=0.e0
   real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
   integer(psb_ipk_) :: err_act
-  procedure(d_func_2d), pointer :: f_
+  procedure(s_func_2d), pointer :: f_
   character(len=20)  :: name, ch_err,tmpfmt
 
   info = psb_success_
@@ -357,7 +368,7 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f
   if (present(f)) then 
     f_ => f
   else
-    f_ => d_null_func_2d
+    f_ => s_null_func_2d
   end if
 
   deltah   = 1.e0/(idim+2)
@@ -514,8 +525,13 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f
   tcdasb = psb_wtime()-t1
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  if (info == psb_success_) &
-       & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+  if (info == psb_success_) then 
+    if (present(amold)) then 
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=amold)
+    else
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    end if
+  end if
   call psb_barrier(ictxt)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -523,8 +539,8 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,a1,a2,b1,b2,c,g,info,f
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (info == psb_success_) call psb_geasb(xv,desc_a,info)
-  if (info == psb_success_) call psb_geasb(bv,desc_a,info)
+  if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
+  if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='asb rout.'

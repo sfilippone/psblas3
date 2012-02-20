@@ -66,12 +66,14 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), intent(out) :: info
 
 
-  integer(psb_ipk_), allocatable :: hsz(:),hidx(:),helem(:),hproc(:),&
-       & sdsz(:),sdidx(:), rvsz(:), rvidx(:),answers(:,:),idxsrch(:,:)
-
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
-       & last_ih, last_j, nv, mglob, nresp
-  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_), allocatable :: helem(:),hproc(:),&
+       & answers(:,:),idxsrch(:,:), hhidx(:)
+  integer(psb_mpik_), allocatable :: hsz(:),hidx(:), &
+       & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
+  integer(psb_mpik_) :: icomm, minfo, iictxt
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,hsize,ip,isz,k,j,&
+       & last_ih, last_j, nv, mglob
+  integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
@@ -85,7 +87,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   mglob   = idxmap%get_gr()
   n_row   = idxmap%get_lr()
   n_col   = idxmap%get_lc()
-
+  iictxt = ictxt 
 
   call psb_info(ictxt, me, np)
 
@@ -114,15 +116,15 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   if (associated(idxmap%parts)) then 
     ! Use function shortcut
 !!$    write(0,*) me,trim(name),' indxmap%parts shortcut'
-    Allocate(hidx(np), stat=info)
+    Allocate(hhidx(np), stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
       goto 9999      
     end if
     do i=1, nv
-      call idxmap%parts(idx(i),mglob,np,hidx,nresp)
+      call idxmap%parts(idx(i),mglob,np,hhidx,nresp)
       if (nresp > 0) then
-        iprc(i) = hidx(1)
+        iprc(i) = hhidx(1)
       else
         iprc(i) = -1 
       end if
@@ -151,7 +153,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
     hsz       = 0
     hsz(me+1) = nv
-    call psb_amx(ictxt,hsz)
+    call psb_amx(iictxt,hsz)
     hidx(1)   = 0
     do i=1, np
       hidx(i+1) = hidx(i) + hsz(i)
@@ -167,9 +169,9 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       t3 = psb_wtime()
     end if
 
-    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_integer,&
-         & hproc,hsz,hidx,psb_mpi_integer,&
-         & icomm,info)
+    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_integer,&
+         & hproc,hsz,hidx,psb_mpi_ipk_integer,&
+         & icomm,minfo)
     if (gettime) then 
       tamx = psb_wtime() - t3
     end if
@@ -211,7 +213,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     end if
 
     ! Collect all the answers with alltoallv (need sizes) 
-    call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
+    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,&
+         & rvsz,1,psb_mpi_def_integer,icomm,minfo)
 
     isz = sum(rvsz) 
 
@@ -225,9 +228,9 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       rvidx(ip) = j
       j         = j + rvsz(ip)
     end do
-    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_integer,&
-         & answers(:,1),rvsz,rvidx,psb_mpi_integer,&
-         & icomm,info)
+    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_integer,&
+         & answers(:,1),rvsz,rvidx,psb_mpi_ipk_integer,&
+         & icomm,minfo)
     if (gettime) then 
       tamx = psb_wtime() - t3 + tamx
     end if
@@ -258,7 +261,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
         do
           if (j > size(answers,1)) then 
             ! Last resort attempt.
-            j = psb_ibsrch(ih,size(answers,1),answers(:,1))
+            j = psb_ibsrch(ih,size(answers,1,kind=psb_ipk_),answers(:,1))
             if (j == -1) then 
               write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
                    & 'not found : ',size(answers,1),':',answers(:,1)
@@ -296,7 +299,6 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       end if
     end do
   end if
-
   if (gettime) then 
     call psb_barrier(ictxt)
     t1 = psb_wtime()

@@ -101,6 +101,7 @@ C
       DO I=1, NP
         DG(I)=LDL(I)
       ENDDO
+      
 
       NEDGES = 0
       DO I=1, NP

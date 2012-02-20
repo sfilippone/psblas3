@@ -111,7 +111,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
-  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -161,7 +161,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   return
 end subroutine psi_iswaptranm
 
-subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_itranidxm
   use psb_error_mod
@@ -175,20 +175,27 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag,n
+  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag,n
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_)         :: y(:,:), beta
   integer(psb_ipk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_) :: np, me, nesd, nerv,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
-       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, data_
-  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: nesd, nerv,&
+       & err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti
+!!$  integer(psb_ipk_) :: np, me, nesd, nerv,&
+!!$       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
+!!$       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
+!!$       & snd_pt, rcv_pt, pnti, data_
+!!$  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
+!!$       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -202,6 +209,8 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
+  ictxt = iictxt
+  icomm = iicomm
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
@@ -311,12 +320,12 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & psb_mpi_integer,&
-         & sndbuf,sdsz,bsdidx,psb_mpi_integer,icomm,iret)
+         & psb_mpi_ipk_integer,&
+         & sndbuf,sdsz,bsdidx,psb_mpi_ipk_integer,icomm,iret)
     if(iret /= mpi_success) then
-      int_err(1) = iret
+      ierr(1) = iret
       info=psb_err_mpi_error_
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
 
@@ -369,7 +378,7 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(sndbuf(snd_pt),n*nesd,&
-             & psb_mpi_integer,prcid(i),&
+             & psb_mpi_ipk_integer,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -379,7 +388,7 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
 
     ! Then I post all the blocking sends
-    if (usersend)  call mpi_barrier(icomm,info)
+    if (usersend)  call mpi_barrier(icomm,iret)
 
     pnti   = 1
     snd_pt = 1
@@ -393,18 +402,18 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
         p2ptag = psb_int_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),n*nerv,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
         if(iret /= mpi_success) then
-          int_err(1) = iret
+          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=int_err)
+          call psb_errpush(info,name,i_err=ierr)
           goto 9999
         end if
       end if
@@ -426,9 +435,9 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       if ((proc_to_comm /= me).and.(nesd>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
-          int_err(1) = iret
+          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=int_err)
+          call psb_errpush(info,name,i_err=ierr)
           goto 9999
         end if
       else if (proc_to_comm == me) then 
@@ -606,7 +615,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   integer(psb_ipk_), pointer :: d_idx(:)
-  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -657,7 +666,7 @@ end subroutine psi_iswaptranv
 
 
 
-subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_itranidxv
   use psb_error_mod
@@ -671,20 +680,27 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
   include 'mpif.h'
 #endif
 
-  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_)         :: y(:), beta
   integer(psb_ipk_), target :: work(:)
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_ipk_) :: np, me, nesd, nerv,&
-       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
-       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, data_, n 
-  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
-  integer(psb_ipk_) :: int_err(5)
+  integer(psb_ipk_) :: nesd, nerv,&
+       & err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti, n
+!!$  integer(psb_ipk_) :: np, me, nesd, nerv,&
+!!$       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
+!!$       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
+!!$       & snd_pt, rcv_pt, pnti, data_, n 
+!!$  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
+!!$       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -698,6 +714,8 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
   info=psb_success_
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
+  ictxt = iictxt
+  icomm = iicomm
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
@@ -806,12 +824,12 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & psb_mpi_integer,&
-         & sndbuf,sdsz,bsdidx,psb_mpi_integer,icomm,iret)
+         & psb_mpi_ipk_integer,&
+         & sndbuf,sdsz,bsdidx,psb_mpi_ipk_integer,icomm,iret)
     if(iret /= mpi_success) then
-      int_err(1) = iret
+      ierr(1) = iret
       info=psb_err_mpi_error_
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
 
@@ -864,7 +882,7 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(sndbuf(snd_pt),nesd,&
-             & psb_mpi_integer,prcid(i),&
+             & psb_mpi_ipk_integer,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -874,7 +892,7 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
 
     ! Then I post all the blocking sends
-    if (usersend)  call mpi_barrier(icomm,info)
+    if (usersend)  call mpi_barrier(icomm,iret)
 
     pnti   = 1
     snd_pt = 1
@@ -888,18 +906,18 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
         p2ptag = psb_int_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag, icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),nerv,&
-               & psb_mpi_integer,prcid(i),&
+               & psb_mpi_ipk_integer,prcid(i),&
                & p2ptag, icomm,iret)
         end if
 
         if(iret /= mpi_success) then
-          int_err(1) = iret
+          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=int_err)
+          call psb_errpush(info,name,i_err=ierr)
           goto 9999
         end if
       end if
@@ -920,9 +938,9 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
       if ((proc_to_comm /= me).and.(nesd>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
-          int_err(1) = iret
+          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=int_err)
+          call psb_errpush(info,name,i_err=ierr)
           goto 9999
         end if
       else if (proc_to_comm ==  me) then
@@ -1049,7 +1067,7 @@ end subroutine psi_itranidxv
 !!$  ! locals
 !!$  integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
 !!$  integer(psb_ipk_), pointer :: d_idx(:)
-!!$  integer(psb_ipk_) :: int_err(5)
+!!$  integer(psb_ipk_) :: ierr(5)
 !!$  character(len=20)  :: name
 !!$
 !!$  info=psb_success_
@@ -1100,7 +1118,7 @@ end subroutine psi_itranidxv
 !!$
 !!$
 !!$
-!!$subroutine psi_itranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+!!$subroutine psi_itranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 !!$     & totxch,totsnd,totrcv,work,info)
 !!$
 !!$  use psi_mod, psb_protect_name => psi_itranidx_vect
@@ -1116,7 +1134,7 @@ end subroutine psi_itranidxv
 !!$  include 'mpif.h'
 !!$#endif
 !!$
-!!$  integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+!!$  integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
 !!$  integer(psb_ipk_), intent(out)     :: info
 !!$  class(psb_i_base_vect_type) :: y
 !!$  integer(psb_ipk_)         :: beta
@@ -1124,13 +1142,14 @@ end subroutine psi_itranidxv
 !!$  integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 !!$
 !!$  ! locals
-!!$  integer(psb_ipk_) :: np, me, nesd, nerv,&
-!!$       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
-!!$       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
-!!$       & snd_pt, rcv_pt, pnti, data_, n 
-!!$  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
+!!$  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+!!$       & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+!!$  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
 !!$       & sdsz, rvsz, prcid, rvhd, sdhd
-!!$  integer(psb_ipk_) :: int_err(5)
+!!$  integer(psb_ipk_) :: nesd, nerv,&
+!!$       & err_act, i, idx_pt, totsnd_, totrcv_,&
+!!$       & snd_pt, rcv_pt, pnti, n
+!!$  integer(psb_ipk_) :: ierr(5)
 !!$  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
 !!$       & albf,do_send,do_recv
 !!$  logical, parameter :: usersend=.false.
@@ -1144,6 +1163,8 @@ end subroutine psi_itranidxv
 !!$  info=psb_success_
 !!$  name='psi_swap_tran'
 !!$  call psb_erractionsave(err_act)
+!!$  ictxt = iictxt
+!!$  icomm = iicomm
 !!$
 !!$  call psb_info(ictxt,me,np) 
 !!$  if (np == -1) then
@@ -1252,12 +1273,12 @@ end subroutine psi_itranidxv
 !!$
 !!$    ! swap elements using mpi_alltoallv
 !!$    call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-!!$         & psb_mpi_integer,&
-!!$         & sndbuf,sdsz,bsdidx,psb_mpi_integer,icomm,iret)
+!!$         & psb_mpi_ipk_integer,&
+!!$         & sndbuf,sdsz,bsdidx,psb_mpi_ipk_integer,icomm,iret)
 !!$    if(iret /= mpi_success) then
-!!$      int_err(1) = iret
+!!$      ierr(1) = iret
 !!$      info=psb_err_mpi_error_
-!!$      call psb_errpush(info,name,i_err=int_err)
+!!$      call psb_errpush(info,name,i_err=ierr)
 !!$      goto 9999
 !!$    end if
 !!$
@@ -1310,7 +1331,7 @@ end subroutine psi_itranidxv
 !!$      if ((nesd>0).and.(proc_to_comm /= me)) then 
 !!$        p2ptag = psb_int_swap_tag
 !!$        call mpi_irecv(sndbuf(snd_pt),nesd,&
-!!$             & psb_mpi_integer,prcid(i),&
+!!$             & psb_mpi_ipk_integer,prcid(i),&
 !!$             & p2ptag,icomm,rvhd(i),iret)
 !!$      end if
 !!$      rcv_pt = rcv_pt + nerv
@@ -1320,7 +1341,7 @@ end subroutine psi_itranidxv
 !!$
 !!$
 !!$    ! Then I post all the blocking sends
-!!$    if (usersend)  call mpi_barrier(icomm,info)
+!!$    if (usersend)  call mpi_barrier(icomm,iret)
 !!$
 !!$    pnti   = 1
 !!$    snd_pt = 1
@@ -1334,18 +1355,18 @@ end subroutine psi_itranidxv
 !!$        p2ptag = psb_int_swap_tag
 !!$        if (usersend) then 
 !!$          call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-!!$               & psb_mpi_integer,prcid(i),&
+!!$               & psb_mpi_ipk_integer,prcid(i),&
 !!$               & p2ptag, icomm,iret)
 !!$        else
 !!$          call mpi_send(rcvbuf(rcv_pt),nerv,&
-!!$               & psb_mpi_integer,prcid(i),&
+!!$               & psb_mpi_ipk_integer,prcid(i),&
 !!$               & p2ptag, icomm,iret)
 !!$        end if
 !!$
 !!$        if(iret /= mpi_success) then
-!!$          int_err(1) = iret
+!!$          ierr(1) = iret
 !!$          info=psb_err_mpi_error_
-!!$          call psb_errpush(info,name,i_err=int_err)
+!!$          call psb_errpush(info,name,i_err=ierr)
 !!$          goto 9999
 !!$        end if
 !!$      end if
@@ -1366,9 +1387,9 @@ end subroutine psi_itranidxv
 !!$      if ((proc_to_comm /= me).and.(nesd>0)) then
 !!$        call mpi_wait(rvhd(i),p2pstat,iret)
 !!$        if(iret /= mpi_success) then
-!!$          int_err(1) = iret
+!!$          ierr(1) = iret
 !!$          info=psb_err_mpi_error_
-!!$          call psb_errpush(info,name,i_err=int_err)
+!!$          call psb_errpush(info,name,i_err=ierr)
 !!$          goto 9999
 !!$        end if
 !!$      else if (proc_to_comm ==  me) then

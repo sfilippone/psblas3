@@ -74,8 +74,9 @@ program cf_sample
   integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec
   real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
-  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
-  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv
+  integer(psb_ipk_), allocatable :: ivg(:), perm(:)
+  integer(psb_ipk_), allocatable :: ipv(:)
   character(len=40)  :: fname, fnout
 
 
@@ -92,7 +93,7 @@ program cf_sample
   name='cf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -139,15 +140,15 @@ program cf_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-!!$    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
-!!$      call psb_gelp('N',perm(1:m_problem),&
-!!$           & b_col_glob(1:m_problem),info)
+      call psb_gelp('N',perm(1:m_problem),&
+           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')

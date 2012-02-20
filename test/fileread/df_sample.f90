@@ -73,10 +73,11 @@ program df_sample
   ! other variables
   integer(psb_ipk_) :: i,info,j,m_problem
   integer(psb_ipk_) :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
-       &scale,resmx,resmxp
-  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
-  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
+  real(psb_dpk_) :: t1, t2, tprec
+  real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv
+  integer(psb_ipk_), allocatable :: ivg(:), perm(:)
+  integer(psb_ipk_), allocatable :: ipv(:)
   character(len=40)  :: fname, fnout
 
 
@@ -93,8 +94,8 @@ program df_sample
   name='df_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
-  call psb_cd_set_large_threshold(2)
+  call psb_set_errverbosity(itwo)
+  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -144,7 +145,7 @@ program df_sample
     call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
@@ -219,8 +220,8 @@ program df_sample
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
-  write(fnout,'(a,i3.3,a)') 'amat-',iam,'.mtx'
-  call a%print(fname=fnout)
+!!$  write(fnout,'(a,i3.3,a)') 'amat-',iam,'.mtx'
+!!$  call a%print(fname=fnout)
   call psb_amx(ictxt, t2)
 
   if (iam == psb_root_) then

@@ -10,7 +10,7 @@ subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   real(psb_dpk_),intent(inout), optional, target :: work(:)
-  integer(psb_ipk_) :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
   character(len=20)  :: name='c_null_prec_apply'
 
   call psb_erractionsave(err_act)
@@ -20,13 +20,13 @@ subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
   nrow = desc_data%get_local_rows()
   if (x%get_nrows() < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (y%get_nrows() < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -62,7 +62,7 @@ subroutine psb_d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
   real(psb_dpk_),intent(inout), optional, target :: work(:)
-  integer(psb_ipk_) :: err_act, nrow
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
   character(len=20)  :: name='c_null_prec_apply'
 
   call psb_erractionsave(err_act)
@@ -73,13 +73,13 @@ subroutine psb_d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
   nrow = desc_data%get_local_rows()
   if (size(x) < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/2,nrow,0,0,0/))
+    info = 36; ierr(1) = 2; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y) < nrow) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,nrow,0,0,0/))
+    info = 36; ierr(1) = 3; ierr(2) = nrow;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 

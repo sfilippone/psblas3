@@ -60,10 +60,10 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
   integer(psb_ipk_), intent(in), optional    :: iroot
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
-       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
-       & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
-       & jlx, myrank, rootrank, c, pos
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, ilx,&
+       & jlx, c, pos
   integer(psb_ipk_), allocatable :: scatterv(:)
   integer(psb_ipk_), allocatable :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
@@ -87,8 +87,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1)=5; ierr(2)= root
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -126,8 +126,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
+  if (info == psb_success_) call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -167,8 +167,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     end do
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
-    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
-         & 1,psb_mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
+         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     if (me == root) then
       displ(1)=0
@@ -188,8 +188,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
 
 
     do c=1, k
@@ -206,8 +206,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
       ! scatter !!!
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & psb_mpi_integer,locx(1,jlocx+c-1),nrow,&
-           & psb_mpi_integer,rootrank,icomm,info)
+           & psb_mpi_ipk_integer,locx(1,jlocx+c-1),nrow,&
+           & psb_mpi_ipk_integer,rootrank,icomm,info)
 
     end do
 
@@ -293,10 +293,9 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
-       & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
-       & rootrank, pos, ilx, jlx
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_ipk_), allocatable  :: scatterv(:)
   integer(psb_ipk_), allocatable  :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)     :: name, ch_err
@@ -323,8 +322,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1) = 5; ierr(2) = root
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -347,9 +346,9 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   k = 1
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if (info == psb_success_) &
-       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+       & call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -382,8 +381,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     call psb_loc_to_glob(ltg(1:nrow),desc_a,info) 
 
 
-    call mpi_gather(nrow,1,psb_mpi_integer,all_dim,&
-         & 1,psb_mpi_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
+         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     if(me == root) then
       displ(1)=0
@@ -400,8 +399,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (me == root) then
@@ -416,8 +415,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & psb_mpi_integer,locx,nrow,&
-         & psb_mpi_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_integer,locx,nrow,&
+         & psb_mpi_ipk_integer,rootrank,icomm,info)
 
     if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
   end if

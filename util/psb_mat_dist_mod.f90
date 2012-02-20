@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psb_mat_dist_mod
-  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_, psb_desc_type, &
+  use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_, psb_desc_type, psb_parts, &
        & psb_sspmat_type, psb_cspmat_type, psb_dspmat_type, psb_zspmat_type, &
        & psb_s_base_sparse_mat, psb_c_base_sparse_mat, &
        &  psb_d_base_sparse_mat, psb_z_base_sparse_mat, &
@@ -96,7 +96,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       import :: psb_ipk_, psb_sspmat_type, psb_desc_type, psb_spk_,&
-           & psb_s_base_sparse_mat, psb_s_vect_type
+           & psb_s_base_sparse_mat, psb_s_vect_type, psb_parts
       implicit none
 
       ! parameters
@@ -110,18 +110,8 @@ module psb_mat_dist_mod
       integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_s_base_sparse_mat), optional :: mold
- 
-      integer(psb_ipk_) :: v(:)
-      interface 
-        subroutine parts(global_indx,n,np,pv,nv)
-          import :: psb_ipk_
-          implicit none
-          integer(psb_ipk_), intent(in)  :: global_indx, n, np
-          integer(psb_ipk_), intent(out) :: nv
-          integer(psb_ipk_), intent(out) :: pv(*) 
-        end subroutine parts
-      end interface
-      optional                  :: parts, v
+      procedure(psb_parts), optional  :: parts
+      integer(psb_ipk_), optional     :: v(:)
 
     end subroutine smatdist
     subroutine dmatdist(a_glob, a, ictxt, desc_a,&
@@ -183,7 +173,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_d_base_sparse_mat, psb_d_vect_type
+           & psb_d_base_sparse_mat, psb_d_vect_type, psb_parts
       implicit none
 
       ! parameters
@@ -197,18 +187,8 @@ module psb_mat_dist_mod
       integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_d_base_sparse_mat), optional :: mold
-
-      integer(psb_ipk_) :: v(:)
-      interface 
-        subroutine parts(global_indx,n,np,pv,nv)
-          import :: psb_ipk_
-          implicit none
-          integer(psb_ipk_), intent(in)  :: global_indx, n, np
-          integer(psb_ipk_), intent(out) :: nv
-          integer(psb_ipk_), intent(out) :: pv(*) 
-        end subroutine parts
-      end interface
-      optional                  :: parts, v
+      procedure(psb_parts), optional  :: parts
+      integer(psb_ipk_), optional     :: v(:)
 
     end subroutine dmatdist
 
@@ -271,7 +251,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       import :: psb_ipk_, psb_cspmat_type, psb_spk_, psb_desc_type,&
-           & psb_c_base_sparse_mat, psb_c_vect_type
+           & psb_c_base_sparse_mat, psb_c_vect_type, psb_parts
       implicit none
 
       ! parameters
@@ -285,19 +265,8 @@ module psb_mat_dist_mod
       integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_c_base_sparse_mat), optional :: mold
-
-      integer(psb_ipk_) :: v(:)
-      interface 
-        subroutine parts(global_indx,n,np,pv,nv)
-          import :: psb_ipk_
-          implicit none
-          integer(psb_ipk_), intent(in)  :: global_indx, n, np
-          integer(psb_ipk_), intent(out) :: nv
-          integer(psb_ipk_), intent(out) :: pv(*) 
-        end subroutine parts
-      end interface
-      optional                  :: parts, v
-
+      procedure(psb_parts), optional  :: parts
+      integer(psb_ipk_), optional     :: v(:)
     end subroutine cmatdist
 
     subroutine zmatdist(a_glob, a, ictxt, desc_a,&
@@ -359,7 +328,7 @@ module psb_mat_dist_mod
       !     on exit : unchanged.
       !
       import :: psb_ipk_, psb_zspmat_type, psb_dpk_, psb_desc_type,&
-           & psb_z_base_sparse_mat, psb_z_vect_type
+           & psb_z_base_sparse_mat, psb_z_vect_type, psb_parts
       implicit none
 
       ! parameters
@@ -373,20 +342,8 @@ module psb_mat_dist_mod
       integer(psb_ipk_), optional          :: inroot
       character(len=*), optional :: fmt
       class(psb_z_base_sparse_mat), optional :: mold
-
-      integer(psb_ipk_) :: v(:)
-      interface 
-        subroutine parts(global_indx,n,np,pv,nv)
-          import :: psb_ipk_
-          implicit none
-          integer(psb_ipk_), intent(in)  :: global_indx, n, np
-          integer(psb_ipk_), intent(out) :: nv
-          integer(psb_ipk_), intent(out) :: pv(*) 
-        end subroutine parts
-      end interface
-      optional                  :: parts, v
-
-
+      procedure(psb_parts), optional  :: parts
+      integer(psb_ipk_), optional     :: v(:)
     end subroutine zmatdist
   end interface
 

@@ -60,16 +60,15 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
   complex(psb_dpk_)                    :: res
   type(psb_z_vect_type), intent(inout) :: x, y
   type(psb_desc_type), intent(in)      :: desc_a
-  integer(psb_ipk_), intent(out)                 :: info
-  
+  integer(psb_ipk_), intent(out)       :: info
+
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
-  complex(psb_dpk_)         :: dot_local
   character(len=20)      :: name, ch_err
 
   name='psb_sdot'
-  res = szero
+  res = zzero
   if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -118,27 +117,22 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
     goto 9999
   end if
 
-  if(m /= 0) then
-    nr = desc_a%get_local_rows() 
-    if(nr > 0) then
-      dot_local = x%dot(nr,y)
-!!$      ! adjust dot_local because overlapped elements are computed more than once
+  nr = desc_a%get_local_rows() 
+  if(nr > 0) then
+    res = x%dot(nr,y)
+    ! FIXME
+    ! adjust dot_local because overlapped elements are computed more than once
 !!$      do i=1,size(desc_a%ovrlap_elem,1)
 !!$        idx  = desc_a%ovrlap_elem(i,1)
 !!$        ndm  = desc_a%ovrlap_elem(i,2)
 !!$        dot_local = dot_local - (real(ndm-1)/real(ndm))*(x(idx)*y(idx))
 !!$      end do
-    else
-      dot_local=zzero
-    end if
   else
-    dot_local=zzero
+    res = zzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, dot_local)
-  
-  res = dot_local
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -151,27 +145,24 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
     return
   end if
   return
-  
+
 end function psb_zdot_vect
 
-function psb_zdot(x, y,desc_a, info, jx, jy)  
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+function psb_zdot(x, y,desc_a, info, jx, jy)  result(res)
+  use psb_base_mod, psb_protect_name => psb_zdot
   implicit none
 
-  complex(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
+  complex(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(in), optional    :: jx, jy
-  integer(psb_ipk_), intent(out)             :: info
-  complex(psb_dpk_)              :: psb_zdot
+  integer(psb_ipk_), intent(out)   :: info
+  complex(psb_dpk_)              :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
-  complex(psb_dpk_)         :: dot_local
-  complex(psb_dpk_)         :: zdotc
+       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr, &
+       & lldx, lldy
+  complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
@@ -208,11 +199,13 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   end if
 
   m = desc_a%get_global_rows()
+  lldx = size(x,1)
+  lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -226,27 +219,21 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if(desc_a%get_local_rows() > 0) then
-      dot_local = zdotc(desc_a%get_local_rows(),&
-           & x(iix:,jjx),ione,y(iiy:,jjy),ione)
-      ! adjust dot_local because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx,jjx))*y(idx,jjy))
-      end do
-    else
-      dot_local=0.d0
-    end if
+  nr = desc_a%get_local_rows() 
+  if(nr > 0) then
+    res = zdotc(int(nr,kind=psb_mpik_), x(iix:,jjx),1,y(iiy:,jjy),1)
+    ! adjust dot_local because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx  = desc_a%ovrlap_elem(i,1)
+      ndm  = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*(conjg(x(idx,jjx))*y(idx,jjy))
+    end do
   else
-    dot_local=0.d0
+    res = zzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, dot_local)
-
-  psb_zdot = dot_local
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -307,22 +294,19 @@ end function psb_zdot
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_zdotv(x, y,desc_a, info)  
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+function psb_zdotv(x, y,desc_a, info)  result(res)
+  use psb_base_mod, psb_protect_name => psb_zdotv
   implicit none
 
-  complex(psb_dpk_), intent(in)  :: x(:), y(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
-  complex(psb_dpk_)              :: psb_zdotv
+  complex(psb_dpk_), intent(in)   :: x(:), y(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  complex(psb_dpk_)              :: res
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
-  complex(psb_dpk_)         :: dot_local
+       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, nr, &
+       & lldx, lldy
   complex(psb_dpk_)         :: zdotc
   character(len=20)        :: name, ch_err
 
@@ -345,11 +329,12 @@ function psb_zdotv(x, y,desc_a, info)
   jx = ione
   jy = ione
   m = desc_a%get_global_rows()
-
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_)&
-       & call psb_chkvect(m,ione,size(y,1),iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ione,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -363,27 +348,22 @@ function psb_zdotv(x, y,desc_a, info)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if(desc_a%get_local_rows() > 0) then
-      dot_local = zdotc(desc_a%get_local_rows(),&
-           & x,ione,y,ione)
-      ! adjust dot_local because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
-      end do
-    else
-      dot_local=0.d0
-    end if
+  nr = desc_a%get_local_rows() 
+  if(nr > 0) then
+    res = zdotc(int(nr,kind=psb_mpik_), x,1,y,1)
+    ! adjust res because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx  = desc_a%ovrlap_elem(i,1)
+      ndm  = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
+    end do
   else
-    dot_local=0.d0
+    res = zzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, dot_local)
+  call psb_sum(ictxt, res)
 
-  psb_zdotv = dot_local
 
   call psb_erractionrestore(err_act)
   return  
@@ -448,16 +428,16 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   use psb_base_mod, psb_protect_name => psb_zdotvs
   implicit none
 
-  complex(psb_dpk_), intent(in)     :: x(:), y(:)
-  complex(psb_dpk_), intent(out)    :: res
+  complex(psb_dpk_), intent(in)    :: x(:), y(:)
+  complex(psb_dpk_), intent(out)   :: res
   type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(out)   :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m
-  complex(psb_dpk_)         :: dot_local
-  complex(psb_dpk_)         :: zdotc
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m,nr, &
+       & lldx, lldy
+  complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
@@ -477,10 +457,12 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   ix = ione
   iy = ione
   m = desc_a%get_global_rows()
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -494,27 +476,21 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
     goto 9999
   end if
 
-  if(m /= 0) then
-    if(desc_a%get_local_rows() > 0) then
-      dot_local = zdotc(desc_a%get_local_rows(),&
-           & x,ione,y,ione)
-      ! adjust dot_local because overlapped elements are computed more than once
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
-      end do
-    else
-      dot_local=0.d0
-    end if
+  nr = desc_a%get_local_rows() 
+  if(nr > 0) then
+    res = zdotc(int(nr,kind=psb_mpik_), x,1,y,1)
+    ! adjust res because overlapped elements are computed more than once
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx  = desc_a%ovrlap_elem(i,1)
+      ndm  = desc_a%ovrlap_elem(i,2)
+      res = res - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
+    end do
   else
-    dot_local=0.d0
+    res = zzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, dot_local)
-
-  res = dot_local
+  call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -580,16 +556,16 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_zmdots
   implicit none
 
-  complex(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
-  complex(psb_dpk_), intent(out)    :: res(:)
+  complex(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
+  complex(psb_dpk_), intent(out)   :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
+  integer(psb_ipk_), intent(out)   :: info
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
-  complex(psb_dpk_),allocatable  :: dot_local(:)
-  complex(psb_dpk_)         :: zdotc
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k, nr, &
+       & lldx, lldy
+  complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zmdots'
@@ -610,16 +586,18 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   iy = ione
 
   m = desc_a%get_global_rows()
+  lldx = size(x,1)
+  lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -634,31 +612,26 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   end if
 
   k = min(size(x,2),size(y,2))
-  allocate(dot_local(k))
 
-  if(m /= 0) then
-    if(desc_a%get_local_rows() > 0) then
-      do j=1,k
-        dot_local(j) = zdotc(desc_a%get_local_rows(),&
-             & x(1:,j),ione,y(1:,j),ione)
-        ! adjust dot_local because overlapped elements are computed more than once
-      end do
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx  = desc_a%ovrlap_elem(i,1)
-        ndm  = desc_a%ovrlap_elem(i,2)
-        dot_local(1:k) = dot_local(1:k) - (real(ndm-1)/real(ndm))*(conjg(x(idx,1:k))*y(idx,1:k))
-      end do
-    else
-      dot_local(:)=0.d0
-    end if
+  nr = desc_a%get_local_rows() 
+  if(nr > 0) then
+    do j=1,k
+      res(j) = zdotc(int(nr,kind=psb_mpik_),x(1:,j),1,y(1:,j),1)
+      ! adjust res because overlapped elements are computed more than once
+    end do
+    do i=1,size(desc_a%ovrlap_elem,1)
+      idx  = desc_a%ovrlap_elem(i,1)
+      ndm  = desc_a%ovrlap_elem(i,2)
+      res(1:k) = res(1:k) - &
+           & (real(ndm-1)/real(ndm))*(conjg(x(idx,1:k))*y(idx,1:k))
+    end do
   else
-    dot_local(:)=0.d0
+    res(:) = zzero
   end if
 
-  ! compute global sum
-  call psb_sum(ictxt, dot_local(1:k))
 
-  res(1:k) = dot_local(1:k)
+  ! compute global sum
+  call psb_sum(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  

@@ -30,40 +30,37 @@
 !!$ 
 !!$  
 !
-! File: psb_krylov_mod.f90
+! File: psb_krylov_conv_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
 !
+Module psb_c_krylov_conv_mod
 
-Module psb_z_inner_krylov_mod
-
-  use psb_base_inner_krylov_mod
+  use psb_base_krylov_conv_mod
 
   interface psb_init_conv
-    module procedure psb_z_init_conv, psb_z_init_conv_vect
+    module procedure psb_c_init_conv, psb_c_init_conv_vect
   end interface
 
   interface psb_check_conv
-    module procedure psb_z_check_conv, psb_z_check_conv_vect
+    module procedure psb_c_check_conv, psb_c_check_conv_vect
   end interface
-
 
 
 contains
 
-
-  subroutine psb_z_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_c_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace, itmax
-    type(psb_zspmat_type), intent(in) :: a
-    complex(psb_dpk_), intent(in)   :: b(:)
-    real(psb_dpk_), intent(in)      :: eps
+    type(psb_cspmat_type), intent(in) :: a
+    complex(psb_spk_), intent(in)     :: b(:)
+    real(psb_spk_), intent(in)        :: eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
     character(len=20)                 :: name
 
     info = psb_success_
@@ -85,14 +82,16 @@ contains
     select case(stopdat%controls(psb_ik_stopc_))
     case (1) 
       stopdat%values(psb_ik_ani_) = psb_spnrmi(a,desc_a,info)
-      if (info == psb_success_) stopdat%values(psb_ik_bni_) = psb_geamax(b,desc_a,info)
+      if (info == psb_success_)&
+           & stopdat%values(psb_ik_bni_) = psb_geamax(b,desc_a,info)
 
     case (2) 
       stopdat%values(psb_ik_bn2_) = psb_genrm2(b,desc_a,info)
 
     case default
       info=psb_err_invalid_istop_
-      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      ierr(1) = stopc
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999      
     end select
     if (info /= psb_success_) then
@@ -117,18 +116,18 @@ contains
       return
     end if
 
-  end subroutine psb_z_init_conv
+  end subroutine psb_c_init_conv
 
 
-  function psb_z_check_conv(methdname,it,x,r,desc_a,stopdat,info)
+  function psb_c_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer(psb_ipk_), intent(in)             :: it
-    complex(psb_dpk_), intent(in) :: x(:), r(:)
+    complex(psb_spk_), intent(in)   :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
-    logical                         :: psb_z_check_conv
+    logical                         :: res
     integer(psb_ipk_), intent(out)            :: info
 
     integer(psb_ipk_) :: ictxt, me, np, err_act
@@ -140,14 +139,15 @@ contains
 
     ictxt = desc_a%get_context()
     call psb_info(ictxt,me,np)
-    psb_z_check_conv = .false. 
+
+    res = .false. 
 
     select case(stopdat%controls(psb_ik_stopc_)) 
     case(1)
       stopdat%values(psb_ik_rni_) = psb_geamax(r,desc_a,info)
       if (info == psb_success_) stopdat%values(psb_ik_xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rni_)
-      stopdat%values(psb_ik_errden_) = &
+      stopdat%values(psb_ik_errden_) =&
            & (stopdat%values(psb_ik_ani_)*stopdat%values(psb_ik_xni_)&
            &  +stopdat%values(psb_ik_bni_))
     case(2)
@@ -167,18 +167,17 @@ contains
     end if
 
     if (stopdat%values(psb_ik_errden_) == dzero) then 
-      psb_z_check_conv = (stopdat%values(psb_ik_errnum_) <= stopdat%values(psb_ik_eps_))
+      res = (stopdat%values(psb_ik_errnum_) <= stopdat%values(psb_ik_eps_))
     else
-      psb_z_check_conv = &
-           & (stopdat%values(psb_ik_errnum_) <=&
-           &   stopdat%values(psb_ik_eps_)*stopdat%values(psb_ik_errden_))
+      res = (stopdat%values(psb_ik_errnum_) <= &
+           & stopdat%values(psb_ik_eps_)*stopdat%values(psb_ik_errden_))
     end if
 
-    psb_z_check_conv = (psb_z_check_conv.or.(stopdat%controls(psb_ik_itmax_) <= it))
+    res = (res.or.(stopdat%controls(psb_ik_itmax_) <= it))
 
     if ( (stopdat%controls(psb_ik_trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.psb_z_check_conv)) then 
-      call log_conv(methdname,me,it,1,stopdat%values(psb_ik_errnum_),&
+         & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.res)) then 
+      call log_conv(methdname,me,it,ione,stopdat%values(psb_ik_errnum_),&
            & stopdat%values(psb_ik_errden_),stopdat%values(psb_ik_eps_))
     end if
 
@@ -192,22 +191,22 @@ contains
       return
     end if
 
-  end function psb_z_check_conv
+  end function psb_c_check_conv
 
 
-  subroutine psb_z_init_conv_vect(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_c_init_conv_vect(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer(psb_ipk_), intent(in)               :: stopc, trace,itmax
-    type(psb_zspmat_type), intent(in) :: a
-    real(psb_dpk_), intent(in)        :: eps
-    type(psb_z_vect_type), intent(inout)  :: b
+    type(psb_cspmat_type), intent(in) :: a
+    real(psb_spk_), intent(in)        :: eps
+    type(psb_c_vect_type), intent(inout)  :: b
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: ictxt, me, np, err_act
+    integer(psb_ipk_) :: ictxt, me, np, err_act, ierr(5)
     character(len=20)                 :: name
 
     info = psb_success_
@@ -220,7 +219,7 @@ contains
     call psb_info(ictxt, me, np)
 
     stopdat%controls(:) = 0
-    stopdat%values(:)   = szero
+    stopdat%values(:)   = dzero
 
     stopdat%controls(psb_ik_stopc_) = stopc
     stopdat%controls(psb_ik_trace_) = trace
@@ -237,7 +236,8 @@ contains
 
     case default
       info=psb_err_invalid_istop_
-      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      ierr(1) = stopc
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999      
     end select
     if (info /= psb_success_) then
@@ -246,7 +246,7 @@ contains
     end if
 
     stopdat%values(psb_ik_eps_)    = eps
-    stopdat%values(psb_ik_errnum_) = szero
+    stopdat%values(psb_ik_errnum_) = dzero
     stopdat%values(psb_ik_errden_) = done
 
     if ((stopdat%controls(psb_ik_trace_) > 0).and. (me == 0))&
@@ -262,14 +262,14 @@ contains
       return
     end if
 
-  end subroutine psb_z_init_conv_vect
+  end subroutine psb_c_init_conv_vect
 
-  function psb_z_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_c_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)     :: methdname
     integer(psb_ipk_), intent(in)              :: it
-    type(psb_z_vect_type), intent(inout) :: x, r
+    type(psb_c_vect_type), intent(inout) :: x, r
     type(psb_desc_type), intent(in)  :: desc_a
     type(psb_itconv_type)            :: stopdat
     logical                          :: res
@@ -281,7 +281,7 @@ contains
     info = psb_success_
     res = .false. 
     if (psb_errstatus_fatal()) return 
-    name = 'psb_zheck_conv'
+    name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
     ictxt = desc_a%get_context()
@@ -324,7 +324,7 @@ contains
 
     if ( (stopdat%controls(psb_ik_trace_) > 0).and.&
          & ((mod(it,stopdat%controls(psb_ik_trace_)) == 0).or.res)) then 
-      call log_conv(methdname,me,it,1,stopdat%values(psb_ik_errnum_),&
+      call log_conv(methdname,me,it,ione,stopdat%values(psb_ik_errnum_),&
            & stopdat%values(psb_ik_errden_),stopdat%values(psb_ik_eps_))
     end if
 
@@ -338,7 +338,6 @@ contains
       return
     end if
 
-  end function psb_z_check_conv_vect
+  end function psb_c_check_conv_vect
 
-
-end module psb_z_inner_krylov_mod
+end module psb_c_krylov_conv_mod

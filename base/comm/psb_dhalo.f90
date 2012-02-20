@@ -67,9 +67,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
-       & err, liwork,data_
+  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
+       & err, liwork,data_, ldx
   real(psb_dpk_),pointer :: iwork(:), xp(:,:)
   character                :: tran_
   character(len=20)        :: name, ch_err
@@ -129,9 +129,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   else
     data_ = psb_comm_halo_
   endif
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -148,9 +148,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha /= 1.d0) then
+    if(alpha /= done) then
       do i=0, k-1
-        call dscal(nrow,alpha,x(:,jjx+i),1)
+        call dscal(int(nrow,kind=psb_mpik_),alpha,x(:,jjx+i),1)
       end do
     end if
   end if
@@ -289,7 +289,8 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, err_act, &
+  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_ipk_) :: err_act, ldx, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   real(psb_dpk_),pointer :: iwork(:)
   character                :: tran_
@@ -333,9 +334,9 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   else
     imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -352,8 +353,8 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha /= 1.d0) then
-      call dscal(nrow,alpha,x,ione)
+    if(alpha /= done) then
+      call dscal(int(nrow,kind=psb_mpik_),alpha,x,ione)
     end if
   end if
 
@@ -486,7 +487,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   endif
 
   ! check vector correctness
-  call psb_chkvect(m,1,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -498,12 +499,12 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
     call psb_errpush(info,name)
   end if
 
-  err=info
+  err = info
   call psb_errcomm(ictxt,err)
-  if(err /= 0) goto 9999
+  if (err /= 0) goto 9999
 
-  if(present(alpha)) then
-    if(alpha /= done) then
+  if (present(alpha)) then
+    if (alpha /= done) then
       call x%scal(alpha)
     end if
   end if

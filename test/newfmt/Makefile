@@ -16,17 +16,11 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FMFLAG)$(OPTDIR)
 
 EXEDIR=./runs
 
-all: ppde spde
+all: ppde 
 
 ppde: ppde.o 
 	$(F90LINK)  ppde.o -o ppde $(PSBLAS_LIB) $(LDLIBS) -lgomp
 	/bin/mv ppde $(EXEDIR)
-
-
-spde: spde.o 
-	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spde $(EXEDIR)
-
 
 clean: 
 	/bin/rm -f ppde.o spde.o  $(EXEDIR)/ppde 

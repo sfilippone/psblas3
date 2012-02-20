@@ -104,7 +104,7 @@ program spde2d
   endif
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde2d90'
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -283,7 +283,7 @@ contains
         write(psb_out_unit,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
-        call pr_usage(0)      
+        call pr_usage(izero)      
         call psb_abort(ictxt)
         stop 1
       endif

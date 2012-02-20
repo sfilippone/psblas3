@@ -60,18 +60,27 @@ module psb_error_mod
     subroutine psb_serror()
     end subroutine psb_serror
     subroutine psb_perror(ictxt)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent(in)     ::  ictxt
+      import :: psb_mpik_
+      integer(psb_mpik_), intent(in)     ::  ictxt
     end subroutine psb_perror
   end interface
 
-  interface 
+  interface psb_errcomm
     subroutine psb_errcomm(ictxt, err)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent(in)   :: ictxt
+      import :: psb_mpik_, psb_ipk_
+      integer(psb_mpik_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
-  end interface
+  end interface psb_errcomm
+
+#if defined(LONG_INTEGERS)
+  interface psb_error
+    module procedure psb_perror_ipk
+  end interface psb_error
+  interface psb_errcomm
+    module procedure psb_errcomm_ipk
+  end interface psb_errcomm
+#endif
 
 
   private
@@ -112,7 +121,22 @@ module psb_error_mod
 
 contains
 
+#if defined(LONG_INTEGERS)
+  subroutine psb_errcomm_ipk(ictxt, err)
+    integer(psb_ipk_), intent(in)   :: ictxt
+    integer(psb_ipk_), intent(inout):: err
+    integer(psb_mpik_) :: iictxt
+    iictxt = ictxt
+    call psb_errcomm(iictxt,err)
+  end subroutine psb_errcomm_ipk
 
+  subroutine psb_perror_ipk(ictxt)
+    integer(psb_ipk_), intent(in)   :: ictxt
+    integer(psb_mpik_) :: iictxt
+    iictxt = ictxt
+    call psb_perror(iictxt)
+  end subroutine psb_perror_ipk
+#endif
   ! saves action to support error traceback
   ! also changes error action to "return"
   subroutine psb_erractionsave(err_act)
@@ -330,7 +354,7 @@ contains
     character(len=20), intent(in)    ::  r_name
     character(len=40), intent(in)    ::  a_e_d
     integer(psb_ipk_), intent(in)              ::  i_e_d(5)
-    integer(psb_ipk_), optional                ::  me
+    integer(psb_mpik_), optional                ::  me
 
     if(present(me)) then
       write(psb_err_unit,&

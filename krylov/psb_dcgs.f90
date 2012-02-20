@@ -58,15 +58,14 @@
 !
 ! Subroutine: psb_dcgs
 !    Implements the Conjugate Gradient Squared method.
-!
-!
+!    
 ! Arguments:
 !
 !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_dprec_type)       Input: preconditioner
-!    b      -  real,dimension(:)          Input: vector containing the
+!    b      -  real,dimension(:)       Input: vector containing the
 !                                         right hand side B
-!    x      -  real,dimension(:)          Input/Output: vector containing the
+!    x      -  real,dimension(:)       Input/Output: vector containing the
 !                                         initial guess and final solution X.
 !    eps    -  real                       Input: Stopping tolerance; the iteration is
 !                                         stopped when the error estimate |err| <= eps
@@ -93,33 +92,35 @@
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !
-!
 !!$Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$  use psb_base_mod
 !!$  use psb_prec_mod
-!!$  use psb_d_inner_krylov_mod
+!!$  use psb_d_krylov_conv_mod
 !!$  use psb_krylov_mod
 !!$  implicit none
-!!$  type(psb_dspmat_type), intent(in)  :: a
-!!$  class(psb_dprec_type), Intent(in)   :: prec 
+!!$
+!!$! =  parameters 
+!!$  Type(psb_dspmat_type), Intent(in)  :: a
 !!$  Type(psb_desc_type), Intent(in)    :: desc_a 
-!!$  Real(psb_dpk_), Intent(in)       :: b(:)
-!!$  Real(psb_dpk_), Intent(inout)    :: x(:)
+!!$  class(psb_dprec_type), Intent(in)   :: prec 
+!!$  real(psb_dpk_), Intent(in)       :: b(:)
+!!$  real(psb_dpk_), Intent(inout)    :: x(:)
 !!$  Real(psb_dpk_), Intent(in)       :: eps
 !!$  integer(psb_ipk_), intent(out)               :: info
 !!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace,istop
 !!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$  Real(psb_dpk_), Optional, Intent(out) :: err
-!!$! !$   local data
-!!$  Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
-!!$  Real(psb_dpk_), Pointer  :: ww(:), q(:),&
+!!$! =   local data
+!!$  real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
+!!$  real(psb_dpk_), Pointer  :: ww(:), q(:),&
 !!$       & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
 !!$  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
 !!$       & np,me, n_row, n_col,istop_, err_act
 !!$  integer(psb_ipk_) :: itx, isvch, ictxt
 !!$  integer(psb_ipk_) :: debug_level, debug_unit
-!!$  Real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
+!!$  real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
 !!$  type(psb_itconv_type) :: stopdat
+!!$  real(psb_dpk_)        :: derr
 !!$  character(len=20)           :: name
 !!$  character(len=*), parameter :: methdname='CGS'
 !!$
@@ -144,8 +145,8 @@
 !!$    istop_ = 2
 !!$  Endif
 !!$
-!!$  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-!!$  if (info == psb_success_) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+!!$  call psb_chkvect(mglob,ione,size(x,ione),ione,ione,desc_a,info)
+!!$  if (info == psb_success_) call psb_chkvect(mglob,ione,size(b,ione),ione,ione,desc_a,info)
 !!$  if(info /= psb_success_) then
 !!$    info=psb_err_from_subroutine_    
 !!$    call psb_errpush(info,name,a_err='psb_chkvect on X/B')
@@ -187,8 +188,6 @@
 !!$    itrace_ = 0
 !!$  End If
 !!$
-!!$  ! Ensure global coherence for convergence checks.
-!!$  call psb_set_coher(ictxt,isvch)
 !!$  
 !!$  itx   = 0
 !!$
@@ -199,9 +198,9 @@
 !!$  End If
 !!$
 !!$  restart: Do 
-!!$! !$
-!!$! !$   r0 = b-ax0
-!!$! !$ 
+!!$! =
+!!$! =   r0 = b-ax0
+!!$! = 
 !!$    if (itx >= itmax_) exit restart  
 !!$    it = 0      
 !!$    call psb_geaxpby(done,b,dzero,r,desc_a,info)
@@ -298,7 +297,12 @@
 !!$    end do iteration
 !!$  end do restart
 !!$
-!!$  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
+!!$
+!!$  call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
+!!$
+!!$  if (present(err)) then 
+!!$    err = derr
+!!$  end if
 !!$
 !!$  deallocate(aux,stat=info)
 !!$  if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
@@ -307,8 +311,6 @@
 !!$    goto 9999
 !!$  end if
 !!$
-!!$  ! restore external global coherence behaviour
-!!$  call psb_restore_coher(ictxt,isvch)
 !!$  call psb_erractionrestore(err_act)
 !!$  return
 !!$
@@ -320,13 +322,13 @@
 !!$  end if
 !!$  return
 !!$
-!!$End Subroutine psb_dcgs
+!!$end subroutine psb_dcgs
 
 Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_d_inner_krylov_mod
+  use psb_d_krylov_conv_mod
   use psb_krylov_mod
   implicit none
   type(psb_dspmat_type), intent(in)    :: a
@@ -339,16 +341,17 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
-!!$   local data
-  Real(psb_dpk_), allocatable, target   :: aux(:)
+! =   local data
+  real(psb_dpk_), allocatable, target   :: aux(:)
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: ww, q, r, p, v,&
        & s, z, f, rt, qt, uv
   integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,int_err(5),&
-       & np,me, n_row, n_col,istop_, err_act
-  integer(psb_ipk_) :: itx, isvch, ictxt
+       & n_row, n_col,istop_, itx, err_act
+  integer(psb_ipk_) :: np, me, ictxt
   integer(psb_ipk_) :: debug_level, debug_unit
-  Real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
+  real(psb_dpk_)  :: alpha, beta, rho, rho_old, sigma 
+  real(psb_dpk_)     :: derr  
   type(psb_itconv_type) :: stopdat
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CGS'
@@ -384,8 +387,8 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
     istop_ = 2
   Endif
 
-  call psb_chkvect(mglob,1,x%get_nrows(),1,1,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(mglob,1,b%get_nrows(),1,1,desc_a,info)
+  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  if (info == psb_success_) call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
@@ -394,7 +397,7 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
 
   naux=4*n_col 
   Allocate(aux(naux),stat=info)
-  if (info == psb_success_) Call psb_geall(wwrk,desc_a,info,n=11)
+  if (info == psb_success_) Call psb_geall(wwrk,desc_a,info,n=11_psb_ipk_)
   if (info == psb_success_) Call psb_geasb(wwrk,desc_a,info,mold=x%v)  
   if (info /= psb_success_) Then 
      info=psb_err_from_subroutine_non_ 
@@ -427,9 +430,6 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
     itrace_ = 0
   End If
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
-  
   itx   = 0
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
@@ -439,9 +439,9 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
   End If
 
   restart: Do 
-!!$
-!!$   r0 = b-ax0
-!!$ 
+! =
+! =   r0 = b-ax0
+! = 
     if (itx >= itmax_) exit restart  
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
@@ -538,7 +538,8 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
     end do iteration
   end do restart
 
-  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
+  call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
+  if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
   if (info == psb_success_) deallocate(aux,stat=info)
@@ -547,8 +548,6 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
   call psb_erractionrestore(err_act)
   return
 

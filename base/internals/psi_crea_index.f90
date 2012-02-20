@@ -130,7 +130,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
     goto 9999
   end if
-
+  
   if(debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
   ! Do the actual format conversion. 

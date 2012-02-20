@@ -98,7 +98,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lscale
-  integer(psb_ipk_), parameter       :: nb=4
+  integer(psb_ipk_), parameter  :: nb=4
   complex(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
@@ -220,9 +220,9 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,ik,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -483,9 +483,9 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
@@ -684,9 +684,9 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
   if (info == psb_success_) &
-       & call psb_chkvect(m,ik,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_)&
-       & call psb_chkvect(m,ik,y%get_nrows(),iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'

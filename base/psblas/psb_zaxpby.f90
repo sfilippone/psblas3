@@ -129,8 +129,8 @@ end subroutine psb_zaxpby_vect
 ! Arguments:
 !    alpha  -  complex,input        The scalar used to multiply each component of X
 !    x(:,:) -  complex,input        The input vector containing the entries of X
-!    beta   -  real,input           The scalar used to multiply each component of Y
-!    y(:,:) -  real,inout           The input vector Y
+!    beta   -  complex,input        The scalar used to multiply each component of Y
+!    y(:,:) -  complex,inout        The input vector Y
 !    desc_a -  type(psb_desc_type)  The communication descriptor.
 !    info   -  integer              Return code
 !    jx     -  integer(optional)    The column offset for X 
@@ -138,6 +138,7 @@ end subroutine psb_zaxpby_vect
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_zaxpby
+
   implicit none                    
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
@@ -149,7 +150,8 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
+       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy, &
+       & lldx, lldy
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -197,11 +199,12 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   m = desc_a%get_global_rows()
-
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -217,9 +220,9 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call zaxpby(desc_a%get_local_cols(),in,&
-           & alpha,x(iix:,jjx),size(x,1),beta,&
-           & y(iiy:,jjy),size(y,1),info)
+      call caxpby(desc_a%get_local_cols(),in,&
+           & alpha,x(iix:,jjx),lldx,beta,&
+           & y(iiy:,jjy),lldy,info)
     end if
   end if
 
@@ -280,8 +283,8 @@ end subroutine psb_zaxpby
 ! Arguments:
 !    alpha  -  complex,input        The scalar used to multiply each component of X
 !    x(:)   -  complex,input        The input vector containing the entries of X
-!    beta   -  real,input           The scalar used to multiply each component of Y
-!    y(:)   -  real,inout           The input vector Y
+!    beta   -  complex,input        The scalar used to multiply each component of Y
+!    y(:)   -  complex,inout        The input vector Y
 !    desc_a -  type(psb_desc_type)  The communication descriptor.
 !    info   -  integer              Return code
 !
@@ -298,7 +301,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, m, iiy, jjy
+       & err_act, iix, jjx, ix, iy, m, iiy, jjy, &
+       & lldx, lldy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 
@@ -320,16 +324,17 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   iy = ione
 
   m = desc_a%get_global_rows()
-
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ione,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,size(y),iy,ione,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,ione,lldy,iy,ione,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'
@@ -343,9 +348,9 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call zaxpby(desc_a%get_local_cols(),ione,&
-         & alpha,x,size(x),beta,&
-         & y,size(y),info)
+    call caxpby(desc_a%get_local_cols(),ione,&
+         & alpha,x,lldx,beta,&
+         & y,lldy,info)
   end if
 
   call psb_erractionrestore(err_act)

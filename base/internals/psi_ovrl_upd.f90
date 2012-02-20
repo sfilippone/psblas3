@@ -42,6 +42,7 @@ subroutine  psi_sovrl_updr1(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_updr1'
@@ -82,7 +83,8 @@ subroutine  psi_sovrl_updr1(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -112,6 +114,7 @@ subroutine  psi_sovrl_updr2(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_updr2'
@@ -152,7 +155,8 @@ subroutine  psi_sovrl_updr2(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -181,6 +185,7 @@ subroutine  psi_dovrl_updr1(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_updr1'
@@ -221,7 +226,8 @@ subroutine  psi_dovrl_updr1(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -251,6 +257,7 @@ subroutine  psi_dovrl_updr2(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_dovrl_updr2'
@@ -291,7 +298,8 @@ subroutine  psi_dovrl_updr2(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -320,6 +328,7 @@ subroutine  psi_covrl_updr1(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_covrl_updr1'
@@ -360,7 +369,8 @@ subroutine  psi_covrl_updr1(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -390,6 +400,7 @@ subroutine  psi_covrl_updr2(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_covrl_updr2'
@@ -430,7 +441,8 @@ subroutine  psi_covrl_updr2(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -459,6 +471,7 @@ subroutine  psi_zovrl_updr1(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_updr1'
@@ -499,7 +512,8 @@ subroutine  psi_zovrl_updr1(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -529,6 +543,7 @@ subroutine  psi_zovrl_updr2(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_zovrl_updr2'
@@ -569,7 +584,8 @@ subroutine  psi_zovrl_updr2(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -598,6 +614,7 @@ subroutine  psi_iovrl_updr1(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_updr1'
@@ -639,7 +656,8 @@ subroutine  psi_iovrl_updr1(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -669,6 +687,7 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
   name='psi_iovrl_updr2'
@@ -710,7 +729,8 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
   case default 
     ! wrong value for choice argument
     info = psb_err_iarg_invalid_value_
-    call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+    ierr(1) = 3; ierr(2)=update;
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end select
 
@@ -743,6 +763,7 @@ subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
   ! locals
   real(psb_spk_), allocatable :: xs(:)
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
 
@@ -791,7 +812,8 @@ subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
     case default 
       ! wrong value for choice argument
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end select
     call x%sct(nx,desc_a%ovrlap_elem(:,1),xs,szero)
@@ -825,6 +847,7 @@ subroutine  psi_dovrl_upd_vect(x,desc_a,update,info)
   ! locals
   real(psb_dpk_), allocatable :: xs(:)
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
 
@@ -873,7 +896,8 @@ subroutine  psi_dovrl_upd_vect(x,desc_a,update,info)
     case default 
       ! wrong value for choice argument
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end select
     call x%sct(nx,desc_a%ovrlap_elem(:,1),xs,dzero)
@@ -908,6 +932,7 @@ subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
   ! locals
   complex(psb_spk_), allocatable :: xs(:)
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
 
@@ -956,7 +981,8 @@ subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
     case default 
       ! wrong value for choice argument
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end select
     call x%sct(nx,desc_a%ovrlap_elem(:,1),xs,czero)
@@ -990,6 +1016,7 @@ subroutine  psi_zovrl_upd_vect(x,desc_a,update,info)
   ! locals
   complex(psb_dpk_), allocatable :: xs(:)
   integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
 
@@ -1038,7 +1065,8 @@ subroutine  psi_zovrl_upd_vect(x,desc_a,update,info)
     case default 
       ! wrong value for choice argument
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end select
     call x%sct(nx,desc_a%ovrlap_elem(:,1),xs,zzero)

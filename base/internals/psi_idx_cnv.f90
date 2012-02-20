@@ -322,7 +322,7 @@ subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
     mask_=.true.
   end if
   iout = idxin
-  call psi_idx_cnv(1,iout,desc,info,mask=mask_,owned=owned)
+  call psi_idx_cnv(ione,iout,desc,info,mask=mask_,owned=owned)
   idxout=iout(1)
 
   return
@@ -347,7 +347,7 @@ subroutine psi_idx_cnvs1(idxin,desc,info,mask,owned)
   end if
 
   iout(1) = idxin
-  call psi_idx_cnv(1,iout,desc,info,mask=mask_,owned=owned)
+  call psi_idx_cnv(ione,iout,desc,info,mask=mask_,owned=owned)
   idxin   = iout(1)
 
   return

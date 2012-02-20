@@ -102,27 +102,17 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   integer(psb_ipk_), optional          :: inroot
   character(len=5), optional :: fmt
   class(psb_z_base_sparse_mat), optional :: mold
-
-  integer(psb_ipk_) :: v(:)
-  interface 
-    subroutine parts(global_indx,n,np,pv,nv)
-      import :: psb_ipk_
-      implicit none
-      integer(psb_ipk_), intent(in)  :: global_indx, n, np
-      integer(psb_ipk_), intent(out) :: nv
-      integer(psb_ipk_), intent(out) :: pv(*) 
-    end subroutine parts
-  end interface
-  optional                  :: parts, v
+  procedure(psb_parts), optional         :: parts
+  integer(psb_ipk_), optional            :: v(:)
 
   ! local variables
-  logical                   :: use_parts, use_v
-  integer(psb_ipk_) :: np, iam
-  integer(psb_ipk_) :: length_row, i_count, j_count,&
+  logical           :: use_parts, use_v
+  integer(psb_ipk_) :: np, iam, length_row
+  integer(psb_ipk_) :: i_count, j_count,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-  integer(psb_ipk_), allocatable          :: iwork(:)
-  integer(psb_ipk_), allocatable          :: irow(:),icol(:)
+  integer(psb_ipk_), allocatable       :: iwork(:)
+  integer(psb_ipk_), allocatable        :: irow(:),icol(:)
   complex(psb_dpk_), allocatable :: val(:)
   integer(psb_ipk_), parameter          :: nb=30
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
@@ -365,7 +355,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+            call psb_geins(ione,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
             if(info /= psb_success_) then
               info=psb_err_from_subroutine_
@@ -396,7 +386,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+            call psb_geins(ione,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
             if(info /= psb_success_) then
               info=psb_err_from_subroutine_

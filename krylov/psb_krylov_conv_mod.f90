@@ -33,9 +33,9 @@
 ! File: psb_krylov_mod.f90
 !  Interfaces for Krylov subspace iterative methods.
 !
-module psb_inner_krylov_mod
-  use psb_s_inner_krylov_mod
-  use psb_d_inner_krylov_mod
-  use psb_c_inner_krylov_mod
-  use psb_z_inner_krylov_mod
-end module psb_inner_krylov_mod
+module psb_krylov_conv_mod
+  use psb_s_krylov_conv_mod
+  use psb_d_krylov_conv_mod
+  use psb_c_krylov_conv_mod
+  use psb_z_krylov_conv_mod
+end module psb_krylov_conv_mod

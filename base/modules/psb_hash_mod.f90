@@ -130,7 +130,8 @@ contains
   subroutine HashFree(hashin,info)
     use psb_realloc_mod
     type(psb_hash_type) :: hashin
-    
+    integer(psb_ipk_) :: info 
+
     info = psb_success_
     if (allocated(hashin%table)) then 
       deallocate(hashin%table,stat=info) 
@@ -369,7 +370,7 @@ contains
       end if
       if (hash%table(hk,1) == HashFreeEntry) then 
         val  = HashFreeEntry
-!!$        info = HashNotFound
+!  !$        info = HashNotFound
         return
       end if
       hk = hk - hd 

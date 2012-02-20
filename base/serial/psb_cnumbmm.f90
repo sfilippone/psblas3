@@ -122,7 +122,7 @@ subroutine psb_cbase_numbmm(a,b,c)
   ! Note: we still have to test about possible performance hits. 
   !
   !
-  call psb_ensure_size(size(c%ja),c%val,info)
+  call psb_ensure_size(ione*size(c%ja),c%val,info)
   select type(a)
   type is (psb_c_csr_sparse_mat) 
     select type(b)
@@ -169,9 +169,9 @@ contains
     mb = b%get_nrows()
     nb = b%get_ncols()
     
-    call cnumbmm(ma,na,nb,a%irp,a%ja,0,a%val,&
-         & b%irp,b%ja,0,b%val,&
-         & c%irp,c%ja,0,c%val,temp)
+    call cnumbmm(ma,na,nb,a%irp,a%ja,izero,a%val,&
+         & b%irp,b%ja,izero,b%val,&
+         & c%irp,c%ja,izero,c%val,temp)
 
     
   end subroutine csr_numbmm

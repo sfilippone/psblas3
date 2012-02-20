@@ -36,15 +36,14 @@
 !
 ! Arguments:
 !   globx     -  real,dimension(:,:).          The local matrix into which gather 
-!                                                the distributed pieces.
+!                                                  the distributed pieces.
 !   locx      -  real,dimension(:,:).          The local piece of the distributed 
-!                                                matrix to be gathered.
+!                                                  matrix to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
-!   info      -  integer.                      Return code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
-!                                              Default: -1. 
 !
 subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_sgatherm
@@ -58,9 +57,10 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me,&
-       & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
+
   character(len=20)        :: name, ch_err
 
   name='psb_sgatherm'
@@ -82,8 +82,8 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1) = 5; ierr(2)=root
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -115,9 +115,9 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if (info == psb_success_) &
-       & call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
+       & call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -207,15 +207,16 @@ end subroutine psb_sgatherm
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
 ! Arguments:
-!   globx     -  real,dimension(:).            The local vector into which gather the 
-!                                                  distributed pieces.
-!   locx      -  real,dimension(:).            The local piece of the ditributed
+!   globx     -  real,dimension(:).            The local vector into which gather 
+!                                                  the distributed pieces.
+!   locx      -  real,dimension(:).            The local piece of the distributed 
 !                                                  vector to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
-!   info      -  integer.                      Return code.
-!   root      -  integer.                      The process that has to own the 
+!   info      -  integer.                      Error code.
+!   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
+!                                              default: -1
 !
 subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_sgatherv
@@ -229,8 +230,8 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
-       & err_act, n, root, ilocx, iglobx, jlocx,&
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
 
   character(len=20)        :: name, ch_err
@@ -254,8 +255,8 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1)=5; ierr(2)=root
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -272,15 +273,15 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-  
+
   k = 1
 
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if (info == psb_success_) &
-       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+       & call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -333,20 +334,20 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
   implicit none
 
   type(psb_s_vect_type), intent(inout) :: locx
-  real(psb_spk_), intent(out)       :: globx(:)
+  real(psb_spk_), intent(out)    :: globx(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), intent(in), optional     :: iroot
 
 
   ! locals
-  integer(psb_ipk_) :: int_err(5), ictxt, np, me, &
-       & err_act, n, root, ilocx, iglobx, jlocx,&
+  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
   real(psb_spk_), allocatable :: llocx(:)
   character(len=20)        :: name, ch_err
 
-  name='psb_dgatherv'
+  name='psb_cgatherv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -365,8 +366,8 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
+      ierr(1)=5; ierr(2)=root;
+      call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
@@ -389,7 +390,7 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if (info == psb_success_) &
        & call psb_chkvect(m,n,locx%get_nrows(),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
@@ -407,7 +408,6 @@ subroutine  psb_sgather_vect(globx, locx, desc_a, info, iroot)
   
   globx(:) = szero
   llocx    = locx%get_vect()
-
 
   do i=1,desc_a%get_local_rows()
     call psb_loc_to_glob(i,idx,desc_a,info)

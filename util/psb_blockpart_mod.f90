@@ -36,10 +36,11 @@ module psb_blockpart_mod
   
 contains
   subroutine part_block(global_indx,n,np,pv,nv)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_mpik_
     implicit none
 
-    integer(psb_ipk_), intent(in)  ::  global_indx, n, np
+    integer(psb_ipk_), intent(in)  ::  global_indx, n
+    integer(psb_ipk_), intent(in)  ::  np
     integer(psb_ipk_), intent(out) ::  nv
     integer(psb_ipk_), intent(out) ::  pv(*)
     integer(psb_ipk_) :: dim_block

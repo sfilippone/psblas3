@@ -72,9 +72,8 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
 
   allocate(work(isz))
   ! call srtlist(dep_list, dl_lda, l_dep_list, np, info)
-  call srtlist(dep_list,size(dep_list,1),l_dep_list,np,work(idg),&
+  call srtlist(dep_list,size(dep_list,1,kind=psb_ipk_),l_dep_list,np,work(idg),&
        & work(idgp),work(iupd),work(iedges),work(iidx),work(iich),info)
-
   if (info  /=  psb_success_) then
      call psb_errpush(psb_err_from_subroutine_,name,a_err='srtlist')
      goto 9999

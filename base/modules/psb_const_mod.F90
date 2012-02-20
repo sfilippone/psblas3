@@ -34,14 +34,14 @@ module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
 #endif
-  ! This is the default integer
+  ! This is the default PSBLAS integer, can be 4 or 8 bytes.
 #if defined(LONG_INTEGERS)
   integer, parameter  :: ndig=12
 #else  
   integer, parameter  :: ndig=8
 #endif
   integer, parameter  :: psb_ipk_ = selected_int_kind(ndig)
-  ! This is an 8-byte  integer, and normally different from default integer. 
+  ! This is always an 8-byte  integer.
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   ! This is always a 4-byte integer, for MPI-related stuff
@@ -55,20 +55,26 @@ module psb_const_mod
   integer(psb_ipk_), parameter  :: psb_spk_ = kind(1.e0)
   integer(psb_ipk_), save       :: psb_sizeof_dp, psb_sizeof_sp
   integer(psb_ipk_), save       :: psb_sizeof_int, psb_sizeof_long_int
-  integer(psb_ipk_), save       :: psb_mpi_integer
+  !
+  ! Integer type identifiers for MPI operations. 
+  !
+  integer(psb_mpik_), save      :: psb_mpi_ipk_integer
+  integer(psb_mpik_), save      :: psb_mpi_def_integer
+  integer(psb_mpik_), save      :: psb_mpi_lng_integer
   ! 
   ! Version
   !
-  character(len=*), parameter :: psb_version_string_ = "3.0.0"
-  integer(psb_ipk_), parameter          :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter          :: psb_version_minor_  = 0
-  integer(psb_ipk_), parameter          :: psb_patchlevel_     = 0
+  character(len=*), parameter    :: psb_version_string_ = "3.0.0"
+  integer(psb_ipk_), parameter   :: psb_version_major_  = 3
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 0
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
   !     Handy & miscellaneous constants
   !
-  integer(psb_ipk_), parameter             :: izero=0, ione=1
-  integer(psb_ipk_), parameter             :: itwo=2, ithree=3,mone=-1, psb_root_=0
+  integer(psb_ipk_), parameter   :: izero=0, ione=1
+  integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
+  integer(psb_ipk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.e0, sone=1.e0
   real(psb_dpk_), parameter      :: dzero=0.d0, done=1.d0
   complex(psb_spk_), parameter   :: czero=(0.e0,0.0e0)

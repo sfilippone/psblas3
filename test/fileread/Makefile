@@ -17,6 +17,7 @@ EXEDIR=./runs
 
 all: sf_sample df_sample cf_sample zf_sample 
 
+sf_sample.o df_sample.o cf_sample.o zf_sample.o: getp.o
 
 sf_sample: $(SFOBJS)
 	$(F90LINK) $(LOPT) $(SFOBJS) -o sf_sample $(PSBLAS_LIB) $(LDLIBS) 

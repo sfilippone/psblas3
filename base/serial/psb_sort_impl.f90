@@ -85,7 +85,7 @@ logical function psb_isaperm(n,eip)
         ip(i) = -j 
         i     = j               
       enddo
-      ip(m) = iabs(ip(m))
+      ip(m) = abs(ip(m))
       if (j /= m) then 
         psb_isaperm = .false.
         goto 9999
@@ -195,6 +195,7 @@ subroutine imsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort'
@@ -209,7 +210,8 @@ subroutine imsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -217,7 +219,8 @@ subroutine imsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (present(flag)) then 
@@ -229,7 +232,8 @@ subroutine imsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
 
@@ -256,6 +260,7 @@ subroutine smsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort'
@@ -270,7 +275,8 @@ subroutine smsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -278,7 +284,8 @@ subroutine smsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (present(flag)) then 
@@ -290,7 +297,8 @@ subroutine smsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
 
@@ -316,6 +324,7 @@ subroutine dmsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort'
@@ -330,7 +339,8 @@ subroutine dmsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -338,7 +348,8 @@ subroutine dmsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (present(flag)) then 
@@ -350,7 +361,8 @@ subroutine dmsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
 
@@ -376,6 +388,7 @@ subroutine camsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort'
@@ -390,7 +403,8 @@ subroutine camsort(x,ix,dir,flag)
   case( psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -398,7 +412,8 @@ subroutine camsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (present(flag)) then 
@@ -410,7 +425,8 @@ subroutine camsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
 
@@ -436,6 +452,7 @@ subroutine zamsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort'
@@ -450,7 +467,8 @@ subroutine zamsort(x,ix,dir,flag)
   case( psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -458,7 +476,8 @@ subroutine zamsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (present(flag)) then 
@@ -470,7 +489,8 @@ subroutine zamsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
 
@@ -497,6 +517,7 @@ subroutine imsort_u(x,nout,dir)
 
   integer(psb_ipk_) :: dir_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_msort_u'
@@ -511,7 +532,8 @@ subroutine imsort_u(x,nout,dir)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -538,6 +560,7 @@ subroutine iqsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_qsort'
@@ -552,7 +575,8 @@ subroutine iqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -568,7 +592,8 @@ subroutine iqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -581,7 +606,8 @@ subroutine iqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -591,7 +617,8 @@ subroutine iqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -615,6 +642,7 @@ subroutine sqsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_qsort'
@@ -629,7 +657,8 @@ subroutine sqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -645,7 +674,8 @@ subroutine sqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -658,7 +688,8 @@ subroutine sqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -668,7 +699,8 @@ subroutine sqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -691,6 +723,7 @@ subroutine dqsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_qsort'
@@ -705,7 +738,8 @@ subroutine dqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -721,7 +755,8 @@ subroutine dqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -734,7 +769,8 @@ subroutine dqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -744,7 +780,8 @@ subroutine dqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -768,6 +805,7 @@ subroutine cqsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_qsort'
@@ -782,7 +820,8 @@ subroutine cqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -798,7 +837,8 @@ subroutine cqsort(x,ix,dir,flag)
   case( psb_lsort_up_, psb_lsort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -811,7 +851,8 @@ subroutine cqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -824,7 +865,8 @@ subroutine cqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -834,7 +876,8 @@ subroutine cqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -858,6 +901,7 @@ subroutine zqsort(x,ix,dir,flag)
 
   integer(psb_ipk_) :: dir_, flag_, n, err_act
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_qsort'
@@ -872,7 +916,8 @@ subroutine zqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -888,7 +933,8 @@ subroutine zqsort(x,ix,dir,flag)
   case( psb_lsort_up_, psb_lsort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -901,7 +947,8 @@ subroutine zqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -914,7 +961,8 @@ subroutine zqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
         goto 9999
       end if
 
@@ -924,7 +972,8 @@ subroutine zqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -952,6 +1001,7 @@ subroutine ihsort(x,ix,dir,flag)
   integer(psb_ipk_) :: key
   integer(psb_ipk_) :: index
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_hsort'
@@ -966,7 +1016,8 @@ subroutine ihsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -980,7 +1031,8 @@ subroutine ihsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -997,7 +1049,8 @@ subroutine ihsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (flag_ == psb_sort_ovw_idx_) then 
@@ -1061,6 +1114,7 @@ subroutine shsort(x,ix,dir,flag)
   real(psb_spk_) :: key
   integer(psb_ipk_) :: index
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_hsort'
@@ -1075,7 +1129,8 @@ subroutine shsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1089,7 +1144,8 @@ subroutine shsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1106,7 +1162,8 @@ subroutine shsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (flag_ == psb_sort_ovw_idx_) then 
@@ -1170,6 +1227,7 @@ subroutine dhsort(x,ix,dir,flag)
   real(psb_dpk_) :: key
   integer(psb_ipk_) :: index
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_hsort'
@@ -1184,7 +1242,8 @@ subroutine dhsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1198,7 +1257,8 @@ subroutine dhsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1215,7 +1275,8 @@ subroutine dhsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (flag_ == psb_sort_ovw_idx_) then 
@@ -1279,6 +1340,7 @@ subroutine chsort(x,ix,dir,flag)
   complex(psb_spk_) :: key
   integer(psb_ipk_) :: index
 
+  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
 
   name='psb_hsort'
@@ -1293,7 +1355,8 @@ subroutine chsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1307,7 +1370,8 @@ subroutine chsort(x,ix,dir,flag)
   case(psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1324,7 +1388,8 @@ subroutine chsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (flag_ == psb_sort_ovw_idx_) then 
@@ -1388,6 +1453,7 @@ subroutine zhsort(x,ix,dir,flag)
   complex(psb_dpk_) :: key
   integer(psb_ipk_) :: index
 
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_hsort'
@@ -1402,7 +1468,8 @@ subroutine zhsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
+    ierr(1) = 4; ierr(2) = flag_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1416,7 +1483,8 @@ subroutine zhsort(x,ix,dir,flag)
   case(psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
+    ierr(1) = 3; ierr(2) = dir_; 
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
     goto 9999
   end select
 
@@ -1433,7 +1501,8 @@ subroutine zhsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
+      ierr(1) = 2; ierr(2) = size(ix); 
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
       goto 9999
     end if
     if (flag_ == psb_sort_ovw_idx_) then 

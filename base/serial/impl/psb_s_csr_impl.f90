@@ -28,6 +28,7 @@ subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_) :: acc
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_csmv'
   logical, parameter :: debug=.false.
 
@@ -59,14 +60,16 @@ subroutine psb_s_csr_csmv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x,1)<n) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = n; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -374,6 +377,7 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), allocatable  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_csmm'
   logical, parameter :: debug=.false.
 
@@ -403,14 +407,16 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x,1)<n) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = n; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -424,8 +430,8 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
   end if
   
   call  psb_s_csr_csmm_inner(m,n,nc,alpha,a%irp,a%ja,a%val, &
-       & a%is_triangle(),a%is_unit(),x,size(x,1), &
-       & beta,y,size(y,1),tra,ctra,acc) 
+       & a%is_triangle(),a%is_unit(),x,size(x,1,kind=psb_ipk_), &
+       & beta,y,size(y,1,kind=psb_ipk_),tra,ctra,acc) 
 
 
   call psb_erractionrestore(err_act)
@@ -724,6 +730,7 @@ subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), allocatable :: tmp(:)
   logical   :: tra,ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_cssv'
   logical, parameter :: debug=.false.
 
@@ -751,14 +758,16 @@ subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   
@@ -989,6 +998,7 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), allocatable :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_cssm'
   logical, parameter :: debug=.false.
 
@@ -1035,7 +1045,7 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
 
   if (beta == szero) then 
     call inner_csrsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
-         & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
+         & a%irp,a%ja,a%val,x,size(x,1,kind=psb_ipk_),y,size(y,1,kind=psb_ipk_),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*y(i,1:nc)
     end do
@@ -1048,7 +1058,7 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
     end if
 
     call inner_csrsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
-         & a%irp,a%ja,a%val,x,size(x,1),tmp,size(tmp,1),info) 
+         & a%irp,a%ja,a%val,x,size(x,1,kind=psb_ipk_),tmp,size(tmp,1,kind=psb_ipk_),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
@@ -1244,6 +1254,7 @@ function psb_s_csr_maxval(a) result(res)
   real(psb_spk_)         :: res
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_maxval'
   logical, parameter :: debug=.false.
 
@@ -1267,6 +1278,7 @@ function psb_s_csr_csnmi(a) result(res)
   real(psb_spk_) :: acc
   logical   :: tra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csnmi'
   logical, parameter :: debug=.false.
 
@@ -1297,6 +1309,7 @@ function psb_s_csr_csnm1(a) result(res)
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_csnm1'
   logical, parameter :: debug=.false.
 
@@ -1332,7 +1345,8 @@ subroutine psb_s_csr_rowsum(d,a)
   real(psb_spk_) :: acc
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1341,10 +1355,8 @@ subroutine psb_s_csr_rowsum(d,a)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = m
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1381,7 +1393,8 @@ subroutine psb_s_csr_arwsum(d,a)
   real(psb_spk_) :: acc
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1390,10 +1403,8 @@ subroutine psb_s_csr_arwsum(d,a)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = m
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1430,7 +1441,8 @@ subroutine psb_s_csr_colsum(d,a)
   real(psb_spk_) :: acc
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1440,10 +1452,8 @@ subroutine psb_s_csr_colsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = n
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1482,7 +1492,8 @@ subroutine psb_s_csr_aclsum(d,a)
   real(psb_spk_) :: acc
   real(psb_spk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1492,10 +1503,8 @@ subroutine psb_s_csr_aclsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = n
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1533,6 +1542,7 @@ subroutine psb_s_csr_get_diag(a,d,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act, mnm, i, j, k
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -1542,7 +1552,8 @@ subroutine psb_s_csr_get_diag(a,d,info)
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
     info=psb_err_input_asize_invalid_i_
-    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    ierr(1) = 2; ierr(2) = size(d); 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1588,6 +1599,7 @@ subroutine psb_s_csr_scal(d,a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1597,7 +1609,8 @@ subroutine psb_s_csr_scal(d,a,info)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_invalid_i_
-    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    ierr(1) = 2; ierr(2) = size(d); 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1631,6 +1644,7 @@ subroutine psb_s_csr_scals(d,a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1679,6 +1693,7 @@ subroutine  psb_s_csr_reallocate_nz(nz,a)
   integer(psb_ipk_), intent(in) :: nz
   class(psb_s_csr_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1715,6 +1730,7 @@ subroutine psb_s_csr_mold(a,b,info)
   class(psb_s_base_sparse_mat), intent(out), allocatable  :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1745,6 +1761,7 @@ subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz)
   class(psb_s_csr_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(in), optional :: nz
   integer(psb_ipk_) :: err_act, info, nz_
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -1752,12 +1769,14 @@ subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz)
   info = psb_success_
   if (m < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
+    ierr(1) = ione; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
   if (n < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
+    ierr(1) = 2; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
   if (present(nz)) then 
@@ -1767,7 +1786,8 @@ subroutine  psb_s_csr_allocate_mnnz(m,n,a,nz)
   end if
   if (nz_ < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
+    ierr(1) = 3; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
 
@@ -1821,6 +1841,7 @@ subroutine psb_s_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -1997,6 +2018,7 @@ subroutine psb_s_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -2171,6 +2193,7 @@ subroutine psb_s_csr_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
   integer(psb_ipk_) :: err_act, nzin, nzout
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical :: append_
   logical, parameter :: debug=.false.
@@ -2229,9 +2252,10 @@ subroutine psb_s_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_csput'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, int_err(5)
+  integer(psb_ipk_) :: nza, i,j,k, nzl, isza
 
 
   call psb_erractionsave(err_act)
@@ -2239,27 +2263,27 @@ subroutine psb_s_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (nz <= 0) then 
     info = psb_err_iarg_neg_
-    int_err(1)=1
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=1
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(ia) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=2
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=2
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(ja) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=3
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=3
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(val) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=4
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=4
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -2511,6 +2535,7 @@ subroutine psb_s_csr_reinit(a,clear)
   logical, intent(in), optional :: clear
 
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='reinit'
   logical  :: clear_
   logical, parameter :: debug=.false.
@@ -2558,6 +2583,7 @@ subroutine  psb_s_csr_trim(a)
   implicit none 
   class(psb_s_csr_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info, nz, m 
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -2597,6 +2623,7 @@ subroutine psb_s_csr_print(iout,a,iv,head,ivr,ivc)
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_csr_print'
   logical, parameter :: debug=.false.
   character(len=*), parameter  :: datatype='real'
@@ -3035,6 +3062,7 @@ subroutine psb_s_csr_cp_from(a,b)
 
 
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='cp_from'
   logical, parameter :: debug=.false.
 
@@ -3074,6 +3102,7 @@ subroutine psb_s_csr_mv_from(a,b)
 
 
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='mv_from'
   logical, parameter :: debug=.false.
 

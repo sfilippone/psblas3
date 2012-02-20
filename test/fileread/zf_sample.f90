@@ -74,8 +74,9 @@ program zf_sample
   integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec
   real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
-  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
-  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv
+  integer(psb_ipk_), allocatable :: ivg(:), perm(:)
+  integer(psb_ipk_), allocatable :: ipv(:)
   character(len=40)  :: fname, fnout
 
 
@@ -92,7 +93,7 @@ program zf_sample
   name='zf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -139,22 +140,22 @@ program zf_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-!!$    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
-!!$      call psb_gelp('N',perm(1:m_problem),&
-!!$           & b_col_glob(1:m_problem),info)
+      call psb_gelp('N',perm(1:m_problem),&
+           & b_col_glob(1:m_problem),info)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
-         call psb_errpush(psb_err_alloc_dealloc_,name)
-         goto 9999
+        call psb_errpush(psb_err_alloc_dealloc_,name)
+        goto 9999
       endif
 
       b_col_glob => aux_b(:,1)
@@ -179,7 +180,7 @@ program zf_sample
   ! switch over different partition types
   if (ipart == 0) then 
     call psb_barrier(ictxt)
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block vector")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
       call part_block(i,m_problem,np,ipv,nv)
@@ -190,7 +191,7 @@ program zf_sample
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
-      write(psb_out_unit,'("Partition type: graph")')
+      write(psb_out_unit,'("Partition type: graph vector")')
       write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
       call build_mtpart(aux_a,np)
@@ -203,7 +204,7 @@ program zf_sample
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
 
   else 
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if

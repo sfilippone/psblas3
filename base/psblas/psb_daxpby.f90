@@ -31,14 +31,13 @@
 !!$  
 ! File: psb_daxpby.f90
 
-
 subroutine psb_daxpby_vect(alpha, x, beta, y,&
      & desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_vect
   implicit none                    
   type(psb_d_vect_type), intent (inout) ::  x
   type(psb_d_vect_type), intent (inout) ::  y
-  real(psb_dpk_), intent (in)           :: alpha, beta
+  real(psb_dpk_), intent (in)        :: alpha, beta
   type(psb_desc_type), intent (in)      :: desc_a
   integer(psb_ipk_), intent(out)                  :: info
 
@@ -128,17 +127,18 @@ end subroutine psb_daxpby_vect
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    alpha  -  real                 The scalar alpha
-!    x(:,:) -  real                 The input vector containing the entries of ( X ).
-!    beta   -  real                 The scalar beta
-!    y(:,:) -  real                 The input vector containing the entries of ( Y ).
-!    desc_a -  type(psb_desc_type). The communication descriptor.
-!    info   -  integer.             Return code
-!    jx     -  integer(optional).   The column offset for sub( X ).
-!    jy     -  integer(optional).   The column offset for sub( Y ).
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x(:,:) -  real,input        The input vector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y(:,:) -  real,inout        The input vector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!    jx     -  integer(optional)    The column offset for X 
+!    jy     -  integer(optional)    The column offset for Y 
 !
 subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_base_mod, psb_protect_name => psb_daxpby
+
   implicit none                    
 
   integer(psb_ipk_), intent(in), optional   :: n, jx, jy
@@ -150,16 +150,16 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
+       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy, &
+       & lldx, lldy
   character(len=20)        :: name, ch_err
 
-  name='psb_dgeaxpby'
-  if (psb_errstatus_fatal()) return 
+  name='psb_geaxpby'
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%get_context()
-
   call psb_info(ictxt, me, np)
   if (np == -ione) then
     info = psb_err_context_error_
@@ -199,11 +199,12 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   m = desc_a%get_global_rows()
-
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -219,9 +220,9 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call daxpby(desc_a%get_local_rows(),in,&
-           & alpha,x(iix:,jjx),size(x,1),beta,&
-           & y(iiy:,jjy),size(y,1),info)
+      call caxpby(desc_a%get_local_cols(),in,&
+           & alpha,x(iix:,jjx),lldx,beta,&
+           & y(iiy:,jjy),lldy,info)
     end if
   end if
 
@@ -280,12 +281,12 @@ end subroutine psb_daxpby
 !    Y := beta * Y + alpha * X
 !
 ! Arguments:
-!    alpha  -  real                 The scalar alpha
-!    x(:)   -  real                 The input vector containing the entries of ( X ).
-!    beta   -  real                 The scalar beta
-!    y(:)   -  real                 The input vector containing the entries of ( Y ).
-!    desc_a -  type(psb_desc_type). The communication descriptor.
-!    info   -  integer.             Return code
+!    alpha  -  real,input        The scalar used to multiply each component of X
+!    x(:)   -  real,input        The input vector containing the entries of X
+!    beta   -  real,input        The scalar used to multiply each component of Y
+!    y(:)   -  real,inout        The input vector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
 !
 !
 subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
@@ -300,11 +301,13 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, m, iiy, jjy
+       & err_act, iix, jjx, ix, iy, m, iiy, jjy, &
+       & lldx, lldy
   character(len=20)        :: name, ch_err
+  logical, parameter :: debug=.false.
 
-  name='psb_dgeaxpby'
-  if (psb_errstatus_fatal()) return 
+  name='psb_geaxpby'
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -321,16 +324,17 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   iy = ione
 
   m = desc_a%get_global_rows()
-
+  lldx = size(x,1)
+  lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,lldx,ix,ione,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,size(y),iy,ione,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,ione,lldy,iy,ione,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'
@@ -344,9 +348,9 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call daxpby(desc_a%get_local_rows(),ione,&
-         & alpha,x,size(x),beta,&
-         & y,size(y),info)
+    call caxpby(desc_a%get_local_cols(),ione,&
+         & alpha,x,lldx,beta,&
+         & y,lldy,info)
   end if
 
   call psb_erractionrestore(err_act)

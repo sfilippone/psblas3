@@ -177,9 +177,9 @@ contains
     
     nze = max(ma+1,2*ma)
     call c%allocate(ma,nb,nze)
-    call symbmm(ma,na,nb,a%irp,a%ja,0,&
-         & b%irp,b%ja,0,&
-         & c%irp,c%ja,0,itemp)
+    call symbmm(ma,na,nb,a%irp,a%ja,izero,&
+         & b%irp,b%ja,izero,&
+         & c%irp,c%ja,izero,itemp)
     
   end subroutine csr_symbmm
   subroutine gen_symbmm(a,b,c,index,info)

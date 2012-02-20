@@ -106,6 +106,7 @@ module psb_hash_map_mod
        & hash_bld_g2l_map,  hash_inner_cnvs1, hash_inner_cnvs2,&
        & hash_inner_cnv1, hash_inner_cnv2, hash_row_extendable 
 
+  integer(psb_ipk_), private :: laddsz=500
 
   interface hash_inner_cnv 
     module procedure  hash_inner_cnvs1, hash_inner_cnvs2,&
@@ -146,9 +147,7 @@ contains
          & deallocate(idxmap%hashv)
     if (allocated(idxmap%glb_lc)) &
          & deallocate(idxmap%glb_lc)
-
     call psb_free(idxmap%hash,info) 
-
     call idxmap%psb_indx_map%free()
 
   end subroutine hash_free
@@ -310,7 +309,7 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, nrm 
-    integer(psb_ipk_) :: ictxt, iam, np
+    integer(psb_mpik_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -486,8 +485,9 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, &
-         & nxt, err_act, ictxt, me, np
-    character(len=20)      :: name,ch_err
+         & nxt, err_act
+    integer(psb_mpik_) :: ictxt, me, np
+    character(len=20)  :: name,ch_err
 
     info = psb_success_
     name = 'hash_g2l_ins'
@@ -527,12 +527,12 @@ contains
             if (info >=0) then 
               if (nxt == lip) then 
                 ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1,addsz=200)
+                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
                 if (info /= psb_success_) then
                   info=1
                   ch_err='psb_ensure_size'
                   call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       &a_err=ch_err,i_err=(/info,0,0,0,0/))
+                       &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
                   goto 9999
                 end if
                 idxmap%loc_to_glob(nxt)  = ip
@@ -542,7 +542,7 @@ contains
             else
               ch_err='SearchInsKeyVal'
               call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                   & a_err=ch_err,i_err=(/info,0,0,0,0/))
+                   & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
               goto 9999
             end if
             idx(i) = lip
@@ -568,12 +568,12 @@ contains
           if (info >=0) then 
             if (nxt == lip) then 
               ncol = nxt
-              call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1,addsz=200)
+              call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
               if (info /= psb_success_) then
                 info=1
                 ch_err='psb_ensure_size'
                 call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     &a_err=ch_err,i_err=(/info,0,0,0,0/))
+                     &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
                 goto 9999
               end if
               idxmap%loc_to_glob(nxt)  = ip
@@ -583,7 +583,7 @@ contains
           else
             ch_err='SearchInsKeyVal'
             call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                 & a_err=ch_err,i_err=(/info,0,0,0,0/))
+                 & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
             goto 9999
           end if
           idx(i) = lip
@@ -640,10 +640,12 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i,  nlu, nl, m, nrt,int_err(5)
+    integer(psb_mpik_) :: iam, np
+    integer(psb_ipk_) ::  i,  nlu, nl, m, nrt,int_err(5)
     integer(psb_ipk_), allocatable :: vlu(:)
     character(len=20), parameter :: name='hash_map_init_vl'
 
@@ -704,10 +706,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vg(:)
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i, j, nl, n, int_err(5)
+    integer(psb_mpik_) :: iam, np
+    integer(psb_ipk_) :: i, j, nl, n, int_err(5)
     integer(psb_ipk_), allocatable :: vlu(:)
 
     info = 0
@@ -759,10 +763,12 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vlu(:), nl, ntot
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: vlu(:), nl, ntot
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i, j, lc2, nlu, m, nrt,int_err(5)
+    integer(psb_mpik_) :: iam, np
+    integer(psb_ipk_) :: i, j, lc2, nlu, m, nrt,int_err(5)
     character(len=20), parameter :: name='hash_map_init_vlu'
 
     info = 0
@@ -805,7 +811,6 @@ contains
   end subroutine hash_init_vlu
 
 
-
   subroutine hash_bld_g2l_map(idxmap,info)
     use psb_penv_mod
     use psb_error_mod
@@ -815,7 +820,8 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: ictxt, iam, np, i, j, m, nl
+    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_ipk_) :: i, j, m, nl
     integer(psb_ipk_) :: key, ih, nh, idx, nbits, hsize, hmask
     character(len=20), parameter :: name='hash_map_init_vlu'
 
@@ -855,7 +861,7 @@ contains
     idxmap%hashvmask = hmask
 
     if (info == psb_success_) &
-         & call psb_realloc(hsize+1,idxmap%hashv,info,lb=0)
+         & call psb_realloc(hsize+1,idxmap%hashv,info,lb=0_psb_ipk_)
     if (info /= psb_success_) then 
       ! !$      ch_err='psb_realloc'
       ! !$      call psb_errpush(info,name,a_err=ch_err)
@@ -917,7 +923,8 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
 
-    integer(psb_ipk_) :: nhal, ictxt, iam, np 
+    integer(psb_mpik_) :: ictxt, iam, np 
+    integer(psb_ipk_) :: nhal
 
     info = 0 
     ictxt = idxmap%get_ctxt()
@@ -931,7 +938,9 @@ contains
       return
     end if
 
+
     call psb_free(idxmap%hash,info)
+    
     if (info /= 0) then
       write(0,*) 'Error from hash free', info
       return
@@ -1306,7 +1315,7 @@ contains
     use psb_realloc_mod
     class(psb_hash_map), intent(in) :: idxmap
     type(psb_hash_map), intent(out) :: outmap
-    integer :: info
+    integer(psb_ipk_) :: info
     
     outmap%psb_indx_map = idxmap%psb_indx_map
     outmap%hashvsize    = idxmap%hashvsize

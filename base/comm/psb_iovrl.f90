@@ -77,7 +77,7 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
-       & mode_, err, liwork
+       & mode_, err, liwork, ldx
   integer(psb_ipk_),  pointer  :: iwork(:), xp(:,:)
   logical            :: do_swap
   character(len=20)  :: name, ch_err
@@ -134,9 +134,9 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
     mode_ = IOR(psb_swap_send_,psb_swap_recv_)
   endif
   do_swap = (mode_ /= 0)
-
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -278,7 +278,7 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
-       & mode_, err, liwork
+       & mode_, err, liwork, ldx
   integer(psb_ipk_),pointer          :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
@@ -321,9 +321,10 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
     mode_ = IOR(psb_swap_send_,psb_swap_recv_)
   endif
   do_swap = (mode_ /= 0)
-
+  
+  ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

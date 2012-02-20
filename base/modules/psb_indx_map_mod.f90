@@ -89,8 +89,8 @@ module psb_indx_map_mod
   type      :: psb_indx_map
 
     integer(psb_ipk_) :: state          = psb_desc_null_
-    integer(psb_ipk_) :: ictxt          = -1
-    integer(psb_ipk_) :: mpic           = -1
+    integer(psb_mpik_) :: ictxt          = -1
+    integer(psb_mpik_) :: mpic           = -1
     integer(psb_ipk_) :: global_rows    = -1
     integer(psb_ipk_) :: global_cols    = -1
     integer(psb_ipk_) :: local_rows     = -1
@@ -245,7 +245,7 @@ contains
   function base_get_ctxt(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_mpik_) :: val
 
     val = idxmap%ictxt
 
@@ -255,7 +255,7 @@ contains
   function base_get_mpic(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_mpik_) :: val
 
     val = idxmap%mpic
 
@@ -273,7 +273,7 @@ contains
   subroutine base_set_ctxt(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: val
+    integer(psb_mpik_), intent(in)  :: val
 
     idxmap%ictxt = val
   end subroutine base_set_ctxt
@@ -313,7 +313,7 @@ contains
   subroutine base_set_mpic(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: val
+    integer(psb_mpik_), intent(in)  :: val
 
     idxmap%mpic = val
   end subroutine base_set_mpic
@@ -777,7 +777,8 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_init_vl'

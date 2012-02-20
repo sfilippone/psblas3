@@ -80,6 +80,8 @@ module psb_list_map_mod
        & list_g2lv2, list_g2ls1_ins, list_g2ls2_ins,&
        & list_g2lv1_ins, list_g2lv2_ins, list_row_extendable
 
+  integer(psb_ipk_), private :: laddsz=500
+
 contains
     
   function list_row_extendable() result(val)
@@ -417,7 +419,7 @@ contains
               ix = idxmap%glob_to_loc(idx(i))
               if (ix < 0) then 
                 ix = idxmap%local_cols + 1
-                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=500)
+                call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
                 if (info /= 0) then 
                   info = -4
                   return
@@ -440,7 +442,7 @@ contains
             ix = idxmap%glob_to_loc(idx(i))
             if (ix < 0) then 
               ix = idxmap%local_cols + 1
-              call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=500)
+              call psb_ensure_size(ix,idxmap%loc_to_glob,info,addsz=laddsz)
               if (info /= 0) then 
                 info = -4
                 return
@@ -544,10 +546,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_list_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vl(:)
+    integer(psb_mpik_), intent(in) :: ictxt
+    integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i, ix, nl, n, nrt
+    integer(psb_ipk_) ::  i, ix, nl, n, nrt
+    integer(psb_mpik_) :: iam, np
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -610,7 +614,8 @@ contains
     class(psb_list_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_ipk_) :: nhal, ictxt, iam, np 
+    integer(psb_ipk_) :: nhal
+    integer(psb_mpik_) :: ictxt, iam, np 
     
     info = 0 
     ictxt = idxmap%get_ctxt()

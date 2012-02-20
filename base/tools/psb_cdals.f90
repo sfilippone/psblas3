@@ -52,16 +52,19 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   implicit None
   procedure(psb_parts)               :: parts
   !....Parameters...
-  integer(psb_ipk_), intent(in)                 :: M,N,ictxt
-  Type(psb_desc_type), intent(out)    :: desc
-  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_), intent(in)      :: M,N,ictxt
+  Type(psb_desc_type), intent(out)   :: desc
+  integer(psb_ipk_), intent(out)     :: info
 
   !locals
-  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
+  integer(psb_ipk_) :: counter,i,j,loc_row,err,loc_col,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx 
   integer(psb_ipk_) :: int_err(5),exch(3)
-  integer(psb_ipk_), allocatable  :: prc_v(:), temp_ovrlap(:), loc_idx(:) 
+  integer(psb_ipk_), allocatable   :: temp_ovrlap(:), loc_idx(:) 
+  integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_) :: me, np, nprocs
+  integer(psb_mpik_) :: iictxt
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -72,37 +75,31 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': ',np
   !     ....verify blacs grid correctness..
-
+  
   !... check m and n parameters....
   if (m < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 1
-    int_err(2) = m
+    int_err(1) = 1; int_err(2) = m;
     call psb_errpush(err,name,int_err)
     goto 9999
   else if (n < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 2
-    int_err(2) = n
+    int_err(1) = 2 ;     int_err(2) = n;
     call psb_errpush(err,name,int_err)
     goto 9999
   endif
-
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
   !global check on m and n parameters
   if (me == psb_root_) then
-    exch(1)=m
-    exch(2)=n
-    exch(3)=psb_cd_get_large_threshold()
+    exch(1)=m; exch(2)=n; exch(3)=psb_cd_get_large_threshold()
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
   else
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
@@ -221,7 +218,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         if (prc_v(j) == me) then
           ! this point belongs to me
           k = k + 1 
-          call psb_ensure_size((k+1),loc_idx,info,pad=-1)
+          call psb_ensure_size((k+1),loc_idx,info,pad=-ione)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -230,7 +227,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           loc_idx(k) = i 
 
           if (nprocs > 1)  then
-            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
             if (info /= psb_success_) then
               info=psb_err_from_subroutine_
               call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -258,12 +255,12 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
-
+  iictxt = ictxt
   select type(aa => desc%indxmap) 
   type is (psb_repl_map) 
-    call aa%repl_map_init(ictxt,m,info)
+    call aa%repl_map_init(iictxt,m,info)
   class default 
-    call aa%init(ictxt,loc_idx(1:k),info)
+    call aa%init(iictxt,loc_idx(1:k),info)
   end select
 
 
@@ -280,7 +277,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     call psb_errpush(err,name)
     Goto 9999
   endif
-
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

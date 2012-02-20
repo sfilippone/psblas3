@@ -64,7 +64,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
       goto 9999      
     end if
 
-    call blck_%csall(0,0,info,1)
+    call blck_%csall(izero,izero,info,ione)
 
   endif
 
@@ -137,7 +137,7 @@ contains
     if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     call psb_erractionsave(err_act)
-    call trw%allocate(0,0,1)
+    call trw%allocate(izero,izero,ione)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_sp_all'

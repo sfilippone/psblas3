@@ -126,11 +126,14 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   integer(psb_ipk_) :: ictxt
   integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
-  integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:),&
-       & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
+  integer(psb_ipk_),allocatable  :: sndbuf(:), rcvbuf(:)
+
+  integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:),&
+       & bsdindx(:),sdsz(:)
 
   integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
-       & idxr, idxs, iszs, iszr, nesd, nerv, icomm
+       & idxr, idxs, iszs, iszr, nesd, nerv
+  integer(psb_mpik_) :: icomm, minfo
 
   logical,parameter :: usempi=.true.
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -140,7 +143,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   name='psi_desc_index'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
+  debug_level = psb_get_debug_level() 
 
   ictxt = desc%indxmap%get_ctxt()
   icomm = desc%indxmap%get_mpic()
@@ -169,8 +172,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     goto 9999
   end if
 
-  sdsz(:) = 0
-  rvsz(:) = 0
+  sdsz(:)    = 0
+  rvsz(:)    = 0
   bsdindx(:) = 0
   brvindx(:) = 0
   i = 1
@@ -183,8 +186,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_integer,rvsz,1,mpi_integer,icomm,info)
-  if(info /= psb_success_) then
+  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
   end if
@@ -289,9 +292,9 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_integer,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_integer,icomm,info)
-  if(info /= psb_success_) then
+  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
+       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+  if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999
   end if

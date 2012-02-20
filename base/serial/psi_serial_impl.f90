@@ -856,6 +856,8 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   real(psb_spk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -865,21 +867,26 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if (m>0) call saxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if (m>0) call saxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -904,6 +911,8 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
   real(psb_spk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -913,27 +922,33 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
   if (n < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call saxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
-
+  if ((m>0).and.(n>0)) &
+       & call saxpby(m,n,alpha,x,lx,beta,y,ly,info)
   call psb_erractionrestore(err_act)
   return
 
@@ -958,6 +973,8 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
   real(psb_dpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -967,21 +984,26 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if (m>0) call daxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -1006,6 +1028,8 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   real(psb_dpk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1015,26 +1039,32 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
   if (n < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -1059,6 +1089,8 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
   complex(psb_spk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1068,21 +1100,26 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if (m>0) call caxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if (m>0) call caxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -1107,6 +1144,8 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
   complex(psb_spk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1116,26 +1155,32 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
   if (n < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call caxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if ((m>0).and.(n>0)) call caxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -1160,6 +1205,8 @@ subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
   complex(psb_dpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1169,21 +1216,26 @@ subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if (m>0) call zaxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if (m>0) call zaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -1208,6 +1260,8 @@ subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
   complex(psb_dpk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -1217,26 +1271,32 @@ subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
 
   if (m < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
   if (n < 0) then
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(x,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
-  if (size(y,1) < m) then 
-    info = 36 
-    call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call zaxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+  if ((m>0).and.(n>0)) call zaxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return

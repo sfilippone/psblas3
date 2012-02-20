@@ -75,9 +75,9 @@
 !
 !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
 !    prec   -  class(psb_dprec_type)       Input: preconditioner
-!    b      -  real,dimension(:)          Input: vector containing the
+!    b      -  real,dimension(:)       Input: vector containing the
 !                                         right hand side B
-!    x      -  real,dimension(:)          Input/Output: vector containing the
+!    x      -  real,dimension(:)       Input/Output: vector containing the
 !                                         initial guess and final solution X.
 !    eps    -  real                       Input: Stopping tolerance; the iteration is
 !                                         stopped when the error estimate |err| <= eps
@@ -103,40 +103,39 @@
 !                                            stopped when  |r| <= eps * |b|
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
-!    irst   -  integer(optional)          Input: restart parameter
-!                                         
-! 
-!!$subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
+!    irst   -  integer(optional)          Input: restart parameter 
+!
+!!$Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
 !!$  use psb_base_mod
 !!$  use psb_prec_mod
-!!$  use psb_d_inner_krylov_mod
+!!$  use psb_d_krylov_conv_mod
 !!$  use psb_krylov_mod
 !!$  implicit none
-!!$  type(psb_dspmat_type), intent(in)  :: a
-!!$  
 !!$
+!!$! =  Parameters 
+!!$  Type(psb_dspmat_type), Intent(in)  :: a
 !!$  class(psb_dprec_type), Intent(in)   :: prec 
 !!$  Type(psb_desc_type), Intent(in)    :: desc_a
-!!$  Real(psb_dpk_), Intent(in)       :: b(:)
-!!$  Real(psb_dpk_), Intent(inout)    :: x(:)
+!!$  real(psb_dpk_), Intent(in)       :: b(:)
+!!$  real(psb_dpk_), Intent(inout)    :: x(:)
 !!$  Real(psb_dpk_), Intent(in)       :: eps
 !!$  integer(psb_ipk_), intent(out)               :: info
 !!$  integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, irst,istop
 !!$  integer(psb_ipk_), Optional, Intent(out)     :: iter
 !!$  Real(psb_dpk_), Optional, Intent(out) :: err
-!!$! !$   local data
-!!$  Real(psb_dpk_), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
-!!$  Real(psb_dpk_), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
-!!$  Real(psb_dpk_) :: scal, gm, rti, rti1
+!!$! =   local data
+!!$  real(psb_dpk_), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
+!!$  real(psb_dpk_), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
+!!$  Real(psb_dpk_) :: tmp
+!!$  real(psb_dpk_) :: rti, rti1, scal
 !!$  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
 !!$       & np,me, n_row, n_col, nl, int_err(5)
-!!$  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
+!!$  Logical, Parameter :: exchange=.True., noexchange=.False.
 !!$  integer(psb_ipk_), Parameter :: irmax = 8
 !!$  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
 !!$  integer(psb_ipk_) :: debug_level, debug_unit
-!!$  Real(psb_dpk_) :: rni, xni, bni, ani,bn2, dt
-!!$  real(psb_dpk_), external :: dnrm2
-!!$  real(psb_dpk_)   :: errnum, errden
+!!$  Real(psb_dpk_) :: rni, xni, bni, ani,bn2
+!!$  real(psb_dpk_)   :: errnum, errden, deps, derr
 !!$  character(len=20)           :: name
 !!$  character(len=*), parameter :: methdname='RGMRES'
 !!$
@@ -160,10 +159,10 @@
 !!$  else
 !!$    istop_ = 2
 !!$  endif
-!!$!
-!!$!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!!$!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-!!$!
+!!$  !
+!!$  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!!$  !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
+!!$  !
 !!$
 !!$  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
 !!$    info=psb_err_invalid_istop_
@@ -184,7 +183,7 @@
 !!$  else
 !!$    itrace_ = 0
 !!$  end if
-!!$  
+!!$
 !!$  if (present(irst)) then
 !!$    nl = irst
 !!$    if (debug_level >= psb_debug_ext_) &
@@ -204,13 +203,13 @@
 !!$    goto 9999
 !!$  endif
 !!$
-!!$  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
+!!$  call psb_chkvect(mglob,ione,size(x,1),ione,ione,desc_a,info)
 !!$  if(info /= psb_success_) then
 !!$    info=psb_err_from_subroutine_
 !!$    call psb_errpush(info,name,a_err='psb_chkvect on X')
 !!$    goto 9999
 !!$  end if
-!!$  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+!!$  call psb_chkvect(mglob,ione,size(b,ione),ione,ione,desc_a,info)
 !!$  if(info /= psb_success_) then
 !!$    info=psb_err_from_subroutine_    
 !!$    call psb_errpush(info,name,a_err='psb_chkvect on B')
@@ -222,14 +221,14 @@
 !!$  allocate(aux(naux),h(nl+1,nl+1),&
 !!$       &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
 !!$
-!!$  if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
-!!$  if (info == psb_success_) call psb_geall(w,desc_a,info)
-!!$  if (info == psb_success_) call psb_geall(w1,desc_a,info)
-!!$  if (info == psb_success_) call psb_geall(xt,desc_a,info)
-!!$  if (info == psb_success_) call psb_geasb(v,desc_a,info)  
-!!$  if (info == psb_success_) call psb_geasb(w,desc_a,info)  
-!!$  if (info == psb_success_) call psb_geasb(w1,desc_a,info)
-!!$  if (info == psb_success_) call psb_geasb(xt,desc_a,info)
+!!$  if (info == psb_success_) Call psb_geall(v,desc_a,info,n=nl+1)
+!!$  if (info == psb_success_) Call psb_geall(w,desc_a,info)
+!!$  if (info == psb_success_) Call psb_geall(w1,desc_a,info)
+!!$  if (info == psb_success_) Call psb_geall(xt,desc_a,info)
+!!$  if (info == psb_success_) Call psb_geasb(v,desc_a,info)  
+!!$  if (info == psb_success_) Call psb_geasb(w,desc_a,info)  
+!!$  if (info == psb_success_) Call psb_geasb(w1,desc_a,info)
+!!$  if (info == psb_success_) Call psb_geasb(xt,desc_a,info)
 !!$  if (info /= psb_success_) then 
 !!$    info=psb_err_from_subroutine_non_ 
 !!$    call psb_errpush(info,name)
@@ -240,8 +239,6 @@
 !!$       & ' Size of V,W,W1 ',size(v),size(v,1),&
 !!$       & size(w),size(w,1),size(w1),size(w1,1), size(v(:,1))
 !!$
-!!$  ! Ensure global coherence for convergence checks.
-!!$  call psb_set_coher(ictxt,isvch)
 !!$
 !!$  if (istop_ == 1) then 
 !!$    ani = psb_spnrmi(a,desc_a,info)
@@ -251,6 +248,7 @@
 !!$  endif
 !!$  errnum = dzero
 !!$  errden = done
+!!$  deps   = eps
 !!$  if (info /= psb_success_) then 
 !!$    info=psb_err_from_subroutine_non_ 
 !!$    call psb_errpush(info,name)
@@ -277,15 +275,15 @@
 !!$    end if
 !!$
 !!$    call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
-!!$    if (info /= psb_success_) then 
+!!$    if (info /= psb_success_) Then 
 !!$      info=psb_err_from_subroutine_non_ 
 !!$      call psb_errpush(info,name)
 !!$      goto 9999
-!!$    end if
+!!$    End If
 !!$
 !!$    rs(1) = psb_genrm2(v(:,1),desc_a,info)
 !!$    rs(2:) = dzero
-!!$    if (info /= psb_success_) then 
+!!$    if (info /= psb_success_) Then 
 !!$      info=psb_err_from_subroutine_non_ 
 !!$      call psb_errpush(info,name)
 !!$      goto 9999
@@ -314,12 +312,12 @@
 !!$      call psb_errpush(info,name)
 !!$      goto 9999
 !!$    end if
-!!$    
-!!$    if (errnum <= eps*errden) exit restart
+!!$
+!!$    if (errnum <= deps*errden) exit restart
 !!$
 !!$    if (itrace_ > 0) &
-!!$         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
-!!$     
+!!$         & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
+!!$
 !!$    v(:,1) = v(:,1) * scal
 !!$
 !!$    if (itx >= litmax) exit restart  
@@ -332,7 +330,7 @@
 !!$      itx  = itx + 1
 !!$
 !!$      call prec%apply(v(:,i),w1,desc_a,info)
-!!$      call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
+!!$      Call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
 !!$      !
 !!$
 !!$      do k = 1, i
@@ -343,16 +341,17 @@
 !!$      scal=done/h(i+1,i)
 !!$      call psb_geaxpby(scal,w,dzero,v(:,i+1),desc_a,info)
 !!$      do k=2,i
-!!$        call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+!!$        call drot(1,h(k-1,i),1,h(k,i),1,real(c(k-1)),s(k-1))
 !!$      enddo
-!!$      
+!!$
 !!$      rti  = h(i,i)
 !!$      rti1 = h(i+1,i) 
-!!$      call drotg(rti,rti1,c(i),s(i))
-!!$      call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
+!!$      call drotg(rti,rti1,tmp,s(i))
+!!$      c(i) = cmplx(tmp,szero)
+!!$      call drot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
 !!$      h(i+1,i) = dzero
-!!$      call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
-!!$      
+!!$      call drot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
+!!$
 !!$      if (istop_ == 1) then 
 !!$        !
 !!$        ! build x and then compute the residual and its infinity norm
@@ -386,7 +385,7 @@
 !!$        errden = bn2
 !!$      endif
 !!$
-!!$      if (errnum <= eps*errden) then 
+!!$      If (errnum <= deps*errden) Then 
 !!$
 !!$        if (istop_ == 1) then 
 !!$          x = xt 
@@ -411,7 +410,7 @@
 !!$      end if
 !!$
 !!$      if (itrace_ > 0) &
-!!$           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+!!$           & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
 !!$
 !!$    end do inner
 !!$
@@ -432,12 +431,17 @@
 !!$      call prec%apply(w1,w,desc_a,info)
 !!$      call psb_geaxpby(done,w,done,x,desc_a,info)
 !!$    end if
-!!$     
+!!$
 !!$  end do restart
 !!$  if (itrace_ > 0) &
-!!$       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
+!!$       & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 !!$
-!!$  call log_end(methdname,me,itx,errnum,errden,eps,err=err,iter=iter)
+!!$  call log_end(methdname,me,itx,errnum,errden,deps,err=derr,iter=iter)
+!!$
+!!$  if (present(err)) then 
+!!$    err = derr
+!!$  end if
+!!$
 !!$
 !!$  deallocate(aux,h,c,s,rs,rst, stat=info)
 !!$  if (info == psb_success_) call psb_gefree(v,desc_a,info)
@@ -450,9 +454,6 @@
 !!$    goto 9999
 !!$  end if
 !!$
-!!$  ! restore external global coherence behaviour
-!!$  call psb_restore_coher(ictxt,isvch)
-!!$
 !!$  call psb_erractionrestore(err_act)
 !!$  return
 !!$
@@ -464,14 +465,15 @@
 !!$  end if
 !!$  return
 !!$
-!!$end subroutine psb_drgmres
+!!$End Subroutine psb_drgmres
+
 
 
 subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_d_inner_krylov_mod
+  use psb_d_krylov_conv_mod
   use psb_krylov_mod
   implicit none
   type(psb_dspmat_type), intent(in)    :: a
@@ -484,26 +486,27 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
-!!$   local data
-  Real(psb_dpk_), allocatable   :: aux(:)
-  Real(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
+! =   local data
+  real(psb_dpk_), allocatable   :: aux(:)
+  real(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
   type(psb_d_vect_type), allocatable :: v(:)
   type(psb_d_vect_type)              :: w, w1, xt
-  Real(psb_dpk_) :: scal, gm, rti, rti1
+  real(psb_dpk_) :: tmp 
+  real(psb_dpk_) :: scal, gm, rti, rti1
   integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
-       & np,me, n_row, n_col, nl, int_err(5)
-  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
+       & n_row, n_col, nl, int_err(5)
+  Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
   integer(psb_ipk_), Parameter :: irmax = 8
-  integer(psb_ipk_) :: itx, i, isvch, ictxt,istop_, err_act
+  integer(psb_ipk_) :: itx, i, istop_, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  Real(psb_dpk_) :: rni, xni, bni, ani,bn2, dt
-  real(psb_dpk_), external :: dnrm2
-  real(psb_dpk_)   :: errnum, errden
+  integer(psb_ipk_) :: ictxt, np, me  
+  Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt
+  real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name
   character(len=*), parameter :: methdname='RGMRES'
 
   info = psb_success_
-  name = 'psb_dgmres'
+  name = 'psb_sgmres'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -576,13 +579,13 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
-  call psb_chkvect(mglob,1,x%get_nrows(),1,1,desc_a,info)
+  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
-  call psb_chkvect(mglob,1,b%get_nrows(),1,1,desc_a,info)
+  call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')
@@ -612,8 +615,6 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
        & ' Size of V,W,W1 ',v(1)%get_nrows(),size(v),&
        & w%get_nrows(),w1%get_nrows()
 
-  ! Ensure global coherence for convergence checks.
-  call psb_set_coher(ictxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -623,6 +624,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   errnum = dzero
   errden = done
+  deps   = eps
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_ 
     call psb_errpush(info,name)
@@ -690,7 +692,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     if (errnum <= eps*errden) exit restart
 
     if (itrace_ > 0) &
-         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+         & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
      
     call v(1)%scal(scal) !v(1) = v(1) * scal
 
@@ -715,15 +717,17 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
       scal=done/h(i+1,i)
       call psb_geaxpby(scal,w,dzero,v(i+1),desc_a,info)
       do k=2,i
-        call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+        call drot(1,h(k-1,i),1,h(k,i),1,real(c(k-1)),s(k-1))
       enddo
-      
+
+
       rti  = h(i,i)
       rti1 = h(i+1,i) 
-      call drotg(rti,rti1,c(i),s(i))
-      call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
+      call drotg(rti,rti1,tmp,s(i))
+      c(i) = cmplx(tmp,szero)
+      call drot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
       h(i+1,i) = dzero
-      call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
+      call drot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
       
       if (istop_ == 1) then 
         !
@@ -762,7 +766,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
         if (istop_ == 1) then 
           call psb_geaxpby(done,xt,dzero,x,desc_a,info)
-!!$          x = xt 
+! =          x = xt 
         else if (istop_ == 2) then
           !
           ! build x
@@ -784,7 +788,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
       end if
 
       if (itrace_ > 0) &
-           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+           & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
 
     end do inner
 
@@ -808,9 +812,10 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
      
   end do restart
   if (itrace_ > 0) &
-       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
+       & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
 
-  call log_end(methdname,me,itx,errnum,errden,eps,err=err,iter=iter)
+  call log_end(methdname,me,itx,errnum,errden,deps,err=derr,iter=iter)
+  if (present(err)) err = derr
 
   
   if (info == psb_success_) call psb_gefree(v,desc_a,info)
@@ -824,9 +829,6 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
   call psb_erractionrestore(err_act)
   return
 
@@ -839,5 +841,4 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   return
 
 end subroutine psb_drgmres_vect
-
 

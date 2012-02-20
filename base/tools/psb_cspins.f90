@@ -68,22 +68,21 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  character(len=20)  :: name, ch_err
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name
 
   info = psb_success_
   name = 'psb_cspins'
   call psb_erractionsave(err_act)
 
-
-  ictxt = desc_a%get_context()
-
-  call psb_info(ictxt, me, np)
-
-  if (.not.psb_is_ok_desc(desc_a)) then 
-    info = psb_err_invalid_cd_state_  
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
-  endif
+  end if
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -118,28 +117,27 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
-        ch_err='allocate'
+        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err=ch_err,i_err=(/info,0,0,0,0/))
+             & a_err='allocate',i_err=ierr)
         goto 9999
       end if
       call  psb_cdins(nz,ia,ja,desc_a,info,ila=ila,jla=jla)
 
       if (info /= psb_success_) then
-        ch_err='psb_cdins'
+        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err=ch_err,i_err=(/info,0,0,0,0/))
+             & a_err='psb_cdins',i_err=ierr)
         goto 9999
       end if
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
 
       if (a%is_bld()) then 
-        call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
+        call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
-          ch_err='psb_coins'
-          call psb_errpush(info,name,a_err=ch_err)
+          call psb_errpush(info,name,a_err='a%csput')
           goto 9999
         end if
       else
@@ -153,9 +151,9 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
-        ch_err='allocate'
+        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err=ch_err,i_err=(/info,0,0,0,0/))
+             & a_err='allocate',i_err=ierr)
         goto 9999
       end if
 
@@ -166,11 +164,10 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = desc_a%get_local_rows()
       ncol = desc_a%get_local_cols()
 
-      call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
+      call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='psb_coins'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='a%csput')
         goto 9999
       end if
 
@@ -213,27 +210,26 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  character(len=20)  :: name, ch_err
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name
 
   info = psb_success_
-  name = 'psb_cspins'
+  if (psb_errstatus_fatal()) return 
+  name = 'psb_dspins'
   call psb_erractionsave(err_act)
-
-
-  ictxt = desc_ar%get_context()
-
-  call psb_info(ictxt, me, np)
-
-  if (.not.psb_is_ok_desc(desc_ar)) then 
-    info = psb_err_invalid_cd_state_  
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.psb_is_ok_desc(desc_ac)) then 
+  if (.not.desc_ar%is_ok()) then
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
-  endif
+  end if
+  if (.not.desc_ac%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ictxt = desc_ar%get_context()
+  call psb_info(ictxt, me, np)
 
   if (nz < 0) then 
     info = 1111
@@ -258,13 +254,13 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   end if
   if (nz == 0) return
 
-  if (psb_is_bld_desc(desc_ac)) then 
+  if (desc_ac%is_bld()) then 
 
     allocate(ila(nz),jla(nz),stat=info)
     if (info /= psb_success_) then
-      ch_err='allocate'
+      ierr(1) = info
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err=ch_err,i_err=(/info,0,0,0,0/))
+           & a_err='allocate',i_err=ierr)
       goto 9999
     end if
         ila(1:nz) = ia(1:nz)
@@ -273,25 +269,24 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 
     call psb_cdins(nz,ja,desc_ac,info,jla=jla, mask=(ila(1:nz)>0))
 
-    if (info /= psb_success_) then
-      ch_err='psb_cdins'
+    if (psb_errstatus_fatal()) then
+      ierr(1) = info 
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err=ch_err,i_err=(/info,0,0,0,0/))
+           & a_err='psb_cdins',i_err=ierr)
       goto 9999
     end if
 
     nrow = desc_ar%get_local_rows()
     ncol = desc_ac%get_local_cols()
 
-    call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
-    if (info /= psb_success_) then
+    call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
+    if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
-      ch_err='psb_coins'
-      call psb_errpush(info,name,a_err=ch_err)
+      call psb_errpush(info,name,a_err='a%csput')
       goto 9999
     end if
 
-  else if (psb_is_asb_desc(desc_ac)) then 
+  else if (desc_ac%is_asb()) then 
 
     write(psb_err_unit,*) 'Why are you calling me on an assembled desc_ac?'
     info = psb_err_invalid_cd_state_

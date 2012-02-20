@@ -132,7 +132,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 #endif
   !     ....scalar parameters...
   logical :: is_bld, is_upd
-  integer(psb_ipk_) :: np,dl_lda,mode, info, ictxt
+  integer(psb_mpik_) :: ictxt
+  integer(psb_ipk_) :: np,dl_lda,mode, info
 
   !     ....array parameters....
   integer(psb_ipk_) ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
@@ -141,9 +142,10 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: int_err(5)
 
   !     .....local scalars...
-  integer(psb_ipk_) :: i,me,nprow,pointer_dep_list,proc,j,err_act
-  integer(psb_ipk_) :: err, icomm
+  integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
+  integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_mpik_) :: icomm, me, npr, dl_mpi, minfo
   character  name*20
   name='psi_extrct_dl'
 
@@ -153,7 +155,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
   info = psb_success_
 
-  call psb_info(ictxt,me,nprow)
+  call psb_info(ictxt,me,npr)
   do i=0,np 
     length_dl(i) = 0
   enddo
@@ -173,7 +175,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
       if ((desc_str(i+1) /= 0).or.(desc_str(i+2) /= 0)) then
         !           ..if number of element to be exchanged !=0
         proc=desc_str(i)
-        if ((proc < 0).or.(proc >= nprow)) then
+        if ((proc < 0).or.(proc >= npr)) then
           if (debug_level >= psb_debug_inner_)&
                & write(debug_unit,*) me,' ',trim(name),': error ',i,desc_str(i)
           info = 9999
@@ -269,9 +271,11 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
     goto 9999
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-  call mpi_allgather(itmp,dl_lda,psb_mpi_integer,&
-       & dep_list,dl_lda,psb_mpi_integer,icomm,info)
-  deallocate(itmp,stat=info)
+  dl_mpi = dl_lda
+  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_integer,&
+       & dep_list,dl_mpi,psb_mpi_ipk_integer,icomm,minfo)
+  info = minfo
+  if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
     goto 9999

@@ -52,7 +52,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, nl, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
-  integer(psb_ipk_) :: icomm, err_act
+  integer(psb_ipk_) :: err_act
 
   integer(psb_ipk_), allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   integer(psb_ipk_),allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
@@ -60,8 +60,9 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   integer(psb_ipk_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   logical, allocatable, target :: lmask(:)
   logical, pointer     :: mask_(:)
+  integer(psb_ipk_) :: ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name, ch_err
+  character(len=20)    :: name
 
   name='psb_cd_lstext'
   info  = psb_success_
@@ -70,12 +71,10 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   debug_level = psb_get_debug_level()
 
   ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
        & Write(debug_unit,*) me,' ',trim(name),': start',size(in_list)
-
 
 
   m      = desc_a%get_local_rows()
@@ -115,8 +114,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   call psb_cdcpy(desc_a,desc_ov,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_cdcpy'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_cdcpy')
     goto 9999
   end if
   if (debug_level >= psb_debug_outer_) &
@@ -143,8 +141,9 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   call psb_cd_set_ovl_asb(desc_ov,info)
 
   if (info /= psb_success_) then
-    ch_err='sp_free'
-    call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+    ierr(1) = info 
+    call psb_errpush(psb_err_from_subroutine_ai_,name,a_err='sp_free',&
+         & i_err=ierr)
     goto 9999
   end if
 

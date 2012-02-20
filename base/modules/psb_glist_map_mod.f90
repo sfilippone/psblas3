@@ -96,10 +96,12 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)  :: ictxt, vg(:)
+    integer(psb_mpik_), intent(in)  :: ictxt    
+    integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) :: iam, np, i, n, nl
+    integer(psb_mpik_) :: iam, np
+    integer(psb_ipk_) :: i, n, nl
     
 
     info = 0
@@ -155,7 +157,8 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: ictxt, iam, np, nv, i, ngp
+    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_ipk_) :: nv, i, ngp
     
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)

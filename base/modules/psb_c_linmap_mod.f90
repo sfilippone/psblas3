@@ -54,8 +54,7 @@ module psb_c_linmap_mod
 
   interface psb_map_X2Y
     subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      import ::  psb_clinmap_type
+      import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
       type(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
@@ -65,9 +64,8 @@ module psb_c_linmap_mod
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_X2Y
     subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      use psb_c_vect_mod
-      import ::  psb_clinmap_type
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
       type(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
@@ -79,8 +77,7 @@ module psb_c_linmap_mod
 
   interface psb_map_Y2X
     subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      import ::  psb_clinmap_type
+      import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
       type(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta
@@ -90,9 +87,8 @@ module psb_c_linmap_mod
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_Y2X
     subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
-      use psb_const_mod
-      use psb_c_vect_mod
-      import ::  psb_clinmap_type
+      use psb_c_vect_mod, only : psb_c_vect_type
+      import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
       type(psb_clinmap_type), intent(in) :: map
       complex(psb_spk_), intent(in)     :: alpha,beta

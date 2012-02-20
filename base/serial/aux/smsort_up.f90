@@ -76,7 +76,6 @@ subroutine smsort_up(n,k,l,iret)
   integer(psb_ipk_) :: l(0:n+1)
   !
   integer(psb_ipk_) :: p,q,s,t
-  intrinsic iabs,isign
   !     ..
   iret = 0
   !  first step: we are preparing ordered sublists, exploiting
@@ -99,7 +98,7 @@ subroutine smsort_up(n,k,l,iret)
     iret = 1
     return 
   else
-    l(n+1) = iabs(l(n+1))
+    l(n+1) = abs(l(n+1))
   end if
 
   mergepass: do 
@@ -118,7 +117,7 @@ subroutine smsort_up(n,k,l,iret)
 
       if (k(p) > k(q)) then 
 
-        l(s) = isign(q,l(s))
+        l(s) = sign(q,l(s))
         s = q
         q = l(q)
         if (q > 0) then 
@@ -139,7 +138,7 @@ subroutine smsort_up(n,k,l,iret)
 
       else 
 
-        l(s) = isign(p,l(s))
+        l(s) = sign(p,l(s))
         s = p
         p = l(p)
         if (p>0) then 
@@ -164,7 +163,7 @@ subroutine smsort_up(n,k,l,iret)
       p = -p
       q = -q
       if (q == 0) then
-        l(s) = isign(p,l(s))
+        l(s) = sign(p,l(s))
         l(t) = 0
         exit outer 
       end if

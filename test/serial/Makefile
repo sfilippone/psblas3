@@ -4,8 +4,7 @@ include ../../Make.inc
 #
 LIBDIR=../../lib/
 OPTDIR=../../opt
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_base -L$(OPTDIR)  $(RSB_LIBS) 
-#-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such
@@ -16,20 +15,15 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).  $(FMFLAG)$(OPTDIR)
 
 EXEDIR=./runs
 
-# FIXME: martone will clean up this file from RSB_EXTRA
-RSB_EXTRA=-lgomp
 
-all: d_coo_matgen d_matgen 
-d_coo_matgen: d_coo_matgen.o 
-	$(F90LINK) $(LINKOPT) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
-	/bin/cp -p $(CPUPDFLAG) d_coo_matgen $(EXEDIR)	
+all: d_matgen 
 
 psb_d_cxx_impl.o d_matgen.o: psb_d_cxx_mat_mod.o 
 psb_d_cyy_impl.o d_matgen.o: psb_d_cyy_mat_mod.o 
 
 d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  
 	$(F90LINK) $(LINKOPT) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o psb_d_cyy_mat_mod.o\
-	 psb_d_cyy_impl.o  -o d_matgen  $(PSBLAS_LIB) $(LDLIBS) $(RSB_EXTRA)
+	 psb_d_cyy_impl.o  -o d_matgen  $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/cp -p $(CPUPDFLAG) d_matgen $(EXEDIR)	
 #	/bin/mv d_matgen $(EXEDIR)	
 
@@ -37,7 +31,7 @@ check: all
 	cd runs && echo 5 | ./d_matgen
 
 clean: 
-	/bin/rm -f d_coo_matgen.o d_matgen.o  \
+	/bin/rm -f  d_matgen.o  \
 	 psb_d_cyy_mat_mod.o psb_d_cyy_impl.o  \
 	 psb_d_cxx_mat_mod.o psb_d_cxx_impl.o *$(.mod)  
 verycleanlib: 
