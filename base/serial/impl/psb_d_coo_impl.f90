@@ -49,35 +49,61 @@ subroutine psb_d_coo_get_diag(a,d,info)
 end subroutine psb_d_coo_get_diag
 
 
-subroutine psb_d_coo_scal(d,a,info) 
+subroutine psb_d_coo_scal(d,a,info,side) 
   use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_scal
   use psb_error_mod
   use psb_const_mod
+  use psb_string_mod
   implicit none 
   class(psb_d_coo_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
+  character :: side_
+  logical   :: left 
   logical, parameter :: debug=.false.
 
   info  = psb_success_
   call psb_erractionsave(err_act)
 
-  m = a%get_nrows()
-  if (size(d) < m) then 
-    info=psb_err_input_asize_invalid_i_
-    ierr(1) = 2; ierr(2) = size(d); 
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
+  side_ = 'L'
+  if (present(side)) then 
+    side_ = psb_toupper(side)
   end if
 
-  do i=1,a%get_nzeros()
-    j        = a%ia(i)
-    a%val(i) = a%val(i) * d(j)
-  enddo
+  left = (side_ == 'L')
+  
+  if (left) then 
+    m = a%get_nrows()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1,a%get_nzeros()
+      j        = a%ia(i)
+      a%val(i) = a%val(i) * d(j)
+    enddo
+  else
+    m = a%get_ncols()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1,a%get_nzeros()
+      j        = a%ja(i)
+      a%val(i) = a%val(i) * d(j)
+    enddo
+  end if
 
   call psb_erractionrestore(err_act)
   return
@@ -1214,7 +1240,6 @@ subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-
 
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')

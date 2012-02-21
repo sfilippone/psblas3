@@ -1093,13 +1093,14 @@ end subroutine psb_d_base_scals
 
 
 
-subroutine psb_d_base_scal(d,a,info) 
+subroutine psb_d_base_scal(d,a,info,side) 
   use psb_d_base_mat_mod, psb_protect_name => psb_d_base_scal
   use psb_error_mod
   implicit none 
   class(psb_d_base_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)

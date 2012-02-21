@@ -1384,37 +1384,61 @@ subroutine psb_c_csc_get_diag(a,d,info)
 end subroutine psb_c_csc_get_diag
 
 
-subroutine psb_c_csc_scal(d,a,info) 
+subroutine psb_c_csc_scal(d,a,info,side) 
   use psb_error_mod
   use psb_const_mod
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_scal
+  use psb_string_mod
   implicit none 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
   complex(psb_spk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
 
   integer(psb_ipk_) :: err_act,mnm, i, j, n
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
+  character :: side_
+  logical   :: left 
   logical, parameter :: debug=.false.
 
   info  = psb_success_
   call psb_erractionsave(err_act)
 
-  n = a%get_ncols()
-  if (size(d) < n) then 
-    info=psb_err_input_asize_invalid_i_
-    ierr(1) = 2; ierr(2) = size(d); 
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
+  side_ = 'L'
+  if (present(side)) then 
+    side_ = psb_toupper(side)
   end if
 
-  do i=1, n
-    do j = a%icp(i), a%icp(i+1) -1 
-      a%val(j) = a%val(j) * d(a%ia(j))
-    end do
-  enddo
+  left = (side_ == 'L')
+  
+  if (left) then 
+    n = a%get_ncols()
+    if (size(d) < n) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1, a%get_nzeros()
+      a%val(i) = a%val(i) * d(a%ia(i))
+    enddo
+  else
+    n = a%get_nrows()
+    if (size(d) < n) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
 
+    do j=1, n
+      do i = a%icp(j), a%icp(j+1) -1 
+        a%val(i) = a%val(i) * d(j)
+      end do
+    enddo
+  end if
   call psb_erractionrestore(err_act)
   return
 

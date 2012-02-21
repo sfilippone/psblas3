@@ -44,7 +44,7 @@
 ! the functionalities to have the encapsulated class change its
 ! type dynamically, and to extract/input an inner object.
 !
-! A sparse matrix has a state corresponding to its progression
+! A sparse matric has a state corresponding to its progression
 ! through the application life.
 ! In particular, computational methods can only be invoked when
 ! the matrix is in the ASSEMBLED state, whereas the other states are
@@ -766,11 +766,12 @@ module psb_d_mat_mod
   end interface
   
   interface psb_scal
-    subroutine psb_d_scal(d,a,info)
+    subroutine psb_d_scal(d,a,info,side)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)             :: d(:)
       integer(psb_ipk_), intent(out)                    :: info
+      character, intent(in), optional :: side
     end subroutine psb_d_scal
     subroutine psb_d_scals(d,a,info)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_

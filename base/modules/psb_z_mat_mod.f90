@@ -766,11 +766,12 @@ module psb_z_mat_mod
   end interface
   
   interface psb_scal
-    subroutine psb_z_scal(d,a,info)
+    subroutine psb_z_scal(d,a,info,side)
       import :: psb_ipk_, psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(inout) :: a
       complex(psb_dpk_), intent(in)             :: d(:)
       integer(psb_ipk_), intent(out)                    :: info
+      character, intent(in), optional :: side
     end subroutine psb_z_scal
     subroutine psb_z_scals(d,a,info)
       import :: psb_ipk_, psb_zspmat_type, psb_dpk_

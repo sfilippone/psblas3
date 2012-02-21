@@ -404,11 +404,12 @@ module psb_c_csc_mat_mod
   end interface
   
   interface 
-    subroutine psb_c_csc_scal(d,a,info) 
+    subroutine psb_c_csc_scal(d,a,info,side) 
       import :: psb_ipk_, psb_c_csc_sparse_mat, psb_spk_
       class(psb_c_csc_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: d(:)
       integer(psb_ipk_), intent(out)            :: info
+      character, intent(in), optional :: side
     end subroutine psb_c_csc_scal
   end interface
   

@@ -594,11 +594,12 @@ module psb_z_base_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_base_scal(d,a,info) 
+    subroutine psb_z_base_scal(d,a,info,side) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
       class(psb_z_base_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: d(:)
       integer(psb_ipk_), intent(out)            :: info
+      character, intent(in), optional :: side
     end subroutine psb_z_base_scal
   end interface
   
@@ -1011,11 +1012,12 @@ module psb_z_base_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_coo_scal(d,a,info) 
+    subroutine psb_z_coo_scal(d,a,info,side) 
       import :: psb_ipk_, psb_z_coo_sparse_mat, psb_dpk_
       class(psb_z_coo_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: d(:)
       integer(psb_ipk_), intent(out)            :: info
+      character, intent(in), optional :: side
     end subroutine psb_z_coo_scal
   end interface
   

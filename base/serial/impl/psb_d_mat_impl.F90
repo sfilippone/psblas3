@@ -2323,7 +2323,7 @@ subroutine psb_d_get_diag(a,d,info)
 end subroutine psb_d_get_diag
 
 
-subroutine psb_d_scal(d,a,info)
+subroutine psb_d_scal(d,a,info,side)
   use psb_error_mod
   use psb_const_mod
   use psb_d_mat_mod, psb_protect_name => psb_d_scal
@@ -2331,6 +2331,7 @@ subroutine psb_d_scal(d,a,info)
   class(psb_dspmat_type), intent(inout) :: a
   real(psb_dpk_), intent(in)              :: d(:)
   integer(psb_ipk_), intent(out)                    :: info
+  character, intent(in), optional :: side
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='scal'
@@ -2344,7 +2345,7 @@ subroutine psb_d_scal(d,a,info)
     goto 9999
   endif
 
-  call a%a%scal(d,info)
+  call a%a%scal(d,info,side=side)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)

@@ -404,11 +404,12 @@ module psb_z_csr_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_csr_scal(d,a,info) 
+    subroutine psb_z_csr_scal(d,a,info,side) 
       import :: psb_ipk_, psb_z_csr_sparse_mat, psb_dpk_
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       complex(psb_dpk_), intent(in)      :: d(:)
       integer(psb_ipk_), intent(out)            :: info
+      character, intent(in), optional :: side
     end subroutine psb_z_csr_scal
   end interface
   

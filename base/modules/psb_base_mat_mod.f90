@@ -65,43 +65,65 @@ module psb_base_mat_mod
   use psi_serial_mod
   
   !
-  ! type psb_base_sparse_mat: the basic data about your matrix
-  !            This class is extended twice, to provide the various
-  !            data variations S/D/C/Z and to implement the actual
-  !            storage formats. The grandchild classes are then
-  !            encapsulated to implement the STATE design pattern.
-  !            We have an ambiguity in that the inner class has a
-  !            "state" variable; we hope the context will make it clear. 
+  !> \namespace  psb_base_mod  \class  psb_base_sparse_mat
+  !!  The basic data about your matrix.
+  !!   This class is extended twice, to provide the various
+  !!   data variations S/D/C/Z and to implement the actual
+  !!   storage formats. The grandchild classes are then
+  !!   encapsulated to implement the STATE design pattern.
+  !!   We have an ambiguity in that the inner class has a
+  !!   "state" variable; we hope the context will make it clear. 
+  !!
+  !!
+  !! The methods associated to this class can be grouped into three sets:
+  !! -  Fully implemented methods: some methods such as get_nrows or
+  !!    set_nrows can be fully implemented at this level.
+  !! -  Partially implemented methods: Some methods have an
+  !!    implementation that is split between this level and the leaf
+  !!    level. For example, the matrix transposition can be partially
+  !!    done at this level (swapping of the rows and columns dimensions)
+  !!    but it has to be completed by a method defined at the leaf level
+  !!    (for actually transposing the row and column indices).
+  !! -  Other methods: There are a number of methods that are defined
+  !!    (i.e their interface is defined) but not implemented at this
+  !!    level. This methods will be overwritten at the leaf level with
+  !!    an actual implementation. If it is not the case, the method
+  !!    defined at this level will raise an error. These methods are
+  !!    defined in the serial/impl/psb_base_mat_impl.f90 file
+  !!
   !
-  !  M:        number of rows
-  !  N:        number of columns
-  !  STATE:    null:   pristine
-  !            build:  it's being filled with entries
-  !            assembled: ready to use in computations
-  !            update: accepts coefficients but only
-  !                    in already existing entries
-  !            The transitions among the states are detailed in
-  !            psb_T_mat_mod
-  !            
-  !  TRIANGLE: is it triangular?
-  !  UPPER:    If it is triangular, is it upper (otherwise lower)?
-  !  UNITD:    If it is triangular, is the diagonal assumed to 
-  !            be unitary and not stored explicitly?
-  !  SORTED:   are the entries guaranteed to be sorted? 
-  !
-  ! DUPLICATE: How duplicate entries are to be handled when
-  !            transitioning from the BUILD to the ASSEMBLED state. 
-  !            While many formats would allow for duplicate
-  !            entries, it is much better to constrain the matrices
-  !            NOT to have duplicate entries, except while in the
-  !            BUILD state; in our overall design, only COO matrices
-  !            can ever be in the BUILD state, hence all other formats
-  !            cannot have duplicate entries.
-  ! 
+
   type  :: psb_base_sparse_mat
-    integer(psb_ipk_), private     :: m, n
-    integer(psb_ipk_), private     :: state, duplicate 
-    logical, private     :: triangle, upper, unitd, sorted
+    !> Row size
+    integer(psb_ipk_), private     :: m
+    !> Col size
+    integer(psb_ipk_), private     :: n 
+    !> Matrix state:
+    !!    null:   pristine;
+    !!    build:  it's being filled with entries;
+    !!    assembled: ready to use in computations;
+    !!    update: accepts coefficients but only
+    !!            in already existing entries.
+    !!    The transitions among the states are detailed in
+    !!            psb_T_mat_mod. 
+    integer(psb_ipk), private     :: state
+    !> How to treat duplicate elements when
+    !!            transitioning from the BUILD to the ASSEMBLED state. 
+    !!            While many formats would allow for duplicate
+    !!            entries, it is much better to constrain the matrices
+    !!            NOT to have duplicate entries, except while in the
+    !!            BUILD state; in our overall design, only COO matrices
+    !!            can ever be in the BUILD state, hence all other formats
+    !!            cannot have duplicate entries.
+    integer(psb_ipk), private     :: duplicate 
+    !> Is the matrix triangular? (must also be square)
+    logical, private     :: triangle
+    !> Is the matrix upper or lower? (only if  triangular)
+    logical, private     :: upper
+    !> Is the matrix diagonal stored or assumed unitary? (only if  triangular)
+    logical, private     :: unitd
+    !> Are the coefficients sorted by row and column indices? 
+    logical, private     :: sorted
   contains 
 
     ! == = =================================
@@ -178,10 +200,10 @@ module psb_base_mat_mod
  
   end type psb_base_sparse_mat
 
-  !
-  ! GET_NZ_ROW:
-  !    
-  !    count(A(idx,:)/=0) 
+  !>  Function: psb_base_get_nz_row
+  !!  Interface for  the get_nz_row method. Equivalent to:
+  !!    count(A(idx,:)/=0)
+  !!    \param idx   The line we are interested in.
   !
   interface 
     function psb_base_get_nz_row(idx,a) result(res)
@@ -193,9 +215,9 @@ module psb_base_mat_mod
   end interface
   
   !
-  ! GET_NZEROS: 
-  !    
-  !    count(A(:,:)/=0) 
+  !>  Function: psb_base_get_nzeros
+  !!  Interface for  the get_nzeros method. Equivalent to: 
+  !!    count(A(:,:)/=0) 
   !
   interface 
     function psb_base_get_nzeros(a) result(res)
@@ -205,11 +227,11 @@ module psb_base_mat_mod
     end function psb_base_get_nzeros
   end interface
 
-  !
-  ! GET_SIZE: how many items can A hold with
-  !           its current space allocation?
-  !           (as opposed to how many are
-  !            currently occupied) 
+  !> Function get_size
+  !!  how many items can A hold with
+  !!           its current space allocation?
+  !!           (as opposed to how many are
+  !!            currently occupied) 
   !    
   interface 
     function psb_base_get_size(a) result(res)
@@ -220,8 +242,8 @@ module psb_base_mat_mod
   end interface
 
   !
-  ! REINIT: transition state from ASB to UPDATE
-  !         by default zero the coefficient values. 
+  !> Function reinit: transition state from ASB to UPDATE
+  !!  \param clear [true] explicitly zero out coefficients.
   !    
   interface 
     subroutine psb_base_reinit(a,clear)
@@ -233,12 +255,13 @@ module psb_base_mat_mod
   
 
   !
-  ! PRINT:  print on file in Matrix Market format. 
-  !         Optional arguments:
-  !         head: header descriptive string.
-  !         iv: renumbering to be applied to both rows and columns
-  !         ivr, ivc: renumbering to be applied independently to
-  !                   rows and columns
+  !> Function
+  !!  print on file in Matrix Market format. 
+  !!  \param iout the output unit
+  !!  \param iv(:) [none] renumber both row and column indices
+  !!  \param head [none] a descriptive header for the matrix data
+  !!  \param ivr(:) [none] renumbering for the rows
+  !!  \param ivc(:) [none] renumbering for the cols
   !    
   interface 
     subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
@@ -253,20 +276,29 @@ module psb_base_mat_mod
 
 
   !
-  ! GETPTN: Get the pattern.
-  !         Return a list of NZ pairs
-  !           (IA(i),JA(i))
-  !         each identifying the position of a nonzero in A
-  !         between row indices IMIN:IMAX.
-  !         IA,JA are reallocated as necessary.
-  !         Optional arguments:
-  !         iren: return (IREN(IA(:)),IREN(JA(:))
-  !         RSCALE: map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
-  !         CSCALE: map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !
-  !         iren cannot be specified with rscale/cscale.   
-  !
-  !         APPEND: append to IA,JA; first new entry will be in NZIN+1
+  !> Function  getptn:
+  !! \brief Get the pattern.
+  !!
+  !!
+  !!         Return a list of NZ pairs
+  !!           (IA(i),JA(i))
+  !!         each identifying the position of a nonzero in A
+  !!         between row indices IMIN:IMAX; 
+  !!         IA,JA are reallocated as necessary.
+  !!  \param imin  the minimum row index we are interested in 
+  !!  \param imax  the minimum row index we are interested in 
+  !!  \param nz the number of output coefficients
+  !!  \param ia(:)  the output row indices
+  !!  \param ja(:)  the output col indices
+  !!  \param info  return code
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !           
 
   interface 
@@ -286,10 +318,18 @@ module psb_base_mat_mod
   end interface
   
   !
-  ! GETNEIGH: Get the neighbours of index IDX, i.e.
-  !           get the nonzero indices in its row.
-  !           Optional: LEV: recurse at LEV levels,
-  !           i.e. LEV=2 add neighours of neighbours of IDX, etc. 
+  !> Function  get_neigh:
+  !! \brief Get the neighbours.
+  !!
+  !!
+  !!         Return a list of N indices of neighbours of index idx,
+  !!         i.e. the indices of the nonzeros in row idx of matrix A
+  !!         \param idx the index we are interested in
+  !!         \param neigh(:) the list of indices, reallocated as necessary
+  !!         \param n  the number of indices returned
+  !!         \param info return code
+  !!         \param lev [1] find neighbours recursively for LEV levels,
+  !!               i.e. when lev=2 find neighours of neighbours, etc. 
   !           
   interface 
     subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
@@ -304,9 +344,13 @@ module psb_base_mat_mod
   end interface
   
   !         
-  !  ALLOCATE_MNNZ: allocate/initialize empty for 
-  !         an MxN matrix capable of holding NZ nonzeros.
-  !         Note: NZ is usually an estimate
+  !
+  !> Function  allocate_mnnz
+  !! \brief Three-parameters version of allocate
+  !!
+  !!  \param m  number of rows
+  !!  \param n  number of cols
+  !!  \param nz [estimated internally] number of nonzeros to allocate for
   !
   interface 
     subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
@@ -319,7 +363,11 @@ module psb_base_mat_mod
 
   
   !         
-  !  REALLOCATE_NZ: make room for NZ in an existing matrix
+  !
+  !> Function  reallocate_nz
+  !! \brief One--parameters version of (re)allocate
+  !!
+  !!  \param nz  number of nonzeros to allocate for
   !
   interface 
     subroutine psb_base_reallocate_nz(nz,a) 
@@ -330,7 +378,8 @@ module psb_base_mat_mod
   end interface
 
   !         
-  !  FREE: name says all
+  !> Function  free
+  !! \brief destructor
   !
   interface 
     subroutine psb_base_free(a) 
@@ -340,8 +389,10 @@ module psb_base_mat_mod
   end interface
   
   !         
-  !  TRIM: reallocate internal memory to the barest minimum
-  !        necessary to hold the current nonzeros. 
+  !> Function  trim 
+  !! \brief Memory trim
+  !! Make sure the memory allocation of the sparse matrix is as tight as
+  !! possible given the actual number of nonzeros it contains. 
   !
   interface 
     subroutine psb_base_trim(a) 
@@ -355,7 +406,8 @@ contains
 
   
   !         
-  !  SIZEOF: size in bytes
+  !> Function  free
+  !! \brief Memory occupation in byes
   !
   function psb_base_sizeof(a) result(res)
     implicit none 
@@ -365,7 +417,8 @@ contains
   end function psb_base_sizeof
  
   !         
-  !  GET_FMT: descriptive name (e.g. COO CSR etc.)
+  !> Function  get_fmt
+  !! \brief return a short descriptive name (e.g. COO CSR etc.)
   !
   function psb_base_get_fmt() result(res)
     implicit none 
