@@ -44,7 +44,7 @@
 ! the functionalities to have the encapsulated class change its
 ! type dynamically, and to extract/input an inner object.
 !
-! A sparse matric has a state corresponding to its progression
+! A sparse matrix has a state corresponding to its progression
 ! through the application life.
 ! In particular, computational methods can only be invoked when
 ! the matrix is in the ASSEMBLED state, whereas the other states are

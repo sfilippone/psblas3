@@ -44,6 +44,10 @@ module psb_serial_mod
     module procedure psb_snrm1, psb_dnrm1, psb_cnrm1, psb_znrm1
   end interface psb_nrm1
 
+  interface psb_minreal
+    module procedure psb_sminreal, psb_dminreal, psb_cminreal, psb_zminreal
+  end interface psb_minreal
+
   interface psb_amax
     function psb_samax_s(n, x) result(val)
       import :: psb_ipk_, psb_spk_, psb_dpk_
@@ -560,6 +564,30 @@ contains
     real(psb_dpk_)                 :: res
     res = abs( real( x ) ) + abs( aimag( x ) )  
   end function psb_znrm1
+
+  elemental function psb_sminreal(x) result(res)
+    real(psb_spk_), intent(in)  :: x
+    real(psb_spk_)              :: res
+    res = ( x )
+  end function psb_sminreal
+
+  elemental function psb_dminreal(x) result(res)
+    real(psb_dpk_), intent(in) :: x
+    real(psb_dpk_)             :: res
+    res = (  x )
+  end function psb_dminreal
+
+  elemental function psb_cminreal(x) result(res)
+    complex(psb_spk_), intent(in)  :: x
+    real(psb_spk_)                 :: res
+    res = min( real( x ) , aimag( x ) )  
+  end function psb_cminreal
+
+  elemental function psb_zminreal(x) result(res)
+    complex(psb_dpk_), intent(in)  :: x
+    real(psb_dpk_)                 :: res
+    res = min( real( x ) , aimag( x ) )  
+  end function psb_zminreal
 
 
   subroutine crot( n, cx, incx, cy, incy, c, s )
