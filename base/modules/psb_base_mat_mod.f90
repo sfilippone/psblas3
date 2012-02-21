@@ -106,7 +106,7 @@ module psb_base_mat_mod
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
     !!            psb_T_mat_mod. 
-    integer(psb_ipk), private     :: state
+    integer(psb_ipk_), private     :: state
     !> How to treat duplicate elements when
     !!            transitioning from the BUILD to the ASSEMBLED state. 
     !!            While many formats would allow for duplicate
@@ -115,7 +115,7 @@ module psb_base_mat_mod
     !!            BUILD state; in our overall design, only COO matrices
     !!            can ever be in the BUILD state, hence all other formats
     !!            cannot have duplicate entries.
-    integer(psb_ipk), private     :: duplicate 
+    integer(psb_ipk_), private     :: duplicate 
     !> Is the matrix triangular? (must also be square)
     logical, private     :: triangle
     !> Is the matrix upper or lower? (only if  triangular)
