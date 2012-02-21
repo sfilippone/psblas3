@@ -70,9 +70,9 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
     ndx = nzbr(me+1) 
-    call mpi_allgatherv(loc_coo%val,ndx,mpi_complex,&
+    call mpi_allgatherv(loc_coo%val,ndx,mpi_double_complex,&
          & glob_coo%val,nzbr,idisp,&
-         & mpi_complex,icomm,minfo)
+         & mpi_double_complex,icomm,minfo)
     if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ia,nzbr,idisp,&
          & psb_mpi_ipk_integer,icomm,minfo)
