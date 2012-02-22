@@ -30,34 +30,36 @@
 !!$ 
 !!$  
 !
-! package: psb_d_base_mat_mod
-!
-! This module contains the definition of the psb_d_base_sparse_mat
-! type, derived from the psb_base_sparse_mat one to define a middle
-! level definition of a real(psb_dpk_) sparse matrix
-! object.This class object itself does not have any additional members
-! with respect to those of the base class. No methods can be fully
-! implemented at this level, but we can define the interface for the
-! computational methods requiring the knowledge of the underlying
-! field, such as the matrix-vector product; this interface is defined,
-! but is supposed to be overridden at the leaf level.
-!
-! This module also contains the implementation of the
-! psb_d_coo_sparse_mat type and the related methods. This is the
-! reference type for all the format transitions, copies and mv unless
-! methods are implemented that allow the direct transition from one
-! format to another. The psb_d_coo_sparse_mat type extends 
-! psb_d_base_sparse_mat. 
-!
-! About the method MOLD: this has been defined for those compilers
-! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
-! duplicate "by hand" what is specified in the language (in this case F2008)
 !
 module psb_d_base_mat_mod
   
   use psb_base_mat_mod
   use psb_d_base_vect_mod
 
+
+  !> \namespace  psb_base_mod  \class  psb_d_base_sparse_mat
+  !! \extends psb_base_mod::psb_base_sparse_mat
+  !! This module contains the definition of the psb_d_base_sparse_mat
+  !! type, extending the psb_base_sparse_mat  to define a middle
+  !! level  real(psb_dpk_) sparse matrix object.
+  !! This class object itself does not have any additional members
+  !! with respect to those of the base class. No methods can be fully
+  !! implemented at this level, but we can define the interface for the
+  !! computational methods requiring the knowledge of the underlying
+  !! field, such as the matrix-vector product; this interface is defined,
+  !! but is supposed to be overridden at the leaf level.
+  !!
+  !! This module also contains the definition of the
+  !! psb_d_coo_sparse_mat type and the related methods. This is the
+  !! reference type for all the format transitions, copies and mv unless
+  !! methods are implemented that allow the direct transition from one
+  !! format to another. It is defined here since all other classes must
+  !! refer to it per the MEDIATOR design pattern.
+  !!
+  !! About the method MOLD: this has been defined for those compilers
+  !! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+  !! duplicate "by hand" what is specified in the language (in this case F2008)
+  !!
   type, extends(psb_base_sparse_mat) :: psb_d_base_sparse_mat
   contains
     !
