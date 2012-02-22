@@ -39,22 +39,14 @@ module psb_z_base_mat_mod
 
   !> \namespace  psb_base_mod  \class  psb_z_base_sparse_mat
   !! \extends psb_base_mod::psb_base_sparse_mat
-  !! This module contains the definition of the psb_z_base_sparse_mat
-  !! type, extending the psb_base_sparse_mat  to define a middle
-  !! level  complex(psb_dpk_) sparse matrix object.
+  !! The psb_z_base_sparse_mat type, extending psb_base_sparse_mat,
+  !! defines a middle level  complex(psb_dpk_) sparse matrix object.
   !! This class object itself does not have any additional members
   !! with respect to those of the base class. No methods can be fully
   !! implemented at this level, but we can define the interface for the
   !! computational methods requiring the knowledge of the underlying
   !! field, such as the matrix-vector product; this interface is defined,
   !! but is supposed to be overridden at the leaf level.
-  !!
-  !! This module also contains the definition of the
-  !! psb_z_coo_sparse_mat type and the related methods. This is the
-  !! reference type for all the format transitions, copies and mv unless
-  !! methods are implemented that allow the direct transition from one
-  !! format to another. It is defined here since all other classes must
-  !! refer to it per the MEDIATOR design pattern.
   !!
   !! About the method MOLD: this has been defined for those compilers
   !! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
@@ -123,10 +115,23 @@ module psb_z_base_mat_mod
   private :: z_base_cp_from, z_base_mv_from
   
   
+  !> \namespace  psb_base_mod  \class  psb_z_base_sparse_mat
+  !! \extends psb_base_mod::psb_base_sparse_mat
+  !! 
+  !! psb_z_coo_sparse_mat type and the related methods. This is the
+  !! reference type for all the format transitions, copies and mv unless
+  !! methods are implemented that allow the direct transition from one
+  !! format to another. It is defined here since all other classes must
+  !! refer to it per the MEDIATOR design pattern.
+  !!
   type, extends(psb_z_base_sparse_mat) :: psb_z_coo_sparse_mat
-    
+    !> Number of nonzeros.
     integer(psb_ipk_) :: nnz
-    integer(psb_ipk_), allocatable :: ia(:), ja(:)
+    !> Row indices.
+    integer(psb_ipk_), allocatable :: ia(:)
+    !> Column indices.
+    integer(psb_ipk_), allocatable :: ja(:)
+    !> Coefficient values. 
     complex(psb_dpk_), allocatable :: val(:)
     
   contains
@@ -206,20 +211,40 @@ module psb_z_base_mat_mod
   !
   ! == =================
 
-  !
-  !   CSPUT: Hand over a set of values to A. 
-  !   Simple description: 
-  !   A(IA(1:nz),JA(1:nz)) = VAL(1:NZ)
-  !
-  !   Catches:
-  !     1. If A is in the BUILD state, then this method
-  !        can only be called for COO matrice, in which case it
-  !        is more like queueing coefficients for later processing;
-  !     2. If A is in the UPDATE state, then every derived class must
-  !        implement it;
-  !     3. In the UPDATE state, depending on the value of DUPL flag 
-  !        inside A, it will be A=VAL or A = A + VAL
-  !
+  !> Function  csput:
+  !! \brief Insert coefficients. 
+  !!
+  !!
+  !!         Given  a list of NZ triples
+  !!           (IA(i),JA(i),VAL(i))
+  !!         record a new coefficient in A such that
+  !!            A(IA(1:nz),JA(1:nz)) = VAL(1:NZ).
+  !!            
+  !!         The internal components IA,JA,VAL are reallocated as necessary.
+  !!         Constraints:
+  !!         - If the matrix A is in the BUILD state, then the method will
+  !!           only work for COO matrices, all other format will throw an error.
+  !!           In this case coefficients are queued inside A for further processing.
+  !!         - If the matrix A is in the UPDATE state, then it can be in any format;
+  !!           the update operation will perform either
+  !!               A(IA(1:nz),JA(1:nz)) = VAL(1:NZ)
+  !!           or
+  !!               A(IA(1:nz),JA(1:nz)) =  A(IA(1:nz),JA(1:nz))+VAL(1:NZ)
+  !!           according to the value of DUPLICATE.
+  !!         - Coefficients with (IA(I),JA(I)) outside the ranges specified by
+  !!           IMIN:IMAX,JMIN:JMAX will be ignored. 
+  !!           
+  !!  \param nz    number of triples in input
+  !!  \param ia(:)  the input row indices
+  !!  \param ja(:)  the input col indices
+  !!  \param val(:)  the input coefficients
+  !!  \param imin  minimum row index 
+  !!  \param imax  maximum row index 
+  !!  \param jmin  minimum col index 
+  !!  \param jmax  maximum col index 
+  !!  \param info  return code
+  !!  \param gtl(:) [none] an array to renumber indices   (iren(ia(:)),iren(ja(:))
+  !!
   !
   interface 
     subroutine psb_z_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
@@ -233,27 +258,36 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! CSGET methods: getrow, getblk, clip.
-  !   getrow is the basic method, the other two are
-  !   basically convenient wrappers/shorthand. 
-  ! 
-  !    out(:) = A(imin:imax,:)
-  ! 
-  !  The two methods differ on the output format
-  !  
-  ! GETROW returns as the set
-  !      NZ, IA(1:nz), JA(1:nz), VAL(1:NZ)
   !
-  ! Optional arguments:
-  !    JMIN,JMAX: get A(IMIN:IMAX,JMIN:JMAX),
-  !       default 1:ncols
-  !    APPEND: append at the end of data, in which case
-  !            # used entries must be in NZ
-  !    RSCALE, CSCALE: scale output indices at base 1. 
+  !> Function  csgetrow:
+  !! \brief Get a (subset of) row(s)
+  !!        
+  !!        getrow is the basic method by which the other (getblk, clip) can
+  !!        be implemented.
+  !!        
+  !!        Returns the set
+  !!           NZ, IA(1:nz), JA(1:nz), VAL(1:NZ)
+  !!         each identifying the position of a nonzero in A
+  !!         between row indices IMIN:IMAX; 
+  !!         IA,JA are reallocated as necessary.
+  !!         
+  !!  \param imin  the minimum row index we are interested in 
+  !!  \param imax  the minimum row index we are interested in 
+  !!  \param nz the number of output coefficients
+  !!  \param ia(:)  the output row indices
+  !!  \param ja(:)  the output col indices
+  !!  \param val(:)  the output coefficients
+  !!  \param info  return code
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!           
   !
-  ! GETROW must be overridden by all data formats.
-  !
-  
   interface 
     subroutine psb_z_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -272,13 +306,25 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! CSGET methods: getrow, getblk.
-  !    out(:) = A(imin:imax,:)
-  ! 
-  ! GETBLK returns a pbs_z_coo_sparse_mat with
-  !      the same contents.
-  !      Default implementation at base level
-  !      in terms of (derived) GETROW
+  !> Function  csgetblk:
+  !! \brief Get a (subset of) row(s)
+  !!        
+  !!        getblk is very similar to getrow, except that the output
+  !!        is packaged in a psb_z_coo_sparse_mat object
+  !!         
+  !!  \param imin  the minimum row index we are interested in 
+  !!  \param imax  the minimum row index we are interested in 
+  !!  \param b     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!           
   !
   interface 
     subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
@@ -296,12 +342,26 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! CLIP: extract a subset
-  !  B(:,:) = A(imin:imax,jmin:jmax)
-  !  control: rscale,cscale as in getblk above.
-  !  
-  !  Default implementation at base level in terms of
-  !  GETBLK. 
+  !
+  !> Function  csclip:
+  !! \brief Get a submatrix.
+  !!        
+  !!        csclip is practically identical to getblk.
+  !!        One of them has to go away.....
+  !!         
+  !!  \param b     the output submatrix
+  !!  \param info  return code
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!           
   !
   interface 
     subroutine psb_z_base_csclip(a,b,info,&
@@ -316,9 +376,13 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! GET_DIAG method
-  ! 
-  !   D(i) = A(i:i), i=1:min(nrows,ncols)
+  !> Function  get_diag:
+  !! \brief Extract the diagonal of A. 
+  !!        
+  !!   D(i) = A(i:i), i=1:min(nrows,ncols)
+  !!
+  !! \param d(:)  The output diagonal
+  !! \param info  return code. 
   ! 
   interface 
     subroutine psb_z_base_get_diag(a,d,info) 
@@ -330,10 +394,13 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! MOLD: make B have the same dinamyc type
-  !       as A.
-  !       For compilers not supporting
-  !          allocate(  mold=  )
+  !> Function  mold:
+  !! \brief Allocate a class(psb_z_base_sparse_mat) with the
+  !!     same dynamic type as the input.
+  !!     This is equivalent to allocate(  mold=  ) and is provided
+  !!     for those compilers not yet supporting mold.
+  !!   \param b The output variable
+  !!   \param info return code
   ! 
   interface 
     subroutine psb_z_base_mold(a,b,info) 
@@ -346,17 +413,12 @@ module psb_z_base_mat_mod
   
   
   !
-  ! These are the methods implementing the MEDIATOR pattern
-  ! to allow switch between arbitrary.
-  ! Indeed, the TO/FROM FMT can be implemented at the base level
-  ! in terms of the TO/FROM COO per the MEDIATOR design pattern.
-  ! This does not prevent most of the derived classes to
-  ! provide their own versions with shortcuts.
-  !  A%{MV|CP}_{TO|FROM}_{FMT|COO}
-  !  MV|CP: copy versus move, i.e. deallocate
-  !  TO|FROM: invoked from source or target object
-  !
-  !
+  !> Function  cp_to_coo:
+  !! \brief Copy and convert to psb_z_coo_sparse_mat
+  !!        Invoked from the source object.
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_cp_to_coo(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_z_coo_sparse_mat, psb_dpk_
@@ -366,6 +428,13 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_cp_to_coo
   end interface
   
+  !
+  !> Function  cp_from_coo:
+  !! \brief Copy and convert from psb_z_coo_sparse_mat
+  !!        Invoked from the target object.
+  !!   \param b The input variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_cp_from_coo(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_z_coo_sparse_mat, psb_dpk_
@@ -375,6 +444,14 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_cp_from_coo
   end interface
   
+  !
+  !> Function  cp_to_fmt:
+  !! \brief Copy and convert to a class(psb_z_base_sparse_mat)
+  !!        Invoked from the source object. Can be implemented by
+  !!        simply invoking a%cp_to_coo(tmp) and then b%cp_from_coo(tmp).
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_cp_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -384,6 +461,14 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_cp_to_fmt
   end interface
   
+  !
+  !> Function  cp_from_fmt:
+  !! \brief Copy and convert from a class(psb_z_base_sparse_mat)
+  !!        Invoked from the target object. Can be implemented by
+  !!        simply invoking b%cp_to_coo(tmp) and then a%cp_from_coo(tmp).
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_cp_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -393,6 +478,13 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_cp_from_fmt
   end interface
   
+  !
+  !> Function  mv_to_coo:
+  !! \brief Convert to psb_z_coo_sparse_mat, freeing the source.
+  !!        Invoked from the source object.
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_mv_to_coo(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_z_coo_sparse_mat, psb_dpk_
@@ -402,6 +494,13 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_mv_to_coo
   end interface
   
+  !
+  !> Function  mv_from_coo:
+  !! \brief Convert from psb_z_coo_sparse_mat, freeing the source.
+  !!        Invoked from the target object.
+  !!   \param b The input variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_mv_from_coo(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_z_coo_sparse_mat, psb_dpk_
@@ -411,6 +510,14 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_mv_from_coo
   end interface
   
+  !
+  !> Function  mv_to_fmt:
+  !! \brief Convert to a class(psb_z_base_sparse_mat), freeing the source.
+  !!        Invoked from the source object. Can be implemented by
+  !!        simply invoking a%mv_to_coo(tmp) and then b%mv_from_coo(tmp).
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_mv_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -420,6 +527,14 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_mv_to_fmt
   end interface
   
+  !
+  !> Function  mv_from_fmt:
+  !! \brief Convert from a class(psb_z_base_sparse_mat), freeing the source.
+  !!        Invoked from the target object. Can be implemented by
+  !!        simply invoking b%mv_to_coo(tmp) and then a%mv_from_coo(tmp).
+  !!   \param b The output variable
+  !!   \param info return code
+  !  
   interface 
     subroutine psb_z_base_mv_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -430,11 +545,13 @@ module psb_z_base_mat_mod
   end interface
   
   !
-  ! Transpose methods.
-  ! You can always default to COO to do the actual
-  ! transpose work. 
-  !
-  interface 
+  !> Function  transp:
+  !! \brief Transpose. Can always be implemented by staging through a COO
+  !!        temporary for which transpose is very easy. 
+  !!        Copyout version
+  !!   \param b The output variable
+  !  
+   interface 
     subroutine psb_z_base_transp_2mat(a,b)
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
       class(psb_z_base_sparse_mat), intent(in) :: a
@@ -442,6 +559,13 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_transp_2mat
   end interface
   
+  !
+  !> Function  transc:
+  !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
+  !!        temporary for which transpose is very easy. 
+  !!        Copyout version.
+  !!   \param b The output variable
+  !  
   interface  
     subroutine psb_z_base_transc_2mat(a,b)
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_base_sparse_mat, psb_dpk_
@@ -450,6 +574,12 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_transc_2mat
   end interface
   
+  !
+  !> Function  transp:
+  !! \brief Transpose. Can always be implemented by staging through a COO
+  !!        temporary for which transpose is very easy. 
+  !!        In-place version.
+  !  
   interface 
     subroutine psb_z_base_transp_1mat(a)
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -457,6 +587,12 @@ module psb_z_base_mat_mod
     end subroutine psb_z_base_transp_1mat
   end interface
   
+  !
+  !> Function  transc:
+  !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
+  !!        temporary for which transpose is very easy. 
+  !!        In-place version.
+  !  
   interface 
     subroutine psb_z_base_transc_1mat(a)
       import :: psb_ipk_, psb_z_base_sparse_mat, psb_dpk_
@@ -684,7 +820,11 @@ module psb_z_base_mat_mod
   ! COO interfaces
   !
   ! == ===============
-  
+
+  !
+  !> 
+  !! \see psb_base_mat_mod::psb_base_reallocate_nz
+  !
   interface
     subroutine  psb_z_coo_reallocate_nz(nz,a) 
       import :: psb_ipk_, psb_z_coo_sparse_mat
