@@ -601,13 +601,21 @@ module psb_s_base_mat_mod
   end interface
   
   !
-  ! Matrix-vector products. 
-  !  Y = alpha*A*X + beta*Y
-  !  
-  !  vect_mv relies on csmv for those data types
-  !  not specifically using the encapsulation to handle
-  !  foreign data. 
-  !
+  !> Function  csmm:
+  !! \brief Product by a dense rank 2 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:,:) the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:,:) the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !!
   !
   interface 
     subroutine psb_s_base_csmm(alpha,a,x,beta,y,info,trans)
@@ -620,6 +628,22 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_csmm
   end interface
   
+  !> Function  csmv:
+  !! \brief Product by a dense rank 1 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:)   the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:)   the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !!
+  !
   interface 
     subroutine psb_s_base_csmv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
@@ -631,6 +655,22 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_csmv
   end interface
   
+  !> Function  vect_mv:
+  !! \brief Product by an encapsulated array type(psb_s_vect_type)
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x      the input X
+  !! \param beta   Scaling factor for y
+  !! \param y      the input/output  Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !!
+  !
   interface 
     subroutine psb_s_base_vect_mv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_s_base_vect_type
@@ -649,6 +689,26 @@ module psb_s_base_mat_mod
   ! level, and they take care of the SCALE and D control arguments.
   ! So the derived classes need to override only the INNER_ methods.
   !
+  
+  !
+  !> Function  cssm:
+  !! \brief Triangular system solve by a dense rank 2 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !!        Internal workhorse called by cssm. 
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:,:) the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:,:) the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !!
+  !
   interface 
     subroutine psb_s_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
@@ -660,6 +720,29 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_inner_cssm
   end interface
   
+  
+  !
+  !> Function  cssv:
+  !! \brief Triangular system solve by a dense rank 1 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !!        Internal workhorse called by cssv. 
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:)   the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:)   the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
+  !!               or on the Left (L)  i.e.  DAx
+  !! \param D(:)   [none] Diagonal for scaling. 
+  !!
+  !
   interface 
     subroutine psb_s_base_inner_cssv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
@@ -671,6 +754,25 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_inner_cssv
   end interface
   
+  !
+  !> Function  inner_vect_cssv:
+  !! \brief Triangular system solve by
+  !!        an encapsulated array type(psb_s_vect_type)
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !!        Internal workhorse called by vect_cssv. 
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x      the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y     the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !
   interface 
     subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,  psb_s_base_vect_type
@@ -682,6 +784,26 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_inner_vect_sv
   end interface
   
+  !
+  !> Function  cssm:
+  !! \brief Triangular system solve by a dense rank 2 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:,:) the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:,:) the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
+  !!               or on the Left (L)  i.e.  DAx
+  !! \param D(:)   [none] Diagonal for scaling. 
+  !!
+  !
   interface 
     subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
@@ -694,6 +816,26 @@ module psb_s_base_mat_mod
     end subroutine psb_s_base_cssm
   end interface
   
+  !
+  !> Function  cssv:
+  !! \brief Triangular system solve by a dense rank 1 array.
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x(:)   the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y(:)   the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
+  !!               or on the Left (L)  i.e.  DAx
+  !! \param D(:)   [none] Diagonal for scaling. 
+  !!
+  !
   interface 
     subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
@@ -705,7 +847,28 @@ module psb_s_base_mat_mod
       real(psb_spk_), intent(in), optional :: d(:)
     end subroutine psb_s_base_cssv
   end interface
-  
+    
+  !
+  !> Function  vect_cssv:
+  !! \brief Triangular system solve by
+  !!        an encapsulated array type(psb_s_vect_type)
+  !!
+  !!        Compute
+  !!           Y = alpha*op(A^-1)*X + beta*Y
+  !!
+  !! \param alpha  Scaling factor for Ax
+  !! \param A      the input sparse matrix
+  !! \param x      the input dense X
+  !! \param beta   Scaling factor for y
+  !! \param y     the input/output dense Y
+  !! \param info   return code
+  !! \param trans  [N] Whether to use A (N), its transpose (T)
+  !!               or its conjugate transpose (C)
+  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
+  !!               or on the Left (L)  i.e.  DAx
+  !! \param D      [none] Diagonal for scaling. 
+  !!
+  !
   interface 
     subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,psb_s_base_vect_type
