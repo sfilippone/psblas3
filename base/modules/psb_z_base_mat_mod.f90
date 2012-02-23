@@ -38,7 +38,7 @@ module psb_z_base_mat_mod
 
 
   !> \namespace  psb_base_mod  \class  psb_z_base_sparse_mat
-  !! \extends psb_base_mod::psb_base_sparse_mat
+  !! \extends psb_base_mat_mod::psb_base_sparse_mat
   !! The psb_z_base_sparse_mat type, extending psb_base_sparse_mat,
   !! defines a middle level  complex(psb_dpk_) sparse matrix object.
   !! This class object itself does not have any additional members
@@ -115,8 +115,8 @@ module psb_z_base_mat_mod
   private :: z_base_cp_from, z_base_mv_from
   
   
-  !> \namespace  psb_base_mod  \class  psb_z_base_sparse_mat
-  !! \extends psb_base_mod::psb_base_sparse_mat
+  !> \namespace  psb_base_mod  \class  psb_z_coo_sparse_mat
+  !! \extends psb_z_base_mat_mod::psb_z_base_sparse_mat
   !! 
   !! psb_z_coo_sparse_mat type and the related methods. This is the
   !! reference type for all the format transitions, copies and mv unless
