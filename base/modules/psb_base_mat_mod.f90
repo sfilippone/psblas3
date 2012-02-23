@@ -201,6 +201,7 @@ module psb_base_mat_mod
   end type psb_base_sparse_mat
 
   !>  Function: psb_base_get_nz_row
+  !! \memberof  psb_base_sparse_mat
   !!  Interface for  the get_nz_row method. Equivalent to:
   !!    count(A(idx,:)/=0)
   !!    \param idx   The line we are interested in.
@@ -216,6 +217,7 @@ module psb_base_mat_mod
   
   !
   !>  Function: psb_base_get_nzeros
+  !! \memberof  psb_base_sparse_mat
   !!  Interface for  the get_nzeros method. Equivalent to: 
   !!    count(A(:,:)/=0) 
   !
@@ -228,6 +230,7 @@ module psb_base_mat_mod
   end interface
 
   !> Function get_size
+  !! \memberof  psb_base_sparse_mat
   !!  how many items can A hold with
   !!           its current space allocation?
   !!           (as opposed to how many are
@@ -243,6 +246,7 @@ module psb_base_mat_mod
 
   !
   !> Function reinit: transition state from ASB to UPDATE
+  !! \memberof  psb_base_sparse_mat
   !!  \param clear [true] explicitly zero out coefficients.
   !    
   interface 
@@ -256,6 +260,7 @@ module psb_base_mat_mod
 
   !
   !> Function
+  !! \memberof  psb_base_sparse_mat
   !!  print on file in Matrix Market format. 
   !!  \param iout the output unit
   !!  \param iv(:) [none] renumber both row and column indices
@@ -277,6 +282,7 @@ module psb_base_mat_mod
 
   !
   !> Function  getptn:
+  !! \memberof  psb_base_sparse_mat
   !! \brief Get the pattern.
   !!
   !!
@@ -319,6 +325,7 @@ module psb_base_mat_mod
   
   !
   !> Function  get_neigh:
+  !! \memberof  psb_base_sparse_mat
   !! \brief Get the neighbours.
   !!
   !!
@@ -346,6 +353,7 @@ module psb_base_mat_mod
   !         
   !
   !> Function  allocate_mnnz
+  !! \memberof  psb_base_sparse_mat
   !! \brief Three-parameters version of allocate
   !!
   !!  \param m  number of rows
@@ -365,6 +373,7 @@ module psb_base_mat_mod
   !         
   !
   !> Function  reallocate_nz
+  !! \memberof  psb_base_sparse_mat
   !! \brief One--parameters version of (re)allocate
   !!
   !!  \param nz  number of nonzeros to allocate for
@@ -379,6 +388,7 @@ module psb_base_mat_mod
 
   !         
   !> Function  free
+  !! \memberof  psb_base_sparse_mat
   !! \brief destructor
   !
   interface 
@@ -390,6 +400,7 @@ module psb_base_mat_mod
   
   !         
   !> Function  trim 
+  !! \memberof  psb_base_sparse_mat
   !! \brief Memory trim
   !! Make sure the memory allocation of the sparse matrix is as tight as
   !! possible given the actual number of nonzeros it contains. 
@@ -407,6 +418,7 @@ contains
   
   !         
   !> Function  free
+  !! \memberof  psb_base_sparse_mat
   !! \brief Memory occupation in byes
   !
   function psb_base_sizeof(a) result(res)
@@ -418,6 +430,7 @@ contains
  
   !         
   !> Function  get_fmt
+  !! \memberof  psb_base_sparse_mat
   !! \brief return a short descriptive name (e.g. COO CSR etc.)
   !
   function psb_base_get_fmt() result(res)
