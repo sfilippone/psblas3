@@ -14,17 +14,22 @@ the module \verb|psb_base_mod|; this will have to be included by every
 user subroutine that makes use of the library. The preconditioners are
 defined in the module \verb|psb_prec_mod|
 
-Real and complex data types are parametrized with a kind type defined
-in the library as follows: 
+Integer, real and complex data types are parametrized with a kind type
+defined in the library as follows: 
 \begin{description}
 \item[psb\_spk\_] Kind parameter for short precision real and complex
   data; corresponds to a \verb|REAL| declaration and is
-  normally 4 bytes. 
+  normally 4 bytes; 
 \item[psb\_dpk\_] Kind parameter for long precision real and complex
   data; corresponds to a \verb|DOUBLE PRECISION| declaration and is
-  normally 8 bytes. 
-\item[psb\_long\_int\_k\_] Kind parameter for long integers, used by
-  the \verb|psb_sizeof| utility.
+  normally 8 bytes;
+\item[psb\_ipk\_] Kind parameter for integer data;
+  with default build options this is a 4 bytes integer, but there is
+  (highly) experimental support for 8-bytes integers;  
+\item[psb\_mpik\_] Kind parameter for 4-bytes integer data, as is
+  always used by MPI; 
+\item[psb\_long\_int\_k\_] Kind parameter for long (8 bytes) integers, 
+  which are always used by the \verb|sizeof| methods.
 \end{description}
 Together with the classes attributes we also discuss their
 methods.  Most methods detailed here only act on the local variable,
@@ -184,7 +189,7 @@ nr = desc%get_local_rows()
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \descdata.
+% Specified as: a object of type \descdata.
 \end{description}
 
 \begin{description}
@@ -210,7 +215,7 @@ nc = desc%get_local_cols()
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \descdata.
+% Specified as: a object of type \descdata.
 \end{description}
 
 \begin{description}
@@ -237,7 +242,7 @@ nr = desc%get_global_rows()
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \descdata.
+% Specified as: a object of type \descdata.
 \end{description}
 
 \begin{description}
@@ -260,7 +265,7 @@ nr = desc%get_global_cols()
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \descdata.
+% Specified as: a object of type \descdata.
 \end{description}
 
 \begin{description}
@@ -282,7 +287,7 @@ ictxt = desc%get_context()
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \descdata.
+% Specified as: a object of type \descdata.
 \end{description}
 
 \begin{description}
@@ -365,7 +370,7 @@ processes.
 
 \subsection{Sparse Matrix class}
 \label{sec:spmat}
-The \hypertarget{spdata}{{\tt psb\_spmat\_type}} class
+The \hypertarget{spdata}{{\tt psb\_Tspmat\_type}} class
 contains all information about the local portion of the sparse matrix and   
 its storage mode. Its design is 
 based on the STATE design pattern~\cite{DesignPatterns} as detailed
@@ -378,7 +383,8 @@ data type and precision variants
 \item[C] Single precision complex;
 \item[Z] Double precision complex.
 \end{description}
-The actual data is contained in the polymorphic component \verb|a%a|; its
+The actual data is contained in the polymorphic component \verb|a%a|
+of type  \hypertarget{spbasedata}{{\tt psb\_T\_base\_sparse\_mat}}; its
 specific layout can be chosen dynamically among the predefined types,
 or an entirely new storage layout can be implemented and passed to the
 library at runtime via the \verb|psb_spasb| routine. 
@@ -442,7 +448,7 @@ nr = a%get_nrows()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -465,7 +471,7 @@ nc = a%get_ncols()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -489,7 +495,7 @@ nz = a%get_nnzeros()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -519,7 +525,7 @@ maxnz = a%get_size()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -543,7 +549,7 @@ memory_size = a%sizeof()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -566,7 +572,7 @@ write(*,*) a%get_fmt()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -592,7 +598,7 @@ if (a%is_asb()) then
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -621,8 +627,8 @@ Scope: {\bf local}\\
 
 
 \subsection{Dense Vector Data Structure}
-\label{sec:spmat}
-The \hypertarget{vdata}{{\tt psb\_vect\_type}} data structure
+\label{sec:vecttype}
+The \hypertarget{vdata}{{\tt psb\_T\_vect\_type}} data structure
 encapsulates the dense vectors in a way similar to sparse matrices. 
 The user will not, in general, access the vector components directly,
 but rather via the routines of sec.~\ref{sec:toolsrout}. Among other
@@ -640,10 +646,12 @@ data type and precision variants
 \item[C] Single precision complex;
 \item[Z] Double precision complex.
 \end{description}
-The actual data is contained in the polymorphic component \verb|a%a|; its
-specific layout can be chosen dynamically among the predefined types,
-or an entirely new storage layout can be implemented and passed to the
-library at runtime via the \verb|psb_spasb| routine. 
+The actual data is contained in the polymorphic component \verb|v%v|; 
+the separation between the application and the actual data is
+essential for cases where it is necessary to link to data storage made
+available elsewhere outside the direct control of the
+compiler/application, e.g. data stored in a graphics  accelerator's
+private memory. 
 \begin{figure}[h!]
   \begin{Sbox}
     \begin{minipage}[tl]{0.85\textwidth}
@@ -665,7 +673,7 @@ library at runtime via the \verb|psb_spasb| routine.
   \end{center}
   \caption{\label{fig:vectype} 
     The PSBLAS defined data type that
-    contains a dense vector..} 
+    contains a dense vector.} 
 \end{figure}
 
 \subsubsection{Methods}
@@ -683,7 +691,7 @@ nr = v%get_nrows()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -709,7 +717,7 @@ memory_size = v%sizeof()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}
@@ -732,7 +740,7 @@ extv = v%get_vect()
 Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
-% Specified as: a structured data of type \spdata.
+% Specified as: a object of type \spdata.
 \end{description}
 
 \begin{description}

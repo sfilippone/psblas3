@@ -81,7 +81,7 @@ call psb_geaxpby(alpha, x, beta, y, desc_a, info)
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1516"></A>
+<DIV ALIGN="CENTER"><A NAME="1533"></A>
 <TABLE>
 <CAPTION><STRONG>Table 1:</STRONG>
 Data types</CAPTION>
@@ -89,13 +89,13 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">, <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$">, <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -132,7 +132,7 @@ Data types</CAPTION>
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">.
 <BR>
@@ -147,7 +147,7 @@ Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f9
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
@@ -157,10 +157,10 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array 
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type 
 specified in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -194,12 +194,12 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as:  a rank one or two array containing numbers of the type 
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>  containing numbers of the type 
 indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$"> must be the same of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 </DD>
@@ -212,7 +212,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 
 <P>
 </DD>
@@ -235,7 +235,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array containing numbers of the type
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> containing numbers of the type
 indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>

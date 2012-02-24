@@ -57,12 +57,12 @@ psb_geasum -- 1-Norm of Vector</A>
 
 <P>
 This function computes the 1-norm of a vector <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
 If <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> is a real vector
 it computes 1-norm as:
@@ -82,9 +82,9 @@ asum \leftarrow  \|x_i\|
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
- ALT="$x$"> is a  vector then it computes 1-norm  as:
+ ALT="$x$"> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
@@ -94,7 +94,7 @@ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1
  -->
 
 <IMG
- WIDTH="206" HEIGHT="28" BORDER="0"
+ WIDTH="205" HEIGHT="28" BORDER="0"
  SRC="img39.png"
  ALT="\begin{displaymath}asum \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
@@ -108,7 +108,7 @@ psb_geasum(x, desc_a, info)
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1521"></A>
+<DIV ALIGN="CENTER"><A NAME="1538"></A>
 <TABLE>
 <CAPTION><STRONG>Table 6:</STRONG>
 Data types</CAPTION>
@@ -116,11 +116,11 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="43" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img40.png"
  ALT="$asum$"></TD>
 <TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
@@ -159,7 +159,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 
@@ -170,7 +170,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array 
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90asum">6</A>.
 </DD>
@@ -183,7 +183,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 
 <P>
 </DD>
@@ -192,7 +192,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
 <DD>is the 1-norm of vector <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>

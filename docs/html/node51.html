@@ -70,7 +70,7 @@ x \leftarrow \alpha x
 
 <IMG
  WIDTH="53" HEIGHT="24" BORDER="0"
- SRC="img60.png"
+ SRC="img59.png"
  ALT="\begin{displaymath}x \leftarrow \alpha x \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -78,7 +78,7 @@ x \leftarrow \alpha x
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></STRONG></DT>
 <DD>is a global dense  submatrix.
@@ -87,7 +87,7 @@ where:
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2761"></A>
+<DIV ALIGN="CENTER"><A NAME="2859"></A>
 <TABLE>
 <CAPTION><STRONG>Table 13:</STRONG>
 Data types</CAPTION>
@@ -95,10 +95,10 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">, <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -141,7 +141,7 @@ call psb_halo(x, desc_a, info, alpha, work, data)
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense matrix <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
@@ -168,7 +168,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">.
 <BR>
@@ -180,7 +180,7 @@ Intent: <B>in</B>.
 <BR>
 Default: <IMG
  WIDTH="73" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img61.png"
+ SRC="img60.png"
  ALT="$alpha = 1 $">
 <BR>
 Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90halo">13</A>.
@@ -195,7 +195,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> with the
 POINTER attribute.
@@ -218,7 +218,7 @@ index list on which to base the data exchange.
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense result matrix <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
@@ -248,15 +248,15 @@ An integer value that contains an error code.
 </DD>
 </DL>
 
-<DIV ALIGN="CENTER"><A NAME="fig:try8x8"></A><A NAME="2763"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:try8x8"></A><A NAME="2861"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 7:</STRONG>
 Sample discretization mesh.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="358" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
- SRC="img63.png"
+ WIDTH="357" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
+ SRC="img62.png"
  ALT="\includegraphics[scale=0.45]{figures/try8x8.eps}">
 
 <!-- MATH
@@ -264,7 +264,7 @@ Sample discretization mesh.</CAPTION>
  -->
 <IMG
  WIDTH="1" HEIGHT="2" ALIGN="BOTTOM" BORDER="0"
- SRC="img62.png"
+ SRC="img61.png"
  ALT="\rotatebox{-90}{\includegraphics[scale=0.45]{figures/try8x8}}">
 
 </DIV></TD></TR>
@@ -279,7 +279,7 @@ distribution is such that each process will own 32 entries in the
 index space, with a halo made of 8 entries placed at local indices 33
 through 40. If process 0 assigns an initial value of 1 to its entries
 in the <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> vector, and process 1 assigns a value of 2, then after a
 call to <code>psb_halo</code> the contents of the local vectors will be the

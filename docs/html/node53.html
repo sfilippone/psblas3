@@ -71,7 +71,7 @@ glob\_x \leftarrow collect(loc\_x_i)
 
 <IMG
  WIDTH="163" HEIGHT="28" BORDER="0"
- SRC="img73.png"
+ SRC="img72.png"
  ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -80,19 +80,19 @@ where:
 <DL>
 <DT><STRONG><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ SRC="img73.png"
  ALT="$glob\_x$"></STRONG></DT>
 <DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <IMG
  WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img75.png"
+ SRC="img74.png"
  ALT="$glob\_x_{1:m,1:n}$">
 </DD>
 <DT><STRONG><IMG
  WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
+ SRC="img75.png"
  ALT="$loc\_x_i$"></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <IMG
@@ -101,8 +101,8 @@ process <IMG
  ALT="$i$">.
 </DD>
 <DT><STRONG><IMG
- WIDTH="49" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img77.png"
+ WIDTH="48" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img76.png"
  ALT="$collect$"></STRONG></DT>
 <DD>is the collect function.
 </DD>
@@ -110,7 +110,7 @@ process <IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2769"></A>
+<DIV ALIGN="CENTER"><A NAME="2867"></A>
 <TABLE>
 <CAPTION><STRONG>Table 15:</STRONG>
 Data types</CAPTION>
@@ -119,7 +119,7 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
+ SRC="img77.png"
  ALT="$x_i, y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -163,7 +163,7 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ SRC="img73.png"
  ALT="$glob\_x$">. 
 <BR>
 Scope: <B>local</B> 
@@ -189,7 +189,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <IMG
  WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
+ SRC="img78.png"
  ALT="$root=-1$"> all
   the processes will have a copy of the global vector.
 <BR>
@@ -204,10 +204,10 @@ Specified as: an integer variable <!-- MATH
  -->
 <IMG
  WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img80.png"
+ SRC="img79.png"
  ALT="$-1\le root\le np-1$">, default <IMG
  WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img81.png"
+ SRC="img80.png"
  ALT="$-1$">. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>

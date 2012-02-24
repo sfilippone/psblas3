@@ -57,14 +57,14 @@ psb_genrm2 -- 2-Norm of Vector</A>
 
 <P>
 This function computes the 2-norm of a vector <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
 If <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
- ALT="$x$"> is a double precision real  vector
+ ALT="$x$"> is a  real  vector
 it computes 2-norm as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -82,9 +82,9 @@ nrm2 \leftarrow \sqrt{x^T x}
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
- ALT="$x$"> is double precision complex vector then it computes 2-norm  as:
+ ALT="$x$"> is a complex vector then it computes 2-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
@@ -103,7 +103,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1523"></A>
+<DIV ALIGN="CENTER"><A NAME="1540"></A>
 <TABLE>
 <CAPTION><STRONG>Table 8:</STRONG>
 Data types</CAPTION>
@@ -111,11 +111,11 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="44" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="44" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img45.png"
  ALT="$nrm2$"></TD>
 <TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
@@ -159,7 +159,7 @@ psb_genrm2(x, desc_a, info)
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>
@@ -169,7 +169,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array 
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90nrm2">8</A>.
 </DD>
@@ -182,7 +182,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 
 <P>
 </DD>
@@ -191,7 +191,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>Function Value</STRONG></DT>
 <DD>is the 2-norm of subvector <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 <BR>

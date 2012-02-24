@@ -49,7 +49,7 @@ call psb_halo(x, desc_a, info, alpha, work, data)
 Scope: {\bf local} \\
 Type: {\bf required} \\
 Intent: {\bf inout}.\\
-Specified as:  a rank one or two array with the TARGET attribute
+Specified as:  a rank one or two array or an object of type \vdata\ 
 containing numbers of type specified in
 Table~\ref{tab:f90halo}.
 \item[desc\_a] contains data structures for communications.\\
@@ -67,8 +67,7 @@ Specified as: a number of the data type indicated in Table~\ref{tab:f90halo}.
 Scope: {\bf local} \\
 Type: {\bf optional}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one array of the same type of $x$ with the
-POINTER attribute.
+Specified as: a rank one array of the same type of $x$. 
 \item[data] index list selector.\\
 Scope: {\bf global} \\
 Type: {\bf optional} \\
@@ -209,7 +208,7 @@ call psb_ovrl(x, desc_a, info, update=update_type, work=work)
 Scope: {\bf local} \\
 Type: {\bf required} \\
 Intent: {\bf inout}.\\
-Specified as:  a rank one or two array 
+Specified as:  a rank one or two array or an object of type \vdata\ 
 containing numbers of type specified in
 Table~\ref{tab:f90ovrl}.
 \item[desc\_a] contains data structures for communications.\\

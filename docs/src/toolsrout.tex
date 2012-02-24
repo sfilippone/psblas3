@@ -641,7 +641,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_spasb}
 
 \begin{verbatim}
-call psb_spasb(a, desc_a, info, afmt, upd, dupl)
+call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
 \end{verbatim}
 
 \begin{description}
@@ -653,7 +653,7 @@ Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[afmt] the storage format for the sparse matrix.\\
-Scope: {\bf global}.\\
+Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an array of characters. Defalt:  'CSR'.
@@ -668,6 +668,11 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\item[mold] The desired dynamic type for the internal matrix storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \spbasedata. 
 \end{description}
 
 \begin{description}
@@ -696,6 +701,8 @@ An integer value; 0 means no error has been detected.
   calls to \verb|psb_spins| to update the matrix must be arranged in
   such a way as to produce exactly the same sequence of coefficient
   values as encountered at the first assembly; 
+\item The output storage format need not be the same on all
+  processes; 
 \item On exit from this routine the matrix is in the assembled state,
   and thus is suitable for the computational routines. 
 \end{enumerate}

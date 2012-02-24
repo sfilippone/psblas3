@@ -52,11 +52,11 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00044000000000000000"></A>
-<A NAME="sec:spmat"></A>
+<A NAME="sec:vecttype"></A>
 <BR>
 Dense Vector Data Structure
 </H2>
-The vdata<TT>psb_vect_type</TT> data structure
+The vdata<TT>psb_T_vect_type</TT> data structure
 encapsulates the dense vectors in a way similar to sparse matrices. 
 The user will not, in general, access the vector components directly,
 but rather via the routines of sec.&nbsp;<A HREF="node55.html#sec:toolsrout">6</A>. Among other
@@ -85,16 +85,18 @@ data type and precision variants
 <DD>Double precision complex.
 </DD>
 </DL>
-The actual data is contained in the polymorphic component <code>a%a</code>; its
-specific layout can be chosen dynamically among the predefined types,
-or an entirely new storage layout can be implemented and passed to the
-library at runtime via the <code>psb_spasb</code> routine. 
+The actual data is contained in the polymorphic component <code>v%v</code>; 
+the separation between the application and the actual data is
+essential for cases where it is necessary to link to data storage made
+available elsewhere outside the direct control of the
+compiler/application, e.g. data stored in a graphics  accelerator's
+private memory. 
 
-<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="708"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="723"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
     The PSBLAS defined data type that
-    contains a dense vector..</CAPTION>
+    contains a dense vector.</CAPTION>
 <TR><TD>
 <BR>
    

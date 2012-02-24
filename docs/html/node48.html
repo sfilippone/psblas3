@@ -64,15 +64,15 @@ This subroutine computes the Sparse Matrix by Dense Matrix Product:
 
 <!-- MATH
  \begin{equation}
-y \leftarrow \alpha P_r A P_c x + \beta y
+y \leftarrow \alpha  A  x + \beta y
 \end{equation}
  -->
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_no_tra"></A><IMG
- WIDTH="136" HEIGHT="27" BORDER="0"
+ WIDTH="101" HEIGHT="27" BORDER="0"
  SRC="img48.png"
  ALT="\begin{displaymath}
-y \leftarrow \alpha P_r A P_c x + \beta y
+y \leftarrow \alpha A x + \beta y
 \end{displaymath}"></TD>
 <TD WIDTH=10 ALIGN="RIGHT">
 (1)</TD></TR>
@@ -83,15 +83,15 @@ y \leftarrow \alpha P_r A P_c x + \beta y
 
 <!-- MATH
  \begin{equation}
-y \leftarrow \alpha P_r A^T P_c x + \beta y
+y \leftarrow \alpha  A^T x + \beta y
 \end{equation}
  -->
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_tra"></A><IMG
- WIDTH="145" HEIGHT="27" BORDER="0"
+ WIDTH="112" HEIGHT="27" BORDER="0"
  SRC="img49.png"
  ALT="\begin{displaymath}
-y \leftarrow \alpha P_r A^T P_c x + \beta y
+y \leftarrow \alpha A^T x + \beta y
 \end{displaymath}"></TD>
 <TD WIDTH=10 ALIGN="RIGHT">
 (2)</TD></TR>
@@ -102,15 +102,15 @@ y \leftarrow \alpha P_r A^T P_c x + \beta y
 
 <!-- MATH
  \begin{equation}
-y \leftarrow \alpha P_r A^H P_c x + \beta y
+y \leftarrow \alpha  A^H  x + \beta y
 \end{equation}
  -->
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_con"></A><IMG
- WIDTH="148" HEIGHT="27" BORDER="0"
+ WIDTH="114" HEIGHT="27" BORDER="0"
  SRC="img50.png"
  ALT="\begin{displaymath}
-y \leftarrow \alpha P_r A^H P_c x + \beta y
+y \leftarrow \alpha A^H x + \beta y
 \end{displaymath}"></TD>
 <TD WIDTH=10 ALIGN="RIGHT">
 (3)</TD></TR>
@@ -121,10 +121,10 @@ y \leftarrow \alpha P_r A^H P_c x + \beta y
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></STRONG></DT>
-<DD>is the global dense submatrix <IMG
+<DD>is the global dense matrix <IMG
  WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img51.png"
  ALT="$x_{:, :}$">
@@ -133,7 +133,7 @@ where:
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$"></STRONG></DT>
-<DD>is the global dense submatrix <IMG
+<DD>is the global dense matrix <IMG
  WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img52.png"
  ALT="$y_{:, :}$">
@@ -142,22 +142,16 @@ where:
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></STRONG></DT>
-<DD>is the global sparse submatrix <IMG
+<DD>is the global sparse matrix <IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$">
-</DD>
-<DT><STRONG><IMG
- WIDTH="45" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img53.png"
- ALT="$P_r, P_c$"></STRONG></DT>
-<DD>are the permutation matrices.
 </DD>
 </DL>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1526"></A>
+<DIV ALIGN="CENTER"><A NAME="1543"></A>
 <TABLE>
 <CAPTION><STRONG>Table 11:</STRONG>
 Data types</CAPTION>
@@ -168,13 +162,13 @@ Data types</CAPTION>
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$">, <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">, <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$">, <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -218,7 +212,7 @@ call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">.
 <BR>
@@ -244,12 +238,12 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: an object of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 
@@ -260,10 +254,10 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">11</A>.  The rank of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -298,13 +292,13 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as:  a rank one or two array 
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">11</A>. The rank of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$"> must be the same of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 </DD>
@@ -317,10 +311,10 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>trans</STRONG></DT>
-<DD>indicate what kind of operation to perform.
+<DD>indicates what kind of operation to perform.
 <DL>
 <DT><STRONG>trans = N</STRONG></DT>
 <DD>the operation is specified by equation <A HREF="#eq:f90spmm_no_tra">1</A>
@@ -341,8 +335,8 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <IMG
- WIDTH="78" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img54.png"
+ WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img53.png"
  ALT="$trans = N$">
 <BR>
 Specified as: a character variable.
@@ -359,7 +353,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> and <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -373,7 +367,7 @@ the TARGET attribute.
 <DD>
 </DD>
 <DT><STRONG>y</STRONG></DT>
-<DD>the local portion of result submatrix <IMG
+<DD>the local portion of result matrix <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$">.

@@ -69,22 +69,31 @@ user subroutine that makes use of the library. The preconditioners are
 defined in the module <code>psb_prec_mod</code>
 
 <P>
-Real and complex data types are parametrized with a kind type defined
-in the library as follows: 
+Integer, real and complex data types are parametrized with a kind type
+defined in the library as follows: 
 <DL>
 <DT><STRONG>psb_spk_</STRONG></DT>
 <DD>Kind parameter for short precision real and complex
   data; corresponds to a <code>REAL</code> declaration and is
-  normally 4 bytes. 
+  normally 4 bytes; 
 </DD>
 <DT><STRONG>psb_dpk_</STRONG></DT>
 <DD>Kind parameter for long precision real and complex
   data; corresponds to a <code>DOUBLE PRECISION</code> declaration and is
-  normally 8 bytes. 
+  normally 8 bytes;
+</DD>
+<DT><STRONG>psb_ipk_</STRONG></DT>
+<DD>Kind parameter for integer data;
+  with default build options this is a 4 bytes integer, but there is
+  (highly) experimental support for 8-bytes integers;  
+</DD>
+<DT><STRONG>psb_mpik_</STRONG></DT>
+<DD>Kind parameter for 4-bytes integer data, as is
+  always used by MPI; 
 </DD>
 <DT><STRONG>psb_long_int_k_</STRONG></DT>
-<DD>Kind parameter for long integers, used by
-  the <code>psb_sizeof</code> utility.
+<DD>Kind parameter for long (8 bytes) integers, 
+  which are always used by the <code>sizeof</code> methods.
 </DD>
 </DL>
 Together with the classes attributes we also discuss their

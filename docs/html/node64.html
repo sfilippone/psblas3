@@ -57,7 +57,7 @@ psb_spasb -- Sparse matrix assembly routine</A>
 
 <P>
 <PRE>
-call psb_spasb(a, desc_a, info, afmt, upd, dupl)
+call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
 </PRE>
 
 <P>
@@ -82,7 +82,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>afmt</STRONG></DT>
 <DD>the storage format for the sparse matrix.
 <BR>
-Scope: <B>global</B>.
+Scope: <B>local</B>.
 <BR>
 Type: <B>optional</B>.
 <BR>
@@ -113,6 +113,17 @@ Intent: <B>in</B>.
 Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
 <code>psb_dupl_add_</code>, <code>psb_dupl_err_</code>.
 </DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal matrix storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
+</DD>
 </DL>
 
 <P>
@@ -129,7 +140,7 @@ Type:<B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -161,6 +172,9 @@ An integer value; 0 means no error has been detected.
   calls to <code>psb_spins</code> to update the matrix must be arranged in
   such a way as to produce exactly the same sequence of coefficient
   values as encountered at the first assembly; 
+</LI>
+<LI>The output storage format need not be the same on all
+  processes; 
 </LI>
 <LI>On exit from this routine the matrix is in the assembled state,
   and thus is suitable for the computational routines. 

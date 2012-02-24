@@ -1,4 +1,4 @@
-all: guide doxy
+all: guide 
 
 guide:
 	cd src && $(MAKE)
