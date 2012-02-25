@@ -212,7 +212,7 @@ module psb_c_base_mat_mod
   ! == =================
 
   !> Function  csput:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Insert coefficients. 
   !!
   !!
@@ -261,7 +261,7 @@ module psb_c_base_mat_mod
   !
   !
   !> Function  csgetrow:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!        
   !!        getrow is the basic method by which the other (getblk, clip) can
@@ -309,7 +309,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  csgetblk:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!        
   !!        getblk is very similar to getrow, except that the output
@@ -347,7 +347,7 @@ module psb_c_base_mat_mod
   !
   !
   !> Function  csclip:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Get a submatrix.
   !!        
   !!        csclip is practically identical to getblk.
@@ -381,7 +381,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  get_diag:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Extract the diagonal of A. 
   !!        
   !!   D(i) = A(i:i), i=1:min(nrows,ncols)
@@ -400,7 +400,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  mold:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Allocate a class(psb_c_base_sparse_mat) with the
   !!     same dynamic type as the input.
   !!     This is equivalent to allocate(  mold=  ) and is provided
@@ -420,7 +420,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cp_to_coo:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Copy and convert to psb_c_coo_sparse_mat
   !!        Invoked from the source object.
   !!   \param b The output variable
@@ -437,7 +437,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cp_from_coo:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Copy and convert from psb_c_coo_sparse_mat
   !!        Invoked from the target object.
   !!   \param b The input variable
@@ -454,7 +454,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cp_to_fmt:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Copy and convert to a class(psb_c_base_sparse_mat)
   !!        Invoked from the source object. Can be implemented by
   !!        simply invoking a%cp_to_coo(tmp) and then b%cp_from_coo(tmp).
@@ -472,7 +472,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cp_from_fmt:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Copy and convert from a class(psb_c_base_sparse_mat)
   !!        Invoked from the target object. Can be implemented by
   !!        simply invoking b%cp_to_coo(tmp) and then a%cp_from_coo(tmp).
@@ -490,7 +490,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  mv_to_coo:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Convert to psb_c_coo_sparse_mat, freeing the source.
   !!        Invoked from the source object.
   !!   \param b The output variable
@@ -507,7 +507,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  mv_from_coo:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Convert from psb_c_coo_sparse_mat, freeing the source.
   !!        Invoked from the target object.
   !!   \param b The input variable
@@ -524,7 +524,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  mv_to_fmt:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Convert to a class(psb_c_base_sparse_mat), freeing the source.
   !!        Invoked from the source object. Can be implemented by
   !!        simply invoking a%mv_to_coo(tmp) and then b%mv_from_coo(tmp).
@@ -542,7 +542,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  mv_from_fmt:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Convert from a class(psb_c_base_sparse_mat), freeing the source.
   !!        Invoked from the target object. Can be implemented by
   !!        simply invoking b%mv_to_coo(tmp) and then a%mv_from_coo(tmp).
@@ -560,7 +560,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  transp:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy. 
   !!        Copyout version
@@ -576,7 +576,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  transc:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy. 
   !!        Copyout version.
@@ -592,7 +592,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  transp:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy. 
   !!        In-place version.
@@ -606,7 +606,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  transc:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy. 
   !!        In-place version.
@@ -620,7 +620,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  csmm:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Product by a dense rank 2 array.
   !!
   !!        Compute
@@ -648,7 +648,7 @@ module psb_c_base_mat_mod
   end interface
   
   !> Function  csmv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Product by a dense rank 1 array.
   !!
   !!        Compute
@@ -676,7 +676,7 @@ module psb_c_base_mat_mod
   end interface
   
   !> Function  vect_mv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Product by an encapsulated array type(psb_c_vect_type)
   !!
   !!        Compute
@@ -713,7 +713,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cssm:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 2 array.
   !!
   !!        Compute
@@ -745,7 +745,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cssv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 1 array.
   !!
   !!        Compute
@@ -779,7 +779,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  inner_vect_cssv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by
   !!        an encapsulated array type(psb_c_vect_type)
   !!
@@ -810,7 +810,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cssm:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 2 array.
   !!
   !!        Compute
@@ -843,7 +843,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function  cssv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 1 array.
   !!
   !!        Compute
@@ -876,7 +876,7 @@ module psb_c_base_mat_mod
     
   !
   !> Function  vect_cssv:
-  !! \memberof  psb_@X_base_sparse_mat
+  !! \memberof  psb_c_base_sparse_mat
   !! \brief Triangular system solve by
   !!        an encapsulated array type(psb_c_vect_type)
   !!
@@ -909,8 +909,12 @@ module psb_c_base_mat_mod
   end interface
   
   !
-  ! Scale a matrix by a scalar or by a vector.
-  ! Should we handle scale on the columns?? 
+  !> Function  base_scals:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Scale a matrix by a single scalar value
+  !!
+  !! \param d      Scaling factor 
+  !! \param info   return code
   !
   interface 
     subroutine psb_c_base_scals(d,a,info) 
@@ -921,6 +925,15 @@ module psb_c_base_mat_mod
     end subroutine psb_c_base_scals
   end interface
   
+  !
+  !> Function  base_scal:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Scale a matrix by a vector
+  !!
+  !! \param d(:)   Scaling vector
+  !! \param info   return code
+  !! \param side   [L] Scale on the Left (rows) or on the Right (columns)
+  !
   interface 
     subroutine psb_c_base_scal(d,a,info,side) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_
@@ -932,7 +945,10 @@ module psb_c_base_mat_mod
   end interface
   
   !
-  ! Maximum coefficient absolute value norm
+  !> Function  base_maxval:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Maximum absolute value of all coefficients;
+  !! 
   !
   interface 
     function psb_c_base_maxval(a) result(res)
@@ -943,7 +959,11 @@ module psb_c_base_mat_mod
   end interface
   
   !
-  ! Operator infinity norm
+  !
+  !> Function  base_csnmi:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Operator infinity norm
+  !! 
   !
   interface 
     function psb_c_base_csnmi(a) result(res)
@@ -954,7 +974,11 @@ module psb_c_base_mat_mod
   end interface
 
   !
-  ! Operator 1-norm
+  !
+  !> Function  base_csnmi:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Operator 1-norm
+  !! 
   !
   interface 
     function psb_c_base_csnm1(a) result(res)
@@ -965,8 +989,12 @@ module psb_c_base_mat_mod
   end interface
 
   !
-  ! Compute sums along the rows, either
-  ! natural or absolute value
+  !
+  !> Function  base_rowsum:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Sum along the rows
+  !! \param d(:) The output row sums
+  !! 
   !
   interface 
     subroutine psb_c_base_rowsum(d,a) 
@@ -976,6 +1004,12 @@ module psb_c_base_mat_mod
     end subroutine psb_c_base_rowsum
   end interface
 
+  !
+  !> Function  base_arwsum:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Absolute value sum along the rows
+  !! \param d(:) The output row sums
+  !! 
   interface 
     subroutine psb_c_base_arwsum(d,a) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_
@@ -985,8 +1019,12 @@ module psb_c_base_mat_mod
   end interface
   
   !
-  ! Compute sums along the columns, either
-  ! natural or absolute value
+  !
+  !> Function  base_colsum:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Sum along the columns
+  !! \param d(:) The output col sums
+  !! 
   !
   interface 
     subroutine psb_c_base_colsum(d,a) 
@@ -996,6 +1034,12 @@ module psb_c_base_mat_mod
     end subroutine psb_c_base_colsum
   end interface
 
+  !
+  !> Function  base_aclsum:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Absolute value sum along the columns
+  !! \param d(:) The output col sums
+  !! 
   interface 
     subroutine psb_c_base_aclsum(d,a) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_
@@ -1013,7 +1057,7 @@ module psb_c_base_mat_mod
 
   !
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_reallocate_nz
   !
   interface
@@ -1026,7 +1070,7 @@ module psb_c_base_mat_mod
   
   !
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_reinit
   !
   interface 
@@ -1038,7 +1082,7 @@ module psb_c_base_mat_mod
   end interface
   !
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_trim
   !
   interface
@@ -1050,7 +1094,7 @@ module psb_c_base_mat_mod
   
   !
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_allocate_mnnz
   !
   interface
@@ -1064,7 +1108,7 @@ module psb_c_base_mat_mod
 
   !
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_mold
   !
   interface 
@@ -1079,7 +1123,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function print.
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \brief Print the matrix to file in MatrixMarket format
   !!
   !! \param iout  The unit to write to
@@ -1103,15 +1147,11 @@ module psb_c_base_mat_mod
   
   
   !
-  !> Function print.
-  !! \memberof  psb_@X_coo_sparse_mat
-  !! \brief Print the matrix to file in MatrixMarket format
+  !> Function get_nz_row.
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \brief How many nonzeros in a row?
   !!
-  !! \param iout  The unit to write to
-  !! \param iv    [none] Renumbering for both rows and columns
-  !! \param head  [none] Descriptive header for the file
-  !! \param ivr   [none] Row renumbering
-  !! \param ivc   [none] Col renumbering
+  !! \param idx  The row to search.
   !!
   !
   interface 
@@ -1151,7 +1191,7 @@ module psb_c_base_mat_mod
   
   !
   !> Function fix_coo
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \brief Make sure the entries are sorted and duplicates are handled.
   !! \param info   return code
   !! \param idir [0] Sort in: row major order (0) or col major order (1)
@@ -1167,7 +1207,7 @@ module psb_c_base_mat_mod
   end interface
   
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_cp_to_coo
   interface 
     subroutine psb_c_cp_coo_to_coo(a,b,info) 
@@ -1179,7 +1219,7 @@ module psb_c_base_mat_mod
   end interface
   
   !> 
-  !! \memberof  psb_@X_coo_sparse_mat
+  !! \memberof  psb_c_coo_sparse_mat
   !! \see psb_c_base_mat_mod::psb_c_base_cp_from_coo
   interface 
     subroutine psb_c_cp_coo_from_coo(a,b,info) 
@@ -1190,6 +1230,10 @@ module psb_c_base_mat_mod
     end subroutine psb_c_cp_coo_from_coo
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_cp_from_coo
+  !! 
   interface 
     subroutine psb_c_cp_coo_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat
@@ -1199,7 +1243,11 @@ module psb_c_base_mat_mod
     end subroutine psb_c_cp_coo_to_fmt
   end interface
   
-  interface 
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_cp_from_fmt
+  !! 
+   interface 
     subroutine psb_c_cp_coo_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat
       class(psb_c_coo_sparse_mat), intent(inout) :: a
@@ -1208,6 +1256,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_cp_coo_from_fmt
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_mv_to_coo
   interface 
     subroutine psb_c_mv_coo_to_coo(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat
@@ -1217,6 +1268,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_mv_coo_to_coo
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_mv_from_coo
   interface 
     subroutine psb_c_mv_coo_from_coo(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat
@@ -1226,6 +1280,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_mv_coo_from_coo
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_mv_to_fmt
   interface 
     subroutine psb_c_mv_coo_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat
@@ -1235,6 +1292,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_mv_coo_to_fmt
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_mv_from_fmt
   interface 
     subroutine psb_c_mv_coo_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat
@@ -1261,6 +1321,22 @@ module psb_c_base_mat_mod
   end interface
   
   
+  !> Function csput
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \brief  Add coefficients into the matrix.
+  !!
+  !! \param nz  Number of entries to be added
+  !! \param ia(:) Row indices
+  !! \param ja(:) Col indices
+  !! \param val(:) Values
+  !! \param imin  Minimum row index to accept
+  !! \param imax  Maximum row index to accept
+  !! \param jmin  Minimum col index to accept
+  !! \param jmax  Maximum col index to accept
+  !! \param info return code
+  !! \param gtl [none] Renumbering for rows/columns
+  !!
+  !
   interface 
     subroutine psb_c_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1273,6 +1349,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_csput
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_base_mat_mod::psb_base_csgetptn
   interface 
     subroutine psb_c_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -1289,6 +1368,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_csgetptn
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_csgetrow
   interface 
     subroutine psb_c_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -1306,6 +1388,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_csgetrow
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_cssv
   interface 
     subroutine psb_c_coo_cssv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1315,6 +1400,11 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
     end subroutine psb_c_coo_cssv
+  end interface
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_cssm
+  interface 
     subroutine psb_c_coo_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
       class(psb_c_coo_sparse_mat), intent(in) :: a
@@ -1325,6 +1415,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_cssm
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_csmv
   interface 
     subroutine psb_c_coo_csmv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1334,6 +1427,12 @@ module psb_c_base_mat_mod
       integer(psb_ipk_), intent(out)                :: info
       character, optional, intent(in)     :: trans
     end subroutine psb_c_coo_csmv
+  end interface
+
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_csmm
+  interface 
     subroutine psb_c_coo_csmm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
       class(psb_c_coo_sparse_mat), intent(in) :: a
@@ -1345,6 +1444,9 @@ module psb_c_base_mat_mod
   end interface
   
     
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_maxval
   interface 
     function psb_c_coo_maxval(a) result(res)
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1353,6 +1455,9 @@ module psb_c_base_mat_mod
     end function psb_c_coo_maxval
   end interface
 
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_csnmi
   interface 
     function psb_c_coo_csnmi(a) result(res)
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1361,6 +1466,9 @@ module psb_c_base_mat_mod
     end function psb_c_coo_csnmi
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_csnm1
   interface 
     function psb_c_coo_csnm1(a) result(res)
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1369,6 +1477,9 @@ module psb_c_base_mat_mod
     end function psb_c_coo_csnm1
   end interface
 
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_rowsum
   interface 
     subroutine psb_c_coo_rowsum(d,a) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1376,7 +1487,9 @@ module psb_c_base_mat_mod
       complex(psb_spk_), intent(out)              :: d(:)
     end subroutine psb_c_coo_rowsum
   end interface
-
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_arwsum
   interface 
     subroutine psb_c_coo_arwsum(d,a) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1385,6 +1498,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_arwsum
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_colsum
   interface 
     subroutine psb_c_coo_colsum(d,a) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1393,6 +1509,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_colsum
   end interface
 
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_aclsum
   interface 
     subroutine psb_c_coo_aclsum(d,a) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1401,6 +1520,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_aclsum
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_get_diag
   interface 
     subroutine psb_c_coo_get_diag(a,d,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1410,6 +1532,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_get_diag
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_scal
   interface 
     subroutine psb_c_coo_scal(d,a,info,side) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
@@ -1420,6 +1545,9 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_scal
   end interface
   
+  !> 
+  !! \memberof  psb_c_coo_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_c_base_scals
   interface
     subroutine psb_c_coo_scals(d,a,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
