@@ -282,7 +282,7 @@ module psb_s_base_mat_mod
   !!  \param info  return code
   !!  \param jmin [1] minimum col index 
   !!  \param jmax [a\%get_ncols()] maximum col index 
-  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
@@ -681,6 +681,10 @@ module psb_s_base_mat_mod
   !!
   !!        Compute
   !!           Y = alpha*op(A)*X + beta*Y
+  !!        Usually the unwrapping of the encapsulated vector is done
+  !!        here, so that all the derived classes need only the
+  !!        versions with the standard arrays. 
+  !!
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix
@@ -703,13 +707,6 @@ module psb_s_base_mat_mod
       character, optional, intent(in)  :: trans
     end subroutine psb_s_base_vect_mv
   end interface
-  
-  !
-  ! Triangular system solve.
-  ! The CSSM/CSSV/VECT_SV outer methods are implemented at the base
-  ! level, and they take care of the SCALE and D control arguments.
-  ! So the derived classes need to override only the INNER_ methods.
-  !
   
   !
   !> Function  cssm:
