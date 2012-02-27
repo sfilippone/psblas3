@@ -34,72 +34,97 @@
 ! package: psb_indx_map_mod
 !    Defines the PSB_INDX_MAP class.
 !
-!  In particular, besides the communicator, it contains the data relevant
-!  to the following queries:
-!  1. How many global rows/columns?
-!  2. How many local  rows/columns?
-!  3. Convert between local and global indices
-!  4. Add to local indices.
-!  5. Find (one of) the owner(s) of a given index
-!  6. Query the indx state.
-!  7. Does the dynamic class support extensions of the rows? I.e., can
-!     it have overlap? for instance, the BLOCK cannot, it would run afoul
-!     of the glob_to_loc translation. 
-!  
-!  Checking for the existence of overlap is very expensive, thus
-!  it is done at build time (for extended-halo cases it can be inferred from
-!  the construction process).
-!  
-!  1. Each global index I is owned by at least one process;
-!
-!  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
-!     are locally owned; the value of N_ROW can be determined upon allocation 
-!     based on the index distribution (see also the interface to CDALL).
-!
-!  3. If a global index is owned by more than one process, we have an OVERLAP
-!     in which case the sum of all the N_ROW values is greater than the total 
-!     size of the index space; 
-!
-!  4. During the buildup of the descriptor, according to the user specified 
-!     stencil, we also take notice of indices that are not owned by the current
-!     process, but whose value is needed to proceed with the computation; these 
-!     form the HALO of the current process. Halo indices are assigned local indices
-!     from N_ROW+1 to N_COL (inclusive).
-!
-!  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
-!
-!
-!  This is the base version of the class; as such, it only contains
-!  methods for getting/setting the common attributes, whereas
-!  the index translation methods are only implemented at the derived
-!  class level.
-!  Note that the INIT method is defined in the derived methods, and
-!  is specialized for them; a better solution would have to have
-!  a constructor for each specific class, with the name of the class,
-!  but this is not yet working on many compilers, most notably GNU. 
-!
-!  Note: the CLONE method was implemented as a workaround for a problem
-!  with SOURCE= allocation on GNU. Might be removed later on. 
 !
 !
 module psb_indx_map_mod
   use psb_const_mod
   use psb_desc_const_mod
 
+  !
+  !> \namespace  psb_base_mod  \class  psb_indx_map
+  !! \brief Object to handle the mapping between global and local indices.
+  !!
+  !!
+  !!  In particular, besides the communicator, it contains the data relevant
+  !!  to the following queries:
+  !!  
+  !!  -  How many global rows/columns?
+  !!  
+  !!  -  How many local  rows/columns?
+  !!  
+  !!  -  Convert between local and global indices
+  !!  
+  !!  -  Add to local indices.
+  !!  
+  !!  -  Find (one of) the owner(s) of a given index
+  !!  
+  !!  -  Query the indx state.
+  !!    
+  !!  -  Does the dynamic class support extensions of the rows? I.e., can
+  !!     it have overlap? for instance, the BLOCK cannot, it would run afoul
+  !!     of the glob_to_loc translation. 
+  !!  
+  !!  Checking for the existence of overlap is very expensive, thus
+  !!  it is done at build time (for extended-halo cases it can be inferred from
+  !!  the construction process).
+  !!
+  !!  The object can be in the NULL, BUILD or ASSEMBLED state.
+  !!  
+  !!  Rules/constraints:
+  !!  
+  !!  1. Each global index I is owned by at least one process;
+  !!
+  !!  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
+  !!     are locally owned; the value of N_ROW can be determined upon allocation 
+  !!     based on the index distribution (see also the interface to CDALL).
+  !!
+  !!  3. If a global index is owned by more than one process, we have an OVERLAP
+  !!     in which case the sum of all the N_ROW values is greater than the total 
+  !!     size of the index space; 
+  !!
+  !!  4. During the buildup of the descriptor, according to the user specified 
+  !!     stencil, we also take notice of indices that are not owned by the current
+  !!     process, but whose value is needed to proceed with the computation; these 
+  !!     form the HALO of the current process. Halo indices are assigned local indices
+  !!     from N_ROW+1 to N_COL (inclusive).
+  !!
+  !!  5. The upper bound  N_COL moves during the descriptor build process (see CDINS). 
+  !!
+  !!
+  !!  This is the base version of the class; as such, it only contains
+  !!  methods for getting/setting the common attributes, whereas
+  !!  the index translation methods are only implemented at the derived
+  !!  class level.
+  !!  Note that the INIT method is defined in the derived methods, and
+  !!  is specialized for them; a better solution would have to have
+  !!  a constructor for each specific class, with the name of the class,
+  !!  but this is not yet working on many compilers, most notably GNU. 
+  !!
+  !!  Note: the CLONE method was implemented as a workaround for a problem
+  !!  with SOURCE= allocation on GNU. Might be removed later on. 
+  !!
   type      :: psb_indx_map
-
-    integer(psb_ipk_) :: state          = psb_desc_null_
+    !> State of the map 
+    integer(psb_ipk_) :: state          = psb_desc_null_    
+    !> Communication context
     integer(psb_mpik_) :: ictxt          = -1
+    !> MPI communicator
     integer(psb_mpik_) :: mpic           = -1
+    !> Number of global rows
     integer(psb_ipk_) :: global_rows    = -1
+    !> Number of global columns
     integer(psb_ipk_) :: global_cols    = -1
+    !> Number of local rows
     integer(psb_ipk_) :: local_rows     = -1
+    !> Number of local columns
     integer(psb_ipk_) :: local_cols     = -1
-    
+    !> A pointer to the user-defined parts subroutine
     procedure(psb_parts), nopass, pointer  :: parts => null()
+    !> The global vector assigning indices to processes, temp copy
     integer(psb_ipk_), allocatable :: tempvg(:)
+    !> Reserved for future use. 
     integer(psb_ipk_), allocatable :: oracle(:,:)
-    
+
   contains
 
     procedure, pass(idxmap)  :: get_state => base_get_state
@@ -170,6 +195,24 @@ module psb_indx_map_mod
        & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins,&
        & base_g2lv2_ins, base_init_vl, base_is_null,&
        & base_row_extendable, base_clone
+  
+  !> Function: psb_indx_map_fnd_owner
+  !! \memberof psb_indx_map
+  !! \brief  Find the process owning indices
+  !!
+  !!  Given a list of indices IDX, return the processes owning
+  !!  them. The base class provides the default implementation,
+  !!  which is simply aggregating the requests and converting on
+  !!  each proces who then builds its part of the solution.
+  !!  This implies that in general this routine is a
+  !!  synchronization point; for some derived classes it is
+  !!  possible to answer locally, but this should not be relied
+  !!  upon. 
+  !!
+  !!  \param idx(:) The set of indices (local to each process)
+  !!  \param iprc(:) The processes owning them
+  !!  \param info    return code. 
+  !!
 
   interface 
     subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
@@ -185,6 +228,9 @@ module psb_indx_map_mod
 contains
 
 
+  !> 
+  !! \memberof psb_indx_map
+  !! \brief  Print a descriptive name
   function base_get_fmt() result(res)
     implicit none 
     character(len=5) :: res
@@ -319,6 +365,9 @@ contains
   end subroutine base_set_mpic
 
 
+  !> 
+  !! \memberof psb_indx_map
+  !! \brief  Is the class capable of having overlapped rows?
   function base_row_extendable() result(val)
     implicit none 
     logical :: val
@@ -387,11 +436,11 @@ contains
   end function base_sizeof
 
 
-  ! !!!!!!!!!!!!!!!!
-  !
-  ! !!!!!!!!!!!!!!!!
+  !> 
+  !! \memberof psb_indx_map
+  !! \brief  Local to global, scalar, in place
   subroutine base_l2gs1(idx,idxmap,info,mask,owned)
-    use psb_error_mod
+    use psb_error_mod 
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(inout) :: idx
@@ -809,7 +858,7 @@ contains
     logical, parameter :: debug=.false.
 
     info = psb_success_
-        
+
     call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
