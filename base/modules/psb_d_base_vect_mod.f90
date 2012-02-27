@@ -47,6 +47,17 @@ module psb_d_base_vect_mod
   use psb_const_mod
   use psb_error_mod
 
+
+  !> \namespace  psb_base_mod  \class psb_d_base_vect_type
+  !! The psb_d_base_vect_type 
+  !! defines a middle level  real(psb_dpk_) encapsulated dense vector.
+  !! The encapsulation is needed, in place of a simple array, to allow  
+  !! for complicated situations, such as GPU programming, where the memory
+  !!  area we are interested in is not easily accessible from the host/Fortran
+  !!  side. It is also meant to be encapsulated in an outer type, to allow
+  !!  runtime switching as per the STATE design pattern, similar to the
+  !!  sparse matrix types.
+  !!
   type psb_d_base_vect_type
     real(psb_dpk_), allocatable :: v(:)
   contains
