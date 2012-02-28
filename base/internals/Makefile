@@ -17,19 +17,22 @@ MPFOBJS = psi_dswapdata.o psi_dswaptran.o\
 	psi_zswapdata.o psi_zswaptran.o  \
 	psi_desc_index.o psi_extrct_dl.o \
 	psi_fnd_owner.o psb_indx_map_fnd_owner.o
+MPCOBJS=sndrcv.o
 LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR)
 CINCLUDES=-I. 
 
-lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2) $(MPFOBJS) 
-	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) $(COBJS)
+lib: mpfobjs mpcobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2) $(MPFOBJS) $(MPCOBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) $(COBJS)  $(MPCOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 $(FOBJS) $(FBOJS2): $(MODDIR)/psi_mod.o
 mpfobjs: 
-	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")	
-	(make $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
+	$(MAKE) $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)"    
+	$(MAKE) $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)"
+mpcobjs: 
+	$(MAKE) $(MPCOBJS) CC="$(MPCC)"
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2) *$(.mod)
 
