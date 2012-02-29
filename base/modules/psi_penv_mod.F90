@@ -110,6 +110,7 @@ contains
 #endif
     integer(psb_mpik_) :: info
 
+    info = 0
 #if defined(LONG_INTEGERS)
     psb_mpi_ipk_integer = mpi_integer8
 #else
