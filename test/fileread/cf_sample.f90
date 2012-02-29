@@ -273,7 +273,7 @@ program cf_sample
     write(psb_out_unit,'("Iterations to convergence: ",i6)')iter
     write(psb_out_unit,'("Error estimate on exit   : ",es12.5)') err
     write(psb_out_unit,'("Time to buil prec.       : ",es12.5)')tprec
-    write(psb_out_unit,'("Time to solve matrix     : ",es12.5)')t2
+    write(psb_out_unit,'("Time to solve system     : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration       : ",es12.5)')t2/(iter)
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
