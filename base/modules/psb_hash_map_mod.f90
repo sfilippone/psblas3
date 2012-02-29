@@ -1316,7 +1316,8 @@ contains
     class(psb_hash_map), intent(in) :: idxmap
     type(psb_hash_map), intent(out) :: outmap
     integer(psb_ipk_) :: info
-    
+
+    info = psb_success_
     outmap%psb_indx_map = idxmap%psb_indx_map
     outmap%hashvsize    = idxmap%hashvsize
     outmap%hashvmask    = idxmap%hashvmask
