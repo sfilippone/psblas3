@@ -559,6 +559,12 @@ PAC_FORTRAN_HAVE_MOVE_ALLOC(
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
 )
 
+PAC_FORTRAN_TEST_ISO_C_BIND( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+)
+
 #
 # Optional features
 #
@@ -574,11 +580,6 @@ PAC_FORTRAN_TEST_FLUSH(
 PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"],
 )
-
-PAC_FORTRAN_TEST_ISO_C_BIND( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"],
-)
-
 
 PAC_FORTRAN_TEST_FINAL( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
