@@ -1,5 +1,49 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+	
+2012/02/21: Added experimental support for 8-bytes integers.
+	    Refactored the problem generation methods and the pargen 
+	    sample programs.
+	
+2012/02/15: Fixed major perf problem with genblock. 
+	
+2012/01/30: Reworked norms 1 and infty, added sparse mat norm1.
+
+2012/01/10: Bunch of fixes and configury improvements from Cray FTN	
+
+2012/01/03: Split preconditioners into interface/implementation. 	
+	
+2011/11/27: Merged may routines from preprocessing project psblas-testpre.
+	
+2011/11/21: Added test for ISO_C_BINDING and AMD renumbering.
+	
+2011/11/19: Added the scratch option to the vect ASB routine. 
+	
+2011/11/11: Makefile fixes allowing for parallel make. 	
+
+2011/10/25: Major upgrade defining the encapsulated vector types,
+            providing further support for GPU.
+	
+2011/10/05: Split preconditioner modules to alleviate memory pressure
+	    on the compiler, esp. XLF. 
+	    Fixed bug in glist map. 
+	
+2011/08/01: MOLD methods and various fixes for NAG configry.
+	
+2011/07/25: Bunch of fixes for problems uncovered by Cray FTN.	
+
+2011/06/15: Changed get_local_rows and friends 	into methods.
+
+	
+2011/03/25: Added version identification constants.
+	
+2011/03/10: Added support for sparse dot products. Changed intent of X in 
+	    preconditioner apply to allow for GPU extensions.
+
+2011/02/27: Reworked PRINT methods, for vectors as well. 	
+	
+2011/02/11: Changes to accommodate Cray compiler. 
+	
 2011/01/07: Silly bugs in spgather MPI data types and in z_nubmm calling
 	    cnumbmm. Also, don't use allocate on assignment with GNU. 
 
