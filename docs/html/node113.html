@@ -57,7 +57,7 @@ psb_precbld -- Builds a preconditioner</A>
 
 <P>
 <PRE>
-call psb_precbld(a, desc_a, prec, info)
+call psb_precbld(a, desc_a, prec, info,amold,vmold)
 </PRE>
 
 <P>
@@ -98,6 +98,30 @@ Type: <B>required</B>
 Intent: <B>in</B>, target.
 <BR>
 Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>amold</STRONG></DT>
+<DD>The desired dynamic type for the internal matrix storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
+</DD>
+<DT><STRONG>vmold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>. 
+
+<P>
 </DD>
 </DL>
 

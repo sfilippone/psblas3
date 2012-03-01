@@ -57,7 +57,7 @@ psb_geasb -- Assembly a dense matrix</A>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
@@ -79,6 +79,21 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
 </DL>
 
 <P>
@@ -95,8 +110,8 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.

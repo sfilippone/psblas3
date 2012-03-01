@@ -70,8 +70,8 @@ call psb_geins(m, irw, val, x, desc_a, info,dupl)
 </DD>
 <DT><STRONG>m</STRONG></DT>
 <DD>Number of rows in <IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img102.png"
+ WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img103.png"
  ALT="$val$"> to be inserted.
 <BR>
 Scope:<B>local</B>.
@@ -88,12 +88,12 @@ Specified as: an integer value.
  SRC="img4.png"
  ALT="$i$">
   of <IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img102.png"
+ WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img103.png"
  ALT="$val$"> will be inserted into the local row corresponding to the
   global row index <IMG
- WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img103.png"
+ WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img104.png"
  ALT="$irw(i)$">.
 Scope:<B>local</B>.
 <BR>
@@ -154,8 +154,8 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>, of
+type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.

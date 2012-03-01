@@ -71,7 +71,7 @@ glob\_x \leftarrow collect(loc\_x_i)
 
 <IMG
  WIDTH="163" HEIGHT="28" BORDER="0"
- SRC="img72.png"
+ SRC="img73.png"
  ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -79,20 +79,20 @@ glob\_x \leftarrow collect(loc\_x_i)
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
+ WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
  ALT="$glob\_x$"></STRONG></DT>
 <DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <IMG
- WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
  ALT="$glob\_x_{1:m,1:n}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img75.png"
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
  ALT="$loc\_x_i$"></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <IMG
@@ -101,8 +101,8 @@ process <IMG
  ALT="$i$">.
 </DD>
 <DT><STRONG><IMG
- WIDTH="48" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img76.png"
+ WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img77.png"
  ALT="$collect$"></STRONG></DT>
 <DD>is the collect function.
 </DD>
@@ -110,16 +110,16 @@ process <IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2867"></A>
+<DIV ALIGN="CENTER"><A NAME="2970"></A>
 <TABLE>
-<CAPTION><STRONG>Table 15:</STRONG>
+<CAPTION><STRONG>Table 16:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img77.png"
+ WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
  ALT="$x_i, y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -162,8 +162,8 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DT><STRONG>loc_x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
+ WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
  ALT="$glob\_x$">. 
 <BR>
 Scope: <B>local</B> 
@@ -172,8 +172,8 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:gather">15</A>.
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+indicated in Table&nbsp;<A HREF="#tab:gather">16</A>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -188,8 +188,8 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <IMG
- WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
+ WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.png"
  ALT="$root=-1$"> all
   the processes will have a copy of the global vector.
 <BR>
@@ -203,11 +203,11 @@ Specified as: an integer variable <!-- MATH
  $-1\le root\le np-1$
  -->
 <IMG
- WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
- ALT="$-1\le root\le np-1$">, default <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img80.png"
+ ALT="$-1\le root\le np-1$">, default <IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
  ALT="$-1$">. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>

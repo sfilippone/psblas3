@@ -910,8 +910,8 @@ rank-1 array.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf out}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE  attribute
+or an object of type \vdata, of type real, complex or integer.\\ 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -970,8 +970,8 @@ Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as:  a rank one or two array or an object of type \vdata, of
+type real, complex or integer.\\ 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -994,7 +994,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_geasb}
 
 \begin{verbatim}
-call psb_geasb(x, desc_a, info)
+call psb_geasb(x, desc_a, info, mold)
 \end{verbatim}
 
 \begin{description}
@@ -1005,6 +1005,12 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
+\item[mold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata; this is
+only allowed when $x$ is of type \vdata.
 \end{description}
 
 \begin{description}
@@ -1013,8 +1019,8 @@ Specified as: a variable of type \descdata.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -1039,8 +1045,8 @@ call psb_gefree(x, desc_a, info)
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
 
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
@@ -1722,7 +1728,7 @@ position as the corresponding entries in $x$.
   subsequences that may be already in the desired ordering prior to
   the subroutine call; this situation is relatively common when
   dealing with groups of indices of sparse matrix entries, thus
-  merge-sort is often the preferred  choice when a sorting is needed
+  merge-sort is the preferred  choice when a sorting is needed
   by other routines in the library. 
 \end{enumerate}
 \end{enumerate}

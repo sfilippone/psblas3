@@ -51,8 +51,8 @@ pattern and enables data communications and other operations that are
 necessary for implementing the various algorithms of interest to us. 
 
 The data structure itself \verb|psb_desc_type| can be treated as an
-opaque object handled via the  tools routines of
-Sec.~\ref{sec:toolsrout} and~\ref{sec:dataquery};
+opaque object handled via the   tools routines of
+Sec.~\ref{sec:toolsrout} or the query routines detailed below;
 nevertheless we include here a  description for the curious 
 reader. 
 
@@ -629,7 +629,9 @@ Scope: {\bf local}\\
 \subsection{Dense Vector Data Structure}
 \label{sec:vecttype}
 The \hypertarget{vdata}{{\tt psb\_T\_vect\_type}} data structure
-encapsulates the dense vectors in a way similar to sparse matrices. 
+encapsulates the dense vectors in a way similar to sparse matrices,
+i.e. including a base type \hypertarget{vbasedata}{{\tt
+    psb\_T\_base\_vect\_type}}.  
 The user will not, in general, access the vector components directly,
 but rather via the routines of sec.~\ref{sec:toolsrout}. Among other
 simple things, we define here an extraction method that can be used to
@@ -772,58 +774,17 @@ associated communication descriptor.%%  which may be different than the
 %% \verb|psb_precbld| subroutine.
 %% This data structure wants to be flexible enough to easily allow the
 %% implementation of new kind of preconditioners.
-The values contained in
-the \verb|iprcparm| and \verb|rprcparm| define tha type of
-preconditioner along with all the parameters related to it; thus,
-\verb|iprcparm| and \verb|rprcparm| define how the other records have
-to be interpreted. This data structure is the basis of more complex
-preconditioning strategies, which are the subject of further
-research. 
+The internal preconditioner is allocated appropriately with the
+dynamic type corresponding to the desired preconditioner. 
 \begin{figure}[h!]
   \small
   \begin{Sbox}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim}
 
-  type psb_sprec_type
-    type(psb_sspmat_type), allocatable :: av(:) 
-    real(psb_spk_), allocatable        :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_spk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
-  end type psb_sprec_type
-
-  type psb_dprec_type
-    type(psb_dspmat_type), allocatable :: av(:) 
-    real(psb_dpk_), allocatable        :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
-  end type psb_dprec_type
-
-  type psb_cprec_type
-    type(psb_cspmat_type), allocatable :: av(:) 
-    complex(psb_spk_), allocatable     :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_spk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
-  end type psb_cprec_type
-
-  type psb_zprec_type
-    type(psb_zspmat_type), allocatable :: av(:) 
-    complex(psb_dpk_), allocatable     :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
-  end type psb_zprec_type
+  type psb_Tprec_type
+    class(psb_T_base_prec_type), allocatable :: prec
+  end type psb_Tprec_type
 
 \end{verbatim}
     \end{minipage}
@@ -855,8 +816,8 @@ research.
 %% \end{description}
 
 
-\subsection{Data structure Methods}
-\label{sec:dataquery}
+% \subsection{Data structure Methods}
+% \label{sec:dataquery}
 
 
 
