@@ -22132,9 +22132,9 @@ endobj
 /OpenAction 469 0 R
 >> endobj
 1680 0 obj <<
- /Title (Parallel Sparse BLAS V. 3.0-beta) /Subject (Parallel Sparse Basic Linear Algebra Subroutines) /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners) /Creator (pdfLaTeX) /Producer ($Id: userguide.tex 5789 2012-03-01 15:04:22Z sfilippo $) /Author()/Title()/Subject()/Creator(LaTeX with hyperref package)/Producer(pdfTeX-1.40.3)/Keywords()
-/CreationDate (D:20120301162309+01'00')
-/ModDate (D:20120301162309+01'00')
+ /Title (Parallel Sparse BLAS V. 3.0-beta) /Subject (Parallel Sparse Basic Linear Algebra Subroutines) /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners) /Creator (pdfLaTeX) /Producer ($Id: userguide.tex 5790 2012-03-01 15:24:09Z sfilippo $) /Author()/Title()/Subject()/Creator(LaTeX with hyperref package)/Producer(pdfTeX-1.40.3)/Keywords()
+/CreationDate (D:20120302132704+01'00')
+/ModDate (D:20120302132704+01'00')
 /Trapped /False
 /PTEX.Fullbanner (This is pdfTeX using libpoppler, Version 3.141592-1.40.3-2.2 (Web2C 7.5.6) kpathsea version 3.5.6)
 >> endobj
@@ -23825,7 +23825,7 @@ trailer
 << /Size 1681
 /Root 1679 0 R
 /Info 1680 0 R
-/ID [<E8714FBB1895411486B0ABAA1E2E90E8> <E8714FBB1895411486B0ABAA1E2E90E8>] >>
+/ID [<A1EB9183F5D91577F5CE82551123A606> <A1EB9183F5D91577F5CE82551123A606>] >>
 startxref
 957452
 %%EOF
