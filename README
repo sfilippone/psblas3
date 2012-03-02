@@ -118,7 +118,7 @@ EXPERIMENTAL
 
 We have an experimental flag --long-integers that will enable having
 8-byte integer data, allowing an index space larger than 2G; some
-small cases have been tested but it's a far cry from full reliance. 
+small cases have been tested but we do not offer full guarantee (yet). 
 
 
 COMPILER NOTES.
@@ -127,14 +127,14 @@ later versions thereof):
        NAGware 5.2;
        XLF 13.1;
        GNU 4.6.1;  
-       Cray CCE 7.4.4/8.0.1;
+       Cray CCE 8.0.1;
 
 They are all recognized by the configure script. 
 
 To make the script work with the Cray CCE environment, it is
 recommended to use the following:
 ./configure FC=ftn F77=ftn CC=cc
-with both Cray and GNU lower-level compilers. 
+with both CCE and GNU lower-level compilers. 
 
 The Intel compiler up to version 12.1 fails due to a bug in the
 handlind of generic interfaces. 
