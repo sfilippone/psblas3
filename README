@@ -12,7 +12,7 @@ reported and mostly fixed by the respective vendors).
 
 
 
-The new   have been completely overhauled, and in many cases
+The new internals have been completely overhauled, and in many cases
 rewritten; they now enable a much better interfacing with user-defined
 storage formats. If the user is only interested in the predefined
 formats, then the user's guide should be sufficient; what is somewhat
