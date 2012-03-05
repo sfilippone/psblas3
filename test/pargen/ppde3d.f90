@@ -290,7 +290,7 @@ contains
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: intbuf(10), ip
+    integer(psb_ipk_) :: ip
 
     call psb_info(ictxt, iam, np)
 
@@ -300,11 +300,6 @@ contains
         read(psb_inp_unit,*) kmethd
         read(psb_inp_unit,*) ptype
         read(psb_inp_unit,*) afmt
-
-        ! broadcast parameters to all processors
-        call psb_bcast(ictxt,kmethd)
-        call psb_bcast(ictxt,afmt)
-        call psb_bcast(ictxt,ptype)
 
 
         read(psb_inp_unit,*) idim
@@ -330,12 +325,6 @@ contains
         endif
         ! broadcast parameters to all processors    
 
-        intbuf(1) = idim
-        intbuf(2) = istopc
-        intbuf(3) = itmax
-        intbuf(4) = itrace
-        intbuf(5) = irst
-        call psb_bcast(ictxt,intbuf(1:5))
 
         write(psb_out_unit,'("Solving matrix       : ell1")')      
         write(psb_out_unit,&
@@ -352,17 +341,17 @@ contains
         call psb_abort(ictxt)
         stop 1
       endif
-    else
-      call psb_bcast(ictxt,kmethd)
-      call psb_bcast(ictxt,afmt)
-      call psb_bcast(ictxt,ptype)
-      call psb_bcast(ictxt,intbuf(1:5))
-      idim    = intbuf(1)
-      istopc  = intbuf(2)
-      itmax   = intbuf(3)
-      itrace  = intbuf(4)
-      irst    = intbuf(5)
     end if
+    ! broadcast parameters to all processors
+    call psb_bcast(ictxt,kmethd)
+    call psb_bcast(ictxt,afmt)
+    call psb_bcast(ictxt,ptype)
+    call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,istopc)
+    call psb_bcast(ictxt,itmax)
+    call psb_bcast(ictxt,itrace)
+    call psb_bcast(ictxt,irst)
+
     return
 
   end subroutine get_parms
