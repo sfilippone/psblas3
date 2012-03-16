@@ -554,14 +554,10 @@ contains
     class(psb_d_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    res = 0
+    res = -1
     
     if (allocated(a%ja)) then 
-      if (res >= 0) then 
-        res = min(res,size(a%ja))
-      else 
-        res = size(a%ja)
-      end if
+      res = size(a%ja)
     end if
     if (allocated(a%val)) then 
       if (res >= 0) then 
