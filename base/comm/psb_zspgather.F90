@@ -1,8 +1,9 @@
 subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
   use psb_descriptor_type
   use psb_error_mod
-  use psb_mat_mod
   use psb_penv_mod
+  use psb_mat_mod
+  use psb_tools_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -20,7 +21,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   type(psb_z_coo_sparse_mat)      :: loc_coo, glob_coo
   integer(psb_mpik_) :: ictxt,np,me, icomm, minfo
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
-  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k
+  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
   integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
@@ -59,9 +60,18 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       call psb_errpush(info,name,i_err=ierr,a_err='integer')
       goto 9999      
     end if
-    call loca%mv_to(loc_coo)
+
+    
+    if (keeploc_) then
+      call loca%cp_to(loc_coo)
+    else
+      call loca%mv_to(loc_coo)
+    end if
+    nzl = loc_coo%get_nzeros()
+    call psb_loc_to_glob(loc_coo%ia(1:nzl),desc_a,info,iact='I')
+    call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
-    nzbr(me+1) = loc_coo%get_nzeros()
+    nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
     if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
@@ -86,11 +96,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       goto 9999
     end if
     
-    if (keeploc_) then
-      call loca%mv_from(loc_coo)
-    else
-      call loc_coo%free()
-    end if
+    call loc_coo%free()
     call glob_coo%set_nzeros(nzg)
     if (present(dupl)) call glob_coo%set_dupl(dupl)
     call globa%mv_from(glob_coo)
