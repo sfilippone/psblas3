@@ -79,19 +79,19 @@ glob\_x \leftarrow collect(loc\_x_i)
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img74.png"
  ALT="$glob\_x$"></STRONG></DT>
 <DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img75.png"
  ALT="$glob\_x_{1:m,1:n}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img76.png"
  ALT="$loc\_x_i$"></STRONG></DT>
 <DD>is the local portion of global dense matrix on
@@ -101,7 +101,7 @@ process <IMG
  ALT="$i$">.
 </DD>
 <DT><STRONG><IMG
- WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="49" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img77.png"
  ALT="$collect$"></STRONG></DT>
 <DD>is the collect function.
@@ -118,7 +118,7 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img78.png"
  ALT="$x_i, y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -162,7 +162,7 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DT><STRONG>loc_x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img74.png"
  ALT="$glob\_x$">. 
 <BR>
@@ -188,7 +188,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <IMG
- WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img79.png"
  ALT="$root=-1$"> all
   the processes will have a copy of the global vector.
@@ -203,10 +203,10 @@ Specified as: an integer variable <!-- MATH
  $-1\le root\le np-1$
  -->
 <IMG
- WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img80.png"
  ALT="$-1\le root\le np-1$">, default <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img81.png"
  ALT="$-1$">. 
 </DD>
@@ -222,7 +222,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one or two array.
+Specified as: a rank one or two array with the <code>ALLOCATABLE</code> attribute.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.

@@ -88,11 +88,11 @@ y &amp;\leftarrow&amp; \alpha T^{-H} D x + \beta y\\
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense matrix <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img52.png"
  ALT="$x_{:, :}$">
 </DD>
@@ -101,21 +101,21 @@ where:
  SRC="img26.png"
  ALT="$y$"></STRONG></DT>
 <DD>is the global dense matrix <IMG
- WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img53.png"
  ALT="$y_{:, :}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img56.png"
  ALT="$T$"></STRONG></DT>
 <DD>is the global sparse block triangular submatrix <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img56.png"
  ALT="$T$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img57.png"
  ALT="$D$"></STRONG></DT>
 <DD>is the scaling diagonal matrix.
@@ -139,19 +139,19 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img56.png"
  ALT="$T$">, <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">, <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$">, <IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img57.png"
  ALT="$D$">, <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -188,7 +188,7 @@ Data types</CAPTION>
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img27.png"
  ALT="$\alpha$">.
 <BR>
@@ -204,7 +204,7 @@ Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
 <DT><STRONG>t</STRONG></DT>
 <DD>the global portion of the sparse matrix
 <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img56.png"
  ALT="$T$">.  
 <BR>
@@ -220,7 +220,7 @@ Specified as: an object type specified in
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 
@@ -234,7 +234,7 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spsm">13</A>.  The rank of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -275,7 +275,7 @@ Table&nbsp;<A HREF="#tab:f90spsm">13</A>. The rank of <IMG
  WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img26.png"
  ALT="$y$"> must be the same of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">. 
 </DD>
@@ -310,7 +310,7 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <IMG
- WIDTH="79" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img54.png"
  ALT="$trans = N$">
 <BR>
@@ -336,7 +336,7 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <IMG
- WIDTH="76" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="76" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img58.png"
  ALT="$unitd = U$">
 <BR>
@@ -382,7 +382,7 @@ Default: <!-- MATH
  $diag(1) = 1 (no scaling)$
  -->
 <IMG
- WIDTH="164" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="165" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img59.png"
  ALT="$diag(1) = 1 (no scaling)$">
 <BR>
@@ -399,7 +399,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> with the
 TARGET attribute. 

@@ -72,7 +72,7 @@ call psb_hsort(x,ix,dir,flag)
 
 <P>
 These  serial routines sort a sequence <IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img109.png"
  ALT="$X$"> into ascending or
 descending  order. The argument meaning is identical for the three
@@ -98,7 +98,7 @@ Specified as: an integer, real or complex  array of rank 1.
 Type:<B>optional</B>.
 <BR>
 Specified as: an integer array of (at least) the same size as <IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img109.png"
  ALT="$X$">.
 </DD>
@@ -122,7 +122,7 @@ default <code>psb_lsort_up_</code>.
 </DD>
 <DT><STRONG>flag</STRONG></DT>
 <DD>Whether to keep the original values in <IMG
- WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img110.png"
  ALT="$IX$">.
 <BR>
@@ -154,7 +154,7 @@ Type: <B>Optional</B>
 <BR>
 An integer array of rank 1, whose entries are moved to the same
 position as the corresponding entries in <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$">.
 </DD>
@@ -184,24 +184,24 @@ position as the corresponding entries in <IMG
  $flag = psb\_sort\_ovw\_idx\_$
  -->
 <IMG
- WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="181" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img111.png"
  ALT="$flag = psb\_sort\_ovw\_idx\_$"> then the entries in <IMG
- WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="61" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img112.png"
  ALT="$ix(1:n)$">
   where <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img16.png"
  ALT="$n$"> is the size of <IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img25.png"
  ALT="$x$"> are initialized to <!-- MATH
  $ix(i) \leftarrow
   i$
  -->
 <IMG
- WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="67" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img113.png"
  ALT="$ix(i) \leftarrow
 i$">; thus, upon return from the subroutine, for each
@@ -209,7 +209,7 @@ i$">; thus, upon return from the subroutine, for each
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"> we have in <IMG
- WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img114.png"
  ALT="$ix(i)$"> the position that the item <IMG
  WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
@@ -221,11 +221,11 @@ i$">; thus, upon return from the subroutine, for each
  $flag = psb\_sort\_keep\_idx\_$
  -->
 <IMG
- WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="184" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img116.png"
  ALT="$flag = psb\_sort\_keep\_idx\_$"> the routine will assume that
   the entries in <IMG
- WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img117.png"
  ALT="$ix(:)$"> have already been initialized by the user;
 </LI>
@@ -238,7 +238,7 @@ i$">; thus, upon return from the subroutine, for each
 
 <OL>
 <LI>The worst case running time for quicksort is <IMG
- WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="46" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
  SRC="img119.png"
  ALT="$O(n^2)$">; the algorithm
   implemented here follows the well-known median-of-three heuristics,

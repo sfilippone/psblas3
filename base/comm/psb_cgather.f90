@@ -50,7 +50,7 @@ subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
   implicit none
 
   complex(psb_spk_), intent(in)    :: locx(:,:)
-  complex(psb_spk_), intent(out)   :: globx(:,:)
+  complex(psb_spk_), intent(out), allocatable :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iroot
@@ -100,16 +100,13 @@ subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
   ilocx = 1
   jlocx = 1
 
-  lda_globx = size(globx,1)
-  lda_locx  = size(locx, 1)
-
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-
-  lock=size(locx,2)-jlocx+1
-  globk=size(globx,2)-jglobx+1
-  maxk=min(lock,globk)
-  k = maxk
+  lda_globx = m
+  lda_locx  = size(locx, 1)
+  lock      = size(locx,2)
+  maxk      = lock
+  k         = maxk
 
   call psb_bcast(ictxt,k,root=iiroot)
 
@@ -130,13 +127,20 @@ subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
     call psb_errpush(info,name)
     goto 9999
   end if
+  
+  call psb_realloc(m,k,globx,info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   globx(:,:)=czero
 
   do j=1,k
     do i=1,desc_a%get_local_rows()
       call psb_loc_to_glob(i,idx,desc_a,info)
-      globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
+      globx(idx,j) = locx(i,jlx+j-1)
     end do
   end do
 
@@ -146,12 +150,12 @@ subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
       if (me /= desc_a%ovrlap_elem(i,3)) then 
         idx = desc_a%ovrlap_elem(i,1)
         call psb_loc_to_glob(idx,desc_a,info)
-        globx(idx,jglobx+j-1) = czero
+        globx(idx,j) = czero
       end if
     end do
   end do
 
-  call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
+  call psb_sum(ictxt,globx(1:m,1:k),root=root)
 
   call psb_erractionrestore(err_act)
   return  
@@ -223,7 +227,7 @@ subroutine  psb_cgatherv(globx, locx, desc_a, info, iroot)
   implicit none
 
   complex(psb_spk_), intent(in)    :: locx(:)
-  complex(psb_spk_), intent(out)   :: globx(:)
+  complex(psb_spk_), intent(out), allocatable :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iroot
@@ -268,11 +272,11 @@ subroutine  psb_cgatherv(globx, locx, desc_a, info, iroot)
   jlocx=1
   ilocx = 1
 
-  lda_globx = size(globx)
-  lda_locx  = size(locx)
-
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
+
+  lda_globx = m
+  lda_locx  = size(locx)
 
   k = 1
 
@@ -291,6 +295,13 @@ subroutine  psb_cgatherv(globx, locx, desc_a, info, iroot)
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
     info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
+  call psb_realloc(m,globx,info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -334,7 +345,7 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
   implicit none
 
   type(psb_c_vect_type), intent(inout) :: locx
-  complex(psb_spk_), intent(out)    :: globx(:)
+  complex(psb_spk_), intent(out), allocatable   :: globx(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), intent(in), optional     :: iroot
@@ -379,11 +390,11 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
   jlocx=1
   ilocx = 1
 
-  lda_globx = size(globx)
-  lda_locx  = locx%get_nrows()
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
+  lda_globx = m
+  lda_locx  = locx%get_nrows()
   
   k = 1
 
@@ -402,6 +413,13 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
     info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
+  call psb_realloc(m,globx,info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if

@@ -111,7 +111,7 @@ module psb_z_comm_mod
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_zscatterv
-  end interface
+  end interface psb_scatter
 
   interface psb_gather
     subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
@@ -125,10 +125,10 @@ module psb_z_comm_mod
       integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_zsp_allgather
-    subroutine  psb_zgatherm(globx, locx, desc_a, info, root)
+    subroutine psb_zgatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_dpk_), intent(in)  :: locx(:,:)
-      complex(psb_dpk_), intent(out) :: globx(:,:)
+      complex(psb_dpk_), intent(out), allocatable  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
@@ -136,7 +136,7 @@ module psb_z_comm_mod
     subroutine  psb_zgatherv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_dpk_), intent(in)  :: locx(:)
-      complex(psb_dpk_), intent(out) :: globx(:)
+      complex(psb_dpk_), intent(out), allocatable  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
@@ -145,7 +145,7 @@ module psb_z_comm_mod
       use psb_descriptor_type
       use psb_z_vect_mod
       type(psb_z_vect_type), intent(inout) :: locx
-      complex(psb_dpk_), intent(out)     :: globx(:)
+      complex(psb_dpk_), intent(out), allocatable :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root
