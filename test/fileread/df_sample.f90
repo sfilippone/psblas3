@@ -296,6 +296,7 @@ program df_sample
   call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
   if (info == psb_success_) &
        & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+  if (info /= psb_success_) goto 9999
   if (iam == psb_root_) then
     write(psb_err_unit,'(" ")')
     write(psb_err_unit,'("Saving x on file")')
