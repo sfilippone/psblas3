@@ -61,10 +61,13 @@ subroutine psb_icdasb(desc,info,ext_hv)
   integer(psb_ipk_) ::  int_err(5)
   integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row
-  integer(psb_mpik_) ::  np,me, icomm, ictxt
+  integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row,j
+  integer(psb_mpik_) ::  np,me, icomm, ictxt,proc_to_comm
   logical             :: ext_hv_
   integer(psb_ipk_) :: debug_level, debug_unit
+  integer	:: totxch, idxr, idxs, data_, pnti, snd_pt, rcv_pt,nerv,nesd,idx_pt
+  integer, allocatable :: blens(:), new_idx(:)
+  integer(psb_ipk_), pointer             :: idx(:)
   character(len=20)   :: name
 
   info = psb_success_
@@ -157,6 +160,56 @@ subroutine psb_icdasb(desc,info,ext_hv)
     call psb_errpush(info,name)
     goto 9999
   endif
+  
+  !datatypes allocation
+  data_ = psb_comm_halo_
+  call desc%get_list(data_,idx,totxch,idxr,idxs,info)
+  !Send/Gather
+  pnti   = 1
+  snd_pt = 1
+  rcv_pt = 1
+  allocate(desc%sendtypes(totxch), stat=info)
+  	do i=1, totxch
+		nerv = idx(pnti+psb_n_elem_recv_)
+		nesd = idx(pnti+nerv+psb_n_elem_send_)
+		idx_pt = 1+pnti+nerv+psb_n_elem_send_
+		allocate(blens(nesd),stat=info)
+		do j=1,nesd
+		  blens(j) = 1
+		end do
+
+		call MPI_TYPE_INDEXED(nesd,blens,(idx(idx_pt:idx_pt+nesd-1)-1),&
+		     & mpi_double_precision,desc%sendtypes(i),info)
+		call MPI_TYPE_COMMIT(desc%sendtypes(i),info)
+		deallocate(blens,stat=info)
+		snd_pt = snd_pt + nesd 
+		pnti   = pnti + nerv + nesd + 3
+  	end do
+  pnti   = 1
+  snd_pt = 1
+  rcv_pt = 1
+  !Recv/Scatter
+  allocate(desc%recvtypes(totxch), stat=info)
+	do i=1, totxch
+		proc_to_comm = idx(pnti+psb_proc_id_)
+		nerv = idx(pnti+psb_n_elem_recv_)
+		nesd = idx(pnti+nerv+psb_n_elem_send_)
+		idx_pt = 1+pnti+psb_n_elem_recv_
+		allocate(blens(nerv),stat=info)
+		do j=1, nerv
+		  blens(j) = 1
+		end do
+
+		call MPI_TYPE_INDEXED(nerv,blens,(idx(idx_pt:idx_pt+nerv-1)-1),&
+		     & mpi_double_precision,desc%recvtypes(i),info)
+		call MPI_TYPE_COMMIT(desc%recvtypes(i),info)
+		deallocate(blens,stat=info)
+
+		rcv_pt = rcv_pt + nerv
+		snd_pt = snd_pt + nesd
+		pnti   = pnti + nerv + nesd + 3
+	end do
+  	
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Done'

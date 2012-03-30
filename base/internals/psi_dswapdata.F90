@@ -1074,7 +1074,7 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,desc_a%sendtypes,desc_a%recvtypes,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -1090,7 +1090,7 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 end subroutine psi_dswapdata_vect
 
 
-subroutine psi_dswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_dswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,sendtypes,recvtypes,work,info)
 
   use psi_mod, psb_protect_name => psi_dswapidx_vect
   use psb_error_mod
@@ -1111,6 +1111,7 @@ subroutine psi_dswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
   real(psb_dpk_)           :: beta
   real(psb_dpk_), target   :: work(:)
   integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd, totrcv
+  integer, allocatable,optional, intent(in) :: sendtypes(:),recvtypes(:)
 
   ! locals
   integer(psb_mpik_) :: ictxt, icomm, np, me,&
@@ -1131,8 +1132,8 @@ subroutine psi_dswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 #endif
   character(len=20)  :: name
   !integer, dimension(totxch) :: sendtypes,recvtypes
-  integer, allocatable, save :: sendtypes(:),recvtypes(:)
-  integer, allocatable :: blens(:), new_idx(:)
+  !integer, allocatable :: sendtypes(:),recvtypes(:)
+  !integer, allocatable :: blens(:), new_idx(:)
 
   info=psb_success_
   name='psi_swap_datav'
@@ -1221,54 +1222,54 @@ subroutine psi_dswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 
   !We've to set the derivate datatypes
   !Send/Gather
-  pnti   = 1
-  snd_pt = 1
-  if(.not.allocated(sendtypes)) then
-  	allocate(sendtypes(totxch), stat=info)
-  	do i=1, totxch
-		nerv = idx(pnti+psb_n_elem_recv_)
-		nesd = idx(pnti+nerv+psb_n_elem_send_)
-		idx_pt = 1+pnti+nerv+psb_n_elem_send_
-		allocate(blens(nesd),stat=info)
-		do j=1,nesd
-		  blens(j) = 1
-		end do
+ ! pnti   = 1
+!  snd_pt = 1
+!  if(.not.allocated(sendtypes)) then
+  !	allocate(sendtypes(totxch), stat=info)
+ ! 	do i=1, totxch
+!		nerv = idx(pnti+psb_n_elem_recv_)
+!		nesd = idx(pnti+nerv+psb_n_elem_send_)
+!		idx_pt = 1+pnti+nerv+psb_n_elem_send_
+!		allocate(blens(nesd),stat=info)
+!		do j=1,nesd
+!		  blens(j) = 1
+!		end do
 
-		call MPI_TYPE_INDEXED(nesd,blens,(idx(idx_pt:idx_pt+nesd-1)-1),&
-		     & mpi_double_precision,sendtypes(i),info)
-		call MPI_TYPE_COMMIT(sendtypes(i),info)
-		deallocate(blens,stat=info)
-		snd_pt = snd_pt + nesd 
-		pnti   = pnti + nerv + nesd + 3
-  	end do
-  end if
+!		call MPI_TYPE_INDEXED(nesd,blens,(idx(idx_pt:idx_pt+nesd-1)-1),&
+!		     & mpi_double_precision,sendtypes(i),info)
+!		call MPI_TYPE_COMMIT(sendtypes(i),info)
+!		deallocate(blens,stat=info)
+!		snd_pt = snd_pt + nesd 
+!		pnti   = pnti + nerv + nesd + 3
+ ! 	end do
+ ! end if
   
   !Recv/Scatter
-  pnti   = 1
-  snd_pt = 1
-  rcv_pt = 1
-  if(.not.allocated(recvtypes)) then
-  	allocate(recvtypes(totxch), stat=info)
-	do i=1, totxch
-		proc_to_comm = idx(pnti+psb_proc_id_)
-		nerv = idx(pnti+psb_n_elem_recv_)
-		nesd = idx(pnti+nerv+psb_n_elem_send_)
-		idx_pt = 1+pnti+psb_n_elem_recv_
-		allocate(blens(nerv),stat=info)
-		do j=1, nerv
-		  blens(j) = 1
-		end do
+!  pnti   = 1
+ ! snd_pt = 1
+!  rcv_pt = 1
+  !if(.not.allocated(recvtypes)) then
+ ! 	allocate(recvtypes(totxch), stat=info)
+!	do i=1, totxch
+!		proc_to_comm = idx(pnti+psb_proc_id_)
+!		nerv = idx(pnti+psb_n_elem_recv_)
+!		nesd = idx(pnti+nerv+psb_n_elem_send_)
+!		idx_pt = 1+pnti+psb_n_elem_recv_
+!		allocate(blens(nerv),stat=info)
+!		do j=1, nerv
+!		  blens(j) = 1
+!		end do
+!
+!		call MPI_TYPE_INDEXED(nerv,blens,(idx(idx_pt:idx_pt+nerv-1)-1),&
+!		     & mpi_double_precision,recvtypes(i),info)
+!		call MPI_TYPE_COMMIT(recvtypes(i),info)
+!		deallocate(blens,stat=info)
 
-		call MPI_TYPE_INDEXED(nerv,blens,(idx(idx_pt:idx_pt+nerv-1)-1),&
-		     & mpi_double_precision,recvtypes(i),info)
-		call MPI_TYPE_COMMIT(recvtypes(i),info)
-		deallocate(blens,stat=info)
-
-		rcv_pt = rcv_pt + nerv
-		snd_pt = snd_pt + nesd
-		pnti   = pnti + nerv + nesd + 3
-	end do
-  end if
+!		rcv_pt = rcv_pt + nerv
+!		snd_pt = snd_pt + nesd
+!		pnti   = pnti + nerv + nesd + 3
+!	end do
+ ! end if
 
 
   if (beta/=0 .and. do_send) then

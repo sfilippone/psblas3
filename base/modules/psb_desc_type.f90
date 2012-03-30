@@ -209,6 +209,8 @@ module psb_descriptor_type
     integer(psb_ipk_), allocatable  :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable  :: idx_space(:)
+    integer, allocatable :: sendtypes(:),recvtypes(:) !Extendable as a matrix of every kind of data
+    
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
