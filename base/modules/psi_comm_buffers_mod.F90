@@ -5,15 +5,15 @@ module mpi
   integer(psb_mpik_), parameter :: mpi_success          = 0
   integer(psb_mpik_), parameter :: mpi_request_null     = 0
   integer(psb_mpik_), parameter :: mpi_status_size      = 1
-  integer(psb_mpik_), parameter :: psb_mpi_def_integer          = 1
-  integer(psb_mpik_), parameter :: psb_mpi_lng_integer         = 2
+  integer(psb_mpik_), parameter :: mpi_integer          = 1
+  integer(psb_mpik_), parameter :: mpi_integer8         = 2
   integer(psb_mpik_), parameter :: mpi_real             = 3
   integer(psb_mpik_), parameter :: mpi_double_precision = 4
   integer(psb_mpik_), parameter :: mpi_complex          = 5   
   integer(psb_mpik_), parameter :: mpi_double_complex   = 6 
   integer(psb_mpik_), parameter :: mpi_character        = 7
   integer(psb_mpik_), parameter :: mpi_logical          = 8
-  integer(psb_mpik_), parameter :: psb_mpi_def_integer2         = 9
+  integer(psb_mpik_), parameter :: mpi_integer2         = 9
   integer(psb_mpik_), parameter :: mpi_comm_null        = -1
   integer(psb_mpik_), parameter :: mpi_comm_world       = 1
   
