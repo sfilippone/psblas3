@@ -140,7 +140,8 @@ Specified as: an allocatable integer array of rank two.
 The Fortran~2003 declaration  for \verb|psb_desc_type| structures is 
 as follows:
 \begin{figure}[h!]
-  \begin{Sbox}
+  % \begin{Sbox}
+\begin{center}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
@@ -154,11 +155,12 @@ type psb_desc_type
 end type psb_desc_type 
 \end{verbatim}
     \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
   \end{center}
+% \end{Sbox}
+%   \setlength{\fboxsep}{8pt}
+%   \begin{center}
+%     \fbox{\TheSbox}
+%   \end{center}
   \caption{\label{fig:desctype}The PSBLAS defined data type that
     contains the communication descriptor.}
 \end{figure}
@@ -389,7 +391,8 @@ specific layout can be chosen dynamically among the predefined types,
 or an entirely new storage layout can be implemented and passed to the
 library at runtime via the \verb|psb_spasb| routine. 
 \begin{figure}[h!]
-  \begin{Sbox}
+  % \begin{Sbox}
+\begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
 \begin{verbatim}
 
@@ -401,11 +404,12 @@ library at runtime via the \verb|psb_spasb| routine.
 
 \end{verbatim}
     \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
   \end{center}
+% \end{Sbox}
+%   \setlength{\fboxsep}{8pt}
+%   \begin{center}
+%     \fbox{\TheSbox}
+%   \end{center}
   \caption{\label{fig:spmattype} 
     The PSBLAS defined data type that
     contains a sparse matrix.} 
@@ -655,7 +659,8 @@ available elsewhere outside the direct control of the
 compiler/application, e.g. data stored in a graphics  accelerator's
 private memory. 
 \begin{figure}[h!]
-  \begin{Sbox}
+  % \begin{Sbox}
+\begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
 \begin{verbatim}
   type psb_T_base_vect_type
@@ -668,11 +673,12 @@ private memory.
 
 \end{verbatim}
     \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
   \end{center}
+% \end{Sbox}
+%   \setlength{\fboxsep}{8pt}
+%   \begin{center}
+%     \fbox{\TheSbox}
+%   \end{center}
   \caption{\label{fig:vectype} 
     The PSBLAS defined data type that
     contains a dense vector.} 
@@ -778,7 +784,8 @@ The internal preconditioner is allocated appropriately with the
 dynamic type corresponding to the desired preconditioner. 
 \begin{figure}[h!]
   \small
-  \begin{Sbox}
+  % \begin{Sbox}
+\begin{center}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim}
 
@@ -788,11 +795,12 @@ dynamic type corresponding to the desired preconditioner.
 
 \end{verbatim}
     \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
   \end{center}
+% \end{Sbox}
+%   \setlength{\fboxsep}{8pt}
+%   \begin{center}
+%     \fbox{\TheSbox}
+%   \end{center}
   \caption{\label{fig:prectype}The PSBLAS defined data type that contains a preconditioner.}
 \end{figure}
 

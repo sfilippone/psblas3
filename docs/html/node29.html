@@ -93,22 +93,25 @@ available elsewhere outside the direct control of the
 compiler/application, e.g. data stored in a graphics  accelerator's
 private memory. 
 
-<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="732"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="712"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
     The PSBLAS defined data type that
     contains a dense vector.</CAPTION>
+<TR><TD><DIV ALIGN="CENTER">
+</DIV><TABLE  WIDTH="85%">
 <TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}">
+<PRE>
+  type psb_T_base_vect_type
+    TYPE(KIND_), allocatable :: v(:)
+  end type psb_T_base_vect_type
+
+  type psb_T_vect_type
+    class(psb_T_base_vect_type), allocatable :: v 
+  end type  psb_T_vect_type
+</PRE></TD></TR>
+</TABLE>
+<DIV ALIGN="CENTER">
 </DIV></TD></TR>
 </TABLE>
 </DIV>

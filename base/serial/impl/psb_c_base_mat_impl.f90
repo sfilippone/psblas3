@@ -86,9 +86,28 @@ subroutine psb_c_base_cp_to_fmt(a,b,info)
   ! Default implementation
   ! 
   info = psb_success_
+  call psb_erractionsave(err_act)
+
   call a%cp_to_coo(tmp,info)
   if (info == psb_success_) call b%mv_from_coo(tmp,info)
 
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
   return
 
 end subroutine psb_c_base_cp_to_fmt
@@ -111,10 +130,29 @@ subroutine psb_c_base_cp_from_fmt(a,b,info)
   !
   ! Default implementation
   ! 
-  info = psb_success_
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+
   call b%cp_to_coo(tmp,info)
   if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
   return
 
 end subroutine psb_c_base_cp_from_fmt
@@ -134,15 +172,30 @@ subroutine psb_c_base_mv_to_coo(a,b,info)
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_to_coo(b,info) 
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to coo')
+    goto 9999
+  end if
+
+  call a%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
     call psb_error()
+    return
   end if
   return
 
@@ -162,15 +215,29 @@ subroutine psb_c_base_mv_from_coo(a,b,info)
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
+  call a%cp_from_coo(b,info) 
 
-  if (err_act /= psb_act_ret_) then
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='from coo')
+    goto 9999
+  end if
+
+  call b%free()
+  
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
     call psb_error()
+    return
   end if
   return
 
@@ -1550,11 +1617,8 @@ subroutine psb_c_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='c_base_inner_vect_sv'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_success_
+  info  = psb_success_
+  call psb_erractionsave(err_act)
 
   call a%inner_cssm(alpha,x%v,beta,y%v,info,trans)  
 

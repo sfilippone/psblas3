@@ -202,22 +202,27 @@ Specified as: an allocatable integer array of rank two.
 The Fortran&nbsp;2003 declaration  for <code>psb_desc_type</code> structures is 
 as follows:
 
-<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="726"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="706"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3:</STRONG>
 The PSBLAS defined data type that
     contains the communication descriptor.</CAPTION>
+<TR><TD><DIV ALIGN="CENTER">
+</DIV><TABLE  WIDTH="90%">
 <TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}">
+<PRE> 
+type psb_desc_type 
+    class(psb_indx_map), allocatable :: indxmap
+    integer, allocatable  :: halo_index(:)
+    integer, allocatable  :: ext_index(:)
+    integer, allocatable  :: ovrlap_index(:)
+    integer, allocatable  :: ovrlap_elem(:,:)
+    integer, allocatable  :: ovr_mst_idx(:)
+    integer, allocatable  :: bnd_elem(:)
+end type psb_desc_type
+</PRE></TD></TR>
+</TABLE>
+<DIV ALIGN="CENTER">
 </DIV></TD></TR>
 </TABLE>
 </DIV>
