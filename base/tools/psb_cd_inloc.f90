@@ -61,7 +61,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
        & npr_ov, itmpov, i_pnt, nrt
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
-       & nov(:), ov_idx(:,:)
+       & nov(:), ov_idx(:,:), ix(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpik_) :: iictxt
   logical            :: check_, islarge
@@ -139,7 +139,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   islarge = psb_cd_choose_large_state(ictxt,m)
 
-  allocate(vl(loc_row),stat=info) 
+  allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name,i_err=int_err)
@@ -224,16 +224,19 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     goto 9999
   end if
 
-  !
-  ! Now sort the input items, and check for  duplicates
-  ! (unlikely, but possible)
-  !
-  call psb_msort_unique(vl,nlu)
-  if (loc_row /= nlu) then 
-    info = psb_err_dupl_cd_vl
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+  ! Sort, eliminate duplicates, then
+  ! scramble back into original position.
+  call psb_msort(vl,ix)
+  nlu = 1
+  do i=2,loc_row
+    if (vl(i) /= vl(nlu)) then
+      nlu = nlu + 1 
+      vl(nlu) = vl(i)
+      ix(nlu) = ix(i)
+    end if
+  end do
+  call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
+
 
   call psb_nullify_desc(desc)
 
@@ -355,7 +358,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
-  if (info == psb_success_) deallocate(temp_ovrlap,vl,stat=info)
+  if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&
        &  deallocate(tmpgidx,stat=info)
   if ((info == psb_success_) .and.(allocated(ov_idx)))  &

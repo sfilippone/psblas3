@@ -167,6 +167,7 @@ program ppde3d
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
+  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !

@@ -646,7 +646,7 @@ contains
     !  To be implemented
     integer(psb_mpik_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, m, nrt,int_err(5)
-    integer(psb_ipk_), allocatable :: vlu(:)
+    integer(psb_ipk_), allocatable :: vlu(:), ix(:)
     character(len=20), parameter :: name='hash_map_init_vl'
 
     info = 0
@@ -664,7 +664,7 @@ contains
     call psb_sum(ictxt,nrt)
     call psb_max(ictxt,m)
 
-    allocate(vlu(nl), stat=info) 
+    allocate(vlu(nl), ix(nl), stat=info) 
     if (info /= 0) then 
       info = -1
       return
@@ -687,16 +687,21 @@ contains
            & ' Warning: globalcheck=.false., but there is a mismatch'
       write(psb_err_unit,*) trim(name),&
            & '        : in the global sizes!',m,nrt
-    end if
-    !
-    ! Now sort the input items, and check for  duplicates
-    ! (unlikely, but possible)
-    !
-    call psb_msort_unique(vlu,nlu)
-    if (nlu /= nl) then 
-      write(0,*) 'Warning: duplicates in input'
+
     end if
 
+    call psb_msort(vlu,ix)
+    nlu = 1
+    do i=2,nl
+      if (vlu(i) /= vlu(nlu)) then
+        nlu = nlu + 1 
+        vlu(nlu) = vlu(i)
+        ix(nlu) = ix(i)
+      end if
+    end do
+    call psb_msort(ix(1:nlu),vlu(1:nlu),flag=psb_sort_keep_idx_)
+    
+    nlu = nl
     call hash_init_vlu(idxmap,ictxt,m,nlu,vlu,info)    
 
   end subroutine hash_init_vl

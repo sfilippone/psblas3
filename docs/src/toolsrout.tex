@@ -64,8 +64,8 @@ Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. May be specified together with
 \verb|vl|. 
-\item[repl] Data allocation: build a replicated index space (i.e. all
-  processes own all indices).\\
+\item[repl] Data allocation: build a replicated index space 
+  (i.e. all processes own all indices).\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
@@ -242,6 +242,12 @@ An integer value; 0 means no error has been detected.
 \item  This routine automatically ignores edges that do not
 insist on the  current process, i.e. edges for which neither the starting
 nor the end vertex belong to the current process. 
+\item There exists another interface for this routine
+\begin{verbatim}
+call psb_cdins(nz, ja, desc_a, info)
+\end{verbatim}
+which will digest all entries in \verb|ja| and add them to the
+communication requirements. 
 \end{enumerate}
 
 
@@ -552,7 +558,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_spins}
 
 \begin{verbatim}
-call psb_spins(nz, ia, ja, val, a, desc_a, info)
+call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
@@ -584,6 +590,12 @@ Scope: {\bf local}. \\
 Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: a variable of type \descdata.\\
+\item[local] Whether the entries in the indices vectors \verb|ia|,
+  \verb|ja| are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
 %% \item[is] the starting row on matrix $a$.\\
 %% Scope:{\bf local}.\\
 %% Type:{\bf optional}.\\
@@ -927,7 +939,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_geins}
 
 \begin{verbatim}
-call psb_geins(m, irw, val, x, desc_a, info,dupl)
+call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
 \end{verbatim}
 
 \begin{description}
@@ -962,6 +974,12 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \verb|psb_dupl_add_|.
+\item[local] Whether the entries in the index vector \verb|irw|,
+   are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
 \end{description}
 
 \begin{description}
