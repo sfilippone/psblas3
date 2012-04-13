@@ -167,7 +167,7 @@ Module psb_c_tools_mod
 
 
   interface psb_geins
-    subroutine psb_cinsi(m,irw,val, x, desc_a,info,dupl)
+    subroutine psb_cinsi(m,irw,val, x, desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_base_vect_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat
@@ -178,8 +178,9 @@ Module psb_c_tools_mod
       complex(psb_spk_), intent(in)  ::  val(:,:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_cinsi
-    subroutine psb_cinsvi(m, irw,val, x,desc_a,info,dupl)
+    subroutine psb_cinsvi(m, irw,val, x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_base_vect_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat
@@ -190,8 +191,9 @@ Module psb_c_tools_mod
       complex(psb_spk_), intent(in)  ::  val(:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_cinsvi
-    subroutine psb_cins_vect(m,irw,val,x,desc_a,info,dupl)
+    subroutine psb_cins_vect(m,irw,val,x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_base_vect_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat
@@ -202,8 +204,9 @@ Module psb_c_tools_mod
       complex(psb_spk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_cins_vect
-    subroutine psb_cins_vect_r2(m,irw,val,x,desc_a,info,dupl)
+    subroutine psb_cins_vect_r2(m,irw,val,x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_base_vect_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat
@@ -214,6 +217,7 @@ Module psb_c_tools_mod
       complex(psb_spk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_cins_vect_r2
   end interface
 
@@ -270,7 +274,7 @@ Module psb_c_tools_mod
 
 
   interface psb_spins
-    subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
+    subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_base_vect_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat
@@ -280,6 +284,7 @@ Module psb_c_tools_mod
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
+      logical, intent(in), optional        :: local
     end subroutine psb_cspins
     subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &

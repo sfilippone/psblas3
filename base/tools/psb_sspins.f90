@@ -48,7 +48,7 @@
 !    rebuild  - logical                     Allows to reopen a matrix under
 !                                           certain circumstances.
 !
-subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
+subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   use psb_base_mod, psb_protect_name => psb_sspins
   use psi_mod
   implicit none
@@ -59,14 +59,14 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   integer(psb_ipk_), intent(in)                   :: nz,ia(:),ja(:)
   real(psb_spk_), intent(in)         :: val(:)
   integer(psb_ipk_), intent(out)                  :: info
-  logical, intent(in), optional         :: rebuild
+  logical, intent(in), optional         :: rebuild, local
   !locals.....
 
   integer(psb_ipk_) :: nrow, err_act, ncol, spstate
   integer(psb_ipk_) :: ictxt,np,me
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
-  logical                :: rebuild_
+  logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
@@ -113,8 +113,19 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     rebuild_ = .false.
   endif
 
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
+
   if (psb_is_bld_desc(desc_a)) then 
 
+    if (local_) then
+      info = psb_err_invalid_a_and_cd_state_
+      call psb_errpush(info,name)
+      goto 9999
+    else      
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
         ierr(1) = info
@@ -145,10 +156,18 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
         call psb_errpush(info,name)
         goto 9999
       end if
+    endif
 
-    
   else if (psb_is_asb_desc(desc_a)) then 
 
+    if (local_) then
+      call a%csput(nz,ia,ja,val,ione,nrow,ione,ncol,info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='a%csput')
+        goto 9999
+      end if
+    else
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
         ierr(1) = info
@@ -170,7 +189,7 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
         call psb_errpush(info,name,a_err='a%csput')
         goto 9999
       end if
-
+    end if
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
