@@ -1,4 +1,4 @@
-subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck)
+subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -8,13 +8,13 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   use psi_mod
   implicit None
   procedure(psb_parts)               :: parts
-  integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
+  integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl,lidx(:)
   integer(psb_ipk_), intent(in)               :: flag
   logical, intent(in)               :: repl, globalcheck
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
-  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck
+  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx
 
   interface 
     subroutine psb_cdals(m, n, parts, ictxt, desc, info)
@@ -31,13 +31,14 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
       integer(psb_ipk_), intent(out)              :: info
       Type(psb_desc_type), intent(out)  :: desc
     end subroutine psb_cdalv
-    subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
+    subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
       use psb_descriptor_type
       implicit None
       integer(psb_ipk_), intent(in)               :: ictxt, v(:)
       integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
       logical, intent(in), optional     :: globalcheck
+      integer(psb_ipk_), intent(in), optional     :: idx(:)
     end subroutine psb_cd_inloc
     subroutine psb_cdrep(m, ictxt, desc,info)
       use psb_descriptor_type
@@ -125,7 +126,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
       nnv = size(vl)
     end if
 
-    call psb_cd_inloc(vl(1:nnv),ictxt,desc,info, globalcheck=globalcheck)
+    call psb_cd_inloc(vl(1:nnv),ictxt,desc,info, globalcheck=globalcheck,idx=lidx)
 
   else if (present(nl)) then 
     

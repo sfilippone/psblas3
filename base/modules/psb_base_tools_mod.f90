@@ -422,17 +422,17 @@ module psb_cd_tools_mod
 
   interface psb_cdall
 
-    subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck)
+    subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl,&
+         & globalcheck,lidx)
       import :: psb_ipk_, psb_desc_type, psb_parts
       implicit None
       procedure(psb_parts)                :: parts
-      integer(psb_ipk_), intent(in)       :: mg,ng,ictxt, vg(:), vl(:),nl
+      integer(psb_ipk_), intent(in)       :: mg,ng,ictxt, vg(:), vl(:),nl,lidx(:)
       integer(psb_ipk_), intent(in)       :: flag
       logical, intent(in)                 :: repl, globalcheck
       integer(psb_ipk_), intent(out)      :: info
-      type(psb_desc_type), intent(out)    :: desc
-      
-      optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck
+      type(psb_desc_type), intent(out)    :: desc      
+      optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx
     end subroutine psb_cdall
     
   end interface
