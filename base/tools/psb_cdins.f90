@@ -162,9 +162,9 @@ end subroutine psb_cdinsrc
 ! Arguments: 
 !    nz       - integer.                       The number of points to insert.
 !    ja(:)    - integer                        The column indices of the points.
-!    desc     - type(psb_desc_type).         The communication descriptor 
+!    desc     - type(psb_desc_type).           The communication descriptor 
 !    info     - integer.                       Return code.
-!    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
+!    jla(:)   - integer(psb_ipk_), optional    The col indices in local numbering
 !    mask(:)  - logical, optional, target
 !
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)

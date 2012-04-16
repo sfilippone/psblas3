@@ -96,7 +96,7 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of length <IMG
  WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img93.png"
+ SRC="img95.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>ja</STRONG></DT>
@@ -110,7 +110,7 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of length <IMG
  WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img93.png"
+ SRC="img95.png"
  ALT="$nz$">.
 </DD>
 </DL>
@@ -152,6 +152,13 @@ An integer value; 0 means no error has been detected.
 <LI>This routine automatically ignores edges that do not
 insist on the  current process, i.e. edges for which neither the starting
 nor the end vertex belong to the current process. 
+</LI>
+<LI>There exists another interface for this routine
+<PRE>
+call psb_cdins(nz, ja, desc_a, info)
+</PRE>
+which will digest all entries in <code>ja</code> and add them to the
+communication requirements. 
 </LI>
 </OL>
 

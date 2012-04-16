@@ -57,7 +57,7 @@ psb_geins -- Dense matrix insertion routine</A>
 
 <P>
 <PRE>
-call psb_geins(m, irw, val, x, desc_a, info,dupl)
+call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
 </PRE>
 
 <P>
@@ -71,7 +71,7 @@ call psb_geins(m, irw, val, x, desc_a, info,dupl)
 <DT><STRONG>m</STRONG></DT>
 <DD>Number of rows in <IMG
  WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ SRC="img100.png"
  ALT="$val$"> to be inserted.
 <BR>
 Scope:<B>local</B>.
@@ -89,11 +89,11 @@ Specified as: an integer value.
  ALT="$i$">
   of <IMG
  WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ SRC="img100.png"
  ALT="$val$"> will be inserted into the local row corresponding to the
   global row index <IMG
  WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img99.png"
+ SRC="img101.png"
  ALT="$irw(i)$">.
 Scope:<B>local</B>.
 <BR>
@@ -137,6 +137,18 @@ Intent: <B>in</B>.
 <BR>
 Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
 <code>psb_dupl_add_</code>.
+</DD>
+<DT><STRONG>local</STRONG></DT>
+<DD>Whether the entries in the index vector <code>irw</code>,
+   are already in local  numbering. 
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a logical value; default: <code>.false.</code>.
+
+<P>
 </DD>
 </DL>
 

@@ -58,7 +58,7 @@ psb_spins -- Insert a cloud of elements into a sparse
 
 <P>
 <PRE>
-call psb_spins(nz, ia, ja, val, a, desc_a, info)
+call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
 </PRE>
 
 <P>
@@ -91,7 +91,7 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of size <IMG
  WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img93.png"
+ SRC="img95.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>ja</STRONG></DT>
@@ -105,7 +105,7 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of size <IMG
  WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img93.png"
+ SRC="img95.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>val</STRONG></DT>
@@ -119,11 +119,11 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an array of size <IMG
  WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img93.png"
+ SRC="img95.png"
  ALT="$nz$">. Must be of the same type and kind
 of the <code>aspk</code> component of the sparse matrix <IMG
  WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img96.png"
+ SRC="img98.png"
  ALT="$a$">.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -137,6 +137,18 @@ Intent: <B>inout</B>.
 <BR>
 Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
+<DT><STRONG>local</STRONG></DT>
+<DD>Whether the entries in the indices vectors <code>ia</code>,
+  <code>ja</code> are already in local  numbering. 
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a logical value; default: <code>.false.</code>.
+
+<P>
+</DD>
 </DL>
 
 <P>

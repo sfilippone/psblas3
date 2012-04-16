@@ -59,7 +59,7 @@ psb_cdall -- Allocates a communication descriptor</A>
 <PRE>
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 </PRE>
@@ -181,8 +181,8 @@ Specified as: an integer value. May be specified together with
 <code>vl</code>. 
 </DD>
 <DT><STRONG>repl</STRONG></DT>
-<DD>Data allocation: build a replicated index space (i.e. all
-  processes own all indices).
+<DD>Data allocation: build a replicated index space 
+  (i.e. all processes own all indices).
 <BR>
 Scope:<B>global</B>.
 <BR>
@@ -203,6 +203,24 @@ Type:<B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: a logical value, default: <code>.true.</code>
+</DD>
+<DT><STRONG>lidx</STRONG></DT>
+<DD>Data allocation: the set of local  indices 
+  <IMG
+ WIDTH="81" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img85.png"
+ ALT="$lidx(1:nl)$"> to be assigned to the global indices <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img86.png"
+ ALT="$vl$">. 
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array. 
 </DD>
 </DL>
 
@@ -286,10 +304,10 @@ An integer value; 0 means no error has been detected.
  -->
 <IMG
  WIDTH="107" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img85.png"
+ SRC="img87.png"
  ALT="$0\le pv(i) &lt; np$">; if <IMG
  WIDTH="51" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img86.png"
+ SRC="img88.png"
  ALT="$nv&gt;1$"> we have an index assigned to multiple
     processes, i.e. we have an overlap among the subdomains.
   
@@ -312,15 +330,15 @@ An integer value; 0 means no error has been detected.
   The vector <code>vg</code> must be identical on all
   calling processes; its entries may have the ranges <IMG
  WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img87.png"
+ SRC="img89.png"
  ALT="$(0\dots np-1)$">
   or <IMG
  WIDTH="65" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img88.png"
+ SRC="img90.png"
  ALT="$(1\dots np)$"> according to the value of <code>flag</code>.  
   The size <IMG
  WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img89.png"
+ SRC="img91.png"
  ALT="$mg$"> may be  specified via the optional argument <code>mg</code>;
   the default is to use the entire vector <code>vg</code>, thus having
   <code>mg=size(vg)</code>. 
@@ -330,33 +348,37 @@ An integer value; 0 means no error has been detected.
   <code>vl(1:nl)</code> assigned   to the current process; thus, the global
   problem size <IMG
  WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img89.png"
+ SRC="img91.png"
  ALT="$mg$"> is given by 
   the range of the aggregate of the individual vectors <code>vl</code> specified
   in the calling processes. The size may be specified via the optional
-  argument <code>nl</code>; the default is to use the entire vector  <code>vl</code>, thus having
-  <code>nl=size(vl)</code>.  
+  argument <code>nl</code>; the default is to use the entire vector
+  <code>vl</code>, thus having   <code>nl=size(vl)</code>.  
   If <code>globalcheck=.true.</code>   the subroutine will check how many
   times  each entry in the global   index   space <IMG
  WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img90.png"
+ SRC="img92.png"
  ALT="$(1\dots mg)$"> is
   specified in the input lists   <code>vl</code>, thus allowing for the
   presence of overlap in the input,   and checking for ``orphan''
   indices.    If <code>globalcheck=.false.</code>, the subroutine will not
   check for   overlap, and may be significantly faster, but   the user
   is implicitly guaranteeing that there are neither orphan   nor
-  overlap indices.  
+  overlap indices.  The optional argument <code>lidx</code> is available for
+  those cases in which the user has already established a
+  global-to-local mapping; if it is specified, each  index in
+  <code>vl(i)</code> will be mapped to the corresponding local index
+  <code>lidx(i)</code>.
 </DD>
 <DT><STRONG>nl</STRONG></DT>
 <DD>If this argument is specified alone (i.e. without <code>vl</code>)
   the  result is  a generalized row-block   distribution in which each
   process <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img91.png"
+ SRC="img93.png"
  ALT="$I$"> gets assigned a consecutive   chunk of <IMG
  WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img92.png"
+ SRC="img94.png"
  ALT="$N_I=nl$"> global
   indices. 
 </DD>

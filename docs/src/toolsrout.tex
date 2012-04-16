@@ -11,7 +11,7 @@
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
@@ -76,6 +76,12 @@ Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: a logical value, default: \verb|.true.|
+\item[lidx] Data allocation: the set of local  indices 
+  $lidx(1:nl)$ to be assigned to the global indices $vl$. \\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. 
 \end{description}
 
 \begin{description}
@@ -139,8 +145,8 @@ An integer value; 0 means no error has been detected.
   problem size $mg$ is given by 
   the range of the aggregate of the individual vectors \verb|vl| specified
   in the calling processes. The size may be specified via the optional
-  argument \verb|nl|; the default is to use the entire vector  \verb|vl|, thus having
-  \verb|nl=size(vl)|.  
+  argument \verb|nl|; the default is to use the entire vector
+  \verb|vl|, thus having   \verb|nl=size(vl)|.  
   If \verb|globalcheck=.true.|   the subroutine will check how many
   times  each entry in the global   index   space $(1\dots mg)$ is
   specified in the input lists   \verb|vl|, thus allowing for the
@@ -148,7 +154,11 @@ An integer value; 0 means no error has been detected.
   indices.    If \verb|globalcheck=.false.|, the subroutine will not
   check for   overlap, and may be significantly faster, but   the user
   is implicitly guaranteeing that there are neither orphan   nor
-  overlap indices.  
+  overlap indices.  The optional argument \verb|lidx| is available for
+  those cases in which the user has already established a
+  global-to-local mapping; if it is specified, each  index in
+  \verb|vl(i)| will be mapped to the corresponding local index
+  \verb|lidx(i)|.
 \item[nl] If this argument is specified alone (i.e. without \verb|vl|)
   the  result is  a generalized row-block   distribution in which each
   process $I$ gets assigned a consecutive   chunk of $N_I=nl$ global
