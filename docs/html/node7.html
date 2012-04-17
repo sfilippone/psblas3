@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Programming model</TITLE>
-<META NAME="description" CONTENT="Programming model">
+<TITLE>User-defined index mappings</TITLE>
+<META NAME="description" CONTENT="User-defined index mappings">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,105 +19,93 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="previous" HREF="node6.html">
-<LINK REL="up" HREF="node3.html">
+<LINK REL="up" HREF="node6.html">
 <LINK REL="next" HREF="node8.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html256"
+<A NAME="tex2html259"
   HREF="node8.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html252"
-  HREF="node3.html">
+<A NAME="tex2html255"
+  HREF="node6.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html248"
+<A NAME="tex2html251"
   HREF="node6.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html254"
+<A NAME="tex2html257"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html257"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Up:</B> <A NAME="tex2html253"
-  HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html249"
+<B> Next:</B> <A NAME="tex2html260"
+  HREF="node8.html">Programming model</A>
+<B> Up:</B> <A NAME="tex2html256"
   HREF="node6.html">Application structure</A>
- &nbsp; <B>  <A NAME="tex2html255"
+<B> Previous:</B> <A NAME="tex2html252"
+  HREF="node6.html">Application structure</A>
+ &nbsp; <B>  <A NAME="tex2html258"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00034000000000000000">
-Programming model</A>
-</H2>
+<H3><A NAME="SECTION00033100000000000000">
+User-defined index mappings</A>
+</H3>
 
 <P>
-The PSBLAS librarary is based on the Single Program Multiple Data
-(SPMD) programming model: each process participating in the
-computation performs the same actions on a chunk of data. Parallelism
-is thus data-driven. 
+PSBLAS supports user-defined global to local index mappings, subject
+to the constraints outlined in sec.&nbsp;<A HREF="node6.html#sec:appstruct">2.3</A>: 
+
+<OL>
+<LI>The set of indices owned locally must be mapped to the set
+  <!-- MATH
+ $1\dots n_{\hbox{row}_i}$
+ -->
+<IMG
+ WIDTH="77" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.png"
+ ALT="$1\dots n_{\hbox{row}_i}$">;
+</LI>
+<LI>The set of halo points must be mapped to the set
+  <!-- MATH
+ $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$
+ -->
+<IMG
+ WIDTH="130" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img18.png"
+ ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$">;
+</LI>
+</OL>
+but otherwise the mapping is arbitrary. The user application is
+responsible to ensure consistency of this mapping; some errors may be
+catched by the library, but this is not guaranteed. 
+The application structure to
+support this usage is as follows:
+
+<OL>
+<LI>Initialize index space with
+  <code>psb_cdall(ictx,desc,info,vl=vl,lidx=lidx)</code> passing the vectors 
+  <code>vl(:)</code> containing the set of global indices owned by the
+  current process and   <code>lidx(:)</code> containing the corresponding
+  local indices;
+</LI>
+<LI>Add the halo points <code>ja(:)</code> and their associated local
+  indices <code>lidx(:)</code>  with a(some) call(s) to
+  <code>psb_cdins(nz,ja,desc,info,lidx=lidx)</code>; 
+</LI>
+<LI>Assemble the descriptor with <code>psb_cdasb</code>;
+</LI>
+<LI>Build the sparse matrices and vectors, optionally making use in
+  <code>psb_spins</code> and <code>psb_geins</code> of the <code>local</code> argument
+  specifying that the indices in <code>ia</code>, <code>ja</code> and <code>irw</code>,
+  respectively, are already local indices. 
+</LI>
+</OL>
 
 <P>
-Because of this structure, many subroutines coordinate their action
-across the various processes, thus providing an implicit
-synchronization point, and therefore <I>must</I> be
-called simultaneously by all processes participating in the
-computation. This is certainly true for the data allocation and
-assembly routines, for  all the computational routines and for some of
-the tools routines.
-
-<P>
-However there are many cases where no synchronization, and indeed no
-communication among processes, is implied; for instance, all the routines in
-sec.&nbsp;<A HREF="#sec:dataquery"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A> are only acting on the local data structures,
-and thus may be called independently. The most important case is that
-of the coefficient insertion routines: since the number of
-coefficients in the sparse and dense matrices varies among the
-processors, and since the user is free to choose an arbitrary order in
-builiding the matrix entries, these routines cannot imply a
-synchronization. 
-
-<P>
-Throughout this user's guide each subroutine will be clearly indicated
-as:
-<DL>
-<DT><STRONG>Synchronous:</STRONG></DT>
-<DD>must be called simultaneously by all the
-  processes in the relevant communication context;
-</DD>
-<DT><STRONG>Asynchronous:</STRONG></DT>
-<DD>may be called in a totally independent manner.
-</DD>
-</DL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html256"
-  HREF="node8.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html252"
-  HREF="node3.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html248"
-  HREF="node6.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html254"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html257"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Up:</B> <A NAME="tex2html253"
-  HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html249"
-  HREF="node6.html">Application structure</A>
- &nbsp; <B>  <A NAME="tex2html255"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

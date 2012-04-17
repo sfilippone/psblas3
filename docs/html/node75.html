@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_owned_index </TITLE>
-<META NAME="description" CONTENT="psb_owned_index ">
+<TITLE>psb_is_owned </TITLE>
+<META NAME="description" CONTENT="psb_is_owned ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node76.html">
 <LINK REL="previous" HREF="node74.html">
-<LINK REL="up" HREF="node55.html">
+<LINK REL="up" HREF="node56.html">
 <LINK REL="next" HREF="node76.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1151"
+<A NAME="tex2html1152"
   HREF="node76.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1147"
-  HREF="node55.html">
+<A NAME="tex2html1148"
+  HREF="node56.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1141"
+<A NAME="tex2html1142"
   HREF="node74.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1149"
+<A NAME="tex2html1150"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1152"
-  HREF="node76.html">psb_is_local</A>
-<B> Up:</B> <A NAME="tex2html1148"
-  HREF="node55.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1142"
-  HREF="node74.html">psb_is_owned</A>
- &nbsp; <B>  <A NAME="tex2html1150"
+<B> Next:</B> <A NAME="tex2html1153"
+  HREF="node76.html">psb_owned_index</A>
+<B> Up:</B> <A NAME="tex2html1149"
+  HREF="node56.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1143"
+  HREF="node74.html">psb_loc_to_glob   Local</A>
+ &nbsp; <B>  <A NAME="tex2html1151"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000720000000000000000">
-psb_owned_index </A>
+<H2><A NAME="SECTION000719000000000000000">
+psb_is_owned </A>
 </H2>
 
 <P>
 <PRE>
-call psb_owned_index(y, x, desc_a, info)
+call psb_is_owned(x, desc_a)
 </PRE>
 
 <P>
@@ -69,15 +69,15 @@ call psb_owned_index(y, x, desc_a, info)
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>Integer indices.
+<DD>Integer index.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in, inout</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: a scalar or a rank one integer array.
+Specified as: a scalar integer.
 <BR></DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -90,17 +90,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
-</DD>
 </DL>
 
 <P>
@@ -108,39 +97,26 @@ Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>A logical mask which is true for all corresponding entries of
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A logical mask which is true if 
   <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> that are owned by the current process
+ ALT="$x$"> is  owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
-<BR>
-Specified as: a scalar or rank one logical array.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
+<BR></DD>
 </DL>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This routine returns a <code>.true.</code> value for those indices
-  that are strictly owned by the current process, excluding the halo
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is strictly owned by the current process, excluding the halo
   indices
 </LI>
 </OL>

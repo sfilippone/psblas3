@@ -186,36 +186,40 @@ module psi_i_mod
   end interface psi_idx_cnv
 
   interface psi_idx_ins_cnv
-    subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
+    subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
       integer(psb_ipk_), intent(in)    :: nv
       integer(psb_ipk_), intent(inout) ::  idxin(:)
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask(:)
+      integer, intent(in), optional :: lidx(:)
     end subroutine psi_idx_ins_cnv1
-    subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
+    subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
       integer(psb_ipk_), intent(in)  :: nv, idxin(:)
       integer(psb_ipk_), intent(out) :: idxout(:)
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask(:)
+      integer, intent(in), optional :: lidx(:)
     end subroutine psi_idx_ins_cnv2
-    subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
+    subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
       integer(psb_ipk_), intent(in)  :: idxin
       integer(psb_ipk_), intent(out) :: idxout
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask
+      integer, intent(in), optional :: lidx
     end subroutine psi_idx_ins_cnvs2
-    subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
+    subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
       integer(psb_ipk_), intent(inout)  :: idxin
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask
+      integer, intent(in), optional :: lidx
     end subroutine psi_idx_ins_cnvs1
   end interface psi_idx_ins_cnv
 

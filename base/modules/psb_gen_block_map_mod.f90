@@ -406,7 +406,7 @@ contains
 
 
 
-  subroutine block_g2ls1_ins(idx,idxmap,info,mask)
+  subroutine block_g2ls1_ins(idx,idxmap,info,mask, lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
@@ -414,34 +414,41 @@ contains
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
     
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_ipk_) :: idxv(1), lidxv(1)
 
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
     end if
     idxv(1) = idx
-    call idxmap%g2l_ins(idxv,info)
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2l_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2l_ins(idxv,info)
+    end if
     idx = idxv(1) 
 
   end subroutine block_g2ls1_ins
 
-  subroutine block_g2ls2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine block_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    
+    integer, intent(in), optional :: lidx
+
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info)
+    call idxmap%g2l_ins(idxout,info,mask=mask,lidx=lidx)
     
   end subroutine block_g2ls2_ins
 
 
-  subroutine block_g2lv1_ins(idx,idxmap,info,mask)
+  subroutine block_g2lv1_ins(idx,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
@@ -449,6 +456,8 @@ contains
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: i, nv, is, ix
     integer(psb_ipk_) :: ip, lip, nxt
 
@@ -462,6 +471,12 @@ contains
         return
       end if
     end if
+    if (present(lidx)) then 
+      if (size(lidx) < size(idx)) then 
+        info = -1
+        return
+      end if
+    end if
 
 
     if (idxmap%is_asb()) then 
@@ -471,9 +486,125 @@ contains
 
     else if (idxmap%is_valid()) then 
 
-      if (present(mask)) then 
-        do i=1, is
-          if (mask(i)) then 
+      if (present(lidx)) then 
+        if (present(mask)) then 
+
+          do i=1, is
+            if (mask(i)) then 
+              if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+                idx(i) = idx(i) - idxmap%min_glob_row + 1
+              else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+
+                if (lidx(i) <= idxmap%local_rows) then 
+                  info = -5
+                  return
+                end if
+                nxt = lidx(i)-idxmap%local_rows
+                ip  = idx(i) 
+                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                if (info >= 0) then 
+                  if (lip == nxt) then 
+                    ! We have added one item
+                    call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
+                    if (info /= 0) then 
+                      info = -4
+                      return
+                    end if
+                    idxmap%local_cols       = max(lidx(i),idxmap%local_cols)
+                    idxmap%loc_to_glob(nxt) = idx(i)
+                  end if
+                  info = psb_success_
+                else
+                  info = -5
+                  return
+                end if
+                idx(i)  = lip + idxmap%local_rows
+              else 
+                idx(i) = -1
+                info = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+
+          do i=1, is
+
+            if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+              idx(i) = idx(i) - idxmap%min_glob_row + 1
+            else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+              if (lidx(i) <= idxmap%local_rows) then 
+                info = -5
+                return
+              end if
+              nxt = lidx(i)-idxmap%local_rows
+              ip = idx(i) 
+              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+
+              if (info >= 0) then 
+                if (lip == nxt) then 
+                  ! We have added one item
+                  call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
+                  if (info /= 0) then 
+                    info = -4
+                    return
+                  end if
+                  idxmap%local_cols       = max(lidx(i),idxmap%local_cols)
+                  idxmap%loc_to_glob(nxt) = idx(i)
+                end if
+                info = psb_success_
+              else
+                info = -5
+                return
+              end if
+              idx(i)  = lip + idxmap%local_rows
+            else 
+              idx(i) = -1
+              info = -1
+            end if
+          end do
+        end if
+
+      else if (.not.present(lidx)) then 
+
+        if (present(mask)) then 
+          do i=1, is
+            if (mask(i)) then 
+              if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+                idx(i) = idx(i) - idxmap%min_glob_row + 1
+              else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+                nv  = idxmap%local_cols-idxmap%local_rows
+                nxt = nv + 1 
+                ip = idx(i) 
+                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                if (info >= 0) then 
+                  if (lip == nxt) then 
+                    ! We have added one item
+                    call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
+                    if (info /= 0) then 
+                      info = -4
+                      return
+                    end if
+                    idxmap%local_cols       = nxt + idxmap%local_rows
+                    idxmap%loc_to_glob(nxt) = idx(i)
+                  end if
+                  info = psb_success_
+                else
+                  info = -5
+                  return
+                end if
+                idx(i)  = lip + idxmap%local_rows
+              else 
+                idx(i) = -1
+                info = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+
+          do i=1, is
+
             if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
@@ -481,6 +612,7 @@ contains
               nxt = nv + 1 
               ip = idx(i) 
               call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+
               if (info >= 0) then 
                 if (lip == nxt) then 
                   ! We have added one item
@@ -502,43 +634,8 @@ contains
               idx(i) = -1
               info = -1
             end if
-          end if
-        end do
-
-      else if (.not.present(mask)) then 
-
-        do i=1, is
-
-          if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
-            idx(i) = idx(i) - idxmap%min_glob_row + 1
-          else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
-            nv  = idxmap%local_cols-idxmap%local_rows
-            nxt = nv + 1 
-            ip = idx(i) 
-            call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
-            if (info >= 0) then 
-              if (lip == nxt) then 
-                ! We have added one item
-                call psb_ensure_size(nxt,idxmap%loc_to_glob,info,addsz=laddsz)
-                if (info /= 0) then 
-                  info = -4
-                  return
-                end if
-                idxmap%local_cols       = nxt + idxmap%local_rows
-                idxmap%loc_to_glob(nxt) = idx(i)
-              end if
-              info = psb_success_
-            else
-              info = -5
-              return
-            end if
-            idx(i)  = lip + idxmap%local_rows
-          else 
-            idx(i) = -1
-            info = -1
-          end if
-        end do
+          end do
+        end if
       end if
 
     else 
@@ -548,19 +645,21 @@ contains
 
   end subroutine block_g2lv1_ins
 
-  subroutine block_g2lv2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine block_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l_ins(idxout(1:im),info,mask)
+    call idxmap%g2l_ins(idxout(1:im),info,mask=mask,lidx=lidx)
     if (is > im) then 
 !!$      write(0,*) 'g2lv2_ins err -3'
       info = -3 

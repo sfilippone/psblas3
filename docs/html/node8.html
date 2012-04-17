@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Data Structures and Classes</TITLE>
-<META NAME="description" CONTENT="Data Structures and Classes">
+<TITLE>Programming model</TITLE>
+<META NAME="description" CONTENT="Programming model">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,198 +18,104 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node36.html">
-<LINK REL="previous" HREF="node3.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="node3.html">
 <LINK REL="next" HREF="node9.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html268"
+<A NAME="tex2html269"
   HREF="node9.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html264"
-  HREF="userhtml.html">
+<A NAME="tex2html265"
+  HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html258"
+<A NAME="tex2html261"
   HREF="node7.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html266"
+<A NAME="tex2html267"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html269"
-  HREF="node9.html">Descriptor data structure</A>
-<B> Up:</B> <A NAME="tex2html265"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html259"
-  HREF="node7.html">Programming model</A>
- &nbsp; <B>  <A NAME="tex2html267"
+<B> Next:</B> <A NAME="tex2html270"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Up:</B> <A NAME="tex2html266"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html262"
+  HREF="node7.html">User-defined index mappings</A>
+ &nbsp; <B>  <A NAME="tex2html268"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00040000000000000000"></A>
-<A NAME="sec:datastruct"></A>
-<BR>
-Data Structures and Classes
-</H1>
+<H2><A NAME="SECTION00034000000000000000">
+Programming model</A>
+</H2>
 
 <P>
-In this chapter we  illustrate the  data structures used for definition of
-routines interfaces. They  include data structures for sparse matrices,
-communication descriptors and preconditioners.
-<P>
-All the data types and the basic subroutine interfaces related to
-descriptors and sparse matrices are defined in
-the module <code>psb_base_mod</code>; this will have to be included by every
-user subroutine that makes use of the library. The preconditioners are
-defined in the module <code>psb_prec_mod</code>
+The PSBLAS librarary is based on the Single Program Multiple Data
+(SPMD) programming model: each process participating in the
+computation performs the same actions on a chunk of data. Parallelism
+is thus data-driven. 
 
 <P>
-Integer, real and complex data types are parametrized with a kind type
-defined in the library as follows: 
+Because of this structure, many subroutines coordinate their action
+across the various processes, thus providing an implicit
+synchronization point, and therefore <I>must</I> be
+called simultaneously by all processes participating in the
+computation. This is certainly true for the data allocation and
+assembly routines, for  all the computational routines and for some of
+the tools routines.
+
+<P>
+However there are many cases where no synchronization, and indeed no
+communication among processes, is implied; for instance, all the routines in
+sec.&nbsp;<A HREF="#sec:dataquery"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A> are only acting on the local data structures,
+and thus may be called independently. The most important case is that
+of the coefficient insertion routines: since the number of
+coefficients in the sparse and dense matrices varies among the
+processors, and since the user is free to choose an arbitrary order in
+builiding the matrix entries, these routines cannot imply a
+synchronization. 
+
+<P>
+Throughout this user's guide each subroutine will be clearly indicated
+as:
 <DL>
-<DT><STRONG>psb_spk_</STRONG></DT>
-<DD>Kind parameter for short precision real and complex
-  data; corresponds to a <code>REAL</code> declaration and is
-  normally 4 bytes; 
+<DT><STRONG>Synchronous:</STRONG></DT>
+<DD>must be called simultaneously by all the
+  processes in the relevant communication context;
 </DD>
-<DT><STRONG>psb_dpk_</STRONG></DT>
-<DD>Kind parameter for long precision real and complex
-  data; corresponds to a <code>DOUBLE PRECISION</code> declaration and is
-  normally 8 bytes;
-</DD>
-<DT><STRONG>psb_ipk_</STRONG></DT>
-<DD>Kind parameter for integer data;
-  with default build options this is a 4 bytes integer, but there is
-  (highly) experimental support for 8-bytes integers;  
-</DD>
-<DT><STRONG>psb_mpik_</STRONG></DT>
-<DD>Kind parameter for 4-bytes integer data, as is
-  always used by MPI; 
-</DD>
-<DT><STRONG>psb_long_int_k_</STRONG></DT>
-<DD>Kind parameter for long (8 bytes) integers, 
-  which are always used by the <code>sizeof</code> methods.
+<DT><STRONG>Asynchronous:</STRONG></DT>
+<DD>may be called in a totally independent manner.
 </DD>
 </DL>
-Together with the classes attributes we also discuss their
-methods.  Most methods detailed here only act on the local variable,
-i.e. their action is purely local and asynchronous unless otherwise
-stated. 
-The list of methods here is not completely exhaustive; many methods,
-especially those that alter the contents of the various objects, are
-usually not needed by the end-user, and therefore are described in the
-developer's documentation. 
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html270"
-  HREF="node9.html">Descriptor data structure</A>
-<UL>
-<LI><A NAME="tex2html271"
-  HREF="node10.html">Methods</A>
-<LI><A NAME="tex2html272"
-  HREF="node11.html">get_local_rows -- Get number of local rows</A>
-<LI><A NAME="tex2html273"
-  HREF="node12.html">get_local_cols -- Get number of local cols</A>
-<LI><A NAME="tex2html274"
-  HREF="node13.html">get_global_rows -- Get number of global rows</A>
-<LI><A NAME="tex2html275"
-  HREF="node14.html">get_global_cols -- Get number of global cols</A>
-</UL>
-<BR>
-<LI><A NAME="tex2html276"
-  HREF="node15.html">
-<DIV ALIGN="LEFT">
-get_context--Get communication context 
-</DIV></A>
-<UL>
-<LI><A NAME="tex2html277"
-  HREF="node16.html">psb_cd_get_large_threshold -- Get threshold for
-  index mapping switch</A>
-<LI><A NAME="tex2html278"
-  HREF="node17.html">psb_cd_set_large_threshold -- Set threshold for
-  index mapping switch</A>
-<LI><A NAME="tex2html279"
-  HREF="node18.html">Named Constants</A>
-</UL>
-<BR>
-<LI><A NAME="tex2html280"
-  HREF="node19.html">Sparse Matrix class</A>
-<UL>
-<LI><A NAME="tex2html281"
-  HREF="node20.html">Methods</A>
-<LI><A NAME="tex2html282"
-  HREF="node21.html">get_nrows -- Get number of  rows in a sparse  matrix</A>
-<LI><A NAME="tex2html283"
-  HREF="node22.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
-<LI><A NAME="tex2html284"
-  HREF="node23.html">get_nnzeros -- Get number of nonzero elements
-  in a sparse matrix</A>
-<LI><A NAME="tex2html285"
-  HREF="node24.html">get_size  -- Get maximum number of nonzero elements
-  in a sparse matrix</A>
-<LI><A NAME="tex2html286"
-  HREF="node25.html">sizeof  -- Get memory occupation in bytes
-of  a sparse matrix</A>
-<LI><A NAME="tex2html287"
-  HREF="node26.html">get_fmt  -- Short description of the dynamic type</A>
-<LI><A NAME="tex2html288"
-  HREF="node27.html">is_bld, is_upd, is_asb  -- Status check</A>
-<LI><A NAME="tex2html289"
-  HREF="node28.html">Named Constants</A>
-</UL>
-<BR>
-<LI><A NAME="tex2html290"
-  HREF="node29.html">Dense Vector Data Structure</A>
-<UL>
-<LI><A NAME="tex2html291"
-  HREF="node30.html">Methods</A>
-<LI><A NAME="tex2html292"
-  HREF="node31.html">get_nrows -- Get number of  rows in a dense vector</A>
-<LI><A NAME="tex2html293"
-  HREF="node32.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
-<LI><A NAME="tex2html294"
-  HREF="node33.html">sizeof  -- Get memory occupation in bytes
-of  a dense vector matrix</A>
-<LI><A NAME="tex2html295"
-  HREF="node34.html">get_vect  -- Get a copy of the vector contents</A>
-</UL>
-<BR>
-<LI><A NAME="tex2html296"
-  HREF="node35.html">Preconditioner data structure</A>
-</UL>
-<!--End of Table of Child-Links-->
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html268"
+<A NAME="tex2html269"
   HREF="node9.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html264"
-  HREF="userhtml.html">
+<A NAME="tex2html265"
+  HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html258"
+<A NAME="tex2html261"
   HREF="node7.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html266"
+<A NAME="tex2html267"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html269"
-  HREF="node9.html">Descriptor data structure</A>
-<B> Up:</B> <A NAME="tex2html265"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html259"
-  HREF="node7.html">Programming model</A>
- &nbsp; <B>  <A NAME="tex2html267"
+<B> Next:</B> <A NAME="tex2html270"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Up:</B> <A NAME="tex2html266"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html262"
+  HREF="node7.html">User-defined index mappings</A>
+ &nbsp; <B>  <A NAME="tex2html268"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

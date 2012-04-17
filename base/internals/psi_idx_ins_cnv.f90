@@ -48,7 +48,7 @@
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
 !    
-subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
+subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv1
   use psb_descriptor_type
   use psb_serial_mod
@@ -61,6 +61,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
+  integer, intent(in), optional :: lidx(:)
   integer(psb_ipk_) :: ictxt,mglob, nglob
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: nrow,ncol, err_act
@@ -82,7 +83,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   call psb_info(ictxt, me, np)
 
   if ((.not.allocated(desc%indxmap)).or.&
-       & (.not.psb_is_bld_desc(desc))) then 
+       & (.not.desc%is_bld())) then 
     info =  psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
@@ -112,7 +113,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   endif
 
 
-  call desc%indxmap%g2l_ins(idxin(1:nv),info,mask)
+  call desc%indxmap%g2l_ins(idxin(1:nv),info,mask=mask,lidx=lidx)
   
   if (info /= 0) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='g2l_ins') 
@@ -184,7 +185,7 @@ end subroutine psi_idx_ins_cnv1
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
 !    
-subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
+subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv2
   use psb_descriptor_type
   use psb_serial_mod
@@ -197,6 +198,8 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
+  integer, intent(in), optional :: lidx(:)
+
   integer(psb_ipk_) :: i,ictxt,k,mglob, nglob
   integer(psb_ipk_) :: np, me, isize
   integer(psb_ipk_) :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt,lipf
@@ -216,8 +219,9 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
 
   call psb_info(ictxt, me, np)
 
-  if (.not.psb_is_ok_desc(desc)) then 
-    info = psb_err_input_matrix_unassembled_
+  if ((.not.allocated(desc%indxmap)).or.&
+       & (.not.desc%is_bld())) then 
+    info =  psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -242,7 +246,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   end if
 
   idxout(1:nv) = idxin(1:nv)
-  call psi_idx_ins_cnv(nv,idxout,desc,info,mask)
+  call psi_idx_ins_cnv(nv,idxout,desc,info,mask=mask,lidx=lidx)
 
   call psb_erractionrestore(err_act)
   return
@@ -307,7 +311,7 @@ end subroutine psi_idx_ins_cnv2
 !    info      - integer.                  return code.
 !    mask      - logical, optional         Only do the conversion for specific indices.
 !    
-subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
+subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs2
   use psb_descriptor_type
   integer(psb_ipk_), intent(in)  :: idxin
@@ -315,7 +319,8 @@ subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer(psb_ipk_) :: iout(1) 
+  integer, intent(in), optional :: lidx
+  integer(psb_ipk_) :: iout(1),lidxv(1) 
   logical  :: mask_(1)
   
   if (present(mask)) then 
@@ -325,7 +330,12 @@ subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
   end if
 
   iout(1) = idxin
-  call psi_idx_ins_cnv(ione,iout,desc,info,mask_)
+  if (present(lidx)) then 
+    lidxv(1) = lidx
+    call psi_idx_ins_cnv(ione,iout,desc,info,mask=mask_,lidx=lidxv)
+  else
+    call psi_idx_ins_cnv(ione,iout,desc,info,mask=mask_)
+  end if
   idxout  = iout(1) 
   return
 
@@ -378,14 +388,15 @@ end subroutine psi_idx_ins_cnvs2
 !    info      - integer.                  return code.
 !    mask      - logical, optional         Only do the conversion for specific indices.
 !    
-subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
+subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs1
   use psb_descriptor_type
   integer(psb_ipk_), intent(inout)  :: idxin
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer(psb_ipk_) :: iout(1) 
+  integer, intent(in), optional :: lidx
+  integer(psb_ipk_) :: iout(1),lidxv(1)
   logical  :: mask_(1)
   
   if (present(mask)) then 
@@ -395,7 +406,12 @@ subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
   end if
 
   iout(1) = idxin
-  call psi_idx_ins_cnv(ione,iout,desc,info,mask_)
+  if (present(lidx)) then 
+    lidxv(1) = lidx
+    call psi_idx_ins_cnv(ione,iout,desc,info,mask=mask_,lidx=lidxv)
+  else
+    call psi_idx_ins_cnv(ione,iout,desc,info,mask_)
+  end if
   idxin   = iout(1) 
 
   return

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_global_cols -- Get number of global cols</TITLE>
-<META NAME="description" CONTENT="get_global_cols -- Get number of global cols">
+<TITLE>get_global_rows -- Get number of global rows</TITLE>
+<META NAME="description" CONTENT="get_global_rows -- Get number of global rows">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,54 +18,55 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node15.html">
 <LINK REL="previous" HREF="node13.html">
-<LINK REL="up" HREF="node9.html">
+<LINK REL="up" HREF="node10.html">
 <LINK REL="next" HREF="node15.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html370"
+<A NAME="tex2html373"
   HREF="node15.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html366"
-  HREF="node9.html">
+<A NAME="tex2html369"
+  HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html362"
+<A NAME="tex2html363"
   HREF="node13.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html368"
+<A NAME="tex2html371"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html371"
-  HREF="node15.html">get_context Get communication context</A>
-<B> Up:</B> <A NAME="tex2html367"
-  HREF="node9.html">Descriptor data structure</A>
-<B> Previous:</B> <A NAME="tex2html363"
-  HREF="node13.html">get_global_rows   Get</A>
- &nbsp; <B>  <A NAME="tex2html369"
+<B> Next:</B> <A NAME="tex2html374"
+  HREF="node15.html">get_global_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html370"
+  HREF="node10.html">Descriptor data structure</A>
+<B> Previous:</B> <A NAME="tex2html364"
+  HREF="node13.html">get_local_cols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html372"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00041500000000000000">
-get_global_cols -- Get number of global cols</A>
+<H3><A NAME="SECTION00041400000000000000">
+get_global_rows -- Get number of global rows</A>
 </H3>
 
 <P>
 <PRE>
-nr = desc%get_global_cols()
+nr = desc%get_global_rows()
 </PRE>
 
 <P>
 <DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
 <DT><STRONG>desc</STRONG></DT>
 <DD>the communication descriptor.
@@ -80,8 +81,8 @@ Scope: <B>local</B>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The number of global cols; usually this is equal
-  to the number of global rows. 
+<DD>The number of global rows, i.e. the size of the
+  global index space. 
 </DD>
 </DL>
 

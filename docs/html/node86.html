@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_exit -- Exit from PSBLAS parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_exit -- Exit from PSBLAS parallel environment">
+<TITLE>psb_info -- Return information about PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_info -- Return information about PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,52 +20,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node87.html">
 <LINK REL="previous" HREF="node85.html">
-<LINK REL="up" HREF="node83.html">
+<LINK REL="up" HREF="node84.html">
 <LINK REL="next" HREF="node87.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1297"
+<A NAME="tex2html1298"
   HREF="node87.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1293"
-  HREF="node83.html">
+<A NAME="tex2html1294"
+  HREF="node84.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1287"
+<A NAME="tex2html1288"
   HREF="node85.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1295"
+<A NAME="tex2html1296"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1298"
-  HREF="node87.html">psb_get_mpicomm   Get</A>
-<B> Up:</B> <A NAME="tex2html1294"
-  HREF="node83.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1288"
-  HREF="node85.html">psb_info   Return</A>
- &nbsp; <B>  <A NAME="tex2html1296"
+<B> Next:</B> <A NAME="tex2html1299"
+  HREF="node87.html">psb_exit   Exit</A>
+<B> Up:</B> <A NAME="tex2html1295"
+  HREF="node84.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1289"
+  HREF="node85.html">psb_init   Initializes</A>
+ &nbsp; <B>  <A NAME="tex2html1297"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00083000000000000000">
-psb_exit -- Exit from  PSBLAS parallel environment</A>
+<H2><A NAME="SECTION00082000000000000000">
+psb_info -- Return information about  PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_exit(icontxt)
-call psb_exit(icontxt,close)
+call psb_info(icontxt, iam, np)
 </PRE>
 
 <P>
-This subroutine exits from the  PSBLAS parallel virtual  machine.
+This subroutine returns information about  the PSBLAS parallel environment, defining
+a virtual parallel machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,67 +83,88 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>close</STRONG></DT>
-<DD>Whether to close all data structures related to the
-  virtual parallel machine, besides those associated with icontxt.
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iam</STRONG></DT>
+<DD>Identifier of current  process in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer value. <!-- MATH
+ $-1 \le iam \le np-1$
+ -->
+<IMG
+ WIDTH="139" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img118.png"
+ ALT="$-1 \le iam \le np-1$"> </DD>
+<DT><STRONG>np</STRONG></DT>
+<DD>Number of processes in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.
 <BR>
-Type: <B>optional</B>.
+Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a logical  variable, default value: true.
-</DD>
+Specified as: an integer variable.  </DD>
 </DL>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This routine may be called even if a previous call to
-  <code>psb_info</code> has returned with <IMG
+<LI>For processes in the virtual parallel machine  the identifier
+  will satisfy <!-- MATH
+ $0 \le iam \le np-1$
+ -->
+<IMG
+ WIDTH="128" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img119.png"
+ ALT="$0 \le iam \le np-1$">;
+</LI>
+<LI>If the user has requested on <code>psb_init</code> a number of
+  processes less than the total available in the parallel execution
+  environment, the remaining processes will have on return <IMG
  WIDTH="73" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img120.png"
- ALT="$iam=-1$">; indeed, it it is the only
-  routine that may be called with argument <code>icontxt</code> in this
-  situation.
-</LI>
-<LI>A call to this routine with <code>close=.true.</code> implies a call
-  to <code>MPI_Finalize</code>, after which no parallel routine may be called.
-</LI>
-<LI>If the user whishes to use multiple communication contexts in the
-  same program, or to enter and exit multiple times into the parallel
-  environment, this routine may be called to 
-  selectively close the contexts with <code>close=.false.</code>, while on
-  the last call it should be called with <code>close=.true.</code> to
-  shutdown in a clean way the entire parallel environment.
+ ALT="$iam=-1$">;
+  the only call involving <code>icontxt</code> that any such process may
+  execute is  to <code>psb_exit</code>. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1297"
+<A NAME="tex2html1298"
   HREF="node87.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1293"
-  HREF="node83.html">
+<A NAME="tex2html1294"
+  HREF="node84.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1287"
+<A NAME="tex2html1288"
   HREF="node85.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1295"
+<A NAME="tex2html1296"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1298"
-  HREF="node87.html">psb_get_mpicomm   Get</A>
-<B> Up:</B> <A NAME="tex2html1294"
-  HREF="node83.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1288"
-  HREF="node85.html">psb_info   Return</A>
- &nbsp; <B>  <A NAME="tex2html1296"
+<B> Next:</B> <A NAME="tex2html1299"
+  HREF="node87.html">psb_exit   Exit</A>
+<B> Up:</B> <A NAME="tex2html1295"
+  HREF="node84.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1289"
+  HREF="node85.html">psb_init   Initializes</A>
+ &nbsp; <B>  <A NAME="tex2html1297"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

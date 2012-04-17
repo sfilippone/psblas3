@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_get_large_threshold -- Get threshold for index mapping switch</TITLE>
-<META NAME="description" CONTENT="psb_cd_get_large_threshold -- Get threshold for index mapping switch">
+<TITLE>get_context--Get communication context </TITLE>
+<META NAME="description" CONTENT="get_context--Get communication context ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,46 +18,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node17.html">
-<LINK REL="previous" HREF="node15.html">
-<LINK REL="up" HREF="node15.html">
+<LINK REL="next" HREF="node20.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node17.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html397"
+<A NAME="tex2html395"
   HREF="node17.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html393"
-  HREF="node15.html">
+<A NAME="tex2html391"
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html387"
+<A NAME="tex2html385"
   HREF="node15.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html395"
+<A NAME="tex2html393"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html398"
-  HREF="node17.html">psb_cd_set_large_threshold   Set</A>
-<B> Up:</B> <A NAME="tex2html394"
-  HREF="node15.html">get_context Get communication context</A>
-<B> Previous:</B> <A NAME="tex2html388"
-  HREF="node15.html">get_context Get communication context</A>
- &nbsp; <B>  <A NAME="tex2html396"
+<B> Next:</B> <A NAME="tex2html396"
+  HREF="node17.html">psb_cd_get_large_threshold   Get</A>
+<B> Up:</B> <A NAME="tex2html392"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Previous:</B> <A NAME="tex2html386"
+  HREF="node15.html">get_global_cols   Get</A>
+ &nbsp; <B>  <A NAME="tex2html394"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042100000000000000">
-psb_cd_get_large_threshold -- Get threshold for
-  index mapping switch</A>
-</H3>
-
+<H2><A NAME="SECTION00042000000000000000">
+<DIV ALIGN="LEFT">
+get_context--Get communication context 
+</DIV></A>
+</H2>
 <PRE>
-ith = psb_cd_get_large_threshold()
+ictxt = desc%get_context()
 </PRE>
 
 <P>
@@ -65,17 +65,42 @@ ith = psb_cd_get_large_threshold()
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The current value for the size threshold. 
-
-<P>
+<DD>The communication context.
 </DD>
 </DL>
 
 <P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html397"
+  HREF="node17.html">psb_cd_get_large_threshold -- Get threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html398"
+  HREF="node18.html">psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html399"
+  HREF="node19.html">Named Constants</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

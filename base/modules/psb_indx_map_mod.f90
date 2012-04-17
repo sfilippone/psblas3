@@ -659,13 +659,14 @@ contains
 
 
 
-  subroutine base_g2ls1_ins(idx,idxmap,info,mask)
+  subroutine base_g2ls1_ins(idx,idxmap,info,mask, lidx)
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
@@ -684,7 +685,7 @@ contains
 
   end subroutine base_g2ls1_ins
 
-  subroutine base_g2ls2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine base_g2ls2_ins(idxin,idxout,idxmap,info,mask, lidx)
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
@@ -692,6 +693,7 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
 
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
@@ -712,13 +714,14 @@ contains
   end subroutine base_g2ls2_ins
 
 
-  subroutine base_g2lv1_ins(idx,idxmap,info,mask)
+  subroutine base_g2lv1_ins(idx,idxmap,info,mask, lidx)
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
@@ -738,7 +741,7 @@ contains
 
   end subroutine base_g2lv1_ins
 
-  subroutine base_g2lv2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine base_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     use psb_error_mod
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
@@ -746,6 +749,8 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
