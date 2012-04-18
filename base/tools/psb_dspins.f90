@@ -119,7 +119,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     local_ = .false.
   endif
 
-  if (psb_is_bld_desc(desc_a)) then 
+  if (desc_a%is_bld()) then 
 
     if (local_) then
       info = psb_err_invalid_a_and_cd_state_
@@ -158,7 +158,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
     endif
 
-  else if (psb_is_asb_desc(desc_a)) then 
+  else if (desc_a%is_asb()) then 
 
     if (local_) then
       call a%csput(nz,ia,ja,val,ione,nrow,ione,ncol,info)
