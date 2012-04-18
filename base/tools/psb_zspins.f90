@@ -160,6 +160,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   else if (desc_a%is_asb()) then 
 
+    nrow = desc_a%get_local_rows()
+    ncol = desc_a%get_local_cols()
     if (local_) then
       call a%csput(nz,ia,ja,val,ione,nrow,ione,ncol,info)
       if (info /= psb_success_) then
@@ -180,8 +182,6 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       jla(1:nz) = ja(1:nz)
       call psb_glob_to_loc(ila(1:nz),desc_a,info,iact='I')
       call psb_glob_to_loc(jla(1:nz),desc_a,info,iact='I')
-      nrow = desc_a%get_local_rows()
-      ncol = desc_a%get_local_cols()
 
       call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
       if (info /= psb_success_) then
