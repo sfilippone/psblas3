@@ -1,5 +1,13 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+
+2012/04/15: New LOCAL argument to geins/spins. New LIDX argument to CDALL
+            with VL to allow for user-specified local numbering. 
+	
+2012/04/05: Default implementation of MV_TO_COO and MV_FROM_COO based on
+            CP. 
+
+2012/03/01: Make ISO_C_BINDING a prerequisite. 
 	
 2012/02/21: Added experimental support for 8-bytes integers.
 	    Refactored the problem generation methods and the pargen 
