@@ -635,17 +635,19 @@ contains
     call psb_erractionsave(err_act)
     name = 'psb_cdfree'
 
-
-    ictxt=psb_cd_get_context(desc)
-
-    call psb_info(ictxt, me, np)
-    !     ....verify blacs grid correctness..
-    if (np == -1) then
-      info = psb_err_context_error_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
+    if (desc%is_valid()) then 
+      ictxt=psb_cd_get_context(desc)
+      
+      call psb_info(ictxt, me, np)
+      !     ....verify blacs grid correctness..
+      if (np == -1) then
+        info = psb_err_context_error_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+    else
+      ictxt = -1
+    end if
 
     if (.not.allocated(desc%halo_index)) then
       info=298
@@ -739,7 +741,11 @@ contains
     if (err_act == psb_act_ret_) then
       return
     else
-      call psb_error(ictxt)
+      if (ictxt == -1) then
+        call psb_error()
+      else
+        call psb_error(ictxt)
+      end if
     end if
     return
 
@@ -780,37 +786,43 @@ contains
     name = 'psb_cdtransfer'
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt = psb_cd_get_context(desc_in)
-    call psb_info(ictxt,me,np)
-    ! Should not require ictxt to be present: this
-    ! function might be called even when desc_in is
-    ! empty. 
+    !
+    ! Note: this  might be called even
+    ! when desc_in is empty.
+    ! 
+    if (desc_in%is_valid()) then 
+      ictxt = psb_cd_get_context(desc_in)
+      call psb_info(ictxt,me,np)
 
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
-    if (info == psb_success_) &
-         & call move_alloc(desc_in%indxmap, desc_out%indxmap)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': end'
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
+      if (info == psb_success_) &
+           & call move_alloc(desc_in%indxmap, desc_out%indxmap)
+      if (info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': end'
+    else
+      call desc_out%free(info)
+    end if
+    call desc_in%free(info)
 
     call psb_erractionrestore(err_act)
     return
