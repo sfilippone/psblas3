@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
 
+2012/04/30: Change descriptor's move_alloc and free to work on
+            uninitialized input.	
+	
 2012/04/15: New LOCAL argument to geins/spins. New LIDX argument to CDALL
             with VL to allow for user-specified local numbering. 
 	
