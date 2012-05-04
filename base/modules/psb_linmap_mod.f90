@@ -38,8 +38,6 @@
 module psb_linmap_mod
 
   use psb_const_mod
-!!$  use psb_descriptor_type
-!!$  use psb_linmap_type_mod
   use psb_s_linmap_mod
   use psb_d_linmap_mod
   use psb_c_linmap_mod

@@ -140,8 +140,8 @@ contains
     use psb_descriptor_type
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
-    type(psb_base_linmap_type) :: mapin,mapout
-    integer(psb_ipk_), intent(out)       :: info 
+    type(psb_base_linmap_type), intent(inout) :: mapin,mapout
+    integer(psb_ipk_), intent(out)            :: info 
     
     mapout%kind = mapin%kind
     call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)

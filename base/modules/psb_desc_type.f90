@@ -199,16 +199,16 @@ module psb_descriptor_type
 
 
   type psb_desc_type
-    integer(psb_ipk_), allocatable  :: halo_index(:)
-    integer(psb_ipk_), allocatable  :: ext_index(:)
-    integer(psb_ipk_), allocatable  :: ovrlap_index(:)
-    integer(psb_ipk_), allocatable  :: ovrlap_elem(:,:)
-    integer(psb_ipk_), allocatable  :: ovr_mst_idx(:)
-    integer(psb_ipk_), allocatable  :: bnd_elem(:)
+    integer(psb_ipk_), allocatable   :: halo_index(:)
+    integer(psb_ipk_), allocatable   :: ext_index(:)
+    integer(psb_ipk_), allocatable   :: ovrlap_index(:)
+    integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
+    integer(psb_ipk_), allocatable   :: ovr_mst_idx(:)
+    integer(psb_ipk_), allocatable   :: bnd_elem(:)
     class(psb_indx_map), allocatable :: indxmap
-    integer(psb_ipk_), allocatable  :: lprm(:)
+    integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
-    integer(psb_ipk_), allocatable  :: idx_space(:)
+    integer(psb_ipk_), allocatable   :: idx_space(:)
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
