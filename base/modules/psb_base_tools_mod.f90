@@ -362,12 +362,12 @@ module psb_cd_if_tools_mod
     end subroutine psb_cdinsrc
     subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       import :: psb_ipk_, psb_desc_type
-      type(psb_desc_type), intent(inout) :: desc
-      integer(psb_ipk_), intent(in)                :: nz,ja(:)
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), optional, intent(out)     :: jla(:)
-      logical, optional, target, intent(in) :: mask(:)
-      integer, intent(in), optional         :: lidx(:)
+      type(psb_desc_type), intent(inout)         :: desc
+      integer(psb_ipk_), intent(in)              :: nz,ja(:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(out)   :: jla(:)
+      logical, optional, target, intent(in)      :: mask(:)
+      integer(psb_ipk_), intent(in), optional    :: lidx(:)
     end subroutine psb_cdinsc
   end interface
 

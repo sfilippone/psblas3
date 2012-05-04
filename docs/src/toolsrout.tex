@@ -154,11 +154,15 @@ An integer value; 0 means no error has been detected.
   indices.    If \verb|globalcheck=.false.|, the subroutine will not
   check for   overlap, and may be significantly faster, but   the user
   is implicitly guaranteeing that there are neither orphan   nor
-  overlap indices.  The optional argument \verb|lidx| is available for
+  overlap indices.  
+\item[lidx] The optional argument \verb|lidx| is available for
   those cases in which the user has already established a
   global-to-local mapping; if it is specified, each  index in
   \verb|vl(i)| will be mapped to the corresponding local index
-  \verb|lidx(i)|.
+  \verb|lidx(i)|. When specifying the argument \verb|lidx| the user
+  would also likely employ \verb|lidx| in calls to \verb|psb_cdins|
+  and \verb|local| in calls to \verb|psb_spins| and \verb|psb_geins|;
+  see also sec.~\ref{sec:usermaps}. 
 \item[nl] If this argument is specified alone (i.e. without \verb|vl|)
   the  result is  a generalized row-block   distribution in which each
   process $I$ gets assigned a consecutive   chunk of $N_I=nl$ global
@@ -196,13 +200,17 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_cdins}
 
 \begin{verbatim}
-call psb_cdins(nz, ia, ja, desc_a, info)
+call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
+call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
 \end{verbatim}
 
 This subroutine examines the edges of the graph associated with the
 discretization mesh (and isomorphic to the sparsity pattern of a
 linear system coefficient matrix), storing them as necessary into the
-communication descriptor.
+communication descriptor. In the first form the edges are specified as
+pairs of indices $ia(i),ja(i)$; the starting index $ia(i)$ should
+belong to the current process. 
+In the second form only the remote indices $ja(i)$ are specified. 
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -222,9 +230,20 @@ Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array of length $nz$.
+\item[mask] Mask entries in \verb|ja|, they are inserted only when the
+  corresponding \verb|mask| entries are \verb|.true.|\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical  array of length $nz$, default \verb|.true.|.
+\item[lidx]  User defined local indices for \verb|ja|.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of length $nz$.
 %% \item[is] the row offset.\\
 %% Scope:{\bf local}.\\
-%% Type:{\bf optional}.\\
+%% Type:{\bf optional}.\\a
 %% Specified as: an integer value.
 %% \item[js] the column offset.\\
 %% Scope: {\bf local}.\\
@@ -244,6 +263,17 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
+\item[ila] the local indices of the starting vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+\item[jla]  the local indices of the end vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+
 \end{description}
 {\par\noindent\large\bfseries Notes}
 \begin{enumerate}
@@ -251,13 +281,9 @@ An integer value; 0 means no error has been detected.
   build state;
 \item  This routine automatically ignores edges that do not
 insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process. 
-\item There exists another interface for this routine
-\begin{verbatim}
-call psb_cdins(nz, ja, desc_a, info)
-\end{verbatim}
-which will digest all entries in \verb|ja| and add them to the
-communication requirements. 
+nor the end vertex belong to the current process.
+\item The second form of this routine will be useful when dealing with
+  user-specified index mappings; see also~\ref{sec:usermaps}.
 \end{enumerate}
 
 

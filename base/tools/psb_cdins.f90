@@ -166,6 +166,7 @@ end subroutine psb_cdinsrc
 !    info     - integer.                       Return code.
 !    jla(:)   - integer(psb_ipk_), optional    The col indices in local numbering
 !    mask(:)  - logical, optional, target
+!    lidx(:)  - integer(psb_ipk_), optional    User-defined local col indices
 !
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   use psb_base_mod, psb_protect_name => psb_cdinsc
@@ -178,7 +179,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), optional, intent(out) :: jla(:)
   logical, optional, target, intent(in)    :: mask(:) 
-  integer, intent(in), optional            :: lidx(:)
+  integer(psb_ipk_), intent(in), optional  :: lidx(:)
 
 
   !LOCALS.....

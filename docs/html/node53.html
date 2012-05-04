@@ -68,7 +68,7 @@ x \leftarrow Q x
  -->
 
 <IMG
- WIDTH="55" HEIGHT="27" BORDER="0"
+ WIDTH="56" HEIGHT="27" BORDER="0"
  SRC="img59.png"
  ALT="\begin{displaymath}x \leftarrow Q x \end{displaymath}">
 </DIV>
@@ -77,16 +77,16 @@ x \leftarrow Q x
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img60.png"
  ALT="$Q$"></STRONG></DT>
 <DD>is the overlap operator; it is the composition of two
@@ -94,7 +94,7 @@ operators <IMG
  WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img61.png"
  ALT="$ P_a$"> and <IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
  SRC="img62.png"
  ALT="$ P^{T}$">. 
 </DD>
@@ -102,7 +102,7 @@ operators <IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2951"></A>
+<DIV ALIGN="CENTER"><A NAME="2950"></A>
 <TABLE>
 <CAPTION><STRONG>Table 15:</STRONG>
 Data types</CAPTION>
@@ -110,7 +110,7 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -150,7 +150,7 @@ call psb_ovrl(x, desc_a, info, update=update_type, work=work)
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense matrix <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
@@ -183,13 +183,13 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>update = psb_add_</STRONG></DT>
 <DD>Sum overlap entries, i.e. apply <IMG
- WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
  SRC="img63.png"
  ALT="$P^T$">;
 </DD>
 <DT><STRONG>update = psb_avg_</STRONG></DT>
 <DD>Average overlap entries, i.e. apply <IMG
- WIDTH="44" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="45" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
  SRC="img64.png"
  ALT="$P_aP^T$">;
 </DD>
@@ -220,7 +220,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a one dimensional array of the same type of <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 
@@ -231,7 +231,7 @@ Specified as: a one dimensional array of the same type of <IMG
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense result matrix <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
@@ -266,11 +266,11 @@ An integer value; 0 means no error has been detected.
   the descriptor, no operations are performed;
 </LI>
 <LI>The operator <IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
  SRC="img62.png"
  ALT="$ P^{T}$"> performs the reduction sum of overlap
 elements; it is a ``prolongation'' operator <IMG
- WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
  SRC="img63.png"
  ALT="$P^T$"> that
 replicates overlap elements, accounting for the physical replication
@@ -288,14 +288,14 @@ their instances.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:try8x8_ov"></A><A NAME="2953"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:try8x8_ov"></A><A NAME="2952"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 8:</STRONG>
 Sample discretization mesh.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="533" HEIGHT="453" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="534" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
  SRC="img67.png"
  ALT="\includegraphics[scale=0.65]{figures/try8x8_ov.eps}">
 
@@ -320,7 +320,7 @@ distribution is such that each process will own 40 entries in the
 index space, with an overlap of 16  entries placed at local indices 25 
 through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
 in the <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"> vector, and process 1 assigns a value of 2, then after a
 call to <code>psb_ovrl</code> with <code>psb_avg_</code> and a call to
