@@ -100,33 +100,6 @@ module psb_z_bjacprec
     end subroutine psb_z_bjac_precseti
   end interface
   
-!!$  interface
-!!$    subroutine psb_z_bjac_precsetr(prec,what,val,info)
-!!$      import :: psb_ipk_, psb_desc_type, psb_z_bjac_prec_type, psb_z_vect_type, psb_dpk_
-!!$      class(psb_z_bjac_prec_type),intent(inout) :: prec
-!!$      integer(psb_ipk_), intent(in)                      :: what 
-!!$      real(psb_dpk_), intent(in)               :: val 
-!!$      integer(psb_ipk_), intent(out)                     :: info
-!!$    end subroutine psb_z_bjac_precsetr
-!!$  end interface
-!!$  
-!!$  interface
-!!$    subroutine psb_z_bjac_precsetc(prec,what,val,info)
-!!$      import :: psb_ipk_, psb_desc_type, psb_z_bjac_prec_type, psb_z_vect_type, psb_dpk_
-!!$      class(psb_z_bjac_prec_type),intent(inout) :: prec
-!!$      integer(psb_ipk_), intent(in)                      :: what 
-!!$      character(len=*), intent(in)             :: val
-!!$      integer(psb_ipk_), intent(out)                     :: info
-!!$    end subroutine psb_z_bjac_precsetc
-!!$  end interface
-!!$  
-!!$  interface 
-!!$    subroutine psb_z_bjac_precfree(prec,info)
-!!$      import :: psb_ipk_, psb_desc_type, psb_z_bjac_prec_type, psb_z_vect_type, psb_dpk_
-!!$      class(psb_z_bjac_prec_type), intent(inout) :: prec
-!!$      integer(psb_ipk_), intent(out)                :: info
-!!$    end subroutine psb_z_bjac_precfree
-!!$  end interface 
 
 contains
 
@@ -283,6 +256,9 @@ contains
     if (allocated(prec%dv)) then 
       call prec%dv%free(info)
       if (info == 0) deallocate(prec%dv,stat=info)
+    end if
+    if (allocated(prec%iprcparm)) then 
+      deallocate(prec%iprcparm,stat=info)
     end if
     call psb_erractionrestore(err_act)
     return
