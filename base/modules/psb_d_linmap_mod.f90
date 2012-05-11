@@ -124,6 +124,19 @@ module psb_d_linmap_mod
     end function psb_d_linmap
   end interface
 
+  interface psb_linmaps
+    subroutine psb_d_linmaps(mapout,map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr)
+      use psb_d_mat_mod, only : psb_dspmat_type
+      import :: psb_ipk_, psb_dlinmap_type, psb_desc_type
+      implicit none 
+      type(psb_dlinmap_type), intent(inout)   :: mapout
+      type(psb_desc_type), target       :: desc_X, desc_Y
+      type(psb_dspmat_type), intent(in) :: map_X2Y, map_Y2X
+      integer(psb_ipk_), intent(in)               :: map_kind
+      integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
+    end subroutine psb_d_linmaps
+  end interface
+
   private :: d_map_sizeof, d_is_asb, d_free
 
 
