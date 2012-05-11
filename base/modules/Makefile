@@ -123,7 +123,7 @@ psb_c_psblas_mod.o: psb_c_vect_mod.o psb_c_mat_mod.o
 psb_z_psblas_mod.o: psb_z_vect_mod.o psb_z_mat_mod.o
 psb_psblas_mod.o: psb_s_psblas_mod.o psb_c_psblas_mod.o  psb_d_psblas_mod.o psb_z_psblas_mod.o
 psb_s_psblas_mod.o psb_c_psblas_mod.o psb_d_psblas_mod.o psb_z_psblas_mod.o: psb_mat_mod.o psb_desc_type.o
-psb_vect_mod.o: psb_d_vect_mod.o psb_s_vect_mod.o psb_c_vect_mod.o psb_z_vect_mod.o
+psb_vect_mod.o: psb_i_vect_mod.o psb_d_vect_mod.o psb_s_vect_mod.o psb_c_vect_mod.o psb_z_vect_mod.o
 psb_comm_mod.o: psb_i_comm_mod.o psb_s_comm_mod.o psb_d_comm_mod.o psb_c_comm_mod.o psb_z_comm_mod.o 
 psb_i_comm_mod.o: psb_i_vect_mod.o psb_desc_type.o 
 psb_s_comm_mod.o: psb_s_vect_mod.o psb_desc_type.o psb_mat_mod.o 
