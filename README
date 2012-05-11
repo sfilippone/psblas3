@@ -117,7 +117,8 @@ small cases have been tested but we do not offer full guarantee (yet).
 
 
 COMPILER NOTES.
-Notes: This code is confirmed to work with the following compilers (or
+
+This code is confirmed to work with the following compilers (or
 later versions thereof): 
        NAGware 5.2;
        XLF 13.1;
@@ -136,8 +137,8 @@ with both CCE and GNU lower-level compilers.
 KNOWN ISSUES.
 
 For the GNU compilers 4.6.x we are aware of a number of memory management
-issues that may or may not surface in your applications; all of them
-(that we're aware of) are solved in version 4.7.0.
+issues that might surface in your applications; all of them (that
+we're aware of) are solved in version 4.7.0.  
 
 The Intel compiler up to version 12.1 fails due to a bug in the
 handling of generic interfaces. 

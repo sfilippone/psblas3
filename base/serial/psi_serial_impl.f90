@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -844,6 +844,124 @@ subroutine psi_zsctv(n,idx,x,beta,y)
   end if
 end subroutine psi_zsctv
 
+
+subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none 
+
+  integer(psb_ipk_), intent(in)               :: m
+  integer(psb_ipk_), intent (in)       ::  x(:)
+  integer(psb_ipk_), intent (inout)    ::  y(:)
+  integer(psb_ipk_), intent (in)       :: alpha, beta
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)        :: name, ch_err
+
+  name='psb_geaxpby'
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+
+  if (m>0) call iaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psi_iaxpbyv
+subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none 
+  integer(psb_ipk_), intent(in)               :: m, n
+  integer(psb_ipk_), intent (in)       ::  x(:,:)
+  integer(psb_ipk_), intent (inout)    ::  y(:,:)
+  integer(psb_ipk_), intent (in)       ::  alpha, beta
+  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: lx, ly
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)        :: name, ch_err
+
+  name='psb_geaxpby'
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+  lx = size(x,1)
+  ly = size(y,1)
+  if (lx < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+  if (ly < m) then 
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999 
+  end if
+
+  if ((m>0).and.(n>0)) &
+       & call iaxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psi_iaxpby
 
 subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   use psb_const_mod

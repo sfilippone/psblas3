@@ -3,7 +3,7 @@ include ../../../Make.inc
 #
 # The object files
 #
-FOBJS =  daxpby.o 	saxpby.o \
+FOBJS =  iaxpby.o daxpby.o saxpby.o \
 	caxpby.o  zaxpby.o smmp.o
 
 

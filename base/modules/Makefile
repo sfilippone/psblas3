@@ -13,6 +13,7 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 	psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o \
 	psb_comm_mod.o psb_i_comm_mod.o psb_s_comm_mod.o psb_d_comm_mod.o\
 	psb_c_comm_mod.o psb_z_comm_mod.o \
+	psb_i_base_vect_mod.o psb_i_vect_mod.o\
 	psb_d_base_vect_mod.o psb_d_vect_mod.o\
 	psb_s_base_vect_mod.o psb_s_vect_mod.o\
 	psb_c_base_vect_mod.o psb_c_vect_mod.o\
@@ -62,7 +63,7 @@ psb_s_base_mat_mod.o: psb_s_base_vect_mod.o
 psb_d_base_mat_mod.o: psb_d_base_vect_mod.o
 psb_c_base_mat_mod.o: psb_c_base_vect_mod.o
 psb_z_base_mat_mod.o: psb_z_base_vect_mod.o
-psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o psb_realloc_mod.o
+psb_i_base_vect_mod.o psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o psb_realloc_mod.o
 psb_s_mat_mod.o: psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_vect_mod.o
 psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_vect_mod.o
 psb_c_mat_mod.o: psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o psb_c_vect_mod.o
@@ -75,11 +76,11 @@ psb_mat_mod.o: psb_vect_mod.o psb_s_mat_mod.o psb_d_mat_mod.o psb_c_mat_mod.o ps
 error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o
 psb_spmat_type.o: psb_string_mod.o psb_sort_mod.o
-psi_i_mod.o: psb_desc_type.o 
-psi_s_mod.o: psb_desc_type.o psb_s_base_vect_mod.o
-psi_d_mod.o: psb_desc_type.o psb_d_base_vect_mod.o
-psi_c_mod.o: psb_desc_type.o psb_c_base_vect_mod.o
-psi_z_mod.o: psb_desc_type.o psb_z_base_vect_mod.o
+psi_i_mod.o: psb_desc_type.o psb_i_vect_mod.o
+psi_s_mod.o: psb_desc_type.o psb_s_vect_mod.o
+psi_d_mod.o: psb_desc_type.o psb_d_vect_mod.o
+psi_c_mod.o: psb_desc_type.o psb_c_vect_mod.o
+psi_z_mod.o: psb_desc_type.o psb_z_vect_mod.o
 psi_mod.o: psb_penv_mod.o psb_desc_type.o psi_serial_mod.o psb_serial_mod.o\
 	psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o
 psb_desc_type.o: psb_penv_mod.o psb_realloc_mod.o\
@@ -103,6 +104,7 @@ psb_base_linmap_mod.o: psb_desc_type.o psb_serial_mod.o psb_comm_mod.o
 psb_comm_mod.o: psb_desc_type.o psb_mat_mod.o 
 psb_check_mod.o: psb_desc_type.o
 psb_serial_mod.o: psb_mat_mod.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o
+psb_i_vect_mod.o: psb_i_base_vect_mod.o
 psb_s_vect_mod.o: psb_s_base_vect_mod.o
 psb_d_vect_mod.o: psb_d_base_vect_mod.o
 psb_c_vect_mod.o: psb_c_base_vect_mod.o
@@ -123,7 +125,7 @@ psb_psblas_mod.o: psb_s_psblas_mod.o psb_c_psblas_mod.o  psb_d_psblas_mod.o psb_
 psb_s_psblas_mod.o psb_c_psblas_mod.o psb_d_psblas_mod.o psb_z_psblas_mod.o: psb_mat_mod.o psb_desc_type.o
 psb_vect_mod.o: psb_d_vect_mod.o psb_s_vect_mod.o psb_c_vect_mod.o psb_z_vect_mod.o
 psb_comm_mod.o: psb_i_comm_mod.o psb_s_comm_mod.o psb_d_comm_mod.o psb_c_comm_mod.o psb_z_comm_mod.o 
-psb_i_comm_mod.o: psb_desc_type.o 
+psb_i_comm_mod.o: psb_i_vect_mod.o psb_desc_type.o 
 psb_s_comm_mod.o: psb_s_vect_mod.o psb_desc_type.o psb_mat_mod.o 
 psb_d_comm_mod.o: psb_d_vect_mod.o psb_desc_type.o psb_mat_mod.o 
 psb_c_comm_mod.o: psb_c_vect_mod.o psb_desc_type.o psb_mat_mod.o 

@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -127,7 +127,7 @@ end function psb_samax
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -326,7 +326,7 @@ end function psb_samax_vect
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -445,7 +445,7 @@ end subroutine psb_samaxvs
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
