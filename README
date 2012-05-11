@@ -1,15 +1,10 @@
-This directory contains  the PSBLAS library, version 3.0-beta. 
-
-This version is still experimental, to some extent, but has already
-undergone  quite a bit of testing; the documentation has been updated,
-although it probably still contains some inconsistencies. 
+This directory contains  the PSBLAS library, version 3.0. 
 
 This version requires a working Fortran 2003 compiler; we do not use
 all of the language features (specifically, so far we did not employ
 FINAL subroutines), but the features we use were sufficient in
 identifying bugs in ALL compilers we tried (all the bugs have been
 reported and mostly fixed by the respective vendors). 
-
 
 
 The new internals have been completely overhauled, and in many cases
@@ -25,7 +20,7 @@ The architecture of the Fortran 2003 sparse BLAS is described in
 S. Filippone, A. Buttari:
 Object-Oriented Techniques for Sparse Matrix Computations in Fortran
 2003, 
-ACM Trans. on Math. Software, 2012, to appear
+ACM Trans. on Math. Software, vol. 38, No. 4, 2012.
 
 Version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
@@ -136,11 +131,16 @@ recommended to use the following:
 ./configure FC=ftn F77=ftn CC=cc
 with both CCE and GNU lower-level compilers. 
 
-The Intel compiler up to version 12.1 fails due to a bug in the
-handlind of generic interfaces. 
 
 
 KNOWN ISSUES.
+
+For the GNU compilers 4.6.x we are aware of a number of memory management
+issues that may or may not surface in your applications; all of them
+(that we're aware of) are solved in version 4.7.0.
+
+The Intel compiler up to version 12.1 fails due to a bug in the
+handling of generic interfaces. 
 
 An annoying problem exists with some versions of MPI: if the configure
 script sets -DMPI_MOD the MPI call interfaces will be resolved by
