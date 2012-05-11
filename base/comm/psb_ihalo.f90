@@ -62,7 +62,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   integer(psb_ipk_), intent(inout), target           :: x(:,:)
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), intent(in), optional     :: alpha
+  integer(psb_ipk_), intent(in), optional     :: alpha
   integer(psb_ipk_), intent(inout), optional, target :: work(:)
   integer(psb_ipk_), intent(in), optional            :: mode,jx,ik,data
   character, intent(in), optional          :: tran
@@ -287,7 +287,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   integer(psb_ipk_), intent(inout)                   :: x(:)
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), intent(in), optional     :: alpha
+  integer(psb_ipk_), intent(in), optional     :: alpha
   integer(psb_ipk_), intent(inout), optional, target :: work(:)
   integer(psb_ipk_), intent(in), optional            :: mode,data
   character, intent(in), optional          :: tran

@@ -33,7 +33,7 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
-OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
+OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
 LIBDIR=..
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).

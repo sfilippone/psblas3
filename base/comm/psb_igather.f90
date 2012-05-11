@@ -51,7 +51,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   implicit none
 
   integer(psb_ipk_), intent(in)    :: locx(:,:)
-  integer(psb_ipk_), intent(out)   :: globx(:,:)
+  integer(psb_ipk_), intent(out), allocatable  :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iroot
@@ -222,7 +222,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   implicit none
 
   integer(psb_ipk_), intent(in)    :: locx(:)
-  integer(psb_ipk_), intent(out)   :: globx(:)
+  integer(psb_ipk_), intent(out), allocatable :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iroot
