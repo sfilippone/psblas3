@@ -100,16 +100,13 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   ilocx = 1
   jlocx = 1
 
-  lda_globx = size(globx,1)
-  lda_locx  = size(locx, 1)
-
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-
-  lock=size(locx,2)-jlocx+1
-  globk=size(globx,2)-jglobx+1
-  maxk=min(lock,globk)
-  k = maxk
+  lda_globx = m
+  lda_locx  = size(locx, 1)
+  lock      = size(locx,2)
+  maxk      = lock
+  k         = maxk
 
   call psb_bcast(ictxt,k,root=iiroot)
 
@@ -130,13 +127,20 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
     call psb_errpush(info,name)
     goto 9999
   end if
+  
+  call psb_realloc(m,k,globx,info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
-  globx(:,:)=0
+  globx(:,:)=izero
 
   do j=1,k
     do i=1,desc_a%get_local_rows()
       call psb_loc_to_glob(i,idx,desc_a,info)
-      globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
+      globx(idx,j) = locx(i,jlx+j-1)
     end do
   end do
 
@@ -146,12 +150,12 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
       if (me /= desc_a%ovrlap_elem(i,3)) then 
         idx = desc_a%ovrlap_elem(i,1)
         call psb_loc_to_glob(idx,desc_a,info)
-        globx(idx,jglobx+j-1) = izero
+        globx(idx,j) = izero
       end if
     end do
   end do
 
-  call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
+  call psb_sum(ictxt,globx(1:m,1:k),root=root)
 
   call psb_erractionrestore(err_act)
   return  
@@ -294,7 +298,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
   
-  globx(:)=0
+  globx(:)=izero
 
   do i=1,desc_a%get_local_rows()
     call psb_loc_to_glob(i,idx,desc_a,info)
