@@ -113,7 +113,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
   endif
 
 
-  call desc%indxmap%g2l_ins(idxin(1:nv),info,mask=mask,lidx=lidx)
+  call desc%indxmap%g2lip_ins(idxin(1:nv),info,mask=mask,lidx=lidx)
   
   if (info /= 0) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='g2l_ins') 

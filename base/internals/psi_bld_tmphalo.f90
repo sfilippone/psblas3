@@ -100,7 +100,7 @@ subroutine psi_bld_tmphalo(desc,info)
     helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
   end do
 
-  call desc%indxmap%l2g(helem(1:nh),info)
+  call desc%indxmap%l2gip(helem(1:nh),info)
   call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
       
   if (info /= psb_success_) then 
