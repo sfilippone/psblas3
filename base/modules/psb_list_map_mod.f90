@@ -133,7 +133,7 @@ contains
     end if
 
     idxv(1) = idx
-    call idxmap%l2g(idxv,info,owned=owned)
+    call idxmap%l2gip(idxv,info,owned=owned)
     idx = idxv(1)
 
   end subroutine list_l2gs1
@@ -148,7 +148,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%l2g(idxout,info,mask,owned)
+    call idxmap%l2gip(idxout,info,mask,owned)
     
   end subroutine list_l2gs2
 
@@ -221,7 +221,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%l2g(idxout(1:im),info,mask,owned)
+    call idxmap%l2gip(idxout(1:im),info,mask,owned)
     if (is > im) info = -3 
 
   end subroutine list_l2gv2
@@ -242,7 +242,7 @@ contains
     end if
     
     idxv(1) = idx 
-    call idxmap%g2l(idxv,info,owned=owned)
+    call idxmap%g2lip(idxv,info,owned=owned)
     idx = idxv(1) 
       
   end subroutine list_g2ls1
@@ -257,7 +257,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%g2l(idxout,info,mask,owned)
+    call idxmap%g2lip(idxout,info,mask,owned)
     
   end subroutine list_g2ls2
 
@@ -342,7 +342,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l(idxout(1:im),info,mask,owned)
+    call idxmap%g2lip(idxout(1:im),info,mask,owned)
     if (is > im) info = -3 
 
   end subroutine list_g2lv2
@@ -368,9 +368,9 @@ contains
     idxv(1) = idx
     if (present(lidx)) then 
       lidxv(1) = lidx
-      call idxmap%g2l_ins(idxv,info,lidx=lidxv)
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
     else
-      call idxmap%g2l_ins(idxv,info)
+      call idxmap%g2lip_ins(idxv,info)
     end if
 
     idx = idxv(1) 
@@ -387,7 +387,7 @@ contains
     integer, intent(in), optional :: lidx
 
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info,mask=mask,lidx=lidx)
+    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
     
   end subroutine list_g2ls2_ins
 
@@ -545,7 +545,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
     if (is > im) info = -3 
 
   end subroutine list_g2lv2_ins
