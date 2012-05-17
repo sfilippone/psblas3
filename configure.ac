@@ -377,7 +377,8 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F $FCOPT"
+     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F -qlanglvl=extended $FCOPT"
+     FCFLAGS="-qhalt=e $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
@@ -411,7 +412,7 @@ if test "X$F90COPT" == "X" ; then
    F90COPT="-O3  $F90COPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 $F90COPT"
+     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 -qlanglvl=extended $F90COPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      F90COPT="-O3 $F90COPT"
