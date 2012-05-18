@@ -1554,9 +1554,11 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
         call psb_errpush(info,name,i_err=ierr)
         goto 9999
       end if
-      
+#ifdef HAVE_MOLD
       allocate(tmpv, mold=y,stat=info)
-      !    allocate(tmp(nac),stat=info) 
+#else
+      call y%mold(tmpv,info)
+#endif
       if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
       if (info == psb_success_) call tmpv%mlt(zone,d%v(1:nac),x,zzero,info) 
       if (info == psb_success_)&
@@ -1579,10 +1581,13 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       if (beta == zzero) then 
         call a%inner_cssm(alpha,x,zzero,y,info,trans)
         if (info == psb_success_)  call y%mlt(d%v(1:nar),info)
-!!$        if (info == psb_success_)  call inner_vscal1(nar,d,y)
+
       else
-        !        allocate(tmp(nar),stat=info) 
+#ifdef HAVE_MOLD
         allocate(tmpv, mold=y,stat=info)
+#else 
+        call y%mold(tmpv,info)
+#endif
         if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
         if (info == psb_success_)&
              & call a%inner_cssm(alpha,x,zzero,tmpv,info,trans)
