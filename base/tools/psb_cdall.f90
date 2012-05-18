@@ -4,7 +4,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_base_tools_mod, psb_protect_name => psb_cdall
+  use psb_cd_tools_mod, psb_protect_name => psb_cdall
   use psi_mod
   implicit None
   procedure(psb_parts)               :: parts
