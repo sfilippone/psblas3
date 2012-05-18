@@ -579,6 +579,57 @@ end subroutine psi_iovrl_saver2
 
 
 
+subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
+  use psi_mod, psi_protect_name =>   psi_iovrl_save_vect
+  use psb_realloc_mod
+  use psb_i_base_vect_mod
+
+  implicit none
+
+  class(psb_i_base_vect_type)     :: x
+  integer(psb_ipk_), allocatable     :: xs(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, isz
+  character(len=20) :: name, ch_err
+
+  name='psi_iovrl_saver1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  isz = size(desc_a%ovrlap_elem,1)
+  call psb_realloc(isz,xs,info) 
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  call x%gth(isz,desc_a%ovrlap_elem(:,1),xs)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_iovrl_save_vect
+
 subroutine  psi_sovrl_save_vect(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_sovrl_save_vect
   use psb_realloc_mod
