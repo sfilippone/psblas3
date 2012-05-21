@@ -645,11 +645,11 @@ AR="${AR} -cur"
 # Right now it is a matter of user's taste when linking custom applications.
 # But PSBLAS examples could take advantage of these libraries, too.
 
-AC_LANG([C])
 PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
 PAC_LAPACK(
 [FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
 )
+AC_LANG([C])
 
 
 ###############################################################################
