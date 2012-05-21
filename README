@@ -121,7 +121,6 @@ COMPILER NOTES.
 This code is confirmed to work with the following compilers (or
 later versions thereof): 
        NAGware 5.2;
-       XLF 13.1;
        GNU 4.6.1;  
        Cray CCE 8.0.1;
 
@@ -129,19 +128,23 @@ They are all recognized by the configure script.
 
 To make the script work with the Cray CCE environment, it is
 recommended to use the following:
-./configure FC=ftn F77=ftn CC=cc
+./configure FC=ftn F77=ftn CC=cc MPF90=ftn MPF77=ftn MPCC=cc
 with both CCE and GNU lower-level compilers. 
 
-
-
-KNOWN ISSUES.
+XLF 13.1 configures correctly, but then fails with ICEs (Internal
+Compiler Error) at build time. We do not yet know whether XLF 14
+compiles correctly. 
 
 For the GNU compilers 4.6.x we are aware of a number of memory management
 issues that might surface in your applications; all of them (that
 we're aware of) are solved in version 4.7.0.  
 
-The Intel compiler up to version 12.1 fails due to a bug in the
-handling of generic interfaces. 
+The Intel compiler up to version 12.1 fails to compile, as of the last
+version we got access to. 
+
+
+
+KNOWN ISSUES.
 
 An annoying problem exists with some versions of MPI: if the configure
 script sets -DMPI_MOD the MPI call interfaces will be resolved by
