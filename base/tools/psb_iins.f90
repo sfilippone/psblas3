@@ -45,7 +45,7 @@
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_iinsvi
   use psi_mod
   implicit none
@@ -62,12 +62,14 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in) ::  desc_a
   integer(psb_ipk_), intent(out)            ::  info
   integer(psb_ipk_), optional, intent(in)   ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -127,9 +129,17 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
-  
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
@@ -225,7 +235,7 @@ end subroutine psb_iinsvi
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_iinsi
   use psi_mod
   implicit none
@@ -243,12 +253,14 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in) ::  desc_a
   integer(psb_ipk_), intent(out)            ::  info
   integer(psb_ipk_), optional, intent(in)   ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -310,8 +322,18 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
+
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
 
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
