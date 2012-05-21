@@ -68,6 +68,7 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: bld_n    => s_base_bld_n
     generic, public    :: bld      => bld_x, bld_n
     procedure, pass(x) :: all      => s_base_all
+    procedure, pass(x) :: mold     => s_base_mold
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
@@ -218,6 +219,18 @@ contains
     call psb_realloc(n,x%v,info)
     
   end subroutine s_base_all
+
+  subroutine s_base_mold(x, y, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_s_base_vect_type), intent(in)   :: x
+    class(psb_s_base_vect_type), intent(out), allocatable :: y
+    integer(psb_ipk_), intent(out)              :: info
+    
+    allocate(psb_s_base_vect_type :: y, stat=info)
+
+  end subroutine s_base_mold
 
   !
   ! Insert a bunch of values at specified positions.

@@ -163,20 +163,22 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: l2gs2  => base_l2gs2
     procedure, pass(idxmap)  :: l2gv1  => base_l2gv1
     procedure, pass(idxmap)  :: l2gv2  => base_l2gv2
-    generic, public          :: l2g => l2gs1, l2gs2, l2gv1, l2gv2
+    generic, public          :: l2g =>   l2gs2, l2gv2
+    generic, public          :: l2gip => l2gs1, l2gv1
 
     procedure, pass(idxmap)  :: g2ls1  => base_g2ls1
     procedure, pass(idxmap)  :: g2ls2  => base_g2ls2
     procedure, pass(idxmap)  :: g2lv1  => base_g2lv1
     procedure, pass(idxmap)  :: g2lv2  => base_g2lv2
-    generic, public          :: g2l => g2ls1, g2ls2, g2lv1, g2lv2
+    generic, public          :: g2l =>   g2ls2, g2lv2
+    generic, public          :: g2lip => g2ls1, g2lv1
 
     procedure, pass(idxmap)  :: g2ls1_ins  => base_g2ls1_ins
     procedure, pass(idxmap)  :: g2ls2_ins  => base_g2ls2_ins
     procedure, pass(idxmap)  :: g2lv1_ins  => base_g2lv1_ins
     procedure, pass(idxmap)  :: g2lv2_ins  => base_g2lv2_ins
-    generic, public          :: g2l_ins => g2ls1_ins, g2ls2_ins,&
-         &                     g2lv1_ins, g2lv2_ins
+    generic, public          :: g2l_ins =>   g2ls2_ins, g2lv2_ins
+    generic, public          :: g2lip_ins => g2ls1_ins, g2lv1_ins
 
     procedure, pass(idxmap)  :: fnd_owner => psb_indx_map_fnd_owner
     procedure, pass(idxmap)  :: init_vl   => base_init_vl

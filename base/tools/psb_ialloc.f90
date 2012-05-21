@@ -250,3 +250,81 @@ subroutine psb_iallocv(x, desc_a, info,n)
 
 end subroutine psb_iallocv
 
+
+subroutine psb_ialloc_vect(x, desc_a,info,n)
+  use psb_base_mod, psb_protect_name => psb_ialloc_vect
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_i_vect_type), intent(out)  :: x
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_),intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)   :: n
+
+  !locals
+  integer(psb_ipk_) :: np,me,nr,i,err_act
+  integer(psb_ipk_) :: ictxt, int_err(5)
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  name='psb_geall'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check m and n parameters....
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ! As this is a rank-1 array, optional parameter N is actually ignored.
+
+  !....allocate x .....
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
+    nr = max(1,desc_a%get_local_cols())
+  else if (psb_is_bld_desc(desc_a)) then
+    nr = max(1,desc_a%get_local_rows())
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
+  endif
+
+  allocate(psb_i_base_vect_type :: x%v, stat=info) 
+  if (info == 0) call x%all(nr,info)
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_alloc_request_
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='integer(psb_ipk_)')
+    goto 9999
+  endif
+  call x%zero()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_ialloc_vect
+

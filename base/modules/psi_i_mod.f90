@@ -413,6 +413,13 @@ module psi_i_mod
       integer(psb_ipk_), intent(in)                :: update
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psi_iovrl_updr2
+    subroutine  psi_iovrl_upd_vect(x,desc_a,update,info)
+      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      class(psb_i_base_vect_type)       :: x
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer(psb_ipk_), intent(in)               :: update
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psi_iovrl_upd_vect
   end interface
 
   interface psi_ovrl_save
@@ -430,6 +437,13 @@ module psi_i_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_saver2
+    subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      class(psb_i_base_vect_type)     :: x
+      integer(psb_ipk_), allocatable     :: xs(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_iovrl_save_vect
   end interface
 
   interface psi_ovrl_restore
@@ -447,6 +461,13 @@ module psi_i_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_restrr2
+    subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
+      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      class(psb_i_base_vect_type)     :: x
+      integer(psb_ipk_)                  :: xs(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_iovrl_restr_vect
   end interface
 
 end module psi_i_mod

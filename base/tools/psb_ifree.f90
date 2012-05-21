@@ -198,3 +198,63 @@ subroutine psb_ifreev(x, desc_a,info)
   return
 
 end subroutine psb_ifreev
+
+
+subroutine psb_ifree_vect(x, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_ifree_vect
+  implicit none
+  !....parameters...
+  type(psb_i_vect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer(psb_ipk_), intent(out)             :: info 
+  !...locals....
+  integer(psb_ipk_) :: ictxt,np,me,err_act
+  character(len=20)   :: name
+
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  call psb_erractionsave(err_act)
+  name='psb_ifreev'
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  ictxt = desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call x%free(info)
+
+  if (info /= psb_no_err_) then
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+     call psb_error(ictxt)
+     return
+  end if
+  return
+
+end subroutine psb_ifree_vect
+
