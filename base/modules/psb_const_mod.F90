@@ -82,14 +82,14 @@ module psb_const_mod
   integer(psb_ipk_), parameter   :: izero=0, ione=1
   integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
   integer(psb_ipk_), parameter   :: psb_root_=0
-  real(psb_spk_), parameter      :: szero=0.e0, sone=1.e0
-  real(psb_dpk_), parameter      :: dzero=0.d0, done=1.d0
-  complex(psb_spk_), parameter   :: czero=(0.e0,0.0e0)
-  complex(psb_spk_), parameter   :: cone=(1.e0,0.0e0)
-  complex(psb_dpk_), parameter   :: zzero=(0.d0,0.0d0)
-  complex(psb_dpk_), parameter   :: zone=(1.d0,0.0d0)
-  real(psb_dpk_), parameter      :: d_epstol=1.1d-16 ! Unit roundoff.  
-  real(psb_spk_), parameter      :: s_epstol=5.e-8   ! Is this right?
+  real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_
+  real(psb_dpk_), parameter      :: dzero=0.0_psb_dpk_, done=1.0_psb_dpk_
+  complex(psb_spk_), parameter   :: czero=(0.0_psb_spk_,0.0_psb_spk_)
+  complex(psb_spk_), parameter   :: cone=(1.0_psb_spk_,0.0_psb_spk_)
+  complex(psb_dpk_), parameter   :: zzero=(0.0_psb_dpk_,0.0_psb_dpk_)
+  complex(psb_dpk_), parameter   :: zone=(1.0_psb_dpk_,0.0_psb_dpk_)
+  real(psb_dpk_), parameter      :: d_epstol=1.1e-16_psb_dpk_ ! Unit roundoff.  
+  real(psb_spk_), parameter      :: s_epstol=5.e-8_psb_spk_   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
   logical, parameter             :: psb_i_is_complex_ = .false.
   logical, parameter             :: psb_s_is_complex_ = .false.
