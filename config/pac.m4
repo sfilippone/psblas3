@@ -1085,7 +1085,7 @@ esac
 #AC_FC_FUNC(sgemm)
 #AC_FC_FUNC(dgemm)
 
-#pac_blas_save_LIBS="$LIBS"
+pac_blas_save_LIBS="$LIBS"
 #LIBS="$LIBS $FLIBS"
 AC_LANG([Fortran])
 
