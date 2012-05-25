@@ -142,6 +142,15 @@ contains
     integer(psb_mpik_) :: info
     
     info = 0
+#if 0
+    if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_integer ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_mpik_, psb_mpi_def_integer ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_long_int_k_, psb_mpi_lng_integer ,info)
+    if (info == 0) call mpi_type_create_f90_real(psb_spk_p_,psb_spk_r_, psb_mpi_r_spk_,info)
+    if (info == 0) call mpi_type_create_f90_real(psb_dpk_p_,psb_dpk_r_, psb_mpi_r_dpk_,info)
+    if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
+    if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
+#else
 #if defined(LONG_INTEGERS)
     psb_mpi_ipk_integer = mpi_integer8
 #else
@@ -149,7 +158,11 @@ contains
 #endif
     psb_mpi_def_integer = mpi_integer
     psb_mpi_lng_integer = mpi_integer8
-
+    psb_mpi_r_spk_      = mpi_real
+    psb_mpi_r_dpk_      = mpi_double_precision
+    psb_mpi_c_spk_      = mpi_complex
+    psb_mpi_c_dpk_      = mpi_double_complex
+#endif
 
 #if defined(SERIAL_MPI)
 #else 

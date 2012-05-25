@@ -45,22 +45,29 @@ module psb_const_mod
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   ! This is always a 4-byte integer, for MPI-related stuff
-  integer, parameter  :: mpindig=8
-  integer, parameter  :: psb_mpik_ = selected_int_kind(mpindig)
+  integer, parameter  :: psb_mpik_ = kind(1)
   !
   ! These must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
   ! and MPI_REAL
   !
-  integer(psb_ipk_), parameter  :: psb_dpk_ = kind(1.d0)
-  integer(psb_ipk_), parameter  :: psb_spk_ = kind(1.e0)
-  integer(psb_ipk_), save       :: psb_sizeof_dp, psb_sizeof_sp
-  integer(psb_ipk_), save       :: psb_sizeof_int, psb_sizeof_long_int
+  integer(psb_mpik_), parameter  :: psb_spk_p_ = 6
+  integer(psb_mpik_), parameter  :: psb_spk_r_ = 37
+  integer(psb_mpik_), parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_,psb_spk_r_)
+  integer(psb_mpik_), parameter  :: psb_dpk_p_ = 15
+  integer(psb_mpik_), parameter  :: psb_dpk_r_ = 307
+  integer(psb_mpik_), parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
+  integer(psb_ipk_), save        :: psb_sizeof_dp, psb_sizeof_sp
+  integer(psb_ipk_), save        :: psb_sizeof_int, psb_sizeof_long_int
   !
   ! Integer type identifiers for MPI operations. 
   !
   integer(psb_mpik_), save      :: psb_mpi_ipk_integer
   integer(psb_mpik_), save      :: psb_mpi_def_integer
   integer(psb_mpik_), save      :: psb_mpi_lng_integer
+  integer(psb_mpik_), save      :: psb_mpi_r_spk_
+  integer(psb_mpik_), save      :: psb_mpi_r_dpk_
+  integer(psb_mpik_), save      :: psb_mpi_c_spk_
+  integer(psb_mpik_), save      :: psb_mpi_c_dpk_
   ! 
   ! Version
   !

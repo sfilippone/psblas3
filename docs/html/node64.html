@@ -90,7 +90,7 @@ Type:<B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img98.png"
  ALT="$nz$">.
 </DD>
@@ -104,7 +104,7 @@ Type:<B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img98.png"
  ALT="$nz$">.
 </DD>
@@ -118,11 +118,11 @@ Type:<B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an array of size <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img98.png"
  ALT="$nz$">. Must be of the same type and kind
-of the <code>aspk</code> component of the sparse matrix <IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+of the coefficients  of the sparse matrix <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img101.png"
  ALT="$a$">.
 </DD>
@@ -206,17 +206,42 @@ An integer value; 0 means no error has been detected.
   (implicitly) call <code>psb_cdins</code> to add entries to the sparsity
   pattern; each sparse matrix entry implicitly defines a graph edge,
   that is passed to the descriptor routine for the appropriate
-  processing. 
+  processing;
 </LI>
-<LI>Any coefficients from matrix rows not assigned to the calling
+<LI>The coefficients to be inserted are represented by the ordered
+  triples <!-- MATH
+ $ia(i),ja(i),val(i)$
+ -->
+<IMG
+ WIDTH="124" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ia(i),ja(i),val(i)$">, for <IMG
+ WIDTH="91" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$i=1,\dots,nz$">; these triples
+  should belong to the current process, i.e. <IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.png"
+ ALT="$ia(i)$"> should be one of
+  the local indices, but are otherwise arbitrary;
+</LI>
+<LI>There is no
+  requirement that a given row must be passed in its entirety to a
+  single call to this routine: the buildup of a row may be split into
+  as many calls as desired;
+</LI>
+<LI>Coefficients from different rows   may also be mixed up freely
+  in a single call, according to the application needs; 
+</LI>
+<LI>Any coefficients from matrix rows not owned by the calling
   process are silently ignored;
 </LI>
 <LI>If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
-  requirements will be ignored; 
+  requirements are  ignored; 
 </LI>
 <LI>If the matrix is in the update state, any entries in positions
-  that were not present in the original matrix will be ignored. 
+  that were not present in the original matrix are ignored. 
 </LI>
 </OL>
 
