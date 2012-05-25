@@ -87,9 +87,9 @@ which points to GNU Fortran.
 The best way to avoid this situation is (in our opinion) to use the
 environment modules package (see http://modules.sourceforge.net/), and
 load the relevant variables with (e.g.)  
-module load gnu42 mpich 
+module load gnu46 mpich 
 This will delegate to the modules setup to make sure that the version
-of mpich in use is the one compiled with the gnu42 compilers. 
+of mpich in use is the one compiled with the gnu46 compilers. 
 After the configure script has completed you can always tweak the
 Make.inc  file yourself. 
 
@@ -132,8 +132,7 @@ recommended to use the following:
 with both CCE and GNU lower-level compilers. 
 
 XLF 13.1 configures correctly, but then fails with ICEs (Internal
-Compiler Error) at build time. We do not yet know whether XLF 14
-compiles correctly. 
+Compiler Error) at build time; the vendor has been notified of the problem.  
 
 For the GNU compilers 4.6.x we are aware of a number of memory management
 issues that might surface in your applications; all of them (that
