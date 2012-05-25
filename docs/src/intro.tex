@@ -103,8 +103,7 @@ further details on our communication layer see Sec.~\ref{sec:parenv}.
 \ifcase\pdfoutput
 \includegraphics[scale=0.65]{figures/psblas.eps}
 \or
-%\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
-{\includegraphics[scale=0.65]{figures/psblas}}
+\includegraphics[scale=0.65]{figures/psblas}
 \fi
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
@@ -424,7 +423,7 @@ to the constraints outlined in sec.~\ref{sec:appstruct}:
 \end{enumerate}
 but otherwise the mapping is arbitrary. The user application is
 responsible to ensure consistency of this mapping; some errors may be
-catched by the library, but this is not guaranteed. 
+caught by the library, but this is not guaranteed. 
 The application structure to
 support this usage is as follows:
 \begin{enumerate}

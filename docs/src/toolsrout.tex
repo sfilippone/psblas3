@@ -620,7 +620,7 @@ Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an array of size $nz$. Must be of the same type and kind
-of the \verb|aspk| component of the sparse matrix $a$.
+of the coefficients  of the sparse matrix $a$.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\
@@ -672,14 +672,24 @@ An integer value; 0 means no error has been detected.
   (implicitly) call \verb|psb_cdins| to add entries to the sparsity
   pattern; each sparse matrix entry implicitly defines a graph edge,
   that is passed to the descriptor routine for the appropriate
-  processing. 
-\item Any coefficients from matrix rows not assigned to the calling
+  processing;
+\item The coefficients to be inserted are represented by the ordered
+  triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$; these triples
+  should belong to the current process, i.e. $ia(i)$ should be one of
+  the local indices, but are otherwise arbitrary;
+\item There is no
+  requirement that a given row must be passed in its entirety to a
+  single call to this routine: the buildup of a row may be split into
+  as many calls as desired;
+\item Coefficients from different rows   may also be mixed up freely
+  in a single call, according to the application needs; 
+\item Any coefficients from matrix rows not owned by the calling
   process are silently ignored;
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
-  requirements will be ignored; 
+  requirements are  ignored; 
 \item If the matrix is in the update state, any entries in positions
-  that were not present in the original matrix will be ignored. 
+  that were not present in the original matrix are ignored. 
 \end{enumerate}
 
 %
