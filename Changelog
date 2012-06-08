@@ -1,6 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
-
+2012/06/08: Fix silly bug in GPS renumbering.
+	
 2012/05/25: Fixed docs for release 3.0
 	
 2012/05/21: Fix configure script to work around configure failure on Cray.
