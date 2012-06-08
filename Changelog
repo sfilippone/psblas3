@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
 
+2012/06/08: Fix silly bug in GPS renumbering.
+
 2012/05/21: Fix configure script to work around configure failure on Cray.
 	
 2012/04/30: Change descriptor's move_alloc and free to work on
