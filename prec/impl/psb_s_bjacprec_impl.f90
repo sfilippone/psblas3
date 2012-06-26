@@ -147,7 +147,6 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   else
     allocate(ww(n_col),aux(4*n_col),stat=info)
   endif
-  if (info == psb_success_) allocate(wv%v,mold=x%v)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -182,7 +181,7 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
       call wv1%mlt(sone,prec%dv,wv,szero,info,conjgx=trans_)
   
-      if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
+      if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
            & beta,y,desc_data,info,&
            & trans=trans_,scale='U',choice=psb_none_,work=aux)
 
