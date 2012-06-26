@@ -668,7 +668,7 @@ contains
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    integer, intent(in), optional :: lidx
+    integer(psb_ipk_), intent(in), optional :: lidx
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
     logical, parameter :: debug=.false.
@@ -695,7 +695,7 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    integer, intent(in), optional :: lidx
+    integer(psb_ipk_), intent(in), optional :: lidx
 
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
@@ -723,7 +723,7 @@ contains
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer, intent(in), optional :: lidx(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
@@ -751,7 +751,7 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer, intent(in), optional :: lidx(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: err_act
     character(len=20)  :: name='base_g2l_ins'
