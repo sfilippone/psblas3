@@ -34,7 +34,7 @@ clean:
 	cd prec && $(MAKE) clean 
 	cd krylov && $(MAKE) clean
 	cd util && $(MAKE) clean
-	cd opt && $(MAKE) clean
+#	cd opt && $(MAKE) clean
 
 check: all
 	make check -C test/serial
