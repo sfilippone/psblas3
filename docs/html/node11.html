@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_local_rows -- Get number of local rows</TITLE>
-<META NAME="description" CONTENT="get_local_rows -- Get number of local rows">
+<TITLE>Methods</TITLE>
+<META NAME="description" CONTENT="Methods">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,7 +20,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node12.html">
 <LINK REL="previous" HREF="node10.html">
-<LINK REL="up" HREF="node9.html">
+<LINK REL="up" HREF="node10.html">
 <LINK REL="next" HREF="node12.html">
 </HEAD>
 
@@ -30,7 +30,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   HREF="node12.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
 <A NAME="tex2html333"
-  HREF="node9.html">
+  HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html327"
   HREF="node10.html">
@@ -40,61 +40,20 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
 <B> Next:</B> <A NAME="tex2html338"
-  HREF="node12.html">get_local_cols   Get</A>
+  HREF="node12.html">get_local_rows   Get</A>
 <B> Up:</B> <A NAME="tex2html334"
-  HREF="node9.html">Descriptor data structure</A>
+  HREF="node10.html">Descriptor data structure</A>
 <B> Previous:</B> <A NAME="tex2html328"
-  HREF="node10.html">Methods</A>
+  HREF="node10.html">Descriptor data structure</A>
  &nbsp; <B>  <A NAME="tex2html336"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00041200000000000000">
-get_local_rows -- Get number of local rows</A>
+<H3><A NAME="SECTION00041100000000000000">
+Methods</A>
 </H3>
-
-<P>
-<PRE>
-nr = desc%get_local_rows()
-</PRE>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of local rows, i.e. the number of
-  rows owned by the current process; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>,
-  it is equal to <!-- MATH
- $|{\cal I}_i| + |{\cal B}_i|$
- -->
-<IMG
- WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img10.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">. The returned value is
-  specific to the calling process. 
-</DD>
-</DL>
-
-<P>
 <BR><HR>
 
 </BODY>

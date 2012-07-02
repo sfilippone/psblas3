@@ -103,8 +103,7 @@ further details on our communication layer see Sec.~\ref{sec:parenv}.
 \ifcase\pdfoutput
 \includegraphics[scale=0.65]{figures/psblas.eps}
 \or
-%\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
-{\includegraphics[scale=0.65]{figures/psblas}}
+\includegraphics[scale=0.65]{figures/psblas}
 \fi
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
@@ -297,6 +296,7 @@ constant
 whose current value is \verb|3.0.0|
 
 \subsection{Application structure}
+\label{sec:appstruct}
 
 The main underlying principle of the PSBLAS library is that the
 library objects are created and exist with reference to a discretized
@@ -410,6 +410,38 @@ part of a coefficient matrix residing on a process and pass it in a
 single call to \verb|psb_spins|; this, however, would entail a
 doubling of memory occupation, and thus would be almost always far
 from optimal. 
+
+\subsubsection{User-defined index mappings}
+\label{sec:usermaps}
+PSBLAS supports user-defined global to local index mappings, subject
+to the constraints outlined in sec.~\ref{sec:appstruct}: 
+\begin{enumerate}
+\item The set of indices owned locally must be mapped to the set
+  $1\dots n_{\hbox{row}_i}$;
+\item The set of halo points must be mapped to the set
+  $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$;
+\end{enumerate}
+but otherwise the mapping is arbitrary. The user application is
+responsible to ensure consistency of this mapping; some errors may be
+caught by the library, but this is not guaranteed. 
+The application structure to
+support this usage is as follows:
+\begin{enumerate}
+\item Initialize index space with
+  \verb|psb_cdall(ictx,desc,info,vl=vl,lidx=lidx)| passing the vectors 
+  \verb|vl(:)| containing the set of global indices owned by the
+  current process and   \verb|lidx(:)| containing the corresponding
+  local indices;
+\item Add the halo points \verb|ja(:)| and their associated local
+  indices \verb|lidx(:)|  with a(some) call(s) to
+  \verb|psb_cdins(nz,ja,desc,info,lidx=lidx)|; 
+\item Assemble the descriptor with \verb|psb_cdasb|;
+\item Build the sparse matrices and vectors, optionally making use in
+  \verb|psb_spins| and \verb|psb_geins| of the \verb|local| argument
+  specifying that the indices in \verb|ia|, \verb|ja| and \verb|irw|,
+  respectively, are already local indices. 
+\end{enumerate}
+
 
 \subsection{Programming model}
 

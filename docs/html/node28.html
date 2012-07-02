@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Named Constants</TITLE>
-<META NAME="description" CONTENT="Named Constants">
+<TITLE>is_bld, is_upd, is_asb -- Status check</TITLE>
+<META NAME="description" CONTENT="is_bld, is_upd, is_asb -- Status check">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,63 +18,73 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node29.html">
 <LINK REL="previous" HREF="node27.html">
-<LINK REL="up" HREF="node19.html">
+<LINK REL="up" HREF="node20.html">
 <LINK REL="next" HREF="node29.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html547"
+<A NAME="tex2html549"
   HREF="node29.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html543"
-  HREF="node19.html">
+<A NAME="tex2html545"
+  HREF="node20.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html539"
   HREF="node27.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html545"
+<A NAME="tex2html547"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html548"
-  HREF="node29.html">Dense Vector Data Structure</A>
-<B> Up:</B> <A NAME="tex2html544"
-  HREF="node19.html">Sparse Matrix class</A>
+<B> Next:</B> <A NAME="tex2html550"
+  HREF="node29.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html546"
+  HREF="node20.html">Sparse Matrix class</A>
 <B> Previous:</B> <A NAME="tex2html540"
-  HREF="node27.html">is_bld, is_upd, is_asb </A>
- &nbsp; <B>  <A NAME="tex2html546"
+  HREF="node27.html">get_fmt   Short</A>
+ &nbsp; <B>  <A NAME="tex2html548"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043900000000000000"></A>
-<A NAME="sec:sp_constants"></A>
-<BR>
-Named Constants
+<H3><A NAME="SECTION00043800000000000000">
+is_bld, is_upd, is_asb  -- Status check</A>
 </H3>
+
+<P>
+<PRE>
+if (a%is_bld()) then 
+if (a%is_upd()) then 
+if (a%is_asb()) then 
+</PRE>
+
+<P>
 <DL>
-<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
-<DD>Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
-<DT><STRONG>psb_dupl_add_</STRONG></DT>
-<DD>Duplicate coefficients should be added;	         
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_dupl_err_</STRONG></DT>
-<DD>Duplicate coefficients should trigger an error conditino
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix
+<BR>
+Scope: <B>local</B>
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_upd_dflt_</STRONG></DT>
-<DD>Default update strategy for matrix coefficients;
-</DD>
-<DT><STRONG>psb_upd_srch_</STRONG></DT>
-<DD>Update strategy based on search into the data structure;
-</DD>
-<DT><STRONG>psb_upd_perm_</STRONG></DT>
-<DD>Update strategy based on additional
-  permutation data (see tools routine description).
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A <code>logical</code> value indicating whether the
+  matrix is in the Build, Update or Assembled state, respectively. 
 </DD>
 </DL>
 

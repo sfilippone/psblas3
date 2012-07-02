@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html752"
+<A NAME="tex2html753"
   HREF="node45.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html748"
+<A NAME="tex2html749"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html742"
+<A NAME="tex2html743"
   HREF="node43.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html750"
+<A NAME="tex2html751"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html753"
+<B> Next:</B> <A NAME="tex2html754"
   HREF="node45.html">psb_genrm2   2-Norm</A>
-<B> Up:</B> <A NAME="tex2html749"
+<B> Up:</B> <A NAME="tex2html750"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html743"
+<B> Previous:</B> <A NAME="tex2html744"
   HREF="node43.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html751"
+ &nbsp; <B>  <A NAME="tex2html752"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -58,8 +58,8 @@ psb_geasums -- Generalized 1-Norm of Vector</A>
 <P>
 This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -70,20 +70,20 @@ res(i) \leftarrow \max_k |x(k,i)|
  -->
 
 <IMG
- WIDTH="147" HEIGHT="36" BORDER="0"
- SRC="img37.png"
+ WIDTH="148" HEIGHT="36" BORDER="0"
+ SRC="img32.png"
  ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 This function computes the 1-norm of a vector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 If <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> is a real vector 
 it computes 1-norm as:
 <BR><P></P>
@@ -96,14 +96,14 @@ res(i) \leftarrow  \|x_i\|
 
 <IMG
  WIDTH="94" HEIGHT="28" BORDER="0"
- SRC="img41.png"
+ SRC="img36.png"
  ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -114,8 +114,8 @@ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
  -->
 
 <IMG
- WIDTH="206" HEIGHT="28" BORDER="0"
- SRC="img42.png"
+ WIDTH="207" HEIGHT="28" BORDER="0"
+ SRC="img37.png"
  ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -128,7 +128,7 @@ call psb_geasums(res, x, desc_a, info)
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1539"></A>
+<DIV ALIGN="CENTER"><A NAME="1560"></A>
 <TABLE>
 <CAPTION><STRONG>Table 7:</STRONG>
 Data types</CAPTION>
@@ -136,12 +136,12 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img33.png"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
  ALT="$res$"></TD>
 <TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -179,8 +179,8 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">. 
 
 <BR>
@@ -190,7 +190,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90asums">7</A>.
 </DD>
@@ -212,8 +212,8 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>res</STRONG></DT>
 <DD>contains the 1-norm of (the columns of) <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
@@ -239,26 +239,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html752"
+<A NAME="tex2html753"
   HREF="node45.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html748"
+<A NAME="tex2html749"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html742"
+<A NAME="tex2html743"
   HREF="node43.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html750"
+<A NAME="tex2html751"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html753"
+<B> Next:</B> <A NAME="tex2html754"
   HREF="node45.html">psb_genrm2   2-Norm</A>
-<B> Up:</B> <A NAME="tex2html749"
+<B> Up:</B> <A NAME="tex2html750"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html743"
+<B> Previous:</B> <A NAME="tex2html744"
   HREF="node43.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html751"
+ &nbsp; <B>  <A NAME="tex2html752"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

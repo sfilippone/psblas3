@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_context--Get communication context </TITLE>
-<META NAME="description" CONTENT="get_context--Get communication context ">
+<TITLE>get_global_cols -- Get number of global cols</TITLE>
+<META NAME="description" CONTENT="get_global_cols -- Get number of global cols">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,9 +18,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node19.html">
-<LINK REL="previous" HREF="node9.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node10.html">
 <LINK REL="next" HREF="node16.html">
 </HEAD>
 
@@ -30,9 +29,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   HREF="node16.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
 <A NAME="tex2html379"
-  HREF="node8.html">
+  HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html373"
+<A NAME="tex2html375"
   HREF="node14.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
 <A NAME="tex2html381"
@@ -40,24 +39,24 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
 <B> Next:</B> <A NAME="tex2html384"
-  HREF="node16.html">psb_cd_get_large_threshold   Get</A>
+  HREF="node16.html">get_context Get communication context</A>
 <B> Up:</B> <A NAME="tex2html380"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html374"
-  HREF="node14.html">get_global_cols   Get</A>
+  HREF="node10.html">Descriptor data structure</A>
+<B> Previous:</B> <A NAME="tex2html376"
+  HREF="node14.html">get_global_rows   Get</A>
  &nbsp; <B>  <A NAME="tex2html382"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00042000000000000000">
-<DIV ALIGN="LEFT">
-get_context--Get communication context 
-</DIV></A>
-</H2>
+<H3><A NAME="SECTION00041500000000000000">
+get_global_cols -- Get number of global cols</A>
+</H3>
+
+<P>
 <PRE>
-ictxt = desc%get_context()
+nr = desc%get_global_cols()
 </PRE>
 
 <P>
@@ -81,26 +80,12 @@ Scope: <B>local</B>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The communication context.
+<DD>The number of global cols; usually this is equal
+  to the number of global rows. 
 </DD>
 </DL>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html385"
-  HREF="node16.html">psb_cd_get_large_threshold -- Get threshold for
-  index mapping switch</A>
-<LI><A NAME="tex2html386"
-  HREF="node17.html">psb_cd_set_large_threshold -- Set threshold for
-  index mapping switch</A>
-<LI><A NAME="tex2html387"
-  HREF="node18.html">Named Constants</A>
-</UL>
-<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

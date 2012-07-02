@@ -405,7 +405,7 @@ $glob\_x$. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
-Specified as: a rank one or two array containing numbers of the type
+Specified as:  a rank one or two array or an object of type \vdata\ 
 indicated in Table~\ref{tab:gather}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
@@ -447,7 +447,7 @@ Specified as: an integer variable $-1\le root\le np-1$, default $-1$.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Intent: {\bf out}.\\
-Specified as: a rank one or two array.
+Specified as: a rank one or two array with the \verb|ALLOCATABLE| attribute.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\

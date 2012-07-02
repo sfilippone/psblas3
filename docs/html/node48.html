@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_spmm -- Sparse Matrix by Dense Matrix Product</TITLE>
-<META NAME="description" CONTENT="psb_spmm -- Sparse Matrix by Dense Matrix Product">
+<TITLE>psb_spnrmi -- Infinity Norm of Sparse Matrix</TITLE>
+<META NAME="description" CONTENT="psb_spnrmi -- Infinity Norm of Sparse Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,123 +26,64 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html800"
+<A NAME="tex2html801"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html796"
+<A NAME="tex2html797"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html790"
+<A NAME="tex2html791"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html798"
+<A NAME="tex2html799"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html801"
-  HREF="node49.html">psb_spsm   Triangular</A>
-<B> Up:</B> <A NAME="tex2html797"
+<B> Next:</B> <A NAME="tex2html802"
+  HREF="node49.html">psb_spmm   Sparse</A>
+<B> Up:</B> <A NAME="tex2html798"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html791"
-  HREF="node47.html">psb_spnrmi   Infinity</A>
- &nbsp; <B>  <A NAME="tex2html799"
+<B> Previous:</B> <A NAME="tex2html792"
+  HREF="node47.html">psb_spnrm1   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html800"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION000511000000000000000">
-psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
+psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
 </H2>
 
 <P>
-This subroutine computes the Sparse Matrix by Dense Matrix Product:
-
+This function computes the infinity-norm of a matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">:
+<BR>
 <P>
-<BR>
-<DIV ALIGN="RIGHT">
-
+<BR><P></P>
+<DIV ALIGN="CENTER">
 <!-- MATH
- \begin{equation}
-y \leftarrow \alpha  A  x + \beta y
-\end{equation}
+ \begin{displaymath}
+nrmi \leftarrow \|A\|_\infty
+\end{displaymath}
  -->
-<TABLE WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_no_tra"></A><IMG
- WIDTH="101" HEIGHT="27" BORDER="0"
- SRC="img48.png"
- ALT="\begin{displaymath}
-y \leftarrow \alpha A x + \beta y
-\end{displaymath}"></TD>
-<TD WIDTH=10 ALIGN="RIGHT">
-(1)</TD></TR>
-</TABLE>
-<BR CLEAR="ALL"></DIV><P></P>
-<BR>
-<DIV ALIGN="RIGHT">
 
-<!-- MATH
- \begin{equation}
-y \leftarrow \alpha  A^T x + \beta y
-\end{equation}
- -->
-<TABLE WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_tra"></A><IMG
- WIDTH="112" HEIGHT="27" BORDER="0"
- SRC="img49.png"
- ALT="\begin{displaymath}
-y \leftarrow \alpha A^T x + \beta y
-\end{displaymath}"></TD>
-<TD WIDTH=10 ALIGN="RIGHT">
-(2)</TD></TR>
-</TABLE>
-<BR CLEAR="ALL"></DIV><P></P>
-<BR>
-<DIV ALIGN="RIGHT">
-
-<!-- MATH
- \begin{equation}
-y \leftarrow \alpha  A^H  x + \beta y
-\end{equation}
- -->
-<TABLE WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_con"></A><IMG
- WIDTH="114" HEIGHT="27" BORDER="0"
- SRC="img50.png"
- ALT="\begin{displaymath}
-y \leftarrow \alpha A^H x + \beta y
-\end{displaymath}"></TD>
-<TD WIDTH=10 ALIGN="RIGHT">
-(3)</TD></TR>
-</TABLE>
-<BR CLEAR="ALL"></DIV><P></P>
-
-<P>
+<IMG
+ WIDTH="102" HEIGHT="28" BORDER="0"
+ SRC="img43.png"
+ ALT="\begin{displaymath}nrmi \leftarrow \Vert A\Vert _\infty \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
 where:
 <DL>
-<DT><STRONG><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$"></STRONG></DT>
-<DD>is the global dense matrix <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img51.png"
- ALT="$x_{:, :}$">
-</DD>
-<DT><STRONG><IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$"></STRONG></DT>
-<DD>is the global dense matrix <IMG
- WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img52.png"
- ALT="$y_{:, :}$">
-</DD>
 <DT><STRONG><IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$"></STRONG></DT>
-<DD>is the global sparse matrix <IMG
+<DD>represents the global matrix <IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$">
@@ -151,7 +92,7 @@ where:
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1543"></A>
+<DIV ALIGN="CENTER"><A NAME="1564"></A>
 <TABLE>
 <CAPTION><STRONG>Table 11:</STRONG>
 Data types</CAPTION>
@@ -161,32 +102,20 @@ Data types</CAPTION>
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
- ALT="$A$">, <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$">, <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$">, <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$\alpha$">, <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$\beta$"></TD>
-<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+ ALT="$A$"></TD>
+<TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_spmm</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_spmm</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spmm</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spmm</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -197,10 +126,8 @@ Data types</CAPTION>
 
 <P>
 <PRE>
-call psb_spmm(alpha, a, x, beta, y, desc_a, info)
-call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
-             &amp; trans, work)
-</PRE> 
+psb_spnrmi(A, desc_a, info)
+</PRE>
 
 <P>
 <DL>
@@ -210,23 +137,8 @@ call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>alpha</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img27.png"
- ALT="$\alpha$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in
-Table&nbsp;<A HREF="#tab:f90spmm">11</A>. 
-</DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the local portion of the sparse matrix
+<DD>the local  portion of the global sparse matrix
 <IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
@@ -240,68 +152,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an object of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$">. 
-
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spmm">11</A>.  The rank of <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$"> must be the same of <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$">. 
-</DD>
-<DT><STRONG>beta</STRONG></DT>
-<DD>the scalar <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img28.png"
- ALT="$\beta$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90spmm">11</A>.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$">. 
-
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spmm">11</A>. The rank of <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$"> must be the same of <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$">. 
-</DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
 <BR>
@@ -313,74 +163,18 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>indicates what kind of operation to perform.
-<DL>
-<DT><STRONG>trans = N</STRONG></DT>
-<DD>the operation is specified by equation <A HREF="#eq:f90spmm_no_tra">1</A>
-</DD>
-<DT><STRONG>trans = T</STRONG></DT>
-<DD>the operation is specified by equation
-<A HREF="#eq:f90spmm_tra">2</A>
-</DD>
-<DT><STRONG>trans = C</STRONG></DT>
-<DD>the operation is specified by equation
-<A HREF="#eq:f90spmm_con">3</A>
-</DD>
-</DL>
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: <IMG
- WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img53.png"
- ALT="$trans = N$">
-<BR>
-Specified as: a character variable.
-
-<P>
-</DD>
-<DT><STRONG>work</STRONG></DT>
-<DD>work array.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one array of the same type of <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$"> and <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$"> with
-the TARGET attribute. 
-
-<P>
-</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the local portion of result matrix <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
- ALT="$y$">.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>is the infinity-norm of sparse submatrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">.
 <BR>
-Scope: <B>local</B> 
+Scope: <B>global</B> 
 <BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an array of rank one or two
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90spmm">11</A>.
+Specified as: a long precision real number.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -398,26 +192,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html800"
+<A NAME="tex2html801"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html796"
+<A NAME="tex2html797"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html790"
+<A NAME="tex2html791"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html798"
+<A NAME="tex2html799"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html801"
-  HREF="node49.html">psb_spsm   Triangular</A>
-<B> Up:</B> <A NAME="tex2html797"
+<B> Next:</B> <A NAME="tex2html802"
+  HREF="node49.html">psb_spmm   Sparse</A>
+<B> Up:</B> <A NAME="tex2html798"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html791"
-  HREF="node47.html">psb_spnrmi   Infinity</A>
- &nbsp; <B>  <A NAME="tex2html799"
+<B> Previous:</B> <A NAME="tex2html792"
+  HREF="node47.html">psb_spnrm1   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html800"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

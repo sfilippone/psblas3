@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -273,7 +273,7 @@ program cf_sample
     write(psb_out_unit,'("Iterations to convergence: ",i6)')iter
     write(psb_out_unit,'("Error estimate on exit   : ",es12.5)') err
     write(psb_out_unit,'("Time to buil prec.       : ",es12.5)')tprec
-    write(psb_out_unit,'("Time to solve matrix     : ",es12.5)')t2
+    write(psb_out_unit,'("Time to solve system     : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration       : ",es12.5)')t2/(iter)
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
@@ -286,27 +286,24 @@ program cf_sample
          &  desc_a%indxmap%get_fmt()
   end if
 
-  allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
-  if (ierr /= 0) then 
-    write(psb_err_unit,*) 'allocation error: no data collection'
-  else
-    call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
-    call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
-    if (iam == psb_root_) then
-      write(psb_err_unit,'(" ")')
-      write(psb_err_unit,'("Saving x on file")')
-      write(20,*) 'matrix: ',mtrx_file
-      write(20,*) 'computed solution on ',np,' processors.'
-      write(20,*) 'iterations to convergence: ',iter
-      write(20,*) 'error estimate (infinity norm) on exit:', &
-           & ' ||r||/(||a||||x||+||b||) = ',err
-      write(20,'("Residual norm 2          : ",es12.5)')resmx
-      write(20,'("Residual norm inf        : ",es12.5)')resmxp
-      write(20,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
-      do i=1,m_problem
-        write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
-      enddo
-    end if
+  call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
+  if (info == psb_success_) &
+       & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+  if (info /= psb_success_) goto 9999
+  if (iam == psb_root_) then
+    write(psb_err_unit,'(" ")')
+    write(psb_err_unit,'("Saving x on file")')
+    write(20,*) 'matrix: ',mtrx_file
+    write(20,*) 'computed solution on ',np,' processors.'
+    write(20,*) 'iterations to convergence: ',iter
+    write(20,*) 'error estimate (infinity norm) on exit:', &
+         & ' ||r||/(||a||||x||+||b||) = ',err
+    write(20,'("Residual norm 2          : ",es12.5)')resmx
+    write(20,'("Residual norm inf        : ",es12.5)')resmxp
+    write(20,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
+    do i=1,m_problem
+      write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
+    enddo
   end if
 998 format(i8,6(1x,g11.5))
 993 format(i6,4(1x,e12.6))

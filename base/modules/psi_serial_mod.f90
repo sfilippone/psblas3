@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -233,6 +233,22 @@ module psi_serial_mod
 
 
   interface psb_geaxpby
+    subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m
+      integer(psb_ipk_), intent (in)       ::  x(:)
+      integer(psb_ipk_), intent (inout)    ::  y(:)
+      integer(psb_ipk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psi_iaxpbyv
+    subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
+      import :: psb_ipk_, psb_spk_, psb_dpk_
+      integer(psb_ipk_), intent(in)               :: m, n
+      integer(psb_ipk_), intent (in)       ::  x(:,:)
+      integer(psb_ipk_), intent (inout)    ::  y(:,:)
+      integer(psb_ipk_), intent (in)       ::  alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psi_iaxpby
     subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
       import :: psb_ipk_, psb_spk_, psb_dpk_
       integer(psb_ipk_), intent(in)               :: m

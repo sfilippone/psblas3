@@ -377,7 +377,8 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F $FCOPT"
+     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F -qlanglvl=extended $FCOPT"
+     FCFLAGS="-qhalt=e $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
@@ -411,7 +412,7 @@ if test "X$F90COPT" == "X" ; then
    F90COPT="-O3  $F90COPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 $F90COPT"
+     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 -qlanglvl=extended $F90COPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      F90COPT="-O3 $F90COPT"
@@ -559,6 +560,12 @@ PAC_FORTRAN_HAVE_MOVE_ALLOC(
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
 )
 
+PAC_FORTRAN_TEST_ISO_C_BIND( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+)
+
 #
 # Optional features
 #
@@ -574,11 +581,6 @@ PAC_FORTRAN_TEST_FLUSH(
 PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"],
 )
-
-PAC_FORTRAN_TEST_ISO_C_BIND( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"],
-)
-
 
 PAC_FORTRAN_TEST_FINAL( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
@@ -643,11 +645,11 @@ AR="${AR} -cur"
 # Right now it is a matter of user's taste when linking custom applications.
 # But PSBLAS examples could take advantage of these libraries, too.
 
-AC_LANG([C])
 PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
 PAC_LAPACK(
 [FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
 )
+AC_LANG([C])
 
 
 ###############################################################################

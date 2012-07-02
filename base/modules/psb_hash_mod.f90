@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -30,26 +30,28 @@
 !!$ 
 !!$  
 !
-! package: psb_hash_mod
-! 
-!   This module implements a very simple minded hash table.
-!   The hash is based on the idea of open addressing with double hashing;
-!   the primary hash function h1(K) is simply the remainder modulo 2^N, while
-!   the secondary hash function is 1 if H1(k) == 0, otherwise IOR((2^N-H1(k)),1)
-!   (See Knuth: TAOCP, Vol. 3, sec. 6.4)
-!   These hash functions are not very smart; however they are very simple and fast.
-!   The intended usage of this hash table is to store indices of halo points, which
-!   are supposed to be few compared to the internal indices (which are stored elsewhere).
-!   Therefore, either the table has a very low occupancy, and this scheme will work,
-!   or we have lots more to worry about in parallel performance than the efficiency
-!   of this hashing scheme.
-!
-!
 !
 module psb_hash_mod
   use psb_const_mod
   
-  !
+  !> \class psb_hash_mod
+  !! \brief Simple hash module for storing integer keys. 
+  !! 
+  !!   This module implements a very simple minded hash table.
+  !!   The hash is based on the idea of open addressing with double hashing;
+  !!   the primary hash function h1(K) is simply the remainder modulo 2^N, while
+  !!   the secondary hash function is 1 if H1(k) == 0, otherwise IOR((2^N-H1(k)),1)
+  !!   (See Knuth: TAOCP, Vol. 3, sec. 6.4)
+  !!   
+  !!   These hash functions are not very smart; however they are very simple and fast.
+  !!   The intended usage of this hash table is to store indices of halo points, which
+  !!   are supposed to be few compared to the internal indices
+  !!   (which are stored elsewhere).
+  !!   Therefore, either the table has a very low occupancy, and this scheme will work,
+  !!   or we have lots more to worry about in parallel performance than the efficiency
+  !!   of this hashing scheme.
+  !!
+  !!
   ! For us a hash is a Nx2 table.
   ! Note: we are assuming that the keys are positive numbers.
   ! Allocatable scalars would be a nice solution...

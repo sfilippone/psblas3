@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -747,6 +747,90 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
   return
 end subroutine psi_iovrl_updr2
 
+
+subroutine  psi_iovrl_upd_vect(x,desc_a,update,info)
+  use psi_mod, psi_protect_name =>   psi_iovrl_upd_vect
+  use psb_realloc_mod
+  use psb_i_base_vect_mod
+
+  implicit none
+
+  class(psb_i_base_vect_type)     :: x
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(in)             :: update
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  integer(psb_ipk_), allocatable :: xs(:)
+  integer(psb_ipk_) :: ictxt, np, me, err_act, i, idx, ndm, nx
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20) :: name, ch_err
+
+
+  name='psi_iovrl_updr1'
+  if (psb_get_errstatus() /= 0) return 
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  nx = size(desc_a%ovrlap_elem,1)
+  call psb_realloc(nx,xs,info)
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_Dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (update /= psb_sum_) then 
+    call x%gth(nx,desc_a%ovrlap_elem(:,1),xs)
+    ! switch on update type
+
+    select case (update)
+    case(psb_square_root_)
+      do i=1,nx
+        ndm = desc_a%ovrlap_elem(i,2)
+        xs(i) = xs(i)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,nx
+        ndm = desc_a%ovrlap_elem(i,2)
+        xs(i) = xs(i)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,nx
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & xs(i) = izero
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = psb_err_iarg_invalid_value_
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end select
+    call x%sct(nx,desc_a%ovrlap_elem(:,1),xs,izero)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_iovrl_upd_vect
 
 subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
   use psi_mod, psi_protect_name =>   psi_sovrl_upd_vect

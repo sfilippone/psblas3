@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -83,38 +83,38 @@ contains
   end subroutine base_set_kind
 
 
-  function base_is_ok(map) result(this)
+  function base_is_ok(map) result(res)
     use psb_descriptor_type
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
-    logical  :: this
-    this = .false.
+    logical  :: res
+    res = .false.
 
     select case(map%get_kind())
     case (psb_map_aggr_)
       if (.not.associated(map%p_desc_X)) return
       if (.not.associated(map%p_desc_Y)) return
-      this = map%p_desc_X%is_ok().and.map%p_desc_Y%is_ok()    
+      res = map%p_desc_X%is_ok().and.map%p_desc_Y%is_ok()    
     case(psb_map_gen_linear_)    
-      this = map%desc_X%is_ok().and.map%desc_Y%is_ok()    
+      res = map%desc_X%is_ok().and.map%desc_Y%is_ok()    
     end select
 
   end function base_is_ok
 
-  function base_is_asb(map) result(this)
+  function base_is_asb(map) result(res)
     use psb_descriptor_type
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
-    logical  :: this
-    this = .false.
+    logical  :: res
+    res = .false.
 
     select case(map%get_kind())
     case (psb_map_aggr_)
       if (.not.associated(map%p_desc_X)) return
       if (.not.associated(map%p_desc_Y)) return
-      this = map%p_desc_X%is_asb().and.map%p_desc_Y%is_asb()    
+      res = map%p_desc_X%is_asb().and.map%p_desc_Y%is_asb()    
     case(psb_map_gen_linear_)    
-      this = map%desc_X%is_asb().and.map%desc_Y%is_asb()    
+      res = map%desc_X%is_asb().and.map%desc_Y%is_asb()    
     end select
 
   end function base_is_asb
@@ -140,8 +140,8 @@ contains
     use psb_descriptor_type
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
-    type(psb_base_linmap_type) :: mapin,mapout
-    integer(psb_ipk_), intent(out)       :: info 
+    type(psb_base_linmap_type), intent(inout) :: mapin,mapout
+    integer(psb_ipk_), intent(out)            :: info 
     
     mapout%kind = mapin%kind
     call psb_move_alloc(mapin%iaggr,mapout%iaggr,info)

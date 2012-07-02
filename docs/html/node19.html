@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Sparse Matrix class</TITLE>
-<META NAME="description" CONTENT="Sparse Matrix class">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,9 +18,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node29.html">
-<LINK REL="previous" HREF="node15.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="previous" HREF="node18.html">
+<LINK REL="up" HREF="node16.html">
 <LINK REL="next" HREF="node20.html">
 </HEAD>
 
@@ -30,9 +29,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   HREF="node20.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
 <A NAME="tex2html428"
-  HREF="node8.html">
+  HREF="node16.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html422"
+<A NAME="tex2html424"
   HREF="node18.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
 <A NAME="tex2html430"
@@ -40,158 +39,60 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
 <B> Next:</B> <A NAME="tex2html433"
-  HREF="node20.html">Methods</A>
+  HREF="node20.html">Sparse Matrix class</A>
 <B> Up:</B> <A NAME="tex2html429"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html423"
-  HREF="node18.html">Named Constants</A>
+  HREF="node16.html">get_context Get communication context</A>
+<B> Previous:</B> <A NAME="tex2html425"
+  HREF="node18.html">psb_cd_set_large_threshold   Set</A>
  &nbsp; <B>  <A NAME="tex2html431"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00043000000000000000"></A>
-<A NAME="sec:spmat"></A>
+<H3><A NAME="SECTION00042300000000000000"></A>
+<A NAME="sec:cd_constants"></A>
 <BR>
-Sparse Matrix class
-</H2>
-The spdata<TT>psb_Tspmat_type</TT> class
-contains all information about the local portion of the sparse matrix and   
-its storage mode. Its design is 
-based on the STATE design pattern&nbsp;[<A
- HREF="node118.html#DesignPatterns">13</A>] as detailed
-in&nbsp;[<A
- HREF="node118.html#Sparse03">11</A>]; the type declaration is shown in
-figure&nbsp;<A HREF="#fig:spmattype">4</A> where <code>T</code> is a placeholder for the
-data type and precision variants 
+Named Constants
+</H3>
 <DL>
-<DT><STRONG>S</STRONG></DT>
-<DD>Single precision real;
+<DT><STRONG>psb_none_</STRONG></DT>
+<DD>Generic no-op;
 </DD>
-<DT><STRONG>D</STRONG></DT>
-<DD>Double precision real;
+<DT><STRONG>psb_nohalo_</STRONG></DT>
+<DD>Do not fetch halo elements;
 </DD>
-<DT><STRONG>C</STRONG></DT>
-<DD>Single precision complex;
+<DT><STRONG>psb_halo_</STRONG></DT>
+<DD>Fetch halo elements from neighbouring processes;
 </DD>
-<DT><STRONG>Z</STRONG></DT>
-<DD>Double precision complex.
+<DT><STRONG>psb_sum_</STRONG></DT>
+<DD>Sum overlapped elements
 </DD>
-</DL>
-The actual data is contained in the polymorphic component <code>a%a</code>
-of type  spbasedata<TT>psb_T_base_sparse_mat</TT>; its
-specific layout can be chosen dynamically among the predefined types,
-or an entirely new storage layout can be implemented and passed to the
-library at runtime via the <code>psb_spasb</code> routine. 
+<DT><STRONG>psb_avg_</STRONG></DT>
+<DD>Average overlapped elements
+</DD>
+<DT><STRONG>psb_comm_halo_</STRONG></DT>
+<DD>Exchange data based on the <code>halo_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ext_</STRONG></DT>
+<DD>Exchange data based on the <code>ext_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_ovr_</STRONG></DT>
+<DD>Exchange data based on the <code>ovrlap_index</code>
+  list;
+</DD>
+<DT><STRONG>psb_comm_mov_</STRONG></DT>
+<DD>Exchange data based on the <code>ovr_mst_idx</code>
+  list;
 
-<DIV ALIGN="CENTER"><A NAME="fig:spmattype"></A><A NAME="721"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4:</STRONG>
-    The PSBLAS defined data type that
-    contains a sparse matrix.</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-The following very common formats are precompiled in  PSBLAS and thus
-are always available: 
-<DL>
-<DT><STRONG>psb_T_coo_sparse_mat</STRONG></DT>
-<DD>Coordinate storage; 
-</DD>
-<DT><STRONG>psb_T_csr_sparse_mat</STRONG></DT>
-<DD>Compressed storage by rows; 
-</DD>
-<DT><STRONG>psb_T_csc_sparse_mat</STRONG></DT>
-<DD>Compressed storage by columns; 
+<P>
 </DD>
 </DL>
-The inner sparse matrix has an associated state, which can take the
-following values:
-<DL>
-<DT><STRONG>Build:</STRONG></DT>
-<DD>State entered after the first allocation, and before the
-  first assembly; in this state it is possible to add nonzero entries.
-</DD>
-<DT><STRONG>Assembled:</STRONG></DT>
-<DD>State entered after the assembly; computations using
-  the sparse matrix, such as matrix-vector products, are only possible
-  in this state;
-</DD>
-<DT><STRONG>Update:</STRONG></DT>
-<DD>State entered after a reinitalization; this is used to
-  handle applications in which the same sparsity pattern is used
-  multiple times with different coefficients. In this state it is only
-  possible to enter coefficients for already existing nonzero entries.
-</DD>
-</DL>
-The only storage variant supporting the build state is COO; all other
-variants are obtained by conversion to/from it. 
 
 <P>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html434"
-  HREF="node20.html">Methods</A>
-<LI><A NAME="tex2html435"
-  HREF="node21.html">get_nrows -- Get number of  rows in a sparse  matrix</A>
-<LI><A NAME="tex2html436"
-  HREF="node22.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
-<LI><A NAME="tex2html437"
-  HREF="node23.html">get_nnzeros -- Get number of nonzero elements
-  in a sparse matrix</A>
-<LI><A NAME="tex2html438"
-  HREF="node24.html">get_size  -- Get maximum number of nonzero elements
-  in a sparse matrix</A>
-<LI><A NAME="tex2html439"
-  HREF="node25.html">sizeof  -- Get memory occupation in bytes
-of  a sparse matrix</A>
-<LI><A NAME="tex2html440"
-  HREF="node26.html">get_fmt  -- Short description of the dynamic type</A>
-<LI><A NAME="tex2html441"
-  HREF="node27.html">is_bld, is_upd, is_asb  -- Status check</A>
-<LI><A NAME="tex2html442"
-  HREF="node28.html">Named Constants</A>
-</UL>
-<!--End of Table of Child-Links-->
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html432"
-  HREF="node20.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html428"
-  HREF="node8.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html422"
-  HREF="node18.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html430"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html433"
-  HREF="node20.html">Methods</A>
-<B> Up:</B> <A NAME="tex2html429"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html423"
-  HREF="node18.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html431"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

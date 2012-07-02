@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -554,14 +554,10 @@ contains
     class(psb_d_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
 
-    res = 0
+    res = -1
     
     if (allocated(a%ja)) then 
-      if (res >= 0) then 
-        res = min(res,size(a%ja))
-      else 
-        res = size(a%ja)
-      end if
+      res = size(a%ja)
     end if
     if (allocated(a%val)) then 
       if (res >= 0) then 

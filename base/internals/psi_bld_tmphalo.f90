@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -100,7 +100,7 @@ subroutine psi_bld_tmphalo(desc,info)
     helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
   end do
 
-  call desc%indxmap%l2g(helem(1:nh),info)
+  call desc%indxmap%l2gip(helem(1:nh),info)
   call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
       
   if (info /= psb_success_) then 

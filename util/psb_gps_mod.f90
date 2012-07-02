@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -112,7 +112,6 @@ CONTAINS
     use psb_base_mod
     implicit none 
     INTEGER(psb_ipk_) :: NR, IDEGE, IBW2, IPF2, IDPTHE
-!!$    INTEGER(psb_ipk_) :: STNODE, RVNODE, RENUM, STNUM, CCSTOR, SBNUM
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 CONNECTED COMPONENTS.
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
@@ -487,14 +486,14 @@ CONTAINS
     ! STPT(I)-     INDEX INTO CCSTORE OF 1ST NODE IN ITH CON COMPT
     ! ISDIR-       FLAG WHICH INDICATES WHICH WAY THE LARGEST CONNECTED
     !              COMPONENT FELL.  =+1 IF LOW AND -1 IF HIGH
-    INTEGER(psb_ipk_) :: LVLS1(N), LVLS2(N), CCSTOR(N),idflt,isdir
     ! COMMON /GRA/ N, IDPTH, IDEG
     ! IT IS ASSUMED THAT THE GRAPH HAS AT MOST 50 COMPONENTS AND
     ! THAT THERE ARE AT MOST 100 LEVELS.
     ! COMMON /LVLW/ NHIGH(100), NLOW(100), NACUM(100)
     ! COMMON /CC/ XCC, SIZEG(50), STPT(50)
-    integer(psb_ipk_) :: SZ, ENDC,i,j,idpth,max1,max2,inode
-    integer(psb_ipk_) :: lvlnh, it, k, lvlnl
+    INTEGER(psb_ipk_) :: LVLS1(N), LVLS2(N), CCSTOR(N)
+    integer(psb_ipk_) :: SZ, ENDC,i,j,max1,max2,inode
+    integer(psb_ipk_) :: lvlnh, it, k, lvlnl,idflt,isdir
     ! FOR EACH CONNECTED COMPONENT DO
     DO 80 I=1,XCC
        J = STPT(I)

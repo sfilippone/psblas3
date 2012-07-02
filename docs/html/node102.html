@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_error -- Prints the error stack content and aborts execution</TITLE>
-<META NAME="description" CONTENT="psb_error -- Prints the error stack content and aborts execution">
+<TITLE>psb_errpush -- Pushes an error code onto the error stack</TITLE>
+<META NAME="description" CONTENT="psb_errpush -- Pushes an error code onto the error stack">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node103.html">
 <LINK REL="previous" HREF="node101.html">
-<LINK REL="up" HREF="node100.html">
+<LINK REL="up" HREF="node101.html">
 <LINK REL="next" HREF="node103.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1491"
+<A NAME="tex2html1492"
   HREF="node103.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1487"
-  HREF="node100.html">
+<A NAME="tex2html1488"
+  HREF="node101.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1481"
+<A NAME="tex2html1482"
   HREF="node101.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1489"
+<A NAME="tex2html1490"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1492"
-  HREF="node103.html">psb_set_errverbosity   Sets</A>
-<B> Up:</B> <A NAME="tex2html1488"
-  HREF="node100.html">Error handling</A>
-<B> Previous:</B> <A NAME="tex2html1482"
-  HREF="node101.html">psb_errpush   Pushes</A>
- &nbsp; <B>  <A NAME="tex2html1490"
+<B> Next:</B> <A NAME="tex2html1493"
+  HREF="node103.html">psb_error   Prints</A>
+<B> Up:</B> <A NAME="tex2html1489"
+  HREF="node101.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1483"
+  HREF="node101.html">Error handling</A>
+ &nbsp; <B>  <A NAME="tex2html1491"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00092000000000000000">
-psb_error -- Prints the error stack content and aborts
-  execution</A>
+<H2><A NAME="SECTION00091000000000000000">
+psb_errpush -- Pushes an error code onto the error
+  stack</A>
 </H2>
 
 <P>
 <PRE>
-call psb_error(icontxt)
+call psb_errpush(err_c, r_name, i_err, a_err)
 </PRE>
 
 <P>
@@ -69,17 +69,46 @@ call psb_error(icontxt)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context.
+<DT><STRONG>err_c</STRONG></DT>
+<DD>the error code
 <BR>
-Scope: <B>global</B> 
+Scope: <B>local</B> 
 <BR>
-Type: <B>optional</B>
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer.
 </DD>
+<DT><STRONG>r_name</STRONG></DT>
+<DD>the soutine where the error has been caught.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a string.
+<BR></DD>
+<DT><STRONG>i_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: an integer array
+<BR></DD>
+<DT><STRONG>a_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: a string.
+<BR></DD>
 </DL>
 
 <P>

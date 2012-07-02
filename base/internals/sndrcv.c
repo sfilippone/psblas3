@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <mpi.h>
 
-int receiveRoutine(double * y, int recvtype, int procSender,int tag, int comm, int *handle){
+int receiveRoutine(double * y, int recvtype, int procSender,
+		   int tag, int comm, int *handle){
 
 	MPI_Comm co = MPI_Comm_f2c(comm);
 	MPI_Datatype dt = MPI_Type_f2c(recvtype);

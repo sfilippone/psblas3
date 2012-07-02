@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$
@@ -506,7 +506,7 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=*), parameter :: methdname='RGMRES'
 
   info = psb_success_
-  name = 'psb_sgmres'
+  name = 'psb_zgmres'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -717,17 +717,17 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
       scal=zone/h(i+1,i)
       call psb_geaxpby(scal,w,zzero,v(i+1),desc_a,info)
       do k=2,i
-        call zrot(1,h(k-1,i),1,h(k,i),1,real(c(k-1)),s(k-1))
+        call zrot(1,h(k-1,i),1,h(k,i),1,real(c(k-1),kind=psb_dpk_),s(k-1))
       enddo
 
 
       rti  = h(i,i)
       rti1 = h(i+1,i) 
       call zrotg(rti,rti1,tmp,s(i))
-      c(i) = cmplx(tmp,szero)
-      call zrot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
+      c(i) = cmplx(tmp,dzero)
+      call zrot(1,h(i,i),1,h(i+1,i),1,real(c(i),kind=psb_dpk_),s(i))
       h(i+1,i) = zzero
-      call zrot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
+      call zrot(1,rs(i),1,rs(i+1),1,real(c(i),kind=psb_dpk_),s(i))
       
       if (istop_ == 1) then 
         !

@@ -693,6 +693,70 @@ An integer value; 0 means no error has been detected.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+%       1-NORM OF A MATRIX 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_spnrm1 --- 1-Norm of Sparse Matrix}    
+\addcontentsline{toc}{subsection}{psb\_spnrm1}
+
+This function computes the 1-norm of a matrix $A$:\\
+
+\[ nrm1 \leftarrow \|A\|_1 \]
+where:
+\begin{description}
+\item[$A$] represents the global matrix $A$
+\end{description}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$A$ & {\bf Function}\\
+\hline
+Short Precision Real & psb\_spnrm1 \\
+Long Precision Real & psb\_spnrm1 \\
+Short Precision Complex & psb\_spnrm1 \\
+Long Precision Complex & psb\_spnrm1 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrm1}}
+\end{table}
+
+\begin{verbatim}
+psb_spnrm1(A, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the local  portion of the global sparse matrix
+$A$. \\   
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \spdata.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[\bf On Return] 
+\item[Function value] is the 1-norm of sparse submatrix $A$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 %       INFINITY-NORM OF A MATRIX 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

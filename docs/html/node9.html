@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Descriptor data structure</TITLE>
-<META NAME="description" CONTENT="Descriptor data structure">
+<TITLE>Data Structures and Classes</TITLE>
+<META NAME="description" CONTENT="Data Structures and Classes">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,225 +18,92 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node15.html">
-<LINK REL="previous" HREF="node8.html">
-<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node37.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node10.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html308"
+<A NAME="tex2html281"
   HREF="node10.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html304"
-  HREF="node8.html">
+<A NAME="tex2html277"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html298"
+<A NAME="tex2html271"
   HREF="node8.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html306"
+<A NAME="tex2html279"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html309"
-  HREF="node10.html">Methods</A>
-<B> Up:</B> <A NAME="tex2html305"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html299"
-  HREF="node8.html">Data Structures and Classes</A>
- &nbsp; <B>  <A NAME="tex2html307"
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node10.html">Descriptor data structure</A>
+<B> Up:</B> <A NAME="tex2html278"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html272"
+  HREF="node8.html">Programming model</A>
+ &nbsp; <B>  <A NAME="tex2html280"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00041000000000000000"></A>
-<A NAME="sec:desc"></A>
+<H1><A NAME="SECTION00040000000000000000"></A>
+<A NAME="sec:datastruct"></A>
 <BR>
-Descriptor data structure
-</H2>
-All the general matrix informations and elements to be
-exchanged among processes are stored within a data structure of the
-type descdata<TT>psb_desc_type</TT>. 
-Every structure of this type is associated with a discretization
-pattern and enables data communications and other operations that are
-necessary for implementing the various algorithms of interest to us. 
+Data Structures and Classes
+</H1>
 
 <P>
-The data structure itself <code>psb_desc_type</code> can be treated as an
-opaque object handled via the  tools routines of
-Sec.&nbsp;<A HREF="node55.html#sec:toolsrout">6</A> and&nbsp;<A HREF="node36.html#sec:dataquery">3.5</A>;
-nevertheless we include here a  description for the curious 
-reader. 
+In this chapter we  illustrate the  data structures used for definition of
+routines interfaces. They  include data structures for sparse matrices,
+communication descriptors and preconditioners.
+<P>
+All the data types and the basic subroutine interfaces related to
+descriptors and sparse matrices are defined in
+the module <code>psb_base_mod</code>; this will have to be included by every
+user subroutine that makes use of the library. The preconditioners are
+defined in the module <code>psb_prec_mod</code>
 
 <P>
-First we describe the <code>psb_indx_map</code> type. This is a data
-structure that keeps track of a certain number of basic issues such
-as:
-
-<UL>
-<LI>The value of the communication/MPI context;
-</LI>
-<LI>The number of indices in the index space, i.e. global number of
-  rows and columns of a sparse matrix;
-</LI>
-<LI>The local set of indices, including:
-
-<UL>
-<LI>The number of local indices (and local rows);
-</LI>
-<LI>The number of halo indices (and therefore local columns); 
-</LI>
-<LI>The global indices corresponding to the local ones. 
-</LI>
-</UL>
-</LI>
-</UL>
-There are many different schemes for storing these data; therefore
-there are a number of types extending the base one, and the descriptor
-structure holds a polymorphic object whose dynamic type can be any of
-the extended  types. 
-The methods associated with this data type answer the following
-queries:
-
-<UL>
-<LI>For a given set of local indices, find the corresponding indices
-  in the global numbering;
-</LI>
-<LI>For a given set of global indices, find the corresponding
-  indices in the local numbering, if any, or return an invalid 
-</LI>
-<LI>Add a global index to the set of halo indices;
-</LI>
-<LI>Find the process  owner of each member of a set of global
-  indices.
-</LI>
-</UL>
-All methods but the last are purely local; the last method potentially
-requires communication among processes, and thus is a synchronous
-method. The choice of a specific dynamic type for the index map is
-made at the time the descriptor is initially allocated, according to
-the mode of initialization (see also&nbsp;<A HREF="node55.html#sec:toolsrout">6</A>).
-
-<P>
-The descriptor contents are as follows:
+Integer, real and complex data types are parametrized with a kind type
+defined in the library as follows: 
 <DL>
-<DT><STRONG><B>indxmap</B></STRONG></DT>
-<DD>A polymorphic variable of a type that is any
-  extension of the indx_map type described above. 
-<BR></DD>
-<DT><STRONG><B>halo_index</B></STRONG></DT>
-<DD>A list of the halo and boundary elements for
-the current process to be exchanged with other processes; for each
-processes with which it is necessary to communicate:
-
-<OL>
-<LI>Process identifier;
-</LI>
-<LI>Number of points to be received;
-</LI>
-<LI>Indices of points to be received;
-</LI>
-<LI>Number of points to be sent;
-</LI>
-<LI>Indices of points to be sent;
-</LI>
-</OL>
-The list may contain an arbitrary number of groups; its end is marked
-by a -1.
-<BR>
-Specified as: an allocatable integer array of rank one.
+<DT><STRONG>psb_spk_</STRONG></DT>
+<DD>Kind parameter for short precision real and complex
+  data; corresponds to a <code>REAL</code> declaration and is
+  normally 4 bytes; 
 </DD>
-<DT><STRONG><B>ext_index</B></STRONG></DT>
-<DD>A list of element indices to be exchanged to
-  implement the mapping between a base descriptor and a descriptor
-  with overlap. 
+<DT><STRONG>psb_dpk_</STRONG></DT>
+<DD>Kind parameter for long precision real and complex
+  data; corresponds to a <code>DOUBLE PRECISION</code> declaration and is
+  normally 8 bytes;
 </DD>
-<DT><STRONG><B>ovrlap_index</B></STRONG></DT>
-<DD>A list of the overlap elements for the
-current process, organized in groups like the previous vector:
-
-<OL>
-<LI>Process identifier;
-</LI>
-<LI>Number of points to be received;
-</LI>
-<LI>Indices of points to be received;
-</LI>
-<LI>Number of points to be sent;
-</LI>
-<LI>Indices of points to be sent;
-</LI>
-</OL>
-The list may contain an arbitrary number of groups; its end is marked
-by a -1.
-<BR>
-Specified as: an allocatable integer array  of rank one.
+<DT><STRONG>psb_ipk_</STRONG></DT>
+<DD>Kind parameter for integer data;
+  with default build options this is a 4 bytes integer, but there is
+  (highly) experimental support for 8-bytes integers;  
 </DD>
-<DT><STRONG><B>ovr_mst_idx</B></STRONG></DT>
-<DD>A list to retrieve the value of each
-  overlap element from the respective master process.
-<BR>
-Specified as: an allocatable integer array of rank one.
+<DT><STRONG>psb_mpik_</STRONG></DT>
+<DD>Kind parameter for 4-bytes integer data, as is
+  always used by MPI; 
 </DD>
-<DT><STRONG><B>ovrlap_elem</B></STRONG></DT>
-<DD>For all overlap points belonging to th
-ecurrent process:
-
-<OL>
-<LI>Overlap point index;
-</LI>
-<LI>Number of processes sharing that overlap points;
-</LI>
-<LI>Index of a ``master'' process: 
-</LI>
-</OL>
-Specified as: an allocatable integer array of rank two.
-</DD>
-<DT><STRONG><B>bnd_elem</B></STRONG></DT>
-<DD>A list of all boundary points, i.e. points
-  that have a connection with other processes.
+<DT><STRONG>psb_long_int_k_</STRONG></DT>
+<DD>Kind parameter for long (8 bytes) integers, 
+  which are always used by the <code>sizeof</code> methods.
 </DD>
 </DL>
-The Fortran&nbsp;2003 declaration  for <code>psb_desc_type</code> structures is 
-as follows:
-
-<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="718"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3:</STRONG>
-The PSBLAS defined data type that
-    contains the communication descriptor.</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="535" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
- SRC="img20.png"
- ALT="\fbox{\TheSbox}">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
-A communication descriptor associated with a sparse  matrix has a
-state, which can take the following values:
-<DL>
-<DT><STRONG>Build:</STRONG></DT>
-<DD>State entered after the first allocation, and before the
-  first assembly; in this state it is possible to add communication
-  requirements among different processes. 
-</DD>
-<DT><STRONG>Assembled:</STRONG></DT>
-<DD>State entered after the assembly; computations using
-  the associated sparse matrix, such as matrix-vector products, are
-  only possible   in this state.
-</DD>
-</DL>
+Together with the classes attributes we also discuss their
+methods.  Most methods detailed here only act on the local variable,
+i.e. their action is purely local and asynchronous unless otherwise
+stated. 
+The list of methods here is not completely exhaustive; many methods,
+especially those that alter the contents of the various objects, are
+usually not needed by the end-user, and therefore are described in the
+developer's documentation. 
 
 <P>
 <BR><HR>
@@ -244,40 +111,105 @@ state, which can take the following values:
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
 <UL>
-<LI><A NAME="tex2html310"
-  HREF="node10.html">Methods</A>
-<LI><A NAME="tex2html311"
-  HREF="node11.html">get_local_rows -- Get number of local rows</A>
-<LI><A NAME="tex2html312"
-  HREF="node12.html">get_local_cols -- Get number of local cols</A>
-<LI><A NAME="tex2html313"
-  HREF="node13.html">get_global_rows -- Get number of global rows</A>
-<LI><A NAME="tex2html314"
-  HREF="node14.html">get_global_cols -- Get number of global cols</A>
+<LI><A NAME="tex2html283"
+  HREF="node10.html">Descriptor data structure</A>
+<UL>
+<LI><A NAME="tex2html284"
+  HREF="node11.html">Methods</A>
+<LI><A NAME="tex2html285"
+  HREF="node12.html">get_local_rows -- Get number of local rows</A>
+<LI><A NAME="tex2html286"
+  HREF="node13.html">get_local_cols -- Get number of local cols</A>
+<LI><A NAME="tex2html287"
+  HREF="node14.html">get_global_rows -- Get number of global rows</A>
+<LI><A NAME="tex2html288"
+  HREF="node15.html">get_global_cols -- Get number of global cols</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html289"
+  HREF="node16.html">
+<DIV ALIGN="LEFT">
+get_context--Get communication context 
+</DIV></A>
+<UL>
+<LI><A NAME="tex2html290"
+  HREF="node17.html">psb_cd_get_large_threshold -- Get threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html291"
+  HREF="node18.html">psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html292"
+  HREF="node19.html">Named Constants</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html293"
+  HREF="node20.html">Sparse Matrix class</A>
+<UL>
+<LI><A NAME="tex2html294"
+  HREF="node21.html">Methods</A>
+<LI><A NAME="tex2html295"
+  HREF="node22.html">get_nrows -- Get number of  rows in a sparse  matrix</A>
+<LI><A NAME="tex2html296"
+  HREF="node23.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
+<LI><A NAME="tex2html297"
+  HREF="node24.html">get_nnzeros -- Get number of nonzero elements
+  in a sparse matrix</A>
+<LI><A NAME="tex2html298"
+  HREF="node25.html">get_size  -- Get maximum number of nonzero elements
+  in a sparse matrix</A>
+<LI><A NAME="tex2html299"
+  HREF="node26.html">sizeof  -- Get memory occupation in bytes
+of  a sparse matrix</A>
+<LI><A NAME="tex2html300"
+  HREF="node27.html">get_fmt  -- Short description of the dynamic type</A>
+<LI><A NAME="tex2html301"
+  HREF="node28.html">is_bld, is_upd, is_asb  -- Status check</A>
+<LI><A NAME="tex2html302"
+  HREF="node29.html">Named Constants</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html303"
+  HREF="node30.html">Dense Vector Data Structure</A>
+<UL>
+<LI><A NAME="tex2html304"
+  HREF="node31.html">Methods</A>
+<LI><A NAME="tex2html305"
+  HREF="node32.html">get_nrows -- Get number of  rows in a dense vector</A>
+<LI><A NAME="tex2html306"
+  HREF="node33.html">get_ncols -- Get number of  columns in a  sparse matrix</A>
+<LI><A NAME="tex2html307"
+  HREF="node34.html">sizeof  -- Get memory occupation in bytes
+of  a dense vector matrix</A>
+<LI><A NAME="tex2html308"
+  HREF="node35.html">get_vect  -- Get a copy of the vector contents</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html309"
+  HREF="node36.html">Preconditioner data structure</A>
 </UL>
 <!--End of Table of Child-Links-->
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html308"
+<A NAME="tex2html281"
   HREF="node10.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html304"
-  HREF="node8.html">
+<A NAME="tex2html277"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html298"
+<A NAME="tex2html271"
   HREF="node8.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html306"
+<A NAME="tex2html279"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html309"
-  HREF="node10.html">Methods</A>
-<B> Up:</B> <A NAME="tex2html305"
-  HREF="node8.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html299"
-  HREF="node8.html">Data Structures and Classes</A>
- &nbsp; <B>  <A NAME="tex2html307"
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node10.html">Descriptor data structure</A>
+<B> Up:</B> <A NAME="tex2html278"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html272"
+  HREF="node8.html">Programming model</A>
+ &nbsp; <B>  <A NAME="tex2html280"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

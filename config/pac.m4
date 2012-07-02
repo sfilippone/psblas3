@@ -340,7 +340,7 @@ dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN([PAC_ARG_SERIAL_MPI],
 [
-AC_MSG_CHECKING([whether we want serial (fake) mpi])
+AC_MSG_CHECKING([whether we want serial  mpi stubs])
 AC_ARG_ENABLE(serial,
 AC_HELP_STRING([--enable-serial], 
 [Specify whether to enable a fake mpi library to run in serial mode. ]),
@@ -1057,7 +1057,9 @@ dnl @category InstalledPackages
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
 dnl @version 2001-12-13
 dnl @license GPLWithACException
+dnl
 dnl modified by salvatore.filippone@uniroma2.it
+dnl
 dnl shifted check for ESSL as it was generating erroneous results on
 dnl AIX SP5. 
 dnl Modified with new name to handle Fortran compilers (such as NAG) 
@@ -1067,7 +1069,7 @@ dnl would fail even when linking in the compiler's library)
 
 AC_DEFUN([PAC_BLAS], [
 AC_PREREQ(2.50)
-AC_REQUIRE([AC_F77_LIBRARY_LDFLAGS])
+dnl AC_REQUIRE([AC_FC_LIBRARY_LDFLAGS])
 pac_blas_ok=no 
 
 AC_ARG_WITH(blas,
@@ -1080,21 +1082,20 @@ case $with_blas in
 esac
 
 # Get fortran linker names of BLAS functions to check for.
-AC_F77_FUNC(sgemm)
-AC_F77_FUNC(dgemm)
+#AC_FC_FUNC(sgemm)
+#AC_FC_FUNC(dgemm)
 
 pac_blas_save_LIBS="$LIBS"
-LIBS="$LIBS $FLIBS"
+#LIBS="$LIBS $FLIBS"
+AC_LANG([Fortran])
 
 # First, check BLAS_LIBS environment variable
 if test $pac_blas_ok = no; then
 if test "x$BLAS_LIBS" != x; then
 	save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
-	AC_LANG([Fortran])
 	AC_MSG_CHECKING([for sgemm in $BLAS_LIBS])
 	AC_TRY_LINK_FUNC(sgemm, [pac_blas_ok=yes], [BLAS_LIBS=""])
 	AC_MSG_RESULT($pac_blas_ok)
-	AC_LANG([C])
 	LIBS="$save_LIBS"
 fi
 fi
@@ -1102,6 +1103,7 @@ fi
 
 # BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
 if test $pac_blas_ok = no; then
+	AC_LANG([C])
 	AC_CHECK_LIB(atlas, ATL_xerbla,
 		[AC_LANG([Fortran])
 		 AC_CHECK_LIB(f77blas, sgemm,
@@ -1111,7 +1113,6 @@ if test $pac_blas_ok = no; then
 			 BLAS_LIBS="-lcblas -lf77blas -latlas"],
 			[], [-lf77blas -latlas])],
 			[], [-latlas])])
-	AC_LANG([C])
 
 fi
 
@@ -1124,17 +1125,16 @@ if test $pac_blas_ok = no; then
 			[pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"],
 			[], [-lblas])],
 			[], [-lblas])])
-        AC_LANG([C])
 fi
 
 # BLAS in Alpha CXML library? 
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(cxml, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml"])
+	AC_CHECK_LIB(cxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml"])
 fi
 
 # BLAS in Alpha DXML library? (now called CXML, see above)
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(dxml, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-ldxml"])
+	AC_CHECK_LIB(dxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-ldxml"])
 
 fi
 
@@ -1142,7 +1142,7 @@ fi
 if test $pac_blas_ok = no; then
 	if test "x$GCC" != xyes; then # only works with Sun CC
 		AC_CHECK_LIB(sunmath, acosp,
-			[AC_CHECK_LIB(sunperf, $sgemm,
+			[AC_CHECK_LIB(sunperf, sgemm,
         			[BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
                                  pac_blas_ok=yes],[],[-lsunmath])])
 
@@ -1151,7 +1151,7 @@ fi
 
 # BLAS in SCSL library?  (SGI/Cray Scientific Library)
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(scs, $sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lscs"])
+	AC_CHECK_LIB(scs, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lscs"])
 fi
 
 # BLAS in SGIMATH library?
@@ -1163,15 +1163,15 @@ fi
 # BLAS in IBM ESSL library? (requires generic BLAS lib, too)
 if test $pac_blas_ok = no; then
 	AC_CHECK_LIB(blas, $sgemm,
-		[AC_CHECK_LIB(essl, $sgemm,
+		[AC_CHECK_LIB(essl, sgemm,
 			[pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas"],
 			[], [-lblas $FLIBS])])
 fi
 # BLAS linked to by default?  (happens on some supercomputers)
 if test $pac_blas_ok = no; then
 	save_LIBS="$LIBS"; LIBS="$LIBS"
-	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes], [BLAS_LIBS=""])
-dnl	AC_CHECK_FUNC($sgemm, [pac_blas_ok=yes])
+	AC_TRY_LINK_FUNC(sgemm, [pac_blas_ok=yes], [BLAS_LIBS=""])
+dnl	AC_CHECK_FUNC(sgemm, [pac_blas_ok=yes])
 	LIBS="$save_LIBS"
 fi
 
@@ -1179,10 +1179,6 @@ fi
 if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
   AC_CHECK_LIB(blas, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas"])
-  AC_LANG([C])
-  if test $pac_blas_ok = no; then
-    AC_CHECK_LIB(blas, $sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas"])
-  fi
 fi
 
 AC_SUBST(BLAS_LIBS)
@@ -1256,7 +1252,7 @@ case $with_lapack in
 esac
 
 # Get fortran linker name of LAPACK function to check for.
-AC_F77_FUNC(cheev)
+#AC_FC_FUNC(cheev)
 
 # We cannot use LAPACK if BLAS is not found
 if test "x$pac_blas_ok" != xyes; then

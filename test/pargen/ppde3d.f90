@@ -55,11 +55,73 @@
 ! then the corresponding vector is distributed according to a BLOCK
 ! data distribution.
 !
+module ppde3d_mod
+contains
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) :: b1
+    real(psb_dpk_), intent(in) :: x,y,z
+    b1=1.d0/sqrt(3.d0)
+  end function b1
+  function b2(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  b2
+    real(psb_dpk_), intent(in) :: x,y,z
+    b2=1.d0/sqrt(3.d0)
+  end function b2
+  function b3(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  b3
+    real(psb_dpk_), intent(in) :: x,y,z      
+    b3=1.d0/sqrt(3.d0)
+  end function b3
+  function c(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  c
+    real(psb_dpk_), intent(in) :: x,y,z      
+    c=0.d0
+  end function c
+  function a1(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a1   
+    real(psb_dpk_), intent(in) :: x,y,z
+    a1=1.d0/80
+  end function a1
+  function a2(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a2
+    real(psb_dpk_), intent(in) :: x,y,z
+    a2=1.d0/80
+  end function a2
+  function a3(x,y,z)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a3
+    real(psb_dpk_), intent(in) :: x,y,z
+    a3=1.d0/80
+  end function a3
+  function g(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    real(psb_dpk_) ::  g
+    real(psb_dpk_), intent(in) :: x,y,z
+    g = dzero
+    if (x == done) then
+      g = done
+    else if (x == dzero) then 
+      g = exp(y**2-z**2)
+    end if
+  end function g
+
+end module ppde3d_mod
+
 program ppde3d
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   use psb_util_mod
+  use ppde3d_mod
   implicit none
 
   ! input parameters
@@ -105,6 +167,7 @@ program ppde3d
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
+  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -185,7 +248,7 @@ program ppde3d
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Time to solve matrix          : ",es12.5)')t2
+    write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
@@ -228,7 +291,7 @@ contains
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: intbuf(10), ip
+    integer(psb_ipk_) :: ip
 
     call psb_info(ictxt, iam, np)
 
@@ -238,11 +301,6 @@ contains
         read(psb_inp_unit,*) kmethd
         read(psb_inp_unit,*) ptype
         read(psb_inp_unit,*) afmt
-
-        ! broadcast parameters to all processors
-        call psb_bcast(ictxt,kmethd)
-        call psb_bcast(ictxt,afmt)
-        call psb_bcast(ictxt,ptype)
 
 
         read(psb_inp_unit,*) idim
@@ -268,12 +326,6 @@ contains
         endif
         ! broadcast parameters to all processors    
 
-        intbuf(1) = idim
-        intbuf(2) = istopc
-        intbuf(3) = itmax
-        intbuf(4) = itrace
-        intbuf(5) = irst
-        call psb_bcast(ictxt,intbuf(1:5))
 
         write(psb_out_unit,'("Solving matrix       : ell1")')      
         write(psb_out_unit,&
@@ -290,17 +342,17 @@ contains
         call psb_abort(ictxt)
         stop 1
       endif
-    else
-      call psb_bcast(ictxt,kmethd)
-      call psb_bcast(ictxt,afmt)
-      call psb_bcast(ictxt,ptype)
-      call psb_bcast(ictxt,intbuf(1:5))
-      idim    = intbuf(1)
-      istopc  = intbuf(2)
-      itmax   = intbuf(3)
-      itrace  = intbuf(4)
-      irst    = intbuf(5)
     end if
+    ! broadcast parameters to all processors
+    call psb_bcast(ictxt,kmethd)
+    call psb_bcast(ictxt,afmt)
+    call psb_bcast(ictxt,ptype)
+    call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,istopc)
+    call psb_bcast(ictxt,itmax)
+    call psb_bcast(ictxt,itrace)
+    call psb_bcast(ictxt,irst)
+
     return
 
   end subroutine get_parms
@@ -324,63 +376,6 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
-
-  !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) :: b1
-    real(psb_dpk_), intent(in) :: x,y,z
-    b1=1.d0/sqrt(3.d0)
-  end function b1
-  function b2(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  b2
-    real(psb_dpk_), intent(in) :: x,y,z
-    b2=1.d0/sqrt(3.d0)
-  end function b2
-  function b3(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  b3
-    real(psb_dpk_), intent(in) :: x,y,z      
-    b3=1.d0/sqrt(3.d0)
-  end function b3
-  function c(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  c
-    real(psb_dpk_), intent(in) :: x,y,z      
-    c=0.d0
-  end function c
-  function a1(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a1   
-    real(psb_dpk_), intent(in) :: x,y,z
-    a1=1.d0/80
-  end function a1
-  function a2(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a2
-    real(psb_dpk_), intent(in) :: x,y,z
-    a2=1.d0/80
-  end function a2
-  function a3(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a3
-    real(psb_dpk_), intent(in) :: x,y,z
-    a3=1.d0/80
-  end function a3
-  function g(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done
-    real(psb_dpk_) ::  g
-    real(psb_dpk_), intent(in) :: x,y,z
-    g = dzero
-    if (x == done) then
-      g = done
-    else if (x == dzero) then 
-      g = exp(y**2-z**2)
-    end if
-  end function g
 
 end program ppde3d
 

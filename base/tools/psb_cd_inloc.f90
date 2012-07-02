@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -41,7 +41,7 @@
 !    ictxt - integer.                         The communication context.
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
-subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
+subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   use psb_base_mod
   use psi_mod
   use psb_repl_map_mod
@@ -53,15 +53,16 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
   logical, intent(in), optional     :: globalcheck
+  integer(psb_ipk_), intent(in), optional     :: idx(:)
 
   !locals
   integer(psb_ipk_) :: i,j,np,me,loc_row,err,&
        & loc_col,nprocs,n, k,glx,nlu,&
-       & idx, flag_, err_act,m, novrl, norphan,&
+       & flag_, err_act,m, novrl, norphan,&
        & npr_ov, itmpov, i_pnt, nrt
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
-       & nov(:), ov_idx(:,:)
+       & nov(:), ov_idx(:,:), ix(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpik_) :: iictxt
   logical            :: check_, islarge
@@ -139,7 +140,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   islarge = psb_cd_choose_large_state(ictxt,m)
 
-  allocate(vl(loc_row),stat=info) 
+  allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name,i_err=int_err)
@@ -224,16 +225,31 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     goto 9999
   end if
 
-  !
-  ! Now sort the input items, and check for  duplicates
-  ! (unlikely, but possible)
-  !
-  call psb_msort_unique(vl,nlu)
-  if (loc_row /= nlu) then 
-    info = psb_err_dupl_cd_vl
-    call psb_errpush(info,name)
-    goto 9999
+  ! Sort, eliminate duplicates, then
+  ! scramble back into original position.
+  ix(1) = -1 
+  if (present(idx)) then 
+    if (size(idx) >= loc_row) then 
+      do i=1, loc_row
+        ix(i) = idx(i) 
+      end do
+    end if
   end if
+  if (idx(1) == -1) then 
+    do i=1, loc_row
+      ix(i) = i 
+    end do
+  end if
+  call psb_msort(vl,ix,flag=psb_sort_keep_idx_)
+  nlu = 1
+  do i=2,loc_row
+    if (vl(i) /= vl(nlu)) then
+      nlu = nlu + 1 
+      vl(nlu) = vl(i)
+      ix(nlu) = ix(i)
+    end if
+  end do
+  call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
 
   call psb_nullify_desc(desc)
 
@@ -355,7 +371,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
-  if (info == psb_success_) deallocate(temp_ovrlap,vl,stat=info)
+  if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&
        &  deallocate(tmpgidx,stat=info)
   if ((info == psb_success_) .and.(allocated(ov_idx)))  &

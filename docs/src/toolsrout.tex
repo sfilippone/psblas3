@@ -11,7 +11,7 @@
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
@@ -64,8 +64,8 @@ Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. May be specified together with
 \verb|vl|. 
-\item[repl] Data allocation: build a replicated index space (i.e. all
-  processes own all indices).\\
+\item[repl] Data allocation: build a replicated index space 
+  (i.e. all processes own all indices).\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
@@ -76,6 +76,12 @@ Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: a logical value, default: \verb|.true.|
+\item[lidx] Data allocation: the set of local  indices 
+  $lidx(1:nl)$ to be assigned to the global indices $vl$. \\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. 
 \end{description}
 
 \begin{description}
@@ -139,8 +145,8 @@ An integer value; 0 means no error has been detected.
   problem size $mg$ is given by 
   the range of the aggregate of the individual vectors \verb|vl| specified
   in the calling processes. The size may be specified via the optional
-  argument \verb|nl|; the default is to use the entire vector  \verb|vl|, thus having
-  \verb|nl=size(vl)|.  
+  argument \verb|nl|; the default is to use the entire vector
+  \verb|vl|, thus having   \verb|nl=size(vl)|.  
   If \verb|globalcheck=.true.|   the subroutine will check how many
   times  each entry in the global   index   space $(1\dots mg)$ is
   specified in the input lists   \verb|vl|, thus allowing for the
@@ -149,6 +155,14 @@ An integer value; 0 means no error has been detected.
   check for   overlap, and may be significantly faster, but   the user
   is implicitly guaranteeing that there are neither orphan   nor
   overlap indices.  
+\item[lidx] The optional argument \verb|lidx| is available for
+  those cases in which the user has already established a
+  global-to-local mapping; if it is specified, each  index in
+  \verb|vl(i)| will be mapped to the corresponding local index
+  \verb|lidx(i)|. When specifying the argument \verb|lidx| the user
+  would also likely employ \verb|lidx| in calls to \verb|psb_cdins|
+  and \verb|local| in calls to \verb|psb_spins| and \verb|psb_geins|;
+  see also sec.~\ref{sec:usermaps}. 
 \item[nl] If this argument is specified alone (i.e. without \verb|vl|)
   the  result is  a generalized row-block   distribution in which each
   process $I$ gets assigned a consecutive   chunk of $N_I=nl$ global
@@ -186,13 +200,17 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_cdins}
 
 \begin{verbatim}
-call psb_cdins(nz, ia, ja, desc_a, info)
+call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
+call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
 \end{verbatim}
 
 This subroutine examines the edges of the graph associated with the
 discretization mesh (and isomorphic to the sparsity pattern of a
 linear system coefficient matrix), storing them as necessary into the
-communication descriptor.
+communication descriptor. In the first form the edges are specified as
+pairs of indices $ia(i),ja(i)$; the starting index $ia(i)$ should
+belong to the current process. 
+In the second form only the remote indices $ja(i)$ are specified. 
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -212,9 +230,20 @@ Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array of length $nz$.
+\item[mask] Mask entries in \verb|ja|, they are inserted only when the
+  corresponding \verb|mask| entries are \verb|.true.|\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical  array of length $nz$, default \verb|.true.|.
+\item[lidx]  User defined local indices for \verb|ja|.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of length $nz$.
 %% \item[is] the row offset.\\
 %% Scope:{\bf local}.\\
-%% Type:{\bf optional}.\\
+%% Type:{\bf optional}.\\a
 %% Specified as: an integer value.
 %% \item[js] the column offset.\\
 %% Scope: {\bf local}.\\
@@ -234,6 +263,17 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
+\item[ila] the local indices of the starting vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+\item[jla]  the local indices of the end vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+
 \end{description}
 {\par\noindent\large\bfseries Notes}
 \begin{enumerate}
@@ -241,7 +281,9 @@ An integer value; 0 means no error has been detected.
   build state;
 \item  This routine automatically ignores edges that do not
 insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process. 
+nor the end vertex belong to the current process.
+\item The second form of this routine will be useful when dealing with
+  user-specified index mappings; see also~\ref{sec:usermaps}.
 \end{enumerate}
 
 
@@ -552,7 +594,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_spins}
 
 \begin{verbatim}
-call psb_spins(nz, ia, ja, val, a, desc_a, info)
+call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
 \end{verbatim}
 
 \begin{description}
@@ -578,12 +620,18 @@ Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an array of size $nz$. Must be of the same type and kind
-of the \verb|aspk| component of the sparse matrix $a$.
+of the coefficients  of the sparse matrix $a$.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: a variable of type \descdata.\\
+\item[local] Whether the entries in the indices vectors \verb|ia|,
+  \verb|ja| are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
 %% \item[is] the starting row on matrix $a$.\\
 %% Scope:{\bf local}.\\
 %% Type:{\bf optional}.\\
@@ -624,14 +672,24 @@ An integer value; 0 means no error has been detected.
   (implicitly) call \verb|psb_cdins| to add entries to the sparsity
   pattern; each sparse matrix entry implicitly defines a graph edge,
   that is passed to the descriptor routine for the appropriate
-  processing. 
-\item Any coefficients from matrix rows not assigned to the calling
+  processing;
+\item The coefficients to be inserted are represented by the ordered
+  triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$; these triples
+  should belong to the current process, i.e. $ia(i)$ should be one of
+  the local indices, but are otherwise arbitrary;
+\item There is no
+  requirement that a given row must be passed in its entirety to a
+  single call to this routine: the buildup of a row may be split into
+  as many calls as desired;
+\item Coefficients from different rows   may also be mixed up freely
+  in a single call, according to the application needs; 
+\item Any coefficients from matrix rows not owned by the calling
   process are silently ignored;
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
-  requirements will be ignored; 
+  requirements are  ignored; 
 \item If the matrix is in the update state, any entries in positions
-  that were not present in the original matrix will be ignored. 
+  that were not present in the original matrix are ignored. 
 \end{enumerate}
 
 %
@@ -910,8 +968,8 @@ rank-1 array.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf out}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE  attribute
+or an object of type \vdata, of type real, complex or integer.\\ 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -927,7 +985,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_geins}
 
 \begin{verbatim}
-call psb_geins(m, irw, val, x, desc_a, info,dupl)
+call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
 \end{verbatim}
 
 \begin{description}
@@ -962,6 +1020,12 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \verb|psb_dupl_add_|.
+\item[local] Whether the entries in the index vector \verb|irw|,
+   are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
 \end{description}
 
 \begin{description}
@@ -970,8 +1034,8 @@ Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as:  a rank one or two array or an object of type \vdata, of
+type real, complex or integer.\\ 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -994,7 +1058,7 @@ An integer value; 0 means no error has been detected.
 \addcontentsline{toc}{subsection}{psb\_geasb}
 
 \begin{verbatim}
-call psb_geasb(x, desc_a, info)
+call psb_geasb(x, desc_a, info, mold)
 \end{verbatim}
 
 \begin{description}
@@ -1005,6 +1069,12 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
+\item[mold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata; this is
+only allowed when $x$ is of type \vdata.
 \end{description}
 
 \begin{description}
@@ -1013,8 +1083,8 @@ Specified as: a variable of type \descdata.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -1039,8 +1109,8 @@ call psb_gefree(x, desc_a, info)
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
 
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
@@ -1722,7 +1792,7 @@ position as the corresponding entries in $x$.
   subsequences that may be already in the desired ordering prior to
   the subroutine call; this situation is relatively common when
   dealing with groups of indices of sparse matrix entries, thus
-  merge-sort is often the preferred  choice when a sorting is needed
+  merge-sort is the preferred  choice when a sorting is needed
   by other routines in the library. 
 \end{enumerate}
 \end{enumerate}

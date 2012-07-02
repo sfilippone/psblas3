@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -199,16 +199,16 @@ module psb_descriptor_type
 
 
   type psb_desc_type
-    integer(psb_ipk_), allocatable  :: halo_index(:)
-    integer(psb_ipk_), allocatable  :: ext_index(:)
-    integer(psb_ipk_), allocatable  :: ovrlap_index(:)
-    integer(psb_ipk_), allocatable  :: ovrlap_elem(:,:)
-    integer(psb_ipk_), allocatable  :: ovr_mst_idx(:)
-    integer(psb_ipk_), allocatable  :: bnd_elem(:)
+    integer(psb_ipk_), allocatable   :: halo_index(:)
+    integer(psb_ipk_), allocatable   :: ext_index(:)
+    integer(psb_ipk_), allocatable   :: ovrlap_index(:)
+    integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
+    integer(psb_ipk_), allocatable   :: ovr_mst_idx(:)
+    integer(psb_ipk_), allocatable   :: bnd_elem(:)
     class(psb_indx_map), allocatable :: indxmap
-    integer(psb_ipk_), allocatable  :: lprm(:)
+    integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
-    integer(psb_ipk_), allocatable  :: idx_space(:)
+    integer(psb_ipk_), allocatable   :: idx_space(:)
     integer, allocatable :: sendtypes(:),recvtypes(:) !Extendable as a matrix of every kind of data
     
   contains
@@ -229,6 +229,7 @@ module psb_descriptor_type
     procedure, pass(desc) :: get_list        => psb_cd_get_list
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: free            => psb_cdfree
+    procedure, pass(desc) :: destroy         => psb_cd_destroy
     procedure, pass(desc) :: nullify         => nullify_desc
   end type psb_desc_type
 
@@ -627,110 +628,16 @@ contains
     implicit none
     !....parameters...
     class(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(out)               :: info
+    integer(psb_ipk_), intent(out)      :: info
     !...locals....
     integer(psb_ipk_) :: ictxt,np,me, err_act
     character(len=20)   :: name
 
-    if(psb_get_errstatus() /= 0) return 
     info=psb_success_
     call psb_erractionsave(err_act)
     name = 'psb_cdfree'
 
-
-    ictxt=psb_cd_get_context(desc)
-
-    call psb_info(ictxt, me, np)
-    !     ....verify blacs grid correctness..
-    if (np == -1) then
-      info = psb_err_context_error_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-
-    if (.not.allocated(desc%halo_index)) then
-      info=298
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    !deallocate halo_index field
-    deallocate(desc%halo_index,stat=info)
-    if (info /= psb_success_) then
-      info=2053
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    if (.not.allocated(desc%bnd_elem)) then
-!!$    info=296
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  end if
-    else
-      !deallocate halo_index field
-      deallocate(desc%bnd_elem,stat=info)
-      if (info /= psb_success_) then
-        info=2054
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    end if
-
-    if (.not.allocated(desc%ovrlap_index)) then
-      info=299
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    !deallocate ovrlap_index  field
-    deallocate(desc%ovrlap_index,stat=info)
-    if (info /= psb_success_) then
-      info=2055
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    !deallocate ovrlap_elem  field
-    deallocate(desc%ovrlap_elem,stat=info)
-    if (info /= psb_success_) then 
-      info=2056
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    !deallocate ovrlap_index  field
-    deallocate(desc%ovr_mst_idx,stat=info)
-    if (info /= psb_success_) then
-      info=2055
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-
-    if (allocated(desc%lprm)) &
-         & deallocate(desc%lprm,stat=info)
-    if (info /= psb_success_) then 
-      info=2057
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    if (allocated(desc%indxmap)) then 
-      call desc%indxmap%free()
-      deallocate(desc%indxmap, stat=info)
-    end if
-    if (allocated(desc%idx_space)) then 
-      deallocate(desc%idx_space,stat=info)
-      if (info /= psb_success_) then 
-        info=2056
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    end if
-
-    call desc%nullify()
+    call desc%destroy()
 
     call psb_erractionrestore(err_act)
     return
@@ -741,11 +648,63 @@ contains
     if (err_act == psb_act_ret_) then
       return
     else
-      call psb_error(ictxt)
+      if (ictxt == -1) then
+        call psb_error()
+      else
+        call psb_error(ictxt)
+      end if
     end if
     return
 
   end subroutine psb_cdfree
+
+  !
+  ! Subroutine: psb_cdfree
+  !   Frees a descriptor data structure.
+  ! 
+  ! Arguments: 
+  !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
+  subroutine psb_cd_destroy(desc)
+    !...free descriptor structure...
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+    !....parameters...
+    class(psb_desc_type), intent(inout) :: desc
+    !...locals....
+    integer(psb_ipk_) :: info
+
+
+    if (allocated(desc%halo_index)) &
+         &  deallocate(desc%halo_index,stat=info)
+
+    if (allocated(desc%bnd_elem)) &
+         &    deallocate(desc%bnd_elem,stat=info)
+
+    if (allocated(desc%ovrlap_index)) &
+         & deallocate(desc%ovrlap_index,stat=info)
+    
+    if (allocated(desc%ovrlap_elem)) &
+         & deallocate(desc%ovrlap_elem,stat=info)
+    if (allocated(desc%ovr_mst_idx)) &
+         & deallocate(desc%ovr_mst_idx,stat=info)
+
+    if (allocated(desc%lprm)) &
+         & deallocate(desc%lprm,stat=info)
+    if (allocated(desc%idx_space)) &
+         & deallocate(desc%idx_space,stat=info)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%free()
+      deallocate(desc%indxmap, stat=info)
+    end if
+
+    call desc%nullify()
+
+    return
+
+  end subroutine psb_cd_destroy
   !
   ! Subroutine: psb_cdtransfer
   !   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
@@ -782,37 +741,43 @@ contains
     name = 'psb_cdtransfer'
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt = psb_cd_get_context(desc_in)
-    call psb_info(ictxt,me,np)
-    ! Should not require ictxt to be present: this
-    ! function might be called even when desc_in is
-    ! empty. 
+    !
+    ! Note: this  might be called even
+    ! when desc_in is empty.
+    ! 
+    if (desc_in%is_valid()) then 
+      ictxt = psb_cd_get_context(desc_in)
+      call psb_info(ictxt,me,np)
 
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
-    if (info == psb_success_)  &
-         & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
-    if (info == psb_success_) &
-         & call move_alloc(desc_in%indxmap, desc_out%indxmap)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': end'
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
+      if (info == psb_success_)  &
+           & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
+      if (info == psb_success_) &
+           & call move_alloc(desc_in%indxmap, desc_out%indxmap)
+      if (info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': end'
+    else
+      call desc_out%free(info)
+    end if
+    call desc_in%free(info)
 
     call psb_erractionrestore(err_act)
     return

@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -68,6 +68,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: bld_n    => z_base_bld_n
     generic, public    :: bld      => bld_x, bld_n
     procedure, pass(x) :: all      => z_base_all
+    procedure, pass(x) :: mold     => z_base_mold
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
@@ -218,6 +219,18 @@ contains
     call psb_realloc(n,x%v,info)
     
   end subroutine z_base_all
+
+  subroutine z_base_mold(x, y, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_z_base_vect_type), intent(in)   :: x
+    class(psb_z_base_vect_type), intent(out), allocatable :: y
+    integer(psb_ipk_), intent(out)              :: info
+    
+    allocate(psb_z_base_vect_type :: y, stat=info)
+
+  end subroutine z_base_mold
 
   !
   ! Insert a bunch of values at specified positions.

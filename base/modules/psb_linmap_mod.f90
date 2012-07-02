@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -38,8 +38,6 @@
 module psb_linmap_mod
 
   use psb_const_mod
-!!$  use psb_descriptor_type
-!!$  use psb_linmap_type_mod
   use psb_s_linmap_mod
   use psb_d_linmap_mod
   use psb_c_linmap_mod

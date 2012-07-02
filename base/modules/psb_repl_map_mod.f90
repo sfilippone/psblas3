@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -117,7 +117,7 @@ contains
     end if
 
     idxv(1) = idx
-    call idxmap%l2g(idxv,info,owned=owned)
+    call idxmap%l2gip(idxv,info,owned=owned)
     idx = idxv(1)
 
   end subroutine repl_l2gs1
@@ -132,7 +132,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%l2g(idxout,info,mask,owned)
+    call idxmap%l2gip(idxout,info,mask,owned)
     
   end subroutine repl_l2gs2
 
@@ -199,7 +199,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%l2g(idxout(1:im),info,mask,owned)
+    call idxmap%l2gip(idxout(1:im),info,mask,owned)
     if (is > im) info = -3 
 
   end subroutine repl_l2gv2
@@ -220,7 +220,7 @@ contains
     end if
     
     idxv(1) = idx 
-    call idxmap%g2l(idxv,info,owned=owned)
+    call idxmap%g2lip(idxv,info,owned=owned)
     idx = idxv(1) 
       
   end subroutine repl_g2ls1
@@ -235,7 +235,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%g2l(idxout,info,mask,owned)
+    call idxmap%g2lip(idxout,info,mask,owned)
     
   end subroutine repl_g2ls2
 
@@ -335,14 +335,14 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l(idxout(1:im),info,mask,owned)
+    call idxmap%g2lip(idxout(1:im),info,mask,owned)
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2
 
 
 
-  subroutine repl_g2ls1_ins(idx,idxmap,info,mask)
+  subroutine repl_g2ls1_ins(idx,idxmap,info,mask, lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
@@ -350,34 +350,41 @@ contains
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    
-    integer(psb_ipk_) :: idxv(1)
+    integer, intent(in), optional :: lidx
+
+    integer(psb_ipk_) :: idxv(1),lidxv(1)
 
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
     end if
     idxv(1) = idx
-    call idxmap%g2l_ins(idxv,info)
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2lip_ins(idxv,info)
+    end if
     idx = idxv(1) 
 
   end subroutine repl_g2ls1_ins
 
-  subroutine repl_g2ls2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine repl_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
     
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info,mask=mask)
+    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
     
   end subroutine repl_g2ls2_ins
 
 
-  subroutine repl_g2lv1_ins(idx,idxmap,info,mask)
+  subroutine repl_g2lv1_ins(idx,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
@@ -385,6 +392,8 @@ contains
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: i, is
 
     info = 0
@@ -392,6 +401,12 @@ contains
 
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(lidx)) then 
+      if (size(lidx) < size(idx)) then 
         info = -1
         return
       end if
@@ -404,29 +419,50 @@ contains
       info = -1
 
     else if (idxmap%is_valid()) then 
+      if (present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, is
+            if (mask(i)) then 
+              if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+                ! do nothing
+              else 
+                idx(i) = -1
+              end if
+            end if
+          end do
 
-      if (present(mask)) then 
-        do i=1, is
-          if (mask(i)) then 
+        else if (.not.present(mask)) then 
+
+          do i=1, is
             if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               ! do nothing
             else 
               idx(i) = -1
             end if
-          end if
-        end do
+          end do
+        end if
+      else if (.not.present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, is
+            if (mask(i)) then 
+              if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+                ! do nothing
+              else 
+                idx(i) = -1
+              end if
+            end if
+          end do
 
-      else if (.not.present(mask)) then 
-
-        do i=1, is
-          if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
-            ! do nothing
-          else 
-            idx(i) = -1
-          end if
-        end do
+        else if (.not.present(mask)) then 
+          do i=1, is
+            if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
+              ! do nothing
+            else 
+              idx(i) = -1
+            end if
+          end do
+        end if
       end if
-
     else 
       idx = -1
       info = -1
@@ -434,19 +470,21 @@ contains
 
   end subroutine repl_g2lv1_ins
 
-  subroutine repl_g2lv2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine repl_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_repl_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: is, im
     
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l_ins(idxout(1:im),info,mask)
+    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2_ins

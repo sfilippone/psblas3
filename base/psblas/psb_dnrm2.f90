@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -108,7 +108,7 @@ function psb_dnrm2(x, desc_a, info, jx)  result(res)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx,jjx))/res)**2) 
+      res = res * sqrt(done - dd*(abs(x(idx,jjx))/res)**2) 
     end do
   else 	    
     res = dzero
@@ -133,7 +133,7 @@ end function psb_dnrm2
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -232,7 +232,7 @@ function psb_dnrm2v(x, desc_a, info)  result(res)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+      res = res * sqrt(done - dd*(abs(x(idx))/res)**2) 
     end do
   else 	    
     res = dzero
@@ -347,7 +347,7 @@ end function psb_dnrm2_vect
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -448,7 +448,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
       idx = desc_a%ovrlap_elem(i,1)
       ndm = desc_a%ovrlap_elem(i,2)
       dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx))/res)**2) 
+      res = res * sqrt(done - dd*(abs(x(idx))/res)**2) 
     end do
   else 	    
     res = dzero

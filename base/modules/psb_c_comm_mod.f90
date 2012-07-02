@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -128,7 +128,7 @@ module psb_c_comm_mod
     subroutine psb_cgatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_spk_), intent(in)  :: locx(:,:)
-      complex(psb_spk_), intent(out) :: globx(:,:)
+      complex(psb_spk_), intent(out), allocatable  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
@@ -136,7 +136,7 @@ module psb_c_comm_mod
     subroutine  psb_cgatherv(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_spk_), intent(in)  :: locx(:)
-      complex(psb_spk_), intent(out) :: globx(:)
+      complex(psb_spk_), intent(out), allocatable  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
@@ -145,7 +145,7 @@ module psb_c_comm_mod
       use psb_descriptor_type
       use psb_c_vect_mod
       type(psb_c_vect_type), intent(inout) :: locx
-      complex(psb_spk_), intent(out)     :: globx(:)
+      complex(psb_spk_), intent(out), allocatable :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root

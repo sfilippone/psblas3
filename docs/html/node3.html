@@ -18,7 +18,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node8.html">
+<LINK REL="next" HREF="node9.html">
 <LINK REL="previous" HREF="node2.html">
 <LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node4.html">
@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html206"
+<A NAME="tex2html207"
   HREF="node4.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html202"
+<A NAME="tex2html203"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html196"
+<A NAME="tex2html197"
   HREF="node2.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html204"
+<A NAME="tex2html205"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html207"
+<B> Next:</B> <A NAME="tex2html208"
   HREF="node4.html">Basic Nomenclature</A>
-<B> Up:</B> <A NAME="tex2html203"
+<B> Up:</B> <A NAME="tex2html204"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html197"
+<B> Previous:</B> <A NAME="tex2html198"
   HREF="node2.html">Introduction</A>
- &nbsp; <B>  <A NAME="tex2html205"
+ &nbsp; <B>  <A NAME="tex2html206"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -78,14 +78,14 @@ calls to the serial sparse BLAS subroutines.
 In a similar way, the inter-process message exchanges are encapsulated
 in an applicaiton layer that has been strongly inspired by the  Basic
 Linear Algebra Communication Subroutines (BLACS) library&nbsp;[<A
- HREF="node118.html#BLACS">7</A>].  
+ HREF="node119.html#BLACS">7</A>].  
 Usually  there is no need to deal directly with MPI;  however, in some
 cases, MPI routines are used directly to improve efficiency. For
-further details on our communication layer see Sec.&nbsp;<A HREF="node83.html#sec:parenv">7</A>.
+further details on our communication layer see Sec.&nbsp;<A HREF="node84.html#sec:parenv">7</A>.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:psblas"></A><A NAME="237"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:psblas"></A><A NAME="256"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 1:</STRONG>
 PSBLAS library components hierarchy.</CAPTION>
@@ -93,12 +93,12 @@ PSBLAS library components hierarchy.</CAPTION>
 <DIV ALIGN="CENTER">
 <IMG
  WIDTH="195" HEIGHT="223" ALIGN="BOTTOM" BORDER="0"
- SRC="img3.png"
+ SRC="img2.png"
  ALT="\includegraphics[scale=0.65]{figures/psblas.eps}">
 
 <IMG
  WIDTH="195" HEIGHT="223" ALIGN="BOTTOM" BORDER="0"
- SRC="img2.png"
+ SRC="img3.png"
  ALT="\includegraphics[scale=0.65]{figures/psblas}">
 
 </DIV></TD></TR>
@@ -134,7 +134,7 @@ equation indices to processes.
 In particular it is consistent with the
 usage of graph partitioning tools commonly available in the
 literature, e.g. METIS&nbsp;[<A
- HREF="node118.html#METIS">14</A>].
+ HREF="node119.html#METIS">14</A>].
 Dense vectors  conform  to sparse
 matrices, that is, the entries of a vector follow the same distribution
 of the matrix rows.  
@@ -145,7 +145,7 @@ process generates its own portion. We never require that the entire
 matrix be available on a single node. However, it is possible
 to hold the entire matrix in one process and distribute it
 explicitly<A NAME="tex2html2"
-  HREF="footnode.html#foot178"><SUP>1</SUP></A>, even though  the resulting memory 
+  HREF="footnode.html#foot187"><SUP>1</SUP></A>, even though  the resulting memory 
 bottleneck would make this option unattractive in most  cases. 
 
 <P>
@@ -154,38 +154,43 @@ bottleneck would make this option unattractive in most  cases.
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
 <UL>
-<LI><A NAME="tex2html208"
-  HREF="node4.html">Basic Nomenclature</A>
 <LI><A NAME="tex2html209"
-  HREF="node5.html">Library contents</A>
+  HREF="node4.html">Basic Nomenclature</A>
 <LI><A NAME="tex2html210"
-  HREF="node6.html">Application structure</A>
+  HREF="node5.html">Library contents</A>
 <LI><A NAME="tex2html211"
-  HREF="node7.html">Programming model</A>
+  HREF="node6.html">Application structure</A>
+<UL>
+<LI><A NAME="tex2html212"
+  HREF="node7.html">User-defined index mappings</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html213"
+  HREF="node8.html">Programming model</A>
 </UL>
 <!--End of Table of Child-Links-->
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html206"
+<A NAME="tex2html207"
   HREF="node4.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html202"
+<A NAME="tex2html203"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html196"
+<A NAME="tex2html197"
   HREF="node2.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html204"
+<A NAME="tex2html205"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html207"
+<B> Next:</B> <A NAME="tex2html208"
   HREF="node4.html">Basic Nomenclature</A>
-<B> Up:</B> <A NAME="tex2html203"
+<B> Up:</B> <A NAME="tex2html204"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html197"
+<B> Previous:</B> <A NAME="tex2html198"
   HREF="node2.html">Introduction</A>
- &nbsp; <B>  <A NAME="tex2html205"
+ &nbsp; <B>  <A NAME="tex2html206"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

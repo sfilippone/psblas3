@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html764"
+<A NAME="tex2html765"
   HREF="node46.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html760"
+<A NAME="tex2html761"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html754"
+<A NAME="tex2html755"
   HREF="node44.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html762"
+<A NAME="tex2html763"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html765"
+<B> Next:</B> <A NAME="tex2html766"
   HREF="node46.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html761"
+<B> Up:</B> <A NAME="tex2html762"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html755"
+<B> Previous:</B> <A NAME="tex2html756"
   HREF="node44.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html763"
+ &nbsp; <B>  <A NAME="tex2html764"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -57,13 +57,13 @@ psb_genrm2 -- 2-Norm of Vector</A>
 
 <P>
 This function computes the 2-norm of a vector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 If <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> is a  real  vector
 it computes 2-norm as:
 <BR><P></P>
@@ -76,14 +76,14 @@ nrm2 \leftarrow \sqrt{x^T x}
 
 <IMG
  WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img43.png"
+ SRC="img38.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> is a complex vector then it computes 2-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -95,7 +95,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <IMG
  WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img44.png"
+ SRC="img39.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -103,7 +103,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1540"></A>
+<DIV ALIGN="CENTER"><A NAME="1561"></A>
 <TABLE>
 <CAPTION><STRONG>Table 8:</STRONG>
 Data types</CAPTION>
@@ -111,12 +111,12 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="44" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img45.png"
+ WIDTH="43" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img40.png"
  ALT="$nrm2$"></TD>
 <TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
@@ -159,8 +159,8 @@ psb_genrm2(x, desc_a, info)
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 Scope: <B>local</B> 
@@ -169,7 +169,7 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90nrm2">8</A>.
 </DD>
@@ -191,8 +191,8 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>Function Value</STRONG></DT>
 <DD>is the 2-norm of subvector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
@@ -217,26 +217,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html764"
+<A NAME="tex2html765"
   HREF="node46.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html760"
+<A NAME="tex2html761"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html754"
+<A NAME="tex2html755"
   HREF="node44.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html762"
+<A NAME="tex2html763"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html765"
+<B> Next:</B> <A NAME="tex2html766"
   HREF="node46.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html761"
+<B> Up:</B> <A NAME="tex2html762"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html755"
+<B> Previous:</B> <A NAME="tex2html756"
   HREF="node44.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html763"
+ &nbsp; <B>  <A NAME="tex2html764"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

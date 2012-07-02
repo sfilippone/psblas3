@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -30,7 +30,8 @@
 !!$ 
 !!$  
 module psb_tools_mod
-  use psb_base_tools_mod
+  use psb_cd_tools_mod
+  use psb_i_tools_mod
   use psb_s_tools_mod
   use psb_d_tools_mod
   use psb_c_tools_mod

@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -167,7 +167,7 @@ contains
     end if
 
     idxv(1) = idx
-    call idxmap%l2g(idxv,info,owned=owned)
+    call idxmap%l2gip(idxv,info,owned=owned)
     idx = idxv(1)
 
   end subroutine hash_l2gs1
@@ -182,7 +182,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%l2g(idxout,info,mask,owned)
+    call idxmap%l2gip(idxout,info,mask,owned)
 
   end subroutine hash_l2gs2
 
@@ -255,7 +255,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%l2g(idxout(1:im),info,mask,owned)
+    call idxmap%l2gip(idxout(1:im),info,mask,owned)
     if (is > im) then 
       write(0,*) 'l2gv2 err -3'
       info = -3 
@@ -279,7 +279,7 @@ contains
     end if
 
     idxv(1) = idx 
-    call idxmap%g2l(idxv,info,owned=owned)
+    call idxmap%g2lip(idxv,info,owned=owned)
     idx = idxv(1) 
 
   end subroutine hash_g2ls1
@@ -294,7 +294,7 @@ contains
     logical, intent(in), optional :: owned
 
     idxout = idxin
-    call idxmap%g2l(idxout,info,mask,owned)
+    call idxmap%g2lip(idxout,info,mask,owned)
 
   end subroutine hash_g2ls2
 
@@ -429,7 +429,7 @@ contains
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l(idxout(1:im),info,mask,owned)
+    call idxmap%g2lip(idxout(1:im),info,mask,owned)
     if (is > im) then 
       write(0,*) 'g2lv2 err -3'
       info = -3 
@@ -439,7 +439,7 @@ contains
 
 
 
-  subroutine hash_g2ls1_ins(idx,idxmap,info,mask)
+  subroutine hash_g2ls1_ins(idx,idxmap,info,mask,lidx)
     use psb_realloc_mod
     use psb_sort_mod
     implicit none 
@@ -447,34 +447,43 @@ contains
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
 
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_ipk_) :: idxv(1), lidxv(1)
 
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
     end if
+
     idxv(1) = idx
-    call idxmap%g2l_ins(idxv,info)
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2lip_ins(idxv,info)
+    end if
     idx = idxv(1) 
 
   end subroutine hash_g2ls1_ins
 
-  subroutine hash_g2ls2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine hash_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
+    integer, intent(in), optional :: lidx
+
 
     idxout = idxin
-    call idxmap%g2l_ins(idxout,info,mask=mask)
+    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
 
   end subroutine hash_g2ls2_ins
 
 
-  subroutine hash_g2lv1_ins(idx,idxmap,info,mask)
+  subroutine hash_g2lv1_ins(idx,idxmap,info,mask,lidx)
     use psb_error_mod
     use psb_realloc_mod
     use psb_sort_mod
@@ -483,7 +492,9 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
-    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional    :: mask(:)
+    integer, intent(in), optional    :: lidx(:)
+
     integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, &
          & nxt, err_act
     integer(psb_mpik_) :: ictxt, me, np
@@ -504,16 +515,159 @@ contains
         return
       end if
     end if
+    if (present(lidx)) then 
+      if (size(lidx) < size(idx)) then 
+        info = -1
+        return
+      end if
+    end if
 
 
     mglob = idxmap%get_gr()
     nrow  = idxmap%get_lr()
     if (idxmap%is_bld()) then 
 
-      if (present(mask)) then 
-        do i = 1, is
-          ncol  = idxmap%get_lc()
-          if (mask(i)) then 
+      if (present(lidx)) then
+        if (present(mask)) then 
+          do i = 1, is
+            ncol  = idxmap%get_lc()
+            if (mask(i)) then 
+              ip = idx(i) 
+              if ((ip < 1 ).or.(ip>mglob) ) then 
+                idx(i) = -1
+                cycle
+              endif
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+              if (lip < 0) then 
+                nxt = lidx(i)
+                if (nxt <= nrow) then 
+                  idx(i) = -1
+                  cycle
+                endif
+                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                if (info >=0) then 
+                  if (nxt == lip) then 
+                    ncol = max(ncol,nxt)
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                    if (info /= psb_success_) then
+                      info=1
+                      ch_err='psb_ensure_size'
+                      call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                           &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                      goto 9999
+                    end if
+                    idxmap%loc_to_glob(nxt)  = ip
+                    call idxmap%set_lc(ncol)
+                  endif
+                  info = psb_success_
+                else
+                  ch_err='SearchInsKeyVal'
+                  call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                       & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                  goto 9999
+                end if
+              end if
+              idx(i) = lip
+              info = psb_success_
+            else
+              idx(i) = -1
+            end if
+          enddo
+
+        else if (.not.present(mask)) then 
+
+          do i = 1, is
+            ncol  = idxmap%get_lc()
+            ip    = idx(i) 
+            if ((ip < 1 ).or.(ip>mglob)) then 
+              idx(i) = -1
+              cycle
+            endif
+            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+            if (lip < 0) then 
+              nxt = lidx(i)
+              if (nxt <= nrow) then 
+                idx(i) = -1
+                cycle
+              endif
+              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = max(nxt,ncol)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                  if (info /= psb_success_) then
+                    info=1
+                    ch_err='psb_ensure_size'
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                    goto 9999
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                ch_err='SearchInsKeyVal'
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                goto 9999
+              end if
+            end if
+            idx(i) = lip
+            info = psb_success_
+          enddo
+
+        end if
+
+      else if (.not.present(lidx)) then 
+
+        if (present(mask)) then 
+          do i = 1, is
+            ncol  = idxmap%get_lc()
+            if (mask(i)) then 
+              ip = idx(i) 
+              if ((ip < 1 ).or.(ip>mglob)) then 
+                idx(i) = -1
+                cycle
+              endif
+              nxt = ncol + 1 
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+              if (lip < 0) &
+                   &  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+
+              if (info >=0) then 
+                if (nxt == lip) then 
+                  ncol = nxt
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                  if (info /= psb_success_) then
+                    info=1
+                    ch_err='psb_ensure_size'
+                    call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                    goto 9999
+                  end if
+                  idxmap%loc_to_glob(nxt)  = ip
+                  call idxmap%set_lc(ncol)
+                endif
+                info = psb_success_
+              else
+                ch_err='SearchInsKeyVal'
+                call psb_errpush(psb_err_from_subroutine_ai_,name,&
+                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                goto 9999
+              end if
+              idx(i) = lip
+              info = psb_success_
+            else
+              idx(i) = -1
+            end if
+          enddo
+
+        else if (.not.present(mask)) then 
+
+          do i = 1, is
+            ncol  = idxmap%get_lc()
             ip = idx(i) 
             if ((ip < 1 ).or.(ip>mglob)) then 
               idx(i) = -1
@@ -547,52 +701,11 @@ contains
             end if
             idx(i) = lip
             info = psb_success_
-          else
-            idx(i) = -1
-          end if
-        enddo
-
-      else
-        do i = 1, is
-          ncol  = idxmap%get_lc()
-          ip = idx(i) 
-          if ((ip < 1 ).or.(ip>mglob)) then 
-            idx(i) = -1
-            cycle
-          endif
-          nxt = ncol + 1 
-          call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
-          if (lip < 0) &
-               &  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
-          if (info >=0) then 
-            if (nxt == lip) then 
-              ncol = nxt
-              call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
-              if (info /= psb_success_) then
-                info=1
-                ch_err='psb_ensure_size'
-                call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-                goto 9999
-              end if
-              idxmap%loc_to_glob(nxt)  = ip
-              call idxmap%set_lc(ncol)
-            endif
-            info = psb_success_
-          else
-            ch_err='SearchInsKeyVal'
-            call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                 & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
-            goto 9999
-          end if
-          idx(i) = lip
-          info = psb_success_
-        enddo
+          enddo
 
 
+        end if
       end if
-
     else 
       ! Wrong state
       idx = -1
@@ -613,19 +726,21 @@ contains
 
   end subroutine hash_g2lv1_ins
 
-  subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask)
+  subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
+    integer, intent(in), optional :: lidx(:)
+
     integer(psb_ipk_) :: is, im
 
     is = size(idxin)
     im = min(is,size(idxout))
     idxout(1:im) = idxin(1:im)
-    call idxmap%g2l_ins(idxout(1:im),info,mask)
+    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
     if (is > im) then 
       write(0,*) 'g2lv2_ins err -3'
       info = -3 
@@ -646,7 +761,7 @@ contains
     !  To be implemented
     integer(psb_mpik_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, m, nrt,int_err(5)
-    integer(psb_ipk_), allocatable :: vlu(:)
+    integer(psb_ipk_), allocatable :: vlu(:), ix(:)
     character(len=20), parameter :: name='hash_map_init_vl'
 
     info = 0
@@ -664,7 +779,7 @@ contains
     call psb_sum(ictxt,nrt)
     call psb_max(ictxt,m)
 
-    allocate(vlu(nl), stat=info) 
+    allocate(vlu(nl), ix(nl), stat=info) 
     if (info /= 0) then 
       info = -1
       return
@@ -687,16 +802,21 @@ contains
            & ' Warning: globalcheck=.false., but there is a mismatch'
       write(psb_err_unit,*) trim(name),&
            & '        : in the global sizes!',m,nrt
-    end if
-    !
-    ! Now sort the input items, and check for  duplicates
-    ! (unlikely, but possible)
-    !
-    call psb_msort_unique(vlu,nlu)
-    if (nlu /= nl) then 
-      write(0,*) 'Warning: duplicates in input'
+
     end if
 
+    call psb_msort(vlu,ix)
+    nlu = 1
+    do i=2,nl
+      if (vlu(i) /= vlu(nlu)) then
+        nlu = nlu + 1 
+        vlu(nlu) = vlu(i)
+        ix(nlu) = ix(i)
+      end if
+    end do
+    call psb_msort(ix(1:nlu),vlu(1:nlu),flag=psb_sort_keep_idx_)
+    
+    nlu = nl
     call hash_init_vlu(idxmap,ictxt,m,nlu,vlu,info)    
 
   end subroutine hash_init_vl

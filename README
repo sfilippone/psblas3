@@ -1,8 +1,4 @@
-This directory contains  the PSBLAS library, version 3.0-pre-release.
-
-WARNING: This is higly experimental, unstable, and almost undocumented.  
-	 Do not count on anything to remain unchanged by the time 3.0
-	 really comes out. 
+This directory contains  the PSBLAS library, version 3.0. 
 
 This version requires a working Fortran 2003 compiler; we do not use
 all of the language features (specifically, so far we did not employ
@@ -10,27 +6,22 @@ FINAL subroutines), but the features we use were sufficient in
 identifying bugs in ALL compilers we tried (all the bugs have been
 reported and mostly fixed by the respective vendors). 
 
-Notes: This code is confirmed to work with the following compilers 
-       (as well as newer versions):
-       NAGware 5.2 and subsequent;
-       XLF 13.1;
-       GNU 4.6.1;  
-       Cray CCE 7.4.4;
-       All these are recognized by the configure script. 
-       If you find it working with other compilers, please let us
-       know. 
-       The Intel compiler up to version 12.1 fails. 
 
-       The "undocumented" in the warning above refers to the
-       internals; the new internals have been completely overhauled,
-       and in many cases rewritten; they now enable a much
-       better interfacing with user-defined storage formats. If the
-       user is only interested in the predefined formats, then the
-       user's guide should be sufficient; what is lacking is
-       documentation on how to add to the library. This will come. 
+The new internals have been completely overhauled, and in many cases
+rewritten; they now enable a much better interfacing with user-defined
+storage formats. If the user is only interested in the predefined
+formats, then the user's guide should be sufficient; what is somewhat
+lacking is documentation on how to add to the library, i.e. a
+developers' guide; stay tuned. 
 
 
  
+The architecture of the Fortran 2003 sparse BLAS is described in 
+S. Filippone, A. Buttari:
+Object-Oriented Techniques for Sparse Matrix Computations in Fortran
+2003, 
+ACM Trans. on Math. Software, vol. 38, No. 4, 2012.
+
 Version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
@@ -46,21 +37,23 @@ DOCUMENTATION
 
 See docs/psblas-3.0.pdf; an HTML version of the same document is
 available in docs/html. 
-Please consult the sample programs, especially test/pargen/ppde.f90. 
+Please consult the sample programs, especially 
+test/pargen/ppde[23]d.f90
+
 
 
 OTHER SOFTWARE CREDITS 
 
-We include our modified implementation of some of the Sparker (serial
-sparse BLAS)  material,  e.g. Jagged diagonal, plus a number of
-extensions of our own design. The original file spblas.f can be
-downloaded from matisa.cc.rl.ac.uk; of course any bugs in our
-implementation are our own to fix.  The main reference for the serial
-sparse BLAS is: 
+We originally included a modified implementation of some of the
+Sparker (serial sparse BLAS)  material; this has been completely
+rewritten, way beyond the intention(s) and responsibilities of the
+original developers. 
+The main reference for the serial sparse BLAS is: 
 Duff, I., Marrone, M., Radicati, G., and Vittoli, C.
 Level 3 basic linear algebra subprograms for sparse matrices: a user 
 level interface
 ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+
 
 INSTALLING
 
@@ -76,7 +69,10 @@ prerequisites (see also SERIAL below):
 3. We have had good results with  the METIS library, from 
    http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
    This is optional; it is  used in the util and test/fileread
-   directories but only if you define the HAVE_METIS directive.
+   directories but only if you specify --with-metis.
+
+4. If you have the AMD package of Davis, Duff and Amestoy, you can
+   specify  --with-amd (see ./configure --help for more details). 
 
 The configure script will generate a Make.inc file suitable for
 building the library.  
@@ -104,6 +100,48 @@ subdirectories to get test programs done.
 If you specify --prefix=/path you can do make install and the
 libraries will be installed under /path/lib, while the module files
 will be installed under /path/include.
+
+SERIAL
+
+Configuring with --enable-serial will provide a fake MPI stub library
+that enables running in pure serial mode; no MPI installation is
+needed in this case (but note that the fake MPI stubs are only
+guaranteed to cover what we use internally, it's not a complete
+replacement). 
+
+EXPERIMENTAL
+
+We have an experimental flag --long-integers that will enable having
+8-byte integer data, allowing an index space larger than 2G; some
+small cases have been tested but we do not offer full guarantee (yet). 
+
+
+COMPILER NOTES.
+
+This code is confirmed to work with the following compilers (or
+later versions thereof): 
+       NAGware 5.2;
+       GNU 4.6.1;  
+       Cray CCE 8.0.1;
+
+They are all recognized by the configure script. 
+
+To make the script work with the Cray CCE environment, it is
+recommended to use the following:
+./configure FC=ftn F77=ftn CC=cc MPF90=ftn MPF77=ftn MPCC=cc
+with both CCE and GNU lower-level compilers. 
+
+XLF 13.1 configures correctly, but then fails with ICEs (Internal
+Compiler Error) at build time. We do not yet know whether XLF 14
+compiles correctly. 
+
+For the GNU compilers 4.6.x we are aware of a number of memory management
+issues that might surface in your applications; all of them (that
+we're aware of) are solved in version 4.7.0.  
+
+The Intel compiler up to version 12.1 fails to compile, as of the last
+version we got access to. 
+
 
 
 KNOWN ISSUES.

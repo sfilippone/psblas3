@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gather -- Gather Global Dense Matrix</TITLE>
-<META NAME="description" CONTENT="psb_gather -- Gather Global Dense Matrix">
+<TITLE>psb_ovrl -- Overlap Update</TITLE>
+<META NAME="description" CONTENT="psb_ovrl -- Overlap Update">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,97 +20,89 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node54.html">
 <LINK REL="previous" HREF="node52.html">
-<LINK REL="up" HREF="node50.html">
+<LINK REL="up" HREF="node51.html">
 <LINK REL="next" HREF="node54.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html862"
+<A NAME="tex2html863"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html858"
-  HREF="node50.html">
+<A NAME="tex2html859"
+  HREF="node51.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html852"
+<A NAME="tex2html853"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html860"
+<A NAME="tex2html861"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html863"
-  HREF="node54.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html859"
-  HREF="node50.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html853"
-  HREF="node52.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html861"
+<B> Next:</B> <A NAME="tex2html864"
+  HREF="node54.html">psb_gather   Gather</A>
+<B> Up:</B> <A NAME="tex2html860"
+  HREF="node51.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html854"
+  HREF="node52.html">psb_halo   Halo</A>
+ &nbsp; <B>  <A NAME="tex2html862"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00063000000000000000">
-psb_gather -- Gather Global Dense Matrix</A>
+<H2><A NAME="SECTION00062000000000000000">
+psb_ovrl -- Overlap Update</A>
 </H2>
 
 <P>
-These subroutines collect the portions of global dense matrix
-distributed over all process into one single array stored on one
-process.
+These subroutines applies an overlap operator to the input vector:
 
 <P>
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-glob\_x \leftarrow collect(loc\_x_i)
+x \leftarrow Q x
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="163" HEIGHT="28" BORDER="0"
- SRC="img72.png"
- ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
+ WIDTH="55" HEIGHT="27" BORDER="0"
+ SRC="img59.png"
+ ALT="\begin{displaymath}x \leftarrow Q x \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
- ALT="$glob\_x$"></STRONG></DT>
-<DD>is the global submatrix <!-- MATH
- $glob\_x_{1:m,1:n}$
- -->
-<IMG
- WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
- ALT="$glob\_x_{1:m,1:n}$">
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></STRONG></DT>
+<DD>is the global dense submatrix <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img75.png"
- ALT="$loc\_x_i$"></STRONG></DT>
-<DD>is the local portion of global dense matrix on
-process <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$">.
-</DD>
-<DT><STRONG><IMG
- WIDTH="48" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img76.png"
- ALT="$collect$"></STRONG></DT>
-<DD>is the collect function.
+ WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img60.png"
+ ALT="$Q$"></STRONG></DT>
+<DD>is the overlap operator; it is the composition of two
+operators <IMG
+ WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img61.png"
+ ALT="$ P_a$"> and <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img62.png"
+ ALT="$ P^{T}$">. 
 </DD>
 </DL>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2867"></A>
+<DIV ALIGN="CENTER"><A NAME="2949"></A>
 <TABLE>
 <CAPTION><STRONG>Table 15:</STRONG>
 Data types</CAPTION>
@@ -118,25 +110,22 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img77.png"
- ALT="$x_i, y$"></TD>
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
-<TR><TD ALIGN="LEFT">Integer</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
-</TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">psb_ovrl</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">psb_ovrl</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">psb_ovrl</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gather</TD>
+<TD ALIGN="LEFT">psb_ovrl</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -147,9 +136,9 @@ Data types</CAPTION>
 
 <P>
 <PRE>
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-call psb_gather(glob_x, loc_x, desc_a, info, root)
-</PRE>
+call psb_ovrl(x, desc_a, info)
+call psb_ovrl(x, desc_a, info, update=update_type, work=work)
+</PRE> 
 
 <P>
 <DL>
@@ -159,21 +148,21 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>loc_x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
- ALT="$glob\_x$">. 
+<DT><STRONG>x</STRONG></DT>
+<DD>global dense matrix <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">.
 <BR>
 Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:gather">15</A>.
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90ovrl">15</A>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -186,43 +175,75 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>The process that holds the global copy. If <IMG
- WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
- ALT="$root=-1$"> all
-  the processes will have a copy of the global vector.
-<BR>
+<DT><STRONG>update</STRONG></DT>
+<DD>Update operator. 
+<BR><DL>
+<DT><STRONG>update = psb_none_</STRONG></DT>
+<DD>Do nothing;
+</DD>
+<DT><STRONG>update = psb_add_</STRONG></DT>
+<DD>Sum overlap entries, i.e. apply <IMG
+ WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img63.png"
+ ALT="$P^T$">;
+</DD>
+<DT><STRONG>update = psb_avg_</STRONG></DT>
+<DD>Average overlap entries, i.e. apply <IMG
+ WIDTH="44" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img64.png"
+ ALT="$P_aP^T$">;
+</DD>
+</DL>
 Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer variable <!-- MATH
- $-1\le root\le np-1$
+Default: <!-- MATH
+ $update\_type = psb\_avg\_$
  -->
 <IMG
- WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
- ALT="$-1\le root\le np-1$">, default <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img80.png"
- ALT="$-1$">. 
+ WIDTH="166" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img65.png"
+ ALT="$update\_type = psb\_avg\_ $">
+<BR>
+Scope: <B>global</B> 
+<BR>
+Specified as: a integer variable.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>the work array. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a one dimensional array of the same type of <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">.
+
+<P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>glob_x</STRONG></DT>
-<DD>The array where the local parts must be gathered.
+<DT><STRONG>x</STRONG></DT>
+<DD>global dense result matrix <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>required</B> 
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array.
+Specified as: an  array of rank one or two
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90ovrl">15</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -238,28 +259,501 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>If there is no overlap in the data distribution associated with
+  the descriptor, no operations are performed;
+</LI>
+<LI>The operator <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img62.png"
+ ALT="$ P^{T}$"> performs the reduction sum of overlap
+elements; it is a ``prolongation'' operator <IMG
+ WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img63.png"
+ ALT="$P^T$"> that
+replicates overlap elements, accounting for the physical replication
+of data;
+</LI>
+<LI>The operator <IMG
+ WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img61.png"
+ ALT="$ P_a$"> performs a scaling on the overlap elements by
+the amount of replication; thus, when combined with the reduction
+operator, it implements the average of replicated elements over all of
+their instances. 
+</LI>
+</OL>
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:try8x8_ov"></A><A NAME="2951"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 8:</STRONG>
+Sample discretization mesh.</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<IMG
+ WIDTH="533" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
+ SRC="img67.png"
+ ALT="\includegraphics[scale=0.65]{figures/try8x8_ov.eps}">
+
+<!-- MATH
+ $\rotatebox{-90}{\includegraphics[scale=0.65]{figures/try8x8_ov}}$
+ -->
+<IMG
+ WIDTH="76" HEIGHT="2" ALIGN="BOTTOM" BORDER="0"
+ SRC="img66.png"
+ ALT="\rotatebox{-90}{\includegraphics[scale=0.65]{figures/try8x8_ov}}">
+
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<FONT SIZE="+1"><B>Example of use</B></FONT>
+Consider the discretization mesh depicted in fig.&nbsp;<A HREF="#fig:try8x8_ov">8</A>,
+partitioned among two processes as shown by the dashed lines, with an
+overlap of 1 extra layer with respect to the partition of
+fig.&nbsp;<A HREF="node52.html#fig:try8x8">7</A>; the data 
+distribution is such that each process will own 40 entries in the
+index space, with an overlap of 16  entries placed at local indices 25 
+through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
+in the <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> vector, and process 1 assigns a value of 2, then after a
+call to <code>psb_ovrl</code> with <code>psb_avg_</code> and a call to
+<code>psb_halo_</code> the contents of the local vectors will be the
+following (showing a transition among the two subdomains)  
+
+<P>
+<BR>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 ALIGN="CENTER">
+<TR><TD ALIGN="CENTER" COLSPAN=3><FONT SIZE="-1">
+Process  0</FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="CENTER" COLSPAN=3><FONT SIZE="-1">
+Process  1</FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  I  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   GLOB(I) </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1"> X(I)  </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   I </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1"> GLOB(I) </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1"> X(I) </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  1   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    1  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   1  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  33  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1">  
+  2   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    2  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   2  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  34  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  3   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    3  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   3  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  35  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  4   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    4  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   4  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  36  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  5   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    5  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   5  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  37  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  6   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    6  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   6  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  38  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  7   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    7  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   7  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  39  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  8   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    8  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   8  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  40  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+  9   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">    9  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">   9  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  41  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 10   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   10  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  10  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  42  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 11   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   11  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  11  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  43  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 12   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   12  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  12  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  44  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 13   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   13  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  13  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  45  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 14   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   14  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  14  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  46  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 15   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   15  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  15  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  47  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 16   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   16  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  16  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  48  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 17   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   17  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  17  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  49  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 18   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   18  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  18  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  50  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 19   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   19  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  19  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  51  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 20   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   20  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  20  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  52  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1">  
+ 21   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   21  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  21  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  53  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 22   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   22  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  22  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  54  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 23   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   23  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  23  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  55  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 24   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   24  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  24  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  56  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 25   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   25  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  25  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  57  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 26   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   26  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  26  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  58  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 27   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   27  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  27  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  59  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 28   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   28  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  28  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  60  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 29   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   29  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  29  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  61  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 30   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   30  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  30  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  62  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 31   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   31  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  31  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  63  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 32   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   32  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  32  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  64  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   2.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 33   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   33  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  33  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  25  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 34   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   34  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  34  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  26  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 35   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   35  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  35  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  27  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 36   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   36  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  36  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  28  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 37   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   37  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  37  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  29  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 38   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   38  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  38  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  30  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 39   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   39  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  39  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  31  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 40   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   40  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  1.5   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  40  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  32  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.5 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 41   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   41  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  41  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  17  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 42   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   42  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  42  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  18  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 43   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   43  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  43  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  19  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 44   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   44  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  44  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  20  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 45   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   45  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  45  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  21  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 46   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   46  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  46  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  22  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 47   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   47  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  47  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  23  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+<TR><TD ALIGN="RIGHT"><FONT SIZE="-1"> 
+ 48   </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   48  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  2.0   </FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="RIGHT"><FONT SIZE="-1">  48  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">  24  </FONT></TD>
+<TD ALIGN="RIGHT"><FONT SIZE="-1">   1.0 </FONT></TD>
+</TR>
+</TABLE></DIV>
+<BR>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html862"
+<A NAME="tex2html863"
   HREF="node54.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html858"
-  HREF="node50.html">
+<A NAME="tex2html859"
+  HREF="node51.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html852"
+<A NAME="tex2html853"
   HREF="node52.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html860"
+<A NAME="tex2html861"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html863"
-  HREF="node54.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html859"
-  HREF="node50.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html853"
-  HREF="node52.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html861"
+<B> Next:</B> <A NAME="tex2html864"
+  HREF="node54.html">psb_gather   Gather</A>
+<B> Up:</B> <A NAME="tex2html860"
+  HREF="node51.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html854"
+  HREF="node52.html">psb_halo   Halo</A>
+ &nbsp; <B>  <A NAME="tex2html862"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

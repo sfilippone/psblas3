@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node71.html">
 <LINK REL="previous" HREF="node69.html">
-<LINK REL="up" HREF="node55.html">
+<LINK REL="up" HREF="node56.html">
 <LINK REL="next" HREF="node71.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1091"
+<A NAME="tex2html1092"
   HREF="node71.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1087"
-  HREF="node55.html">
+<A NAME="tex2html1088"
+  HREF="node56.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1081"
+<A NAME="tex2html1082"
   HREF="node69.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1089"
+<A NAME="tex2html1090"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1092"
-  HREF="node71.html">psb_gelp   Applies</A>
-<B> Up:</B> <A NAME="tex2html1088"
-  HREF="node55.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1082"
-  HREF="node69.html">psb_geasb   Assembly</A>
- &nbsp; <B>  <A NAME="tex2html1090"
+<B> Next:</B> <A NAME="tex2html1093"
+  HREF="node71.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1089"
+  HREF="node56.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1083"
+  HREF="node69.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html1091"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000715000000000000000">
-psb_gefree -- Frees a dense matrix</A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_gefree(x, desc_a, info)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
@@ -67,21 +67,6 @@ call psb_gefree(x, desc_a, info)
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to
-  be freed.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.
-<BR>
-<P>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>The communication descriptor.
@@ -94,6 +79,21 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
 </DL>
 
 <P>
@@ -101,6 +101,18 @@ Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be assembled.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -113,8 +125,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <BR><HR>
 
 </BODY>

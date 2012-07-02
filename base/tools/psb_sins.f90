@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -38,36 +38,39 @@
 !    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
 !    irw(:)  - integer          Row indices of rows of val (global numbering)
-!    val(:)  - real                  The source dense submatrix.  
-!    x(:)    - real                  The destination dense matrix.  
+!    val(:)  - real               The source dense submatrix.  
+!    x(:)    - real               The destination dense matrix.  
 !    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_sinsvi
   use psi_mod
   implicit none
 
   ! m rows number of submatrix belonging to val to be inserted
+
   ! ix  x global-row corresponding to position at which val submatrix
   !     must be inserted
 
   !....parameters...
   integer(psb_ipk_), intent(in)              ::  m
   integer(psb_ipk_), intent(in)              ::  irw(:)
-  real(psb_spk_), intent(in)       ::  val(:)
-  real(psb_spk_), intent(inout)    ::  x(:)
+  real(psb_spk_), intent(in)  ::  val(:)
+  real(psb_spk_),intent(inout)      ::  x(:)
   type(psb_desc_type), intent(in)  ::  desc_a
   integer(psb_ipk_), intent(out)             ::  info
   integer(psb_ipk_), optional, intent(in)    ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -81,7 +84,7 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt = desc_a%get_context()
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -110,11 +113,10 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  if (m == 0) return  
+  if (m == 0) return
   loc_rows = desc_a%get_local_rows()
   loc_cols = desc_a%get_local_cols()
   mglob    = desc_a%get_global_rows()
-
 
   allocate(irl(m),stat=info) 
   if (info /= psb_success_) then 
@@ -122,15 +124,23 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
-
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
@@ -150,8 +160,8 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
       !loop over all val's rows
 
       if (irl(i) > 0) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
+        ! this row belongs to me
+        ! copy i-th row of block val in x
         x(irl(i)) = x(irl(i)) +  val(i)
       end if
     enddo
@@ -178,7 +188,8 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
 
 end subroutine psb_sinsvi
 
-subroutine psb_sins_vect(m, irw, val, x, desc_a, info, dupl)
+
+subroutine psb_sins_vect(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_sins_vect
   use psi_mod
   implicit none
@@ -190,17 +201,19 @@ subroutine psb_sins_vect(m, irw, val, x, desc_a, info, dupl)
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
   integer(psb_ipk_), intent(in)                  :: irw(:)
-  real(psb_spk_), intent(in)           :: val(:)
+  real(psb_spk_), intent(in)        :: val(:)
   type(psb_s_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), optional, intent(in)        :: dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -263,9 +276,17 @@ subroutine psb_sins_vect(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
-  
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
   call x%ins(m,irl,val,dupl_,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
@@ -288,7 +309,7 @@ subroutine psb_sins_vect(m, irw, val, x, desc_a, info, dupl)
 
 end subroutine psb_sins_vect
 
-subroutine psb_sins_vect_r2(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_sins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_sins_vect_r2
   use psi_mod
   implicit none
@@ -300,17 +321,19 @@ subroutine psb_sins_vect_r2(m, irw, val, x, desc_a, info, dupl)
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
   integer(psb_ipk_), intent(in)                  :: irw(:)
-  real(psb_spk_), intent(in)           :: val(:,:)
+  real(psb_spk_), intent(in)        :: val(:,:)
   type(psb_s_vect_type), intent(inout) :: x(:)
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), optional, intent(in)        :: dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5), n
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -373,8 +396,18 @@ subroutine psb_sins_vect_r2(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
+  
   do i=1,n
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
     if (info == 0) call x(i)%ins(m,irl,val(:,i),dupl_,info) 
@@ -402,9 +435,10 @@ subroutine psb_sins_vect_r2(m, irw, val, x, desc_a, info, dupl)
 end subroutine psb_sins_vect_r2
 
 
+
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -433,23 +467,23 @@ end subroutine psb_sins_vect_r2
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_dinsi
+! Subroutine: psb_sinsi
 !    Insert dense submatrix to dense matrix. Note: the row indices in IRW 
 !    are assumed to be in global numbering and are converted on the fly. 
 !    Row indices not belonging to the current process are silently discarded.
 ! 
 ! Arguments: 
-!    m        - integer.        Number of rows of submatrix belonging to 
+!    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
 !    irw(:)   - integer          Row indices of rows of val (global numbering)
-!    val(:,:) - real                    The source dense submatrix.  
-!    x(:,:)   - real                    The destination dense matrix.  
+!    val(:,:) - real                 The source dense submatrix.  
+!    x(:,:)   - real                 The destination dense matrix.  
 !    desc_a   - type(psb_desc_type).         The communication descriptor.
 !    info     - integer.                       return code
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_sinsi
   use psi_mod
   implicit none
@@ -462,17 +496,19 @@ subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
   !....parameters...
   integer(psb_ipk_), intent(in)             ::  m
   integer(psb_ipk_), intent(in)             ::  irw(:)
-  real(psb_spk_), intent(in)      ::  val(:,:)
-  real(psb_spk_), intent(inout)   ::  x(:,:)
+  real(psb_spk_), intent(in) ::  val(:,:)
+  real(psb_spk_),intent(inout)     ::  x(:,:)
   type(psb_desc_type), intent(in) ::  desc_a
   integer(psb_ipk_), intent(out)            ::  info
   integer(psb_ipk_), optional, intent(in)   ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -480,14 +516,13 @@ subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_sinsi'
 
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_input_matrix_unassembled_
-    int_err(1) = desc_a%get_dectype()
-    call psb_errpush(info,name,int_err)
-    goto 9999
+  if (.not.psb_is_ok_desc(desc_a)) then
+    int_err(1)=3110
+    call psb_errpush(info,name)
+    return
   end if
 
-  ictxt = desc_a%get_context()
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -501,6 +536,11 @@ subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
     info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
+  else if (.not.psb_is_ok_desc(desc_a)) then
+    info = psb_err_input_matrix_unassembled_
+    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name,int_err)
     goto 9999
   else if (size(x, dim=1) < desc_a%get_local_rows()) then
@@ -530,9 +570,18 @@ subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
+  
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m

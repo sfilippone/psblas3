@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdall -- Allocates a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdall -- Allocates a communication descriptor">
+<TITLE>Data management routines</TITLE>
+<META NAME="description" CONTENT="Data management routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,407 +18,114 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node57.html">
-<LINK REL="previous" HREF="node55.html">
-<LINK REL="up" HREF="node55.html">
+<LINK REL="next" HREF="node84.html">
+<LINK REL="previous" HREF="node51.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node57.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html923"
+<A NAME="tex2html897"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html919"
-  HREF="node55.html">
+<A NAME="tex2html893"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html913"
+<A NAME="tex2html887"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html921"
+<A NAME="tex2html895"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html924"
-  HREF="node57.html">psb_cdins   Communication</A>
-<B> Up:</B> <A NAME="tex2html920"
-  HREF="node55.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html914"
-  HREF="node55.html">Data management routines</A>
- &nbsp; <B>  <A NAME="tex2html922"
+<B> Next:</B> <A NAME="tex2html898"
+  HREF="node57.html">psb_cdall   Allocates</A>
+<B> Up:</B> <A NAME="tex2html894"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html888"
+  HREF="node55.html">psb_scatter   Scatter</A>
+ &nbsp; <B>  <A NAME="tex2html896"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00071000000000000000">
-psb_cdall -- Allocates a communication descriptor</A>
-</H2>
+<H1><A NAME="SECTION00070000000000000000"></A>
+<A NAME="sec:toolsrout"></A>
+<BR>
+Data management routines
+</H1>
 
 <P>
-<PRE>
-call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
-call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
-call psb_cdall(icontxt, desc_a, info,nl=nl)
-call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
-</PRE>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
-This subroutine initializes the communication descriptor associated
-with an index space. One of the  optional arguments
-<code>parts</code>, <code>vg</code>, <code>vl</code>, <code>nl</code>  or <code>repl</code> 
-must be specified, thereby choosing
-the specific initialization strategy.
-<DL>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
-</DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>vg</STRONG></DT>
-<DD>Data allocation: each index <!-- MATH
- $i\in \{1\dots mg\}$
- -->
-<IMG
- WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
- ALT="$i\in \{1\dots mg\}$"> is allocated
-  to process <IMG
- WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img84.png"
- ALT="$vg(i)$">.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array. 
-</DD>
-<DT><STRONG>flag</STRONG></DT>
-<DD>Specifies whether entries in <IMG
- WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img85.png"
- ALT="$vg$"> are zero- or one-based.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <IMG
- WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img86.png"
- ALT="$0,1$">, default <IMG
- WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img87.png"
- ALT="$0$">.
-
-<P>
-</DD>
-<DT><STRONG>mg</STRONG></DT>
-<DD>the (global) number of rows of the problem.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. It is required if <code>parts</code> or
-<code>repl</code> is specified, it is optional if <code>vg</code> is specified. 
-</DD>
-<DT><STRONG>parts</STRONG></DT>
-<DD>the subroutine that defines the partitioning scheme.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Specified as: a subroutine. 
-</DD>
-<DT><STRONG>vl</STRONG></DT>
-<DD>Data allocation: the set of global indices 
-  <IMG
- WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img88.png"
- ALT="$vl(1:nl)$"> belonging to the calling process. 
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array. 
-</DD>
-<DT><STRONG>nl</STRONG></DT>
-<DD>Data allocation: in a generalized block-row distribution the
-  number of indices belonging to the current process. 
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. May be specified together with
-<code>vl</code>. 
-</DD>
-<DT><STRONG>repl</STRONG></DT>
-<DD>Data allocation: build a replicated index space (i.e. all
-  processes own all indices).
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: the logical value <code>.true.</code>
-</DD>
-<DT><STRONG>globalcheck</STRONG></DT>
-<DD>Data allocation: do global checks on the local
-  index lists <code>vl</code>
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a logical value, default: <code>.true.</code>
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
-</DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>One of the optional arguments  <code>parts</code>, <code>vg</code>,
-  <code>vl</code>, <code>nl</code>  or <code>repl</code> must be specified, thereby choosing the
-  initialization   strategy as follows:
-<DL>
-<DT><STRONG>parts</STRONG></DT>
-<DD>In this case we have a subroutine specifying the mapping
-  between global indices and process/local index pairs. If this
-  optional argument   is specified, then it is mandatory to 
-  specify the argument <code>mg</code> as well.  
-  The subroutine must conform to the following interface: 
-<PRE>
-  interface 
-     subroutine psb_parts(glob_index,mg,np,pv,nv)
-       integer, intent (in)  :: glob_index,np,mg
-       integer, intent (out) :: nv, pv(*)
-     end subroutine psb_parts
-  end interface
-</PRE>
-  The input arguments are:
-  <DL>
-<DT><STRONG>glob_index</STRONG></DT>
-<DD>The global index to be mapped;
-    
-</DD>
-<DT><STRONG>np</STRONG></DT>
-<DD>The number of processes in the mapping;
-    
-</DD>
-<DT><STRONG>mg</STRONG></DT>
-<DD>The total number of global rows in the mapping;
-  
-</DD>
-</DL>
-  The output arguments are:
-  <DL>
-<DT><STRONG>nv</STRONG></DT>
-<DD>The number of entries in <code>pv</code>;
-    
-</DD>
-<DT><STRONG>pv</STRONG></DT>
-<DD>A vector containing the indices of the processes to
-    which the global index should be assigend; each entry must satisfy
-    <!-- MATH
- $0\le pv(i) < np$
- -->
-<IMG
- WIDTH="106" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img89.png"
- ALT="$0\le pv(i) &lt; np$">; if <IMG
- WIDTH="51" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img90.png"
- ALT="$nv&gt;1$"> we have an index assigned to multiple
-    processes, i.e. we have an overlap among the subdomains.
-  
-</DD>
-</DL>
-</DD>
-<DT><STRONG>vg</STRONG></DT>
-<DD>In this case the association between an index and a process
-  is specified via an integer vector  <code>vg(1:mg)</code>; 
-  each index <!-- MATH
- $i \in \{1\dots mg\}$
- -->
-<IMG
- WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
- ALT="$i\in \{1\dots mg\}$"> is assigned to process <IMG
- WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img84.png"
- ALT="$vg(i)$">. 
-  The vector <code>vg</code> must be identical on all
-  calling processes; its entries may have the ranges <IMG
- WIDTH="93" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img91.png"
- ALT="$(0\dots np-1)$">
-  or <IMG
- WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img92.png"
- ALT="$(1\dots np)$"> according to the value of <code>flag</code>.  
-  The size <IMG
- WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img93.png"
- ALT="$mg$"> may be  specified via the optional argument <code>mg</code>;
-  the default is to use the entire vector <code>vg</code>, thus having
-  <code>mg=size(vg)</code>. 
-</DD>
-<DT><STRONG>vl</STRONG></DT>
-<DD>In this case we are specifying the list of indices
-  <code>vl(1:nl)</code> assigned   to the current process; thus, the global
-  problem size <IMG
- WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img93.png"
- ALT="$mg$"> is given by 
-  the range of the aggregate of the individual vectors <code>vl</code> specified
-  in the calling processes. The size may be specified via the optional
-  argument <code>nl</code>; the default is to use the entire vector  <code>vl</code>, thus having
-  <code>nl=size(vl)</code>.  
-  If <code>globalcheck=.true.</code>   the subroutine will check how many
-  times  each entry in the global   index   space <IMG
- WIDTH="71" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img94.png"
- ALT="$(1\dots mg)$"> is
-  specified in the input lists   <code>vl</code>, thus allowing for the
-  presence of overlap in the input,   and checking for ``orphan''
-  indices.    If <code>globalcheck=.false.</code>, the subroutine will not
-  check for   overlap, and may be significantly faster, but   the user
-  is implicitly guaranteeing that there are neither orphan   nor
-  overlap indices.  
-</DD>
-<DT><STRONG>nl</STRONG></DT>
-<DD>If this argument is specified alone (i.e. without <code>vl</code>)
-  the  result is  a generalized row-block   distribution in which each
-  process <IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img95.png"
- ALT="$I$"> gets assigned a consecutive   chunk of <IMG
- WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img96.png"
- ALT="$N_I=nl$"> global
-  indices. 
-</DD>
-<DT><STRONG>repl</STRONG></DT>
-<DD>This arguments specifies to replicate all indices on
-  all processes. This is a special purpose data allocation that is
-  useful in the construction of some multilevel preconditioners.
-</DD>
-</DL>
-</LI>
-<LI>On exit from this routine the descriptor is in the build
-  state. 
-</LI>
-<LI>Calling the routine with <code>vg</code> or <code>parts</code> implies that
-  every process will scan the entire index space to figure out the
-  local indices.
-</LI>
-<LI>Overlapped indices are possible with both <code>parts</code> and
-  <code>vl</code> invocations.
-</LI>
-<LI>When the subroutine is invoked with <code>vl</code> in
-  conjunction with <code>globalcheck=.true.</code>, it will perform a scan
-  of the index   space to search for overlap or orphan indices.
-</LI>
-<LI>When the subroutine is invoked with <code>vl</code> in
-  conjunction with <code>globalcheck=.false.</code>, no index space scan
-  will take place. Thus it is the responsibility of the user to make
-  sure that the indices specified in <code>vl</code> have neither orphans nor
-  overlaps; if this assumption fails, results will be 
-  unpredictable. 
-</LI>
-<LI>Orphan and overlap indices are
-  impossible by construction when the subroutine is invoked with
-  <code>nl</code> (alone),  or <code>vg</code>.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html923"
-  HREF="node57.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html919"
-  HREF="node55.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html913"
-  HREF="node55.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html921"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html924"
-  HREF="node57.html">psb_cdins   Communication</A>
-<B> Up:</B> <A NAME="tex2html920"
-  HREF="node55.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html914"
-  HREF="node55.html">Data management routines</A>
- &nbsp; <B>  <A NAME="tex2html922"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<UL>
+<LI><A NAME="tex2html899"
+  HREF="node57.html">psb_cdall -- Allocates a communication descriptor</A>
+<LI><A NAME="tex2html900"
+  HREF="node58.html">psb_cdins -- Communication descriptor insert routine</A>
+<LI><A NAME="tex2html901"
+  HREF="node59.html">psb_cdasb -- Communication descriptor assembly routine</A>
+<LI><A NAME="tex2html902"
+  HREF="node60.html">psb_cdcpy -- Copies a communication descriptor</A>
+<LI><A NAME="tex2html903"
+  HREF="node61.html">psb_cdfree -- Frees a communication descriptor</A>
+<LI><A NAME="tex2html904"
+  HREF="node62.html">psb_cdbldext -- Build an extended  communication
+  descriptor</A>
+<LI><A NAME="tex2html905"
+  HREF="node63.html">psb_spall -- Allocates a sparse matrix</A>
+<LI><A NAME="tex2html906"
+  HREF="node64.html">psb_spins -- Insert a cloud of elements into a sparse
+  matrix</A>
+<LI><A NAME="tex2html907"
+  HREF="node65.html">psb_spasb -- Sparse matrix assembly routine</A>
+<LI><A NAME="tex2html908"
+  HREF="node66.html">psb_spfree -- Frees a sparse matrix</A>
+<LI><A NAME="tex2html909"
+  HREF="node67.html">psb_sprn -- Reinit sparse matrix structure for psblas
+  routines.</A>
+<LI><A NAME="tex2html910"
+  HREF="node68.html">psb_geall -- Allocates a dense matrix</A>
+<LI><A NAME="tex2html911"
+  HREF="node69.html">psb_geins -- Dense matrix insertion routine</A>
+<LI><A NAME="tex2html912"
+  HREF="node70.html">psb_geasb -- Assembly a dense matrix</A>
+<LI><A NAME="tex2html913"
+  HREF="node71.html">psb_gefree -- Frees a dense matrix</A>
+<LI><A NAME="tex2html914"
+  HREF="node72.html">psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
+<LI><A NAME="tex2html915"
+  HREF="node73.html">psb_glob_to_loc -- Global to local indices
+  convertion</A>
+<LI><A NAME="tex2html916"
+  HREF="node74.html">psb_loc_to_glob -- Local to global indices
+  conversion</A>
+<LI><A NAME="tex2html917"
+  HREF="node75.html">psb_is_owned </A>
+<LI><A NAME="tex2html918"
+  HREF="node76.html">psb_owned_index </A>
+<LI><A NAME="tex2html919"
+  HREF="node77.html">psb_is_local </A>
+<LI><A NAME="tex2html920"
+  HREF="node78.html">psb_local_index </A>
+<LI><A NAME="tex2html921"
+  HREF="node79.html">psb_get_boundary -- Extract list of boundary elements</A>
+<LI><A NAME="tex2html922"
+  HREF="node80.html">psb_get_overlap -- Extract list of overlap elements</A>
+<LI><A NAME="tex2html923"
+  HREF="node81.html">psb_sp_getrow -- Extract row(s) from a sparse matrix</A>
+<LI><A NAME="tex2html924"
+  HREF="node82.html">psb_sizeof -- Memory occupation</A>
+<LI><A NAME="tex2html925"
+  HREF="node83.html">Sorting utilities</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
 
 </BODY>
 </HTML>

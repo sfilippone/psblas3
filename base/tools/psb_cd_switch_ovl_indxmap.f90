@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -79,7 +79,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
   do i=1,n_col
     vl(i) = i
   end do
-  call desc%indxmap%l2g(vl(1:n_col),info)
+  call desc%indxmap%l2gip(vl(1:n_col),info)
 
   if (info /= psb_success_) then
     ierr(1)=info
@@ -101,7 +101,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
        & call desc%indxmap%init(iictxt,vl(1:n_row),info)
   if (info == psb_success_) call psb_cd_set_bld(desc,info)
   if (info == psb_success_) &
-       & call  desc%indxmap%g2l_ins(vl(n_row+1:n_col),info)
+       & call  desc%indxmap%g2lip_ins(vl(n_row+1:n_col),info)
   if (info /= psb_success_) then
     ierr(1) = info
     call psb_errpush(psb_err_from_subroutine_ai_,name,&

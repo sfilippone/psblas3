@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html692"
+<A NAME="tex2html693"
   HREF="node40.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html688"
+<A NAME="tex2html689"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html682"
+<A NAME="tex2html683"
   HREF="node38.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html690"
+<A NAME="tex2html691"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html693"
+<B> Next:</B> <A NAME="tex2html694"
   HREF="node40.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html689"
+<B> Up:</B> <A NAME="tex2html690"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html683"
+<B> Previous:</B> <A NAME="tex2html684"
   HREF="node38.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html691"
+ &nbsp; <B>  <A NAME="tex2html692"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -57,20 +57,20 @@ psb_gedot -- Dot Product</A>
 
 <P>
 This function computes dot product between two vectors <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> and
 <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$">.
 <BR>
 If <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> and <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$"> are real vectors
 it computes dot-product as:
 <BR><P></P>
@@ -82,18 +82,18 @@ dot \leftarrow x^T y
  -->
 
 <IMG
- WIDTH="73" HEIGHT="27" BORDER="0"
- SRC="img29.png"
+ WIDTH="74" HEIGHT="27" BORDER="0"
+ SRC="img24.png"
  ALT="\begin{displaymath}dot \leftarrow x^T y\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 Else if <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> and <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$"> are complex vectors then it computes dot-product as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -104,8 +104,8 @@ dot \leftarrow x^H y
  -->
 
 <IMG
- WIDTH="76" HEIGHT="27" BORDER="0"
- SRC="img30.png"
+ WIDTH="75" HEIGHT="27" BORDER="0"
+ SRC="img25.png"
  ALT="\begin{displaymath}dot \leftarrow x^H y\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -116,7 +116,7 @@ dot \leftarrow x^H y
 psb_gedot(x, y, desc_a, info)
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1534"></A>
+<DIV ALIGN="CENTER"><A NAME="1555"></A>
 <TABLE>
 <CAPTION><STRONG>Table 2:</STRONG>
 Data types</CAPTION>
@@ -124,14 +124,14 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img31.png"
- ALT="$dot$">, <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
- ALT="$x$">, <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="25" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img26.png"
+ ALT="$dot$">, <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">, <IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$"></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
@@ -165,8 +165,8 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">.
 <BR>
 Scope: <B>local</B> 
@@ -178,18 +178,18 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> must be the same of <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$">. 
 <BR>
 Scope: <B>local</B> 
@@ -201,11 +201,11 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$"> must be the same of <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$">. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -226,11 +226,11 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
 <DD>is the dot product of subvectors <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img25.png"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
  ALT="$x$"> and <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img26.png"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
  ALT="$y$">.
 <BR>
 Scope: <B>global</B> 
@@ -253,26 +253,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html692"
+<A NAME="tex2html693"
   HREF="node40.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html688"
+<A NAME="tex2html689"
   HREF="node37.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html682"
+<A NAME="tex2html683"
   HREF="node38.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html690"
+<A NAME="tex2html691"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html693"
+<B> Next:</B> <A NAME="tex2html694"
   HREF="node40.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html689"
+<B> Up:</B> <A NAME="tex2html690"
   HREF="node37.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html683"
+<B> Previous:</B> <A NAME="tex2html684"
   HREF="node38.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html691"
+ &nbsp; <B>  <A NAME="tex2html692"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

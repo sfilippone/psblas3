@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -100,7 +100,11 @@ contains
     integer(psb_ipk_) :: info
 
     if (present(mold)) then 
+#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
+#else
+      call mold%mold(x%v,info)
+#endif
     else
       allocate(psb_z_base_vect_type :: x%v,stat=info)
     endif
@@ -117,7 +121,11 @@ contains
     integer(psb_ipk_) :: info
 
     if (present(mold)) then 
+#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
+#else
+      call mold%mold(x%v,info)
+#endif
     else
       allocate(psb_z_base_vect_type :: x%v,stat=info)
     endif
@@ -411,7 +419,11 @@ contains
     integer(psb_ipk_), intent(out)                :: info
     
     if (present(mold)) then 
+#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
+#else
+      call mold%mold(x%v,info)
+#endif
     else
       allocate(psb_z_base_vect_type :: x%v,stat=info)
     endif
@@ -531,7 +543,11 @@ contains
     complex(psb_dpk_), allocatable          :: invect(:)
     integer(psb_ipk_) :: info
 
-    allocate(tmp,stat=info,mold=mold)
+#ifdef HAVE_MOLD
+      allocate(tmp,stat=info,mold=mold)
+#else
+      call mold%mold(tmp,info)
+#endif
     call x%v%sync()
     if (info == psb_success_) call tmp%bld(x%v%v)
     call x%v%free(info)

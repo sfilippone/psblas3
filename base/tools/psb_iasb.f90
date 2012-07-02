@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -136,7 +136,7 @@ end subroutine psb_iasb
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -251,3 +251,82 @@ subroutine psb_iasbv(x, desc_a, info)
   
 end subroutine psb_iasbv
 
+
+subroutine psb_iasb_vect(x, desc_a, info, mold, scratch)
+  use psb_base_mod, psb_protect_name => psb_iasb_vect
+  implicit none
+
+  type(psb_desc_type), intent(in)      ::  desc_a
+  type(psb_i_vect_type), intent(inout) ::  x
+  integer(psb_ipk_), intent(out)                 ::  info
+  class(psb_i_base_vect_type), intent(in), optional :: mold
+  logical, intent(in), optional        :: scratch
+
+  ! local variables
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  logical :: scratch_
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
+
+  info = psb_success_
+  if (psb_errstatus_fatal()) return 
+
+  int_err(1) = 0
+  name = 'psb_igeasb_v'
+
+  ictxt       = desc_a%get_context()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  scratch_ = .false.
+  if (present(scratch)) scratch_ = scratch
+  call psb_info(ictxt, me, np)
+
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  else   if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+
+  if (scratch_) then 
+    call x%free(info)
+    call x%bld(ncol,mold=mold)
+  else
+    call x%asb(ncol,info)
+    ! ..update halo elements..
+    call psb_halo(x,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_halo')
+      goto 9999
+    end if
+    if (present(mold)) then 
+      call x%cnv(mold)
+    end if
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_iasb_vect

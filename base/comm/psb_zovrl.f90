@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -204,7 +204,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
 end subroutine psb_zovrlm
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -242,7 +242,7 @@ end subroutine psb_zovrlm
 !   x(:)        -  complex                   The local part of the dense vector.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
-!   work        -  real(optional).           A work area.
+!   work        -  complex(optional).           A work area.
 !   update      -  integer(optional).        Type of update:
 !                                            psb_none_   do nothing
 !                                            psb_sum_    sum of overlaps

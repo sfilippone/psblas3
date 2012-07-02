@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -167,7 +167,7 @@ Module psb_s_tools_mod
 
 
   interface psb_geins
-    subroutine psb_sinsi(m,irw,val, x, desc_a,info,dupl)
+    subroutine psb_sinsi(m,irw,val, x, desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
@@ -178,8 +178,9 @@ Module psb_s_tools_mod
       real(psb_spk_), intent(in)  ::  val(:,:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_sinsi
-    subroutine psb_sinsvi(m, irw,val, x,desc_a,info,dupl)
+    subroutine psb_sinsvi(m, irw,val, x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
@@ -190,8 +191,9 @@ Module psb_s_tools_mod
       real(psb_spk_), intent(in)  ::  val(:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_sinsvi
-    subroutine psb_sins_vect(m,irw,val,x,desc_a,info,dupl)
+    subroutine psb_sins_vect(m,irw,val,x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
@@ -202,8 +204,9 @@ Module psb_s_tools_mod
       real(psb_spk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_sins_vect
-    subroutine psb_sins_vect_r2(m,irw,val,x,desc_a,info,dupl)
+    subroutine psb_sins_vect_r2(m,irw,val,x,desc_a,info,dupl,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
@@ -214,6 +217,7 @@ Module psb_s_tools_mod
       real(psb_spk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
     end subroutine psb_sins_vect_r2
   end interface
 
@@ -270,7 +274,7 @@ Module psb_s_tools_mod
 
 
   interface psb_spins
-    subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
+    subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
@@ -280,6 +284,7 @@ Module psb_s_tools_mod
       real(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
+      logical, intent(in), optional        :: local
     end subroutine psb_sspins
     subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &

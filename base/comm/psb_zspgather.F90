@@ -1,8 +1,41 @@
+!!$ 
+!!$              Parallel Sparse BLAS  version 3.0
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+! File:  psb_zspgather.f90
 subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
   use psb_descriptor_type
   use psb_error_mod
-  use psb_mat_mod
   use psb_penv_mod
+  use psb_mat_mod
+  use psb_tools_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -20,7 +53,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   type(psb_z_coo_sparse_mat)      :: loc_coo, glob_coo
   integer(psb_mpik_) :: ictxt,np,me, icomm, minfo
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
-  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k
+  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
   integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
@@ -59,9 +92,18 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       call psb_errpush(info,name,i_err=ierr,a_err='integer')
       goto 9999      
     end if
-    call loca%mv_to(loc_coo)
+
+    
+    if (keeploc_) then
+      call loca%cp_to(loc_coo)
+    else
+      call loca%mv_to(loc_coo)
+    end if
+    nzl = loc_coo%get_nzeros()
+    call psb_loc_to_glob(loc_coo%ia(1:nzl),desc_a,info,iact='I')
+    call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
-    nzbr(me+1) = loc_coo%get_nzeros()
+    nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
     if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
@@ -86,11 +128,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       goto 9999
     end if
     
-    if (keeploc_) then
-      call loca%mv_from(loc_coo)
-    else
-      call loc_coo%free()
-    end if
+    call loc_coo%free()
     call glob_coo%set_nzeros(nzg)
     if (present(dupl)) call glob_coo%set_dupl(dupl)
     call globa%mv_from(glob_coo)

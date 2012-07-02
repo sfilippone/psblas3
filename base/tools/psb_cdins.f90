@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -162,22 +162,25 @@ end subroutine psb_cdinsrc
 ! Arguments: 
 !    nz       - integer.                       The number of points to insert.
 !    ja(:)    - integer                        The column indices of the points.
-!    desc     - type(psb_desc_type).         The communication descriptor 
+!    desc     - type(psb_desc_type).           The communication descriptor 
 !    info     - integer.                       Return code.
-!    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
+!    jla(:)   - integer(psb_ipk_), optional    The col indices in local numbering
 !    mask(:)  - logical, optional, target
+!    lidx(:)  - integer(psb_ipk_), optional    User-defined local col indices
 !
-subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
+subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   use psb_base_mod, psb_protect_name => psb_cdinsc
   use psi_mod
   implicit none
 
   !....PARAMETERS...
-  Type(psb_desc_type), intent(inout) :: desc
-  integer(psb_ipk_), intent(in)                :: nz,ja(:)
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_), optional, intent(out)     :: jla(:)
-  logical, optional, target, intent(in) :: mask(:) 
+  Type(psb_desc_type), intent(inout)       :: desc
+  integer(psb_ipk_), intent(in)            :: nz,ja(:)
+  integer(psb_ipk_), intent(out)           :: info
+  integer(psb_ipk_), optional, intent(out) :: jla(:)
+  logical, optional, target, intent(in)    :: mask(:) 
+  integer(psb_ipk_), intent(in), optional  :: lidx(:)
+
 
   !LOCALS.....
 
@@ -230,6 +233,13 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
       goto 9999
     end if
   end if
+  if (present(lidx)) then 
+    if (size(lidx) < nz) then 
+      info = 1111
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
   if (present(mask)) then 
     if (size(mask) < nz) then 
       info = 1111
@@ -244,7 +254,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
   end if
 
   if (present(jla)) then 
-    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask_)
+    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask_,lidx=lidx)
   else
     allocate(jla_(nz),stat=info)
     if (info /= psb_success_) then 
@@ -252,7 +262,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
       call psb_errpush(info,name)
       goto 9999
     end if
-    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask_)
+    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask_,lidx=lidx)
     deallocate(jla_)
   end if
 

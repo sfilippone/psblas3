@@ -85,7 +85,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \addcontentsline{toc}{subsection}{psb\_precbld}
 
 \begin{verbatim}
-call psb_precbld(a, desc_a, prec, info)
+call psb_precbld(a, desc_a, prec, info,amold,vmold)
 \end{verbatim}
 
 \begin{description}
@@ -111,6 +111,17 @@ Specified as: a communication descriptor data structure \descdata.
 %% Type: {\bf optional}\\
 %% Intent: {\bf in}.\\
 %% Specified as: a character.
+\item[amold] The desired dynamic type for the internal matrix storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \spbasedata. 
+\item[vmold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata. 
+
 \end{description}
 
 \begin{description}
@@ -149,7 +160,7 @@ Specified as: a preconditioner data structure \precdata.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a double precision array.
+Specified as:  a rank one array or an object of type \vdata. 
 \item[desc\_a] the problem communication descriptor.
 Scope: {\bf local} \\
 Type: {\bf required}\\
@@ -173,7 +184,7 @@ Specified as: a double precision array.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
-Specified as: a double precision array.
+Specified as:  a rank one array or an object of type \vdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\

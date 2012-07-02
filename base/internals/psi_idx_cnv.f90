@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -112,7 +112,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
     end if
   endif
 
-  call desc%indxmap%g2l(idxin(1:nv),info,mask=mask,owned=owned)
+  call desc%indxmap%g2lip(idxin(1:nv),info,mask=mask,owned=owned)
 
   if (info /= 0) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='g2l') 
@@ -136,7 +136,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
 end subroutine psi_idx_cnv1
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -260,7 +260,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
 end subroutine psi_idx_cnv2
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 

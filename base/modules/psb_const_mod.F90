@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -45,22 +45,29 @@ module psb_const_mod
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   ! This is always a 4-byte integer, for MPI-related stuff
-  integer, parameter  :: mpindig=8
-  integer, parameter  :: psb_mpik_ = selected_int_kind(mpindig)
+  integer, parameter  :: psb_mpik_ = kind(1)
   !
   ! These must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
   ! and MPI_REAL
   !
-  integer(psb_ipk_), parameter  :: psb_dpk_ = kind(1.d0)
-  integer(psb_ipk_), parameter  :: psb_spk_ = kind(1.e0)
-  integer(psb_ipk_), save       :: psb_sizeof_dp, psb_sizeof_sp
-  integer(psb_ipk_), save       :: psb_sizeof_int, psb_sizeof_long_int
+  integer(psb_mpik_), parameter  :: psb_spk_p_ = 6
+  integer(psb_mpik_), parameter  :: psb_spk_r_ = 37
+  integer(psb_mpik_), parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_,psb_spk_r_)
+  integer(psb_mpik_), parameter  :: psb_dpk_p_ = 15
+  integer(psb_mpik_), parameter  :: psb_dpk_r_ = 307
+  integer(psb_mpik_), parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
+  integer(psb_ipk_), save        :: psb_sizeof_dp, psb_sizeof_sp
+  integer(psb_ipk_), save        :: psb_sizeof_int, psb_sizeof_long_int
   !
   ! Integer type identifiers for MPI operations. 
   !
   integer(psb_mpik_), save      :: psb_mpi_ipk_integer
   integer(psb_mpik_), save      :: psb_mpi_def_integer
   integer(psb_mpik_), save      :: psb_mpi_lng_integer
+  integer(psb_mpik_), save      :: psb_mpi_r_spk_
+  integer(psb_mpik_), save      :: psb_mpi_r_dpk_
+  integer(psb_mpik_), save      :: psb_mpi_c_spk_
+  integer(psb_mpik_), save      :: psb_mpi_c_dpk_
   ! 
   ! Version
   !
@@ -75,14 +82,14 @@ module psb_const_mod
   integer(psb_ipk_), parameter   :: izero=0, ione=1
   integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
   integer(psb_ipk_), parameter   :: psb_root_=0
-  real(psb_spk_), parameter      :: szero=0.e0, sone=1.e0
-  real(psb_dpk_), parameter      :: dzero=0.d0, done=1.d0
-  complex(psb_spk_), parameter   :: czero=(0.e0,0.0e0)
-  complex(psb_spk_), parameter   :: cone=(1.e0,0.0e0)
-  complex(psb_dpk_), parameter   :: zzero=(0.d0,0.0d0)
-  complex(psb_dpk_), parameter   :: zone=(1.d0,0.0d0)
-  real(psb_dpk_), parameter      :: d_epstol=1.1d-16 ! Unit roundoff.  
-  real(psb_spk_), parameter      :: s_epstol=5.e-8   ! Is this right?
+  real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_
+  real(psb_dpk_), parameter      :: dzero=0.0_psb_dpk_, done=1.0_psb_dpk_
+  complex(psb_spk_), parameter   :: czero=(0.0_psb_spk_,0.0_psb_spk_)
+  complex(psb_spk_), parameter   :: cone=(1.0_psb_spk_,0.0_psb_spk_)
+  complex(psb_dpk_), parameter   :: zzero=(0.0_psb_dpk_,0.0_psb_dpk_)
+  complex(psb_dpk_), parameter   :: zone=(1.0_psb_dpk_,0.0_psb_dpk_)
+  real(psb_dpk_), parameter      :: d_epstol=1.1e-16_psb_dpk_ ! Unit roundoff.  
+  real(psb_spk_), parameter      :: s_epstol=5.e-8_psb_spk_   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
   logical, parameter             :: psb_i_is_complex_ = .false.
   logical, parameter             :: psb_s_is_complex_ = .false.

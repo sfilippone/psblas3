@@ -1,6 +1,6 @@
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -45,7 +45,7 @@
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zinsvi
   use psi_mod
   implicit none
@@ -63,12 +63,14 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in)  ::  desc_a
   integer(psb_ipk_), intent(out)             ::  info
   integer(psb_ipk_), optional, intent(in)    ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -122,15 +124,23 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
     dupl_ = psb_dupl_ovwrt_
   endif
-  
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
@@ -150,8 +160,8 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
       !loop over all val's rows
 
       if (irl(i) > 0) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
+        ! this row belongs to me
+        ! copy i-th row of block val in x
         x(irl(i)) = x(irl(i)) +  val(i)
       end if
     enddo
@@ -178,7 +188,8 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
 
 end subroutine psb_zinsvi
 
-subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl)
+
+subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zins_vect
   use psi_mod
   implicit none
@@ -195,12 +206,14 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), optional, intent(in)        :: dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -263,9 +276,17 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
-  
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
   call x%ins(m,irl,val,dupl_,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
@@ -288,7 +309,7 @@ subroutine psb_zins_vect(m, irw, val, x, desc_a, info, dupl)
 
 end subroutine psb_zins_vect
 
-subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zins_vect_r2
   use psi_mod
   implicit none
@@ -305,12 +326,14 @@ subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), optional, intent(in)        :: dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5), n
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)      :: name
 
   if (psb_errstatus_fatal()) return 
@@ -373,8 +396,18 @@ subroutine psb_zins_vect_r2(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
+  
   do i=1,n
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
     if (info == 0) call x(i)%ins(m,irl,val(:,i),dupl_,info) 
@@ -405,7 +438,7 @@ end subroutine psb_zins_vect_r2
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.0
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -450,7 +483,7 @@ end subroutine psb_zins_vect_r2
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
-subroutine psb_zinsi(m, irw, val, x, desc_a, info, dupl)
+subroutine psb_zinsi(m, irw, val, x, desc_a, info, dupl,local)
   use psb_base_mod, psb_protect_name => psb_zinsi
   use psi_mod
   implicit none
@@ -468,12 +501,14 @@ subroutine psb_zinsi(m, irw, val, x, desc_a, info, dupl)
   type(psb_desc_type), intent(in) ::  desc_a
   integer(psb_ipk_), intent(out)            ::  info
   integer(psb_ipk_), optional, intent(in)   ::  dupl
+  logical, intent(in), optional        :: local
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -535,9 +570,18 @@ subroutine psb_zinsi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
-  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
 
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+  end if
+  
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
