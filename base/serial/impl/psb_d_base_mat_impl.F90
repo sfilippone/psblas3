@@ -1483,7 +1483,7 @@ subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans)
   call x%sync()
   call y%sync()
   call a%csmm(alpha,x%v,beta,y%v,info,trans)
-  
+  call y%set_host()
 end subroutine psb_d_base_vect_mv
 
 subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
