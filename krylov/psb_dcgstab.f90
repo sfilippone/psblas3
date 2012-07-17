@@ -129,7 +129,7 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   character(len=*), parameter :: methdname='BiCGStab'
 
   info = psb_success_
-  name = 'psb_scgstab'
+  name = 'psb_dcgstab'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()

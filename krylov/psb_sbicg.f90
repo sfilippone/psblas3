@@ -131,7 +131,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=*), parameter :: methdname='BiCG'
 
   info = psb_success_
-  name = 'psb_bicg'
+  name = 'psb_sbicg'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
