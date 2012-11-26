@@ -45,17 +45,15 @@ subroutine psb_s_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
       if (ipy > ny) exit
       if (ix(ipx) == iy(ipy)) then 
         acc = beta*y(ipy) + alpha*x(ipx) 
-        if (acc /= szero) then 
-          nz = nz + 1 
-          if (nz > isz) then 
-            info = -1 
-            return
-          endif
-          iz(nz) = ix(ipx) 
-          z(nz)  = acc
-          ipx    = ipx + 1
-          ipy    = ipy + 1
-        end if
+        nz = nz + 1 
+        if (nz > isz) then 
+          info = -1 
+          return
+        endif
+        iz(nz) = ix(ipx) 
+        z(nz)  = acc
+        ipx    = ipx + 1
+        ipy    = ipy + 1
       else 
         nz = nz + 1 
         if (nz > isz) then 
@@ -175,17 +173,15 @@ subroutine psb_d_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
       if (ipy > ny) exit
       if (ix(ipx) == iy(ipy)) then 
         acc = beta*y(ipy) + alpha*x(ipx) 
-        if (acc /= dzero) then 
-          nz = nz + 1 
-          if (nz > isz) then 
-            info = -1 
-            return
-          endif
-          iz(nz) = ix(ipx) 
-          z(nz)  = acc
-          ipx    = ipx + 1
-          ipy    = ipy + 1
-        end if
+        nz = nz + 1 
+        if (nz > isz) then 
+          info = -1 
+          return
+        endif
+        iz(nz) = ix(ipx) 
+        z(nz)  = acc
+        ipx    = ipx + 1
+        ipy    = ipy + 1
       else 
         nz = nz + 1 
         if (nz > isz) then 
@@ -321,17 +317,15 @@ subroutine psb_c_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
       if (ipy > ny) exit
       if (ix(ipx) == iy(ipy)) then 
         acc = beta*y(ipy) + alpha*x(ipx) 
-        if (acc /= czero) then 
-          nz = nz + 1 
-          if (nz > isz) then 
-            info = -1 
-            return
-          endif
-          iz(nz) = ix(ipx) 
-          z(nz)  = acc
-          ipx    = ipx + 1
-          ipy    = ipy + 1
-        end if
+        nz = nz + 1 
+        if (nz > isz) then 
+          info = -1 
+          return
+        endif
+        iz(nz) = ix(ipx) 
+        z(nz)  = acc
+        ipx    = ipx + 1
+        ipy    = ipy + 1
       else 
         nz = nz + 1 
         if (nz > isz) then 
@@ -451,17 +445,15 @@ subroutine psb_z_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
       if (ipy > ny) exit
       if (ix(ipx) == iy(ipy)) then 
         acc = beta*y(ipy) + alpha*x(ipx) 
-        if (acc /= zzero) then 
-          nz = nz + 1 
-          if (nz > isz) then 
-            info = -1 
-            return
-          endif
-          iz(nz) = ix(ipx) 
-          z(nz)  = acc
-          ipx    = ipx + 1
-          ipy    = ipy + 1
-        end if
+        nz = nz + 1 
+        if (nz > isz) then 
+          info = -1 
+          return
+        endif
+        iz(nz) = ix(ipx) 
+        z(nz)  = acc
+        ipx    = ipx + 1
+        ipy    = ipy + 1
       else 
         nz = nz + 1 
         if (nz > isz) then 
