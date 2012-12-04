@@ -1,5 +1,16 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+
+2012/12/04: Rename specifics for GLOB_TO_LOC/LOC_TO_GLOB
+	
+2012/11/26: Infinite loop bug in sparse AXPBY.
+	
+2012/10/24: Split serial_mod to improve build time. 	
+	
+2012/07/12: Cleanup Krylov routines. 	
+	
+2012/06/26: Fixed bug in prec%apply with 'C', and usage of rotations in
+	    GMRES. 	
 2012/06/08: Fix silly bug in GPS renumbering.
 	
 2012/05/25: Fixed docs for release 3.0
