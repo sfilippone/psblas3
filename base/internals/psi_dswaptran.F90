@@ -320,8 +320,8 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & mpi_double_precision,&
-         & sndbuf,sdsz,bsdidx,mpi_double_precision,icomm,iret)
+         & psb_mpi_r_dpk_,&
+         & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -378,7 +378,7 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_double_swap_tag
         call mpi_irecv(sndbuf(snd_pt),n*nesd,&
-             & mpi_double_precision,prcid(i),&
+             & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -402,11 +402,11 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
         p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),n*nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
@@ -824,8 +824,8 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & mpi_double_precision,&
-         & sndbuf,sdsz,bsdidx,mpi_double_precision,icomm,iret)
+         & psb_mpi_r_dpk_,&
+         & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -882,7 +882,7 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_double_swap_tag
         call mpi_irecv(sndbuf(snd_pt),nesd,&
-             & mpi_double_precision,prcid(i),&
+             & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -906,11 +906,11 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
         p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
         end if
 
@@ -1273,8 +1273,8 @@ subroutine psi_dtranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & mpi_double_precision,&
-         & sndbuf,sdsz,bsdidx,mpi_double_precision,icomm,iret)
+         & psb_mpi_r_dpk_,&
+         & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -1331,7 +1331,7 @@ subroutine psi_dtranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_double_swap_tag
         call mpi_irecv(sndbuf(snd_pt),nesd,&
-             & mpi_double_precision,prcid(i),&
+             & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -1355,11 +1355,11 @@ subroutine psi_dtranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
         p2ptag = psb_double_swap_tag
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),nerv,&
-               & mpi_double_precision,prcid(i),&
+               & psb_mpi_r_dpk_,prcid(i),&
                & p2ptag, icomm,iret)
         end if
 

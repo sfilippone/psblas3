@@ -272,8 +272,8 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
 
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_real,&
-       & acoo%val,rvsz,brvindx,mpi_real,icomm,info)
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_spk_,&
+       & acoo%val,rvsz,brvindx,psb_mpi_r_spk_,icomm,info)
   call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
        & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
   call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&

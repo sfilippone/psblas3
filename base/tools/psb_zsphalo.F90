@@ -272,8 +272,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
 
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_double_complex,&
-       & acoo%val,rvsz,brvindx,mpi_double_complex,icomm,info)
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_c_dpk_,&
+       & acoo%val,rvsz,brvindx,psb_mpi_c_dpk_,icomm,info)
   call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
        & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
   call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&

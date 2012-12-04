@@ -208,8 +208,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
       ! scatter !!!
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & mpi_double_precision,locx(1,jlocx+c-1),nrow,&
-           & mpi_double_precision,rootrank,icomm,info)
+           & psb_mpi_r_dpk_,locx(1,jlocx+c-1),nrow,&
+           & psb_mpi_r_dpk_,rootrank,icomm,info)
 
     end do
 
@@ -417,8 +417,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & mpi_double_precision,locx,nrow,&
-         & mpi_double_precision,rootrank,icomm,info)
+         & psb_mpi_r_dpk_,locx,nrow,&
+         & psb_mpi_r_dpk_,rootrank,icomm,info)
 
     if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
   end if

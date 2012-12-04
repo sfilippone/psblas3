@@ -1067,7 +1067,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_real,src,psb_real_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_r_spk_,src,psb_real_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_srcvs
@@ -1090,7 +1090,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_real,src,psb_real_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_r_spk_,src,psb_real_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1121,13 +1121,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_real,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_r_spk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_real_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_real,src,psb_real_tag,ictxt,status,info)
+      call mpi_recv(dat,size(dat),psb_mpi_r_spk_,src,psb_real_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
       write(psb_err_unit,*) 'Error in psb_recv', info
@@ -1154,7 +1154,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_double_precision,src,psb_double_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_drcvs
@@ -1177,7 +1177,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_double_precision,src,psb_double_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1208,13 +1208,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_double_precision,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_r_dpk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_double_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_double_precision,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,&
            & psb_double_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1242,7 +1242,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_complex,src,psb_complex_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_crcvs
@@ -1265,7 +1265,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_complex,src,psb_complex_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1296,13 +1296,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_complex,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_c_spk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_complex_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_complex,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,&
            & psb_complex_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1330,7 +1330,7 @@ contains
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,mpi_double_complex,src,psb_dcomplex_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_c_dpk_,src,psb_dcomplex_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_zrcvs
@@ -1353,7 +1353,7 @@ contains
     integer(psb_mpik_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),mpi_double_complex,src,psb_dcomplex_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_c_dpk_,src,psb_dcomplex_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1384,13 +1384,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,mpi_double_complex,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_c_dpk_,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_dcomplex_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),mpi_double_complex,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_c_dpk_,src,&
            & psb_dcomplex_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 

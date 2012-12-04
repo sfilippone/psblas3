@@ -31,7 +31,7 @@
 !!$  
 ! File: psb_glob_to_loc.f90
 !
-! Subroutine: psb_glob_to_loc2
+! Subroutine: psb_glob_to_loc2v
 !    Performs global to local index translation. If an index does not belong
 !    to the current process, a negative value is returned (see also iact).
 ! 
@@ -46,8 +46,8 @@
 !    owned    - logical, optional         When .true. limits the input to indices strictly
 !                                         owned by the process, i.e. excludes halo.
 !
-subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
-  use psb_base_mod, psb_protect_name => psb_glob_to_loc2
+subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
+  use psb_base_mod, psb_protect_name => psb_glob_to_loc2v
   use psi_mod
   implicit none
 
@@ -116,7 +116,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   return
 
 
-end subroutine psb_glob_to_loc2
+end subroutine psb_glob_to_loc2v
 
 
 !!$ 
@@ -150,7 +150,7 @@ end subroutine psb_glob_to_loc2
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_glob_to_loc
+! Subroutine: psb_glob_to_loc1v
 !    Performs global to local index translation. If an index does not belong
 !    to the current process, a negative value is returned (see also iact).
 ! 
@@ -165,8 +165,8 @@ end subroutine psb_glob_to_loc2
 !    owned    - logical, optional         When .true. limits the input to indices strictly
 !                                         owned by the process, i.e. excludes halo.
 !
-subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
-  use psb_base_mod, psb_protect_name => psb_glob_to_loc
+subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
+  use psb_base_mod, psb_protect_name => psb_glob_to_loc1v
   use psi_mod
   implicit none
 
@@ -238,7 +238,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   end if
   return
 
-end subroutine psb_glob_to_loc
+end subroutine psb_glob_to_loc1v
 
 subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
   use psb_base_mod, psb_protect_name => psb_glob_to_loc2s
@@ -257,8 +257,8 @@ subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
   y      = iv2(1)
 end subroutine psb_glob_to_loc2s
 
-subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
-  use psb_base_mod, psb_protect_name => psb_glob_to_locs
+subroutine psb_glob_to_loc1s(x,desc_a,info,iact,owned)
+  use psb_base_mod, psb_protect_name => psb_glob_to_loc1s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
   integer(psb_ipk_),intent(inout)              ::  x  
@@ -271,5 +271,5 @@ subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
   call psb_glob_to_loc(iv1,desc_a,info,iact,owned)
   x      = iv1(1)
 
-end subroutine psb_glob_to_locs
+end subroutine psb_glob_to_loc1s
 
