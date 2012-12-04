@@ -1,7 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
 
-2012/12/04: Rename specifics for GLOB_TO_LOC/LOC_TO_GLOB
+2012/12/04: Rename specifics for GLOB_TO_LOC/LOC_TO_GLOB. Parametrize type
+	    identifiers for MPI calls.
 	
 2012/11/26: Infinite loop bug in sparse AXPBY.
 	
