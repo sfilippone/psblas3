@@ -76,7 +76,7 @@ subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans,work)
 
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -151,7 +151,7 @@ subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans,work)
   type(psb_c_vect_type)       :: ww
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -228,7 +228,7 @@ subroutine psb_c_apply2v(prec,x,y,desc_data,info,trans,work)
 
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
   character(len=20)   :: name
 
@@ -297,7 +297,7 @@ subroutine psb_c_apply1v(prec,x,desc_data,info,trans)
   character(len=1), optional        :: trans
 
   character     :: trans_
-  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act
   complex(psb_spk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name

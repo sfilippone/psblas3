@@ -45,7 +45,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd,amold,afmt,vmold)
   class(psb_z_base_vect_type), intent(in), optional  :: vmold
 
   ! Local scalars
-  integer(psb_mpik_) :: ictxt, me,np
+  integer(psb_ipk_) :: ictxt, me,np
   integer(psb_ipk_) :: err, n_row, n_col,mglob, err_act
   integer(psb_ipk_) :: int_err(5)
   character    :: upd_
