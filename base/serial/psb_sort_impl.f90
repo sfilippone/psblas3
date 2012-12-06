@@ -1175,13 +1175,13 @@ subroutine shsort(x,ix,dir,flag)
     do i=1, n 
       key   = x(i)
       index = ix(i)
-      call psi_insert_real_idx_heap(key,index,l,x,ix,dir_,info)
+      call psi_insert_sreal_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
         write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
-      call psi_real_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+      call psi_sreal_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
         write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
@@ -1288,13 +1288,13 @@ subroutine dhsort(x,ix,dir,flag)
     do i=1, n 
       key   = x(i)
       index = ix(i)
-      call psi_insert_double_idx_heap(key,index,l,x,ix,dir_,info)
+      call psi_insert_dreal_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
         write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
-      call psi_double_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+      call psi_dreal_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
         write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
@@ -1659,19 +1659,19 @@ subroutine psb_int_heap_get_first(key,heap,info)
 end subroutine psb_int_heap_get_first
 
 
-function  psb_howmany_real_idx_heap(heap)
-  use psb_sort_mod, psb_protect_name => psb_howmany_real_idx_heap
+function  psb_howmany_sreal_idx_heap(heap)
+  use psb_sort_mod, psb_protect_name => psb_howmany_sreal_idx_heap
   implicit none 
-  type(psb_real_idx_heap), intent(in) :: heap
-  integer(psb_ipk_) :: psb_howmany_real_idx_heap
-  psb_howmany_real_idx_heap = heap%last
-end function psb_howmany_real_idx_heap
+  type(psb_sreal_idx_heap), intent(in) :: heap
+  integer(psb_ipk_) :: psb_howmany_sreal_idx_heap
+  psb_howmany_sreal_idx_heap = heap%last
+end function psb_howmany_sreal_idx_heap
 
-subroutine psb_init_real_idx_heap(heap,info,dir)
-  use psb_sort_mod, psb_protect_name => psb_init_real_idx_heap
+subroutine psb_init_sreal_idx_heap(heap,info,dir)
+  use psb_sort_mod, psb_protect_name => psb_init_sreal_idx_heap
   use psb_realloc_mod
   implicit none 
-  type(psb_real_idx_heap), intent(inout) :: heap
+  type(psb_sreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: dir
 
@@ -1693,12 +1693,12 @@ subroutine psb_init_real_idx_heap(heap,info,dir)
   call psb_ensure_size(psb_heap_resize,heap%keys,info)
   call psb_ensure_size(psb_heap_resize,heap%idxs,info)
   return
-end subroutine psb_init_real_idx_heap
+end subroutine psb_init_sreal_idx_heap
 
-subroutine psb_dump_real_idx_heap(iout,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_dump_real_idx_heap
+subroutine psb_dump_sreal_idx_heap(iout,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_dump_sreal_idx_heap
   implicit none 
-  type(psb_real_idx_heap), intent(in) :: heap
+  type(psb_sreal_idx_heap), intent(in) :: heap
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), intent(in)            :: iout
 
@@ -1723,16 +1723,16 @@ subroutine psb_dump_real_idx_heap(iout,heap,info)
       write(iout,*) heap%idxs(1:heap%last)
     end if
   end if
-end subroutine psb_dump_real_idx_heap
+end subroutine psb_dump_sreal_idx_heap
 
-subroutine psb_insert_real_idx_heap(key,index,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_insert_real_idx_heap
+subroutine psb_insert_sreal_idx_heap(key,index,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_insert_sreal_idx_heap
   use psb_realloc_mod
   implicit none 
 
   real(psb_spk_), intent(in)      :: key
   integer(psb_ipk_), intent(in)               :: index
-  type(psb_real_idx_heap), intent(inout) :: heap
+  type(psb_sreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)              :: info
 
   info = psb_success_
@@ -1751,42 +1751,42 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
     return
   end if
 
-  call psi_insert_real_idx_heap(key,index,&
+  call psi_insert_sreal_idx_heap(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
   return
-end subroutine psb_insert_real_idx_heap
+end subroutine psb_insert_sreal_idx_heap
 
-subroutine psb_real_idx_heap_get_first(key,index,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_real_idx_heap_get_first
+subroutine psb_sreal_idx_heap_get_first(key,index,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_sreal_idx_heap_get_first
   implicit none 
 
-  type(psb_real_idx_heap), intent(inout) :: heap
+  type(psb_sreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)              :: index,info
   real(psb_spk_), intent(out)     :: key
 
   info = psb_success_
 
-  call psi_real_idx_heap_get_first(key,index,&
+  call psi_sreal_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
   return
-end subroutine psb_real_idx_heap_get_first
+end subroutine psb_sreal_idx_heap_get_first
 
 
-function  psb_howmany_double_idx_heap(heap)
-  use psb_sort_mod, psb_protect_name => psb_howmany_double_idx_heap
+function  psb_howmany_dreal_idx_heap(heap)
+  use psb_sort_mod, psb_protect_name => psb_howmany_dreal_idx_heap
   implicit none 
-  type(psb_double_idx_heap), intent(in) :: heap
-  integer(psb_ipk_) :: psb_howmany_double_idx_heap
-  psb_howmany_double_idx_heap = heap%last
-end function psb_howmany_double_idx_heap
+  type(psb_dreal_idx_heap), intent(in) :: heap
+  integer(psb_ipk_) :: psb_howmany_dreal_idx_heap
+  psb_howmany_dreal_idx_heap = heap%last
+end function psb_howmany_dreal_idx_heap
 
-subroutine psb_init_double_idx_heap(heap,info,dir)
-  use psb_sort_mod, psb_protect_name => psb_init_double_idx_heap
+subroutine psb_init_dreal_idx_heap(heap,info,dir)
+  use psb_sort_mod, psb_protect_name => psb_init_dreal_idx_heap
   use psb_realloc_mod
   implicit none 
-  type(psb_double_idx_heap), intent(inout) :: heap
+  type(psb_dreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: dir
 
@@ -1808,12 +1808,12 @@ subroutine psb_init_double_idx_heap(heap,info,dir)
   call psb_ensure_size(psb_heap_resize,heap%keys,info)
   call psb_ensure_size(psb_heap_resize,heap%idxs,info)
   return
-end subroutine psb_init_double_idx_heap
+end subroutine psb_init_dreal_idx_heap
 
-subroutine psb_dump_double_idx_heap(iout,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_dump_double_idx_heap
+subroutine psb_dump_dreal_idx_heap(iout,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_dump_dreal_idx_heap
   implicit none 
-  type(psb_double_idx_heap), intent(in) :: heap
+  type(psb_dreal_idx_heap), intent(in) :: heap
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), intent(in)            :: iout
 
@@ -1838,16 +1838,16 @@ subroutine psb_dump_double_idx_heap(iout,heap,info)
       write(iout,*) heap%idxs(1:heap%last)
     end if
   end if
-end subroutine psb_dump_double_idx_heap
+end subroutine psb_dump_dreal_idx_heap
 
-subroutine psb_insert_double_idx_heap(key,index,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_insert_double_idx_heap
+subroutine psb_insert_dreal_idx_heap(key,index,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_insert_dreal_idx_heap
   use psb_realloc_mod
   implicit none 
 
   real(psb_dpk_), intent(in)      :: key
   integer(psb_ipk_), intent(in)               :: index
-  type(psb_double_idx_heap), intent(inout) :: heap
+  type(psb_dreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)              :: info
 
   info = psb_success_
@@ -1866,27 +1866,27 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
     return
   end if
 
-  call psi_insert_double_idx_heap(key,index,&
+  call psi_insert_dreal_idx_heap(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
   return
-end subroutine psb_insert_double_idx_heap
+end subroutine psb_insert_dreal_idx_heap
 
-subroutine psb_double_idx_heap_get_first(key,index,heap,info)
-  use psb_sort_mod, psb_protect_name => psb_double_idx_heap_get_first
+subroutine psb_dreal_idx_heap_get_first(key,index,heap,info)
+  use psb_sort_mod, psb_protect_name => psb_dreal_idx_heap_get_first
   implicit none 
 
-  type(psb_double_idx_heap), intent(inout) :: heap
+  type(psb_dreal_idx_heap), intent(inout) :: heap
   integer(psb_ipk_), intent(out)              :: index,info
   real(psb_dpk_), intent(out)     :: key
 
   info = psb_success_
 
-  call psi_double_idx_heap_get_first(key,index,&
+  call psi_dreal_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
   return
-end subroutine psb_double_idx_heap_get_first
+end subroutine psb_dreal_idx_heap_get_first
 
 function  psb_howmany_int_idx_heap(heap)
   use psb_sort_mod, psb_protect_name => psb_howmany_int_idx_heap
@@ -3655,8 +3655,8 @@ subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   return
 end subroutine psi_int_idx_heap_get_first
 
-subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
-  use psb_sort_mod, psb_protect_name => psi_insert_real_idx_heap
+subroutine psi_insert_sreal_idx_heap(key,index,last,heap,idxs,dir,info)
+  use psb_sort_mod, psb_protect_name => psi_insert_sreal_idx_heap
 
   implicit none 
   !  
@@ -3775,10 +3775,10 @@ subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
   end select
 
   return
-end subroutine psi_insert_real_idx_heap
+end subroutine psi_insert_sreal_idx_heap
 
-subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-  use psb_sort_mod, psb_protect_name => psi_real_idx_heap_get_first
+subroutine psi_sreal_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+  use psb_sort_mod, psb_protect_name => psi_sreal_idx_heap_get_first
   implicit none 
 
   real(psb_spk_), intent(inout) :: heap(:)
@@ -3912,11 +3912,11 @@ subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   end select
 
   return
-end subroutine psi_real_idx_heap_get_first
+end subroutine psi_sreal_idx_heap_get_first
 
 
-subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
-  use psb_sort_mod, psb_protect_name => psi_insert_double_idx_heap
+subroutine psi_insert_dreal_idx_heap(key,index,last,heap,idxs,dir,info)
+  use psb_sort_mod, psb_protect_name => psi_insert_dreal_idx_heap
 
   implicit none 
   !  
@@ -4035,10 +4035,10 @@ subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
   end select
 
   return
-end subroutine psi_insert_double_idx_heap
+end subroutine psi_insert_dreal_idx_heap
 
-subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-  use psb_sort_mod, psb_protect_name => psi_double_idx_heap_get_first
+subroutine psi_dreal_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+  use psb_sort_mod, psb_protect_name => psi_dreal_idx_heap_get_first
   implicit none 
 
   real(psb_dpk_), intent(inout) :: heap(:)
@@ -4172,7 +4172,7 @@ subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   end select
 
   return
-end subroutine psi_double_idx_heap_get_first
+end subroutine psi_dreal_idx_heap_get_first
 
 
 subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)

@@ -35,18 +35,18 @@ subroutine psb_sprecbld(a,desc_a,p,info,upd,amold,afmt,vmold)
   use psb_s_prec_type
   Implicit None
 
-  type(psb_sspmat_type), intent(in), target :: a
-  type(psb_desc_type), intent(in), target :: desc_a
-  type(psb_sprec_type),intent(inout)      :: p
-  integer(psb_ipk_), intent(out)                    :: info
-  character, intent(in), optional         :: upd
-  character(len=*), intent(in), optional    :: afmt
+  type(psb_sspmat_type), intent(in), target  :: a
+  type(psb_desc_type), intent(in), target      :: desc_a
+  type(psb_sprec_type),intent(inout)         :: p
+  integer(psb_ipk_), intent(out)               :: info
+  character, intent(in), optional              :: upd
+  character(len=*), intent(in), optional       :: afmt
   class(psb_s_base_sparse_mat), intent(in), optional :: amold
   class(psb_s_base_vect_type), intent(in), optional  :: vmold
 
   ! Local scalars
-  integer(psb_ipk_) :: err, n_row, n_col,ictxt,&
-       & me,np,mglob, err_act
+  integer(psb_mpik_) :: ictxt, me,np
+  integer(psb_ipk_) :: err, n_row, n_col,mglob, err_act
   integer(psb_ipk_) :: int_err(5)
   character    :: upd_
 

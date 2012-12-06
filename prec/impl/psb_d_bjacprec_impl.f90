@@ -38,7 +38,7 @@ subroutine psb_d_bjac_dump(prec,info,prefix,head)
   integer(psb_ipk_), intent(out)                    :: info
   character(len=*), intent(in), optional  :: prefix,head
   integer(psb_ipk_) :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_) :: ictxt,iam, np
+  integer(psb_mpik_) :: ictxt,iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
 
@@ -87,7 +87,8 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_) :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
   type(psb_d_vect_type) :: wv, wv1
-  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
+  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='d_bjac_prec_apply'
@@ -243,7 +244,8 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
-  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
+  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='d_bjac_prec_apply'
@@ -442,7 +444,7 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
   real(psb_dpk_), allocatable :: dd(:)
   integer(psb_ipk_) :: nztota,  err_act, n_row, nrow_a,n_col, nhalo
-  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_mpik_) :: ictxt,np,me
   character(len=20)  :: name='d_bjac_precbld'
   character(len=20)  :: ch_err
 
