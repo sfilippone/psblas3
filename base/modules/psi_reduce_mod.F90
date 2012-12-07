@@ -3517,10 +3517,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
       dat = dat_
     endif
 
@@ -3557,15 +3557,15 @@ contains
       call psb_realloc(size(dat),dat_,info)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_sum,ictxt,info)
+           & psb_mpi_def_integer,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3601,15 +3601,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_sum,ictxt,info)
+           & psb_mpi_def_integer,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
