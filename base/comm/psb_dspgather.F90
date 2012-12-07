@@ -51,10 +51,10 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   logical, intent(in), optional   :: keepnum,keeploc
 
   type(psb_d_coo_sparse_mat)      :: loc_coo, glob_coo
-  integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
+  integer(psb_mpik_) :: ictxt,np,me
   integer(psb_mpik_) :: icomm, minfo, ndx
   integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
