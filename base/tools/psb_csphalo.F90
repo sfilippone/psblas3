@@ -80,7 +80,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
        &     l1, err_act
-  integer(psb_mpik_) :: icomm
+  integer(psb_mpik_) :: icomm, minfo
   integer(psb_mpik_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_), allocatable  :: iasnd(:), jasnd(:)
@@ -190,7 +190,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
-  call mpi_alltoall(sdsz,1,psb_mpi_ipk_integer,rvsz,1,psb_mpi_ipk_integer,icomm,info)
+  call mpi_alltoall(sdsz,1,psb_mpi_ipk_integer,rvsz,1,psb_mpi_ipk_integer,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'
@@ -274,11 +274,11 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
 
   call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_complex,&
-       & acoo%val,rvsz,brvindx,mpi_complex,icomm,info)
+       & acoo%val,rvsz,brvindx,mpi_complex,icomm,minfo)
   call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
+       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
   call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,info)
+       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'
