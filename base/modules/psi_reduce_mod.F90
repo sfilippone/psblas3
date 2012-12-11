@@ -3542,7 +3542,6 @@ contains
     integer(psb_mpik_) :: root_
     integer(psb_mpik_), allocatable :: dat_(:)
     integer(psb_mpik_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
 
@@ -3556,7 +3555,7 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
            & psb_mpi_def_integer,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
@@ -3586,8 +3585,6 @@ contains
     integer(psb_mpik_) :: root_
     integer(psb_mpik_), allocatable :: dat_(:,:)
     integer(psb_mpik_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
-
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
@@ -3600,7 +3597,7 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
            & psb_mpi_def_integer,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
