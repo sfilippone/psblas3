@@ -140,7 +140,7 @@ subroutine psb_d_nspaxpby(nz,iz,z,alpha, nx, ix, x, beta, ny,iy,y,info)
   integer(psb_ipk_) :: i,j,k, ipx, ipy, isz
   real(psb_dpk_) :: acc
 
-  info=psb_success_
+  info = psb_success_
   nz   = 0
   ipx  = 1
   ipy  = 1 

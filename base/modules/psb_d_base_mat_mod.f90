@@ -683,7 +683,10 @@ module psb_d_base_mat_mod
   !!           Y = alpha*op(A)*X + beta*Y
   !!        Usually the unwrapping of the encapsulated vector is done
   !!        here, so that all the derived classes need only the
-  !!        versions with the standard arrays. 
+  !!        versions with the standard arrays.
+  !!        Must be overridden explicitly in case of non standard memory
+  !!        management; an example would be external memory allocation
+  !!        in attached processors such as GPUs. 
   !!
   !!
   !! \param alpha  Scaling factor for Ax
@@ -784,6 +787,10 @@ module psb_d_base_mat_mod
   !!           Y = alpha*op(A^-1)*X + beta*Y
   !!
   !!        Internal workhorse called by vect_cssv. 
+  !!        Must be overridden explicitly in case of non standard memory
+  !!        management; an example would be external memory allocation
+  !!        in attached processors such as GPUs. 
+  !!
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix

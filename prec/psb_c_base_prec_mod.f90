@@ -91,7 +91,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -127,7 +127,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -158,7 +158,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -194,7 +194,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -226,7 +226,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -258,7 +258,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -290,7 +290,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -321,7 +321,7 @@ contains
     
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -354,7 +354,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
@@ -385,7 +385,7 @@ contains
 
     !
     ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preonditioner???
+    ! Or should it be the NULL preconditioner???
     !
     info = 700
     call psb_errpush(info,name)
