@@ -66,23 +66,23 @@ module psb_sort_mod
   end type psb_int_idx_heap
   type psb_sreal_idx_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_spk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable        :: idxs(:)
+    real(psb_spk_), allocatable    :: keys(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_sreal_idx_heap
   type psb_dreal_idx_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_dpk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable        :: idxs(:)
+    real(psb_dpk_), allocatable    :: keys(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_dreal_idx_heap
   type psb_scomplex_idx_heap
     integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_scomplex_idx_heap
   type psb_dcomplex_idx_heap
     integer(psb_ipk_) :: last, dir
     complex(psb_dpk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_dcomplex_idx_heap
 
 
