@@ -1813,7 +1813,7 @@ subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  call a%a%csmm(alpha,x,beta,y,info,trans) 
+  call a%a%spmm(alpha,x,beta,y,info,trans) 
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
   return
@@ -1851,7 +1851,7 @@ subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  call a%a%csmm(alpha,x,beta,y,info,trans) 
+  call a%a%spmm(alpha,x,beta,y,info,trans) 
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
   return
@@ -1901,7 +1901,7 @@ subroutine psb_s_csmv_vect(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  call a%a%csmm(alpha,x%v,beta,y%v,info,trans) 
+  call a%a%spmm(alpha,x%v,beta,y%v,info,trans) 
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
   return
@@ -1941,7 +1941,7 @@ subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   endif
 
-  call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
+  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d) 
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
@@ -1981,7 +1981,7 @@ subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     goto 9999
   endif
 
-  call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
+  call a%a%spsm(alpha,x,beta,y,info,trans,scale,d) 
 
   if (info /= psb_success_) goto 9999 
 
@@ -2039,9 +2039,9 @@ subroutine psb_s_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
       call psb_errpush(info,name)
       goto 9999
     endif
-    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale,d%v) 
+    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale,d%v) 
   else
-    call a%a%cssm(alpha,x%v,beta,y%v,info,trans,scale) 
+    call a%a%spsm(alpha,x%v,beta,y%v,info,trans,scale) 
   end if
 
   if (info /= psb_success_) goto 9999 
@@ -2114,7 +2114,7 @@ function psb_s_csnmi(a) result(res)
     goto 9999
   endif
 
-  res = a%a%csnmi()
+  res = a%a%spnmi()
   return
 
 9999 continue
@@ -2148,7 +2148,7 @@ function psb_s_csnm1(a) result(res)
     goto 9999
   endif
 
-  res = a%a%csnm1()
+  res = a%a%spnm1()
   return
 
 9999 continue

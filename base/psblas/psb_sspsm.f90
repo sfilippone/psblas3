@@ -711,9 +711,9 @@ subroutine  psb_sspsv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   ! Perform local triangular system solve
   if (present(diag)) then 
-    call a%cssm(alpha,x,beta,y,info,scale=scale,d=diag,trans=trans)    
+    call a%spsm(alpha,x,beta,y,info,scale=scale,d=diag,trans=trans)    
   else
-    call a%cssm(alpha,x,beta,y,info,scale=scale,trans=trans)    
+    call a%spsm(alpha,x,beta,y,info,scale=scale,trans=trans)    
   end if
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_

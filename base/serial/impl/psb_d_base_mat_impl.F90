@@ -933,7 +933,7 @@ subroutine psb_d_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
         end do
       end if
       if (info == psb_success_)&
-           & call a%inner_cssm(alpha,tmp,beta,y,info,trans)
+           & call a%inner_spsm(alpha,tmp,beta,y,info,trans)
 
       if (info == psb_success_) then 
         deallocate(tmp,stat=info) 
@@ -952,7 +952,7 @@ subroutine psb_d_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
       allocate(tmp(nar,nc),stat=info) 
       if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
       if (info == psb_success_)&
-           & call a%inner_cssm(done,x,dzero,tmp,info,trans)
+           & call a%inner_spsm(done,x,dzero,tmp,info,trans)
 
       if (info == psb_success_)then 
         do i=1, nar
@@ -975,7 +975,7 @@ subroutine psb_d_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
     end if
   else 
     ! Scale is ignored in this case 
-    call a%inner_cssm(alpha,x,beta,y,info,trans)
+    call a%inner_spsm(alpha,x,beta,y,info,trans)
   end if
 
   if (info /= psb_success_) then 
@@ -1070,7 +1070,7 @@ subroutine psb_d_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
       if (info == psb_success_) call inner_vscal(nac,d,x,tmp) 
       if (info == psb_success_)&
-           & call a%inner_cssm(alpha,tmp,beta,y,info,trans)
+           & call a%inner_spsm(alpha,tmp,beta,y,info,trans)
 
       if (info == psb_success_) then 
         deallocate(tmp,stat=info) 
@@ -1086,13 +1086,13 @@ subroutine psb_d_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       end if
 
       if (beta == dzero) then 
-        call a%inner_cssm(alpha,x,dzero,y,info,trans)
+        call a%inner_spsm(alpha,x,dzero,y,info,trans)
         if (info == psb_success_)  call inner_vscal1(nar,d,y)
       else
         allocate(tmp(nar),stat=info) 
         if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
         if (info == psb_success_)&
-             & call a%inner_cssm(alpha,x,dzero,tmp,info,trans)
+             & call a%inner_spsm(alpha,x,dzero,tmp,info,trans)
 
         if (info == psb_success_)  call inner_vscal1(nar,d,tmp)
         if (info == psb_success_)&
@@ -1111,12 +1111,12 @@ subroutine psb_d_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     end if
   else 
     ! Scale is ignored in this case 
-    call a%inner_cssm(alpha,x,beta,y,info,trans)
+    call a%inner_spsm(alpha,x,beta,y,info,trans)
   end if
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
-    call psb_errpush(info,name, a_err='inner_cssm')
+    call psb_errpush(info,name, a_err='inner_spsm')
     goto 9999
   end if
 
@@ -1482,7 +1482,7 @@ subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans)
   ! onto the normal routines. 
   call x%sync()
   call y%sync()
-  call a%csmm(alpha,x%v,beta,y%v,info,trans)
+  call a%spmm(alpha,x%v,beta,y%v,info,trans)
   call y%set_host()
 end subroutine psb_d_base_vect_mv
 
@@ -1562,7 +1562,7 @@ subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
       if (info == psb_success_) call tmpv%mlt(done,d%v(1:nac),x,dzero,info) 
       if (info == psb_success_)&
-           & call a%inner_cssm(alpha,tmpv,beta,y,info,trans)
+           & call a%inner_spsm(alpha,tmpv,beta,y,info,trans)
 
       if (info == psb_success_) then 
         call tmpv%free(info)
@@ -1579,7 +1579,7 @@ subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       end if
 
       if (beta == dzero) then 
-        call a%inner_cssm(alpha,x,dzero,y,info,trans)
+        call a%inner_spsm(alpha,x,dzero,y,info,trans)
         if (info == psb_success_)  call y%mlt(d%v(1:nar),info)
 
       else
@@ -1590,7 +1590,7 @@ subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 #endif
         if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
         if (info == psb_success_)&
-             & call a%inner_cssm(alpha,x,dzero,tmpv,info,trans)
+             & call a%inner_spsm(alpha,x,dzero,tmpv,info,trans)
 
         if (info == psb_success_)  call tmpv%mlt(d%v(1:nar),info)
         if (info == psb_success_)&
@@ -1610,12 +1610,12 @@ subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     end if
   else 
     ! Scale is ignored in this case 
-    call a%inner_cssm(alpha,x,beta,y,info,trans)
+    call a%inner_spsm(alpha,x,beta,y,info,trans)
   end if
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
-    call psb_errpush(info,name, a_err='inner_cssm')
+    call psb_errpush(info,name, a_err='inner_spsm')
     goto 9999
   end if
 
@@ -1656,11 +1656,11 @@ subroutine psb_d_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
   info  = psb_success_
   call psb_erractionsave(err_act)
 
-  call a%inner_cssm(alpha,x%v,beta,y%v,info,trans)  
+  call a%inner_spsm(alpha,x%v,beta,y%v,info,trans)  
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
-    call psb_errpush(info,name, a_err='inner_cssm')
+    call psb_errpush(info,name, a_err='inner_spsm')
     goto 9999
   end if
 
