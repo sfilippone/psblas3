@@ -522,7 +522,7 @@ end subroutine psi_iovrl_saver1
 
 subroutine  psi_iovrl_saver2(x,xs,desc_a,info)
   use psi_mod, psi_protect_name =>   psi_iovrl_saver2
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod

@@ -31,7 +31,7 @@
 !!$  
 ! File:  psb_cspgather.f90
 subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_mat_mod

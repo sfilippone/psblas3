@@ -125,7 +125,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'

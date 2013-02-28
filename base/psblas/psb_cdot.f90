@@ -49,7 +49,7 @@
 !    jy     -  integer(optional).    The column offset for sub( Y ).
 !
 function psb_cdot_vect(x, y, desc_a,info) result(res)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_c_base_mat_mod
   use psb_check_mod
   use psb_error_mod

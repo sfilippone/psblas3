@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psb_i_tools_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_ipk_, psb_success_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
   
 

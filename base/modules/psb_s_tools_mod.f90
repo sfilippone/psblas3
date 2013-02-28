@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 Module psb_s_tools_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_
   use psb_s_vect_mod, only : psb_s_base_vect_type, psb_s_vect_type
   use psb_s_mat_mod, only : psb_sspmat_type, psb_s_base_sparse_mat
 

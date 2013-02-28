@@ -91,7 +91,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_zswaptranm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -165,7 +165,7 @@ subroutine psi_ztranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
   use psi_mod, psb_protect_name => psi_ztranidxm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -595,7 +595,7 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_zswaptranv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -670,7 +670,7 @@ subroutine psi_ztranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
   use psi_mod, psb_protect_name => psi_ztranidxv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -1045,7 +1045,7 @@ subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_zswaptran_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_z_base_vect_mod
 #ifdef MPI_MOD
@@ -1123,7 +1123,7 @@ subroutine psi_ztranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
   use psi_mod, psb_protect_name => psi_ztranidx_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_z_base_vect_mod
 #ifdef MPI_MOD

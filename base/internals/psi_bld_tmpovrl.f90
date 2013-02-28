@@ -51,7 +51,7 @@
 !    info     - integer.              return code.
 !
 subroutine psi_bld_tmpovrl(iv,desc,info)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod

@@ -31,11 +31,11 @@
 !!$  
 !
 !
-! package: psb_descriptor_type
+! package: psb_desc_mod
 !    Defines a communication descriptor
 !
 
-module psb_descriptor_type
+module psb_desc_mod
   use psb_const_mod
   use psb_hash_mod 
   use psb_desc_const_mod
@@ -898,4 +898,4 @@ contains
 
 
 
-end module psb_descriptor_type
+end module psb_desc_mod

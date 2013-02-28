@@ -91,7 +91,7 @@ subroutine psi_cswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswaptranm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -165,7 +165,7 @@ subroutine psi_ctranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
   use psi_mod, psb_protect_name => psi_ctranidxm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -595,7 +595,7 @@ subroutine psi_cswaptranv(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswaptranv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -670,7 +670,7 @@ subroutine psi_ctranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
   use psi_mod, psb_protect_name => psi_ctranidxv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -1045,7 +1045,7 @@ subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswaptran_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_c_base_vect_mod
 #ifdef MPI_MOD
@@ -1123,7 +1123,7 @@ subroutine psi_ctranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
   use psi_mod, psb_protect_name => psi_ctranidx_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_c_base_vect_mod
 #ifdef MPI_MOD

@@ -67,7 +67,7 @@ contains
   !  iix      - integer(optional).     The local rows starting index of the submatrix.
   !  jjx      - integer(optional).     The local columns starting index of the submatrix.
   subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx)
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_const_mod
     use psb_error_mod
     implicit none
@@ -193,7 +193,7 @@ contains
   !
   subroutine psb_chkglobvect( m, n, lldx, ix, jx, desc_dec, info)
 
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_const_mod
     use psb_error_mod
     implicit none
@@ -316,7 +316,7 @@ contains
   !
   subroutine psb_chkmat( m, n, ia, ja, desc_dec, info, iia, jja)
 
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_const_mod
     use psb_error_mod
     implicit none

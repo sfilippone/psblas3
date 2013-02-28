@@ -211,7 +211,7 @@ subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
 end subroutine psb_loc_to_glob1v
 
 subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_tools_mod, psb_protect_name => psb_loc_to_glob2s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
@@ -228,7 +228,7 @@ subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
 end subroutine psb_loc_to_glob2s
 
 subroutine psb_loc_to_glob1s(x,desc_a,info,iact)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_tools_mod, psb_protect_name => psb_loc_to_glob1s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a

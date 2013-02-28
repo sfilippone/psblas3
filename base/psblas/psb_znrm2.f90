@@ -45,7 +45,7 @@
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !
 function psb_znrm2(x, desc_a, info, jx)  result(res)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -174,7 +174,7 @@ end function psb_znrm2
 !    info   -  integer.              Return code
 !
 function psb_znrm2v(x, desc_a, info)  result(res)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -257,7 +257,7 @@ end function psb_znrm2v
 
 
 function psb_znrm2_vect(x, desc_a, info)  result(res)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -389,7 +389,7 @@ end function psb_znrm2_vect
 !    info   -  integer.              Return code
 !
 subroutine psb_znrm2vs(res, x, desc_a, info)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod

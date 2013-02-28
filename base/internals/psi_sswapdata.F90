@@ -87,7 +87,7 @@ subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_sswapdatam
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -160,7 +160,7 @@ subroutine psi_sswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
   use psi_mod, psb_protect_name => psi_sswapidxm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -585,7 +585,7 @@ subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_sswapdatav
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -659,7 +659,7 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
   use psi_mod, psb_protect_name => psi_sswapidxv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -1019,7 +1019,7 @@ subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
   use psi_mod, psb_protect_name => psi_sswapdata_vect
   use psb_s_base_vect_mod
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -1094,7 +1094,7 @@ subroutine psi_sswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 
   use psi_mod, psb_protect_name => psi_sswapidx_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_s_base_vect_mod
 #ifdef MPI_MOD

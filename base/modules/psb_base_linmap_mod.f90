@@ -37,7 +37,7 @@
 !
 module psb_base_linmap_mod
   use psb_const_mod
-  use psb_descriptor_type, only: psb_desc_type
+  use psb_desc_mod, only: psb_desc_type
   
 
   type psb_base_linmap_type
@@ -84,7 +84,7 @@ contains
 
 
   function base_is_ok(map) result(res)
-    use psb_descriptor_type
+    use psb_desc_mod
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
     logical  :: res
@@ -102,7 +102,7 @@ contains
   end function base_is_ok
 
   function base_is_asb(map) result(res)
-    use psb_descriptor_type
+    use psb_desc_mod
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
     logical  :: res
@@ -120,7 +120,7 @@ contains
   end function base_is_asb
 
   function base_map_sizeof(map) result(val)
-    use psb_descriptor_type
+    use psb_desc_mod
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -137,7 +137,7 @@ contains
   
   subroutine  psb_base_linmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_base_linmap_type), intent(inout) :: mapin,mapout
