@@ -47,8 +47,8 @@ module psb_const_mod
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpik_ = kind(1)
   !
-  ! These must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
-  ! and MPI_REAL
+  ! These must be the kind parameter corresponding to psb_mpi_r_dpk_
+  ! and psb_mpi_r_spk_
   !
   integer(psb_mpik_), parameter  :: psb_spk_p_ = 6
   integer(psb_mpik_), parameter  :: psb_spk_r_ = 37

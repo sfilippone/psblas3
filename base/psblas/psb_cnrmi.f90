@@ -89,7 +89,7 @@ function psb_cnrmi(a,desc_a,info)  result(res)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    res = a%csnmi()
+    res = a%spnmi()
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='psb_cnrmi'

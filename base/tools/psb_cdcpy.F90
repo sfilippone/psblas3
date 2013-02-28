@@ -83,6 +83,8 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
   if (info == psb_success_) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%sendtypes,desc_out%sendtypes,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%recvtypes,desc_out%recvtypes,info)
 
   if (allocated(desc_in%indxmap)) then 
 

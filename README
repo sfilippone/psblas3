@@ -87,9 +87,9 @@ which points to GNU Fortran.
 The best way to avoid this situation is (in our opinion) to use the
 environment modules package (see http://modules.sourceforge.net/), and
 load the relevant variables with (e.g.)  
-module load gnu42 mpich 
+module load gnu46 openmpi
 This will delegate to the modules setup to make sure that the version
-of mpich in use is the one compiled with the gnu42 compilers. 
+of openmpi in use is the one compiled with the gnu46 compilers. 
 After the configure script has completed you can always tweak the
 Make.inc  file yourself. 
 
@@ -111,7 +111,7 @@ replacement).
 
 EXPERIMENTAL
 
-We have an experimental flag --long-integers that will enable having
+We have an experimental flag --enable-long-integers that will enable having
 8-byte integer data, allowing an index space larger than 2G; some
 small cases have been tested but we do not offer full guarantee (yet). 
 

@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psb_i_tools_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_ipk_, psb_success_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
   
 
@@ -146,7 +146,7 @@ module psb_i_tools_mod
 
 
   interface psb_glob_to_loc
-    subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
+    subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
       integer(psb_ipk_),intent(in)                 ::  x(:)  
@@ -154,15 +154,15 @@ module psb_i_tools_mod
       integer(psb_ipk_), intent(out)               ::  info
       logical, intent(in),  optional     :: owned
       character, intent(in), optional    ::  iact
-    end subroutine psb_glob_to_loc2
-    subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
+    end subroutine psb_glob_to_loc2v
+    subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
       integer(psb_ipk_),intent(inout)              ::  x(:)  
       integer(psb_ipk_), intent(out)               ::  info
       logical, intent(in),  optional     :: owned
       character, intent(in), optional    ::  iact
-    end subroutine psb_glob_to_loc
+    end subroutine psb_glob_to_loc1v
     subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
       import :: psb_ipk_, psb_desc_type
       implicit none 
@@ -172,10 +172,8 @@ module psb_i_tools_mod
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
       logical, intent(in),  optional     :: owned
-
     end subroutine psb_glob_to_loc2s
-
-    subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
+    subroutine psb_glob_to_loc1s(x,desc_a,info,iact,owned)
       import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    ::  desc_a
@@ -183,25 +181,25 @@ module psb_i_tools_mod
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
       logical, intent(in),  optional     :: owned
-    end subroutine psb_glob_to_locs
+    end subroutine psb_glob_to_loc1s
   end interface
 
   interface psb_loc_to_glob
-    subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
+    subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
       integer(psb_ipk_),intent(in)                 ::  x(:)  
       integer(psb_ipk_),intent(out)                ::  y(:)  
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob2
-    subroutine psb_loc_to_glob(x,desc_a,info,iact)
+    end subroutine psb_loc_to_glob2v
+    subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
       integer(psb_ipk_),intent(inout)              ::  x(:)  
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob
+    end subroutine psb_loc_to_glob1v
     subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
       import :: psb_ipk_, psb_desc_type
       implicit none 
@@ -210,15 +208,14 @@ module psb_i_tools_mod
       integer(psb_ipk_),intent(out)                ::  y  
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
-
     end subroutine psb_loc_to_glob2s
-    subroutine psb_loc_to_globs(x,desc_a,info,iact)
+    subroutine psb_loc_to_glob1s(x,desc_a,info,iact)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(in)    ::  desc_a
       integer(psb_ipk_),intent(inout)              ::  x  
       integer(psb_ipk_), intent(out)               ::  info
       character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_globs
+    end subroutine psb_loc_to_glob1s
 
   end interface
 

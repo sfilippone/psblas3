@@ -31,7 +31,7 @@
 !!$  
 ! File: psb_loc_to_glob.f90
 !
-! Subroutine: psb_loc_to_glob2
+! Subroutine: psb_loc_to_glob2v
 !    Performs local to global index translation. If an index is out of range
 !    a negative value is returned (see also iact).
 ! 
@@ -44,8 +44,8 @@
 !                                         an out of range index 
 !                                         'I'gnore, 'W'arning, 'A'bort
 !
-subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
-  use psb_base_mod, psb_protect_name => psb_loc_to_glob2
+subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
+  use psb_base_mod, psb_protect_name => psb_loc_to_glob2v
   implicit none
 
   !...parameters....
@@ -103,7 +103,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   end if
   return
 
-end subroutine psb_loc_to_glob2
+end subroutine psb_loc_to_glob2v
 
 
 !!$ 
@@ -137,7 +137,7 @@ end subroutine psb_loc_to_glob2
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_loc_to_glob
+! Subroutine: psb_loc_to_glob1v
 !    Performs local to global index translation. If an index is out of range
 !    a negative value is returned (see also iact).
 ! 
@@ -150,8 +150,8 @@ end subroutine psb_loc_to_glob2
 !                                         an out of range index 
 !                                         'I'gnore, 'W'arning, 'A'bort
 !
-subroutine psb_loc_to_glob(x,desc_a,info,iact)
-  use psb_base_mod, psb_protect_name => psb_loc_to_glob
+subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
+  use psb_base_mod, psb_protect_name => psb_loc_to_glob1v
   implicit none
 
   !...parameters....
@@ -208,10 +208,10 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   end if
   return
 
-end subroutine psb_loc_to_glob
+end subroutine psb_loc_to_glob1v
 
 subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_tools_mod, psb_protect_name => psb_loc_to_glob2s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
@@ -227,9 +227,9 @@ subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
   y      = iv2(1)
 end subroutine psb_loc_to_glob2s
 
-subroutine psb_loc_to_globs(x,desc_a,info,iact)
-  use psb_descriptor_type
-  use psb_tools_mod, psb_protect_name => psb_loc_to_globs
+subroutine psb_loc_to_glob1s(x,desc_a,info,iact)
+  use psb_desc_mod
+  use psb_tools_mod, psb_protect_name => psb_loc_to_glob1s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
   integer(psb_ipk_),intent(inout)              ::  x  
@@ -241,5 +241,5 @@ subroutine psb_loc_to_globs(x,desc_a,info,iact)
   call psb_loc_to_glob(iv1,desc_a,info,iact)
   x      = iv1(1)
 
-end subroutine psb_loc_to_globs
+end subroutine psb_loc_to_glob1s
 

@@ -55,7 +55,7 @@
 subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
 
   use psb_realloc_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
   use psi_mod, psb_protect_name => psi_crea_index

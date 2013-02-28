@@ -357,7 +357,7 @@ contains
     integer(psb_ipk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    integer, intent(in), optional :: lidx
+    integer(psb_ipk_), intent(in), optional :: lidx
 
     integer(psb_ipk_) :: idxv(1), lidxv(1)
 
@@ -384,7 +384,7 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
-    integer, intent(in), optional :: lidx
+    integer(psb_ipk_), intent(in), optional :: lidx
 
     idxout = idxin
     call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
@@ -400,7 +400,7 @@ contains
     integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer, intent(in), optional :: lidx(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: i, is, ix, lix
 
@@ -538,7 +538,7 @@ contains
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
-    integer, intent(in), optional :: lidx(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: is, im
     

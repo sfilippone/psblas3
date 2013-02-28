@@ -50,7 +50,7 @@
 !    
 subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv1
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -61,7 +61,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
-  integer, intent(in), optional :: lidx(:)
+  integer(psb_ipk_), intent(in), optional :: lidx(:)
   integer(psb_ipk_) :: ictxt,mglob, nglob
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: nrow,ncol, err_act
@@ -187,7 +187,7 @@ end subroutine psi_idx_ins_cnv1
 !    
 subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv2
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -198,7 +198,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask(:)
-  integer, intent(in), optional :: lidx(:)
+  integer(psb_ipk_), intent(in), optional :: lidx(:)
 
   integer(psb_ipk_) :: i,ictxt,k,mglob, nglob
   integer(psb_ipk_) :: np, me, isize
@@ -313,13 +313,13 @@ end subroutine psi_idx_ins_cnv2
 !    
 subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs2
-  use psb_descriptor_type
+  use psb_desc_mod
   integer(psb_ipk_), intent(in)  :: idxin
   integer(psb_ipk_), intent(out) :: idxout
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer, intent(in), optional :: lidx
+  integer(psb_ipk_), intent(in), optional :: lidx
   integer(psb_ipk_) :: iout(1),lidxv(1) 
   logical  :: mask_(1)
   
@@ -390,12 +390,12 @@ end subroutine psi_idx_ins_cnvs2
 !    
 subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask,lidx)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs1
-  use psb_descriptor_type
+  use psb_desc_mod
   integer(psb_ipk_), intent(inout)  :: idxin
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out) :: info
   logical, intent(in), optional :: mask
-  integer, intent(in), optional :: lidx
+  integer(psb_ipk_), intent(in), optional :: lidx
   integer(psb_ipk_) :: iout(1),lidxv(1)
   logical  :: mask_(1)
   

@@ -31,7 +31,7 @@
 !!$  
 ! File:  psb_zspgather.f90
 subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_mat_mod
@@ -51,10 +51,11 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   logical, intent(in), optional   :: keepnum,keeploc
 
   type(psb_z_coo_sparse_mat)      :: loc_coo, glob_coo
-  integer(psb_mpik_) :: ictxt,np,me, icomm, minfo
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
-  integer(psb_ipk_) :: ip, ndx,naggrm1,naggrp1, i, j, k, nzl
+  integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
+  integer(psb_mpik_) :: ictxt,np,me
+  integer(psb_mpik_) :: icomm, minfo, ndx
   integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
@@ -115,10 +116,12 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call mpi_allgatherv(loc_coo%val,ndx,mpi_double_complex,&
          & glob_coo%val,nzbr,idisp,&
          & mpi_double_complex,icomm,minfo)
-    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
+    if (minfo == psb_success_) call &
+         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ia,nzbr,idisp,&
          & psb_mpi_ipk_integer,icomm,minfo)
-    if (minfo == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
+    if (minfo == psb_success_) call &
+         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ja,nzbr,idisp,&
          & psb_mpi_ipk_integer,icomm,minfo)
     
@@ -135,6 +138,8 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
   else
     write(psb_err_unit,*) 'SP_ALLGATHER: Not implemented yet with keepnum ',keepnum_
+    info = -1
+    goto 9999
   end if
 
 

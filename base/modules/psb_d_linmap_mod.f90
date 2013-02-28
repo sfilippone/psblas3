@@ -39,7 +39,7 @@ module psb_d_linmap_mod
 
   use psb_const_mod
   use psb_d_mat_mod, only : psb_dspmat_type
-  use psb_descriptor_type, only : psb_desc_type
+  use psb_desc_mod, only : psb_desc_type
   use psb_base_linmap_mod
 
 
@@ -133,7 +133,7 @@ module psb_d_linmap_mod
 contains
 
   function d_map_sizeof(map) result(val)
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_d_mat_mod
     implicit none 
     class(psb_dlinmap_type), intent(in) :: map
@@ -147,7 +147,7 @@ contains
 
 
   function d_is_asb(map) result(val)
-    use psb_descriptor_type
+    use psb_desc_mod
     implicit none 
     class(psb_dlinmap_type), intent(in) :: map
     logical  :: val
@@ -186,7 +186,7 @@ contains
 
   subroutine  psb_dlinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_descriptor_type
+    use psb_desc_mod
     use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_dlinmap_type) :: mapin,mapout
@@ -200,7 +200,7 @@ contains
   end subroutine psb_dlinmap_transfer
 
   subroutine  d_free(map,info)
-    use psb_descriptor_type
+    use psb_desc_mod
     implicit none 
     class(psb_dlinmap_type) :: map
     integer(psb_ipk_), intent(out)      :: info 

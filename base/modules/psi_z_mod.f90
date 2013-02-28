@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psi_z_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_ipk_, psb_dpk_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_
   use psb_z_vect_mod, only : psb_z_base_vect_type 
 
   interface psi_swapdata

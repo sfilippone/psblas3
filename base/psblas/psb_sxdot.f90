@@ -49,7 +49,7 @@
 !    jy     -  integer(optional).   The column offset for sub( Y ).
 !
 function psb_sxdot(x, y,desc_a, info, jx, jy)  
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -202,7 +202,7 @@ end function psb_sxdot
 !    info   -  integer.              Return code
 !
 function psb_sxdotv(x, y,desc_a, info)  
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod

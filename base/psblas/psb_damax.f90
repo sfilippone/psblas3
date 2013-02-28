@@ -245,7 +245,7 @@ end function psb_damaxv
 function psb_damax_vect(x, desc_a, info) result(res)
   use psb_penv_mod
   use psb_serial_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_d_vect_mod

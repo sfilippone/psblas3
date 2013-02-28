@@ -87,7 +87,8 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   integer(psb_ipk_) :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
   type(psb_d_vect_type) :: wv, wv1
-  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='d_bjac_prec_apply'
@@ -243,7 +244,8 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
-  integer(psb_ipk_) :: ictxt,np,me, err_act, ierr(5)
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: err_act, ierr(5)
   integer(psb_ipk_) :: debug_level, debug_unit
   character          :: trans_
   character(len=20)  :: name='d_bjac_prec_apply'

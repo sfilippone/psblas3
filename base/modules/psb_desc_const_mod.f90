@@ -37,6 +37,17 @@
 module psb_desc_const_mod
   use psb_const_mod, only : psb_ipk_, psb_mpik_
   !
+  !     Sendtypes/receive types
+  !
+  integer(psb_ipk_), parameter :: psb_ipkidx_  = 1
+  integer(psb_ipk_), parameter :: psb_mpikidx_ = 2
+  integer(psb_ipk_), parameter :: psb_lngkidx_ = 3
+  integer(psb_ipk_), parameter :: psb_rspkidx_ = 4
+  integer(psb_ipk_), parameter :: psb_rdpkidx_ = 5
+  integer(psb_ipk_), parameter :: psb_cspkidx_ = 6
+  integer(psb_ipk_), parameter :: psb_cdpkidx_ = 7
+  integer(psb_ipk_), parameter :: psb_nkidx_   = 7
+  !
   !     Communication, prolongation & restriction
   !
   integer(psb_ipk_), parameter :: psb_nohalo_=0,  psb_halo_=1

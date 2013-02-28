@@ -45,7 +45,7 @@
 !    owned    - logical,optional          Restrict to local indices, no halo 
 !                                         (default false)
 subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -181,7 +181,7 @@ end subroutine psi_idx_cnv1
 !    owned     - logical,optional          Restrict to local indices, no halo
 !                                          (default false)
 subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -306,7 +306,7 @@ end subroutine psi_idx_cnv2
 subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
 
   use psi_mod, psb_protect_name => psi_idx_cnvs
-  use psb_descriptor_type
+  use psb_desc_mod
   integer(psb_ipk_), intent(in)  :: idxin
   integer(psb_ipk_), intent(out) :: idxout
   type(psb_desc_type), intent(in) :: desc
@@ -331,7 +331,7 @@ end subroutine psi_idx_cnvs
 subroutine psi_idx_cnvs1(idxin,desc,info,mask,owned)
 
   use psi_mod, psb_protect_name => psi_idx_cnvs1
-  use psb_descriptor_type
+  use psb_desc_mod
   integer(psb_ipk_), intent(inout)  :: idxin
   type(psb_desc_type), intent(in) :: desc
   integer(psb_ipk_), intent(out) :: info

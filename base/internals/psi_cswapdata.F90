@@ -87,7 +87,7 @@ subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswapdatam
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -160,7 +160,7 @@ subroutine psi_cswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
   use psi_mod, psb_protect_name => psi_cswapidxm
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -302,8 +302,8 @@ subroutine psi_cswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & mpi_complex,rcvbuf,rvsz,&
-         & brvidx,mpi_complex,icomm,iret)
+         & psb_mpi_c_spk_,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_c_spk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -363,7 +363,7 @@ subroutine psi_cswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_complex_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
-             & mpi_complex,prcid(i),&
+             & psb_mpi_c_spk_,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -388,11 +388,11 @@ subroutine psi_cswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),n*nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
              & p2ptag,icomm,iret)
         end if
 
@@ -585,7 +585,7 @@ subroutine psi_cswapdatav(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswapdatav
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -659,7 +659,7 @@ subroutine psi_cswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
   use psi_mod, psb_protect_name => psi_cswapidxv
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -801,8 +801,8 @@ subroutine psi_cswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & mpi_complex,rcvbuf,rvsz,&
-         & brvidx,mpi_complex,icomm,iret)
+         & psb_mpi_c_spk_,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_c_spk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -859,7 +859,7 @@ subroutine psi_cswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_complex_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-             & mpi_complex,prcid(i),&
+             & psb_mpi_c_spk_,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -884,11 +884,11 @@ subroutine psi_cswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
@@ -1019,7 +1019,7 @@ subroutine psi_cswapdata_vect(flag,beta,y,desc_a,work,info,data)
   use psi_mod, psb_protect_name => psi_cswapdata_vect
   use psb_c_base_vect_mod
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
@@ -1094,7 +1094,7 @@ subroutine psi_cswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 
   use psi_mod, psb_protect_name => psi_cswapidx_vect
   use psb_error_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_penv_mod
   use psb_c_base_vect_mod
 #ifdef MPI_MOD
@@ -1238,8 +1238,8 @@ subroutine psi_cswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & mpi_complex,rcvbuf,rvsz,&
-         & brvidx,mpi_complex,icomm,iret)
+         & psb_mpi_c_spk_,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_c_spk_,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -1296,7 +1296,7 @@ subroutine psi_cswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_complex_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-             & mpi_complex,prcid(i),&
+             & psb_mpi_c_spk_,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -1321,11 +1321,11 @@ subroutine psi_cswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),nesd,&
-               & mpi_complex,prcid(i),&
+               & psb_mpi_c_spk_,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 

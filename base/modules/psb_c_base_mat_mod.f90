@@ -58,10 +58,10 @@ module psb_c_base_mat_mod
     ! Data management methods: defined here, but (mostly) not implemented.
     !    
     procedure, pass(a) :: csput         => psb_c_base_csput  
-    procedure, pass(a) :: c_csgetrow  => psb_c_base_csgetrow
-    procedure, pass(a) :: c_csgetblk  => psb_c_base_csgetblk
+    procedure, pass(a) :: csgetrow  => psb_c_base_csgetrow
+    procedure, pass(a) :: csgetblk  => psb_c_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_c_base_get_diag
-    generic, public    :: csget         => c_csgetrow, c_csgetblk 
+    generic, public    :: csget         => csgetrow, csgetblk 
     procedure, pass(a) :: csclip        => psb_c_base_csclip 
     procedure, pass(a) :: mold          => psb_c_base_mold 
     procedure, pass(a) :: cp_to_coo     => psb_c_base_cp_to_coo   
@@ -88,31 +88,31 @@ module psb_c_base_mat_mod
     !
     ! Computational methods: defined here but not implemented. 
     !    
-    procedure, pass(a) :: c_sp_mv      => psb_c_base_vect_mv
-    procedure, pass(a) :: c_csmv       => psb_c_base_csmv
-    procedure, pass(a) :: c_csmm       => psb_c_base_csmm
-    generic, public    :: csmm         => c_csmm, c_csmv, c_sp_mv
-    procedure, pass(a) :: c_in_sv      => psb_c_base_inner_vect_sv
-    procedure, pass(a) :: c_inner_cssv => psb_c_base_inner_cssv    
-    procedure, pass(a) :: c_inner_cssm => psb_c_base_inner_cssm
-    generic, public    :: inner_cssm   => c_inner_cssm, c_inner_cssv, c_in_sv
-    procedure, pass(a) :: c_vect_cssv  => psb_c_base_vect_cssv
-    procedure, pass(a) :: c_cssv       => psb_c_base_cssv
-    procedure, pass(a) :: c_cssm       => psb_c_base_cssm
-    generic, public    :: cssm         => c_cssm, c_cssv, c_vect_cssv
-    procedure, pass(a) :: c_scals      => psb_c_base_scals
-    procedure, pass(a) :: c_scal       => psb_c_base_scal
-    generic, public    :: scal         => c_scals, c_scal 
-    procedure, pass(a) :: maxval       => psb_c_base_maxval
-    procedure, pass(a) :: csnmi        => psb_c_base_csnmi
-    procedure, pass(a) :: csnm1        => psb_c_base_csnm1
-    procedure, pass(a) :: rowsum       => psb_c_base_rowsum
-    procedure, pass(a) :: arwsum       => psb_c_base_arwsum
-    procedure, pass(a) :: colsum       => psb_c_base_colsum
-    procedure, pass(a) :: aclsum       => psb_c_base_aclsum
+    procedure, pass(a) :: sp_mv       => psb_c_base_vect_mv
+    procedure, pass(a) :: csmv        => psb_c_base_csmv
+    procedure, pass(a) :: csmm        => psb_c_base_csmm
+    generic, public    :: spmm        => csmm, csmv, sp_mv
+    procedure, pass(a) :: in_sv       => psb_c_base_inner_vect_sv
+    procedure, pass(a) :: inner_cssv  => psb_c_base_inner_cssv    
+    procedure, pass(a) :: inner_cssm  => psb_c_base_inner_cssm
+    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_sv
+    procedure, pass(a) :: vect_cssv   => psb_c_base_vect_cssv
+    procedure, pass(a) :: cssv        => psb_c_base_cssv
+    procedure, pass(a) :: cssm        => psb_c_base_cssm
+    generic, public    :: spsm        => cssm, cssv, vect_cssv
+    procedure, pass(a) :: scals       => psb_c_base_scals
+    procedure, pass(a) :: scalv       => psb_c_base_scal
+    generic, public    :: scal        => scals, scalv
+    procedure, pass(a) :: maxval      => psb_c_base_maxval
+    procedure, pass(a) :: spnmi       => psb_c_base_csnmi
+    procedure, pass(a) :: spnm1       => psb_c_base_csnm1
+    procedure, pass(a) :: rowsum      => psb_c_base_rowsum
+    procedure, pass(a) :: arwsum      => psb_c_base_arwsum
+    procedure, pass(a) :: colsum      => psb_c_base_colsum
+    procedure, pass(a) :: aclsum      => psb_c_base_aclsum
   end type psb_c_base_sparse_mat
   
-  private :: c_base_cp_from, c_base_mv_from
+  private :: base_cp_from, base_mv_from
   
   
   !> \namespace  psb_base_mod  \class  psb_c_coo_sparse_mat
@@ -154,7 +154,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: mv_from_fmt  => psb_c_mv_coo_from_fmt
     procedure, pass(a) :: csput        => psb_c_coo_csput
     procedure, pass(a) :: get_diag     => psb_c_coo_get_diag
-    procedure, pass(a) :: c_csgetrow   => psb_c_coo_csgetrow
+    procedure, pass(a) :: csgetrow     => psb_c_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_c_coo_csgetptn
     procedure, pass(a) :: reinit       => psb_c_coo_reinit
     procedure, pass(a) :: get_nz_row   => psb_c_coo_get_nz_row
@@ -183,19 +183,19 @@ module psb_c_base_mat_mod
     !
     ! Computational methods. 
     !    
-    procedure, pass(a) :: c_csmm       => psb_c_coo_csmm
-    procedure, pass(a) :: c_csmv       => psb_c_coo_csmv
-    procedure, pass(a) :: c_inner_cssm => psb_c_coo_cssm
-    procedure, pass(a) :: c_inner_cssv => psb_c_coo_cssv
-    procedure, pass(a) :: c_scals      => psb_c_coo_scals
-    procedure, pass(a) :: c_scal       => psb_c_coo_scal
-    procedure, pass(a) :: maxval       => psb_c_coo_maxval
-    procedure, pass(a) :: csnmi        => psb_c_coo_csnmi
-    procedure, pass(a) :: csnm1        => psb_c_coo_csnm1
-    procedure, pass(a) :: rowsum       => psb_c_coo_rowsum
-    procedure, pass(a) :: arwsum       => psb_c_coo_arwsum
-    procedure, pass(a) :: colsum       => psb_c_coo_colsum
-    procedure, pass(a) :: aclsum       => psb_c_coo_aclsum
+    procedure, pass(a) :: csmm       => psb_c_coo_csmm
+    procedure, pass(a) :: csmv       => psb_c_coo_csmv
+    procedure, pass(a) :: inner_cssm => psb_c_coo_cssm
+    procedure, pass(a) :: inner_cssv => psb_c_coo_cssv
+    procedure, pass(a) :: scals      => psb_c_coo_scals
+    procedure, pass(a) :: scalv      => psb_c_coo_scal
+    procedure, pass(a) :: maxval     => psb_c_coo_maxval
+    procedure, pass(a) :: spnmi      => psb_c_coo_csnmi
+    procedure, pass(a) :: spnm1      => psb_c_coo_csnm1
+    procedure, pass(a) :: rowsum     => psb_c_coo_rowsum
+    procedure, pass(a) :: arwsum     => psb_c_coo_arwsum
+    procedure, pass(a) :: colsum     => psb_c_coo_colsum
+    procedure, pass(a) :: aclsum     => psb_c_coo_aclsum
     
   end type psb_c_coo_sparse_mat
   
@@ -683,7 +683,10 @@ module psb_c_base_mat_mod
   !!           Y = alpha*op(A)*X + beta*Y
   !!        Usually the unwrapping of the encapsulated vector is done
   !!        here, so that all the derived classes need only the
-  !!        versions with the standard arrays. 
+  !!        versions with the standard arrays.
+  !!        Must be overridden explicitly in case of non standard memory
+  !!        management; an example would be external memory allocation
+  !!        in attached processors such as GPUs. 
   !!
   !!
   !! \param alpha  Scaling factor for Ax
@@ -784,6 +787,10 @@ module psb_c_base_mat_mod
   !!           Y = alpha*op(A^-1)*X + beta*Y
   !!
   !!        Internal workhorse called by vect_cssv. 
+  !!        Must be overridden explicitly in case of non standard memory
+  !!        management; an example would be external memory allocation
+  !!        in attached processors such as GPUs. 
+  !!
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix

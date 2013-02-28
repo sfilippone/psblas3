@@ -100,7 +100,7 @@
 !
 subroutine psi_desc_index(desc,index_in,dep_list,&
      & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod

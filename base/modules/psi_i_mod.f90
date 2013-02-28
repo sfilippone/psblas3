@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psi_i_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_ipk_, psb_mpik_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpik_
   use psb_i_vect_mod,  only : psb_i_base_vect_type
 
   interface
@@ -194,7 +194,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask(:)
-      integer, intent(in), optional :: lidx(:)
+      integer(psb_ipk_), intent(in), optional :: lidx(:)
     end subroutine psi_idx_ins_cnv1
     subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
@@ -203,7 +203,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask(:)
-      integer, intent(in), optional :: lidx(:)
+      integer(psb_ipk_), intent(in), optional :: lidx(:)
     end subroutine psi_idx_ins_cnv2
     subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
@@ -212,7 +212,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask
-      integer, intent(in), optional :: lidx
+      integer(psb_ipk_), intent(in), optional :: lidx
     end subroutine psi_idx_ins_cnvs2
     subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask,lidx)
       import :: psb_desc_type, psb_ipk_
@@ -220,7 +220,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
       logical, intent(in), optional :: mask
-      integer, intent(in), optional :: lidx
+      integer(psb_ipk_), intent(in), optional :: lidx
     end subroutine psi_idx_ins_cnvs1
   end interface
 

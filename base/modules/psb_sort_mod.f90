@@ -64,25 +64,25 @@ module psb_sort_mod
     integer(psb_ipk_), allocatable :: keys(:)
     integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_int_idx_heap
-  type psb_real_idx_heap
+  type psb_sreal_idx_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_spk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable        :: idxs(:)
-  end type psb_real_idx_heap
-  type psb_double_idx_heap
+    real(psb_spk_), allocatable    :: keys(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
+  end type psb_sreal_idx_heap
+  type psb_dreal_idx_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_dpk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable        :: idxs(:)
-  end type psb_double_idx_heap
+    real(psb_dpk_), allocatable    :: keys(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
+  end type psb_dreal_idx_heap
   type psb_scomplex_idx_heap
     integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_scomplex_idx_heap
   type psb_dcomplex_idx_heap
     integer(psb_ipk_) :: last, dir
     complex(psb_dpk_), allocatable :: keys(:)
-    integer(psb_ipk_), allocatable           :: idxs(:)
+    integer(psb_ipk_), allocatable :: idxs(:)
   end type psb_dcomplex_idx_heap
 
 
@@ -239,18 +239,18 @@ module psb_sort_mod
       type(psb_int_heap), intent(in) :: heap
       integer(psb_ipk_) :: psb_howmany_int_heap
     end function psb_howmany_int_heap
-    function  psb_howmany_real_idx_heap(heap)
+    function  psb_howmany_sreal_idx_heap(heap)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_real_idx_heap
-      type(psb_real_idx_heap), intent(in) :: heap
-      integer(psb_ipk_) :: psb_howmany_real_idx_heap
-    end function psb_howmany_real_idx_heap
-    function  psb_howmany_double_idx_heap(heap)
+      import :: psb_sreal_idx_heap
+      type(psb_sreal_idx_heap), intent(in) :: heap
+      integer(psb_ipk_) :: psb_howmany_sreal_idx_heap
+    end function psb_howmany_sreal_idx_heap
+    function  psb_howmany_dreal_idx_heap(heap)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_double_idx_heap
-      type(psb_double_idx_heap), intent(in) :: heap
-      integer(psb_ipk_) :: psb_howmany_double_idx_heap
-    end function psb_howmany_double_idx_heap
+      import :: psb_dreal_idx_heap
+      type(psb_dreal_idx_heap), intent(in) :: heap
+      integer(psb_ipk_) :: psb_howmany_dreal_idx_heap
+    end function psb_howmany_dreal_idx_heap
     function  psb_howmany_int_idx_heap(heap)
       import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
@@ -280,13 +280,13 @@ module psb_sort_mod
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_int_heap
-    subroutine psb_init_real_idx_heap(heap,info,dir)
+    subroutine psb_init_sreal_idx_heap(heap,info,dir)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_real_idx_heap
-      type(psb_real_idx_heap), intent(inout) :: heap
+      import :: psb_sreal_idx_heap
+      type(psb_sreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: dir
-    end subroutine psb_init_real_idx_heap
+    end subroutine psb_init_sreal_idx_heap
     subroutine psb_init_int_idx_heap(heap,info,dir)
       import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
@@ -308,13 +308,13 @@ module psb_sort_mod
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: dir
     end subroutine psb_init_dcomplex_idx_heap
-    subroutine psb_init_double_idx_heap(heap,info,dir)
+    subroutine psb_init_dreal_idx_heap(heap,info,dir)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_double_idx_heap
-      type(psb_double_idx_heap), intent(inout) :: heap
+      import :: psb_dreal_idx_heap
+      type(psb_dreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: dir
-    end subroutine psb_init_double_idx_heap
+    end subroutine psb_init_dreal_idx_heap
   end interface
 
 
@@ -326,20 +326,20 @@ module psb_sort_mod
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), intent(in)            :: iout
     end subroutine psb_dump_int_heap
-    subroutine psb_dump_real_idx_heap(iout,heap,info)
+    subroutine psb_dump_sreal_idx_heap(iout,heap,info)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_real_idx_heap
-      type(psb_real_idx_heap), intent(in) :: heap
+      import :: psb_sreal_idx_heap
+      type(psb_sreal_idx_heap), intent(in) :: heap
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), intent(in)            :: iout
-    end subroutine psb_dump_real_idx_heap
-    subroutine psb_dump_double_idx_heap(iout,heap,info)
+    end subroutine psb_dump_sreal_idx_heap
+    subroutine psb_dump_dreal_idx_heap(iout,heap,info)
       import :: psb_ipk_, psb_spk_, psb_dpk_
-      import :: psb_double_idx_heap
-      type(psb_double_idx_heap), intent(in) :: heap
+      import :: psb_dreal_idx_heap
+      type(psb_dreal_idx_heap), intent(in) :: heap
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), intent(in)            :: iout
-    end subroutine psb_dump_double_idx_heap
+    end subroutine psb_dump_dreal_idx_heap
     subroutine psb_dump_int_idx_heap(iout,heap,info)
       import :: psb_ipk_, psb_spk_, psb_dpk_
       import :: psb_int_idx_heap
@@ -378,20 +378,20 @@ module psb_sort_mod
       type(psb_int_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_insert_int_idx_heap
-    subroutine psb_insert_real_idx_heap(key,index,heap,info)
-      import :: psb_spk_, psb_real_idx_heap, psb_ipk_
+    subroutine psb_insert_sreal_idx_heap(key,index,heap,info)
+      import :: psb_spk_, psb_sreal_idx_heap, psb_ipk_
       real(psb_spk_), intent(in)      :: key
       integer(psb_ipk_), intent(in)               :: index
-      type(psb_real_idx_heap), intent(inout) :: heap
+      type(psb_sreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_insert_real_idx_heap
-    subroutine psb_insert_double_idx_heap(key,index,heap,info)
-      import :: psb_dpk_, psb_double_idx_heap, psb_ipk_
+    end subroutine psb_insert_sreal_idx_heap
+    subroutine psb_insert_dreal_idx_heap(key,index,heap,info)
+      import :: psb_dpk_, psb_dreal_idx_heap, psb_ipk_
       real(psb_dpk_), intent(in)      :: key
       integer(psb_ipk_), intent(in)               :: index
-      type(psb_double_idx_heap), intent(inout) :: heap
+      type(psb_dreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_insert_double_idx_heap
+    end subroutine psb_insert_dreal_idx_heap
     subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
       import :: psb_spk_, psb_scomplex_idx_heap, psb_ipk_
       complex(psb_spk_), intent(in)              :: key
@@ -420,18 +420,18 @@ module psb_sort_mod
       integer(psb_ipk_), intent(out)                  :: index,info
       integer(psb_ipk_), intent(out)                  :: key
     end subroutine psb_int_idx_heap_get_first
-    subroutine psb_real_idx_heap_get_first(key,index,heap,info)
-      import :: psb_spk_, psb_real_idx_heap, psb_ipk_
-      type(psb_real_idx_heap), intent(inout) :: heap
+    subroutine psb_sreal_idx_heap_get_first(key,index,heap,info)
+      import :: psb_spk_, psb_sreal_idx_heap, psb_ipk_
+      type(psb_sreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)              :: index,info
       real(psb_spk_), intent(out)     :: key
-    end subroutine psb_real_idx_heap_get_first
-    subroutine psb_double_idx_heap_get_first(key,index,heap,info)
-      import :: psb_dpk_, psb_double_idx_heap, psb_ipk_
-      type(psb_double_idx_heap), intent(inout) :: heap
+    end subroutine psb_sreal_idx_heap_get_first
+    subroutine psb_dreal_idx_heap_get_first(key,index,heap,info)
+      import :: psb_dpk_, psb_dreal_idx_heap, psb_ipk_
+      type(psb_dreal_idx_heap), intent(inout) :: heap
       integer(psb_ipk_), intent(out)              :: index,info
       real(psb_dpk_), intent(out)     :: key
-    end subroutine psb_double_idx_heap_get_first
+    end subroutine psb_dreal_idx_heap_get_first
     subroutine psb_scomplex_idx_heap_get_first(key,index,heap,info)
       import :: psb_spk_, psb_scomplex_idx_heap, psb_ipk_
       type(psb_scomplex_idx_heap), intent(inout) :: heap
@@ -588,47 +588,47 @@ module psb_sort_mod
   end interface
   
   interface 
-    subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
+    subroutine psi_insert_sreal_idx_heap(key,index,last,heap,idxs,dir,info)
       import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(in)     :: key
       integer(psb_ipk_), intent(in)            :: index,dir
       real(psb_spk_), intent(inout)  :: heap(:)
       integer(psb_ipk_), intent(inout)         :: idxs(:),last
       integer(psb_ipk_), intent(out)           :: info
-    end subroutine psi_insert_real_idx_heap
+    end subroutine psi_insert_sreal_idx_heap
   end interface
   
   interface 
-    subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    subroutine psi_sreal_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
       import :: psb_spk_, psb_ipk_
       real(psb_spk_), intent(inout) :: heap(:)
       integer(psb_ipk_), intent(out)          :: index,info
       integer(psb_ipk_), intent(inout)        :: last,idxs(:)
       integer(psb_ipk_), intent(in)           :: dir
       real(psb_spk_), intent(out)   :: key
-    end subroutine psi_real_idx_heap_get_first
+    end subroutine psi_sreal_idx_heap_get_first
   end interface
 
   interface 
-    subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
+    subroutine psi_insert_dreal_idx_heap(key,index,last,heap,idxs,dir,info)
       import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)     :: key
       integer(psb_ipk_), intent(in)              :: index,dir
       real(psb_dpk_), intent(inout)  :: heap(:)
       integer(psb_ipk_), intent(inout)           :: idxs(:),last
       integer(psb_ipk_), intent(out)             :: info
-    end subroutine psi_insert_double_idx_heap
+    end subroutine psi_insert_dreal_idx_heap
   end interface
   
   interface 
-    subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    subroutine psi_dreal_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
       import :: psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(inout) :: heap(:)
       integer(psb_ipk_), intent(out)            :: index,info
       integer(psb_ipk_), intent(inout)          :: last,idxs(:)
       integer(psb_ipk_), intent(in)             :: dir
       real(psb_dpk_), intent(out)   :: key
-    end subroutine psi_double_idx_heap_get_first
+    end subroutine psi_dreal_idx_heap_get_first
   end interface
 
   interface 
@@ -678,8 +678,8 @@ module psb_sort_mod
 
   interface psb_free_heap
     module procedure psb_free_int_heap, psb_free_int_idx_heap,&
-         & psb_free_real_idx_heap, psb_free_scomplex_idx_heap, &
-         & psb_free_double_idx_heap, psb_free_dcomplex_idx_heap
+         & psb_free_sreal_idx_heap, psb_free_scomplex_idx_heap, &
+         & psb_free_dreal_idx_heap, psb_free_dcomplex_idx_heap
   end interface
 
 contains
@@ -694,27 +694,27 @@ contains
 
   end subroutine psb_free_int_heap
 
-  subroutine psb_free_real_idx_heap(heap,info)
+  subroutine psb_free_sreal_idx_heap(heap,info)
     implicit none 
-    type(psb_real_idx_heap), intent(inout) :: heap
+    type(psb_sreal_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
     if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
 
-  end subroutine psb_free_real_idx_heap
+  end subroutine psb_free_sreal_idx_heap
 
-  subroutine psb_free_double_idx_heap(heap,info)
+  subroutine psb_free_dreal_idx_heap(heap,info)
     implicit none 
-    type(psb_double_idx_heap), intent(inout) :: heap
+    type(psb_dreal_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
     if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
 
-  end subroutine psb_free_double_idx_heap
+  end subroutine psb_free_dreal_idx_heap
 
   subroutine psb_free_int_idx_heap(heap,info)
     implicit none 

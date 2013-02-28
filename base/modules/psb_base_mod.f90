@@ -34,7 +34,7 @@ module psb_base_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_check_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_linmap_mod
   use psb_vect_mod
   use psb_mat_mod

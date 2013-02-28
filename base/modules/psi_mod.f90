@@ -32,7 +32,7 @@
 module psi_mod
 
   use psi_serial_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod

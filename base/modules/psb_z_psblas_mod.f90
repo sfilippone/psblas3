@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psb_z_psblas_mod
-  use psb_descriptor_type, only : psb_desc_type, psb_dpk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
   use psb_z_vect_mod, only : psb_z_vect_type
   use psb_z_mat_mod, only : psb_zspmat_type
 

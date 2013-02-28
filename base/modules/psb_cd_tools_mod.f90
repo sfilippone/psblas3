@@ -32,7 +32,7 @@
 module psb_cd_tools_mod
 
   use psb_const_mod
-  use psb_descriptor_type
+  use psb_desc_mod
   use psb_gen_block_map_mod
   use psb_list_map_mod
   use psb_glist_map_mod
