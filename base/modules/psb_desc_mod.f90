@@ -245,6 +245,14 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
+  interface 
+    subroutine psb_cd_destroy(desc)
+      implicit none
+      !....parameters...
+      class(psb_desc_type), intent(inout) :: desc
+    end subroutine psb_cd_destroy
+  end interface
+
   private :: nullify_desc
 
   integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
@@ -660,59 +668,6 @@ contains
 
   end subroutine psb_cdfree
 
-  !
-  ! Subroutine: psb_cdfree
-  !   Frees a descriptor data structure.
-  ! 
-  ! Arguments: 
-  !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
-  subroutine psb_cd_destroy(desc)
-    !...free descriptor structure...
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-    implicit none
-    !....parameters...
-    class(psb_desc_type), intent(inout) :: desc
-    !...locals....
-    integer(psb_ipk_) :: info
-
-
-    if (allocated(desc%halo_index)) &
-         &  deallocate(desc%halo_index,stat=info)
-
-    if (allocated(desc%bnd_elem)) &
-         &    deallocate(desc%bnd_elem,stat=info)
-
-    if (allocated(desc%ovrlap_index)) &
-         & deallocate(desc%ovrlap_index,stat=info)
-    
-    if (allocated(desc%ovrlap_elem)) &
-         & deallocate(desc%ovrlap_elem,stat=info)
-    if (allocated(desc%ovr_mst_idx)) &
-         & deallocate(desc%ovr_mst_idx,stat=info)
-
-    if (allocated(desc%lprm)) &
-         & deallocate(desc%lprm,stat=info)
-    if (allocated(desc%idx_space)) &
-         & deallocate(desc%idx_space,stat=info)
-
-    if (allocated(desc%sendtypes)) &
-         & deallocate(desc%sendtypes,stat=info)
-
-    if (allocated(desc%recvtypes)) &
-         & deallocate(desc%recvtypes,stat=info)
-
-    if (allocated(desc%indxmap)) then 
-      call desc%indxmap%free()
-      deallocate(desc%indxmap, stat=info)
-    end if
-
-    call desc%nullify()
-
-    return
-
-  end subroutine psb_cd_destroy
   !
   ! Subroutine: psb_cdtransfer
   !   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
