@@ -58,8 +58,8 @@ module psb_c_base_mat_mod
     ! Data management methods: defined here, but (mostly) not implemented.
     !    
     procedure, pass(a) :: csput         => psb_c_base_csput  
-    procedure, pass(a) :: csgetrow  => psb_c_base_csgetrow
-    procedure, pass(a) :: csgetblk  => psb_c_base_csgetblk
+    procedure, pass(a) :: csgetrow      => psb_c_base_csgetrow
+    procedure, pass(a) :: csgetblk      => psb_c_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_c_base_get_diag
     generic, public    :: csget         => csgetrow, csgetblk 
     procedure, pass(a) :: csclip        => psb_c_base_csclip 
@@ -88,14 +88,14 @@ module psb_c_base_mat_mod
     !
     ! Computational methods: defined here but not implemented. 
     !    
-    procedure, pass(a) :: sp_mv       => psb_c_base_vect_mv
+    procedure, pass(a) :: vect_mv     => psb_c_base_vect_mv
     procedure, pass(a) :: csmv        => psb_c_base_csmv
     procedure, pass(a) :: csmm        => psb_c_base_csmm
-    generic, public    :: spmm        => csmm, csmv, sp_mv
-    procedure, pass(a) :: in_sv       => psb_c_base_inner_vect_sv
+    generic, public    :: spmm        => csmm, csmv, vect_mv
+    procedure, pass(a) :: in_vect_sv  => psb_c_base_inner_vect_sv
     procedure, pass(a) :: inner_cssv  => psb_c_base_inner_cssv    
     procedure, pass(a) :: inner_cssm  => psb_c_base_inner_cssm
-    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_sv
+    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
     procedure, pass(a) :: vect_cssv   => psb_c_base_vect_cssv
     procedure, pass(a) :: cssv        => psb_c_base_cssv
     procedure, pass(a) :: cssm        => psb_c_base_cssm
