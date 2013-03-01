@@ -247,6 +247,7 @@ module psb_desc_mod
 
   interface 
     subroutine psb_cd_destroy(desc)
+      import :: psb_desc_type
       implicit none
       !....parameters...
       class(psb_desc_type), intent(inout) :: desc
