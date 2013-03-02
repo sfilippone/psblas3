@@ -45,7 +45,7 @@ subroutine psb_cd_destroy(desc)
   if (allocated(desc%sendtypes)) then 
     do j=1, size(desc%sendtypes,2) 
       do i=1, size(desc%sendtypes,1) 
-        if (desc%sendtypes(i,j) == mpi_data_null) then 
+        if (desc%sendtypes(i,j) /= mpi_datatype_null) then 
           call mpi_type_free(desc%sendtypes(i,j),info)
         end if
       end do
@@ -57,7 +57,7 @@ subroutine psb_cd_destroy(desc)
   if (allocated(desc%recvtypes)) then 
     do j=1, size(desc%recvtypes,2) 
       do i=1, size(desc%recvtypes,1) 
-        if (desc%recvtypes(i,j) == mpi_data_null) then 
+        if (desc%recvtypes(i,j) /= mpi_datatype_null) then 
           call mpi_type_free(desc%recvtypes(i,j),info)
         end if
       end do
