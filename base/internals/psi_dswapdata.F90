@@ -1541,7 +1541,7 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   real(psb_dpk_)           :: beta
   real(psb_dpk_), target   :: work(:)
   integer(psb_ipk_), intent(in)  :: idx(:),totxch,totsnd, totrcv
-  integer(psb_mpik_), intent(in) :: sendtypes(:),recvtypes(:)
+  integer(psb_mpik_), intent(inout) :: sendtypes(:),recvtypes(:)
 
   ! locals
   integer(psb_mpik_) :: ictxt, icomm, np, me,&
@@ -1550,7 +1550,7 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
-       & snd_pt, rcv_pt, pnti, n,j
+       & snd_pt, rcv_pt, pnti, n,j,bfsz
   integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
@@ -1561,7 +1561,7 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   volatile :: sndbuf, rcvbuf
 #endif
   character(len=20)  :: name
-  integer, allocatable :: blens(:), new_idx(:)
+  integer(psb_mpik_), allocatable :: blens(:), new_idx(:)
 
   info=psb_success_
   name='psi_swap_datav'
@@ -1576,7 +1576,6 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   endif
 
   n=1
-
   swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
@@ -1584,354 +1583,147 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-  if (beta==0 .and. do_send .and. do_recv) then
+  if (beta==dzero .and. do_send .and. do_recv .and.sendtypes(1)/=mpi_datatype_null) then
 
-
-    totrcv_ = totrcv * n
-    totsnd_ = totsnd * n
-
-    if (swap_mpi) then 
-      allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
-           & brvidx(0:np-1), rvhd(0:np-1), sdhd(0:np-1), prcid(0:np-1),&
-           & stat=info)    
-      if(info /= psb_success_) then
-        call psb_errpush(psb_err_alloc_dealloc_,name)
-        goto 9999
-      end if
-
-      rvhd(:) = mpi_request_null
-      sdsz(:) = 0 
-      rvsz(:) = 0 
-
-      ! prepare info for communications
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-        call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
-
-        brvidx(proc_to_comm) = rcv_pt
-        rvsz(proc_to_comm)   = nerv
-
-        bsdidx(proc_to_comm) = snd_pt
-        sdsz(proc_to_comm)   = nesd
-
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-
-      end do
-
-    else
-      allocate(rvhd(totxch),prcid(totxch),stat=info) 
-      if(info /= psb_success_) then
-        call psb_errpush(psb_err_alloc_dealloc_,name)
-        goto 9999
-      end if
-    end if
-
-
-    totrcv_ = max(totrcv_,1)
-    totsnd_ = max(totsnd_,1)
-    if((totrcv_+totsnd_) < size(work)) then
-      sndbuf => work(1:totsnd_)
-      rcvbuf => work(totsnd_+1:totsnd_+totrcv_)
-      albf=.false.
-    else
-      allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
-      if(info /= psb_success_) then
-        call psb_errpush(psb_err_alloc_dealloc_,name)
-        goto 9999
-      end if
-      albf=.true.
-    end if
-
-
-    !We've to set the derivate datatypes
-    !Send/Gather
-    ! pnti   = 1
-    !  snd_pt = 1
-    !  if(.not.allocated(sendtypes)) then
-    !	allocate(sendtypes(totxch), stat=info)
-    ! 	do i=1, totxch
-    !		nerv = idx(pnti+psb_n_elem_recv_)
-    !		nesd = idx(pnti+nerv+psb_n_elem_send_)
-    !		idx_pt = 1+pnti+nerv+psb_n_elem_send_
-    !		allocate(blens(nesd),stat=info)
-    !		do j=1,nesd
-    !		  blens(j) = 1
-    !		end do
-
-    !		call MPI_TYPE_INDEXED(nesd,blens,(idx(idx_pt:idx_pt+nesd-1)-1),&
-    !		     & mpi_double_precision,sendtypes(i),info)
-    !		call MPI_TYPE_COMMIT(sendtypes(i),info)
-    !		deallocate(blens,stat=info)
-    !		snd_pt = snd_pt + nesd 
-    !		pnti   = pnti + nerv + nesd + 3
-    ! 	end do
-    ! end if
-
-    !Recv/Scatter
-    !  pnti   = 1
-    ! snd_pt = 1
-    !  rcv_pt = 1
-    !if(.not.allocated(recvtypes)) then
-    ! 	allocate(recvtypes(totxch), stat=info)
-    !	do i=1, totxch
-    !		proc_to_comm = idx(pnti+psb_proc_id_)
-    !		nerv = idx(pnti+psb_n_elem_recv_)
-    !		nesd = idx(pnti+nerv+psb_n_elem_send_)
-    !		idx_pt = 1+pnti+psb_n_elem_recv_
-    !		allocate(blens(nerv),stat=info)
-    !		do j=1, nerv
-    !		  blens(j) = 1
-    !		end do
-    !
-    !		call MPI_TYPE_INDEXED(nerv,blens,(idx(idx_pt:idx_pt+nerv-1)-1),&
-    !		     & mpi_double_precision,recvtypes(i),info)
-    !		call MPI_TYPE_COMMIT(recvtypes(i),info)
-    !		deallocate(blens,stat=info)
-
-    !		rcv_pt = rcv_pt + nerv
-    !		snd_pt = snd_pt + nesd
-    !		pnti   = pnti + nerv + nesd + 3
-    !	end do
-    ! end if
-
-
-    if (beta/=0 .and. do_send) then
-
-      ! Pack send buffers
-      pnti   = 1
-      snd_pt = 1
-      do i=1, totxch
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-        idx_pt = 1+pnti+nerv+psb_n_elem_send_
-        call y%gth(nesd,idx(idx_pt:idx_pt+nesd-1),&
-             & sndbuf(snd_pt:snd_pt+nesd-1))
-        snd_pt = snd_pt + nesd 
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-    end if
-
-    ! Case SWAP_MPI
-    if (swap_mpi) then !swap_mpi==false
-
-      ! swap elements using mpi_alltoallv
-      call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-           & psb_mpi_r_dpk_,rcvbuf,rvsz,&
-           & brvidx,psb_mpi_r_dpk_,icomm,iret)
-      if(iret /= mpi_success) then
-        ierr(1) = iret
-        info=psb_err_mpi_error_
-        call psb_errpush(info,name,i_err=ierr)
-        goto 9999
-      end if
-
-    else if (swap_sync) then !swap_sync==false
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-
-        if (proc_to_comm  <  me) then
-          if (nesd>0) call psb_snd(ictxt,&
-               & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-          if (nerv>0) call psb_rcv(ictxt,&
-               & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-        else if (proc_to_comm  >  me) then
-          if (nerv>0) call psb_rcv(ictxt,&
-               & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-          if (nesd>0) call psb_snd(ictxt,&
-               & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-        else if (proc_to_comm ==  me) then
-          if (nesd /= nerv) then 
-            write(psb_err_unit,*) &
-                 & 'Fatal error in swapdata: mismatch on self send',&
-                 & nerv,nesd
-          end if
-          rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
-        end if
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-
-    else if (swap_send .and. swap_recv) then
-
-      !write(*,*) 'Sono dentro swap_send .and. swap_recv'
-
-      ! First I post all the non blocking receives
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-        if ((nerv>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_double_swap_tag
-          call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-               & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag, icomm,rvhd(i),iret)
-        end if
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-
-      ! Then I post all the blocking sends
-      if (usersend)  call mpi_barrier(icomm,iret)
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-
-        p2ptag = psb_double_swap_tag
-
-        if ((nesd>0).and.(proc_to_comm /= me)) then
-
-          if(beta==0) then
-            call send_routine(y%v,sendtypes(i),prcid(i),p2ptag,icomm, iret)
-          else
-            if (usersend) then 
-              call mpi_rsend(sndbuf(snd_pt),nesd,&
-                   & psb_mpi_r_dpk_,prcid(i),&
-                   & p2ptag,icomm,iret)
-            else
-              call mpi_send(sndbuf(snd_pt),nesd,&
-                   & psb_mpi_r_dpk_,prcid(i),&
-                   & p2ptag,icomm,iret)
-            end if
-          end if
-
-          if(iret /= mpi_success) then
-            ierr(1) = iret
-            info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
-            goto 9999
-          end if
-        end if
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-
-      pnti   = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-
-        p2ptag = psb_double_swap_tag
-
-        if ((proc_to_comm /= me).and.(nerv>0)) then
-          call mpi_wait(rvhd(i),p2pstat,iret)
-          if(iret /= mpi_success) then
-            ierr(1) = iret
-            info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
-            goto 9999
-          end if
-        else if (proc_to_comm == me) then 
-          if (nesd /= nerv) then 
-            write(psb_err_unit,*) &
-                 & 'Fatal error in swapdata: mismatch on self send',&
-                 & nerv,nesd
-          end if
-          rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
-        end if
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-
-    else if (swap_send) then
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nesd>0) call psb_snd(ictxt,&
-             & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-    else if (swap_recv) then
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx(pnti+psb_proc_id_)
-        nerv = idx(pnti+psb_n_elem_recv_)
-        nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nerv>0) call psb_rcv(ictxt,&
-             & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-        rcv_pt = rcv_pt + nerv
-        snd_pt = snd_pt + nesd
-        pnti   = pnti + nerv + nesd + 3
-      end do
-
-    end if
-
-    if (do_recv) then 
-
-      pnti   = 1
-      snd_pt = 1
-      rcv_pt = 1
-      do i=1, totxch
-        !call mpi_type_free(sendtypes(i),info)
-        !call mpi_type_free(recvtypes(i),info)
-        if(beta/=0) then
-          proc_to_comm = idx(pnti+psb_proc_id_)
-          nerv = idx(pnti+psb_n_elem_recv_)
-          nesd = idx(pnti+nerv+psb_n_elem_send_)
-          idx_pt = 1+pnti+psb_n_elem_recv_
-          call y%sct(nerv,idx(idx_pt:idx_pt+nerv-1),&
-               & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta)
-          rcv_pt = rcv_pt + nerv
-          snd_pt = snd_pt + nesd
-          pnti   = pnti + nerv + nesd + 3
-        end if
-      end do
-
-    end if
-
-    if (swap_mpi) then 
-      deallocate(sdsz,rvsz,bsdidx,brvidx,rvhd,prcid,sdhd,&
-           & stat=info)
-    else
-      deallocate(rvhd,prcid,stat=info)
-    end if
+    allocate(rvhd(totxch),prcid(totxch),stat=info) 
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
-    if(albf) deallocate(sndbuf,rcvbuf,stat=info)
+
+    pnti   = 1
+    bfsz   = 0
+    do i=1, totxch
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)
+      bfsz = max(bfsz,nesd,nerv)
+      pnti   = pnti + nerv + nesd + 3      
+    end do
+!!$    allocate(blens(bfsz),new_idx(bfsz),stat=info)
+!!$    if(info /= psb_success_) then
+!!$      call psb_errpush(psb_err_alloc_dealloc_,name)
+!!$      goto 9999
+!!$    end if
+!!$
+!!$
+!!$    !We've to set the derivate datatypes
+!!$    !Send/Gather
+!!$    pnti   = 1
+!!$    snd_pt = 1
+!!$    if (sendtypes(1)==mpi_datatype_null) then
+!!$      do i=1, totxch
+!!$        nerv = idx(pnti+psb_n_elem_recv_)
+!!$        nesd = idx(pnti+nerv+psb_n_elem_send_)
+!!$        idx_pt = 1+pnti+nerv+psb_n_elem_send_
+!!$        do j=1,nesd
+!!$          blens(j)   = 1
+!!$          new_idx(i) = idx(idx_pt+i-1)-1
+!!$        end do
+!!$        call MPI_TYPE_INDEXED(nesd,blens,new_idx,&
+!!$    	     & psb_mpi_r_dpk_,sendtypes(i),iret)
+!!$        call MPI_TYPE_COMMIT(sendtypes(i),iret)
+!!$        snd_pt = snd_pt + nesd 
+!!$    	pnti   = pnti + nerv + nesd + 3
+!!$      end do
+!!$    end if
+!!$
+!!$    !Recv/Scatter
+!!$    pnti   = 1
+!!$    snd_pt = 1
+!!$    rcv_pt = 1
+!!$    if (recvtypes(1)==mpi_datatype_null) then
+!!$      do i=1, totxch
+!!$        proc_to_comm = idx(pnti+psb_proc_id_)
+!!$        nerv = idx(pnti+psb_n_elem_recv_)
+!!$        nesd = idx(pnti+nerv+psb_n_elem_send_)
+!!$        idx_pt = 1+pnti+psb_n_elem_recv_
+!!$        do j=1, nerv
+!!$          blens(j)   = 1
+!!$          new_idx(i) = idx(idx_pt+i-1)-1
+!!$        end do
+!!$        call mpi_type_indexed(nerv,blens,new_idx,&
+!!$             & psb_mpi_r_dpk_,recvtypes(i),iret)
+!!$        call mpi_type_commit(recvtypes(i),iret)
+!!$
+!!$        rcv_pt = rcv_pt + nerv
+!!$        snd_pt = snd_pt + nesd
+!!$        pnti   = pnti + nerv + nesd + 3
+!!$      end do
+!!$    end if
+!!$
+
+
+    !write(*,*) 'Sono dentro swap_send .and. swap_recv'
+
+    ! First I post all the non blocking receives
+    pnti   = 1
+    snd_pt = 1
+    rcv_pt = 1
+    do i=1, totxch
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+
+      if (nerv>0) then 
+        p2ptag = psb_double_swap_tag
+        call receive_routine(y%v,recvtypes(i),prcid(i),&
+             & p2ptag,icomm,rvhd(i),iret)
+      end if
+      rcv_pt = rcv_pt + nerv
+      snd_pt = snd_pt + nesd
+      pnti   = pnti + nerv + nesd + 3
+    end do
+
+
+    ! Then I post all the blocking sends
+    if (usersend)  call mpi_barrier(icomm,iret)
+
+    pnti   = 1
+    snd_pt = 1
+    rcv_pt = 1
+    do i=1, totxch
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+
+      p2ptag = psb_double_swap_tag
+      if (nesd>0) then
+        call send_routine(y%v,sendtypes(i),prcid(i),p2ptag,icomm, iret)
+        if(iret /= mpi_success) then
+          ierr(1) = iret
+          info=psb_err_mpi_error_
+          call psb_errpush(info,name,i_err=ierr)
+          goto 9999
+        end if
+      end if
+      rcv_pt = rcv_pt + nerv
+      snd_pt = snd_pt + nesd
+      pnti   = pnti + nerv + nesd + 3
+    end do
+
+
+    pnti   = 1
+    do i=1, totxch
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+
+      p2ptag = psb_double_swap_tag
+
+      if (nerv>0) then
+        call mpi_wait(rvhd(i),p2pstat,iret)
+        if(iret /= mpi_success) then
+          ierr(1) = iret
+          info=psb_err_mpi_error_
+          call psb_errpush(info,name,i_err=ierr)
+          goto 9999
+        end if
+      end if
+      pnti   = pnti + nerv + nesd + 3
+    end do
+
+    deallocate(rvhd,prcid,stat=info)
+
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -2005,58 +1797,6 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
     end if
 
 
-    !We've to set the derivate datatypes
-    !Send/Gather
-    ! pnti   = 1
-    !  snd_pt = 1
-    !  if(.not.allocated(sendtypes)) then
-    !	allocate(sendtypes(totxch), stat=info)
-    ! 	do i=1, totxch
-    !		nerv = idx(pnti+psb_n_elem_recv_)
-    !		nesd = idx(pnti+nerv+psb_n_elem_send_)
-    !		idx_pt = 1+pnti+nerv+psb_n_elem_send_
-    !		allocate(blens(nesd),stat=info)
-    !		do j=1,nesd
-    !		  blens(j) = 1
-    !		end do
-
-    !		call MPI_TYPE_INDEXED(nesd,blens,(idx(idx_pt:idx_pt+nesd-1)-1),&
-    !		     & mpi_double_precision,sendtypes(i),info)
-    !		call MPI_TYPE_COMMIT(sendtypes(i),info)
-    !		deallocate(blens,stat=info)
-    !		snd_pt = snd_pt + nesd 
-    !		pnti   = pnti + nerv + nesd + 3
-    ! 	end do
-    ! end if
-
-    !Recv/Scatter
-    !  pnti   = 1
-    ! snd_pt = 1
-    !  rcv_pt = 1
-    !if(.not.allocated(recvtypes)) then
-    ! 	allocate(recvtypes(totxch), stat=info)
-    !	do i=1, totxch
-    !		proc_to_comm = idx(pnti+psb_proc_id_)
-    !		nerv = idx(pnti+psb_n_elem_recv_)
-    !		nesd = idx(pnti+nerv+psb_n_elem_send_)
-    !		idx_pt = 1+pnti+psb_n_elem_recv_
-    !		allocate(blens(nerv),stat=info)
-    !		do j=1, nerv
-    !		  blens(j) = 1
-    !		end do
-    !
-    !		call MPI_TYPE_INDEXED(nerv,blens,(idx(idx_pt:idx_pt+nerv-1)-1),&
-    !		     & mpi_double_precision,recvtypes(i),info)
-    !		call MPI_TYPE_COMMIT(recvtypes(i),info)
-    !		deallocate(blens,stat=info)
-
-    !		rcv_pt = rcv_pt + nerv
-    !		snd_pt = snd_pt + nesd
-    !		pnti   = pnti + nerv + nesd + 3
-    !	end do
-    ! end if
-
-
     if (beta/=0 .and. do_send) then
 
       ! Pack send buffers
@@ -2258,8 +1998,6 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
       snd_pt = 1
       rcv_pt = 1
       do i=1, totxch
-        !call mpi_type_free(sendtypes(i),info)
-        !call mpi_type_free(recvtypes(i),info)
         if(beta/=0) then
           proc_to_comm = idx(pnti+psb_proc_id_)
           nerv = idx(pnti+psb_n_elem_recv_)
@@ -2312,7 +2050,7 @@ contains
     integer :: procSender,tag,rvhd
     integer, intent(out) :: info
     type(c_ptr)     :: cptr
-
+    integer :: isz
     interface 
       function receive(v,recvtype,procSender,tag,communicator,handle) &
            & result(res) bind(c,name='receiveRoutine')
@@ -2331,6 +2069,9 @@ contains
     cptr = c_loc(v)
 
     info = receive(cptr,recvtype,procSender,tag,communicator,rvhd)
+!!$    call mpi_type_size(recvtype,isz,info)
+!!$    WRITE(0,*) 'Recving from ',procSender,tag,recvtype,isz,v(1)
+!!$    call mpi_irecv(v,1,recvtype,procSender,tag,communicator,rvhd,info)
 
   end subroutine receive_routine
 
@@ -2342,6 +2083,7 @@ contains
     integer :: procToSend,tag
     integer, intent(out) :: info
     type(c_ptr)     :: cptr
+    integer :: isz
 
     interface 
       function send(v,sendtype,procToSend,tag,communicator) &
@@ -2360,7 +2102,9 @@ contains
     cptr = c_loc(v)
 
     info = send(cptr,sendtype,procToSend,tag,communicator)
-
+!!$    call mpi_type_size(sendtype,isz,info)
+!!$    WRITE(0,*) 'Sending to ',procToSend,tag,sendtype,isz,v(1)
+!!$    call mpi_send(v,1,sendtype,procToSend,tag,communicator,info)
   end subroutine send_routine
 
 end subroutine psi_dswapidx_vect_mptx

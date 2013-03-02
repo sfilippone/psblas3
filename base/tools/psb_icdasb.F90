@@ -62,11 +62,11 @@ subroutine psb_icdasb(desc,info,ext_hv)
   integer(psb_ipk_),allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
   integer(psb_ipk_)  ::  i, n_col, dectype, err_act, n_row,j
-  integer(psb_mpik_) ::  np,me, icomm, ictxt,proc_to_comm
+  integer(psb_mpik_) ::  np,me, icomm, ictxt,proc_to_comm,iret,bfsz
   logical             :: ext_hv_
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer	:: totxch, idxr, idxs, data_, pnti, snd_pt, rcv_pt,nerv,nesd,idx_pt
-  integer, allocatable :: blens(:), new_idx(:)
+  integer     	:: totxch, idxr, idxs, data_, pnti, snd_pt, rcv_pt,nerv,nesd,idx_pt
+  integer(psb_mpik_), allocatable :: blens(:), new_idx(:)
   integer(psb_ipk_), pointer             :: idx(:)
   character(len=20)   :: name
 
@@ -160,7 +160,9 @@ subroutine psb_icdasb(desc,info,ext_hv)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+!!$  write(0,*) me,' Going for derived datatypes.'
+
+
   !datatypes allocation
   data_ = psb_comm_halo_
   call desc%get_list(data_,idx,totxch,idxr,idxs,info)
@@ -175,6 +177,71 @@ subroutine psb_icdasb(desc,info,ext_hv)
   ! Init here, they will be filled in upon request
   desc%sendtypes(:,:) = mpi_datatype_null
   desc%recvtypes(:,:) = mpi_datatype_null
+  pnti   = 1
+  bfsz   = 0
+  do i=1, totxch
+    proc_to_comm = idx(pnti+psb_proc_id_)
+    nerv = idx(pnti+psb_n_elem_recv_)
+    nesd = idx(pnti+nerv+psb_n_elem_send_)
+    bfsz = max(bfsz,nesd,nerv)
+    pnti   = pnti + nerv + nesd + 3      
+  end do
+  allocate(blens(bfsz),new_idx(bfsz),stat=info)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  !We've to set the derivate datatypes
+  !Send/Gather
+  pnti   = 1
+  snd_pt = 1
+  do i=1, totxch
+    nerv = idx(pnti+psb_n_elem_recv_)
+    nesd = idx(pnti+nerv+psb_n_elem_send_)
+    idx_pt = 1+pnti+psb_n_elem_recv_
+    do j=1, nerv
+      blens(j)   = 1
+      new_idx(j) = idx(idx_pt+j-1)-1
+    end do
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_ipk_integer,desc%recvtypes(i,psb_ipkidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_def_integer,desc%recvtypes(i,psb_mpikidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_lng_integer,desc%recvtypes(i,psb_lngkidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_r_spk_,desc%recvtypes(i,psb_rspkidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_r_dpk_,desc%recvtypes(i,psb_rdpkidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_c_spk_,desc%recvtypes(i,psb_cspkidx_),iret)
+    call psb_mpi_type(nerv,blens,new_idx,&
+         & psb_mpi_c_dpk_,desc%recvtypes(i,psb_cdpkidx_),iret)
+
+
+    idx_pt = 1+pnti+nerv+psb_n_elem_send_
+    do j=1,nesd
+      blens(j)   = 1
+      new_idx(j) = idx(idx_pt+j-1)-1
+    end do
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_ipk_integer,desc%sendtypes(i,psb_ipkidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_def_integer,desc%sendtypes(i,psb_mpikidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_lng_integer,desc%sendtypes(i,psb_lngkidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_r_spk_,desc%sendtypes(i,psb_rspkidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_r_dpk_,desc%sendtypes(i,psb_rdpkidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_c_spk_,desc%sendtypes(i,psb_cspkidx_),iret)
+    call psb_mpi_type(nesd,blens,new_idx,&
+         & psb_mpi_c_dpk_,desc%sendtypes(i,psb_cdpkidx_),iret)
+
+    pnti   = pnti + nerv + nesd + 3
+  end do
 
 
   if (debug_level >= psb_debug_ext_) &
@@ -192,5 +259,16 @@ subroutine psb_icdasb(desc,info,ext_hv)
     call psb_error(ictxt)
   end if
   return
+
+contains
+  subroutine psb_mpi_type(nitem,disp,idx,type,newtype,iret)
+    integer(psb_mpik_) :: nitem, disp(:),idx(:),type,newtype,iret
+    call mpi_type_indexed(nitem,disp,idx,type,newtype,iret)
+    if (iret /= 0) &
+         &  write(0,*) 'From mpi_type_indexed: ',iret,type
+    call mpi_type_commit(newtype,iret) 
+    if (iret /= 0) &
+         &  write(0,*) 'From mpi_type_commit: ',iret,newtype
+  end subroutine psb_mpi_type
 
 end subroutine psb_icdasb
