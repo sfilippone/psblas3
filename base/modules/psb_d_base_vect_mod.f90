@@ -137,11 +137,12 @@ module psb_d_base_vect_mod
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked. 
     !
-    procedure, pass(x) :: gthab    => d_base_gthab
-    procedure, pass(x) :: gthzv    => d_base_gthzv
-    generic, public    :: gth      => gthab, gthzv
-    procedure, pass(y) :: sctb     => d_base_sctb
-    generic, public    :: sct      => sctb
+    procedure, pass(x) :: gthab     => d_base_gthab
+    procedure, pass(x) :: gthzv     => d_base_gthzv
+    generic, public    :: gth       => gthab, gthzv
+    procedure, pass(y) :: sctb      => d_base_sctb
+    generic, public    :: sct       => sctb
+    procedure, pass(x) :: get_clocv => d_base_get_clocv
   end type psb_d_base_vect_type
 
   public  :: psb_d_base_vect
@@ -816,5 +817,24 @@ contains
     call y%set_host()
 
   end subroutine d_base_sctb
+
+  function d_base_get_clocv(x) result(res)
+    use iso_c_binding
+
+    class(psb_d_base_vect_type), target :: x
+    type(c_ptr)                         :: res
+    if (allocated(x%v)) then 
+      call aux_get_clocv(x%v,res)
+!!$      res = c_loc(x%v)
+    else
+      res = c_null_ptr
+    end if
+  end function d_base_get_clocv
+  subroutine  aux_get_clocv(v,res)
+    use iso_c_binding
+    real(psb_dpk_), target :: v(*)    
+    type(c_ptr)            :: res
+    res = c_loc(v)
+  end subroutine aux_get_clocv
 
 end module psb_d_base_vect_mod

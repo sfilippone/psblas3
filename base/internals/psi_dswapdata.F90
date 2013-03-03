@@ -1527,6 +1527,7 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   use psb_desc_mod
   use psb_penv_mod
   use psb_d_base_vect_mod
+  use iso_c_binding
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -1554,7 +1555,36 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
+
   logical, parameter :: usersend=.false.
+
+    interface 
+      function receive(v,recvtype,procSender,tag,communicator,handle) &
+           & result(res) bind(c,name='receiveRoutine')
+        use iso_c_binding   
+        !real(c_double)  :: v(*)
+        type(c_ptr), value	:: v
+        integer(c_int),value :: recvtype
+        integer(c_int),value :: communicator
+        integer(c_int),value :: procSender
+        integer(c_int),value :: tag
+        integer(c_int) :: handle
+        integer(c_int)  :: res
+      end function receive
+    end interface
+    interface 
+      function send(v,sendtype,procToSend,tag,communicator) &
+           & result(res) bind(c,name='sendRoutine')
+        use iso_c_binding   
+        !real(c_double)  :: v(*)
+        type(c_ptr), value	:: v
+        integer(c_int),value :: sendtype
+        integer(c_int),value :: communicator
+        integer(c_int),value :: procToSend
+        integer(c_int),value :: tag
+        integer(c_int)  :: res
+      end function send
+    end interface
 
   real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 #ifdef HAVE_VOLATILE
@@ -1659,19 +1689,17 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
 
     ! First I post all the non blocking receives
     pnti   = 1
-    snd_pt = 1
-    rcv_pt = 1
     do i=1, totxch
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if (nerv>0) then 
         p2ptag = psb_double_swap_tag
-        call receive_routine(y%v,recvtypes(i),prcid(i),&
-             & p2ptag,icomm,rvhd(i),iret)
+!!$        call receive_routine(y%v,recvtypes(i),prcid(i),&
+!!$             & p2ptag,icomm,rvhd(i),iret)
+        iret = receive(y%get_clocv(),recvtypes(i),prcid(i),&
+             & p2ptag,icomm,rvhd(i))
       end if
-      rcv_pt = rcv_pt + nerv
-      snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
@@ -1680,15 +1708,15 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
     if (usersend)  call mpi_barrier(icomm,iret)
 
     pnti   = 1
-    snd_pt = 1
-    rcv_pt = 1
     do i=1, totxch
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = psb_double_swap_tag
       if (nesd>0) then
-        call send_routine(y%v,sendtypes(i),prcid(i),p2ptag,icomm, iret)
+!!$        call send_routine(y%v,sendtypes(i),prcid(i),p2ptag,icomm, iret)
+        iret = send(y%get_clocv(),sendtypes(i),prcid(i),&
+             & p2ptag,icomm)
         if(iret /= mpi_success) then
           ierr(1) = iret
           info=psb_err_mpi_error_
@@ -1696,8 +1724,6 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
           goto 9999
         end if
       end if
-      rcv_pt = rcv_pt + nerv
-      snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
