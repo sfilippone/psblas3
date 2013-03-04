@@ -186,6 +186,7 @@ subroutine psb_icdasb(desc,info,ext_hv)
     bfsz = max(bfsz,nesd,nerv)
     pnti   = pnti + nerv + nesd + 3      
   end do
+  bfsz = max(1,bfsz)
   allocate(blens(bfsz),new_idx(bfsz),stat=info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_alloc_dealloc_,name)

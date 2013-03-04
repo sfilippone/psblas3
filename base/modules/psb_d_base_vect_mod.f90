@@ -823,6 +823,7 @@ contains
 
     class(psb_d_base_vect_type), target :: x
     type(c_ptr)                         :: res
+
     if (allocated(x%v)) then 
       call aux_get_clocv(x%v,res)
 !!$      res = c_loc(x%v)
