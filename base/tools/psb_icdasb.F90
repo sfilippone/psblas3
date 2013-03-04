@@ -160,15 +160,16 @@ subroutine psb_icdasb(desc,info,ext_hv)
     call psb_errpush(info,name)
     goto 9999
   endif
-!!$  write(0,*) me,' Going for derived datatypes.'
 
 
   !datatypes allocation
   data_ = psb_comm_halo_
   call desc%get_list(data_,idx,totxch,idxr,idxs,info)
-  allocate(desc%sendtypes(totxch,psb_nkidx_),&
-       & desc%recvtypes(totxch,psb_nkidx_), stat=info)
+  totxch = max(1,totxch)
+  call psb_realloc(totxch,psb_nkidx_,desc%sendtypes,info)
+  if (info == 0) call psb_realloc(totxch,psb_nkidx_,desc%recvtypes,info)
   if (info /= 0) then 
+    write(0,*) 'Failed alloc  send/recvtypes',totxch,psb_nkidx_,info
     info =psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -187,8 +188,10 @@ subroutine psb_icdasb(desc,info,ext_hv)
     pnti   = pnti + nerv + nesd + 3      
   end do
   bfsz = max(1,bfsz)
-  allocate(blens(bfsz),new_idx(bfsz),stat=info)
+  call psb_realloc(bfsz,blens,info)
+  if (info == 0) call psb_realloc(bfsz,new_idx,info)
   if(info /= psb_success_) then
+    write(0,*) 'Failed alloc  blens/new_idx',bfsz,info
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
@@ -243,7 +246,6 @@ subroutine psb_icdasb(desc,info,ext_hv)
 
     pnti   = pnti + nerv + nesd + 3
   end do
-
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Done'
