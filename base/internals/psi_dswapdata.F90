@@ -1613,7 +1613,8 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-  if (beta==dzero .and. do_send .and. do_recv .and.sendtypes(1)/=mpi_datatype_null) then
+  if (y%type_idx() .and. beta==dzero .and. do_send .and. do_recv .and. &
+       & sendtypes(1)/=mpi_datatype_null) then
 
     allocate(rvhd(totxch),prcid(totxch),stat=info) 
     if(info /= psb_success_) then
@@ -1631,58 +1632,6 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
       bfsz = max(bfsz,nesd,nerv)
       pnti   = pnti + nerv + nesd + 3      
     end do
-!!$    allocate(blens(bfsz),new_idx(bfsz),stat=info)
-!!$    if(info /= psb_success_) then
-!!$      call psb_errpush(psb_err_alloc_dealloc_,name)
-!!$      goto 9999
-!!$    end if
-!!$
-!!$
-!!$    !We've to set the derivate datatypes
-!!$    !Send/Gather
-!!$    pnti   = 1
-!!$    snd_pt = 1
-!!$    if (sendtypes(1)==mpi_datatype_null) then
-!!$      do i=1, totxch
-!!$        nerv = idx(pnti+psb_n_elem_recv_)
-!!$        nesd = idx(pnti+nerv+psb_n_elem_send_)
-!!$        idx_pt = 1+pnti+nerv+psb_n_elem_send_
-!!$        do j=1,nesd
-!!$          blens(j)   = 1
-!!$          new_idx(i) = idx(idx_pt+i-1)-1
-!!$        end do
-!!$        call MPI_TYPE_INDEXED(nesd,blens,new_idx,&
-!!$    	     & psb_mpi_r_dpk_,sendtypes(i),iret)
-!!$        call MPI_TYPE_COMMIT(sendtypes(i),iret)
-!!$        snd_pt = snd_pt + nesd 
-!!$    	pnti   = pnti + nerv + nesd + 3
-!!$      end do
-!!$    end if
-!!$
-!!$    !Recv/Scatter
-!!$    pnti   = 1
-!!$    snd_pt = 1
-!!$    rcv_pt = 1
-!!$    if (recvtypes(1)==mpi_datatype_null) then
-!!$      do i=1, totxch
-!!$        proc_to_comm = idx(pnti+psb_proc_id_)
-!!$        nerv = idx(pnti+psb_n_elem_recv_)
-!!$        nesd = idx(pnti+nerv+psb_n_elem_send_)
-!!$        idx_pt = 1+pnti+psb_n_elem_recv_
-!!$        do j=1, nerv
-!!$          blens(j)   = 1
-!!$          new_idx(i) = idx(idx_pt+i-1)-1
-!!$        end do
-!!$        call mpi_type_indexed(nerv,blens,new_idx,&
-!!$             & psb_mpi_r_dpk_,recvtypes(i),iret)
-!!$        call mpi_type_commit(recvtypes(i),iret)
-!!$
-!!$        rcv_pt = rcv_pt + nerv
-!!$        snd_pt = snd_pt + nesd
-!!$        pnti   = pnti + nerv + nesd + 3
-!!$      end do
-!!$    end if
-!!$
 
 
     !write(*,*) 'Sono dentro swap_send .and. swap_recv'

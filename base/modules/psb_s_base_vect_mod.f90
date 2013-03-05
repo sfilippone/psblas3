@@ -142,6 +142,8 @@ module psb_s_base_vect_mod
     generic, public    :: gth      => gthab, gthzv
     procedure, pass(y) :: sctb     => s_base_sctb
     generic, public    :: sct      => sctb
+    procedure, pass(x) :: type_idx  => s_base_type_idx
+    procedure, pass(x) :: get_clocv => s_base_get_clocv
   end type psb_s_base_vect_type
 
   public  :: psb_s_base_vect
@@ -816,5 +818,39 @@ contains
     call y%set_host()
 
   end subroutine s_base_sctb
+
+
+  !
+  ! Whether we should go for data exchange
+  ! using MPI_TYPE_INDEXED, if at all
+  ! possible.
+  !
+  function s_base_type_idx(x) result(res)
+    class(psb_s_base_vect_type) :: x
+    logical                     :: res
+
+    res = .true.
+
+  end function s_base_type_idx
+
+  function s_base_get_clocv(x) result(res)
+    use iso_c_binding
+
+    class(psb_s_base_vect_type), target :: x
+    type(c_ptr)                         :: res
+
+    if (allocated(x%v)) then 
+      call s_aux_get_clocv(x%v,res)
+    else
+      res = c_null_ptr
+    end if
+  end function s_base_get_clocv
+
+  subroutine  s_aux_get_clocv(v,res)
+    use iso_c_binding
+    real(psb_spk_), target :: v(*)    
+    type(c_ptr)            :: res
+    res = c_loc(v)
+  end subroutine s_aux_get_clocv
 
 end module psb_s_base_vect_mod
