@@ -165,9 +165,8 @@ subroutine psb_icdasb(desc,info,ext_hv)
   !datatypes allocation
   data_ = psb_comm_halo_
   call desc%get_list(data_,idx,totxch,idxr,idxs,info)
-  totxch = max(1,totxch)
-  call psb_realloc(totxch,psb_nkidx_,desc%sendtypes,info)
-  if (info == 0) call psb_realloc(totxch,psb_nkidx_,desc%recvtypes,info)
+  call psb_realloc(max(1,totxch),psb_nkidx_,desc%sendtypes,info)
+  if (info == 0) call psb_realloc(max(1,totxch),psb_nkidx_,desc%recvtypes,info)
   if (info /= 0) then 
     write(0,*) 'Failed alloc  send/recvtypes',totxch,psb_nkidx_,info
     info =psb_err_alloc_dealloc_
