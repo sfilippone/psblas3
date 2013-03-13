@@ -59,6 +59,7 @@ module psb_s_base_vect_mod
   !!  sparse matrix types.
   !!
   type psb_s_base_vect_type
+    !> Values. 
     real(psb_spk_), allocatable :: v(:)
   contains
     !
@@ -156,6 +157,10 @@ contains
   ! Constructors. 
   !
   
+  !> Function  constructor:
+  !! \brief     Constructor from an array
+  !!  \param   x(:)  input array to be copied
+  !!
   function constructor(x) result(this)
     real(psb_spk_)   :: x(:)
     type(psb_s_base_vect_type) :: this
@@ -166,6 +171,10 @@ contains
   end function constructor
     
   
+  !> Function  constructor:
+  !! \brief     Constructor from size
+  !!  \param    n   Size of vector to be built. 
+  !!
   function size_const(n) result(this)
     integer(psb_ipk_), intent(in) :: n
     type(psb_s_base_vect_type) :: this
@@ -179,6 +188,11 @@ contains
   ! Build from a sample
   !
 
+  !> Function  bld_x:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief     Build method from an array
+  !!  \param   x(:)  input array to be copied
+  !!
   subroutine s_base_bld_x(x,this)
     use psb_realloc_mod
     real(psb_spk_), intent(in) :: this(:)
@@ -197,6 +211,12 @@ contains
   !
   ! Create with size, but no initialization
   !
+
+  !> Function  bld_n:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief     Build method with size (uninitialized data)
+  !!  \param    n    size to be allocated. 
+  !!
   subroutine s_base_bld_n(x,n)
     use psb_realloc_mod
     integer(psb_ipk_), intent(in) :: n
@@ -208,6 +228,13 @@ contains
 
   end subroutine s_base_bld_n
   
+  !> Function  base_all:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief     Build method with size (uninitialized data) and
+  !!            allocation return code.
+  !!  \param    n    size to be allocated. 
+  !!  \param info  return code
+  !!
   subroutine s_base_all(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -220,6 +247,12 @@ contains
     
   end subroutine s_base_all
 
+  !> Function  base_mold:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief     Mold method: return a variable with the same dynamic type
+  !!  \param    y returned variable
+  !!  \param info  return code
+  !!
   subroutine s_base_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -235,6 +268,30 @@ contains
   !
   ! Insert a bunch of values at specified positions.
   !
+  !> Function  base_ins:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Insert coefficients. 
+  !!
+  !!
+  !!         Given  a list of N pairs
+  !!           (IRL(i),VAL(i))
+  !!         record a new coefficient in X such that
+  !!            X(IRL(1:N)) = VAL(1:N).
+  !!            
+  !!         - the update operation will perform either
+  !!               X(IRL(1:n)) = VAL(1:N)
+  !!           or
+  !!               X(IRL(1:n)) = X(IRL(1:n))+VAL(1:N)
+  !!           according to the value of DUPLICATE.
+  !!           
+  !!           
+  !!  \param n     number of pairs in input
+  !!  \param irl(:)  the input row indices
+  !!  \param val(:)  the input coefficients
+  !!  \param dupl    how to treat duplicate entries
+  !!  \param info  return code
+  !!
+  !
   subroutine s_base_ins(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
@@ -244,7 +301,7 @@ contains
     real(psb_spk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_) :: i, isz
 
     info = 0
     if (psb_errstatus_fatal()) return 
@@ -255,13 +312,14 @@ contains
       info = psb_err_invalid_input_
 
     else 
+      isz = size(x%v)
       select case(dupl) 
       case(psb_dupl_ovwrt_) 
         do i = 1, n
           !loop over all val's rows
 
           ! row actual block row 
-          if (irl(i) > 0) then
+          if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
             ! copy i-th row of block val in x
             x%v(irl(i)) = val(i)
@@ -272,8 +330,7 @@ contains
 
         do i = 1, n
           !loop over all val's rows
-
-          if (irl(i) > 0) then
+          if ((1 <= irl(i)).and.(irl(i) <= isz)) then
             ! this row belongs to me
             ! copy i-th row of block val in x
             x%v(irl(i)) = x%v(irl(i)) +  val(i)
@@ -282,8 +339,8 @@ contains
 
       case default
         info = 321
-!!$      call psb_errpush(info,name)
-!!$      goto 9999
+! !$      call psb_errpush(info,name)
+! !$      goto 9999
       end select
     end if
     if (info /= 0) then 
@@ -293,6 +350,11 @@ contains
 
   end subroutine s_base_ins
 
+  !
+  !> Function  base_zero
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Zero out contents
+  !!
   !
   subroutine s_base_zero(x)
     use psi_serial_mod
@@ -309,7 +371,15 @@ contains
   ! For derived classes: after this the vector
   ! storage is supposed to be in sync.
   !
-  
+  !> Function  base_asb:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Assemble vector: reallocate as necessary.
+  !!           
+  !!  \param n     final size
+  !!  \param info  return code
+  !!
+  !
+ 
   subroutine s_base_asb(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -326,6 +396,14 @@ contains
   end subroutine s_base_asb
 
 
+  !
+  !> Function  base_free:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Free vector
+  !!           
+  !!  \param info  return code
+  !!
+  !
   subroutine s_base_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -346,31 +424,60 @@ contains
   ! The base version of SYNC & friends does nothing, it's just
   ! a placeholder.
   ! 
+  !
+  !> Function  base_sync:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Sync: base version is a no-op.
+  !!           
+  !
   subroutine s_base_sync(x)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
     
   end subroutine s_base_sync
 
-
+  !
+  !> Function  base_set_host:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Set_host: base version is a no-op.
+  !!           
+  !
   subroutine s_base_set_host(x)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
     
   end subroutine s_base_set_host
 
+  !
+  !> Function  base_set_dev:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Set_dev: base version is a no-op.
+  !!           
+  !
   subroutine s_base_set_dev(x)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
     
   end subroutine s_base_set_dev
 
+  !
+  !> Function  base_set_sync:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Set_sync: base version is a no-op.
+  !!           
+  !
   subroutine s_base_set_sync(x)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
     
   end subroutine s_base_set_sync
 
+  !
+  !> Function  base_is_dev:
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Is  vector on external device    .
+  !!           
+  !
   function s_base_is_dev(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
@@ -379,6 +486,12 @@ contains
     res = .false.
   end function s_base_is_dev
   
+  !
+  !> Function  base_is_host
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Is  vector on standard memory    .
+  !!           
+  !
   function s_base_is_host(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
@@ -387,6 +500,12 @@ contains
     res = .true.
   end function s_base_is_host
 
+  !
+  !> Function  base_is_sync
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Is  vector on sync               .
+  !!           
+  !
   function s_base_is_sync(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
@@ -399,7 +518,12 @@ contains
   !
   ! Size info. 
   !
-    
+  !
+  !> Function  base_get_nrows
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Number of entries
+  !!           
+  !
   function s_base_get_nrows(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
@@ -410,6 +534,12 @@ contains
 
   end function s_base_get_nrows
 
+  !
+  !> Function  base_get_sizeof
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Size in bytes
+  !!           
+  !
   function s_base_sizeof(x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(in) :: x
@@ -422,10 +552,13 @@ contains
 
   
   !
-  ! Two versions of extracting an array: one of them
-  ! overload the assignment. 
   !
-    
+  !
+  !> Function  base_get_vect
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Extract a copy of the contents
+  !!
+  !    
   function  s_base_get_vect(x) result(res)
     class(psb_s_base_vect_type), intent(inout) :: x
     real(psb_spk_), allocatable                 :: res(:)
@@ -444,6 +577,12 @@ contains
   !
   ! Reset all values 
   !
+  !
+  !> Function  base_set_scal
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Set all entries
+  !! \param val   The value to set
+  !!
   subroutine s_base_set_scal(x,val)
     class(psb_s_base_vect_type), intent(inout)  :: x
     real(psb_spk_), intent(in) :: val
@@ -453,6 +592,12 @@ contains
     
   end subroutine s_base_set_scal
 
+  !
+  !> Function  base_set_vect
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Set all entries
+  !! \param val(:)  The vector to be copied in 
+  !!
   subroutine s_base_set_vect(x,val)
     class(psb_s_base_vect_type), intent(inout)  :: x
     real(psb_spk_), intent(in) :: val(:)
@@ -471,6 +616,13 @@ contains
   !
   ! Dot products 
   ! 
+  !
+  !> Function  base_dot_v
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Dot product by another base_vector
+  !! \param n    Number of entries to be considere
+  !! \param y    The other (base_vect) to be multiplied by
+  !!
   function s_base_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x, y
@@ -498,6 +650,13 @@ contains
   !
   ! Base workhorse is good old BLAS1
   !
+  !
+  !> Function  base_dot_a
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Dot product by a normal array
+  !! \param n    Number of entries to be considere
+  !! \param y(:) The array to be multiplied by
+  !!
   function s_base_dot_a(n,x,y) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
@@ -513,6 +672,17 @@ contains
   !
   ! AXPBY is invoked via Y, hence the structure below. 
   !
+  !
+  !
+  !> Function  base_axpby_v
+  !! \memberof  psb_s_base_vect_type
+  !! \brief AXPBY  by a (base_vect) y=alpha*x+beta*y
+  !! \param m    Number of entries to be considere
+  !! \param alpha scalar alpha
+  !! \param x     The class(base_vect) to be added
+  !! \param beta scalar alpha
+  !! \param info   return code
+  !!
   subroutine s_base_axpby_v(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
@@ -531,6 +701,19 @@ contains
 
   end subroutine s_base_axpby_v
 
+  !
+  ! AXPBY is invoked via Y, hence the structure below. 
+  !
+  !
+  !> Function  base_axpby_a
+  !! \memberof  psb_s_base_vect_type
+  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
+  !! \param m    Number of entries to be considere
+  !! \param alpha scalar alpha
+  !! \param x(:) The array to be added
+  !! \param beta scalar alpha
+  !! \param info   return code
+  !!
   subroutine s_base_axpby_a(m,alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none 
@@ -553,7 +736,13 @@ contains
   !  Variants expanded according to the dynamic type
   !  of the involved entities
   !
-
+  !
+  !> Function  base_mlt_a
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Vector entry-by-entry multiply  by a base_vect array y=x*y
+  !! \param x   The class(base_vect) to be multiplied by
+  !! \param info   return code
+  !!
   subroutine s_base_mlt_v(x, y, info)
     use psi_serial_mod
     implicit none 
@@ -575,6 +764,13 @@ contains
 
   end subroutine s_base_mlt_v
 
+  !
+  !> Function  base_mlt_a
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Vector entry-by-entry multiply  by a normal array y=x*y
+  !! \param x(:) The array to be multiplied by
+  !! \param info   return code
+  !!
   subroutine s_base_mlt_a(x, y, info)
     use psi_serial_mod
     implicit none 
@@ -592,6 +788,17 @@ contains
   end subroutine s_base_mlt_a
 
 
+  !
+  !> Function  base_mlt_a_2
+  !! \memberof  psb_s_base_vect_type
+  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
+  !!        z=beta*z+alpha*x*y
+  !! \param alpha
+  !! \param beta
+  !! \param x(:) The array to be multiplied b
+  !! \param y(:) The array to be multiplied by
+  !! \param info   return code
+  !!
   subroutine s_base_mlt_a_2(alpha,x,y,beta,z,info)
     use psi_serial_mod
     implicit none 
@@ -660,6 +867,17 @@ contains
     end if
   end subroutine s_base_mlt_a_2
 
+  !
+  !> Function  base_mlt_v_2
+  !! \memberof  psb_s_base_vect_type
+  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_vect)
+  !!        z=beta*z+alpha*x*y
+  !! \param alpha
+  !! \param beta
+  !! \param x  The class(base_vect) to be multiplied b
+  !! \param y  The class(base_vect) to be multiplied by
+  !! \param info   return code
+  !!
   subroutine s_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
     use psi_serial_mod
     use psb_string_mod
@@ -725,7 +943,11 @@ contains
   !
   ! Simple scaling 
   !
-  
+  !> Function  base_scal
+  !! \memberof  psb_s_base_vect_type
+  !! \brief Scale all entries  x = alpha*x
+  !! \param alpha   The multiplier
+  !!
   subroutine s_base_scal(alpha, x)
     use psi_serial_mod
     implicit none 
@@ -739,7 +961,10 @@ contains
   !
   ! Norms 1, 2 and infinity
   !
-
+  !> Function  base_nrm2
+  !! \memberof  psb_s_base_vect_type
+  !! \brief 2-norm |x(1:n)|_2
+  !! \param n  how many entries to consider
   function s_base_nrm2(n,x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
@@ -751,6 +976,11 @@ contains
 
   end function s_base_nrm2
   
+  !
+  !> Function  base_amax
+  !! \memberof  psb_s_base_vect_type
+  !! \brief infinity-norm |x(1:n)|_\infty
+  !! \param n  how many entries to consider
   function s_base_amax(n,x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
@@ -761,6 +991,11 @@ contains
 
   end function s_base_amax
 
+  !
+  !> Function  base_asum
+  !! \memberof  psb_s_base_vect_type
+  !! \brief 1-norm |x(1:n)|_1
+  !! \param n  how many entries to consider
   function s_base_asum(n,x) result(res)
     implicit none 
     class(psb_s_base_vect_type), intent(inout) :: x
@@ -775,7 +1010,15 @@ contains
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
   !
-
+  !
+  !> Function  base_gthab
+  !! \memberof  psb_s_base_vect_type
+  !! \brief gather into an array
+  !!    Y = beta * Y + alpha * X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param alpha
+  !! \param beta
   subroutine s_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -789,6 +1032,12 @@ contains
   !
   ! shortcut alpha=1 beta=0
   ! 
+  !> Function  base_gthzv
+  !! \memberof  psb_s_base_vect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
   subroutine s_base_gthzv(n,idx,x,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -804,7 +1053,15 @@ contains
   ! Scatter: 
   ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
   ! 
-  
+  !
+  !> Function  base_sctb
+  !! \memberof  psb_s_base_vect_type
+  !! \brief scatter into a class(base_vect)
+  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param beta
+  !! \param x(:) 
   subroutine s_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)

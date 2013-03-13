@@ -39,7 +39,7 @@ module psb_d_genpde_mod
       type(psb_d_vect_type) :: xv,bv
       type(psb_desc_type)   :: desc_a
       integer(psb_ipk_)     :: ictxt, info
-      character             :: afmt*5
+      character(len=*)      :: afmt
       procedure(d_func_3d), optional :: f
       class(psb_d_base_sparse_mat), optional :: amold
       class(psb_d_base_vect_type), optional :: vmold
@@ -82,7 +82,7 @@ module psb_d_genpde_mod
       type(psb_d_vect_type) :: xv,bv
       type(psb_desc_type)   :: desc_a
       integer(psb_ipk_)     :: ictxt, info
-      character             :: afmt*5
+      character(len=*)      :: afmt
       procedure(d_func_2d), optional :: f
       class(psb_d_base_sparse_mat), optional :: amold
       class(psb_d_base_vect_type), optional :: vmold
