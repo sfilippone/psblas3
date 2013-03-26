@@ -48,9 +48,9 @@ program pdgenspmv
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
   ! descriptor
-  type(psb_desc_type)   :: desc_a, desc_b
+  type(psb_desc_type)   :: desc_a
   ! dense matrices
-  type(psb_d_vect_type)  :: xxv,bv, vtst
+  type(psb_d_vect_type)  :: xv,bv, vtst
   real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
@@ -97,7 +97,7 @@ program pdgenspmv
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_pde3d(ictxt,idim,a,bv,xxv,desc_a,afmt,&
+  call psb_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
@@ -110,18 +110,12 @@ program pdgenspmv
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 
-  call psb_cdbldext(a,desc_a,itwo,desc_b,info,extype=psb_ovt_asov_)
-  if (info /= 0) then 
-    write(0,*) 'Error from bldext'
-    call psb_abort(ictxt)
-  end if
-
-  call xxv%set(done)
+  call xv%set(done)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   do i=1,times 
-    call psb_spmm(done,a,xxv,dzero,bv,desc_a,info,'n')
+    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
   end do
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
@@ -131,7 +125,7 @@ program pdgenspmv
   call psb_barrier(ictxt)
   tt1 = psb_wtime()
   do i=1,times 
-    call psb_spmm(done,a,xxv,dzero,bv,desc_a,info,'t')
+    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'t')
   end do
   call psb_barrier(ictxt)
   tt2 = psb_wtime() - tt1
@@ -177,8 +171,6 @@ program pdgenspmv
     write(psb_out_unit,'("MBYTES/S                  (trans): ",F20.3)') bdwdth
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
-    write(psb_out_unit,'("Storage type for DESC_B: ",a)') desc_b%indxmap%get_fmt()
     
   end if
   
@@ -187,7 +179,7 @@ program pdgenspmv
   !  cleanup storage and exit
   !
   call psb_gefree(bv,desc_a,info)
-  call psb_gefree(xxv,desc_a,info)
+  call psb_gefree(xv,desc_a,info)
   call psb_spfree(a,desc_a,info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
