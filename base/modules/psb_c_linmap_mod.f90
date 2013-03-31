@@ -46,10 +46,10 @@ module psb_c_linmap_mod
   type, extends(psb_base_linmap_type) ::  psb_clinmap_type 
     type(psb_cspmat_type) :: map_X2Y, map_Y2X
   contains
-    procedure, pass(map)   :: sizeof   => c_map_sizeof
-    procedure, pass(map)   :: is_asb   => c_is_asb
-    procedure, pass(map)   :: free     => c_free
-    procedure, pass(mapin) :: clone    => c_clone
+    procedure, pass(map) :: sizeof   => c_map_sizeof
+    procedure, pass(map) :: is_asb   => c_is_asb
+    procedure, pass(map) :: free     => c_free
+    procedure, pass(map) :: clone    => c_clone
   end type psb_clinmap_type
 
 
@@ -214,16 +214,17 @@ contains
   end subroutine c_free
   
 
-  subroutine  c_clone(mapin,mapout)
+  subroutine  c_clone(map,mapout,info)
     use psb_desc_mod
     implicit none 
-    class(psb_clinmap_type), intent(inout) :: mapin
+    class(psb_clinmap_type), intent(inout) :: map
     class(psb_clinmap_type), intent(out)   :: mapout
     integer(psb_ipk_)     :: info 
     
     ! Base clone!    
-    call mapin%map_X2Y%clone(mapout%map_X2Y,info)
-    call mapin%map_Y2X%clone(mapout%map_Y2X,info)
+    call map%psb_base_linmap_type%clone(mapout%psb_base_linmap_type,info)
+    call map%map_X2Y%clone(mapout%map_X2Y,info)
+    call map%map_Y2X%clone(mapout%map_Y2X,info)
 
   end subroutine c_clone
   

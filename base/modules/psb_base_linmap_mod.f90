@@ -52,6 +52,7 @@ module psb_base_linmap_mod
     procedure, pass(map)  :: get_kind => base_get_kind
     procedure, pass(map)  :: set_kind => base_set_kind
     procedure, pass(map)  :: free     => base_free
+    procedure, pass(map)  :: clone    => base_clone
   end type psb_base_linmap_type
 
 
@@ -60,7 +61,7 @@ module psb_base_linmap_mod
   end interface
 
   private :: base_map_sizeof, base_is_ok, base_is_asb,&
-       & base_get_kind, base_set_kind, base_free
+       & base_get_kind, base_set_kind, base_free, base_clone
 
 contains
 
@@ -154,6 +155,26 @@ contains
     call psb_move_alloc(mapin%desc_Y,mapout%desc_Y,info)
 
   end subroutine psb_base_linmap_transfer
+
+
+
+  subroutine  base_clone(map,mapout,info)
+    use psb_desc_mod
+    implicit none 
+    class(psb_base_linmap_type), intent(inout) :: map
+    class(psb_base_linmap_type), intent(out)   :: mapout
+    integer(psb_ipk_)     :: info 
+
+    mapout%kind = map%kind
+    call psb_safe_ab_copy(map%iaggr,mapout%iaggr,info)
+    call psb_safe_ab_copy(map%naggr,mapout%naggr,info)
+    mapout%p_desc_X => map%p_desc_X 
+    mapout%p_desc_Y => map%p_desc_Y
+    call map%desc_X%clone(mapout%desc_X,info)
+    call map%desc_Y%clone(mapout%desc_Y,info)
+
+  end subroutine base_clone
+
 
   subroutine  base_free(map,info)
     implicit none 

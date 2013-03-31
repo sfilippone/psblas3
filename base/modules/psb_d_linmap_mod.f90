@@ -46,10 +46,10 @@ module psb_d_linmap_mod
   type, extends(psb_base_linmap_type) ::  psb_dlinmap_type 
     type(psb_dspmat_type) :: map_X2Y, map_Y2X
   contains
-    procedure, pass(map)   :: sizeof   => d_map_sizeof
-    procedure, pass(map)   :: is_asb   => d_is_asb
-    procedure, pass(map)   :: free     => d_free
-    procedure, pass(mapin) :: clone    => d_clone
+    procedure, pass(map) :: sizeof   => d_map_sizeof
+    procedure, pass(map) :: is_asb   => d_is_asb
+    procedure, pass(map) :: free     => d_free
+    procedure, pass(map) :: clone    => d_clone
   end type psb_dlinmap_type
 
 
@@ -214,16 +214,17 @@ contains
   end subroutine d_free
   
 
-  subroutine  d_clone(mapin,mapout)
+  subroutine  d_clone(map,mapout,info)
     use psb_desc_mod
     implicit none 
-    class(psb_dlinmap_type), intent(inout) :: mapin
+    class(psb_dlinmap_type), intent(inout) :: map
     class(psb_dlinmap_type), intent(out)   :: mapout
     integer(psb_ipk_)     :: info 
     
     ! Base clone!    
-    call mapin%map_X2Y%clone(mapout%map_X2Y,info)
-    call mapin%map_Y2X%clone(mapout%map_Y2X,info)
+    call map%psb_base_linmap_type%clone(mapout%psb_base_linmap_type,info)
+    call map%map_X2Y%clone(mapout%map_X2Y,info)
+    call map%map_Y2X%clone(mapout%map_Y2X,info)
 
   end subroutine d_clone
   
