@@ -160,6 +160,7 @@ contains
 
   subroutine  base_clone(map,mapout,info)
     use psb_desc_mod
+    use psb_realloc_mod
     implicit none 
     class(psb_base_linmap_type), intent(inout) :: map
     class(psb_base_linmap_type), intent(out)   :: mapout
