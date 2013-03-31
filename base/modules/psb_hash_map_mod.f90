@@ -1369,7 +1369,7 @@ contains
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
-    class(psb_hash_map), intent(in)    :: idxmap
+    class(psb_hash_map), intent(inout)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act

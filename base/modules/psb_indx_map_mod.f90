@@ -857,7 +857,7 @@ contains
     use psb_penv_mod
     use psb_error_mod
     implicit none 
-    class(psb_indx_map), intent(in)    :: idxmap
+    class(psb_indx_map), intent(inout)    :: idxmap
     class(psb_indx_map), allocatable, intent(out) :: outmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act
