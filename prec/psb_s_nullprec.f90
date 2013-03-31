@@ -39,16 +39,13 @@ module psb_s_nullprec
     procedure, pass(prec) :: s_apply   => psb_s_null_apply
     procedure, pass(prec) :: precbld   => psb_s_null_precbld
     procedure, pass(prec) :: precinit  => psb_s_null_precinit
-    procedure, pass(prec) :: precseti  => psb_s_null_precseti
-    procedure, pass(prec) :: precsetr  => psb_s_null_precsetr
-    procedure, pass(prec) :: precsetc  => psb_s_null_precsetc
     procedure, pass(prec) :: precfree  => psb_s_null_precfree
     procedure, pass(prec) :: precdescr => psb_s_null_precdescr
     procedure, pass(prec) :: sizeof    => psb_s_null_sizeof
+    procedure, pass(prec) :: dump      => psb_s_null_dump
   end type psb_s_null_prec_type
 
-  private :: psb_s_null_precbld, psb_s_null_precseti,&
-       & psb_s_null_precsetr, psb_s_null_precsetc, psb_s_null_sizeof,&
+  private :: psb_s_null_precbld, psb_s_null_sizeof,&
        & psb_s_null_precinit, psb_s_null_precfree, psb_s_null_precdescr
   
 
@@ -142,87 +139,6 @@ contains
     return
   end subroutine psb_s_null_precbld
 
-  subroutine psb_s_null_precseti(prec,what,val,info)
-    
-    Implicit None
-    
-    class(psb_s_null_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    integer(psb_ipk_), intent(in)                      :: val 
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_null_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_s_null_precseti
-
-  subroutine psb_s_null_precsetr(prec,what,val,info)
-    
-    Implicit None
-    
-    class(psb_s_null_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    real(psb_spk_), intent(in)               :: val 
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_null_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_s_null_precsetr
-
-  subroutine psb_s_null_precsetc(prec,what,val,info)
-    
-    Implicit None
-    
-    class(psb_s_null_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    character(len=*), intent(in)             :: val
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_null_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_s_null_precsetc
-
   subroutine psb_s_null_precfree(prec,info)
     
     Implicit None
@@ -286,6 +202,51 @@ contains
     return
     
   end subroutine psb_s_null_precdescr
+
+
+  subroutine psb_s_null_dump(prec,info,prefix,head)
+    use psb_base_mod, only : psb_info
+    implicit none 
+    class(psb_s_null_prec_type), intent(in) :: prec
+    integer(psb_ipk_), intent(out)          :: info
+    character(len=*), intent(in), optional  :: prefix,head
+    integer(psb_ipk_) :: iout, iam, np, ictxt, lname
+    logical :: isopen
+    character(len=80)  :: prefix_
+    character(len=120) :: fname ! len should be at least 20 more than
+    
+    !  len of prefix_ 
+    
+    info = 0
+    ictxt = prec%get_ctxt()
+    call psb_info(ictxt,iam,np)
+    
+    if (present(prefix)) then 
+      prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
+    else
+      prefix_ = "dump_null_s"
+    end if
+    
+    lname = len_trim(prefix_)
+    fname = trim(prefix_)
+    write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
+    lname = lname + 5
+    ! Search for an unused unit to write
+    iout = 7
+    do 
+      inquire(unit=iout, opened=isopen)
+      if (.not.isopen) exit
+      iout = iout + 1
+      if (iout > 99) exit
+    end do
+    if (iout > 99) then 
+      write(psb_err_unit,*) 'Error: could not find a free unit for I/O'
+      return
+    end if
+    open(iout,file=fname,iostat=info)
+    write(iout,*) 'Null (Identity) Preconditioner. Nothing to be printed, really!'
+
+  end subroutine psb_s_null_dump
 
   function psb_s_null_sizeof(prec) result(val)
 

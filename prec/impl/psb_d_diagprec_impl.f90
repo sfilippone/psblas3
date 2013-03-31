@@ -30,6 +30,40 @@
 !!$ 
 !!$  
 
+subroutine psb_d_diag_dump(prec,info,prefix,head)
+  use psb_base_mod
+  use psb_d_diagprec, psb_protect_name => psb_d_diag_dump
+  implicit none 
+  class(psb_d_diag_prec_type), intent(in) :: prec
+  integer(psb_ipk_), intent(out)                    :: info
+  character(len=*), intent(in), optional  :: prefix,head
+  integer(psb_ipk_) :: i, j, il1, iln, lname, lev
+  integer(psb_ipk_) :: ictxt,iam, np
+  character(len=80)  :: prefix_
+  character(len=120) :: fname ! len should be at least 20 more than
+
+  !  len of prefix_ 
+
+  info = 0
+  ictxt = prec%get_ctxt()
+  call psb_info(ictxt,iam,np)
+
+  if (present(prefix)) then 
+    prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
+  else
+    prefix_ = "dump_diag_d"
+  end if
+
+  lname = len_trim(prefix_)
+  fname = trim(prefix_)
+  write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
+  write(fname(lname+1:),'(a,a)')'_diag.mtx'
+  if (allocated(prec%dv)) &
+       & call psb_geprt(fname,prec%dv%v%v,head=head)
+
+end subroutine psb_d_diag_dump
+
+
 subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_vect

@@ -41,17 +41,14 @@ module psb_z_diagprec
     procedure, pass(prec) :: z_apply   => psb_z_diag_apply
     procedure, pass(prec) :: precbld   => psb_z_diag_precbld
     procedure, pass(prec) :: precinit  => psb_z_diag_precinit  
-    procedure, pass(prec) :: precseti  => psb_z_diag_precseti
-    procedure, pass(prec) :: precsetr  => psb_z_diag_precsetr
-    procedure, pass(prec) :: precsetc  => psb_z_diag_precsetc
     procedure, pass(prec) :: precfree  => psb_z_diag_precfree
     procedure, pass(prec) :: precdescr => psb_z_diag_precdescr
     procedure, pass(prec) :: sizeof    => psb_z_diag_sizeof
+    procedure, pass(prec) :: dump      => psb_z_diag_dump
     procedure, pass(prec) :: get_nzeros => psb_z_diag_get_nzeros
   end type psb_z_diag_prec_type
 
-  private :: psb_z_diag_precseti,&
-       & psb_z_diag_precsetr, psb_z_diag_precsetc, psb_z_diag_sizeof,&
+  private :: psb_z_diag_sizeof,&
        & psb_z_diag_precinit, psb_z_diag_precfree, psb_z_diag_precdescr,&
        & psb_z_diag_get_nzeros
   
@@ -99,6 +96,16 @@ module psb_z_diagprec
       class(psb_z_base_vect_type), intent(in), optional  :: vmold
     end subroutine psb_z_diag_precbld
   end interface
+
+  interface 
+    subroutine psb_z_diag_dump(prec,info,prefix,head)
+      import :: psb_ipk_, psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
+      implicit none 
+      class(psb_z_diag_prec_type), intent(in) :: prec
+      integer(psb_ipk_), intent(out)                    :: info
+      character(len=*), intent(in), optional  :: prefix,head
+    end subroutine psb_z_diag_dump
+  end interface
   
 
 contains
@@ -129,85 +136,6 @@ contains
     return
   end subroutine psb_z_diag_precinit
 
-
-  subroutine psb_z_diag_precseti(prec,what,val,info)
-    Implicit None
-    
-    class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    integer(psb_ipk_), intent(in)                      :: val 
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='z_diag_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_z_diag_precseti
-
-  subroutine psb_z_diag_precsetr(prec,what,val,info)
-    
-    Implicit None
-    
-    class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    real(psb_dpk_), intent(in)               :: val 
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='z_diag_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_z_diag_precsetr
-
-  subroutine psb_z_diag_precsetc(prec,what,val,info)
-    Implicit None
-    
-    class(psb_z_diag_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    character(len=*), intent(in)             :: val
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='z_diag_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_z_diag_precsetc
 
   subroutine psb_z_diag_precfree(prec,info)
     

@@ -45,176 +45,146 @@ module psb_s_base_prec_mod
 
   use psb_prec_const_mod
 
-  type psb_s_base_prec_type
+  type, abstract :: psb_s_base_prec_type
     integer(psb_ipk_) :: ictxt
   contains
-    procedure, pass(prec) :: set_ctxt  => psb_s_base_set_ctxt
-    procedure, pass(prec) :: get_ctxt  => psb_s_base_get_ctxt
-    procedure, pass(prec) :: s_apply_v => psb_s_base_apply_vect
-    procedure, pass(prec) :: s_apply   => psb_s_base_apply
-    generic, public       :: apply     => s_apply, s_apply_v
-    procedure, pass(prec) :: precbld   => psb_s_base_precbld
-    procedure, pass(prec) :: precseti  => psb_s_base_precseti
-    procedure, pass(prec) :: precsetr  => psb_s_base_precsetr
-    procedure, pass(prec) :: precsetc  => psb_s_base_precsetc
-    procedure, pass(prec) :: sizeof    => psb_s_base_sizeof
-    generic, public       :: precset   => precseti, precsetr, precsetc
-    procedure, pass(prec) :: precinit  => psb_s_base_precinit
-    procedure, pass(prec) :: precfree  => psb_s_base_precfree
-    procedure, pass(prec) :: precdescr => psb_s_base_precdescr
-    procedure, pass(prec) :: dump      => psb_s_base_precdump
+    procedure, pass(prec) :: set_ctxt   => psb_s_base_set_ctxt
+    procedure, pass(prec) :: get_ctxt   => psb_s_base_get_ctxt
     procedure, pass(prec) :: get_nzeros => psb_s_base_get_nzeros
+    procedure, pass(prec) :: precseti   => psb_s_base_precseti
+    procedure, pass(prec) :: precsetr   => psb_s_base_precsetr
+    procedure, pass(prec) :: precsetc   => psb_s_base_precsetc
+    generic, public       :: precset    => precseti, precsetr, precsetc
+    procedure(psb_s_base_apply_vect), pass(prec), deferred :: s_apply_v  
+    procedure(psb_s_base_apply), pass(prec), deferred :: s_apply    
+    generic, public       :: apply     => s_apply, s_apply_v
+    procedure(psb_s_base_precbld), pass(prec), deferred :: precbld    
+    procedure(psb_s_base_sizeof), pass(prec), deferred :: sizeof     
+    procedure(psb_s_base_precinit), pass(prec), deferred :: precinit   
+    procedure(psb_s_base_precfree), pass(prec), deferred :: precfree   
+    procedure(psb_s_base_precdescr), pass(prec), deferred :: precdescr  
+    procedure(psb_s_base_precdump), pass(prec), deferred :: dump       
   end type psb_s_base_prec_type
-  
-  private :: psb_s_base_apply, psb_s_base_precbld, psb_s_base_precseti,&
-       & psb_s_base_precsetr, psb_s_base_precsetc, psb_s_base_sizeof,&
-       & psb_s_base_precinit, psb_s_base_precfree, psb_s_base_precdescr,&
-       & psb_s_base_precdump, psb_s_base_set_ctxt, psb_s_base_get_ctxt, &
-       & psb_s_base_apply_vect, psb_s_base_get_nzeros
-  
+
+  private :: psb_s_base_set_ctxt, psb_s_base_get_ctxt, &
+       & psb_s_base_get_nzeros
+
+  abstract interface 
+    subroutine psb_s_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      implicit none 
+      type(psb_desc_type),intent(in)        :: desc_data
+      class(psb_s_base_prec_type), intent(inout)  :: prec
+      real(psb_spk_),intent(in)          :: alpha, beta
+      type(psb_s_vect_type),intent(inout)   :: x
+      type(psb_s_vect_type),intent(inout)   :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character(len=1), optional            :: trans
+      real(psb_spk_),intent(inout), optional, target :: work(:)
+
+    end subroutine psb_s_base_apply_vect
+  end interface
+
+  abstract interface 
+    subroutine psb_s_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      implicit none 
+      type(psb_desc_type),intent(in)       :: desc_data
+      class(psb_s_base_prec_type), intent(in)  :: prec
+      real(psb_spk_),intent(in)         :: alpha, beta
+      real(psb_spk_),intent(inout)      :: x(:)
+      real(psb_spk_),intent(inout)      :: y(:)
+      integer(psb_ipk_), intent(out)                 :: info
+      character(len=1), optional           :: trans
+      real(psb_spk_),intent(inout), optional, target :: work(:)
+
+    end subroutine psb_s_base_apply
+  end interface
+
+
+  abstract interface 
+    subroutine psb_s_base_precinit(prec,info)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      Implicit None
+
+      class(psb_s_base_prec_type),intent(inout) :: prec
+      integer(psb_ipk_), intent(out)                     :: info
+
+    end subroutine psb_s_base_precinit
+  end interface
+
+
+  abstract interface 
+    subroutine psb_s_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      Implicit None
+
+      type(psb_sspmat_type), intent(in), target :: a
+      type(psb_desc_type), intent(in), target   :: desc_a
+      class(psb_s_base_prec_type),intent(inout) :: prec
+      integer(psb_ipk_), intent(out)                      :: info
+      character, intent(in), optional           :: upd
+      character(len=*), intent(in), optional    :: afmt
+      class(psb_s_base_sparse_mat), intent(in), optional :: amold
+      class(psb_s_base_vect_type), intent(in), optional  :: vmold
+
+    end subroutine psb_s_base_precbld
+  end interface
+
+
+  abstract interface 
+    subroutine psb_s_base_precfree(prec,info)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      Implicit None
+
+      class(psb_s_base_prec_type), intent(inout) :: prec
+      integer(psb_ipk_), intent(out)                :: info
+
+    end subroutine psb_s_base_precfree
+  end interface
+
+
+  abstract interface 
+    subroutine psb_s_base_precdescr(prec,iout)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      Implicit None
+
+      class(psb_s_base_prec_type), intent(in) :: prec
+      integer(psb_ipk_), intent(in), optional    :: iout
+
+    end subroutine psb_s_base_precdescr
+  end interface
+
+  abstract interface   
+    subroutine psb_s_base_precdump(prec,info,prefix,head)
+      import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
+           & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
+           & psb_s_base_sparse_mat
+      implicit none 
+      class(psb_s_base_prec_type), intent(in) :: prec
+      integer(psb_ipk_), intent(out)             :: info
+      character(len=*), intent(in), optional :: prefix,head
+
+    end subroutine psb_s_base_precdump
+  end interface
+
 contains
-
-  subroutine psb_s_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    implicit none 
-    type(psb_desc_type),intent(in)        :: desc_data
-    class(psb_s_base_prec_type), intent(inout)  :: prec
-    real(psb_spk_),intent(in)          :: alpha, beta
-    type(psb_s_vect_type),intent(inout)   :: x
-    type(psb_s_vect_type),intent(inout)   :: y
-    integer(psb_ipk_), intent(out)                  :: info
-    character(len=1), optional            :: trans
-    real(psb_spk_),intent(inout), optional, target :: work(:)
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_prec_apply'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine psb_s_base_apply_vect
-
-  subroutine psb_s_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    implicit none 
-    type(psb_desc_type),intent(in)       :: desc_data
-    class(psb_s_base_prec_type), intent(in)  :: prec
-    real(psb_spk_),intent(in)         :: alpha, beta
-    real(psb_spk_),intent(inout)      :: x(:)
-    real(psb_spk_),intent(inout)      :: y(:)
-    integer(psb_ipk_), intent(out)                 :: info
-    character(len=1), optional           :: trans
-    real(psb_spk_),intent(inout), optional, target :: work(:)
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_prec_apply'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine psb_s_base_apply
-
-  subroutine psb_s_base_precinit(prec,info)
-    Implicit None
-   
-    class(psb_s_base_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_precinit'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_s_base_precinit
-
-  subroutine psb_s_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-    Implicit None
-    
-    type(psb_sspmat_type), intent(in), target :: a
-    type(psb_desc_type), intent(in), target   :: desc_a
-    class(psb_s_base_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(out)                      :: info
-    character, intent(in), optional           :: upd
-    character(len=*), intent(in), optional    :: afmt
-    class(psb_s_base_sparse_mat), intent(in), optional :: amold
-    class(psb_s_base_vect_type), intent(in), optional  :: vmold
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_precbld'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_s_base_precbld
 
   subroutine psb_s_base_precseti(prec,what,val,info)
     Implicit None
-    
+
     class(psb_s_base_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(in)                      :: what 
     integer(psb_ipk_), intent(in)                      :: val 
@@ -222,31 +192,18 @@ contains
     integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='s_base_precseti'
 
-    call psb_erractionsave(err_act)
+    !
+    ! Base version does nothing.
 
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
+    info = psb_success_ 
+
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
   end subroutine psb_s_base_precseti
 
   subroutine psb_s_base_precsetr(prec,what,val,info)
     Implicit None
-    
+
     class(psb_s_base_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(in)                      :: what 
     real(psb_spk_), intent(in)               :: val 
@@ -254,31 +211,20 @@ contains
     integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='s_base_precsetr'
 
-    call psb_erractionsave(err_act)
 
     !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
+    ! Base version does nothing.
     !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
+
+    info = psb_success_ 
+
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
   end subroutine psb_s_base_precsetr
 
   subroutine psb_s_base_precsetc(prec,what,val,info)
     Implicit None
-    
+
     class(psb_s_base_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(in)                      :: what 
     character(len=*), intent(in)             :: val
@@ -286,123 +232,16 @@ contains
     integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='s_base_precsetc'
 
-    call psb_erractionsave(err_act)
 
     !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
+    ! Base version does nothing.
     !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
+
+    info = psb_success_ 
+
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
   end subroutine psb_s_base_precsetc
-
-  subroutine psb_s_base_precfree(prec,info)
-    Implicit None
-
-    class(psb_s_base_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(out)                :: info
-    
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_precfree'
-    
-    call psb_erractionsave(err_act)
-    
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-    
-  end subroutine psb_s_base_precfree
-  
-
-  subroutine psb_s_base_precdescr(prec,iout)
-    Implicit None
-
-    class(psb_s_base_prec_type), intent(in) :: prec
-    integer(psb_ipk_), intent(in), optional    :: iout
-
-    integer(psb_ipk_) :: err_act, nrow, info
-    character(len=20)  :: name='s_base_precdescr'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-    
-  end subroutine psb_s_base_precdescr
-  
-  subroutine psb_s_base_precdump(prec,info,prefix,head)
-    implicit none 
-    class(psb_s_base_prec_type), intent(in) :: prec
-    integer(psb_ipk_), intent(out)             :: info
-    character(len=*), intent(in), optional :: prefix,head
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='s_base_precdump'
-
-    call psb_erractionsave(err_act)
-
-    !
-    ! This is the base version and we should throw an error. 
-    ! Or should it be the NULL preconditioner???
-    !
-    info = 700
-    call psb_errpush(info,name)
-    goto 9999 
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-    
-  end subroutine psb_s_base_precdump
 
   subroutine psb_s_base_set_ctxt(prec,ictxt)
     implicit none 
@@ -416,7 +255,7 @@ contains
   function psb_s_base_sizeof(prec) result(val)
     class(psb_s_base_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
-    
+
     val = 0
     return
   end function psb_s_base_sizeof
@@ -424,7 +263,7 @@ contains
   function psb_s_base_get_ctxt(prec) result(val)
     class(psb_s_base_prec_type), intent(in) :: prec
     integer(psb_ipk_) :: val
-    
+
     val = prec%ictxt
     return
   end function psb_s_base_get_ctxt
@@ -432,7 +271,7 @@ contains
   function psb_s_base_get_nzeros(prec) result(res)
     class(psb_s_base_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: res
-    
+
     res = 0
 
   end function psb_s_base_get_nzeros
