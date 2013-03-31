@@ -166,8 +166,8 @@ contains
     integer(psb_ipk_)     :: info 
 
     mapout%kind = map%kind
-    call psb_safe_ab_copy(map%iaggr,mapout%iaggr,info)
-    call psb_safe_ab_copy(map%naggr,mapout%naggr,info)
+    call psb_safe_ab_cpy(map%iaggr,mapout%iaggr,info)
+    call psb_safe_ab_cpy(map%naggr,mapout%naggr,info)
     mapout%p_desc_X => map%p_desc_X 
     mapout%p_desc_Y => map%p_desc_Y
     call map%desc_X%clone(mapout%desc_X,info)
