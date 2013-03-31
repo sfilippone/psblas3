@@ -43,11 +43,12 @@ module psb_d_bjacprec
     procedure, pass(prec) :: precbld   => psb_d_bjac_precbld
     procedure, pass(prec) :: precinit  => psb_d_bjac_precinit
     procedure, pass(prec) :: precseti  => psb_d_bjac_precseti
-    procedure, pass(prec) :: precsetr  => psb_d_bjac_precsetr
-    procedure, pass(prec) :: precsetc  => psb_d_bjac_precsetc
+!!$    procedure, pass(prec) :: precsetr  => psb_d_bjac_precsetr
+!!$    procedure, pass(prec) :: precsetc  => psb_d_bjac_precsetc
     procedure, pass(prec) :: precfree  => psb_d_bjac_precfree
     procedure, pass(prec) :: precdescr => psb_d_bjac_precdescr
     procedure, pass(prec) :: dump      => psb_d_bjac_dump
+    procedure, pass(prec) :: clone     => psb_d_bjac_clone
     procedure, pass(prec) :: sizeof    => psb_d_bjac_sizeof
     procedure, pass(prec) :: get_nzeros => psb_d_bjac_get_nzeros
   end type psb_d_bjac_prec_type
@@ -210,60 +211,6 @@ contains
   end function psb_d_bjac_get_nzeros
 
 
-  subroutine psb_d_bjac_precsetr(prec,what,val,info)
-
-    Implicit None
-
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    real(psb_dpk_), intent(in)               :: val 
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='d_bjac_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_d_bjac_precsetr
-
-  subroutine psb_d_bjac_precsetc(prec,what,val,info)
-
-    Implicit None
-
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
-    integer(psb_ipk_), intent(in)                      :: what 
-    character(len=*), intent(in)             :: val
-    integer(psb_ipk_), intent(out)                     :: info
-    integer(psb_ipk_) :: err_act, nrow
-    character(len=20)  :: name='d_bjac_precset'
-
-    call psb_erractionsave(err_act)
-
-    info = psb_success_
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine psb_d_bjac_precsetc
-
   subroutine psb_d_bjac_precfree(prec,info)
 
     Implicit None
@@ -303,5 +250,58 @@ contains
     return
 
   end subroutine psb_d_bjac_precfree
+
+
+  subroutine psb_d_bjac_clone(prec,precout,info)
+    use psb_error_mod
+    use psb_realloc_mod
+    Implicit None
+
+    class(psb_d_bjac_prec_type), intent(inout) :: prec
+    class(psb_d_base_prec_type), allocatable, intent(out)  :: precout
+    integer(psb_ipk_), intent(out)               :: info
+
+    integer(psb_ipk_) :: err_act, i
+    character(len=20)  :: name='d_bjac_clone'
+
+    call psb_erractionsave(err_act)
+
+    info = psb_success_
+    allocate(psb_d_bjac_prec_type :: precout, stat=info)
+    if (info /= 0) goto 9999
+    select type(pout => precout)
+    type is (psb_d_bjac_prec_type) 
+      call pout%set_ctxt(prec%get_ctxt())
+
+      if (allocated(prec%av)) then 
+        allocate(pout%av(size(prec%av)),stat=info)
+        do i=1,size(prec%av) 
+          if (info /= psb_success_) exit
+          call prec%av(i)%clone(pout%av(i),info)
+        enddo
+        if (info /= psb_success_) goto 9999
+      end if
+
+      if (allocated(prec%dv)) then 
+        allocate(pout%dv,stat=info)
+        if (info == 0) call prec%dv%clone(pout%dv,info)
+      end if
+    class default
+      info = psb_err_internal_error_
+    end select
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_d_bjac_clone
 
 end module psb_d_bjacprec

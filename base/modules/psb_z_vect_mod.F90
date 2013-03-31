@@ -95,11 +95,13 @@ module psb_z_vect_mod
 contains
 
   
-  subroutine z_vect_clone(x,y)
+  subroutine z_vect_clone(x,y,info)
     implicit none 
     class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_vect_type), intent(out)   :: y
+    integer(psb_ipk_), intent(out)        :: info
 
+    info = psb_success_
     if (allocated(x%v)) then 
       call y%bld(x%get_vect(),mold=x%v)
     end if

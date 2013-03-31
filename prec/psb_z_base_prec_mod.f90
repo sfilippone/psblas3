@@ -64,6 +64,7 @@ module psb_z_base_prec_mod
     procedure(psb_z_base_precfree), pass(prec), deferred :: precfree   
     procedure(psb_z_base_precdescr), pass(prec), deferred :: precdescr  
     procedure(psb_z_base_precdump), pass(prec), deferred :: dump       
+    procedure(psb_z_base_precclone), pass(prec), deferred :: clone       
   end type psb_z_base_prec_type
 
   private :: psb_z_base_set_ctxt, psb_z_base_get_ctxt, &
@@ -178,6 +179,18 @@ module psb_z_base_prec_mod
       character(len=*), intent(in), optional :: prefix,head
 
     end subroutine psb_z_base_precdump
+  end interface
+ 
+  abstract interface   
+    subroutine psb_z_base_precclone(prec,precout,info)
+      import psb_ipk_, psb_dpk_, psb_desc_type, psb_z_vect_type, &
+           & psb_z_base_vect_type, psb_zspmat_type, psb_z_base_prec_type,&
+           & psb_z_base_sparse_mat
+      implicit none 
+      class(psb_z_base_prec_type), intent(inout) :: prec
+      class(psb_z_base_prec_type), allocatable, intent(out) :: precout
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine psb_z_base_precclone
   end interface
 
 contains

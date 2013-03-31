@@ -43,6 +43,7 @@ module psb_c_nullprec
     procedure, pass(prec) :: precdescr => psb_c_null_precdescr
     procedure, pass(prec) :: sizeof    => psb_c_null_sizeof
     procedure, pass(prec) :: dump      => psb_c_null_dump
+    procedure, pass(prec) :: clone     => psb_c_null_clone
   end type psb_c_null_prec_type
 
   private :: psb_c_null_precbld, psb_c_null_sizeof,&
@@ -257,5 +258,47 @@ contains
 
     return
   end function psb_c_null_sizeof
+
+
+  subroutine psb_c_null_clone(prec,precout,info)
+    use psb_const_mod
+    use psb_error_mod
+
+    Implicit None
+
+    class(psb_c_null_prec_type), intent(inout) :: prec
+    class(psb_c_base_prec_type), allocatable, intent(out)  :: precout
+    integer(psb_ipk_), intent(out)               :: info
+
+    integer(psb_ipk_) :: err_act, i
+    character(len=20)  :: name='c_null_clone'
+
+    call psb_erractionsave(err_act)
+
+    info = psb_success_
+    allocate(psb_c_null_prec_type :: precout, stat=info)
+    if (info /= 0) goto 9999
+    select type(pout => precout)
+    type is (psb_c_null_prec_type) 
+      call pout%set_ctxt(prec%get_ctxt())
+
+    class default
+      info = psb_err_internal_error_
+    end select
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_c_null_clone
+
 
 end module psb_c_nullprec

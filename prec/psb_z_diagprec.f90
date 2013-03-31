@@ -39,12 +39,13 @@ module psb_z_diagprec
   contains
     procedure, pass(prec) :: z_apply_v => psb_z_diag_apply_vect
     procedure, pass(prec) :: z_apply   => psb_z_diag_apply
-    procedure, pass(prec) :: precbld   => psb_z_diag_precbld
-    procedure, pass(prec) :: precinit  => psb_z_diag_precinit  
-    procedure, pass(prec) :: precfree  => psb_z_diag_precfree
-    procedure, pass(prec) :: precdescr => psb_z_diag_precdescr
-    procedure, pass(prec) :: sizeof    => psb_z_diag_sizeof
-    procedure, pass(prec) :: dump      => psb_z_diag_dump
+    procedure, pass(prec) :: precbld    => psb_z_diag_precbld
+    procedure, pass(prec) :: precinit   => psb_z_diag_precinit  
+    procedure, pass(prec) :: precfree   => psb_z_diag_precfree
+    procedure, pass(prec) :: precdescr  => psb_z_diag_precdescr
+    procedure, pass(prec) :: sizeof     => psb_z_diag_sizeof
+    procedure, pass(prec) :: dump       => psb_z_diag_dump
+    procedure, pass(prec) :: clone      => psb_z_diag_clone
     procedure, pass(prec) :: get_nzeros => psb_z_diag_get_nzeros
   end type psb_z_diag_prec_type
 
@@ -223,6 +224,52 @@ contains
     if (allocated(prec%dv)) val = val + prec%dv%get_nrows()
     return
   end function psb_z_diag_get_nzeros
+
+
+  subroutine psb_z_diag_clone(prec,precout,info)
+    use psb_error_mod
+    use psb_realloc_mod
+
+    Implicit None
+
+    class(psb_z_diag_prec_type), intent(inout) :: prec
+    class(psb_z_base_prec_type), allocatable, intent(out)  :: precout
+    integer(psb_ipk_), intent(out)               :: info
+
+    integer(psb_ipk_) :: err_act, i
+    character(len=20)  :: name='z_diag_clone'
+
+    call psb_erractionsave(err_act)
+
+    info = psb_success_
+    allocate(psb_z_diag_prec_type :: precout, stat=info)
+    if (info /= 0) goto 9999
+    select type(pout => precout)
+    type is (psb_z_diag_prec_type) 
+      call pout%set_ctxt(prec%get_ctxt())
+
+      if (allocated(prec%dv)) then 
+        allocate(pout%dv,stat=info)
+        if (info == 0) call prec%dv%clone(pout%dv,info)
+      end if
+      if (info == 0) call psb_safe_ab_cpy(prec%d,pout%d,info)
+    class default
+      info = psb_err_internal_error_
+    end select
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_z_diag_clone
 
 
 end module psb_z_diagprec
