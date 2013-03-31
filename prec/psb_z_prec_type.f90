@@ -48,15 +48,13 @@ module psb_z_prec_type
     generic, public                     :: apply => psb_z_apply2v, psb_z_apply1v,&
          & psb_z_apply1_vect, psb_z_apply2_vect
     procedure, pass(prec)               :: sizeof => psb_zprec_sizeof
+    procedure, pass(prec)               :: clone  => psb_z_prec_clone
   end type psb_zprec_type
 
   interface psb_precfree
     module procedure psb_z_precfree
   end interface
 
-  interface psb_nullify_prec
-    module procedure psb_nullify_cprec
-  end interface
 
   interface psb_precdescr
     module procedure psb_zfile_prec_descr
@@ -192,11 +190,6 @@ contains
     return
   end subroutine psb_z_precfree
 
-  subroutine psb_nullify_cprec(p)
-    type(psb_zprec_type), intent(inout) :: p
-
-  end subroutine psb_nullify_cprec
-  
   function psb_zprec_sizeof(prec) result(val)
     class(psb_zprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
@@ -208,5 +201,19 @@ contains
     end if
     
   end function psb_zprec_sizeof
+
+  subroutine psb_z_prec_clone(prec,precout,info)
+    implicit none 
+    class(psb_zprec_type), intent(inout) :: prec
+    class(psb_zprec_type), intent(out)   :: precout
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = psb_success_
+    
+    if (allocated(prec%prec)) then 
+      call prec%prec%clone(precout%prec,info)
+    end if
+    
+  end subroutine psb_z_prec_clone
 
 end module psb_z_prec_type
