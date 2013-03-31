@@ -83,6 +83,7 @@ module psb_z_vect_mod
     procedure, pass(x) :: set_scal => z_vect_set_scal
     procedure, pass(x) :: set_vect => z_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: clone    => z_vect_clone
   end type psb_z_vect_type
 
   public  :: psb_z_vect
@@ -93,6 +94,17 @@ module psb_z_vect_mod
 
 contains
 
+  
+  subroutine z_vect_clone(x,y)
+    implicit none 
+    class(psb_z_vect_type), intent(inout) :: x
+    class(psb_z_vect_type), intent(out)   :: y
+
+    if (allocated(x%v)) then 
+      call y%bld(x%get_vect(),mold=x%v)
+    end if
+  end subroutine z_vect_clone
+  
   subroutine z_vect_bld_x(x,invect,mold)
     complex(psb_dpk_), intent(in)          :: invect(:)
     class(psb_z_vect_type), intent(out) :: x

@@ -362,7 +362,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   implicit none 
   type(psb_clinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_cspmat_type), intent(in) :: map_X2Y, map_Y2X
+  type(psb_cspmat_type), intent(inout) :: map_X2Y, map_Y2X
   integer(psb_ipk_), intent(in)               :: map_kind
   integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
   !

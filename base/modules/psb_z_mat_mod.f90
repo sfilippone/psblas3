@@ -612,9 +612,9 @@ module psb_z_mat_mod
   interface 
     subroutine psb_zspmat_clone(a,b,info)
       import :: psb_ipk_, psb_zspmat_type
-      class(psb_zspmat_type), intent(in)  :: a
-      class(psb_zspmat_type), intent(out) :: b
-      integer(psb_ipk_), intent(out)                 :: info
+      class(psb_zspmat_type), intent(inout) :: a
+      class(psb_zspmat_type), intent(out)   :: b
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_zspmat_clone
   end interface
 

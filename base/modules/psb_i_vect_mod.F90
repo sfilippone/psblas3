@@ -83,6 +83,7 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_scal => i_vect_set_scal
     procedure, pass(x) :: set_vect => i_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: clone    => i_vect_clone
   end type psb_i_vect_type
 
   public  :: psb_i_vect
@@ -93,6 +94,17 @@ module psb_i_vect_mod
 
 contains
 
+  
+  subroutine i_vect_clone(x,y)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    class(psb_i_vect_type), intent(out)   :: y
+
+    if (allocated(x%v)) then 
+      call y%bld(x%get_vect(),mold=x%v)
+    end if
+  end subroutine i_vect_clone
+  
   subroutine i_vect_bld_x(x,invect,mold)
     integer(psb_ipk_), intent(in)          :: invect(:)
     class(psb_i_vect_type), intent(out) :: x

@@ -76,6 +76,7 @@ module psb_s_base_mat_mod
     generic, public    :: cp_from => s_base_cp_from
     procedure, pass(a) :: s_base_mv_from
     generic, public    :: mv_from => s_base_mv_from
+    procedure, pass(a) :: clone         => psb_s_base_clone
     
     !
     ! Transpose methods: defined here but not implemented. 
@@ -112,7 +113,7 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: aclsum      => psb_s_base_aclsum
   end type psb_s_base_sparse_mat
   
-  private :: base_cp_from, base_mv_from
+  private :: s_base_cp_from, s_base_mv_from
   
   
   !> \namespace  psb_base_mod  \class  psb_s_coo_sparse_mat
@@ -413,10 +414,30 @@ module psb_s_base_mat_mod
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_long_int_k_
       class(psb_s_base_sparse_mat), intent(in)               :: a
       class(psb_s_base_sparse_mat), intent(out), allocatable :: b
-      integer(psb_ipk_), intent(out)                                 :: info
+      integer(psb_ipk_), intent(out)                         :: info
     end subroutine psb_s_base_mold
   end interface
-  
+
+  !
+  !> Function  clone:
+  !! \memberof  psb_s_base_sparse_mat
+  !! \brief Allocate and clone  a class(psb_s_base_sparse_mat) with the
+  !!     same dynamic type as the input.
+  !!     This is equivalent to allocate( source=  ) except that
+  !!     it should guarantee a deep copy wherever needed.
+  !!   \param b The output variable
+  !!   \param info return code
+  ! 
+  interface 
+    subroutine psb_s_base_clone(a,b, info)
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_long_int_k_      
+      implicit none 
+      class(psb_s_base_sparse_mat), intent(inout)            :: a
+      class(psb_s_base_sparse_mat), allocatable, intent(out) :: b
+      integer(psb_ipk_), intent(out)                         :: info      
+    end subroutine psb_s_base_clone
+  end interface
+
   
   !
   !> Function  cp_to_coo:
@@ -1565,6 +1586,7 @@ module psb_s_base_mat_mod
 contains 
   
   
+ 
   subroutine s_base_mv_from(a,b)
     
     implicit none 

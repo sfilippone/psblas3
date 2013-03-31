@@ -550,6 +550,25 @@ subroutine psb_c_base_csclip(a,b,info,&
 
 end subroutine psb_c_base_csclip
 
+subroutine psb_c_base_clone(a,b,info)
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_clone
+  use psb_error_mod
+  implicit none 
+  
+  class(psb_c_base_sparse_mat), intent(inout)   :: a
+  class(psb_c_base_sparse_mat), allocatable, intent(out) :: b
+  integer(psb_ipk_), intent(out) :: info 
+
+#if defined(HAVE_MOLD)
+  allocate(b,mold=a,stat=info)
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
+#else
+  call a%mold(b,info)
+#endif
+  if (info == psb_success_) call b%cp_from_fmt(a, info)    
+    
+end subroutine psb_c_base_clone
+
 subroutine psb_c_base_mold(a,b,info) 
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_mold
   use psb_error_mod

@@ -612,9 +612,9 @@ module psb_c_mat_mod
   interface 
     subroutine psb_cspmat_clone(a,b,info)
       import :: psb_ipk_, psb_cspmat_type
-      class(psb_cspmat_type), intent(in)  :: a
-      class(psb_cspmat_type), intent(out) :: b
-      integer(psb_ipk_), intent(out)                 :: info
+      class(psb_cspmat_type), intent(inout) :: a
+      class(psb_cspmat_type), intent(out)   :: b
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_cspmat_clone
   end interface
 

@@ -1444,7 +1444,7 @@ subroutine psb_d_cp_from(a,b)
   class(psb_dspmat_type), intent(out)      :: a
   class(psb_d_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_) :: err_act, info
-  character(len=20)  :: name='clone'
+  character(len=20)  :: name='cp_from'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
@@ -1544,9 +1544,9 @@ subroutine psb_dspmat_clone(a,b,info)
   use psb_string_mod
   use psb_d_mat_mod, psb_protect_name => psb_dspmat_clone
   implicit none 
-  class(psb_dspmat_type), intent(in)  :: a
-  class(psb_dspmat_type), intent(out) :: b
-  integer(psb_ipk_), intent(out)                 :: info
+  class(psb_dspmat_type), intent(inout) :: a
+  class(psb_dspmat_type), intent(out)   :: b
+  integer(psb_ipk_), intent(out)        :: info
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='clone'
@@ -1555,13 +1555,9 @@ subroutine psb_dspmat_clone(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
 
-#if defined(HAVE_MOLD)
-  allocate(b%a,mold=a%a,stat=info)
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
-#else
-  call a%a%mold(b%a,info)
-#endif
-  if (info == psb_success_) call b%a%cp_from_fmt(a%a, info)    
+  if (allocated(a%a)) then 
+    call a%a%clone(b%a,info)
+  end if
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
