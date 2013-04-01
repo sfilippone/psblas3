@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Utilities</TITLE>
-<META NAME="description" CONTENT="Utilities">
+<TITLE>psb_set_errverbosity -- Sets the verbosity of error messages.</TITLE>
+<META NAME="description" CONTENT="psb_set_errverbosity -- Sets the verbosity of error messages.">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,73 +18,71 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node112.html">
-<LINK REL="previous" HREF="node101.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node107.html">
+<LINK REL="previous" HREF="node105.html">
+<LINK REL="up" HREF="node103.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1538"
+<A NAME="tex2html1542"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1534"
-  HREF="userhtml.html">
+<A NAME="tex2html1538"
+  HREF="node103.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1528"
+<A NAME="tex2html1532"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1536"
+<A NAME="tex2html1540"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1539"
-  HREF="node107.html">hb_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1535"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1529"
-  HREF="node105.html">psb_set_erraction   Set</A>
- &nbsp; <B>  <A NAME="tex2html1537"
+<B> Next:</B> <A NAME="tex2html1543"
+  HREF="node107.html">psb_set_erraction   Set</A>
+<B> Up:</B> <A NAME="tex2html1539"
+  HREF="node103.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1533"
+  HREF="node105.html">psb_error   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1541"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000100000000000000000"></A>
-<A NAME="sec:util"></A>
+<H2><A NAME="SECTION00093000000000000000">
+psb_set_errverbosity -- Sets the verbosity of error
+  messages.</A>
+</H2>
+
+<P>
+<PRE>
+call psb_set_errverbosity(v)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>v</STRONG></DT>
+<DD>the verbosity level
 <BR>
-Utilities
-</H1>
+Scope: <B>global</B>
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+</DL>
 
 <P>
-We have some utitlities available for input and output of
-sparsematrices; the interfaces to these routines are available in the
-module <code>psb_util_mod</code>.
-
-<P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html1540"
-  HREF="node107.html">hb_read -- Read a sparse matrix from a file in the
-  Harwell-Boeing format</A>
-<LI><A NAME="tex2html1541"
-  HREF="node108.html">hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
-<LI><A NAME="tex2html1542"
-  HREF="node109.html">mm_mat_read -- Read a sparse matrix from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1543"
-  HREF="node110.html">mm_vet_read -- Read a dense vector from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1544"
-  HREF="node111.html">mm_mat_write -- Write a sparse matrix to a
-  file in the MatrixMarket format</A>
-</UL>
-<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

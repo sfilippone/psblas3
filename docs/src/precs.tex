@@ -23,7 +23,6 @@ module  \verb|psb_prec_mod|.
 
 
 
-
 \clearpage\subsection*{psb\_precinit --- Initialize a  preconditioner}
 \addcontentsline{toc}{subsection}{psb\_precinit}
 
@@ -218,6 +217,30 @@ Intent: {\bf in}.\\
 Specified as: an integer number. 
 \end{description}
 
+
+
+\clearpage\subsection*{clone --- clone  current
+  preconditioner}
+\addcontentsline{toc}{subsection}{clone}
+\begin{verbatim}
+call  prec%clone(precout,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+% Type: {\bf required}.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[precout] A copy of the input object.
+\item[info] Return code. 
+\end{description}
 
 
 %%% Local Variables: 

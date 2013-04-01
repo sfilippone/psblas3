@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_error -- Prints the error stack content and aborts execution</TITLE>
-<META NAME="description" CONTENT="psb_error -- Prints the error stack content and aborts execution">
+<TITLE>Error handling</TITLE>
+<META NAME="description" CONTENT="Error handling">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,72 +18,176 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node104.html">
-<LINK REL="previous" HREF="node102.html">
-<LINK REL="up" HREF="node101.html">
+<LINK REL="next" HREF="node108.html">
+<LINK REL="previous" HREF="node86.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node104.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1504"
+<A NAME="tex2html1502"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1500"
-  HREF="node101.html">
+<A NAME="tex2html1498"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1494"
+<A NAME="tex2html1492"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1502"
+<A NAME="tex2html1500"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1505"
-  HREF="node104.html">psb_set_errverbosity   Sets</A>
-<B> Up:</B> <A NAME="tex2html1501"
-  HREF="node101.html">Error handling</A>
-<B> Previous:</B> <A NAME="tex2html1495"
-  HREF="node102.html">psb_errpush   Pushes</A>
- &nbsp; <B>  <A NAME="tex2html1503"
+<B> Next:</B> <A NAME="tex2html1503"
+  HREF="node104.html">psb_errpush   Pushes</A>
+<B> Up:</B> <A NAME="tex2html1499"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1493"
+  HREF="node102.html">psb_rcv   Receive</A>
+ &nbsp; <B>  <A NAME="tex2html1501"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00092000000000000000">
-psb_error -- Prints the error stack content and aborts
-  execution</A>
-</H2>
+<H1><A NAME="SECTION00090000000000000000">
+Error handling</A>
+</H1>
 
 <P>
-<PRE>
-call psb_error(icontxt)
-</PRE>
+The PSBLAS library error handling policy has been completely rewritten
+in version 2.0. The idea behind the design of this new error handling
+strategy is to keep error messages on a stack allowing the user to
+trace back up to the point where the first error message has been
+generated. Every routine in the PSBLAS-2.0 library has, as last
+non-optional argument, an integer <code>info</code> variable; whenever,
+inside the routine, an error is detected, this variable is set to a
+value corresponding to a specific error code. Then this error code is
+also pushed on the error stack and then either control is returned to
+the caller routine or the execution is aborted, depending on the users
+choice. At the time when the execution is aborted, an error message is
+printed on standard output with a level of verbosity than can be
+chosen by the user. If the execution is not aborted, then, the caller
+routine checks the value returned in the <code>info</code> variable and, if
+not zero, an error condition is raised. This process continues on all the
+levels of nested calls until the level where the user decides to abort
+the program execution.
 
 <P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context.
+Figure&nbsp;<A HREF="#fig:routerr">9</A> shows the layout of a generic <code>psb_foo</code>
+routine with respect to the PSBLAS-2.0 error handling policy. It is
+possible to see how, whenever an error condition is detected, the
+<code>info</code> variable is set to the corresponding error code which is,
+then, pushed on top of the stack by means of the
+<code>psb_errpush</code>. An error condition may be directly detected inside
+a routine or indirectly checking the error code returned returned by a
+called routine. Whenever an error is encountered, after it has been
+pushed on stack, the program execution skips to a point where the
+error condition is handled; the error condition is handled either by
+returning control to the caller routine or by calling the
+<code>psb\_error</code> routine which prints the content of the error stack
+and aborts the program execution, according to the choice made by the
+user with <code>psb_set_erraction</code>. The default is to print the error
+and terminate the program, but the user may choose to handle the error
+explicitly. 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="6914"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
+The layout of a generic <TT>psb_foo</TT>
+  routine with respect to PSBLAS-2.0 error handling policy.</CAPTION>
+<TR><TD>
 <BR>
-Scope: <B>global</B> 
+   
+  <DIV ALIGN="CENTER">
+<!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<IMG
+ WIDTH="562" HEIGHT="466" ALIGN="MIDDLE" BORDER="0"
+ SRC="img139.png"
+ ALT="\fbox{\TheSbox}">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Figure&nbsp;<A HREF="#fig:errormsg">10</A> reports a sample error message generated by
+the PSBLAS-2.0 library. This error has been generated by the fact that
+the user has chosen the invalid ``FOO'' storage format to represent
+the sparse matrix. From this error message it is possible to see that
+the error has been detected inside the <code>psb_cest</code> subroutine
+called by <code>psb_spasb</code> ... by process 0 (i.e. the root process).
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="6915"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
+A sample PSBLAS-2.0 error
+    message. Process 0 detected an error condition inside the  psb_cest subroutine</CAPTION>
+<TR><TD>
 <BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer.
-</DD>
-</DL>
+   
+  <DIV ALIGN="CENTER">
+<!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<IMG
+ WIDTH="562" HEIGHT="466" ALIGN="MIDDLE" BORDER="0"
+ SRC="img139.png"
+ ALT="\fbox{\TheSbox}">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
 
 <P>
 <BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1504"
+  HREF="node104.html">psb_errpush -- Pushes an error code onto the error
+  stack</A>
+<LI><A NAME="tex2html1505"
+  HREF="node105.html">psb_error -- Prints the error stack content and aborts
+  execution</A>
+<LI><A NAME="tex2html1506"
+  HREF="node106.html">psb_set_errverbosity -- Sets the verbosity of error
+  messages.</A>
+<LI><A NAME="tex2html1507"
+  HREF="node107.html">psb_set_erraction -- Set the type of action to be
+  taken  upon error condition.</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1502"
+  HREF="node104.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1498"
+  HREF="userhtml.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1492"
+  HREF="node102.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1500"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1503"
+  HREF="node104.html">psb_errpush   Pushes</A>
+<B> Up:</B> <A NAME="tex2html1499"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1493"
+  HREF="node102.html">psb_rcv   Receive</A>
+ &nbsp; <B>  <A NAME="tex2html1501"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

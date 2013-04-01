@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_erraction -- Set the type of action to be taken upon error condition.</TITLE>
-<META NAME="description" CONTENT="psb_set_erraction -- Set the type of action to be taken upon error condition.">
+<TITLE>psb_error -- Prints the error stack content and aborts execution</TITLE>
+<META NAME="description" CONTENT="psb_error -- Prints the error stack content and aborts execution">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,46 +18,47 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node106.html">
 <LINK REL="previous" HREF="node104.html">
-<LINK REL="up" HREF="node101.html">
+<LINK REL="up" HREF="node103.html">
 <LINK REL="next" HREF="node106.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1526"
+<A NAME="tex2html1530"
   HREF="node106.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1522"
-  HREF="node101.html">
+<A NAME="tex2html1526"
+  HREF="node103.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1518"
+<A NAME="tex2html1520"
   HREF="node104.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1524"
+<A NAME="tex2html1528"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1527"
-  HREF="node106.html">Utilities</A>
-<B> Up:</B> <A NAME="tex2html1523"
-  HREF="node101.html">Error handling</A>
-<B> Previous:</B> <A NAME="tex2html1519"
-  HREF="node104.html">psb_set_errverbosity   Sets</A>
- &nbsp; <B>  <A NAME="tex2html1525"
+<B> Next:</B> <A NAME="tex2html1531"
+  HREF="node106.html">psb_set_errverbosity   Sets</A>
+<B> Up:</B> <A NAME="tex2html1527"
+  HREF="node103.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1521"
+  HREF="node104.html">psb_errpush   Pushes</A>
+ &nbsp; <B>  <A NAME="tex2html1529"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00094000000000000000">
-psb_set_erraction -- Set the type of action to be
-  taken  upon error condition.</A>
+<H2><A NAME="SECTION00092000000000000000">
+psb_error -- Prints the error stack content and aborts
+  execution</A>
 </H2>
 
 <P>
 <PRE>
-call psb_set_erraction(err_act)
+call psb_error(icontxt)
 </PRE>
 
 <P>
@@ -68,24 +69,18 @@ call psb_set_erraction(err_act)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>err_act</STRONG></DT>
-<DD>the type of action.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer. Possible values: <code>psb_act_ret</code>,
-<code>psb_act_abort</code>. 
+Specified as: an integer.
 </DD>
 </DL>
-
-<P>
-<PRE>
-call psb_errcomm(icontxt, err)
-</PRE>
 
 <P>
 <BR><HR>

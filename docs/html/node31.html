@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Methods</TITLE>
-<META NAME="description" CONTENT="Methods">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,7 +18,6 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node32.html">
 <LINK REL="previous" HREF="node30.html">
 <LINK REL="up" HREF="node30.html">
 <LINK REL="next" HREF="node32.html">
@@ -26,34 +25,60 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html588"
+<A NAME="tex2html586"
   HREF="node32.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html584"
+<A NAME="tex2html582"
   HREF="node30.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html578"
   HREF="node30.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html586"
+<A NAME="tex2html584"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html589"
-  HREF="node32.html">get_nrows   Get</A>
-<B> Up:</B> <A NAME="tex2html585"
-  HREF="node30.html">Dense Vector Data Structure</A>
+<B> Next:</B> <A NAME="tex2html587"
+  HREF="node32.html">Dense Vector Data Structure</A>
+<B> Up:</B> <A NAME="tex2html583"
+  HREF="node30.html">clone Clone current object</A>
 <B> Previous:</B> <A NAME="tex2html579"
-  HREF="node30.html">Dense Vector Data Structure</A>
- &nbsp; <B>  <A NAME="tex2html587"
+  HREF="node30.html">clone Clone current object</A>
+ &nbsp; <B>  <A NAME="tex2html585"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00044100000000000000">
-Methods</A>
+<H3><A NAME="SECTION00045100000000000000"></A>
+<A NAME="sec:sp_constants"></A>
+<BR>
+Named Constants
 </H3>
+<DL>
+<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
+<DD>Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
+</DD>
+<DT><STRONG>psb_dupl_add_</STRONG></DT>
+<DD>Duplicate coefficients should be added;	         
+</DD>
+<DT><STRONG>psb_dupl_err_</STRONG></DT>
+<DD>Duplicate coefficients should trigger an error conditino
+</DD>
+<DT><STRONG>psb_upd_dflt_</STRONG></DT>
+<DD>Default update strategy for matrix coefficients;
+</DD>
+<DT><STRONG>psb_upd_srch_</STRONG></DT>
+<DD>Update strategy based on search into the data structure;
+</DD>
+<DT><STRONG>psb_upd_perm_</STRONG></DT>
+<DD>Update strategy based on additional
+  permutation data (see tools routine description).
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>

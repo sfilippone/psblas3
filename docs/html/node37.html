@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Computational routines</TITLE>
-<META NAME="description" CONTENT="Computational routines">
+<TITLE>clone--Clone current object </TITLE>
+<META NAME="description" CONTENT="clone--Clone current object ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,77 +18,77 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node51.html">
-<LINK REL="previous" HREF="node9.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node38.html">
+<LINK REL="previous" HREF="node32.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node38.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html656"
+<A NAME="tex2html660"
   HREF="node38.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html652"
-  HREF="userhtml.html">
+<A NAME="tex2html656"
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html646"
+<A NAME="tex2html650"
   HREF="node36.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html654"
+<A NAME="tex2html658"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html657"
-  HREF="node38.html">psb_geaxpby   General</A>
-<B> Up:</B> <A NAME="tex2html653"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html647"
-  HREF="node36.html">Preconditioner data structure</A>
- &nbsp; <B>  <A NAME="tex2html655"
+<B> Next:</B> <A NAME="tex2html661"
+  HREF="node38.html">Preconditioner data structure</A>
+<B> Up:</B> <A NAME="tex2html657"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Previous:</B> <A NAME="tex2html651"
+  HREF="node36.html">get_vect   Get</A>
+ &nbsp; <B>  <A NAME="tex2html659"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00050000000000000000">
-Computational routines</A>
-</H1>
+<H2><A NAME="SECTION00047000000000000000">
+<DIV ALIGN="LEFT">
+clone--Clone current object 
+</DIV></A>
+</H2>
+<PRE>
+call  x%clone(y,info)
+</PRE>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the dense vector.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
 
-<UL>
-<LI><A NAME="tex2html658"
-  HREF="node38.html">psb_geaxpby -- General Dense Matrix Sum</A>
-<LI><A NAME="tex2html659"
-  HREF="node39.html">psb_gedot -- Dot Product</A>
-<LI><A NAME="tex2html660"
-  HREF="node40.html">psb_gedots -- Generalized Dot Product</A>
-<LI><A NAME="tex2html661"
-  HREF="node41.html">psb_geamax -- Infinity-Norm of Vector</A>
-<LI><A NAME="tex2html662"
-  HREF="node42.html">psb_geamaxs -- Generalized Infinity Norm</A>
-<LI><A NAME="tex2html663"
-  HREF="node43.html">psb_geasum -- 1-Norm of Vector</A>
-<LI><A NAME="tex2html664"
-  HREF="node44.html">psb_geasums -- Generalized 1-Norm of Vector</A>
-<LI><A NAME="tex2html665"
-  HREF="node45.html">psb_genrm2 -- 2-Norm of Vector</A>
-<LI><A NAME="tex2html666"
-  HREF="node46.html">psb_genrm2s -- Generalized 2-Norm of Vector</A>
-<LI><A NAME="tex2html667"
-  HREF="node47.html">psb_spnrm1 -- 1-Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html668"
-  HREF="node48.html">psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html669"
-  HREF="node49.html">psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
-<LI><A NAME="tex2html670"
-  HREF="node50.html">psb_spsm -- Triangular System Solve</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>A copy of the input object.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>

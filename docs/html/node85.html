@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_init -- Initializes PSBLAS parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_init -- Initializes PSBLAS parallel environment">
+<TITLE>Sorting utilities</TITLE>
+<META NAME="description" CONTENT="Sorting utilities">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,97 +18,120 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node86.html">
 <LINK REL="previous" HREF="node84.html">
-<LINK REL="up" HREF="node84.html">
+<LINK REL="up" HREF="node58.html">
 <LINK REL="next" HREF="node86.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1286"
+<A NAME="tex2html1272"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1282"
-  HREF="node84.html">
+<A NAME="tex2html1268"
+  HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1276"
+<A NAME="tex2html1264"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1284"
+<A NAME="tex2html1270"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1287"
-  HREF="node86.html">psb_info   Return</A>
-<B> Up:</B> <A NAME="tex2html1283"
-  HREF="node84.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1277"
-  HREF="node84.html">Parallel environment routines</A>
- &nbsp; <B>  <A NAME="tex2html1285"
+<B> Next:</B> <A NAME="tex2html1273"
+  HREF="node86.html">Parallel environment routines</A>
+<B> Up:</B> <A NAME="tex2html1269"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1265"
+  HREF="node84.html">psb_sizeof   Memory</A>
+ &nbsp; <B>  <A NAME="tex2html1271"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00081000000000000000">
-psb_init -- Initializes PSBLAS parallel environment</A>
+<H2><A NAME="SECTION000727000000000000000">
+Sorting utilities</A>
 </H2>
 
 <P>
+<FONT SIZE="+1"><B>psb_msort -- Sorting by the Merge-sort
+  algorithm</B></FONT>
+
+<P>
+<FONT SIZE="+1"><B>psb_qsort -- Sorting by the Quicksort
+  algorithm</B></FONT>
+
+<P>
+<FONT SIZE="+1"><B>psb_hsort -- Sorting by the Heapsort  algorithm</B></FONT>
 <PRE>
-call psb_init(icontxt, np, basectxt, ids)
+call psb_msort(x,ix,dir,flag)
+call psb_qsort(x,ix,dir,flag)
+call psb_hsort(x,ix,dir,flag)
 </PRE>
 
 <P>
-This subroutine initializes the PSBLAS parallel environment, defining
-a virtual parallel machine.
+These  serial routines sort a sequence <IMG
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$X$"> into ascending or
+descending  order. The argument meaning is identical for the three
+calls; the only difference is the algorithm used to accomplish the
+task (see Usage Notes below). 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>np</STRONG></DT>
-<DD>Number of processes in the PSBLAS virtual parallel machine.
+<DT><STRONG>x</STRONG></DT>
+<DD>The sequence to be sorted.
 <BR>
-Scope: <B>global</B>.
+Type:<B>required</B>.
 <BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.  Default: use all available processes.
+Specified as: an integer, real or complex  array of rank 1.
 </DD>
-<DT><STRONG>basectxt</STRONG></DT>
-<DD>the initial communication context. The new context
-  will be defined from the processes participating in the initial one.
+<DT><STRONG>ix</STRONG></DT>
+<DD>A vector of indices.
 <BR>
-Scope: <B>global</B>.
+Type:<B>optional</B>.
 <BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.  Default: use MPI_COMM_WORLD.
+Specified as: an integer array of (at least) the same size as <IMG
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$X$">.
 </DD>
-<DT><STRONG>ids</STRONG></DT>
-<DD>Identities of the processes to use for the new context; the
-  argument is ignored when <code>np</code> is not specified. This allows the
-  processes in the new environment to be in an order different from the
-  original one.
+<DT><STRONG>dir</STRONG></DT>
+<DD>The desired ordering.
 <BR>
-Scope: <B>global</B>.
+Type:<B>optional</B>.
 <BR>
-Type: <B>optional</B>.
+Specified as: an integer value: <DL>
+<DT><STRONG>Integer and real data:</STRONG></DT>
+<DD><code>psb_sort_up_</code>,
+<code>psb_sort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
+default <code>psb_sort_up_</code>. 
+</DD>
+<DT><STRONG>Complex data:</STRONG></DT>
+<DD><code>psb_lsort_up_</code>,
+<code>psb_lsort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
+default <code>psb_lsort_up_</code>. 
+</DD>
+</DL>
+</DD>
+<DT><STRONG>flag</STRONG></DT>
+<DD>Whether to keep the original values in <IMG
+ WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img112.png"
+ ALT="$IX$">.
 <BR>
-Intent: <B>in</B>.
+Type:<B>optional</B>.
 <BR>
-Specified as: an integer array.  Default: use the indices <IMG
- WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img89.png"
- ALT="$(0\dots np-1)$">.  
+Specified as: an integer value <code>psb_sort_ovw_idx_</code> or
+<code>psb_sort_keep_idx_</code>; default <code>psb_sort_ovw_idx_</code>.
+
+<P>
 </DD>
 </DL>
 
@@ -117,60 +140,152 @@ Specified as: an integer array.  Default: use the indices <IMG
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine. Note that this is always a duplicate of
-  <code>basectxt</code>, so that library communications are completely
-  separated from other communication operations.
+<DT><STRONG>x</STRONG></DT>
+<DD>The sequence of values, in the chosen ordering.
 <BR>
-Scope: <B>global</B>.
+Type:<B>required</B>.
 <BR>
-Type: <B>required</B>.
+Specified as: an integer, real or complex array of rank 1.
+</DD>
+<DT><STRONG>ix</STRONG></DT>
+<DD>A vector of indices.
 <BR>
-Intent: <B>out</B>.
+Type: <B>Optional</B> 
 <BR>
-Specified as: an integer variable.
+An integer array of rank 1, whose entries are moved to the same
+position as the corresponding entries in <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">.
 </DD>
 </DL>
+
+<P>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>A call to this routine must precede any other PSBLAS call. 
+<LI>For integer or real data the sorting can be performed in the up/down direction, on the
+  natural or absolute values;
 </LI>
-<LI>It is an error to specify a value for <IMG
- WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img122.png"
- ALT="$np$"> greater than the
-  number of processes available in the underlying base parallel
-  environment. 
+<LI>For  complex data the sorting can  be done in a lexicographic
+  order (i.e.: sort on the real part with ties broken according to
+  the imaginary part) or on the absolute values; 
+</LI>
+<LI>The routines return the items in the chosen ordering; the
+  output difference is the handling of  ties (i.e. items with an
+  equal   value) in the original input. With the merge-sort algorithm
+  ties are   preserved in the same relative order as they had in the
+  original   sequence,  while this is not guaranteed for quicksort or
+  heapsort; 
+</LI>
+<LI>If <!-- MATH
+ $flag = psb\_sort\_ovw\_idx\_$
+ -->
+<IMG
+ WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img113.png"
+ ALT="$flag = psb\_sort\_ovw\_idx\_$"> then the entries in <IMG
+ WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img114.png"
+ ALT="$ix(1:n)$">
+  where <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img16.png"
+ ALT="$n$"> is the size of <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> are initialized to <!-- MATH
+ $ix(i) \leftarrow
+  i$
+ -->
+<IMG
+ WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img115.png"
+ ALT="$ix(i) \leftarrow
+i$">; thus, upon return from the subroutine, for each
+  index <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"> we have in <IMG
+ WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img116.png"
+ ALT="$ix(i)$"> the position that the item <IMG
+ WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img117.png"
+ ALT="$x(i)$">
+  occupied in the original data sequence;
+</LI>
+<LI>If <!-- MATH
+ $flag = psb\_sort\_keep\_idx\_$
+ -->
+<IMG
+ WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img118.png"
+ ALT="$flag = psb\_sort\_keep\_idx\_$"> the routine will assume that
+  the entries in <IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img119.png"
+ ALT="$ix(:)$"> have already been initialized by the user;
+</LI>
+<LI>The three sorting algorithms have a similar <IMG
+ WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img120.png"
+ ALT="$O(n \log n)$"> expected
+  running time; in the average case quicksort will be the
+  fastest and merge-sort the slowest. However note that:
+
+<OL>
+<LI>The worst case running time for quicksort is <IMG
+ WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img121.png"
+ ALT="$O(n^2)$">; the algorithm
+  implemented here follows the well-known median-of-three heuristics,
+  but the worst case may still apply;
+</LI>
+<LI>The worst case running time for merge-sort and heap-sort is
+  <IMG
+ WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img120.png"
+ ALT="$O(n \log n)$"> as the average case;
+</LI>
+<LI>The merge-sort algorithm is implemented to take advantage of 
+  subsequences that may be already in the desired ordering prior to
+  the subroutine call; this situation is relatively common when
+  dealing with groups of indices of sparse matrix entries, thus
+  merge-sort is the preferred  choice when a sorting is needed
+  by other routines in the library. 
+</LI>
+</OL>
 </LI>
 </OL>
 
 <P>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1286"
+<A NAME="tex2html1272"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1282"
-  HREF="node84.html">
+<A NAME="tex2html1268"
+  HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1276"
+<A NAME="tex2html1264"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1284"
+<A NAME="tex2html1270"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1287"
-  HREF="node86.html">psb_info   Return</A>
-<B> Up:</B> <A NAME="tex2html1283"
-  HREF="node84.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1277"
-  HREF="node84.html">Parallel environment routines</A>
- &nbsp; <B>  <A NAME="tex2html1285"
+<B> Next:</B> <A NAME="tex2html1273"
+  HREF="node86.html">Parallel environment routines</A>
+<B> Up:</B> <A NAME="tex2html1269"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1265"
+  HREF="node84.html">psb_sizeof   Memory</A>
+ &nbsp; <B>  <A NAME="tex2html1271"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

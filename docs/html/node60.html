@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
+<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
+<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,64 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node61.html">
 <LINK REL="previous" HREF="node59.html">
-<LINK REL="up" HREF="node56.html">
+<LINK REL="up" HREF="node58.html">
 <LINK REL="next" HREF="node61.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html972"
+<A NAME="tex2html974"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html968"
-  HREF="node56.html">
+<A NAME="tex2html970"
+  HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html962"
+<A NAME="tex2html964"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html970"
+<A NAME="tex2html972"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html973"
-  HREF="node61.html">psb_cdfree   Frees</A>
-<B> Up:</B> <A NAME="tex2html969"
-  HREF="node56.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html963"
-  HREF="node59.html">psb_cdasb   Communication</A>
- &nbsp; <B>  <A NAME="tex2html971"
+<B> Next:</B> <A NAME="tex2html975"
+  HREF="node61.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html971"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html965"
+  HREF="node59.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html973"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00074000000000000000">
-psb_cdcpy -- Copies a communication descriptor</A>
+<H2><A NAME="SECTION00072000000000000000">
+psb_cdins -- Communication descriptor insert routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdcpy(desc_in, desc_out, info)
+call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
+call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
 </PRE>
+
+<P>
+This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a
+linear system coefficient matrix), storing them as necessary into the
+communication descriptor. In the first form the edges are specified as
+pairs of indices <IMG
+ WIDTH="77" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img95.png"
+ ALT="$ia(i),ja(i)$">; the starting index <IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.png"
+ ALT="$ia(i)$"> should
+belong to the current process. 
+In the second form only the remote indices <IMG
+ WIDTH="38" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img97.png"
+ ALT="$ja(i)$"> are specified. 
 
 <P>
 <DL>
@@ -68,18 +87,73 @@ call psb_cdcpy(desc_in, desc_out, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_in</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>nz</STRONG></DT>
+<DD>the number of points being inserted.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
+Specified as: an integer value.
+</DD>
+<DT><STRONG>ia</STRONG></DT>
+<DD>the indices of the starting vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
+</DD>
+<DT><STRONG>ja</STRONG></DT>
+<DD>the indices of the end vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
+</DD>
+<DT><STRONG>mask</STRONG></DT>
+<DD>Mask entries in <code>ja</code>, they are inserted only when the
+  corresponding <code>mask</code> entries are <code>.true.</code>
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical  array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">, default <code>.true.</code>.
+</DD>
+<DT><STRONG>lidx</STRONG></DT>
+<DD>User defined local indices for <code>ja</code>.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
 </DD>
 </DL>
 
@@ -88,14 +162,14 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the communication descriptor copy.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the updated communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
@@ -110,10 +184,77 @@ Intent: <B>out</B>.
 <BR>
 An integer value; 0 means no error has been detected. 
 </DD>
-</DL>
+<DT><STRONG>ila</STRONG></DT>
+<DD>the local indices of the starting vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
+</DD>
+<DT><STRONG>jla</STRONG></DT>
+<DD>the local indices of the end vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="21" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img98.png"
+ ALT="$nz$">.
 
 <P>
-<BR><HR>
+</DD>
+</DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This routine may only be called if the descriptor is in the
+  build state;
+</LI>
+<LI>This routine automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process.
+</LI>
+<LI>The second form of this routine will be useful when dealing with
+  user-specified index mappings; see also&nbsp;<A HREF="node7.html#sec:usermaps">2.3.1</A>.
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html974"
+  HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html970"
+  HREF="node58.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html964"
+  HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html972"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html975"
+  HREF="node61.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html971"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html965"
+  HREF="node59.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html973"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

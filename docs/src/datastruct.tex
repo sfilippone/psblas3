@@ -297,6 +297,27 @@ Scope: {\bf local}.\\
 \item[Function value] The communication context.
 \end{description}
 
+\subsubroutine{clone}{Clone current object}
+\begin{verbatim}
+call  desc%clone(descout,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope: {\bf local}.\\
+% Type: {\bf required}.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[descout] A copy of the input object.
+\item[info] Return code. 
+\end{description}
+
 
 \subsubsection*{psb\_cd\_get\_large\_threshold --- Get threshold for
   index mapping switch}
@@ -612,6 +633,28 @@ Scope: {\bf local}\\
 \end{description}
 
 
+\subsubroutine{clone}{Clone current object}
+\begin{verbatim}
+call  a%clone(b,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+Scope: {\bf local}.\\
+% Type: {\bf required}.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[b] A copy of the input object.
+\item[info] Return code. 
+\end{description}
+
+
 \subsubsection{Named Constants}
 \label{sec:sp_constants}
 \begin{description}
@@ -704,14 +747,12 @@ Scope: {\bf local}\\
 
 \begin{description}
 \item[\bf On Return]
-\item[Function value] The number of  rows  of sparse matrix \verb|a|.
+\item[Function value] The number of  rows  of dense vector \verb|v|.
 \end{description}
 
 
-\subsubsection*{get\_ncols --- Get number of  columns in a  sparse matrix}
-
 \subsubsection*{sizeof  --- Get memory occupation in bytes
-of  a dense vector matrix}
+of  a dense vector}
 \addcontentsline{toc}{subsubsection}{v\_sizeof}
 
 \begin{verbatim}
@@ -755,6 +796,27 @@ Scope: {\bf local}\\
 \item[\bf On Return]
 \item[Function value] An allocatable array holding a copy of the dense
   vector contents.
+\end{description}
+
+\subsubroutine{clone}{Clone current object}
+\begin{verbatim}
+call  x%clone(y,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] the dense vector.\\
+Scope: {\bf local}.\\
+% Type: {\bf required}.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] A copy of the input object.
+\item[info] Return code. 
 \end{description}
 
 

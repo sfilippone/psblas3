@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sizeof -- Memory occupation</TITLE>
-<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
+<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
+<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,49 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node83.html">
 <LINK REL="previous" HREF="node81.html">
-<LINK REL="up" HREF="node56.html">
+<LINK REL="up" HREF="node58.html">
 <LINK REL="next" HREF="node83.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1236"
+<A NAME="tex2html1238"
   HREF="node83.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1232"
-  HREF="node56.html">
+<A NAME="tex2html1234"
+  HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1226"
+<A NAME="tex2html1228"
   HREF="node81.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1234"
+<A NAME="tex2html1236"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1237"
-  HREF="node83.html">Sorting utilities</A>
-<B> Up:</B> <A NAME="tex2html1233"
-  HREF="node56.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1227"
-  HREF="node81.html">psb_sp_getrow   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1235"
+<B> Next:</B> <A NAME="tex2html1239"
+  HREF="node83.html">psb_sp_getrow   Extract</A>
+<B> Up:</B> <A NAME="tex2html1235"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1229"
+  HREF="node81.html">psb_get_boundary   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1237"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000726000000000000000">
-psb_sizeof -- Memory occupation</A>
+<H2><A NAME="SECTION000724000000000000000">
+psb_get_overlap -- Extract list of overlap elements</A>
 </H2>
 
 <P>
-This function computes the memory occupation of a PSBLAS object.
-
-<P>
 <PRE>
-isz = psb_sizeof(a)
-isz = psb_sizeof(desc_a)
-isz = psb_sizeof(prec)
+call psb_get_overlap(ovrel, desc, info)
 </PRE>
 
 <P>
@@ -73,53 +68,61 @@ isz = psb_sizeof(prec)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-<IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">. 
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>Communication descriptor.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation of the object specified in
-  the calling sequence, in bytes.
+<DT><STRONG>ovrel</STRONG></DT>
+<DD>The list of overlap elements on the calling process, in
+  local numbering.
 <BR>
 Scope: <B>local</B> 
 <BR>
-Returned  as: an <code>integer(psb_long_int_k_)</code> number.
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.
+<BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>If there are no overlap elements the output vector is set
+  to the ``not allocated'' state.  
+</LI>
+<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
+  number of overlap elements. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

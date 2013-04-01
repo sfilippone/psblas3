@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gelp -- Applies a left permutation to a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_gelp -- Applies a left permutation to a dense matrix">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,63 +20,56 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node73.html">
 <LINK REL="previous" HREF="node71.html">
-<LINK REL="up" HREF="node56.html">
+<LINK REL="up" HREF="node58.html">
 <LINK REL="next" HREF="node73.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1116"
+<A NAME="tex2html1118"
   HREF="node73.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1112"
-  HREF="node56.html">
+<A NAME="tex2html1114"
+  HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1106"
+<A NAME="tex2html1108"
   HREF="node71.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1114"
+<A NAME="tex2html1116"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1117"
-  HREF="node73.html">psb_glob_to_loc   Global</A>
-<B> Up:</B> <A NAME="tex2html1113"
-  HREF="node56.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1107"
-  HREF="node71.html">psb_gefree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1115"
+<B> Next:</B> <A NAME="tex2html1119"
+  HREF="node73.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1115"
+  HREF="node58.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1109"
+  HREF="node71.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html1117"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000716000000000000000">
-psb_gelp -- Applies a left permutation to a dense
-  matrix</A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_gelp(trans, iperm, x, info)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>A character that specifies whether to permute <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"> or <IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img107.png"
- ALT="$A^T$">.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>The communication descriptor.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -84,36 +77,23 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a single character with value 'N' for <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$"> or 'T' for <IMG
- WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img107.png"
- ALT="$A^T$">.
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
-<DT><STRONG>iperm</STRONG></DT>
-<DD>An integer array containing permutation information.
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
 <BR>
-Scope: <B>local</B> 
+Scope: <B>local</B>.
 <BR>
-Type: <B>required</B>
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer one-dimensional array.
-<BR></DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be permuted.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a one or two dimensional array.
-<BR></DD>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
 </DL>
 
 <P>
@@ -121,6 +101,18 @@ Specified as: a one or two dimensional array.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be assembled.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -133,8 +125,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <BR><HR>
 
 </BODY>
