@@ -1,7 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
-
-2013/03/31: Implement CLONE method for vectors and maps.	
+	
+2013/03/31: Implement CLONE method for vectors, maps and preconditioners.	
 	
 2013/03/13: doxygen docs for base_vect. Fix afmt to be len=* in genpde.	
 	
