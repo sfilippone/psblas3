@@ -417,7 +417,7 @@ contains
 
   
   !         
-  !> Function  free
+  !> Function   sizeof
   !! \memberof  psb_base_sparse_mat
   !! \brief Memory occupation in byes
   !
