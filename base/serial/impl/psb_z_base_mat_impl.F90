@@ -555,10 +555,21 @@ subroutine psb_z_base_clone(a,b,info)
   use psb_error_mod
   implicit none 
   
-  class(psb_z_base_sparse_mat), intent(inout)   :: a
-  class(psb_z_base_sparse_mat), allocatable, intent(out) :: b
+  class(psb_z_base_sparse_mat), intent(inout)              :: a
+  class(psb_z_base_sparse_mat), allocatable, intent(inout) :: b
   integer(psb_ipk_), intent(out) :: info 
 
+  if (allocated(b)) then
+    call b%free()
+    deallocate(b, stat=info)
+  end if
+  if (info /= 0) then 
+    info = psb_err_alloc_dealloc_
+    return
+  end if
+
+  ! Do not use SOURCE allocation: this makes sure that
+  ! memory allocated elsewhere is treated properly. 
 #if defined(HAVE_MOLD)
   allocate(b,mold=a,stat=info)
   if (info /= psb_success_) info = psb_err_alloc_dealloc_

@@ -432,8 +432,8 @@ module psb_s_base_mat_mod
     subroutine psb_s_base_clone(a,b, info)
       import :: psb_ipk_, psb_s_base_sparse_mat, psb_long_int_k_      
       implicit none 
-      class(psb_s_base_sparse_mat), intent(inout)            :: a
-      class(psb_s_base_sparse_mat), allocatable, intent(out) :: b
+      class(psb_s_base_sparse_mat), intent(inout)              :: a
+      class(psb_s_base_sparse_mat), allocatable, intent(inout) :: b
       integer(psb_ipk_), intent(out)                         :: info      
     end subroutine psb_s_base_clone
   end interface
@@ -1585,8 +1585,6 @@ module psb_s_base_mat_mod
   
 contains 
   
-  
- 
   subroutine s_base_mv_from(a,b)
     
     implicit none 
