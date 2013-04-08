@@ -132,42 +132,42 @@ module psb_base_mat_mod
     !
     !
     ! == = =================================
-    procedure, pass(a) :: get_nrows => psb_base_get_nrows
-    procedure, pass(a) :: get_ncols => psb_base_get_ncols
-    procedure, pass(a) :: get_nzeros => psb_base_get_nzeros
-    procedure, pass(a) :: get_nz_row => psb_base_get_nz_row
-    procedure, pass(a) :: get_size => psb_base_get_size
-    procedure, pass(a) :: get_state => psb_base_get_state
-    procedure, pass(a) :: get_dupl => psb_base_get_dupl
-    procedure, nopass  :: get_fmt => psb_base_get_fmt
-    procedure, pass(a) :: is_null => psb_base_is_null
-    procedure, pass(a) :: is_bld => psb_base_is_bld
-    procedure, pass(a) :: is_upd => psb_base_is_upd
-    procedure, pass(a) :: is_asb => psb_base_is_asb
-    procedure, pass(a) :: is_sorted => psb_base_is_sorted
-    procedure, pass(a) :: is_upper => psb_base_is_upper
-    procedure, pass(a) :: is_lower => psb_base_is_lower
+    procedure, pass(a) :: get_nrows   => psb_base_get_nrows
+    procedure, pass(a) :: get_ncols   => psb_base_get_ncols
+    procedure, pass(a) :: get_nzeros  => psb_base_get_nzeros
+    procedure, pass(a) :: get_nz_row  => psb_base_get_nz_row
+    procedure, pass(a) :: get_size    => psb_base_get_size
+    procedure, pass(a) :: get_state   => psb_base_get_state
+    procedure, pass(a) :: get_dupl    => psb_base_get_dupl
+    procedure, nopass  :: get_fmt     => psb_base_get_fmt
+    procedure, pass(a) :: is_null     => psb_base_is_null
+    procedure, pass(a) :: is_bld      => psb_base_is_bld
+    procedure, pass(a) :: is_upd      => psb_base_is_upd
+    procedure, pass(a) :: is_asb      => psb_base_is_asb
+    procedure, pass(a) :: is_sorted   => psb_base_is_sorted
+    procedure, pass(a) :: is_upper    => psb_base_is_upper
+    procedure, pass(a) :: is_lower    => psb_base_is_lower
     procedure, pass(a) :: is_triangle => psb_base_is_triangle
-    procedure, pass(a) :: is_unit => psb_base_is_unit
+    procedure, pass(a) :: is_unit     => psb_base_is_unit
     
     ! == = =================================
     !
     ! Setters 
     !
     ! == = =================================
-    procedure, pass(a) :: set_nrows => psb_base_set_nrows
-    procedure, pass(a) :: set_ncols => psb_base_set_ncols
-    procedure, pass(a) :: set_dupl => psb_base_set_dupl
-    procedure, pass(a) :: set_state => psb_base_set_state
-    procedure, pass(a) :: set_null => psb_base_set_null
-    procedure, pass(a) :: set_bld => psb_base_set_bld
-    procedure, pass(a) :: set_upd => psb_base_set_upd
-    procedure, pass(a) :: set_asb => psb_base_set_asb
-    procedure, pass(a) :: set_sorted => psb_base_set_sorted
-    procedure, pass(a) :: set_upper => psb_base_set_upper
-    procedure, pass(a) :: set_lower => psb_base_set_lower
+    procedure, pass(a) :: set_nrows    => psb_base_set_nrows
+    procedure, pass(a) :: set_ncols    => psb_base_set_ncols
+    procedure, pass(a) :: set_dupl     => psb_base_set_dupl
+    procedure, pass(a) :: set_state    => psb_base_set_state
+    procedure, pass(a) :: set_null     => psb_base_set_null
+    procedure, pass(a) :: set_bld      => psb_base_set_bld
+    procedure, pass(a) :: set_upd      => psb_base_set_upd
+    procedure, pass(a) :: set_asb      => psb_base_set_asb
+    procedure, pass(a) :: set_sorted   => psb_base_set_sorted
+    procedure, pass(a) :: set_upper    => psb_base_set_upper
+    procedure, pass(a) :: set_lower    => psb_base_set_lower
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
-    procedure, pass(a) :: set_unit => psb_base_set_unit
+    procedure, pass(a) :: set_unit     => psb_base_set_unit
 
 
     ! == = =================================
@@ -175,13 +175,13 @@ module psb_base_mat_mod
     ! Data management
     !
     ! == = =================================  
-    procedure, pass(a) :: get_neigh => psb_base_get_neigh
-    procedure, pass(a) :: free => psb_base_free
-    procedure, pass(a) :: trim => psb_base_trim
-    procedure, pass(a) :: reinit => psb_base_reinit
+    procedure, pass(a) :: get_neigh  => psb_base_get_neigh
+    procedure, pass(a) :: free       => psb_base_free
+    procedure, pass(a) :: trim       => psb_base_trim
+    procedure, pass(a) :: reinit     => psb_base_reinit
     procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
     procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
-    generic,   public  :: allocate => allocate_mnnz
+    generic,   public  :: allocate   => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
     procedure, pass(a) :: csgetptn => psb_base_csgetptn
     generic, public    :: csget => csgetptn

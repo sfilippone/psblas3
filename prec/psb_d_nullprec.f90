@@ -39,11 +39,11 @@ module psb_d_nullprec
     procedure, pass(prec) :: d_apply   => psb_d_null_apply
     procedure, pass(prec) :: precbld   => psb_d_null_precbld
     procedure, pass(prec) :: precinit  => psb_d_null_precinit
-    procedure, pass(prec) :: precfree  => psb_d_null_precfree
     procedure, pass(prec) :: precdescr => psb_d_null_precdescr
     procedure, pass(prec) :: sizeof    => psb_d_null_sizeof
     procedure, pass(prec) :: dump      => psb_d_null_dump
     procedure, pass(prec) :: clone     => psb_d_null_clone
+    procedure, pass(prec) :: free      => psb_d_null_precfree
   end type psb_d_null_prec_type
 
   private :: psb_d_null_precbld, psb_d_null_sizeof,&

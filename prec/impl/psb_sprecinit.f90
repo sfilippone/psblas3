@@ -44,7 +44,7 @@ subroutine psb_sprecinit(p,ptype,info)
   info = psb_success_
 
   if (allocated(p%prec) ) then
-    call p%prec%precfree(info)
+    call p%prec%free(info)
     if (info == psb_success_) deallocate(p%prec,stat=info) 
     if (info /= psb_success_) return
   end if

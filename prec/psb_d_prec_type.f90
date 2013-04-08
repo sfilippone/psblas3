@@ -49,6 +49,7 @@ module psb_d_prec_type
          & psb_d_apply1_vect, psb_d_apply2_vect
     procedure, pass(prec)               :: sizeof => psb_dprec_sizeof
     procedure, pass(prec)               :: clone  => psb_d_prec_clone
+    procedure, pass(prec)               :: free   => psb_d_prec_free
   end type psb_dprec_type
 
   interface psb_precfree
@@ -171,11 +172,37 @@ contains
     call psb_erractionsave(err_act)
 
     me=-1
+    call p%free(info)
 
-    if (allocated(p%prec)) then 
-      call p%prec%precfree(info)
+    if (info /= 0) goto 9999
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psb_d_precfree
+
+  subroutine psb_d_prec_free(prec,info)
+    class(psb_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)         :: info
+    integer(psb_ipk_) :: me, err_act,i
+    character(len=20)   :: name
+    if(psb_get_errstatus() /= 0) return 
+    info=psb_success_
+    name = 'psb_precfree'
+    call psb_erractionsave(err_act)
+
+    me=-1
+
+    if (allocated(prec%prec)) then 
+      call prec%prec%free(info)
       if (info /= psb_success_) goto 9999
-      deallocate(p%prec,stat=info)
+      deallocate(prec%prec,stat=info)
       if (info /= psb_success_) goto 9999
     end if
     call psb_erractionrestore(err_act)
@@ -188,7 +215,7 @@ contains
       return
     end if
     return
-  end subroutine psb_d_precfree
+  end subroutine psb_d_prec_free
 
   function psb_dprec_sizeof(prec) result(val)
     class(psb_dprec_type), intent(in) :: prec

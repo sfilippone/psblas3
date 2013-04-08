@@ -61,7 +61,7 @@ module psb_z_base_prec_mod
     procedure(psb_z_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_z_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_z_base_precinit), pass(prec), deferred :: precinit   
-    procedure(psb_z_base_precfree), pass(prec), deferred :: precfree   
+    procedure(psb_z_base_precfree), pass(prec), deferred :: free   
     procedure(psb_z_base_precdescr), pass(prec), deferred :: precdescr  
     procedure(psb_z_base_precdump), pass(prec), deferred :: dump       
     procedure(psb_z_base_precclone), pass(prec), deferred :: clone       

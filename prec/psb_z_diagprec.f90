@@ -41,11 +41,11 @@ module psb_z_diagprec
     procedure, pass(prec) :: z_apply   => psb_z_diag_apply
     procedure, pass(prec) :: precbld    => psb_z_diag_precbld
     procedure, pass(prec) :: precinit   => psb_z_diag_precinit  
-    procedure, pass(prec) :: precfree   => psb_z_diag_precfree
     procedure, pass(prec) :: precdescr  => psb_z_diag_precdescr
     procedure, pass(prec) :: sizeof     => psb_z_diag_sizeof
     procedure, pass(prec) :: dump       => psb_z_diag_dump
     procedure, pass(prec) :: clone      => psb_z_diag_clone
+    procedure, pass(prec) :: free       => psb_z_diag_precfree
     procedure, pass(prec) :: get_nzeros => psb_z_diag_get_nzeros
   end type psb_z_diag_prec_type
 
