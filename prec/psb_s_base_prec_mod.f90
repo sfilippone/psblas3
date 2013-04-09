@@ -187,8 +187,8 @@ module psb_s_base_prec_mod
            & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
            & psb_s_base_sparse_mat
       implicit none 
-      class(psb_s_base_prec_type), intent(inout) :: prec
-      class(psb_s_base_prec_type), allocatable, intent(out) :: precout
+      class(psb_s_base_prec_type), intent(inout)              :: prec
+      class(psb_s_base_prec_type), allocatable, intent(inout) :: precout
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_s_base_precclone
   end interface

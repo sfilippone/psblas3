@@ -1545,7 +1545,7 @@ subroutine psb_dspmat_clone(a,b,info)
   use psb_d_mat_mod, psb_protect_name => psb_dspmat_clone
   implicit none 
   class(psb_dspmat_type), intent(inout) :: a
-  class(psb_dspmat_type), intent(out)   :: b
+  class(psb_dspmat_type), intent(inout) :: b
   integer(psb_ipk_), intent(out)        :: info
 
   integer(psb_ipk_) :: err_act
@@ -1554,7 +1554,7 @@ subroutine psb_dspmat_clone(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-
+  call b%free()
   if (allocated(a%a)) then 
     call a%a%clone(b%a,info)
   end if

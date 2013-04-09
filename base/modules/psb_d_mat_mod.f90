@@ -613,7 +613,7 @@ module psb_d_mat_mod
     subroutine psb_dspmat_clone(a,b,info)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
-      class(psb_dspmat_type), intent(out)   :: b
+      class(psb_dspmat_type), intent(inout) :: b
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dspmat_clone
   end interface

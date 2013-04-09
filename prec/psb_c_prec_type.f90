@@ -232,11 +232,11 @@ contains
   subroutine psb_c_prec_clone(prec,precout,info)
     implicit none 
     class(psb_cprec_type), intent(inout) :: prec
-    class(psb_cprec_type), intent(out)   :: precout
+    class(psb_cprec_type), intent(inout) :: precout
     integer(psb_ipk_), intent(out)             :: info
 
     info = psb_success_
-    
+    call prec%free(info)
     if (allocated(prec%prec)) then 
       call prec%prec%clone(precout%prec,info)
     end if

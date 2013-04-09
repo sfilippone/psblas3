@@ -613,7 +613,7 @@ module psb_c_mat_mod
     subroutine psb_cspmat_clone(a,b,info)
       import :: psb_ipk_, psb_cspmat_type
       class(psb_cspmat_type), intent(inout) :: a
-      class(psb_cspmat_type), intent(out)   :: b
+      class(psb_cspmat_type), intent(inout) :: b
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_cspmat_clone
   end interface

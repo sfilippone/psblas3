@@ -218,13 +218,15 @@ contains
     use psb_desc_mod
     implicit none 
     class(psb_dlinmap_type), intent(inout) :: map
-    class(psb_dlinmap_type), intent(out)   :: mapout
+    class(psb_dlinmap_type), intent(inout) :: mapout
     integer(psb_ipk_)     :: info 
     
+    call mapout%free(info)
     ! Base clone!    
-    call map%psb_base_linmap_type%clone(mapout%psb_base_linmap_type,info)
-    call map%map_X2Y%clone(mapout%map_X2Y,info)
-    call map%map_Y2X%clone(mapout%map_Y2X,info)
+    if (info == 0) call &
+         & map%psb_base_linmap_type%clone(mapout%psb_base_linmap_type,info)
+    if (info == 0) call map%map_X2Y%clone(mapout%map_X2Y,info)
+    if (info == 0) call map%map_Y2X%clone(mapout%map_Y2X,info)
 
   end subroutine d_clone
   

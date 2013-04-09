@@ -63,7 +63,6 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: get_diag      => psb_z_base_get_diag
     generic, public    :: csget         => csgetrow, csgetblk 
     procedure, pass(a) :: csclip        => psb_z_base_csclip 
-    procedure, pass(a) :: mold          => psb_z_base_mold 
     procedure, pass(a) :: cp_to_coo     => psb_z_base_cp_to_coo   
     procedure, pass(a) :: cp_from_coo   => psb_z_base_cp_from_coo 
     procedure, pass(a) :: cp_to_fmt     => psb_z_base_cp_to_fmt   
@@ -76,6 +75,7 @@ module psb_z_base_mat_mod
     generic, public    :: cp_from => z_base_cp_from
     procedure, pass(a) :: z_base_mv_from
     generic, public    :: mv_from => z_base_mv_from
+    procedure, pass(a) :: mold          => psb_z_base_mold 
     procedure, pass(a) :: clone         => psb_z_base_clone
     
     !

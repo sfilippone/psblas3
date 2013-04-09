@@ -163,9 +163,9 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_base_linmap_type), intent(inout) :: map
-    class(psb_base_linmap_type), intent(out)   :: mapout
+    class(psb_base_linmap_type), intent(inout) :: mapout
     integer(psb_ipk_)     :: info 
-
+    
     mapout%kind = map%kind
     call psb_safe_ab_cpy(map%iaggr,mapout%iaggr,info)
     call psb_safe_ab_cpy(map%naggr,mapout%naggr,info)

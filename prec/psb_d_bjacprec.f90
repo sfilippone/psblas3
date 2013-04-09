@@ -257,8 +257,8 @@ contains
     use psb_realloc_mod
     Implicit None
 
-    class(psb_d_bjac_prec_type), intent(inout) :: prec
-    class(psb_d_base_prec_type), allocatable, intent(out)  :: precout
+    class(psb_d_bjac_prec_type), intent(inout)              :: prec
+    class(psb_d_base_prec_type), allocatable, intent(inout) :: precout
     integer(psb_ipk_), intent(out)               :: info
 
     integer(psb_ipk_) :: err_act, i
@@ -267,7 +267,12 @@ contains
     call psb_erractionsave(err_act)
 
     info = psb_success_
-    allocate(psb_d_bjac_prec_type :: precout, stat=info)
+    if (allocated(precout)) then
+      call precout%free(info)
+      if (info == psb_success_) deallocate(precout, stat=info)
+    end if
+    if (info == psb_success_) &
+       & allocate(psb_d_bjac_prec_type :: precout, stat=info)
     if (info /= 0) goto 9999
     select type(pout => precout)
     type is (psb_d_bjac_prec_type) 
