@@ -98,11 +98,12 @@ contains
   subroutine d_vect_clone(x,y,info)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x
-    class(psb_d_vect_type), intent(out)   :: y
+    class(psb_d_vect_type), intent(inout) :: y
     integer(psb_ipk_), intent(out)        :: info
 
     info = psb_success_
-    if (allocated(x%v)) then 
+    call y%free(info)
+    if ((info==0).and.allocated(x%v)) then 
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine d_vect_clone
