@@ -42,6 +42,7 @@
 !  Addison-Wesley
 !
 
+
 logical function psb_isaperm(n,eip)               
   use psb_sort_mod, psb_protect_name => psb_isaperm
   implicit none
@@ -2347,6 +2348,31 @@ subroutine psi_insert_int_heap(key,last,heap,dir,info)
   return
 end subroutine psi_insert_int_heap
 
+
+
+!
+!
+!   Programming note:
+!   In the implementation of the various get_first heap function
+!   we often have the following code (or similar)
+!
+!      if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+!           & (2*i == last)) then 
+!        j = 2*i
+!      else
+!        j = 2*i + 1
+!      end if
+!
+!   It looks like the 2*i+1 could overflow the array, but this
+!   is not true because there is a guard statement
+!       if (i>last/2) exit
+!   and because last has just been reduced by 1 when defining the return value,
+!   therefore 2*i+1 may be greater than the current value of last,
+!   but cannot be greater than the value of last when the routine was entered
+!   hence it is safe.
+!
+!
+!
 
 subroutine psi_int_heap_get_first(key,last,heap,dir,info)
   use psb_sort_mod, psb_protect_name => psi_int_heap_get_first
