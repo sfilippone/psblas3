@@ -71,11 +71,8 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: mv_from_coo   => psb_c_base_mv_from_coo 
     procedure, pass(a) :: mv_to_fmt     => psb_c_base_mv_to_fmt   
     procedure, pass(a) :: mv_from_fmt   => psb_c_base_mv_from_fmt 
-    procedure, pass(a) :: c_base_cp_from
-    generic, public    :: cp_from => c_base_cp_from
-    procedure, pass(a) :: c_base_mv_from
-    generic, public    :: mv_from => c_base_mv_from
     procedure, pass(a) :: mold          => psb_c_base_mold 
+    procedure, pass(a) :: copy          => psb_c_base_copy
     procedure, pass(a) :: clone         => psb_c_base_clone
     
     !
@@ -112,9 +109,6 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: colsum      => psb_c_base_colsum
     procedure, pass(a) :: aclsum      => psb_c_base_aclsum
   end type psb_c_base_sparse_mat
-  
-  private :: c_base_cp_from, c_base_mv_from
-  
   
   !> \namespace  psb_base_mod  \class  psb_c_coo_sparse_mat
   !! \extends psb_c_base_mat_mod::psb_c_base_sparse_mat
@@ -164,10 +158,8 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: print        => psb_c_coo_print
     procedure, pass(a) :: free         => c_coo_free
     procedure, pass(a) :: mold         => psb_c_coo_mold
-    procedure, pass(a) :: psb_c_coo_cp_from
-    generic, public    :: cp_from => psb_c_coo_cp_from
-    procedure, pass(a) :: psb_c_coo_mv_from
-    generic, public    :: mv_from => psb_c_coo_mv_from
+    procedure, pass(a) :: copy         => psb_c_coo_copy
+!!$    procedure, pass(a) :: clone        => psb_c_coo_clone
     !
     ! This is COO specific
     !
@@ -412,19 +404,40 @@ module psb_c_base_mat_mod
   interface 
     subroutine psb_c_base_mold(a,b,info) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_long_int_k_
-      class(psb_c_base_sparse_mat), intent(in)               :: a
-      class(psb_c_base_sparse_mat), intent(out), allocatable :: b
-      integer(psb_ipk_), intent(out)                         :: info
+      class(psb_c_base_sparse_mat), intent(in)                 :: a
+      class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
+      integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_c_base_mold
   end interface
+
+  !
+  !> Function  copy:
+  !! \memberof  psb_c_base_sparse_mat
+  !! \brief Copy  a class(psb_c_base_sparse_mat) 
+  !!     but only if it is the same dynamic type as the input.
+  !!   \param b The output variable
+  !!   \param info return code
+  ! 
+  interface 
+    subroutine psb_c_base_copy(a,b, info)
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_long_int_k_      
+      implicit none 
+      class(psb_c_base_sparse_mat), intent(in)    :: a
+      class(psb_c_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)              :: info      
+    end subroutine psb_c_base_copy
+  end interface
+
 
   !
   !> Function  clone:
   !! \memberof  psb_c_base_sparse_mat
   !! \brief Allocate and clone  a class(psb_c_base_sparse_mat) with the
-  !!     same dynamic type as the input.
+  !!     same dynamic type as the input. 
   !!     This is equivalent to allocate( source=  ) except that
   !!     it should guarantee a deep copy wherever needed.
+  !!     Should also be equivalent to calling mold and then copy,
+  !!     but it can also be implemented by default using cp_to_fmt.
   !!   \param b The output variable
   !!   \param info return code
   ! 
@@ -434,7 +447,7 @@ module psb_c_base_mat_mod
       implicit none 
       class(psb_c_base_sparse_mat), intent(inout)              :: a
       class(psb_c_base_sparse_mat), allocatable, intent(inout) :: b
-      integer(psb_ipk_), intent(out)                         :: info      
+      integer(psb_ipk_), intent(out)                           :: info      
     end subroutine psb_c_base_clone
   end interface
 
@@ -1131,19 +1144,40 @@ module psb_c_base_mat_mod
     end subroutine psb_c_coo_allocate_mnnz
   end interface
 
-  !
-  !> 
-  !! \memberof  psb_c_coo_sparse_mat
-  !! \see psb_c_base_mat_mod::psb_c_base_mold
-  !
+  
+  !> \memberof psb_c_coo_sparse_mat
+  !| \see psb_base_mat_mod::psb_base_mold
   interface 
     subroutine psb_c_coo_mold(a,b,info) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
-      class(psb_c_coo_sparse_mat), intent(in)               :: a
-      class(psb_c_base_sparse_mat), intent(out), allocatable :: b
-      integer(psb_ipk_), intent(out)                                 :: info
+      class(psb_c_coo_sparse_mat), intent(in)                  :: a
+      class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
+      integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_c_coo_mold
   end interface
+  
+  !> \memberof psb_c_coo_sparse_mat
+  !| \see psb_base_mat_mod::psb_base_copy
+  interface 
+    subroutine psb_c_coo_copy(a,b,info) 
+      import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
+      class(psb_c_coo_sparse_mat), intent(in)     :: a
+      class(psb_c_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_c_coo_copy
+  end interface
+  
+!!$  !> \memberof psb_c_coo_sparse_mat
+!!$  !| \see psb_base_mat_mod::psb_base_copy
+!!$  interface 
+!!$    subroutine psb_c_coo_clone(a,b,info) 
+!!$      import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
+!!$      class(psb_c_coo_sparse_mat), intent(inout)               :: a
+!!$      class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
+!!$      integer(psb_ipk_), intent(out)                           :: info
+!!$    end subroutine psb_c_coo_clone
+!!$  end interface
+
 
   
   !
@@ -1584,35 +1618,6 @@ module psb_c_base_mat_mod
   
   
 contains 
-  
-  subroutine c_base_mv_from(a,b)
-    
-    implicit none 
-    
-    class(psb_c_base_sparse_mat), intent(out)   :: a
-    type(psb_c_base_sparse_mat), intent(inout) :: b
-    
-    
-    ! No new things here, very easy
-    call a%psb_base_sparse_mat%mv_from(b%psb_base_sparse_mat)
-    
-    return
-    
-  end subroutine c_base_mv_from
-  
-  subroutine c_base_cp_from(a,b)
-    implicit none 
-    
-    class(psb_c_base_sparse_mat), intent(out) :: a
-    type(psb_c_base_sparse_mat), intent(in)  :: b
-    
-    ! No new things here, very easy
-    call a%psb_base_sparse_mat%cp_from(b%psb_base_sparse_mat)
-    
-    return
-    
-  end subroutine c_base_cp_from
-  
  
   
   ! == ==================================

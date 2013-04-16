@@ -2263,7 +2263,7 @@ subroutine psb_c_cp_csc_to_coo(a,b,info)
   nza = a%get_nzeros()
 
   call b%allocate(nr,nc,nza)
-  call b%psb_c_base_sparse_mat%cp_from(a%psb_c_base_sparse_mat)
+  call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
 
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1
@@ -2305,7 +2305,7 @@ subroutine psb_c_mv_csc_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%psb_c_base_sparse_mat%mv_from(a%psb_c_base_sparse_mat)
+  call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
   call b%set_nzeros(a%get_nzeros())
   call move_alloc(a%ia,b%ia)
   call move_alloc(a%val,b%val)
@@ -2355,7 +2355,7 @@ subroutine psb_c_mv_csc_from_coo(a,b,info)
   nc  = b%get_ncols()
   nza = b%get_nzeros()
   
-  call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
+  call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ja,itemp)
@@ -2443,7 +2443,7 @@ subroutine psb_c_mv_csc_to_fmt(a,b,info)
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
   type is (psb_c_csc_sparse_mat) 
-    call b%psb_c_base_sparse_mat%mv_from(a%psb_c_base_sparse_mat)
+    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
     call move_alloc(a%icp, b%icp)
     call move_alloc(a%ia,  b%ia)
     call move_alloc(a%val, b%val)
@@ -2484,10 +2484,10 @@ subroutine psb_c_cp_csc_to_fmt(a,b,info)
     call a%cp_to_coo(b,info)
 
   type is (psb_c_csc_sparse_mat) 
-    call b%psb_c_base_sparse_mat%cp_from(a%psb_c_base_sparse_mat)
-    call psb_safe_cpy( a%icp, b%icp , info)
-    call psb_safe_cpy( a%ia , b%ia  , info)
-    call psb_safe_cpy( a%val, b%val , info)
+    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat,info)
+    if (info == 0) call psb_safe_cpy( a%icp, b%icp , info)
+    if (info == 0) call psb_safe_cpy( a%ia , b%ia  , info)
+    if (info == 0) call psb_safe_cpy( a%val, b%val , info)
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2523,7 +2523,7 @@ subroutine psb_c_mv_csc_from_fmt(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_c_csc_sparse_mat) 
-    call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
+    call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
     call move_alloc(b%icp, a%icp)
     call move_alloc(b%ia,  a%ia)
     call move_alloc(b%val, a%val)
@@ -2564,34 +2564,41 @@ subroutine psb_c_cp_csc_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_c_csc_sparse_mat) 
-    call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
-    call psb_safe_cpy( b%icp, a%icp , info)
-    call psb_safe_cpy( b%ia , a%ia  , info)
-    call psb_safe_cpy( b%val, a%val , info)
+    call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+    if (info == 0) call psb_safe_cpy( b%icp, a%icp , info)
+    if (info == 0) call psb_safe_cpy( b%ia , a%ia  , info)
+    if (info == 0) call psb_safe_cpy( b%val, a%val , info)
 
   class default
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
+  
 end subroutine psb_c_cp_csc_from_fmt
+
 
 subroutine psb_c_csc_mold(a,b,info) 
   use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_mold
   use psb_error_mod
   implicit none 
-  class(psb_c_csc_sparse_mat), intent(in)  :: a
-  class(psb_c_base_sparse_mat), intent(out), allocatable  :: b
+  class(psb_c_csc_sparse_mat), intent(in)                  :: a
+  class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='reallocate_nz'
+  character(len=20)  :: name='csc_mold'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
   
-  allocate(psb_c_csc_sparse_mat :: b, stat=info)
+  info = 0 
+  if (allocated(b)) then 
+    call b%free()
+    deallocate(b,stat=info)
+  end if
+  if (info == 0) allocate(psb_c_csc_sparse_mat :: b, stat=info)
 
-  if (info /= psb_success_) then 
+  if (info /= 0) then 
     info = psb_err_alloc_dealloc_ 
     call psb_errpush(info, name)
     goto 9999
@@ -2605,6 +2612,44 @@ subroutine psb_c_csc_mold(a,b,info)
 
 end subroutine psb_c_csc_mold
 
+subroutine psb_c_csc_copy(a,b,info) 
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_copy
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(in)     :: a
+  class(psb_c_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='csc_copy'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  
+  info = 0 
+
+  select type(b)
+  type is (psb_c_csc_sparse_mat)
+    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
+    if (info == 0) call psb_safe_cpy( a%icp, b%icp , info)
+    if (info == 0) call psb_safe_cpy( a%ia , b%ia  , info)
+    if (info == 0) call psb_safe_cpy( a%val, b%val , info)
+    if (info /= psb_success_) goto 9999
+    
+  class default
+    info = psb_err_internal_error_
+    goto 9999
+  end select
+
+  return
+9999 continue
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_c_csc_copy
 
 subroutine  psb_c_csc_reallocate_nz(nz,a) 
   use psb_error_mod
@@ -2929,83 +2974,83 @@ subroutine psb_c_csc_print(iout,a,iv,head,ivr,ivc)
 
 end subroutine psb_c_csc_print
 
-subroutine psb_c_csc_cp_from(a,b)
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cp_from
-  implicit none 
-
-  class(psb_c_csc_sparse_mat), intent(inout) :: a
-  type(psb_c_csc_sparse_mat), intent(in)   :: b
-
-
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='cp_from'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-
-  info = psb_success_
-
-  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
-  call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
-  call psb_safe_cpy( b%icp, a%icp , info)
-  call psb_safe_cpy( b%ia , a%ia  , info)
-  call psb_safe_cpy( b%val, a%val , info)
-
-  if (info /= psb_success_) goto 9999
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  call psb_errpush(info,name)
-
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
-end subroutine psb_c_csc_cp_from
-
-subroutine psb_c_csc_mv_from(a,b)
-  use psb_error_mod
-  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_mv_from
-  implicit none 
-
-  class(psb_c_csc_sparse_mat), intent(inout)  :: a
-  type(psb_c_csc_sparse_mat), intent(inout) :: b
-
-
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='mv_from'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-  call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
-  call move_alloc(b%icp, a%icp)
-  call move_alloc(b%ia,  a%ia)
-  call move_alloc(b%val, a%val)
-  call b%free()
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  call psb_errpush(info,name)
-
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
-end subroutine psb_c_csc_mv_from
-
+!!$subroutine psb_c_csc_cp_from(a,b)
+!!$  use psb_error_mod
+!!$  use psb_realloc_mod
+!!$  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cp_from
+!!$  implicit none 
+!!$
+!!$  class(psb_c_csc_sparse_mat), intent(inout) :: a
+!!$  type(psb_c_csc_sparse_mat), intent(in)   :: b
+!!$
+!!$
+!!$  integer(psb_ipk_) :: err_act, info
+!!$  integer(psb_ipk_) :: ierr(5)
+!!$  character(len=20)  :: name='cp_from'
+!!$  logical, parameter :: debug=.false.
+!!$
+!!$  call psb_erractionsave(err_act)
+!!$
+!!$  info = psb_success_
+!!$
+!!$  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+!!$  call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+!!$  if (info == 0) call psb_safe_cpy( b%icp, a%icp , info)
+!!$  if (info == 0) call psb_safe_cpy( b%ia , a%ia  , info)
+!!$  if (info == 0) call psb_safe_cpy( b%val, a%val , info)
+!!$
+!!$  if (info /= psb_success_) goto 9999
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$
+!!$  call psb_errpush(info,name)
+!!$
+!!$  if (err_act /= psb_act_ret_) then
+!!$    call psb_error()
+!!$  end if
+!!$  return
+!!$
+!!$end subroutine psb_c_csc_cp_from
+!!$
+!!$subroutine psb_c_csc_mv_from(a,b)
+!!$  use psb_error_mod
+!!$  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_mv_from
+!!$  implicit none 
+!!$
+!!$  class(psb_c_csc_sparse_mat), intent(inout)  :: a
+!!$  type(psb_c_csc_sparse_mat), intent(inout) :: b
+!!$
+!!$
+!!$  integer(psb_ipk_) :: err_act, info
+!!$  integer(psb_ipk_) :: ierr(5)
+!!$  character(len=20)  :: name='mv_from'
+!!$  logical, parameter :: debug=.false.
+!!$
+!!$  call psb_erractionsave(err_act)
+!!$  info = psb_success_
+!!$  call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+!!$  if (info == 0) call move_alloc(b%icp, a%icp)
+!!$  if (info == 0) call move_alloc(b%ia,  a%ia)
+!!$  if (info == 0) call move_alloc(b%val, a%val)
+!!$  call b%free()
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$
+!!$  call psb_errpush(info,name)
+!!$
+!!$  if (err_act /= psb_act_ret_) then
+!!$    call psb_error()
+!!$  end if
+!!$  return
+!!$
+!!$end subroutine psb_c_csc_mv_from
+!!$
 
 

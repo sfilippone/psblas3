@@ -225,19 +225,24 @@ subroutine psb_s_coo_mold(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_mold
   use psb_error_mod
   implicit none 
-  class(psb_s_coo_sparse_mat), intent(in)  :: a
-  class(psb_s_base_sparse_mat), intent(out), allocatable  :: b
+  class(psb_s_coo_sparse_mat), intent(in)                  :: a
+  class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='reallocate_nz'
+  character(len=20)  :: name='coo_mold'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
   
-  allocate(psb_s_coo_sparse_mat :: b, stat=info)
+  info = 0 
+  if (allocated(b)) then 
+    call b%free()
+    deallocate(b,stat=info)
+  end if
+  if (info == 0) allocate(psb_s_coo_sparse_mat :: b, stat=info)
 
-  if (info /= psb_success_) then 
+  if (info /= 0) then 
     info = psb_err_alloc_dealloc_ 
     call psb_errpush(info, name)
     goto 9999
@@ -251,6 +256,45 @@ subroutine psb_s_coo_mold(a,b,info)
 
 end subroutine psb_s_coo_mold
 
+subroutine psb_s_coo_copy(a,b,info) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_copy
+  use psb_error_mod
+  use psb_realloc_mod
+  implicit none 
+  class(psb_s_coo_sparse_mat), intent(in)     :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='coo_copy'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  
+  info = 0 
+
+  select type(b)
+  type is (psb_s_coo_sparse_mat)
+    call a%psb_s_base_sparse_mat%copy(b%psb_s_base_sparse_mat,info)
+    if (info == 0) call psb_safe_cpy( a%ia,  b%ia,  info)
+    if (info == 0) call psb_safe_cpy( a%ja,  b%ja,  info)
+    if (info == 0) call psb_safe_cpy( a%val, b%val, info)
+    if (info == 0) call b%fix(info)
+    
+    if (info /= psb_success_) goto 9999
+  class default
+    info = psb_err_internal_error_
+    goto 9999
+  end select
+
+  return
+9999 continue
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_s_coo_copy
 
 subroutine psb_s_coo_reinit(a,clear)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_reinit
@@ -2920,7 +2964,7 @@ subroutine psb_s_cp_coo_to_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  call b%psb_s_base_sparse_mat%cp_from(a%psb_s_base_sparse_mat)
+  call a%psb_s_base_sparse_mat%copy(b%psb_s_base_sparse_mat,info)
 
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
@@ -2966,7 +3010,8 @@ subroutine psb_s_cp_coo_from_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  call a%psb_s_base_sparse_mat%cp_from(b%psb_s_base_sparse_mat)
+  call b%psb_s_base_sparse_mat%copy(a%psb_s_base_sparse_mat,info)
+
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
   call a%reallocate(nz)
@@ -3085,7 +3130,7 @@ subroutine psb_s_mv_coo_to_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  call b%psb_s_base_sparse_mat%mv_from(a%psb_s_base_sparse_mat)
+  call a%psb_s_base_sparse_mat%copy(b%psb_s_base_sparse_mat, info)
   call b%set_nzeros(a%get_nzeros())
   call b%reallocate(a%get_nzeros())
 
@@ -3130,7 +3175,7 @@ subroutine psb_s_mv_coo_from_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  call a%psb_s_base_sparse_mat%mv_from(b%psb_s_base_sparse_mat)
+  call b%psb_s_base_sparse_mat%copy(a%psb_s_base_sparse_mat, info)
   call a%set_nzeros(b%get_nzeros())
   call a%reallocate(b%get_nzeros())
 

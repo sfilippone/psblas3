@@ -1574,6 +1574,41 @@ subroutine psb_sspmat_clone(a,b,info)
 end subroutine psb_sspmat_clone
 
 
+subroutine psb_sspmat_copy(a,b,info)
+  use psb_error_mod
+  use psb_string_mod
+  use psb_s_mat_mod, psb_protect_name => psb_sspmat_copy
+  implicit none 
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  integer(psb_ipk_), intent(out)        :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='copy'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  call b%free()
+  if (allocated(a%a)) then 
+    call a%a%clone(b%a,info)
+  end if
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+end subroutine psb_sspmat_copy
+
+
 
 subroutine psb_s_transp_1mat(a)
   use psb_error_mod

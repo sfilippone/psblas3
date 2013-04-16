@@ -584,12 +584,12 @@ subroutine psb_s_base_mold(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_mold
   use psb_error_mod
   implicit none 
-  class(psb_s_base_sparse_mat), intent(in)  :: a
-  class(psb_s_base_sparse_mat), intent(out), allocatable  :: b
+  class(psb_s_base_sparse_mat), intent(in)                 :: a
+  class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='reallocate_nz'
+  character(len=20)  :: name='base_mold'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
@@ -605,6 +605,43 @@ subroutine psb_s_base_mold(a,b,info)
   return
 
 end subroutine psb_s_base_mold
+
+subroutine psb_s_base_copy(a,b,info) 
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_base_copy
+  use psb_error_mod
+  implicit none 
+  class(psb_s_base_sparse_mat), intent(in)    :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='base_copy'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = 0
+
+  call a%psb_base_sparse_mat%copy(b%psb_base_sparse_mat,info)
+  
+  if (info /= 0) then 
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act) 
+
+  return
+9999 continue
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+
+  return
+
+end subroutine psb_s_base_copy
 
 subroutine psb_s_base_transp_2mat(a,b)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_transp_2mat

@@ -98,10 +98,7 @@ module psb_z_csr_mat_mod
     procedure, pass(a) :: print       => psb_z_csr_print
     procedure, pass(a) :: free        => z_csr_free
     procedure, pass(a) :: mold        => psb_z_csr_mold
-    procedure, pass(a) :: psb_z_csr_cp_from
-    generic, public    :: cp_from => psb_z_csr_cp_from
-    procedure, pass(a) :: psb_z_csr_mv_from
-    generic, public    :: mv_from => psb_z_csr_mv_from
+    procedure, pass(a) :: copy        => psb_z_csr_copy
 
   end type psb_z_csr_sparse_mat
 
@@ -143,13 +140,23 @@ module psb_z_csr_mat_mod
   interface 
     subroutine psb_z_csr_mold(a,b,info) 
       import :: psb_ipk_, psb_z_csr_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
-      class(psb_z_csr_sparse_mat), intent(in)               :: a
-      class(psb_z_base_sparse_mat), intent(out), allocatable :: b
-      integer(psb_ipk_), intent(out)                                 :: info
+      class(psb_z_csr_sparse_mat), intent(in)                  :: a
+      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
+      integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_z_csr_mold
   end interface
-
-
+  
+  !> \memberof psb_z_csr_sparse_mat
+  !| \see psb_base_mat_mod::psb_base_copy
+  interface 
+    subroutine psb_z_csr_copy(a,b,info) 
+      import :: psb_ipk_, psb_z_csr_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
+      class(psb_z_csr_sparse_mat), intent(in)     :: a
+      class(psb_z_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_z_csr_copy
+  end interface
+  
   !> \memberof psb_z_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface

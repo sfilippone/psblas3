@@ -115,16 +115,16 @@ module psb_i_comm_mod
 
   interface psb_gather
 !!$    subroutine  psb_isp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-! !$      use psb_desc_mod
-! !$      use psb_mat_mod
-! !$      implicit none
-! !$      type(psb_ispmat_type), intent(inout) :: loca
-! !$      type(psb_ispmat_type), intent(out)   :: globa
-! !$      type(psb_desc_type), intent(in) :: desc_a
-! !$      integer(psb_ipk_), intent(out)            :: info
-! !$      integer(psb_ipk_), intent(in), optional   :: root,dupl
-! !$      logical, intent(in), optional   :: keepnum,keeploc
-! !$    end subroutine psb_isp_allgather
+!!$      use psb_desc_mod
+!!$      use psb_mat_mod
+!!$      implicit none
+!!$      type(psb_ispmat_type), intent(inout) :: loca
+!!$      type(psb_ispmat_type), intent(out)   :: globa
+!!$      type(psb_desc_type), intent(in) :: desc_a
+!!$      integer(psb_ipk_), intent(out)            :: info
+!!$      integer(psb_ipk_), intent(in), optional   :: root,dupl
+!!$      logical, intent(in), optional   :: keepnum,keeploc
+!!$    end subroutine psb_isp_allgather
     subroutine psb_igatherm(globx, locx, desc_a, info, root)
       use psb_desc_mod
       integer(psb_ipk_), intent(in)  :: locx(:,:)

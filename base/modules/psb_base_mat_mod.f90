@@ -177,6 +177,7 @@ module psb_base_mat_mod
     ! == = =================================  
     procedure, pass(a) :: get_neigh  => psb_base_get_neigh
     procedure, pass(a) :: free       => psb_base_free
+    procedure, pass(a) :: copy       => psb_base_copy
     procedure, pass(a) :: trim       => psb_base_trim
     procedure, pass(a) :: reinit     => psb_base_reinit
     procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
@@ -187,10 +188,10 @@ module psb_base_mat_mod
     generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => psb_base_sparse_print
     procedure, pass(a) :: sizeof => psb_base_sizeof
-    procedure, pass(a) :: psb_base_cp_from
-    generic, public    :: cp_from => psb_base_cp_from
-    procedure, pass(a) :: psb_base_mv_from
-    generic, public    :: mv_from => psb_base_mv_from
+!!$    procedure, pass(a) :: psb_base_cp_from
+!!$    generic, public    :: cp_from => psb_base_cp_from
+!!$    procedure, pass(a) :: psb_base_mv_from
+!!$    generic, public    :: mv_from => psb_base_mv_from
     procedure, pass(a) :: transp_1mat => psb_base_transp_1mat
     procedure, pass(a) :: transp_2mat => psb_base_transp_2mat
     generic, public    :: transp => transp_1mat, transp_2mat
@@ -653,46 +654,65 @@ contains
   end function psb_base_is_sorted
 
 
-  !
-  !  MV|CP_FROM: at base level they are the same.
-  !
-  !
-
-  subroutine psb_base_mv_from(a,b)
-    implicit none 
-
-    class(psb_base_sparse_mat), intent(out)   :: a
-    type(psb_base_sparse_mat), intent(inout) :: b
-
-    a%m         = b%m
-    a%n         = b%n
-    a%state     = b%state
-    a%duplicate = b%duplicate
-    a%triangle  = b%triangle
-    a%unitd     = b%unitd
-    a%upper     = b%upper
-    a%sorted    = b%sorted
-
-  end subroutine psb_base_mv_from
+!!$  !
+!!$  !  MV|CP_FROM: at base level they are the same.
+!!$  !
+!!$  !
+!!$
+!!$  subroutine psb_base_mv_from(a,b)
+!!$    implicit none 
+!!$
+!!$    class(psb_base_sparse_mat), intent(out)   :: a
+!!$    type(psb_base_sparse_mat), intent(inout) :: b
+!!$
+!!$    a%m         = b%m
+!!$    a%n         = b%n
+!!$    a%state     = b%state
+!!$    a%duplicate = b%duplicate
+!!$    a%triangle  = b%triangle
+!!$    a%unitd     = b%unitd
+!!$    a%upper     = b%upper
+!!$    a%sorted    = b%sorted
+!!$
+!!$  end subroutine psb_base_mv_from
   
 
-  subroutine psb_base_cp_from(a,b)
+  subroutine psb_base_copy(a,b,info)
     implicit none 
 
-    class(psb_base_sparse_mat), intent(out) :: a
-    type(psb_base_sparse_mat), intent(in)  :: b
+    class(psb_base_sparse_mat), intent(in)    :: a
+    class(psb_base_sparse_mat), intent(inout) :: b
+    integer(psb_ipk_), intent(out) :: info
 
-    a%m         = b%m
-    a%n         = b%n
-    a%state     = b%state
-    a%duplicate = b%duplicate
-    a%triangle  = b%triangle
-    a%unitd     = b%unitd
-    a%upper     = b%upper
-    a%sorted    = b%sorted
+    info        = 0 
+    b%m         = a%m         
+    b%n         = a%n         
+    b%state     = a%state     
+    b%duplicate = a%duplicate 
+    b%triangle  = a%triangle  
+    b%unitd     = a%unitd     
+    b%upper     = a%upper     
+    b%sorted    = a%sorted    
 
-  end subroutine psb_base_cp_from
+  end subroutine psb_base_copy
 
+!!$  subroutine psb_base_cp_from(a,b)
+!!$    implicit none 
+!!$
+!!$    class(psb_base_sparse_mat), intent(out) :: a
+!!$    type(psb_base_sparse_mat), intent(in)  :: b
+!!$
+!!$    a%m         = b%m
+!!$    a%n         = b%n
+!!$    a%state     = b%state
+!!$    a%duplicate = b%duplicate
+!!$    a%triangle  = b%triangle
+!!$    a%unitd     = b%unitd
+!!$    a%upper     = b%upper
+!!$    a%sorted    = b%sorted
+!!$
+!!$  end subroutine psb_base_cp_from
+!!$
   !
   !  TRANSP: note sorted=.false.
   !    better invoke a fix() too many than

@@ -154,6 +154,7 @@ module psb_c_mat_mod
     procedure, pass(a) :: cscnv_ip    => psb_c_cscnv_ip
     procedure, pass(a) :: cscnv_base  => psb_c_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
+    procedure, pass(a) :: copy        => psb_cspmat_copy
     procedure, pass(a) :: clone       => psb_cspmat_clone
 
     ! Computational routines 
@@ -607,6 +608,15 @@ module psb_c_mat_mod
       class(psb_cspmat_type), intent(out)   :: b
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_cspmat_type_move
+  end interface
+  
+  interface 
+    subroutine psb_cspmat_copy(a,b,info)
+      import :: psb_ipk_, psb_cspmat_type
+      class(psb_cspmat_type), intent(inout) :: a
+      class(psb_cspmat_type), intent(inout) :: b
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psb_cspmat_copy
   end interface
   
   interface 
