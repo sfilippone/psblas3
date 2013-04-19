@@ -321,15 +321,13 @@ subroutine  psb_base_trim(a)
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
+  !
+  ! This is the base version. 
+  ! The correct action is: do nothing.
+  ! Indeed, the more complicated the data structure, the
+  ! more likely this is the only possible course.
+  ! 
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
   return
 
 end subroutine psb_base_trim
