@@ -1816,45 +1816,6 @@ subroutine psb_c_csr_mold(a,b,info)
 
 end subroutine psb_c_csr_mold
 
-subroutine psb_c_csr_copy(a,b,info) 
-  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_copy
-  use psb_error_mod
-  use psb_realloc_mod
-  implicit none 
-  class(psb_c_csr_sparse_mat), intent(in)     :: a
-  class(psb_c_base_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='csr_copy'
-  logical, parameter :: debug=.false.
-
-  call psb_get_erraction(err_act)
-  
-  info = 0 
-
-  select type(b)
-  type is (psb_c_csr_sparse_mat)
-    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
-    if (info == 0) call psb_safe_cpy( a%irp, b%irp , info)
-    if (info == 0) call psb_safe_cpy( a%ja , b%ja  , info)
-    if (info == 0) call psb_safe_cpy( a%val, b%val , info)
-    if (info /= psb_success_) goto 9999
-    
-  class default
-    info = psb_err_internal_error_
-    goto 9999
-  end select
-
-  return
-9999 continue
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
-end subroutine psb_c_csr_copy
-
 subroutine  psb_c_csr_allocate_mnnz(m,n,a,nz) 
   use psb_error_mod
   use psb_realloc_mod
@@ -2843,7 +2804,7 @@ subroutine psb_c_cp_csr_to_coo(a,b,info)
   nza = a%get_nzeros()
 
   call b%allocate(nr,nc,nza)
-  call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
+  b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
 
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
@@ -2884,7 +2845,7 @@ subroutine psb_c_mv_csr_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
+  b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
   call move_alloc(a%ja,b%ja)
   call move_alloc(a%val,b%val)
@@ -2935,7 +2896,7 @@ subroutine psb_c_mv_csr_from_coo(a,b,info)
   nc  = b%get_ncols()
   nza = b%get_nzeros()
   
-  call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+  a%psb_c_base_sparse_mat = b%psb_c_base_sparse_mat
 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ia,itemp)
@@ -3022,7 +2983,7 @@ subroutine psb_c_mv_csr_to_fmt(a,b,info)
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
   type is (psb_c_csr_sparse_mat) 
-    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
+    b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
     call move_alloc(a%irp, b%irp)
     call move_alloc(a%ja,  b%ja)
     call move_alloc(a%val, b%val)
@@ -3063,7 +3024,7 @@ subroutine psb_c_cp_csr_to_fmt(a,b,info)
     call a%cp_to_coo(b,info)
 
   type is (psb_c_csr_sparse_mat) 
-    call a%psb_c_base_sparse_mat%copy(b%psb_c_base_sparse_mat, info)
+    b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
     if (info == 0) call psb_safe_cpy( a%irp, b%irp , info)
     if (info == 0) call psb_safe_cpy( a%ja , b%ja  , info)
     if (info == 0) call psb_safe_cpy( a%val, b%val , info)
@@ -3101,7 +3062,7 @@ subroutine psb_c_mv_csr_from_fmt(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_c_csr_sparse_mat) 
-    call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+    a%psb_c_base_sparse_mat = b%psb_c_base_sparse_mat
     call move_alloc(b%irp, a%irp)
     call move_alloc(b%ja,  a%ja)
     call move_alloc(b%val, a%val)
@@ -3142,7 +3103,7 @@ subroutine psb_c_cp_csr_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_c_csr_sparse_mat) 
-    call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
+    a%psb_c_base_sparse_mat = b%psb_c_base_sparse_mat
     if (info == 0) call psb_safe_cpy( b%irp, a%irp , info)
     if (info == 0) call psb_safe_cpy( b%ja , a%ja  , info)
     if (info == 0) call psb_safe_cpy( b%val, a%val , info)
@@ -3152,84 +3113,3 @@ subroutine psb_c_cp_csr_from_fmt(a,b,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 end subroutine psb_c_cp_csr_from_fmt
-
-!!$
-!!$subroutine psb_c_csr_cp_from(a,b)
-!!$  use psb_error_mod
-!!$  use psb_realloc_mod
-!!$  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_cp_from
-!!$  implicit none 
-!!$
-!!$  class(psb_c_csr_sparse_mat), intent(inout) :: a
-!!$  type(psb_c_csr_sparse_mat), intent(in)   :: b
-!!$
-!!$
-!!$  integer(psb_ipk_) :: err_act, info
-!!$  integer(psb_ipk_) :: ierr(5)
-!!$  character(len=20)  :: name='cp_from'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$
-!!$  info = psb_success_
-!!$
-!!$  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
-!!$  call b%psb_c_base_sparse_mat%copy(a%psb_c_base_sparse_mat, info)
-!!$  if (info == 0) call psb_safe_cpy( b%irp, a%irp , info)
-!!$  if (info == 0) call psb_safe_cpy( b%ja , a%ja  , info)
-!!$  if (info == 0) call psb_safe_cpy( b%val, a%val , info)
-!!$
-!!$  if (info /= psb_success_) goto 9999
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  call psb_errpush(info,name)
-!!$
-!!$  if (err_act /= psb_act_ret_) then
-!!$    call psb_error()
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_c_csr_cp_from
-!!$
-!!$subroutine psb_c_csr_mv_from(a,b)
-!!$  use psb_error_mod
-!!$  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_mv_from
-!!$  implicit none 
-!!$
-!!$  class(psb_c_csr_sparse_mat), intent(inout)  :: a
-!!$  type(psb_c_csr_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$  integer(psb_ipk_) :: err_act, info
-!!$  integer(psb_ipk_) :: ierr(5)
-!!$  character(len=20)  :: name='mv_from'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  call psb_erractionsave(err_act)
-!!$  info = psb_success_
-!!$  call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
-!!$  call move_alloc(b%irp, a%irp)
-!!$  call move_alloc(b%ja,  a%ja)
-!!$  call move_alloc(b%val, a%val)
-!!$  call b%free()
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  call psb_errpush(info,name)
-!!$
-!!$  if (err_act /= psb_act_ret_) then
-!!$    call psb_error()
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_c_csr_mv_from
-!!$
-!!$

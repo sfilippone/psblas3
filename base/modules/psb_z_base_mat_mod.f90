@@ -72,7 +72,6 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: mv_to_fmt     => psb_z_base_mv_to_fmt   
     procedure, pass(a) :: mv_from_fmt   => psb_z_base_mv_from_fmt 
     procedure, pass(a) :: mold          => psb_z_base_mold 
-    procedure, pass(a) :: copy          => psb_z_base_copy
     procedure, pass(a) :: clone         => psb_z_base_clone
     
     !
@@ -158,8 +157,6 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: print        => psb_z_coo_print
     procedure, pass(a) :: free         => z_coo_free
     procedure, pass(a) :: mold         => psb_z_coo_mold
-    procedure, pass(a) :: copy         => psb_z_coo_copy
-!!$    procedure, pass(a) :: clone        => psb_z_coo_clone
     !
     ! This is COO specific
     !
@@ -411,24 +408,6 @@ module psb_z_base_mat_mod
   end interface
 
   !
-  !> Function  copy:
-  !! \memberof  psb_z_base_sparse_mat
-  !! \brief Copy  a class(psb_z_base_sparse_mat) 
-  !!     but only if it is the same dynamic type as the input.
-  !!   \param b The output variable
-  !!   \param info return code
-  ! 
-  interface 
-    subroutine psb_z_base_copy(a,b, info)
-      import :: psb_ipk_, psb_z_base_sparse_mat, psb_long_int_k_      
-      implicit none 
-      class(psb_z_base_sparse_mat), intent(in)    :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info      
-    end subroutine psb_z_base_copy
-  end interface
-
-
   !
   !> Function  clone:
   !! \memberof  psb_z_base_sparse_mat
@@ -1156,29 +1135,6 @@ module psb_z_base_mat_mod
     end subroutine psb_z_coo_mold
   end interface
   
-  !> \memberof psb_z_coo_sparse_mat
-  !| \see psb_base_mat_mod::psb_base_copy
-  interface 
-    subroutine psb_z_coo_copy(a,b,info) 
-      import :: psb_ipk_, psb_z_coo_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
-      class(psb_z_coo_sparse_mat), intent(in)     :: a
-      class(psb_z_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_z_coo_copy
-  end interface
-  
-!!$  !> \memberof psb_z_coo_sparse_mat
-!!$  !| \see psb_base_mat_mod::psb_base_copy
-!!$  interface 
-!!$    subroutine psb_z_coo_clone(a,b,info) 
-!!$      import :: psb_ipk_, psb_z_coo_sparse_mat, psb_z_base_sparse_mat, psb_long_int_k_
-!!$      class(psb_z_coo_sparse_mat), intent(inout)               :: a
-!!$      class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
-!!$      integer(psb_ipk_), intent(out)                           :: info
-!!$    end subroutine psb_z_coo_clone
-!!$  end interface
-
-
   
   !
   !> Function print.

@@ -97,7 +97,6 @@ module psb_d_csc_mat_mod
     procedure, pass(a) :: print       => psb_d_csc_print
     procedure, pass(a) :: free        => d_csc_free
     procedure, pass(a) :: mold        => psb_d_csc_mold
-    procedure, pass(a) :: copy        => psb_d_csc_copy
 
   end type psb_d_csc_sparse_mat
 
@@ -144,18 +143,6 @@ module psb_d_csc_mat_mod
     end subroutine psb_d_csc_mold
   end interface
   
-  !> \memberof psb_d_csc_sparse_mat
-  !| \see psb_base_mat_mod::psb_base_copy
-  interface 
-    subroutine psb_d_csc_copy(a,b,info) 
-      import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
-      class(psb_d_csc_sparse_mat), intent(in)     :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_csc_copy
-  end interface
-  
-
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface
