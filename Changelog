@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/04/20: Fix add-by-one for unit triangular matrices.
 	
 2013/03/31: Implement CLONE method for vectors, maps and preconditioners.
 	    Make base_prec abstract.      

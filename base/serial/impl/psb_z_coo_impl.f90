@@ -1788,6 +1788,12 @@ subroutine psb_z_coo_rowsum(d,a)
     d(i) = d(i) + a%val(j)
   end do
 
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + zone
+    end do
+  end if
+
   return
   call psb_erractionrestore(err_act)
   return  
@@ -1836,6 +1842,12 @@ subroutine psb_z_coo_arwsum(d,a)
     d(i) = d(i) + abs(a%val(j))
   end do
 
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + done
+    end do
+  end if
+
   return
   call psb_erractionrestore(err_act)
   return  
@@ -1883,6 +1895,12 @@ subroutine psb_z_coo_colsum(d,a)
     k    = a%ja(j)
     d(k) = d(k) + a%val(j)
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + zone
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1931,6 +1949,12 @@ subroutine psb_z_coo_aclsum(d,a)
     k    = a%ja(j)
     d(k) = d(k) + abs(a%val(j))
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)

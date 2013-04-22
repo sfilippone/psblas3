@@ -1192,6 +1192,12 @@ subroutine psb_d_csc_colsum(d,a)
       d(i) = d(i) + (a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, a%get_ncols()
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1241,6 +1247,12 @@ subroutine psb_d_csc_aclsum(d,a)
       d(i) = d(i) + abs(a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, a%get_ncols()
+      d(i) = d(i) + done
+    end do
+  end if
 
   call psb_erractionrestore(err_act)
   return  
@@ -1292,6 +1304,12 @@ subroutine psb_d_csc_rowsum(d,a)
     end do
   end do
 
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, a%get_nrows()
+      d(i) = d(i) + done
+    end do
+  end if
+
   return
   call psb_erractionrestore(err_act)
   return  
@@ -1335,13 +1353,18 @@ subroutine psb_d_csc_arwsum(d,a)
   end if
 
   d   = dzero
-
   do i=1, m
     do j=a%icp(i),a%icp(i+1)-1
       k = a%ia(j)
       d(k) = d(k) + abs(a%val(k))
     end do
   end do
+
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, a%get_nrows()
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)

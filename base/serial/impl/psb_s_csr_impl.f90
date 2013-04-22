@@ -1397,6 +1397,12 @@ subroutine psb_s_csr_rowsum(d,a)
       d(i) = d(i) + (a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + sone
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1446,6 +1452,12 @@ subroutine psb_s_csr_arwsum(d,a)
       d(i) = d(i) + abs(a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + sone
+    end do
+  end if
 
   call psb_erractionrestore(err_act)
   return  
@@ -1496,6 +1508,12 @@ subroutine psb_s_csr_colsum(d,a)
       d(k) = d(k) + (a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + sone
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1547,6 +1565,12 @@ subroutine psb_s_csr_aclsum(d,a)
       d(k) = d(k) + abs(a%val(j))
     end do
   end do
+  
+  if (a%is_triangle().and.a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + sone
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
