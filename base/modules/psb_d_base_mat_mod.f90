@@ -73,6 +73,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_from_fmt   => psb_d_base_mv_from_fmt 
     procedure, pass(a) :: mold          => psb_d_base_mold 
     procedure, pass(a) :: clone         => psb_d_base_clone
+    procedure, pass(a) :: add_unit_diag => psb_d_base_add_unit_diag
     
     !
     ! Transpose methods: defined here but not implemented. 
@@ -428,6 +429,23 @@ module psb_d_base_mat_mod
       class(psb_d_base_sparse_mat), allocatable, intent(inout) :: b
       integer(psb_ipk_), intent(out)                           :: info      
     end subroutine psb_d_base_clone
+  end interface
+
+
+  !
+  !
+  !> Function  add_unit_diag:
+  !! \memberof  psb_d_base_add_unit_diag
+  !! \brief Given a matrix for which is_unit() is true, explicitly
+  !!     store the unit diagonal and set is_unit() to false. 
+  !!     This is needed e.g. when scaling
+  ! 
+  interface 
+    subroutine psb_d_base_add_unit_diag(a)
+      import :: psb_d_base_sparse_mat
+      implicit none 
+      class(psb_d_base_sparse_mat), intent(inout) :: a
+    end subroutine psb_d_base_add_unit_diag
   end interface
 
   

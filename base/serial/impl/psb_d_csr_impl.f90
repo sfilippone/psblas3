@@ -380,7 +380,7 @@ contains
 
     endif
 
-    if (is_triangle.and.is_unit) then 
+    if (is_unit) then 
       do i=1, min(m,n)
         y(i) = y(i) + alpha*x(i)
       end do
@@ -733,7 +733,7 @@ contains
 
     endif
 
-    if (is_triangle.and.is_unit) then 
+    if (is_unit) then 
       do i=1, min(m,n)
         y(i,1:nc) = y(i,1:nc) + alpha*x(i,1:nc)
       end do
@@ -1398,7 +1398,7 @@ subroutine psb_d_csr_rowsum(d,a)
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, m
       d(i) = d(i) + done
     end do
@@ -1453,7 +1453,7 @@ subroutine psb_d_csr_arwsum(d,a)
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, m
       d(i) = d(i) + done
     end do
@@ -1509,7 +1509,7 @@ subroutine psb_d_csr_colsum(d,a)
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, n
       d(i) = d(i) + done
     end do
@@ -1566,7 +1566,7 @@ subroutine psb_d_csr_aclsum(d,a)
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, n
       d(i) = d(i) + done
     end do
@@ -1613,7 +1613,7 @@ subroutine psb_d_csr_get_diag(a,d,info)
   end if
 
 
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     d(1:mnm) = done
   else
     do i=1, mnm
@@ -1664,6 +1664,10 @@ subroutine psb_d_csr_scal(d,a,info,side)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
+  end if
 
   side_ = 'L'
   if (present(side)) then 
@@ -1734,6 +1738,9 @@ subroutine psb_d_csr_scals(d,a,info)
   info  = psb_success_
   call psb_erractionsave(err_act)
 
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
+  end if
 
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d

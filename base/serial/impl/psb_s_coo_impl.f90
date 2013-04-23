@@ -54,11 +54,11 @@ subroutine psb_s_coo_get_diag(a,d,info)
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
-  d(:) = szero
 
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     d(1:mnm) = sone 
   else
+    d(1:mnm) = szero
     do i=1,a%get_nzeros()
       j=a%ia(i)
       if ((j == a%ja(i)) .and.(j <= mnm ) .and.(j>0)) then 
@@ -100,6 +100,10 @@ subroutine psb_s_coo_scal(d,a,info,side)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
+  end if
 
   side_ = 'L'
   if (present(side)) then 
@@ -167,6 +171,9 @@ subroutine psb_s_coo_scals(d,a,info)
   info  = psb_success_
   call psb_erractionsave(err_act)
 
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
+  end if
 
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
@@ -1313,7 +1320,7 @@ subroutine psb_s_coo_csmv(alpha,a,x,beta,y,info,trans)
     endif
     return
   else 
-    if (a%is_triangle().and.a%is_unit()) then 
+    if (a%is_unit()) then 
       if (beta == szero) then
         do i = 1, min(m,n)
           y(i) = alpha*x(i)
@@ -1524,7 +1531,7 @@ subroutine psb_s_coo_csmm(alpha,a,x,beta,y,info,trans)
     endif
     return
   else 
-    if (a%is_triangle().and.a%is_unit()) then 
+    if (a%is_unit()) then 
       if (beta == szero) then
         do i = 1, min(m,n)
           y(i,1:nc) = alpha*x(i,1:nc)
@@ -1661,12 +1668,17 @@ function psb_s_coo_maxval(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = szero 
+  if (a%is_unit()) then 
+    res = sone
+  else
+    res = szero
+  end if
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
     nnz = min(nnz,size(a%val))
     res = maxval(abs(a%val(1:nnz)))
   end if
+
 end function psb_s_coo_maxval
 
 function psb_s_coo_csnmi(a) result(res)
@@ -1696,7 +1708,11 @@ function psb_s_coo_csnmi(a) result(res)
       do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
         j = j+1
       enddo
-      acc = szero
+      if (a%is_unit()) then 
+        acc = sone
+      else
+        acc = szero
+      end if
       do k=i, j-1
         acc = acc + abs(a%val(k))
       end do
@@ -1707,7 +1723,11 @@ function psb_s_coo_csnmi(a) result(res)
     m = a%get_nrows()
     allocate(vt(m),stat=info)
     if (info /= 0) return
-    vt(:) = szero
+    if (a%is_unit()) then 
+      vt = sone
+    else
+      vt = szero
+    end if
     do j=1, nnz
       i = a%ia(j)
       vt(i) = vt(i) + abs(a%val(j))
@@ -1740,10 +1760,14 @@ function psb_s_coo_csnm1(a) result(res)
 
   res = szero
   nnz = a%get_nzeros()
-  n = a%get_ncols()
+  n   = a%get_ncols()
   allocate(vt(n),stat=info)
   if (info /= 0) return
-  vt(:) = szero
+  if (a%is_unit()) then 
+    vt = sone
+  else
+    vt = szero
+  end if
   do j=1, nnz
     i = a%ja(j)
     vt(i) = vt(i) + abs(a%val(j))
@@ -1781,18 +1805,17 @@ subroutine psb_s_coo_rowsum(d,a)
     goto 9999
   end if
 
-  d   = szero
+  if (a%is_unit()) then 
+    d = sone
+  else
+    d = szero
+  end if
   nnz = a%get_nzeros()
   do j=1, nnz
     i    = a%ia(j)
     d(i) = d(i) + a%val(j)
   end do
 
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, m
-      d(i) = d(i) + sone
-    end do
-  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1835,18 +1858,16 @@ subroutine psb_s_coo_arwsum(d,a)
     goto 9999
   end if
 
-  d   = szero
+  if (a%is_unit()) then 
+    d = sone
+  else
+    d = szero
+  end if
   nnz = a%get_nzeros()
   do j=1, nnz
     i    = a%ia(j)
     d(i) = d(i) + abs(a%val(j))
   end do
-
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, m
-      d(i) = d(i) + sone
-    end do
-  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1889,18 +1910,17 @@ subroutine psb_s_coo_colsum(d,a)
     goto 9999
   end if
 
-  d   = szero
+  if (a%is_unit()) then 
+    d = sone
+  else
+    d = szero
+  end if
+
   nnz = a%get_nzeros()
   do j=1, nnz
     k    = a%ja(j)
     d(k) = d(k) + a%val(j)
   end do
-  
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, n
-      d(i) = d(i) + sone
-    end do
-  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1943,19 +1963,18 @@ subroutine psb_s_coo_aclsum(d,a)
     goto 9999
   end if
 
-  d   = szero
+  if (a%is_unit()) then 
+    d = sone
+  else
+    d = szero
+  end if
+
   nnz = a%get_nzeros()
   do j=1, nnz
     k    = a%ja(j)
     d(k) = d(k) + abs(a%val(j))
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, n
-      d(i) = d(i) + sone
-    end do
-  end if
-
   return
   call psb_erractionrestore(err_act)
   return  
@@ -1996,15 +2015,15 @@ subroutine psb_s_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
   use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_csgetptn
   implicit none
 
-  class(psb_s_coo_sparse_mat), intent(in) :: a
-  integer(psb_ipk_), intent(in)                  :: imin,imax
-  integer(psb_ipk_), intent(out)                 :: nz
-  integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-  integer(psb_ipk_),intent(out)                  :: info
-  logical, intent(in), optional        :: append
-  integer(psb_ipk_), intent(in), optional        :: iren(:)
-  integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  class(psb_s_coo_sparse_mat), intent(in)       :: a
+  integer(psb_ipk_), intent(in)                 :: imin,imax
+  integer(psb_ipk_), intent(out)                :: nz
+  integer(psb_ipk_), allocatable, intent(inout) :: ia(:), ja(:)
+  integer(psb_ipk_),intent(out)                 :: info
+  logical, intent(in), optional                 :: append
+  integer(psb_ipk_), intent(in), optional       :: iren(:)
+  integer(psb_ipk_), intent(in), optional       :: jmin,jmax, nzin
+  logical, intent(in), optional                 :: rscale,cscale
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i

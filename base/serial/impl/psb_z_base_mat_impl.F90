@@ -580,6 +580,37 @@ subroutine psb_z_base_clone(a,b,info)
     
 end subroutine psb_z_base_clone
 
+subroutine psb_z_base_add_unit_diag(a)
+  use psb_z_base_mat_mod, psb_protect_name => psb_z_base_add_unit_diag
+  use psb_error_mod
+  implicit none 
+  class(psb_z_base_sparse_mat), intent(inout) :: a
+  type(psb_z_coo_sparse_mat) :: tmp
+  
+  integer(psb_ipk_) :: i, j, m, n, nz, mnm, info 
+
+  if (a%is_unit()) then 
+    call a%mv_to_coo(tmp,info) 
+    if (info /= 0) return
+    m = tmp%get_nrows()
+    n = tmp%get_ncols()
+    mnm = min(m,n) 
+    nz = tmp%get_nzeros()
+    call tmp%reallocate(nz+mnm)
+    do i=1, mnm
+      tmp%val(nz+i) = zone
+      tmp%ia(nz+i)  = i
+      tmp%ja(nz+i)  = i
+    end do
+    call tmp%set_nzeros(nz+mnm)
+    call tmp%set_unit(.false.)
+    call tmp%fix(info)
+    if (info /= 0) &
+         & call a%mv_from_coo(tmp,info)
+  end if
+
+end subroutine psb_z_base_add_unit_diag
+
 subroutine psb_z_base_mold(a,b,info) 
   use psb_z_base_mat_mod, psb_protect_name => psb_z_base_mold
   use psb_error_mod

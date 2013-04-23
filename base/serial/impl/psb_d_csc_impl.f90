@@ -304,7 +304,7 @@ subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
 
   endif
 
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, min(m,n)
       y(i) = y(i) + alpha*x(i)
     end do
@@ -590,7 +590,7 @@ subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans)
 
   endif
 
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, min(m,n)
       y(i,:) = y(i,:) + alpha*x(i,:)
     end do
@@ -1081,7 +1081,12 @@ function psb_d_csc_maxval(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  if (a%is_unit()) then 
+    res = done
+  else
+    res = dzero
+  end if
+
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
     nnz = min(nnz,size(a%val))
@@ -1112,7 +1117,11 @@ function psb_d_csc_csnmi(a) result(res)
   if (info /= psb_success_) then 
     return
   end if
-  acc(:) = dzero
+  if (a%is_unit()) then 
+    acc = done
+  else
+    acc = dzero
+  end if
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1  
       acc(a%ia(j)) = acc(a%ia(j)) + abs(a%val(j))
@@ -1149,7 +1158,11 @@ function psb_d_csc_csnm1(a) result(res)
   m = a%get_nrows()
   n = a%get_ncols()
   do j=1, n
-    acc = dzero 
+    if (a%is_unit()) then 
+      acc = done
+    else
+      acc = dzero
+    end if
     do k=a%icp(j),a%icp(j+1)-1
       acc = acc + abs(a%val(k))
     end do
@@ -1187,19 +1200,17 @@ subroutine psb_d_csc_colsum(d,a)
   end if
 
   do i = 1, a%get_ncols()
-    d(i) = dzero
+    if (a%is_unit()) then 
+      d(i) = done
+    else
+      d(i) = dzero
+    end if
+
     do j=a%icp(i),a%icp(i+1)-1  
       d(i) = d(i) + (a%val(j))
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, a%get_ncols()
-      d(i) = d(i) + done
-    end do
-  end if
-
-  return
   call psb_erractionrestore(err_act)
   return  
 
@@ -1242,13 +1253,18 @@ subroutine psb_d_csc_aclsum(d,a)
 
 
   do i = 1, a%get_ncols()
-    d(i) = dzero
+    if (a%is_unit()) then 
+      d(i) = done
+    else
+      d(i) = dzero
+    end if
+
     do j=a%icp(i),a%icp(i+1)-1  
       d(i) = d(i) + abs(a%val(j))
     end do
   end do
   
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     do i=1, a%get_ncols()
       d(i) = d(i) + done
     end do
@@ -1295,7 +1311,11 @@ subroutine psb_d_csc_rowsum(d,a)
     goto 9999
   end if
 
-  d   = dzero
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
 
   do i=1, m
     do j=a%icp(i),a%icp(i+1)-1
@@ -1304,13 +1324,6 @@ subroutine psb_d_csc_rowsum(d,a)
     end do
   end do
 
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, a%get_nrows()
-      d(i) = d(i) + done
-    end do
-  end if
-
-  return
   call psb_erractionrestore(err_act)
   return  
 
@@ -1352,7 +1365,12 @@ subroutine psb_d_csc_arwsum(d,a)
     goto 9999
   end if
 
-  d   = dzero
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
+
   do i=1, m
     do j=a%icp(i),a%icp(i+1)-1
       k = a%ia(j)
@@ -1360,13 +1378,6 @@ subroutine psb_d_csc_arwsum(d,a)
     end do
   end do
 
-  if (a%is_triangle().and.a%is_unit()) then 
-    do i=1, a%get_nrows()
-      d(i) = d(i) + done
-    end do
-  end if
-
-  return
   call psb_erractionrestore(err_act)
   return  
 
@@ -1408,7 +1419,7 @@ subroutine psb_d_csc_get_diag(a,d,info)
   end if
 
 
-  if (a%is_triangle().and.a%is_unit()) then 
+  if (a%is_unit()) then 
     d(1:mnm) = done 
   else
     do i=1, mnm
@@ -1445,13 +1456,14 @@ subroutine psb_d_csc_scal(d,a,info,side)
   use psb_string_mod
   implicit none 
   class(psb_d_csc_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: d(:)
-  integer(psb_ipk_), intent(out)            :: info
-  character, intent(in), optional :: side
+  real(psb_dpk_), intent(in)                 :: d(:)
+  integer(psb_ipk_), intent(out)             :: info
+  character, intent(in), optional            :: side
 
   integer(psb_ipk_) :: err_act,mnm, i, j, n
+  type(psb_d_coo_sparse_mat) :: tmp
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='scal'
+  character(len=20) :: name='scal'
   character :: side_
   logical   :: left 
   logical, parameter :: debug=.false.
@@ -1462,6 +1474,10 @@ subroutine psb_d_csc_scal(d,a,info,side)
   side_ = 'L'
   if (present(side)) then 
     side_ = psb_toupper(side)
+  end if
+
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
   end if
 
   left = (side_ == 'L')
@@ -1524,6 +1540,9 @@ subroutine psb_d_csc_scals(d,a,info)
   info  = psb_success_
   call psb_erractionsave(err_act)
 
+  if (a%is_unit()) then 
+    call a%add_unit_diag()
+  end if
 
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
