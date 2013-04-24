@@ -1666,7 +1666,7 @@ subroutine psb_s_csr_scal(d,a,info,side)
   call psb_erractionsave(err_act)
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   side_ = 'L'
@@ -1739,7 +1739,7 @@ subroutine psb_s_csr_scals(d,a,info)
   call psb_erractionsave(err_act)
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   do i=1,a%get_nzeros()

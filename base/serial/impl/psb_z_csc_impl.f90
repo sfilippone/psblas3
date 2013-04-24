@@ -1147,9 +1147,9 @@ function psb_z_csc_csnm1(a) result(res)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
-  logical   :: tra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name='z_csc_csnm1'
   logical, parameter :: debug=.false.
 
@@ -1157,8 +1157,9 @@ function psb_z_csc_csnm1(a) result(res)
   res = dzero 
   m = a%get_nrows()
   n = a%get_ncols()
+  is_unit = a%is_unit()
   do j=1, n
-    if (a%is_unit()) then 
+    if (is_unit) then 
       acc = done
     else
       acc = dzero
@@ -1183,9 +1184,9 @@ subroutine psb_z_csc_colsum(d,a)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_dpk_) :: acc
   complex(psb_dpk_), allocatable :: vt(:)
-  logical   :: tra
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act, info
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1198,9 +1199,9 @@ subroutine psb_z_csc_colsum(d,a)
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
-
+  is_unit = a%is_unit()
   do i = 1, a%get_ncols()
-    if (a%is_unit()) then 
+    if (is_unit) then 
       d(i) = zone
     else
       d(i) = zzero
@@ -1235,9 +1236,9 @@ subroutine psb_z_csc_aclsum(d,a)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
-  logical   :: tra
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act, info
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1251,9 +1252,9 @@ subroutine psb_z_csc_aclsum(d,a)
     goto 9999
   end if
 
-
+  is_unit = a%is_unit()
   do i = 1, a%get_ncols()
-    if (a%is_unit()) then 
+    if (is_unit) then 
       d(i) = done
     else
       d(i) = dzero
@@ -1477,7 +1478,7 @@ subroutine psb_z_csc_scal(d,a,info,side)
   end if
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   left = (side_ == 'L')
@@ -1541,7 +1542,7 @@ subroutine psb_z_csc_scals(d,a,info)
   call psb_erractionsave(err_act)
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   do i=1,a%get_nzeros()

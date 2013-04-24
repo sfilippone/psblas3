@@ -102,7 +102,7 @@ subroutine psb_d_coo_scal(d,a,info,side)
   call psb_erractionsave(err_act)
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   side_ = 'L'
@@ -172,7 +172,7 @@ subroutine psb_d_coo_scals(d,a,info)
   call psb_erractionsave(err_act)
 
   if (a%is_unit()) then 
-    call a%add_unit_diag()
+    call a%make_nonunit()
   end if
 
   do i=1,a%get_nzeros()
@@ -1691,15 +1691,16 @@ function psb_d_coo_csnmi(a) result(res)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
-  logical   :: tra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act
+  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name='d_coo_csnmi'
   logical, parameter :: debug=.false.
 
 
   res = dzero
   nnz = a%get_nzeros()
+  is_unit = a%is_unit()
   if (a%is_sorted()) then 
     i   = 1
     j   = i
@@ -1708,7 +1709,7 @@ function psb_d_coo_csnmi(a) result(res)
       do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
         j = j+1
       enddo
-      if (a%is_unit()) then 
+      if (is_unit) then 
         acc = done
       else
         acc = dzero
@@ -1723,7 +1724,7 @@ function psb_d_coo_csnmi(a) result(res)
     m = a%get_nrows()
     allocate(vt(m),stat=info)
     if (info /= 0) return
-    if (a%is_unit()) then 
+    if (is_unit) then 
       vt = done
     else
       vt = dzero

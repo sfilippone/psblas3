@@ -580,8 +580,8 @@ subroutine psb_c_base_clone(a,b,info)
     
 end subroutine psb_c_base_clone
 
-subroutine psb_c_base_add_unit_diag(a)
-  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_add_unit_diag
+subroutine psb_c_base_make_nonunit(a)
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_make_nonunit
   use psb_error_mod
   implicit none 
   class(psb_c_base_sparse_mat), intent(inout) :: a
@@ -609,7 +609,7 @@ subroutine psb_c_base_add_unit_diag(a)
          & call a%mv_from_coo(tmp,info)
   end if
 
-end subroutine psb_c_base_add_unit_diag
+end subroutine psb_c_base_make_nonunit
 
 subroutine psb_c_base_mold(a,b,info) 
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_mold
