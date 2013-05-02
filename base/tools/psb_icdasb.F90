@@ -195,7 +195,7 @@ subroutine psb_icdasb(desc,info,ext_hv)
     goto 9999
   end if
 
-  !We've to set the derivate datatypes
+  !We've got to set the derivate datatypes
   !Send/Gather
   pnti   = 1
   snd_pt = 1

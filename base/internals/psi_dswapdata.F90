@@ -1075,10 +1075,12 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
   end if
   
   if ((data_ == psb_comm_halo_) .and. (beta == dzero)) then 
+    write(0,*) me,' Going for ISWAPDATA with cached index types'
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,&
          & desc_a%sendtypes(:,psb_rdpkidx_),desc_a%recvtypes(:,psb_rdpkidx_),&
          & work,info)
   else
+    write(0,*) me,' Going for default ISWAPDATA'
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,&
          & work,info)
   end if
