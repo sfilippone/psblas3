@@ -1560,33 +1560,33 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
 
   logical, parameter :: usersend=.false.
 
-    interface 
-      function receive(v,recvtype,procSender,tag,communicator,handle) &
-           & result(res) bind(c,name='receiveRoutine')
-        use iso_c_binding   
-        !real(c_double)  :: v(*)
-        type(c_ptr), value	:: v
-        integer(c_int),value :: recvtype
-        integer(c_int),value :: communicator
-        integer(c_int),value :: procSender
-        integer(c_int),value :: tag
-        integer(c_int) :: handle
-        integer(c_int)  :: res
-      end function receive
-    end interface
-    interface 
-      function send(v,sendtype,procToSend,tag,communicator) &
-           & result(res) bind(c,name='sendRoutine')
-        use iso_c_binding   
-        !real(c_double)  :: v(*)
-        type(c_ptr), value	:: v
-        integer(c_int),value :: sendtype
-        integer(c_int),value :: communicator
-        integer(c_int),value :: procToSend
-        integer(c_int),value :: tag
-        integer(c_int)  :: res
-      end function send
-    end interface
+  interface 
+    function receive(v,recvtype,procSender,tag,communicator,handle) &
+         & result(res) bind(c,name='receiveRoutine')
+      use iso_c_binding   
+      !real(c_double)  :: v(*)
+      type(c_ptr), value	:: v
+      integer(c_int),value :: recvtype
+      integer(c_int),value :: communicator
+      integer(c_int),value :: procSender
+      integer(c_int),value :: tag
+      integer(c_int) :: handle
+      integer(c_int)  :: res
+    end function receive
+  end interface
+  interface 
+    function send(v,sendtype,procToSend,tag,communicator) &
+         & result(res) bind(c,name='sendRoutine')
+      use iso_c_binding   
+      !real(c_double)  :: v(*)
+      type(c_ptr), value	:: v
+      integer(c_int),value :: sendtype
+      integer(c_int),value :: communicator
+      integer(c_int),value :: procToSend
+      integer(c_int),value :: tag
+      integer(c_int)  :: res
+    end function send
+  end interface
 
   real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 #ifdef HAVE_VOLATILE
@@ -1774,7 +1774,7 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
     end if
 
 
-    if (beta/=0 .and. do_send) then
+    if (do_send) then
 
       ! Pack send buffers
       pnti   = 1
@@ -1880,19 +1880,14 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
 
         if ((nesd>0).and.(proc_to_comm /= me)) then
 
-          if(beta==0) then
-            !call send_routine(y%v,sendtypes(i),prcid(i),p2ptag,icomm, iret)
-            iret = send(y%get_clocv(),sendtypes(i),prcid(i),p2ptag,icomm)
+          if (usersend) then 
+            call mpi_rsend(sndbuf(snd_pt),nesd,&
+                 & psb_mpi_r_dpk_,prcid(i),&
+                 & p2ptag,icomm,iret)
           else
-            if (usersend) then 
-              call mpi_rsend(sndbuf(snd_pt),nesd,&
-                   & psb_mpi_r_dpk_,prcid(i),&
-                   & p2ptag,icomm,iret)
-            else
-              call mpi_send(sndbuf(snd_pt),nesd,&
-                   & psb_mpi_r_dpk_,prcid(i),&
-                   & p2ptag,icomm,iret)
-            end if
+            call mpi_send(sndbuf(snd_pt),nesd,&
+                 & psb_mpi_r_dpk_,prcid(i),&
+                 & p2ptag,icomm,iret)
           end if
 
           if(iret /= mpi_success) then
@@ -1976,17 +1971,15 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
       snd_pt = 1
       rcv_pt = 1
       do i=1, totxch
-        if(beta/=0) then
-          proc_to_comm = idx(pnti+psb_proc_id_)
-          nerv = idx(pnti+psb_n_elem_recv_)
-          nesd = idx(pnti+nerv+psb_n_elem_send_)
-          idx_pt = 1+pnti+psb_n_elem_recv_
-          call y%sct(nerv,idx(idx_pt:idx_pt+nerv-1),&
-               & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta)
-          rcv_pt = rcv_pt + nerv
-          snd_pt = snd_pt + nesd
-          pnti   = pnti + nerv + nesd + 3
-        end if
+        proc_to_comm = idx(pnti+psb_proc_id_)
+        nerv = idx(pnti+psb_n_elem_recv_)
+        nesd = idx(pnti+nerv+psb_n_elem_send_)
+        idx_pt = 1+pnti+psb_n_elem_recv_
+        call y%sct(nerv,idx(idx_pt:idx_pt+nerv-1),&
+             & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta)
+        rcv_pt = rcv_pt + nerv
+        snd_pt = snd_pt + nesd
+        pnti   = pnti + nerv + nesd + 3
       end do
 
     end if
@@ -2018,72 +2011,72 @@ subroutine psi_dswapidx_vect_mptx(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,to
   end if
   return
 
-!contains
+  !contains
 
- ! subroutine receive_routine(v,recvtype,procSender,tag,communicator, rvhd,info)
- !   use iso_c_binding
- !   real(c_double), intent(in), target  :: v(*)
- !   integer, intent(in) :: recvtype
- !   integer :: communicator
- !   integer :: procSender,tag,rvhd
- !   integer, intent(out) :: info
- !   type(c_ptr)     :: cptr
- !   integer :: isz
- !   interface 
- !     function receive(v,recvtype,procSender,tag,communicator,handle) &
- !          & result(res) bind(c,name='receiveRoutine')
- !       use iso_c_binding   
- !       !real(c_double)  :: v(*)
- !       type(c_ptr), value	:: v
- !       integer(c_int),value :: recvtype
- !       integer(c_int),value :: communicator
- !       integer(c_int),value :: procSender
- !       integer(c_int),value :: tag
- !       integer(c_int) :: handle
- !       integer(c_int)  :: res
- !     end function receive
- !   end interface
+  ! subroutine receive_routine(v,recvtype,procSender,tag,communicator, rvhd,info)
+  !   use iso_c_binding
+  !   real(c_double), intent(in), target  :: v(*)
+  !   integer, intent(in) :: recvtype
+  !   integer :: communicator
+  !   integer :: procSender,tag,rvhd
+  !   integer, intent(out) :: info
+  !   type(c_ptr)     :: cptr
+  !   integer :: isz
+  !   interface 
+  !     function receive(v,recvtype,procSender,tag,communicator,handle) &
+  !          & result(res) bind(c,name='receiveRoutine')
+  !       use iso_c_binding   
+  !       !real(c_double)  :: v(*)
+  !       type(c_ptr), value	:: v
+  !       integer(c_int),value :: recvtype
+  !       integer(c_int),value :: communicator
+  !       integer(c_int),value :: procSender
+  !       integer(c_int),value :: tag
+  !       integer(c_int) :: handle
+  !       integer(c_int)  :: res
+  !     end function receive
+  !   end interface
 
- !   cptr = c_loc(v)
+  !   cptr = c_loc(v)
 
-!    info = receive(cptr,recvtype,procSender,tag,communicator,rvhd)
+  !    info = receive(cptr,recvtype,procSender,tag,communicator,rvhd)
 !!!$    call mpi_type_size(recvtype,isz,info)
 !!!$    WRITE(0,*) 'Recving from ',procSender,tag,recvtype,isz,v(1)
 !!!$    call mpi_irecv(v,1,recvtype,procSender,tag,communicator,rvhd,info)
 
-!  end subroutine receive_routine
+  !  end subroutine receive_routine
 
-!  subroutine send_routine(v,sendtype,procToSend,tag,communicator,info)
-!    use iso_c_binding
-!    real(c_double), intent(in), target  :: v(*)
-!    integer, intent(in) :: sendtype
-!    integer :: communicator
-!    integer :: procToSend,tag
-!    integer, intent(out) :: info
-!    type(c_ptr)     :: cptr
-!    integer :: isz
+  !  subroutine send_routine(v,sendtype,procToSend,tag,communicator,info)
+  !    use iso_c_binding
+  !    real(c_double), intent(in), target  :: v(*)
+  !    integer, intent(in) :: sendtype
+  !    integer :: communicator
+  !    integer :: procToSend,tag
+  !    integer, intent(out) :: info
+  !    type(c_ptr)     :: cptr
+  !    integer :: isz
 
-!    interface 
-!      function send(v,sendtype,procToSend,tag,communicator) &
-!           & result(res) bind(c,name='sendRoutine')
-!        use iso_c_binding   
-!        !real(c_double)  :: v(*)
-!        type(c_ptr), value	:: v
-!        integer(c_int),value :: sendtype
-!        integer(c_int),value :: communicator
-!        integer(c_int),value :: procToSend
-!        integer(c_int),value :: tag
-!        integer(c_int)  :: res
-!      end function send
-!    end interface
+  !    interface 
+  !      function send(v,sendtype,procToSend,tag,communicator) &
+  !           & result(res) bind(c,name='sendRoutine')
+  !        use iso_c_binding   
+  !        !real(c_double)  :: v(*)
+  !        type(c_ptr), value	:: v
+  !        integer(c_int),value :: sendtype
+  !        integer(c_int),value :: communicator
+  !        integer(c_int),value :: procToSend
+  !        integer(c_int),value :: tag
+  !        integer(c_int)  :: res
+  !      end function send
+  !    end interface
 
-!    cptr = c_loc(v)
+  !    cptr = c_loc(v)
 
-!    info = send(cptr,sendtype,procToSend,tag,communicator)
+  !    info = send(cptr,sendtype,procToSend,tag,communicator)
 !!!$    call mpi_type_size(sendtype,isz,info)
 !!!$    WRITE(0,*) 'Sending to ',procToSend,tag,sendtype,isz,v(1)
 !!!$    call mpi_send(v,1,sendtype,procToSend,tag,communicator,info)
-!  end subroutine send_routine
+  !  end subroutine send_routine
 
 end subroutine psi_dswapidx_vect_mptx
 
