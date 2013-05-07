@@ -1,3 +1,34 @@
+!!$ 
+!!$              Parallel Sparse BLAS  version 3.1
+!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
 
 ! == ===================================
 !
@@ -13,7 +44,8 @@
 ! == ===================================
 
 subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_string_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csmv
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -25,8 +57,9 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
-  logical   :: tra
+  logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_csmv'
   logical, parameter :: debug=.false.
 
@@ -46,9 +79,10 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -57,21 +91,23 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x,1)<n) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = n; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
 
   call psb_d_cxx_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
        & a%is_triangle(),a%is_unit(),&
-       & x,beta,y,tra) 
+       & x,beta,y,tra,ctra) 
 
   call psb_erractionrestore(err_act)
   return
@@ -87,11 +123,11 @@ subroutine psb_d_cxx_csmv(alpha,a,x,beta,y,info,trans)
 
 contains
   subroutine psb_d_cxx_csmv_inner(m,n,alpha,irp,ja,val,is_triangle,is_unit,&
-       & x,beta,y,tra) 
+       & x,beta,y,tra,ctra) 
     integer(psb_ipk_), intent(in)             :: m,n,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(*),val(*)
     real(psb_dpk_), intent(inout)   :: y(*)
-    logical, intent(in)             :: is_triangle,is_unit,tra
+    logical, intent(in)             :: is_triangle,is_unit,tra, ctra
 
 
     integer(psb_ipk_) :: i,j,k, ir, jc
@@ -111,7 +147,7 @@ contains
     end if
 
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (beta == dzero) then 
 
@@ -129,9 +165,9 @@ contains
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = -acc
           end do
 
         else 
@@ -161,11 +197,11 @@ contains
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = y(i) -acc
           end do
 
         else 
@@ -184,21 +220,21 @@ contains
 
         if (alpha == done) then 
           do i=1,m 
-            acc  = -y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = acc
+            y(i) = -y(i) + acc
           end do
 
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = y(i)
+            acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc - val(j) * x(ja(j))          
+              acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) =  acc
+            y(i) = -y(i) -acc
           end do
 
         else 
@@ -295,9 +331,56 @@ contains
 
       end if
 
+    else if (ctra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i) = -y(i) 
+        end do
+      else
+        do i=1, m
+          y(i) = beta*y(i) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) +  (val(j))*x(i)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) -  (val(j))*x(i)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) + alpha*(val(j))*x(i)
+          end do
+        enddo
+
+      end if
+
     endif
 
-    if (is_triangle.and.is_unit) then 
+    if (is_unit) then 
       do i=1, min(m,n)
         y(i) = y(i) + alpha*x(i)
       end do
@@ -310,7 +393,8 @@ contains
 end subroutine psb_d_cxx_csmv
 
 subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_string_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csmm
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -322,8 +406,9 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_), allocatable  :: acc(:)
-  logical   :: tra
+  logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_csmm'
   logical, parameter :: debug=.false.
 
@@ -341,9 +426,10 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
-  if (tra) then 
+  if (tra.or.ctra) then 
     m = a%get_ncols()
     n = a%get_nrows()
   else
@@ -352,14 +438,16 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x,1)<n) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = n; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -373,8 +461,8 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
   end if
   
   call  psb_d_cxx_csmm_inner(m,n,nc,alpha,a%irp,a%ja,a%val, &
-       & a%is_triangle(),a%is_unit(),x,size(x,1), &
-       & beta,y,size(y,1),tra,acc) 
+       & a%is_triangle(),a%is_unit(),x,size(x,1,kind=psb_ipk_), &
+       & beta,y,size(y,1,kind=psb_ipk_),tra,ctra,acc) 
 
 
   call psb_erractionrestore(err_act)
@@ -390,11 +478,11 @@ subroutine psb_d_cxx_csmm(alpha,a,x,beta,y,info,trans)
 
 contains
   subroutine psb_d_cxx_csmm_inner(m,n,nc,alpha,irp,ja,val,&
-       & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,acc) 
+       & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,ctra,acc) 
     integer(psb_ipk_), intent(in)             :: m,n,ldx,ldy,nc,irp(*),ja(*)
     real(psb_dpk_), intent(in)      :: alpha, beta, x(ldx,*),val(*)
     real(psb_dpk_), intent(inout)   :: y(ldy,*)
-    logical, intent(in)             :: is_triangle,is_unit,tra
+    logical, intent(in)             :: is_triangle,is_unit,tra,ctra
 
     real(psb_dpk_), intent(inout)   :: acc(*)
     integer(psb_ipk_) :: i,j,k, ir, jc
@@ -413,8 +501,7 @@ contains
       return
     end if
 
-    if (.not.tra) then 
-
+    if ((.not.tra).and.(.not.ctra)) then 
       if (beta == dzero) then 
 
         if (alpha == done) then 
@@ -431,9 +518,9 @@ contains
           do i=1,m 
             acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
-              acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
+              acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = -acc(1:nc)
           end do
 
         else 
@@ -453,21 +540,21 @@ contains
 
         if (alpha == done) then 
           do i=1,m 
-            acc(1:nc)  = y(i,1:nc)
+            acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
               acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = y(i,1:nc) + acc(1:nc)
           end do
 
         else if (alpha == -done) then 
 
-          do i=1,m
-            acc(1:nc)  = y(i,1:nc)
+          do i=1,m 
+            acc(1:nc)  = dzero
             do j=irp(i), irp(i+1)-1
-              acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
+              acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
             enddo
-            y(i,1:nc) = acc(1:nc)
+            y(i,1:nc) = y(i,1:nc) -acc(1:nc)
           end do
 
         else 
@@ -597,9 +684,56 @@ contains
 
       end if
 
+    else if (ctra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i,1:nc) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i,1:nc) = -y(i,1:nc) 
+        end do
+      else
+        do i=1, m
+          y(i,1:nc) = beta*y(i,1:nc) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) +  (val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) -  (val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir,1:nc) = y(ir,1:nc) + alpha*(val(j))*x(i,1:nc)
+          end do
+        enddo
+
+      end if
+
     endif
 
-    if (is_triangle.and.is_unit) then 
+    if (is_unit) then 
       do i=1, min(m,n)
         y(i,1:nc) = y(i,1:nc) + alpha*x(i,1:nc)
       end do
@@ -611,7 +745,8 @@ end subroutine psb_d_cxx_csmm
 
 
 subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_string_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_cssv
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -624,8 +759,9 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:)
-  logical   :: tra
+  logical   :: tra,ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_cssv'
   logical, parameter :: debug=.false.
 
@@ -642,7 +778,8 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -652,14 +789,16 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (size(x)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y)<m) then 
-    info = 36
-    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    info = psb_err_input_asize_small_i_ 
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   
@@ -678,7 +817,7 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
 
   if (beta == dzero) then 
 
-    call inner_cxxsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_cxxsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,y) 
     if (alpha == done) then 
       ! do nothing
@@ -697,7 +836,7 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
       return
     end if
 
-    call inner_cxxsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+    call inner_cxxsv(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,tmp) 
 
     call psb_geaxpby(m,alpha,tmp,beta,y,info)
@@ -718,18 +857,18 @@ subroutine psb_d_cxx_cssv(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_cxxsv(tra,lower,unit,n,irp,ja,val,x,y) 
+  subroutine inner_cxxsv(tra,ctra,lower,unit,n,irp,ja,val,x,y) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit  
-    integer(psb_ipk_), intent(in)                 :: irp(*), ja(*),n
-    real(psb_dpk_), intent(in)          :: val(*)
-    real(psb_dpk_), intent(in)          :: x(*)
-    real(psb_dpk_), intent(out)         :: y(*)
+    logical, intent(in)            :: tra,ctra,lower,unit  
+    integer(psb_ipk_), intent(in)            :: irp(*), ja(*),n
+    real(psb_dpk_), intent(in)  :: val(*)
+    real(psb_dpk_), intent(in)  :: x(*)
+    real(psb_dpk_), intent(out) :: y(*)
 
     integer(psb_ipk_) :: i,j,k,m, ir, jc
     real(psb_dpk_) :: acc
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
@@ -818,6 +957,54 @@ contains
         end if
 
       end if
+
+    else if (ctra) then 
+
+      do i=1, n
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=n, 1, -1
+            acc = y(i) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(irp(i+1)-1)
+            acc  = y(i) 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, n
+            acc  = y(i) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            y(i) = y(i)/val(irp(i))
+            acc  = y(i) 
+            do j=irp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - (val(j))*acc 
+            end do
+          end do
+        end if
+
+      end if
     end if
   end subroutine inner_cxxsv
 
@@ -826,7 +1013,8 @@ end subroutine psb_d_cxx_cssv
 
 
 subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_string_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_cssm
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -839,8 +1027,9 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: tmp(:,:)
-  logical   :: tra
+  logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_cssm'
   logical, parameter :: debug=.false.
 
@@ -859,7 +1048,8 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
 
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
@@ -885,8 +1075,8 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_cxxsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
-         & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
+    call inner_cxxsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+         & a%irp,a%ja,a%val,x,size(x,1,kind=psb_ipk_),y,size(y,1,kind=psb_ipk_),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*y(i,1:nc)
     end do
@@ -898,8 +1088,8 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_cxxsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
-         & a%irp,a%ja,a%val,x,size(x,1),tmp,size(tmp,1),info) 
+    call inner_cxxsm(tra,ctra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+         & a%irp,a%ja,a%val,x,size(x,1,kind=psb_ipk_),tmp,size(tmp,1,kind=psb_ipk_),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
@@ -927,14 +1117,14 @@ subroutine psb_d_cxx_cssm(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_cxxsm(tra,lower,unit,nr,nc,&
+  subroutine inner_cxxsm(tra,ctra,lower,unit,nr,nc,&
        & irp,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit
-    integer(psb_ipk_), intent(in)                 :: nr,nc,ldx,ldy,irp(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
-    real(psb_dpk_), intent(out)         :: y(ldy,*)
-    integer(psb_ipk_), intent(out)                :: info
+    logical, intent(in)              :: tra,ctra,lower,unit
+    integer(psb_ipk_), intent(in)              :: nr,nc,ldx,ldy,irp(*),ja(*)
+    real(psb_dpk_), intent(in)    :: val(*), x(ldx,*)
+    real(psb_dpk_), intent(out)   :: y(ldy,*)
+    integer(psb_ipk_), intent(out)             :: info
     integer(psb_ipk_) :: i,j,k,m, ir, jc
     real(psb_dpk_), allocatable  :: acc(:)
 
@@ -946,8 +1136,7 @@ contains
     end if
 
 
-    if (.not.tra) then 
-
+    if ((.not.tra).and.(.not.ctra)) then 
       if (lower) then 
         if (unit) then 
           do i=1, nr
@@ -1035,13 +1224,82 @@ contains
         end if
 
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          do i=nr, 1, -1
+            acc = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=nr, 1, -1
+            y(i,1:nc) = y(i,1:nc)/(val(irp(i+1)-1))
+            acc  = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        end if
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, nr
+            acc  = y(i,1:nc) 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=1, nr
+            y(i,1:nc) = y(i,1:nc)/(val(irp(i)))
+            acc    = y(i,1:nc) 
+            do j=irp(i)+1, irp(i+1)-1
+              jc      = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - (val(j))*acc 
+            end do
+          end do
+        end if
+
+      end if
     end if
   end subroutine inner_cxxsm
 
 end subroutine psb_d_cxx_cssm
 
+function psb_d_cxx_maxval(a) result(res)
+  use psb_error_mod
+  use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_maxval
+  implicit none 
+  class(psb_d_cxx_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='d_cxx_maxval'
+  logical, parameter :: debug=.false.
+
+
+  res = dzero
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_d_cxx_maxval
+
 function psb_d_cxx_csnmi(a) result(res)
-  use psb_base_mod
+  use psb_error_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csnmi
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -1051,11 +1309,12 @@ function psb_d_cxx_csnmi(a) result(res)
   real(psb_dpk_) :: acc
   logical   :: tra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csnmi'
   logical, parameter :: debug=.false.
 
 
-  res = dzero 
+  res = dzero
  
   do i = 1, a%get_nrows()
     acc = dzero
@@ -1067,9 +1326,9 @@ function psb_d_cxx_csnmi(a) result(res)
 
 end function psb_d_cxx_csnmi
 
-
 function psb_d_cxx_csnm1(a) result(res)
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csnm1
 
   implicit none 
@@ -1081,11 +1340,12 @@ function psb_d_cxx_csnm1(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_csnm1'
   logical, parameter :: debug=.false.
 
 
-  res = -done 
+  res = dzero
   nnz = a%get_nzeros()
   m = a%get_nrows()
   n = a%get_ncols()
@@ -1095,7 +1355,7 @@ function psb_d_cxx_csnm1(a) result(res)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      vt(k) = vt(k) + abs(a%val(k))
+      vt(k) = vt(k) + abs(a%val(j))
     end do
   end do
   res = maxval(vt(1:n))
@@ -1106,7 +1366,8 @@ function psb_d_cxx_csnm1(a) result(res)
 end function psb_d_cxx_csnm1
 
 subroutine psb_d_cxx_rowsum(d,a) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_rowsum
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)             :: d(:)
@@ -1115,7 +1376,8 @@ subroutine psb_d_cxx_rowsum(d,a)
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1124,10 +1386,8 @@ subroutine psb_d_cxx_rowsum(d,a)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = m
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1137,6 +1397,12 @@ subroutine psb_d_cxx_rowsum(d,a)
       d(i) = d(i) + (a%val(j))
     end do
   end do
+  
+  if (a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1154,7 +1420,8 @@ subroutine psb_d_cxx_rowsum(d,a)
 end subroutine psb_d_cxx_rowsum
 
 subroutine psb_d_cxx_arwsum(d,a) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_arwsum
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1163,7 +1430,8 @@ subroutine psb_d_cxx_arwsum(d,a)
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1172,10 +1440,8 @@ subroutine psb_d_cxx_arwsum(d,a)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = m
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1186,6 +1452,12 @@ subroutine psb_d_cxx_arwsum(d,a)
       d(i) = d(i) + abs(a%val(j))
     end do
   end do
+  
+  if (a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + done
+    end do
+  end if
 
   call psb_erractionrestore(err_act)
   return  
@@ -1202,7 +1474,8 @@ subroutine psb_d_cxx_arwsum(d,a)
 end subroutine psb_d_cxx_arwsum
 
 subroutine psb_d_cxx_colsum(d,a) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_colsum
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1211,7 +1484,8 @@ subroutine psb_d_cxx_colsum(d,a)
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1221,10 +1495,8 @@ subroutine psb_d_cxx_colsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = n
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1233,9 +1505,15 @@ subroutine psb_d_cxx_colsum(d,a)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      d(k) = d(k) + (a%val(k))
+      d(k) = d(k) + (a%val(j))
     end do
   end do
+  
+  if (a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1253,7 +1531,8 @@ subroutine psb_d_cxx_colsum(d,a)
 end subroutine psb_d_cxx_colsum
 
 subroutine psb_d_cxx_aclsum(d,a) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_aclsum
   class(psb_d_cxx_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(out)              :: d(:)
@@ -1262,7 +1541,8 @@ subroutine psb_d_cxx_aclsum(d,a)
   real(psb_dpk_) :: acc
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
-  integer(psb_ipk_) :: err_act, info, int_err(5)
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1272,10 +1552,8 @@ subroutine psb_d_cxx_aclsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    int_err(1) = 1
-    int_err(2) = size(d)
-    int_err(3) = n
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1) = 1; ierr(2) = size(d); ierr(3) = n
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -1284,9 +1562,15 @@ subroutine psb_d_cxx_aclsum(d,a)
   do i=1, m
     do j=a%irp(i),a%irp(i+1)-1
       k = a%ja(j)
-      d(k) = d(k) + abs(a%val(k))
+      d(k) = d(k) + abs(a%val(j))
     end do
   end do
+  
+  if (a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + done
+    end do
+  end if
 
   return
   call psb_erractionrestore(err_act)
@@ -1303,9 +1587,9 @@ subroutine psb_d_cxx_aclsum(d,a)
 
 end subroutine psb_d_cxx_aclsum
 
-
 subroutine psb_d_cxx_get_diag(a,d,info) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_get_diag
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -1313,6 +1597,7 @@ subroutine psb_d_cxx_get_diag(a,d,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act, mnm, i, j, k
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -1322,22 +1607,29 @@ subroutine psb_d_cxx_get_diag(a,d,info)
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
     info=psb_err_input_asize_invalid_i_
-    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    ierr(1) = 2; ierr(2) = size(d); 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
 
-  do i=1, mnm
-    do k=a%irp(i),a%irp(i+1)-1
-      j=a%ja(k)
-      if ((j == i) .and.(j <= mnm )) then 
-        d(i) = a%val(k)
-      endif
-    enddo
-  end do
+  if (a%is_unit()) then 
+    d(1:mnm) = done
+  else
+    do i=1, mnm
+      d(i) = dzero
+      do k=a%irp(i),a%irp(i+1)-1
+        j=a%ja(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  end if
   do i=mnm+1,size(d) 
     d(i) = dzero
   end do
+
   call psb_erractionrestore(err_act)
   return
 
@@ -1352,33 +1644,68 @@ subroutine psb_d_cxx_get_diag(a,d,info)
 end subroutine psb_d_cxx_get_diag
 
 
-subroutine psb_d_cxx_scal(d,a,info) 
-  use psb_base_mod
+subroutine psb_d_cxx_scal(d,a,info,side) 
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_scal
+  use psb_string_mod
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
   integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
+  character :: side_
+  logical   :: left 
   logical, parameter :: debug=.false.
 
   info  = psb_success_
   call psb_erractionsave(err_act)
 
-  m = a%get_nrows()
-  if (size(d) < m) then 
-    info=psb_err_input_asize_invalid_i_
-    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
-    goto 9999
+  if (a%is_unit()) then 
+    call a%make_nonunit()
   end if
 
-  do i=1, m 
-    do j = a%irp(i), a%irp(i+1) -1 
-      a%val(j) = a%val(j) * d(i)
-    end do
-  enddo
+  side_ = 'L'
+  if (present(side)) then 
+    side_ = psb_toupper(side)
+  end if
+
+  left = (side_ == 'L')
+
+  if (left) then 
+    m = a%get_nrows()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1, m 
+      do j = a%irp(i), a%irp(i+1) -1 
+        a%val(j) = a%val(j) * d(i)
+      end do
+    enddo
+  else
+    m = a%get_ncols()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1,a%get_nzeros()
+      j        = a%ja(i)
+      a%val(i) = a%val(i) * d(j)
+    enddo
+  end if
+
+
 
   call psb_erractionrestore(err_act)
   return
@@ -1395,7 +1722,8 @@ end subroutine psb_d_cxx_scal
 
 
 subroutine psb_d_cxx_scals(d,a,info) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_scals
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
@@ -1403,12 +1731,16 @@ subroutine psb_d_cxx_scals(d,a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
   info  = psb_success_
   call psb_erractionsave(err_act)
 
+  if (a%is_unit()) then 
+    call a%make_nonunit()
+  end if
 
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
@@ -1444,12 +1776,14 @@ end subroutine psb_d_cxx_scals
 
 
 subroutine  psb_d_cxx_reallocate_nz(nz,a) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_realloc_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_reallocate_nz
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1479,21 +1813,27 @@ subroutine  psb_d_cxx_reallocate_nz(nz,a)
 end subroutine psb_d_cxx_reallocate_nz
 
 subroutine psb_d_cxx_mold(a,b,info) 
-  use psb_base_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_mold
+  use psb_error_mod
   implicit none 
-  class(psb_d_cxx_sparse_mat), intent(in)  :: a
-  class(psb_d_base_sparse_mat), intent(out), allocatable  :: b
+  class(psb_d_cxx_sparse_mat), intent(in)                  :: a
+  class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='reallocate_nz'
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='cxx_mold'
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
   
-  allocate(psb_d_cxx_sparse_mat :: b, stat=info)
+  info = 0 
+  if (allocated(b)) then 
+    call b%free()
+    deallocate(b,stat=info)
+  end if
+  if (info == 0) allocate(psb_d_cxx_sparse_mat :: b, stat=info)
 
-  if (info /= psb_success_) then 
+  if (info /= 0) then 
     info = psb_err_alloc_dealloc_ 
     call psb_errpush(info, name)
     goto 9999
@@ -1508,13 +1848,15 @@ subroutine psb_d_cxx_mold(a,b,info)
 end subroutine psb_d_cxx_mold
 
 subroutine  psb_d_cxx_allocate_mnnz(m,n,a,nz) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_realloc_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_allocate_mnnz
   implicit none 
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(in), optional :: nz
   integer(psb_ipk_) :: err_act, info, nz_
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -1522,12 +1864,14 @@ subroutine  psb_d_cxx_allocate_mnnz(m,n,a,nz)
   info = psb_success_
   if (m < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
+    ierr(1) = ione; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
   if (n < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
+    ierr(1) = 2; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
   if (present(nz)) then 
@@ -1537,7 +1881,8 @@ subroutine  psb_d_cxx_allocate_mnnz(m,n,a,nz)
   end if
   if (nz_ < 0) then 
     info = psb_err_iarg_neg_
-    call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
+    ierr(1) = 3; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
 
@@ -1571,7 +1916,11 @@ end subroutine psb_d_cxx_allocate_mnnz
 
 subroutine psb_d_cxx_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_base_mod
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csgetptn
   implicit none
 
@@ -1587,6 +1936,7 @@ subroutine psb_d_cxx_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -1667,6 +2017,10 @@ contains
   subroutine cxx_getptn(imin,imax,jmin,jmax,a,nz,ia,ja,nzin,append,info,&
        & iren)
 
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
     implicit none
 
     class(psb_d_cxx_sparse_mat), intent(in)    :: a
@@ -1738,7 +2092,11 @@ end subroutine psb_d_cxx_csgetptn
 
 subroutine psb_d_cxx_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
-  use psb_base_mod
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csgetrow
   implicit none
 
@@ -1755,6 +2113,7 @@ subroutine psb_d_cxx_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -1836,6 +2195,10 @@ contains
   subroutine cxx_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
        & iren)
 
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
     implicit none
 
     class(psb_d_cxx_sparse_mat), intent(in)    :: a
@@ -1910,7 +2273,9 @@ end subroutine psb_d_cxx_csgetrow
 
 subroutine psb_d_cxx_csgetblk(imin,imax,a,b,info,&
      & jmin,jmax,iren,append,rscale,cscale)
-  use psb_base_mod
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csgetblk
   implicit none
 
@@ -1923,6 +2288,7 @@ subroutine psb_d_cxx_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
   integer(psb_ipk_) :: err_act, nzin, nzout
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical :: append_
   logical, parameter :: debug=.false.
@@ -1968,7 +2334,8 @@ end subroutine psb_d_cxx_csgetblk
 
 
 subroutine psb_d_cxx_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_base_mod
+  use psb_error_mod
+  use psb_realloc_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csput
   implicit none 
 
@@ -1980,9 +2347,10 @@ subroutine psb_d_cxx_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_csput'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, int_err(5)
+  integer(psb_ipk_) :: nza, i,j,k, nzl, isza
 
 
   call psb_erractionsave(err_act)
@@ -1990,27 +2358,27 @@ subroutine psb_d_cxx_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (nz <= 0) then 
     info = psb_err_iarg_neg_
-    int_err(1)=1
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=1
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(ia) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=2
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=2
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(ja) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=3
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=3
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(val) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    int_err(1)=4
-    call psb_errpush(info,name,i_err=int_err)
+    ierr(1)=4
+    call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
@@ -2058,6 +2426,10 @@ contains
   subroutine psb_d_cxx_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info,gtl)
 
+    use psb_const_mod
+    use psb_realloc_mod
+    use psb_string_mod
+    use psb_sort_mod
     implicit none 
 
     class(psb_d_cxx_sparse_mat), intent(inout) :: a
@@ -2250,7 +2622,7 @@ end subroutine psb_d_cxx_csput
 
 
 subroutine psb_d_cxx_reinit(a,clear)
-  use psb_base_mod
+  use psb_error_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_reinit
   implicit none 
 
@@ -2258,6 +2630,7 @@ subroutine psb_d_cxx_reinit(a,clear)
   logical, intent(in), optional :: clear
 
   integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='reinit'
   logical  :: clear_
   logical, parameter :: debug=.false.
@@ -2299,11 +2672,13 @@ subroutine psb_d_cxx_reinit(a,clear)
 end subroutine psb_d_cxx_reinit
 
 subroutine  psb_d_cxx_trim(a)
-  use psb_base_mod
+  use psb_realloc_mod
+  use psb_error_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_trim
   implicit none 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info, nz, m 
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -2332,7 +2707,7 @@ subroutine  psb_d_cxx_trim(a)
 end subroutine psb_d_cxx_trim
 
 subroutine psb_d_cxx_print(iout,a,iv,head,ivr,ivc)
-  use psb_base_mod
+  use psb_string_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_print
   implicit none 
 
@@ -2343,9 +2718,10 @@ subroutine psb_d_cxx_print(iout,a,iv,head,ivr,ivc)
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_cxx_print'
   logical, parameter :: debug=.false.
-
+  character(len=*), parameter  :: datatype='real'
   character(len=80)                 :: frmtv 
   integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nr, nc, nz
 
@@ -2362,7 +2738,11 @@ subroutine psb_d_cxx_print(iout,a,iv,head,ivr,ivc)
   nmx = max(nr,nc,1)
   ni  = floor(log10(1.0*nmx)) + 1
 
-  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
   write(iout,*) nr, nc, nz 
   if(present(iv)) then 
     do i=1, nr
@@ -2402,7 +2782,9 @@ end subroutine psb_d_cxx_print
 
 
 subroutine psb_d_cp_cxx_from_coo(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cp_cxx_from_coo
   implicit none 
 
@@ -2414,22 +2796,23 @@ subroutine psb_d_cp_cxx_from_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
-   info = psb_success_
-   ! This is to have fix_coo called behind the scenes
-   call b%cp_to_coo(tmp,info)
-   if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  info = psb_success_
+  ! This is to have fix_coo called behind the scenes
+  call tmp%cp_from_coo(b,info)
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
 end subroutine psb_d_cp_cxx_from_coo
 
 
 
 subroutine psb_d_cp_cxx_to_coo(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cp_cxx_to_coo
   implicit none 
 
@@ -2440,7 +2823,7 @@ subroutine psb_d_cp_cxx_to_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, idl,err_act
+  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2452,7 +2835,7 @@ subroutine psb_d_cp_cxx_to_coo(a,b,info)
   nza = a%get_nzeros()
 
   call b%allocate(nr,nc,nza)
-  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
 
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
@@ -2469,7 +2852,9 @@ end subroutine psb_d_cp_cxx_to_coo
 
 
 subroutine psb_d_mv_cxx_to_coo(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_mv_cxx_to_coo
   implicit none 
 
@@ -2480,7 +2865,7 @@ subroutine psb_d_mv_cxx_to_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, idl,err_act
+  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2491,7 +2876,7 @@ subroutine psb_d_mv_cxx_to_coo(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
+  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
   call move_alloc(a%ja,b%ja)
   call move_alloc(a%val,b%val)
@@ -2511,7 +2896,10 @@ end subroutine psb_d_mv_cxx_to_coo
 
 
 subroutine psb_d_mv_cxx_from_coo(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_error_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_mv_cxx_from_coo
   implicit none 
 
@@ -2522,28 +2910,32 @@ subroutine psb_d_mv_cxx_from_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20)   :: name='mv_from_coo'
 
   info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
 
   call b%fix(info)
   if (info /= psb_success_) return
+
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
-  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+  
+  a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
-  
   call b%free()
-  if (info /= psb_success_) return
+
   if (nza <= 0) then 
     a%irp(:) = 1
   else
@@ -2563,7 +2955,7 @@ subroutine psb_d_mv_cxx_from_coo(a,b,info)
         if (i >= irw) exit inner
         if (i>nr) then 
           write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
+               & 'Strange situation: i>nr ',i,nr,j,nza,irw
           exit outer
         end if
         a%irp(i+1) = a%irp(i) 
@@ -2598,7 +2990,8 @@ end subroutine psb_d_mv_cxx_from_coo
 
 
 subroutine psb_d_mv_cxx_to_fmt(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_mv_cxx_to_fmt
   implicit none 
 
@@ -2609,7 +3002,7 @@ subroutine psb_d_mv_cxx_to_fmt(a,b,info)
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2621,7 +3014,7 @@ subroutine psb_d_mv_cxx_to_fmt(a,b,info)
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
   type is (psb_d_cxx_sparse_mat) 
-    call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
+    b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
     call move_alloc(a%irp, b%irp)
     call move_alloc(a%ja,  b%ja)
     call move_alloc(a%val, b%val)
@@ -2636,7 +3029,9 @@ end subroutine psb_d_mv_cxx_to_fmt
 
 
 subroutine psb_d_cp_cxx_to_fmt(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
+  use psb_realloc_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cp_cxx_to_fmt
   implicit none 
 
@@ -2647,7 +3042,7 @@ subroutine psb_d_cp_cxx_to_fmt(a,b,info)
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2660,10 +3055,10 @@ subroutine psb_d_cp_cxx_to_fmt(a,b,info)
     call a%cp_to_coo(b,info)
 
   type is (psb_d_cxx_sparse_mat) 
-    call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
-    call psb_safe_cpy( a%irp, b%irp , info)
-    call psb_safe_cpy( a%ja , b%ja  , info)
-    call psb_safe_cpy( a%val, b%val , info)
+    b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
+    if (info == 0) call psb_safe_cpy( a%irp, b%irp , info)
+    if (info == 0) call psb_safe_cpy( a%ja , b%ja  , info)
+    if (info == 0) call psb_safe_cpy( a%val, b%val , info)
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2674,7 +3069,8 @@ end subroutine psb_d_cp_cxx_to_fmt
 
 
 subroutine psb_d_mv_cxx_from_fmt(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_mv_cxx_from_fmt
   implicit none 
 
@@ -2685,7 +3081,7 @@ subroutine psb_d_mv_cxx_from_fmt(a,b,info)
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2697,7 +3093,7 @@ subroutine psb_d_mv_cxx_from_fmt(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_d_cxx_sparse_mat) 
-    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
     call move_alloc(b%irp, a%irp)
     call move_alloc(b%ja,  a%ja)
     call move_alloc(b%val, a%val)
@@ -2713,7 +3109,9 @@ end subroutine psb_d_mv_cxx_from_fmt
 
 
 subroutine psb_d_cp_cxx_from_fmt(a,b,info) 
-  use psb_base_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod
+  use psb_realloc_mod
   use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cp_cxx_from_fmt
   implicit none 
 
@@ -2724,7 +3122,7 @@ subroutine psb_d_cp_cxx_from_fmt(a,b,info)
   !locals
   type(psb_d_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nz, nr, i,j,irw, idl,err_act, nc
+  integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2736,91 +3134,13 @@ subroutine psb_d_cp_cxx_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_d_cxx_sparse_mat) 
-    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-    call psb_safe_cpy( b%irp, a%irp , info)
-    call psb_safe_cpy( b%ja , a%ja  , info)
-    call psb_safe_cpy( b%val, a%val , info)
+    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
+    if (info == 0) call psb_safe_cpy( b%irp, a%irp , info)
+    if (info == 0) call psb_safe_cpy( b%ja , a%ja  , info)
+    if (info == 0) call psb_safe_cpy( b%val, a%val , info)
 
   class default
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 end subroutine psb_d_cp_cxx_from_fmt
-
-
-subroutine psb_d_cxx_cp_from(a,b)
-  use psb_base_mod
-  use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_cp_from
-  implicit none 
-
-  class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  type(psb_d_cxx_sparse_mat), intent(in)   :: b
-
-
-  integer(psb_ipk_) :: err_act, info
-  character(len=20)  :: name='cp_from'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-
-  info = psb_success_
-
-  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
-  call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-  a%irp = b%irp 
-  a%ja  = b%ja
-  a%val = b%val 
-
-  if (info /= psb_success_) goto 9999
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  call psb_errpush(info,name)
-
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
-end subroutine psb_d_cxx_cp_from
-
-subroutine psb_d_cxx_mv_from(a,b)
-  use psb_base_mod
-  use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_mv_from
-  implicit none 
-
-  class(psb_d_cxx_sparse_mat), intent(inout)  :: a
-  type(psb_d_cxx_sparse_mat), intent(inout) :: b
-
-
-  integer(psb_ipk_) :: err_act, info
-  character(len=20)  :: name='mv_from'
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-  call move_alloc(b%irp, a%irp)
-  call move_alloc(b%ja,  a%ja)
-  call move_alloc(b%val, a%val)
-  call b%free()
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  call psb_errpush(info,name)
-
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
-end subroutine psb_d_cxx_mv_from
-
-

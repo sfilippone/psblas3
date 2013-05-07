@@ -3,7 +3,6 @@ program d_matgen
   use psb_base_mod
   use psb_util_mod
   use psb_d_cxx_mat_mod
-  use psb_d_cyy_mat_mod
   implicit none
 
   ! input parameters
@@ -29,7 +28,6 @@ program d_matgen
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
-  type(psb_d_cyy_sparse_mat) :: acyy
   type(psb_d_csr_sparse_mat) :: acsr
   type(psb_d_cxx_sparse_mat) :: acxx
   
@@ -67,9 +65,6 @@ program d_matgen
   else if (.false.) then 
     call psb_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
          & a1,a2,a3,b1,b2,b3,c,g,info,amold=acxx)  
-  else if (.false.) then 
-    call psb_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
-         & a1,a2,a3,b1,b2,b3,c,g,info,amold=acyy)  
   end if
     
     
