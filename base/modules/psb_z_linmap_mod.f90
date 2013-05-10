@@ -216,18 +216,37 @@ contains
 
   subroutine  z_clone(map,mapout,info)
     use psb_desc_mod
+    use psb_error_mod
     implicit none 
     class(psb_zlinmap_type), intent(inout) :: map
-    class(psb_zlinmap_type), intent(inout) :: mapout
+    class(psb_base_linmap_type), intent(inout) :: mapout
     integer(psb_ipk_)     :: info 
     
-    call mapout%free(info)
-    ! Base clone!    
-    if (info == 0) call &
-         & map%psb_base_linmap_type%clone(mapout%psb_base_linmap_type,info)
-    if (info == 0) call map%map_X2Y%clone(mapout%map_X2Y,info)
-    if (info == 0) call map%map_Y2X%clone(mapout%map_Y2X,info)
+    integer(psb_ipk_) :: err_act
+    integer(psb_ipk_) :: ierr(5)
+    character(len=20)  :: name='clone'
 
+    info = 0
+    select type(mout => mapout)
+    class is (psb_zlinmap_type)
+      call mout%free(info)
+      ! Base clone!    
+      if (info == 0) call &
+           & map%psb_base_linmap_type%clone(mout%psb_base_linmap_type,info)
+      if (info == 0) call map%map_X2Y%clone(mout%map_X2Y,info)
+      if (info == 0) call map%map_Y2X%clone(mout%map_Y2X,info)
+    class default
+      info = psb_err_invalid_dynamic_type_
+      ierr(1) = 2
+      info = psb_err_missing_override_method_
+      call psb_errpush(info,name,i_err=ierr)
+      call psb_get_erraction(err_act)
+      if (err_act /= psb_act_ret_) then
+        call psb_error()
+      end if
+    end select
+
+      
   end subroutine z_clone
   
 
