@@ -1,4 +1,5 @@
-This directory contains  the PSBLAS library, version 3.0. 
+This directory contains  the PSBLAS library, version 3.1.
+
 
 This version requires a working Fortran 2003 compiler; we do not use
 all of the language features (specifically, so far we did not employ
@@ -35,7 +36,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 
-See docs/psblas-3.0.pdf; an HTML version of the same document is
+See docs/psblas-3.1.pdf; an HTML version of the same document is
 available in docs/html. 
 Please consult the sample programs, especially 
 test/pargen/ppde[23]d.f90
@@ -137,7 +138,7 @@ compiles correctly.
 
 For the GNU compilers 4.6.x we are aware of a number of memory management
 issues that might surface in your applications; all of them (that
-we're aware of) are solved in version 4.7.0.  
+we're aware of) are solved in version 4.7.2.  
 
 The Intel compiler up to version 12.1 fails to compile, as of the last
 version we got access to. 
