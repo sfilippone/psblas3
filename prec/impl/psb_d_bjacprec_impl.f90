@@ -441,7 +441,7 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   integer(psb_ipk_) ::    i, m
   integer(psb_ipk_) ::    ierr(5)
   character ::        trans, unitd
-  type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
+  type(psb_d_csr_sparse_mat), allocatable   :: lf, uf
   real(psb_dpk_), allocatable :: dd(:)
   integer(psb_ipk_) :: nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer(psb_ipk_) :: ictxt,np,me
@@ -564,6 +564,7 @@ subroutine psb_d_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   end if
 
   call psb_erractionrestore(err_act)
+  write(0,*) 'LF and UF are about to go out of scope'
   return
 
 9999 continue

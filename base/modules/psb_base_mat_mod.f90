@@ -193,7 +193,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: transc_1mat => psb_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_base_transc_2mat
     generic, public    :: transc => transc_1mat, transc_2mat
- 
+    final              :: base_sparse_mat_finalize
   end type psb_base_sparse_mat
 
   !>  Function: psb_base_get_nz_row
@@ -714,6 +714,21 @@ contains
     
     call a%transp() 
   end subroutine psb_base_transc_1mat
+
+  subroutine base_sparse_mat_finalize(a)
+    implicit none 
+    
+    type(psb_base_sparse_mat), intent(inout) :: a
+    write(0,*) 'Base sparse_mat finalize'
+    a%m         = 0
+    a%n         = 0
+    a%state     = 0
+    a%duplicate = 0
+    a%triangle  = .false.
+    a%unitd     = .false.
+    a%upper     = .false.
+    a%sorted    = .false.
+  end subroutine base_sparse_mat_finalize
 
 
 end module psb_base_mat_mod

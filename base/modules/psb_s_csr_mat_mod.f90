@@ -98,7 +98,7 @@ module psb_s_csr_mat_mod
     procedure, pass(a) :: print       => psb_s_csr_print
     procedure, pass(a) :: free        => s_csr_free
     procedure, pass(a) :: mold        => psb_s_csr_mold
-
+    final              :: s_csr_finalize
   end type psb_s_csr_sparse_mat
 
   private :: s_csr_get_nzeros, s_csr_free,  s_csr_get_fmt, &
@@ -611,6 +611,18 @@ contains
     return
 
   end subroutine s_csr_free
+
+  subroutine  s_csr_finalize(a) 
+    implicit none 
+
+    type(psb_s_csr_sparse_mat), intent(inout) :: a
+
+    write(0,*) 'Finalizing a s_csr sparse mat'
+    call a%free()
+    
+    return
+
+  end subroutine s_csr_finalize
 
 
 end module psb_s_csr_mat_mod

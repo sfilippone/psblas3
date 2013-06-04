@@ -692,7 +692,7 @@ subroutine  psb_c_free(a)
   class(psb_cspmat_type), intent(inout) :: a
 
   if (allocated(a%a)) then 
-    call a%a%free()
+    ! call a%a%free()
     deallocate(a%a) 
   endif
 

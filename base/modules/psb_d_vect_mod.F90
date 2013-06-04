@@ -523,7 +523,7 @@ contains
     
     info = 0
     if (allocated(x%v)) then 
-      call x%v%free(info)
+      ! call x%v%free(info)
       if (info == 0) deallocate(x%v,stat=info)
     end if
         

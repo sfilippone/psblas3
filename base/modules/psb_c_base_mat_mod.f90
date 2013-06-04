@@ -187,7 +187,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: arwsum     => psb_c_coo_arwsum
     procedure, pass(a) :: colsum     => psb_c_coo_colsum
     procedure, pass(a) :: aclsum     => psb_c_coo_aclsum
-    
+    final              :: c_coo_finalize
   end type psb_c_coo_sparse_mat
   
   private :: c_coo_get_nzeros, c_coo_set_nzeros, &
@@ -1755,6 +1755,24 @@ contains
     if (psb_c_is_complex_) a%val(:) = conjg(a%val(:))
 
   end subroutine c_coo_transc_1mat
+
+ 
+  subroutine c_coo_finalize(a)
+    implicit none 
+    
+    type(psb_c_coo_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_) :: info
+    
+    write(0,*) 'Finalizing an c_COO_SPARSE_MAT'
+    if (allocated(a%ia)) &
+         & deallocate(a%ia,stat=info)
+    if (allocated(a%ja)) &
+         & deallocate(a%ja,stat=info)
+    if (allocated(a%val)) &
+         & deallocate(a%val,stat=info)
+    
+
+  end subroutine c_coo_finalize
 
 
 
