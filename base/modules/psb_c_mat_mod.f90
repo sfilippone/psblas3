@@ -409,8 +409,8 @@ module psb_c_mat_mod
     subroutine psb_c_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
-      class(psb_cspmat_type), intent(in) :: a
-      class(psb_cspmat_type), intent(out) :: b
+      class(psb_cspmat_type), intent(in)    :: a
+      class(psb_cspmat_type), intent(inout) :: b
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_),intent(out)                  :: info
       logical, intent(in), optional        :: append

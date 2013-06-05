@@ -884,8 +884,8 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
   use psb_s_mat_mod, psb_protect_name => psb_s_csgetblk
   implicit none
 
-  class(psb_sspmat_type), intent(in) :: a
-  class(psb_sspmat_type), intent(out) :: b
+  class(psb_sspmat_type), intent(in)    :: a
+  class(psb_sspmat_type), intent(inout) :: b
   integer(psb_ipk_), intent(in)                  :: imin,imax
   integer(psb_ipk_),intent(out)                  :: info
   logical, intent(in), optional        :: append
@@ -896,6 +896,7 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
+  logical            :: append_
   type(psb_s_coo_sparse_mat), allocatable  :: acoo
 
 
@@ -906,8 +907,17 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
     call psb_errpush(info,name)
     goto 9999
   endif
+  if (present(append))  then 
+    append_ = append
+  else
+    append_ = .false.
+  end if
 
   allocate(acoo,stat=info)    
+  if (append_.and.(info==psb_success_)) then 
+    if (allocated(b%a)) &
+         & call b%a%mv_to_coo(acoo,info)
+  end if
 
   if (info == psb_success_) then 
     call a%a%csget(imin,imax,acoo,info,&
