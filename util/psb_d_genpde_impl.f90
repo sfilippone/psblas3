@@ -34,7 +34,7 @@
 !  the rhs. 
 !
 subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-     & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold)
+     & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,nrl)
   use psb_base_mod
   use psb_d_genpde_mod, psb_protect_name => psb_d_gen_pde3d
   !
@@ -63,6 +63,7 @@ subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   procedure(d_func_3d), optional :: f
   class(psb_d_base_sparse_mat), optional :: amold
   class(psb_d_base_vect_type), optional :: vmold
+  integer(psb_ipk_), optional :: nrl
 
   ! Local variables.
 
@@ -111,15 +112,26 @@ subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   nnz = ((n*9)/(np))
   if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
-  !
-  ! Using a simple BLOCK distribution.
-  !
-  nt = (m+np-1)/np
-  nr = max(0,min(nt,m-(iam*nt)))
+  if (present(nrl)) then 
+    nr = nrl
+  else
+    !
+    ! Using a simple BLOCK distribution.
+    !
+    nt = (m+np-1)/np
+    nr = max(0,min(nt,m-(iam*nt)))
+  end if
 
   nt = nr
   call psb_sum(ictxt,nt) 
-  if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+  if (nt /= m) then 
+    write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+    info = -1
+    call psb_barrier(ictxt)
+    call psb_abort(ictxt)
+    return    
+  end if
+    
   call psb_barrier(ictxt)
   t0 = psb_wtime()
   call psb_cdall(ictxt,desc_a,info,nl=nr)
@@ -337,7 +349,7 @@ end subroutine psb_d_gen_pde3d
 !  the rhs. 
 !
 subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-     & a1,a2,b1,b2,c,g,info,f,amold,vmold)
+     & a1,a2,b1,b2,c,g,info,f,amold,vmold,nrl)
   use psb_base_mod
   use psb_d_genpde_mod, psb_protect_name => psb_d_gen_pde2d
   !
@@ -366,6 +378,7 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   procedure(d_func_2d), optional :: f
   class(psb_d_base_sparse_mat), optional :: amold
   class(psb_d_base_vect_type), optional :: vmold
+  integer(psb_ipk_), optional :: nrl
 
   ! Local variables.
 
@@ -414,15 +427,25 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   nnz = ((n*7)/(np))
   if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
-  !
-  ! Using a simple BLOCK distribution.
-  !
-  nt = (m+np-1)/np
-  nr = max(0,min(nt,m-(iam*nt)))
-
+  if (present(nrl)) then 
+    nr = nrl
+  else
+    !
+    ! Using a simple BLOCK distribution.
+    !
+    nt = (m+np-1)/np
+    nr = max(0,min(nt,m-(iam*nt)))
+  end if
+  
   nt = nr
   call psb_sum(ictxt,nt) 
-  if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+  if (nt /= m) then 
+    write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+    info = -1
+    call psb_barrier(ictxt)
+    call psb_abort(ictxt)
+    return    
+  end if
   call psb_barrier(ictxt)
   t0 = psb_wtime()
   call psb_cdall(ictxt,desc_a,info,nl=nr)
