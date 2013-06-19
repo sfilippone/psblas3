@@ -220,7 +220,7 @@ subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in /= 0)) then
     if(desc_a%get_local_rows() > 0) then
-      call caxpby(desc_a%get_local_cols(),in,&
+      call saxpby(desc_a%get_local_cols(),in,&
            & alpha,x(iix:,jjx),lldx,beta,&
            & y(iiy:,jjy),lldy,info)
     end if
@@ -348,7 +348,7 @@ subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call caxpby(desc_a%get_local_cols(),ione,&
+    call saxpby(desc_a%get_local_cols(),ione,&
          & alpha,x,lldx,beta,&
          & y,lldy,info)
   end if
