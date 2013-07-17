@@ -1,5 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/06/19: Fixed type match bug in daxpby/saxpby/zaxpby. 
+	
+2013/06/05: Fix INTENT in APPEND methods. 	
+2013/05/10: test/serial now contains an example of how to define a new 
+	    format.
 2013/04/20: Fix scaling and norm methods for matrices with unit diagonal.
 	
 2013/04/20: Fix add-by-one for unit triangular matrices.
