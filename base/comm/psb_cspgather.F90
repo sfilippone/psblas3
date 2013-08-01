@@ -113,9 +113,9 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
     ndx = nzbr(me+1) 
-    call mpi_allgatherv(loc_coo%val,ndx,mpi_complex,&
+    call mpi_allgatherv(loc_coo%val,ndx,psb_mpi_c_spk_,&
          & glob_coo%val,nzbr,idisp,&
-         & mpi_complex,icomm,minfo)
+         & psb_mpi_c_spk_,icomm,minfo)
     if (minfo == psb_success_) call &
          & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
          & glob_coo%ia,nzbr,idisp,&

@@ -42,7 +42,7 @@
 !                                      coming from the build of an extended
 !                                      halo descriptor with respect to a normal call. 
 !
-subroutine psb_icdasb(desc,info,ext_hv)
+subroutine psb_icdasb(desc,info,ext_hv,mold)
   use psb_base_mod, psb_protect_name => psb_icdasb
   use psi_mod
 #ifdef MPI_MOD
@@ -56,6 +56,7 @@ subroutine psb_icdasb(desc,info,ext_hv)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out)               :: info
   logical, intent(in), optional      :: ext_hv
+  type(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !....Locals....
   integer(psb_ipk_) ::  int_err(5)
@@ -128,7 +129,7 @@ subroutine psb_icdasb(desc,info,ext_hv)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': Final conversion'
     ! Then convert and put them back where they belong.    
-    call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc,info) 
+    call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc,info,mold=mold) 
 
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cnv_dsc')

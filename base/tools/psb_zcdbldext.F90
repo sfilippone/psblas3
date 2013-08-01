@@ -75,7 +75,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   !     .. Array Arguments ..
   integer(psb_ipk_), intent(in)                      :: novr
   Type(psb_zspmat_type), Intent(in)       ::  a
-  Type(psb_desc_type), Intent(in), target :: desc_a
+  Type(psb_desc_type), Intent(inout), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_), intent(in),optional            :: extype

@@ -30,8 +30,9 @@
 !!$ 
 !!$  
 module psi_d_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type
   use psb_d_vect_mod, only : psb_d_base_vect_type 
+
   interface psi_swapdata
     subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       import :: psb_desc_type, psb_ipk_, psb_dpk_, psb_d_base_vect_type
@@ -89,6 +90,16 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidx_vect
+    subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      import :: psb_desc_type, psb_ipk_, psb_dpk_, psb_d_base_vect_type, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_d_base_vect_type)             :: y
+      real(psb_dpk_)                          :: beta
+      real(psb_dpk_), target                  :: work(:)
+      class(psb_i_base_vect_type), intent(in) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_dswap_vidx_vect
   end interface
 
 

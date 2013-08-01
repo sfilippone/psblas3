@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psi_c_mod
-  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_i_base_vect_type
   use psb_c_vect_mod,  only : psb_c_base_vect_type
 
   interface psi_swapdata
@@ -90,6 +90,16 @@ module psi_c_mod
       complex(psb_spk_),target    :: work(:)
       integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_cswapidx_vect
+    subroutine psi_cswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      import :: psb_desc_type, psb_ipk_, psb_spk_, psb_c_base_vect_type, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_c_base_vect_type)             :: y
+      complex(psb_spk_)                       :: beta
+      complex(psb_spk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(in) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_cswap_vidx_vect
   end interface
 
 

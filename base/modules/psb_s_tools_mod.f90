@@ -227,7 +227,7 @@ Module psb_s_tools_mod
            & psb_s_base_vect_type, psb_s_vect_type, &
            & psb_sspmat_type, psb_s_base_sparse_mat
       integer(psb_ipk_), intent(in)                     :: novr
-      Type(psb_sspmat_type), Intent(in)       :: a
+      Type(psb_sspmat_type), Intent(inout)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer(psb_ipk_), intent(out)                    :: info

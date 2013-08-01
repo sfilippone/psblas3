@@ -37,9 +37,11 @@
 
 module psb_desc_mod
   use psb_const_mod
-  use psb_hash_mod 
   use psb_desc_const_mod
   use psb_indx_map_mod
+  use psb_i_vect_mod
+!!$
+!!$  use psb_hash_mod 
 
   implicit none
 
@@ -205,6 +207,12 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: ovr_mst_idx(:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
+
+    type(psb_i_vect_type)            :: v_halo_index
+    type(psb_i_vect_type)            :: v_ext_index
+    type(psb_i_vect_type)            :: v_ovrlap_index
+    type(psb_i_vect_type)            :: v_ovr_mst_idx 
+  
     class(psb_indx_map), allocatable :: indxmap
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
@@ -224,7 +232,9 @@ module psb_desc_mod
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
-    procedure, pass(desc) :: get_list        => psb_cd_get_list
+    procedure, pass(desc) :: a_get_list      => psb_cd_get_list
+    procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
+    generic, public       :: get_list => a_get_list, v_get_list
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: clone           => psb_cd_clone
     procedure, pass(desc) :: free            => psb_cdfree
@@ -270,6 +280,10 @@ contains
     if (allocated(desc%lprm))         val = val + psb_sizeof_int*size(desc%lprm)
     if (allocated(desc%idx_space))    val = val + psb_sizeof_int*size(desc%idx_space)
     if (allocated(desc%indxmap))      val = val + desc%indxmap%sizeof()
+    val = val + desc%v_halo_index%sizeof()
+    val = val + desc%v_ext_index%sizeof()
+    val = val + desc%v_ovrlap_index%sizeof()
+    val = val + desc%v_ovr_mst_idx%sizeof()
 
   end function psb_cd_sizeof
 
@@ -545,6 +559,19 @@ contains
   end subroutine psb_get_xch_idx
 
 
+  subroutine psb_get_v_xch_idx(idx,totxch,totsnd,totrcv)
+    implicit none 
+    class(psb_i_base_vect_type), intent(in)  :: idx
+    integer(psb_ipk_), intent(out) :: totxch,totsnd,totrcv
+
+    integer(psb_ipk_) :: ip, nerv, nesd
+    character(len=20), parameter  :: name='psb_get_v_xch_idx'    
+
+    call psb_get_xch_idx(idx%v,totxch,totsnd,totrcv)
+
+  end subroutine psb_get_v_xch_idx
+
+
 
   subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
@@ -613,6 +640,74 @@ contains
     end if
     return
   end subroutine psb_cd_get_list
+
+
+  subroutine psb_cd_v_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+    integer(psb_ipk_), intent(in)          :: data
+    class(psb_i_base_vect_type), pointer   :: ipnt
+    class(psb_desc_type), target  :: desc
+    integer(psb_ipk_), intent(out)         :: totxch,idxr,idxs,info
+
+    !locals
+    integer(psb_ipk_) :: np,me,ictxt,err_act, debug_level,debug_unit
+    logical, parameter  :: debug=.false.,debugprt=.false.
+    character(len=20), parameter  :: name='psb_cd_v_get_list'
+
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ictxt = psb_cd_get_context(desc)
+
+    call psb_info(ictxt, me, np)
+
+    select case(data) 
+    case(psb_comm_halo_) 
+      ipnt   => desc%v_halo_index%v
+    case(psb_comm_ovr_) 
+      ipnt   => desc%v_ovrlap_index%v
+    case(psb_comm_ext_) 
+      ipnt   => desc%v_ext_index%v
+      if (debug_level >= psb_debug_ext_) then
+        if (.not.associated(desc%base_desc)) then
+          write(debug_unit,*) trim(name),&
+               & ': Warning: trying to get ext_index on a descriptor ',&
+               & 'which does not have a base_desc!'
+        end if
+        if (.not.psb_is_ovl_desc(desc)) then
+          write(debug_unit,*) trim(name),&
+               & ': Warning: trying to get ext_index on a descriptor ',&
+               & 'which is not overlap-extended!'
+        end if
+      end if
+    case(psb_comm_mov_) 
+      ipnt   => desc%v_ovr_mst_idx%v
+    case default
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='wrong Data selector')
+      goto 9999
+    end select
+    call psb_get_v_xch_idx(ipnt,totxch,idxs,idxr)
+
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+  end subroutine psb_cd_v_get_list
 
   !
   ! Subroutine: psb_cdfree
@@ -957,6 +1052,14 @@ contains
            & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
       if ((info == psb_success_).and.(allocated(desc%indxmap))) &
            & call desc%indxmap%clone(desc_out%indxmap,info)
+      if (info == psb_success_) &
+           & call desc%v_halo_index%clone(desc%v_halo_index,info)
+      if (info == psb_success_) &
+           & call desc%v_ext_index%clone(desc%v_ext_index,info)
+      if (info == psb_success_) &
+           & call desc%v_ovrlap_index%clone(desc%v_ovrlap_index,info)
+      if (info == psb_success_) &
+           & call desc%v_ovr_mst_idx%clone(desc%v_ovr_mst_idx,info)
     else
       call desc_out%free(info)
     end if
