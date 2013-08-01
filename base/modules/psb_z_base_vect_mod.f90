@@ -97,7 +97,8 @@ module psb_z_base_vect_mod
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => z_base_get_nrows
-    procedure, pass(x) :: sizeof   => z_base_sizeof
+    procedure, pass(x) :: sizeof    => z_base_sizeof
+    procedure, nopass  :: get_fmt   => z_base_get_fmt
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
@@ -550,7 +551,19 @@ contains
 
   end function z_base_sizeof
 
+  !
+  !> Function  base_get_fmt
+  !! \memberof  psb_z_base_vect_type
+  !! \brief  Format
+  !!           
+  !
+  function z_base_get_fmt() result(res)
+    implicit none 
+    character(len=5) :: res
+    res = 'BASE'
+  end function z_base_get_fmt
   
+
   !
   !
   !

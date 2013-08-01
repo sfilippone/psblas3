@@ -40,7 +40,8 @@
 !                                       process 
 !    idx(:)   - integer                 Required indices on the calling process.
 !                                       Note: the indices should be unique!
-!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for the corresponding
+!    iprc(:)  - integer(psb_ipk_), allocatable    Output: process identifiers for
+!                                       the corresponding
 !                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                return code.
