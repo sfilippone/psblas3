@@ -38,7 +38,7 @@
 !   See also description in base/modules/psb_desc_type.f90
 ! 
 ! Arguments: 
-!    ovr_elem(:,:) - integer(psb_ipk_), allocatable  Array containing the output list              
+!    ovr_elem(:,:) - integer(psb_ipk_), allocatable  Array containing the output list    
 !    desc_a   - type(psb_desc_type).       The communication descriptor.        
 !    info     - integer.                   return code.
 ! 

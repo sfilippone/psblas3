@@ -39,7 +39,7 @@
 !    current (calling) process. 
 ! 
 ! Arguments: 
-!    bndel(:) - integer(psb_ipk_), allocatable      Array containing the output list              
+!    bndel(:) - integer(psb_ipk_), allocatable      Array containing the output list      
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 

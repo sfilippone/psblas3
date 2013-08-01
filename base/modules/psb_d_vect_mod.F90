@@ -46,6 +46,7 @@ module psb_d_vect_mod
   contains
     procedure, pass(x) :: get_nrows => d_vect_get_nrows
     procedure, pass(x) :: sizeof   => d_vect_sizeof
+    procedure, pass(x) :: get_fmt  => d_vect_get_fmt
     procedure, pass(x) :: dot_v    => d_vect_dot_v
     procedure, pass(x) :: dot_a    => d_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -217,6 +218,14 @@ contains
     if (allocated(x%v)) res = x%v%sizeof()
   end function d_vect_sizeof
 
+  function d_vect_get_fmt(x) result(res)
+    implicit none 
+    class(psb_d_vect_type), intent(in) :: x
+    character(len=5) :: res
+    res = 'NULL'
+    if (allocated(x%v)) res = x%v%get_fmt()
+  end function d_vect_get_fmt
+  
   function d_vect_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_d_vect_type), intent(inout) :: x, y
