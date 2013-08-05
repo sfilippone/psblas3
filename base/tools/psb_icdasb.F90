@@ -56,7 +56,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out)               :: info
   logical, intent(in), optional      :: ext_hv
-  type(psb_i_base_vect_type), optional, intent(in) :: mold
+  class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !....Locals....
   integer(psb_ipk_) ::  int_err(5)

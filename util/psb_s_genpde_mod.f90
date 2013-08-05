@@ -33,7 +33,7 @@ module psb_s_genpde_mod
 
   use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
        &  psb_sspmat_type, psb_s_vect_type, szero,&
-       &  psb_s_base_sparse_mat, psb_s_base_vect_type
+       &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
   interface 
     function s_func_3d(x,y,z) result(val)
@@ -45,7 +45,7 @@ module psb_s_genpde_mod
 
   interface psb_gen_pde3d
     subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-         & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,nrl)
+         & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,imold,nrl)
       !
       !   Discretizes the partial differential equation
       ! 
@@ -62,7 +62,7 @@ module psb_s_genpde_mod
       ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
       !
       import  :: psb_ipk_, psb_desc_type, psb_sspmat_type, psb_s_vect_type, &
-           & s_func_3d, psb_s_base_sparse_mat, psb_s_base_vect_type
+           & s_func_3d, psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
       implicit none
       procedure(s_func_3d)  :: a1,a2,a3,c,b1,b2,b3,g
       integer(psb_ipk_)     :: idim
@@ -74,6 +74,7 @@ module psb_s_genpde_mod
       procedure(s_func_3d), optional :: f
       class(psb_s_base_sparse_mat), optional :: amold
       class(psb_s_base_vect_type), optional :: vmold
+      class(psb_i_base_vect_type), optional :: imold
       integer(psb_ipk_), optional :: nrl
     end subroutine psb_s_gen_pde3d
   end interface
@@ -89,7 +90,7 @@ module psb_s_genpde_mod
 
   interface psb_gen_pde2d 
     subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-         & a1,a2,b1,b2,c,g,info,f,amold,vmold,nrl)
+         & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,nrl)
       !
       !   Discretizes the partial differential equation
       ! 
@@ -106,7 +107,7 @@ module psb_s_genpde_mod
       ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
       !
       import  :: psb_ipk_, psb_desc_type, psb_sspmat_type, psb_s_vect_type,&
-           &  s_func_2d, psb_s_base_sparse_mat, psb_s_base_vect_type
+           &  s_func_2d, psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
       implicit none
       procedure(s_func_2d)  :: a1,a2,c,b1,b2,g
       integer(psb_ipk_)     :: idim
@@ -118,6 +119,7 @@ module psb_s_genpde_mod
       procedure(s_func_2d), optional :: f
       class(psb_s_base_sparse_mat), optional :: amold
       class(psb_s_base_vect_type), optional :: vmold
+      class(psb_i_base_vect_type), optional :: imold
       integer(psb_ipk_), optional :: nrl
     end subroutine psb_s_gen_pde2d
   end interface

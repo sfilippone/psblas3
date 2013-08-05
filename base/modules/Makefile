@@ -61,9 +61,10 @@ psb_ip_reord_mod.o psi_serial_mod.o psb_sort_mod.o: $(BASIC_MODS)
 psb_base_mat_mod.o: psi_serial_mod.o
 psb_s_base_mat_mod.o psb_d_base_mat_mod.o psb_c_base_mat_mod.o psb_z_base_mat_mod.o: psb_base_mat_mod.o
 psb_s_base_mat_mod.o: psb_s_base_vect_mod.o
-psb_d_base_mat_mod.o: psb_d_base_vect_mod.o
+psb_d_base_mat_mod.o: psb_d_base_vect_mod.o 
 psb_c_base_mat_mod.o: psb_c_base_vect_mod.o
 psb_z_base_mat_mod.o: psb_z_base_vect_mod.o
+psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psb_i_base_vect_mod.o 
 psb_i_base_vect_mod.o psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o psb_realloc_mod.o
 psb_s_mat_mod.o: psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_vect_mod.o
 psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_vect_mod.o

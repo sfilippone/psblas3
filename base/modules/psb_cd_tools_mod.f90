@@ -149,7 +149,7 @@ module psb_cd_tools_mod
       Type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out)               :: info
       logical, intent(in),optional       :: ext_hv
-      type(psb_i_base_vect_type), optional, intent(in) :: mold
+      class(psb_i_base_vect_type), optional, intent(in) :: mold
     end subroutine psb_icdasb
   end interface
 
@@ -205,7 +205,7 @@ contains
 
     Type(psb_desc_type), intent(inout) :: desc
     integer(psb_ipk_), intent(out)     :: info
-    type(psb_i_base_vect_type), optional, intent(in) :: mold
+    class(psb_i_base_vect_type), optional, intent(in) :: mold
 
     call psb_icdasb(desc,info,ext_hv=.false.,mold=mold)
   end subroutine psb_cdasb
