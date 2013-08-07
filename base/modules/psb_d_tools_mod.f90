@@ -227,9 +227,9 @@ Module psb_d_tools_mod
            & psb_d_base_vect_type, psb_d_vect_type, &
            & psb_dspmat_type, psb_d_base_sparse_mat
       integer(psb_ipk_), intent(in)                     :: novr
-      Type(psb_dspmat_type), Intent(inout)       :: a
-      Type(psb_desc_type), Intent(in), target :: desc_a
-      Type(psb_desc_type), Intent(out)        :: desc_ov
+      Type(psb_dspmat_type), Intent(in)        :: a
+      Type(psb_desc_type), Intent(inout), target :: desc_a
+      Type(psb_desc_type), Intent(out)           :: desc_ov
       integer(psb_ipk_), intent(out)                    :: info
       integer(psb_ipk_), intent(in),optional            :: extype
     end Subroutine psb_dcdbldext
