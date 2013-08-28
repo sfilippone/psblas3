@@ -90,11 +90,11 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
   integer(psb_mpik_) :: icomm, ictxt, me, np, minfo
 
-  integer(psb_ipk_), allocatable  :: irow(:), icol(:)
-  integer(psb_ipk_), allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
-  integer(psb_ipk_),allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
-       & t_halo_out(:),temp(:),maskr(:)
-  integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
+  integer(psb_ipk_), allocatable :: irow(:), icol(:)
+  integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
+  integer(psb_ipk_), allocatable :: halo(:),ovrlap(:),works(:),workr(:),&
+       & t_halo_in(:), t_halo_out(:),temp(:),maskr(:)
+  integer(psb_mpik_),allocatable :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
@@ -203,11 +203,11 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   If (debug_level >= psb_debug_outer_)&
        & Write(debug_unit,*) me,' ',trim(name),':ovr_est done',novr,lovr
 
-  index_dim = size(desc_a%halo_index)
-  elem_dim  = size(desc_a%halo_index)
+  index_dim = max(desc_a%v_halo_index%get_nrows(),1_psb_ipk_)
+  elem_dim  = index_dim
 
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
-  l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
+  l_tmp_halo    = novr*(3*index_dim)
 
   desc_ov%base_desc => desc_a
 
@@ -228,13 +228,18 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
        & t_halo_out(l_tmp_halo), temp(lworkr),stat=info)
   if (info == psb_success_) allocate(orig_ovr(l_tmp_ovr_idx),&
        & tmp_ovr_idx(l_tmp_ovr_idx), &
-       & tmp_halo(l_tmp_halo), halo(size(desc_a%halo_index)),stat=info)
+       & tmp_halo(l_tmp_halo),stat=info)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999      
   end if
-  halo(:)        = desc_a%halo_index(:)
+
+  halo           = desc_a%v_halo_index%get_vect()
+  if (.not.allocated(halo)) halo = (/ -ione /)
+  ovrlap         = desc_a%v_ovrlap_index%get_vect()
+  if (.not.allocated(ovrlap)) ovrlap = (/ -ione /)    
+
   tmp_ovr_idx(:) = -1
   orig_ovr(:)    = -1
   tmp_halo(:)    = -1
@@ -246,14 +251,14 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   cntov_o        =  1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
-  Do While (desc_a%ovrlap_index(counter) /= -1)
-    proc        = desc_a%ovrlap_index(counter+psb_proc_id_)
-    n_elem_recv = desc_a%ovrlap_index(counter+psb_n_elem_recv_)
-    n_elem_send = desc_a%ovrlap_index(counter+n_elem_recv+psb_n_elem_send_)
+  Do While (ovrlap(counter) /= -1)
+    proc        = ovrlap(counter+psb_proc_id_)
+    n_elem_recv = ovrlap(counter+psb_n_elem_recv_)
+    n_elem_send = ovrlap(counter+n_elem_recv+psb_n_elem_send_)
 
     Do j=0,n_elem_recv-1
 
-      idx = desc_a%ovrlap_index(counter+psb_elem_recv_+j)
+      idx = ovrlap(counter+psb_elem_recv_+j)
       call desc_ov%indxmap%l2g(idx,gidx,info) 
       If (gidx < 0) then 
         info=-3
@@ -467,7 +472,8 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
       !       
-      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1, &
+           & psb_mpi_def_integer,icomm,minfo)
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoall')
@@ -610,7 +616,6 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       !
     End If
   End Do
-
 
   select case(extype_) 
   case(psb_ovt_xhal_)

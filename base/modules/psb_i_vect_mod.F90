@@ -151,7 +151,7 @@ contains
 
   function  i_vect_get_vect(x) result(res)
     class(psb_i_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), allocatable                 :: res(:)
+    integer(psb_ipk_), allocatable         :: res(:)
     integer(psb_ipk_) :: info
 
     if (allocated(x%v)) then

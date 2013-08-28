@@ -204,14 +204,15 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: halo_index(:)
     integer(psb_ipk_), allocatable   :: ext_index(:)
     integer(psb_ipk_), allocatable   :: ovrlap_index(:)
-    integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: ovr_mst_idx(:)
-    integer(psb_ipk_), allocatable   :: bnd_elem(:)
 
     type(psb_i_vect_type)            :: v_halo_index
     type(psb_i_vect_type)            :: v_ext_index
     type(psb_i_vect_type)            :: v_ovrlap_index
     type(psb_i_vect_type)            :: v_ovr_mst_idx 
+
+    integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
+    integer(psb_ipk_), allocatable   :: bnd_elem(:)
   
     class(psb_indx_map), allocatable :: indxmap
     integer(psb_ipk_), allocatable   :: lprm(:)
@@ -1053,13 +1054,13 @@ contains
       if ((info == psb_success_).and.(allocated(desc%indxmap))) &
            & call desc%indxmap%clone(desc_out%indxmap,info)
       if (info == psb_success_) &
-           & call desc%v_halo_index%clone(desc%v_halo_index,info)
+           & call desc%v_halo_index%clone(desc_out%v_halo_index,info)
       if (info == psb_success_) &
-           & call desc%v_ext_index%clone(desc%v_ext_index,info)
+           & call desc%v_ext_index%clone(desc_out%v_ext_index,info)
       if (info == psb_success_) &
-           & call desc%v_ovrlap_index%clone(desc%v_ovrlap_index,info)
+           & call desc%v_ovrlap_index%clone(desc_out%v_ovrlap_index,info)
       if (info == psb_success_) &
-           & call desc%v_ovr_mst_idx%clone(desc%v_ovr_mst_idx,info)
+           & call desc%v_ovr_mst_idx%clone(desc_out%v_ovr_mst_idx,info)
     else
       call desc_out%free(info)
     end if
