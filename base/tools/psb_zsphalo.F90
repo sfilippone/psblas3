@@ -158,7 +158,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end select
 
-  call desc_a%get_list(data_,idxv,totxch,nxs,nxr,info)
+  call desc_a%get_list(data_,idxv,totxch,nxr,nxs,info)
 
   l1  = 0
 
