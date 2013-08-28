@@ -87,6 +87,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   complex(psb_dpk_), allocatable :: valsnd(:)
   type(psb_z_coo_sparse_mat), allocatable :: acoo
   integer(psb_ipk_), pointer  :: idxv(:)
+  class(psb_i_base_vect_type), pointer :: pdxv
+  integer(psb_ipk_), allocatable :: ipdxv(:)
   logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -158,12 +160,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end select
 
-  call desc_a%get_list(data_,idxv,totxch,nxs,nxr,info)
 
-  l1  = 0
 
   sdsz(:)=0
   rvsz(:)=0
+  l1  = 0
   ipx = 1
   brvindx(ipx) = 0
   bsdindx(ipx) = 0
@@ -171,17 +172,22 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idx = 0
   idxs = 0
   idxr = 0
+
   call acoo%allocate(izero,a%get_ncols(),info)
+
+
+  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
-    proc=idxv(counter)
+    proc=ipdxv(counter)
     if (proc == -1) exit
-    n_el_recv = idxv(counter+psb_n_elem_recv_)
+    n_el_recv = ipdxv(counter+psb_n_elem_recv_)
     counter   = counter+n_el_recv
-    n_el_send = idxv(counter+psb_n_elem_send_)
+    n_el_send = ipdxv(counter+psb_n_elem_send_)
     tot_elem = 0
     Do j=0,n_el_send-1
-      idx = idxv(counter+psb_elem_send_+j)
+      idx = ipdxv(counter+psb_elem_send_+j)
       n_elem = a%get_nz_row(idx)
       tot_elem = tot_elem+n_elem      
     Enddo
@@ -203,11 +209,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxr = 0
   counter = 1
   Do 
-    proc=idxv(counter)
+    proc=ipdxv(counter)
     if (proc == -1) exit
-    n_el_recv = idxv(counter+psb_n_elem_recv_)
+    n_el_recv = ipdxv(counter+psb_n_elem_recv_)
     counter   = counter+n_el_recv
-    n_el_send = idxv(counter+psb_n_elem_send_)
+    n_el_send = ipdxv(counter+psb_n_elem_send_)
 
     bsdindx(proc+1) = idxs
     idxs = idxs + sdsz(proc+1)
@@ -240,14 +246,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   tot_elem=0
   Do 
-    proc=idxv(counter)
+    proc=ipdxv(counter)
     if (proc == -1) exit 
-    n_el_recv=idxv(counter+psb_n_elem_recv_)
+    n_el_recv=ipdxv(counter+psb_n_elem_recv_)
     counter=counter+n_el_recv
-    n_el_send=idxv(counter+psb_n_elem_send_)
+    n_el_send=ipdxv(counter+psb_n_elem_send_)
 
     Do j=0,n_el_send-1
-      idx = idxv(counter+psb_elem_send_+j)
+      idx = ipdxv(counter+psb_elem_send_+j)
       n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem)
