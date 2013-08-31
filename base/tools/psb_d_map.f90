@@ -137,8 +137,7 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
 
   select case(map_kind)
   case(psb_map_aggr_)
-!!$    write(0,*) 'Using a map_aggr_  map',allocated(map%p_desc_X%v_halo_index%v),&
-!!$         & allocated(map%p_desc_Y%v_halo_index%v)
+
     ictxt = map%p_desc_Y%get_context()
     nr2   = map%p_desc_Y%get_global_rows()
     nc2   = map%p_desc_Y%get_local_cols() 
@@ -159,7 +158,7 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     end if
 
   case(psb_map_gen_linear_)
-!!$    write(0,*) 'Using a gen_linear_  map'    
+
     ictxt = map%desc_Y%get_context()
     nr1   = map%desc_X%get_local_rows() 
     nc1   = map%desc_X%get_local_cols() 
@@ -267,7 +266,7 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-  
+   
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'
@@ -303,7 +302,7 @@ subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
 
   select case(map_kind)
   case(psb_map_aggr_)
-!!$    write(0,*) 'Using a map_aggr_  map'    
+
     ictxt = map%p_desc_X%get_context()
     nr2   = map%p_desc_X%get_global_rows()
     nc2   = map%p_desc_X%get_local_cols() 
@@ -324,7 +323,7 @@ subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     end if
 
   case(psb_map_gen_linear_)
-!!$    write(0,*) 'Using a gen_linear_  map'    
+
     ictxt = map%desc_X%get_context()
     nr1   = map%desc_Y%get_local_rows() 
     nc1   = map%desc_Y%get_local_cols() 
@@ -377,7 +376,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK
-!!$    write(0,*) 'Creating a map_aggr_  map'
+    
     if (psb_is_ok_desc(desc_X)) then 
       this%p_desc_X=>desc_X
     else
@@ -388,9 +387,6 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
     else
       info = psb_err_invalid_ovr_num_
     endif
-!!$    write(0,*) 'Creating  a map_aggr_  map 2:',allocated(this%p_desc_X%v_halo_index%v),&
-!!$         & allocated(this%p_desc_Y%v_halo_index%v)
-
     if (present(iaggr)) then 
       if (.not.present(naggr)) then 
         info = 7
@@ -407,7 +403,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
     end if
 
   case(psb_map_gen_linear_)    
-!!$    write(0,*) 'Creating a gen_linear_  map'    
+    
     if (desc_X%is_ok()) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else

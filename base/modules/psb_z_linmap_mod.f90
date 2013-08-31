@@ -159,17 +159,23 @@ contains
   end function z_is_asb
 
 
-  subroutine psb_z_map_cscnv(map,info,type,mold)    
+  subroutine psb_z_map_cscnv(map,info,type,mold,imold)    
+    use psb_i_vect_mod
     use psb_z_mat_mod
     implicit none
     type(psb_zlinmap_type), intent(inout)  :: map
     integer(psb_ipk_), intent(out)                   :: info
     character(len=*), intent(in), optional :: type
     class(psb_z_base_sparse_mat), intent(in), optional :: mold
+    class(psb_i_base_vect_type), intent(in), optional  :: imold
 
     call map%map_X2Y%cscnv(info,type=type,mold=mold)
     if (info == psb_success_)&
          & call map%map_Y2X%cscnv(info,type=type,mold=mold)
+    if (present(imold)) then 
+      call map%desc_X%cnv(mold=imold)
+      call map%desc_Y%cnv(mold=imold)
+    end if
 
   end subroutine psb_z_map_cscnv
 

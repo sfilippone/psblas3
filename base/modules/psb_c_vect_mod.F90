@@ -564,7 +564,6 @@ contains
     class(psb_c_vect_type), intent(inout) :: x
     class(psb_c_base_vect_type), intent(in) :: mold
     class(psb_c_base_vect_type), allocatable :: tmp
-    complex(psb_spk_), allocatable          :: invect(:)
     integer(psb_ipk_) :: info
 
 #ifdef HAVE_MOLD
