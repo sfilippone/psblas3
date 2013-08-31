@@ -159,6 +159,9 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
     goto 9999
   endif
 
+  if (present(mold)) &
+       & call desc%cnv(mold)
+  
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Done'
 

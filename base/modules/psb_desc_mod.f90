@@ -238,6 +238,7 @@ module psb_desc_mod
     generic, public       :: get_list => a_get_list, v_get_list
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: clone           => psb_cd_clone
+    procedure, pass(desc) :: cnv             => psb_cd_cnv
     procedure, pass(desc) :: free            => psb_cdfree
     procedure, pass(desc) :: destroy         => psb_cd_destroy
     procedure, pass(desc) :: nullify         => nullify_desc
@@ -670,10 +671,16 @@ contains
     select case(data) 
     case(psb_comm_halo_) 
       ipnt   => desc%v_halo_index%v
+      if (.not.allocated(desc%v_halo_index%v)) &
+           & info = psb_err_inconsistent_index_lists_
     case(psb_comm_ovr_) 
       ipnt   => desc%v_ovrlap_index%v
+      if (.not.allocated(desc%v_ovrlap_index%v)) &
+           & info = psb_err_inconsistent_index_lists_
     case(psb_comm_ext_) 
       ipnt   => desc%v_ext_index%v
+      if (.not.allocated(desc%v_ext_index%v)) &
+           & info = psb_err_inconsistent_index_lists_
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
           write(debug_unit,*) trim(name),&
@@ -688,11 +695,17 @@ contains
       end if
     case(psb_comm_mov_) 
       ipnt   => desc%v_ovr_mst_idx%v
+      if (.not.allocated(desc%v_ovr_mst_idx%v)) &
+           & info = psb_err_inconsistent_index_lists_
+      
     case default
       info=psb_err_from_subroutine_
+    end select
+    if (info /= psb_success_) then
       call psb_errpush(info,name,a_err='wrong Data selector')
       goto 9999
-    end select
+    end if
+    
     call psb_get_v_xch_idx(ipnt,totxch,idxs,idxr)
 
 
@@ -796,6 +809,10 @@ contains
       call desc%indxmap%free()
       deallocate(desc%indxmap, stat=info)
     end if
+    call desc%v_halo_index%free(info)
+    call desc%v_ovrlap_index%free(info)
+    call desc%v_ext_index%free(info)
+    call desc%v_ovr_mst_idx%free(info)
 
     call desc%nullify()
 
@@ -864,6 +881,15 @@ contains
            & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
       if (info == psb_success_) &
            & call move_alloc(desc_in%indxmap, desc_out%indxmap)
+      if (info == psb_success_) &
+           & call desc_in%v_halo_index%clone(desc_out%v_halo_index,info)
+      if (info == psb_success_) &
+           & call desc_in%v_ext_index%clone(desc_out%v_ext_index,info)
+      if (info == psb_success_) &
+           & call desc_in%v_ovrlap_index%clone(desc_out%v_ovrlap_index,info)
+      if (info == psb_success_) &
+           & call desc_in%v_ovr_mst_idx%clone(desc_out%v_ovr_mst_idx,info)
+
       if (info /= psb_success_) then
         info = psb_err_from_subroutine_
         call psb_errpush(info,name)
@@ -994,6 +1020,19 @@ contains
     Return
 
   end Subroutine psb_cd_get_recv_idx
+
+
+  subroutine psb_cd_cnv(desc, mold)
+    class(psb_desc_type), intent(inout), target :: desc
+    class(psb_i_base_vect_type), intent(in)  :: mold
+    
+    call desc%v_halo_index%cnv(mold)
+    call desc%v_ext_index%cnv(mold)
+    call desc%v_ovrlap_index%cnv(mold)
+    call desc%v_ovr_mst_idx%cnv(mold)
+
+  end subroutine psb_cd_cnv
+    
 
   subroutine psb_cd_clone(desc, desc_out, info)
 
