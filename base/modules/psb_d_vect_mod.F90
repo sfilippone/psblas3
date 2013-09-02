@@ -562,19 +562,23 @@ contains
 
   subroutine d_vect_cnv(x,mold)
     class(psb_d_vect_type), intent(inout) :: x
-    class(psb_d_base_vect_type), intent(in) :: mold
+    class(psb_d_base_vect_type), intent(in), optional :: mold
     class(psb_d_base_vect_type), allocatable :: tmp
     integer(psb_ipk_) :: info
 
+    if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(tmp,stat=info,mold=mold)
 #else
       call mold%mold(tmp,info)
 #endif
-    call x%v%sync()
-    if (info == psb_success_) call tmp%bld(x%v%v)
-    call x%v%free(info)
-    call move_alloc(tmp,x%v)
+      if (allocated(x%v)) then 
+        call x%v%sync()
+        if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%free(info)
+      end if
+      call move_alloc(tmp,x%v)
+    end if
 
   end subroutine d_vect_cnv
 
