@@ -50,6 +50,7 @@ module psb_c_linmap_mod
     procedure, pass(map) :: is_asb   => c_is_asb
     procedure, pass(map) :: free     => c_free
     procedure, pass(map) :: clone    => c_clone
+    procedure, pass(map) :: cnv      => psb_c_map_cscnv
   end type psb_clinmap_type
 
 
@@ -163,7 +164,7 @@ contains
     use psb_i_vect_mod
     use psb_c_mat_mod
     implicit none
-    type(psb_clinmap_type), intent(inout)  :: map
+    class(psb_clinmap_type), intent(inout)  :: map
     integer(psb_ipk_), intent(out)                   :: info
     character(len=*), intent(in), optional :: type
     class(psb_c_base_sparse_mat), intent(in), optional :: mold

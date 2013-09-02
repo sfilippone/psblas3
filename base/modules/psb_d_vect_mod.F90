@@ -579,7 +579,6 @@ contains
       end if
       call move_alloc(tmp,x%v)
     end if
-
   end subroutine d_vect_cnv
 
 end module psb_d_vect_mod
