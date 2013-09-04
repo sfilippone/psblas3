@@ -790,6 +790,9 @@ with_blas
 with_lapack
 with_rsb
 with_metis
+with_metisdir
+with_metisincdir
+with_metislibdir
 with_amd
 with_amddir
 with_amdincdir
@@ -1473,8 +1476,12 @@ Optional Packages:
                           bin/include/lib subdirs with a regular RSB
                           installation resides, or nothing to make the
                           configure script invoke librsb-config)
-  --with-metis=LIB        Specify -lMETISLIBNAME or the absolute library
-                          filename.
+  --with-metis=LIBNAME    Specify the library name for METIS library. Default:
+                          "-lmetis"
+  --with-metisdir=DIR     Specify the directory for METIS library and
+                          includes.
+  --with-metisincdir=DIR  Specify the directory for METIS includes.
+  --with-metislibdir=DIR  Specify the directory for METIS library.
   --with-amd=LIBNAME      Specify the library name for AMD library. Default:
                           "-lamd"
   --with-amddir=DIR       Specify the directory for AMD library and includes.
@@ -9395,22 +9402,500 @@ LIBS="$RSB_LIBS ${LIBS}"
 
 # Check whether --with-metis was given.
 if test "${with_metis+set}" = set; then
-  withval=$with_metis; psblas_cv_metis="$withval"
+  withval=$with_metis; psblas_cv_metis=$withval
 else
-  psblas_cv_metis=''
+  psblas_cv_metis='-lmetis'
 fi
 
 
+# Check whether --with-metisdir was given.
+if test "${with_metisdir+set}" = set; then
+  withval=$with_metisdir; psblas_cv_metisdir=$withval
+else
+  psblas_cv_metisdir=''
+fi
 
-if test "x$psblas_cv_metis" != "x" ; then
-	{ $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in -l\"m\"" >&5
-$as_echo_n "checking for METIS_PartGraphRecursive in -l\"m\"... " >&6; }
-if test "${ac_cv_lib__m__METIS_PartGraphRecursive+set}" = set; then
+
+# Check whether --with-metisincdir was given.
+if test "${with_metisincdir+set}" = set; then
+  withval=$with_metisincdir; psblas_cv_metisincdir=$withval
+else
+  psblas_cv_metisincdir=''
+fi
+
+
+# Check whether --with-metislibdir was given.
+if test "${with_metislibdir+set}" = set; then
+  withval=$with_metislibdir; psblas_cv_metislibdir=$withval
+else
+  psblas_cv_metislibdir=''
+fi
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$psblas_cv_metisdir" != "x"; then
+   METIS_LIBDIR="-L$psblas_cv_metisdir"
+   LIBS="-L$psblas_cv_metisdir $LIBS"
+   METIS_INCLUDES="-I$psblas_cv_metisdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metisincdir" != "x"; then
+   METIS_INCLUDES="-I$psblas_cv_metisincdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metislibdir" != "x"; then
+   LIBS="-L$psblas_cv_metislibdir $LIBS"
+   METIS_LIBDIR="-L$psblas_cv_metislibdir"
+fi
+
+{ $as_echo "$as_me:$LINENO: metis dir $psblas_cv_metisdir" >&5
+$as_echo "$as_me: metis dir $psblas_cv_metisdir" >&6;}
+if test "${ac_cv_header_metis_h+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking metis.h usability" >&5
+$as_echo_n "checking metis.h usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <metis.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking metis.h presence" >&5
+$as_echo_n "checking metis.h presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <metis.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: metis.h: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: metis.h:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: metis.h: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: metis.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## ---------------------------------------------- ##
+## Report this to salvatore.filippone@uniroma2.it ##
+## ---------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l"m" "$psblas_cv_metis" $LIBS"
+  ac_cv_header_metis_h=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+
+fi
+if test "x$ac_cv_header_metis_h" = x""yes; then
+  pac_metis_header_ok=yes
+else
+  pac_metis_header_ok=no; METIS_INCLUDES=""
+fi
+
+
+if test "x$pac_metis_header_ok" == "xno" ; then
+  unset ac_cv_header_metis_h
+  METIS_INCLUDES="-I$psblas_cv_metisdir/include -I$psblas_cv_metisdir/Include "
+  CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+
+ { $as_echo "$as_me:$LINENO: checking for metis_h in $METIS_INCLUDES" >&5
+$as_echo_n "checking for metis_h in $METIS_INCLUDES... " >&6; }
+ if test "${ac_cv_header_metis_h+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking metis.h usability" >&5
+$as_echo_n "checking metis.h usability... " >&6; }
 cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <metis.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking metis.h presence" >&5
+$as_echo_n "checking metis.h presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <metis.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: metis.h: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: metis.h:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: metis.h: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: metis.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## ---------------------------------------------- ##
+## Report this to salvatore.filippone@uniroma2.it ##
+## ---------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_metis_h=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+
+fi
+if test "x$ac_cv_header_metis_h" = x""yes; then
+  pac_metis_header_ok=yes
+else
+  pac_metis_header_ok=no; METIS_INCLUDES=""
+fi
+
+
+fi
+if test "x$pac_metis_header_ok" == "xno" ; then
+   unset ac_cv_header_metis_h
+   METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
+   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+   if test "${ac_cv_header_metis_h+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking metis.h usability" >&5
+$as_echo_n "checking metis.h usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <metis.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking metis.h presence" >&5
+$as_echo_n "checking metis.h presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <metis.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: metis.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: metis.h: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: metis.h:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: metis.h: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: metis.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: metis.h: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: metis.h: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: metis.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## ---------------------------------------------- ##
+## Report this to salvatore.filippone@uniroma2.it ##
+## ---------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for metis.h" >&5
+$as_echo_n "checking for metis.h... " >&6; }
+if test "${ac_cv_header_metis_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_metis_h=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_metis_h" >&5
+$as_echo "$ac_cv_header_metis_h" >&6; }
+
+fi
+if test "x$ac_cv_header_metis_h" = x""yes; then
+  pac_metis_header_ok=yes
+else
+  pac_metis_header_ok=no; METIS_INCLUDES=""
+fi
+
+
+fi
+
+
+if test "x$pac_metis_header_ok" == "xyes" ; then
+      psblas_cv_metis_includes="$METIS_INCLUDES"
+      METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      LIBS="$METIS_LIBS -lm $LIBS";
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -9453,38 +9938,27 @@ $as_echo "$ac_try_echo") >&5
 	 test "$cross_compiling" = yes ||
 	 $as_test_x conftest$ac_exeext
        }; then
-  ac_cv_lib__m__METIS_PartGraphRecursive=yes
+  psblas_cv_have_metis=yes;pac_metis_lib_ok=yes;
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_lib__m__METIS_PartGraphRecursive=no
+	psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""
 fi
 
 rm -rf conftest.dSYM
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib__m__METIS_PartGraphRecursive" >&5
-$as_echo "$ac_cv_lib__m__METIS_PartGraphRecursive" >&6; }
-if test "x$ac_cv_lib__m__METIS_PartGraphRecursive" = x""yes; then
-  psblas_cv_have_metis=yes; METIS_LIBS="$psblas_cv_metis"
-else
-  psblas_cv_have_metis=no
-fi
+      { $as_echo "$as_me:$LINENO: result: $pac_metis_lib_ok" >&5
+$as_echo "$pac_metis_lib_ok" >&6; }
+     if test "x$pac_metis_lib_ok" == "xno" ; then
+                METIS_LIBDIR="-L$psblas_cv_metisdir/Lib -L$psblas_cv_metisdir/lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
 
-else
-	save_LIBS="$LIBS";
-	LIBS="-lm $LIBS";
-	{ $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in -lmetis" >&5
-$as_echo_n "checking for METIS_PartGraphRecursive in -lmetis... " >&6; }
-if test "${ac_cv_lib_metis_METIS_PartGraphRecursive+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmetis  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -9527,31 +10001,90 @@ $as_echo "$ac_try_echo") >&5
 	 test "$cross_compiling" = yes ||
 	 $as_test_x conftest$ac_exeext
        }; then
-  ac_cv_lib_metis_METIS_PartGraphRecursive=yes
+  psblas_cv_have_metis=yes;pac_metis_lib_ok=yes;
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_lib_metis_METIS_PartGraphRecursive=no
+	psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""
 fi
 
 rm -rf conftest.dSYM
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_metis_METIS_PartGraphRecursive" >&5
-$as_echo "$ac_cv_lib_metis_METIS_PartGraphRecursive" >&6; }
-if test "x$ac_cv_lib_metis_METIS_PartGraphRecursive" = x""yes; then
-  psblas_cv_have_metis=yes;METIS_LIBS="-lmetis"
+      { $as_echo "$as_me:$LINENO: result: $pac_metis_lib_ok" >&5
+$as_echo "$pac_metis_lib_ok" >&6; }
+     fi
+     if test "x$pac_metis_lib_ok" == "xno" ; then
+                METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char METIS_PartGraphRecursive ();
+int
+main ()
+{
+return METIS_PartGraphRecursive ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  psblas_cv_have_metis=yes;pac_metis_lib_ok=yes;
 else
-  psblas_cv_have_metis=no
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""
 fi
 
-	LIBS="$save_LIBS";
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+      { $as_echo "$as_me:$LINENO: result: $pac_metis_lib_ok" >&5
+$as_echo "$pac_metis_lib_ok" >&6; }
+     fi
 fi
+LIBS="$SAVE_LIBS";
+CPPFLAGS="$SAVE_CPPFLAGS";
+
 if test "x$psblas_cv_have_metis" == "xyes" ; then
-  FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_METIS"
+   FDEFINES="$mld_cv_define_prepend-DHAVE_METIS $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES"
 fi
 
 
