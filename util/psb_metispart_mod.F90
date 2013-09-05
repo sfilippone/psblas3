@@ -266,7 +266,8 @@ contains
       end function METIS_PartGraphRecursive
     end interface
 
-    allocate(graph_vect(n),gvl(n),wgh_(nparts),stat=info)
+    call psb_realloc(n,graph_vect,info)
+    if (info == psb_success_) allocate(gvl(n),wgh_(nparts),stat=info)
 
     if (info /= psb_success_) then
       write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
