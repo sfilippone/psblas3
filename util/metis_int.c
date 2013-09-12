@@ -1,5 +1,5 @@
 #include <stdio.h>
-#if defined(HAVE_METIS)
+#if defined(HAVE_METIS_)
 #include "metis.h"
 
 /* extern int METIS_PartGraphRecursive(int *, int *, int *, int *, int *, int *, int *, int *, float *, float, int *, int *, int *); */
