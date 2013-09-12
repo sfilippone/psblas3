@@ -1,4 +1,5 @@
 #include <stdio.h>
+#if defined(HAVE_METIS)
 #include "metis.h"
 
 /* extern int METIS_PartGraphRecursive(int *, int *, int *, int *, int *, int *, int *, int *, float *, float, int *, int *, int *); */
@@ -35,3 +36,14 @@ int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg,
     return res;
   }
 }
+
+
+#else 
+
+int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg, 
+				int *iajw, int *nparts, float *weights, 
+				int *graphpart)
+{
+  return(-1);
+}
+#endif
