@@ -593,7 +593,6 @@ contains
     logical, parameter :: debug=.false.
 
     info = psb_success_
-    write(0,*)name,' Start'
     call psb_get_erraction(err_act)
     if (allocated(outmap)) then 
       write(0,*) 'Error: should not be allocated on input'
