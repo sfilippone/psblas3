@@ -55,6 +55,7 @@ module psb_repl_map_mod
     procedure, pass(idxmap)  :: asb       => repl_asb
     procedure, pass(idxmap)  :: free      => repl_free
     procedure, pass(idxmap)  :: clone     => repl_clone
+    procedure, pass(idxmap)  :: reinit    => repl_reinit
     procedure, nopass        :: get_fmt   => repl_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => repl_l2gs1
@@ -592,6 +593,7 @@ contains
     logical, parameter :: debug=.false.
 
     info = psb_success_
+    write(0,*)name,' Start'
     call psb_get_erraction(err_act)
     if (allocated(outmap)) then 
       write(0,*) 'Error: should not be allocated on input'
@@ -629,4 +631,25 @@ contains
     end if
     return
   end subroutine repl_clone
+
+  subroutine repl_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_repl_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl
+    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    character(len=20)  :: name='repl_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+
+    call idxmap%set_state(psb_desc_bld_)
+
+    return
+
+  end subroutine repl_reinit
+
 end module psb_repl_map_mod
