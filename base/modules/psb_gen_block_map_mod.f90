@@ -64,6 +64,7 @@ module psb_gen_block_map_mod
     procedure, pass(idxmap)  :: asb       => block_asb
     procedure, pass(idxmap)  :: free      => block_free
     procedure, pass(idxmap)  :: clone     => block_clone
+    procedure, pass(idxmap)  :: reinit    => block_reinit
     procedure, nopass        :: get_fmt   => block_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => block_l2gs1
@@ -89,7 +90,7 @@ module psb_gen_block_map_mod
        & block_get_fmt, block_l2gs1, block_l2gs2, block_l2gv1,&
        & block_l2gv2, block_g2ls1, block_g2ls2, block_g2lv1,&
        & block_g2lv2, block_g2ls1_ins, block_g2ls2_ins,&
-       & block_g2lv1_ins, block_g2lv2_ins, block_clone
+       & block_g2lv1_ins, block_g2lv2_ins, block_clone, block_reinit
 
   integer(psb_ipk_), private :: laddsz=500
 
@@ -696,6 +697,7 @@ contains
 
   subroutine block_init(idxmap,ictxt,nl,info)
     use psb_penv_mod
+    use psb_realloc_mod
     use psb_error_mod
     implicit none 
     class(psb_gen_block_map), intent(inout) :: idxmap
@@ -743,7 +745,7 @@ contains
     idxmap%min_glob_row = vnl(iam)+1
     idxmap%max_glob_row = vnl(iam+1) 
     call move_alloc(vnl,idxmap%vnl)
-    allocate(idxmap%loc_to_glob(nl),stat=info) 
+    call psb_realloc(nl,idxmap%loc_to_glob,info) 
     if (info /= 0)  then
       info = -2
       return
@@ -853,5 +855,107 @@ contains
     end if
     return
   end subroutine block_clone
+
+
+  subroutine block_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_gen_block_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt
+    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    character(len=20)  :: name='block_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+    call psb_get_erraction(err_act)
+
+    nr = idxmap%get_lr()
+    nc = idxmap%get_lc()
+    if (nc>nr) then 
+      lidx = (/(k,k=nr+1,nc)/)
+      idx  = (/(k,k=nr+1,nc)/)
+      call idxmap%l2gip(idx,info)
+    end if
+    if (info /= 0) &
+         & write(0,*) 'From l2gip',info
+
+    
+    call psb_hash_init(nr,idxmap%hash,info)
+    if (info /= 0) &
+         & write(0,*) 'From hash_init',info
+    call idxmap%set_state(psb_desc_bld_)
+    if (nc>nr) then 
+      call idxmap%g2lip_ins(idx,info,lidx=lidx)
+    end if
+
+      
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine block_reinit
+
+!!$
+!!$  subroutine block_reinit(idxmap,info)
+!!$    use psb_penv_mod
+!!$    use psb_error_mod
+!!$    use psb_realloc_mod
+!!$    implicit none 
+!!$    class(psb_gen_block_map), intent(inout)    :: idxmap
+!!$    integer(psb_ipk_), intent(out) :: info
+!!$    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt
+!!$    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+!!$    character(len=20)  :: name='block_reinit'
+!!$    logical, parameter :: debug=.false.
+!!$
+!!$    info = psb_success_
+!!$    call psb_get_erraction(err_act)
+!!$    ictxt = idxmap%get_ctxt()
+!!$    nr = idxmap%get_lr()
+!!$    nc = idxmap%get_lc()
+!!$    if (nc>nr) then 
+!!$      lidx = (/(k,k=nr+1,nc)/)
+!!$      idx  = (/(k,k=nr+1,nc)/)
+!!$      call idxmap%l2gip(idx,info)
+!!$    end if
+!!$    if (info /= 0) &
+!!$         & write(0,*) 'From l2gip',info
+!!$    
+!!$    call idxmap%init(ictxt,nr,info)
+!!$    if (nc>nr) then 
+!!$      call idxmap%g2lip_ins(idx,info,lidx=lidx)
+!!$    end if
+!!$
+!!$      
+!!$    if (info /= psb_success_) then 
+!!$      info = psb_err_from_subroutine_
+!!$      call psb_errpush(info,name)
+!!$      goto 9999
+!!$    end if
+!!$    call psb_erractionrestore(err_act)
+!!$    return
+!!$
+!!$9999 continue
+!!$    call psb_erractionrestore(err_act)
+!!$    if (err_act /= psb_act_ret_) then
+!!$      call psb_error()
+!!$    end if
+!!$    return
+!!$  end subroutine block_reinit
+!!$
+
 
 end module psb_gen_block_map_mod
