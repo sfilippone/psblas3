@@ -2630,8 +2630,12 @@ subroutine psb_d_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then 
       call a%reallocate(max(nza+nz,int(1.5*isza)))
-      isza = a%get_size()
     endif
+    isza = a%get_size()
+    if (isza < (nza+nz)) then 
+      info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
+      goto 9999
+    end if
 
     call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info,gtl)
@@ -2696,10 +2700,6 @@ contains
           ic = gtl(ic) 
           if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
             nza = nza + 1 
-            if (nza > maxsz) then 
-              info = -91
-              return
-            endif
             ia1(nza) = ir
             ia2(nza) = ic
             aspk(nza) = val(i)
@@ -2713,10 +2713,6 @@ contains
         ic = ja(i) 
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
-          if (nza > maxsz) then 
-            info = -92
-            return
-          endif
           ia1(nza) = ir
           ia2(nza) = ic
           aspk(nza) = val(i)
