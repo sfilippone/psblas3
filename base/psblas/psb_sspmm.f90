@@ -731,16 +731,6 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   endif
 
-
-  ia = 1
-  ja = 1
-  ix = 1
-  jx = 1
-  iy = 1
-  jy = 1
-  ik = 1
-  ib = 1
-
   if (present(doswap)) then
     doswap_ = doswap
   else
@@ -766,6 +756,16 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   ncol = desc_a%get_local_cols()
   lldx = x%get_nrows()
   lldy = y%get_nrows()
+  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
+  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
+
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_from_subroutine_
+    ch_err='reall'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+    
 
   iwork => null()
   ! check for presence/size of a work area
@@ -795,43 +795,9 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   if (debug_level >= psb_debug_comp_) &
        & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
-  ! checking for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkmat'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
 
-  if (debug_level >= psb_debug_comp_) &
-       & write(debug_unit,*) me,' ',trim(name),' Checkmat ', info
   if (trans_ == 'N') then
     !  Matrix is not transposed
-    if((ja /= ix).or.(ia /= iy)) then
-      ! this case is not yet implemented
-      info = psb_err_ja_nix_ia_niy_unsupported_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    ! checking for vectors correctness
-    call psb_chkvect(n,ik,lldx,ix,jx,desc_a,info,iix,jjx)
-    if (info == psb_success_) &
-         & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_chkvect'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    if((iix /= 1).or.(iiy /= 1)) then
-      ! this case is not yet implemented
-      info = psb_err_ix_n1_iy_n1_unsupported_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
 
     if (doswap_) then
       call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
@@ -848,31 +814,6 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   else
     !  Matrix is transposed
-    if((ja /= iy).or.(ia /= ix)) then
-      ! this case is not yet implemented
-      info = psb_err_ja_nix_ia_niy_unsupported_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    ! checking for vectors correctness
-    call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
-    if (info == psb_success_)&
-         & call psb_chkvect(n,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_chkvect'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    if((iix /= 1).or.(iiy /= 1)) then
-      ! this case is not yet implemented
-      info = psb_err_ix_n1_iy_n1_unsupported_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
 
     !
     ! Non-empty overlap, need a buffer to hold
