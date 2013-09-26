@@ -196,11 +196,49 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: i
+    logical :: owned_
     
+    info = 0
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%l2gip(idxout(1:im),info,mask,owned)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(owned)) then 
+      owned_ = owned
+    else
+      owned_ = .false.
+    end if
+
+    if (present(mask)) then 
+
+      do i=1, im
+        if (mask(i)) then 
+          if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
+            idxout(i) = idxin(i)
+          else 
+            idxout(i) = -1
+          end if
+        end if
+      end do
+
+    else  if (.not.present(mask)) then 
+
+      do i=1, im
+          if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
+            idxout(i) = idxin(i)
+          else 
+            idxout(i) = -1
+          end if
+      end do
+
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_l2gv2
@@ -331,12 +369,79 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: is, im,i
+    logical :: owned_
+
+    info = 0
     
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip(idxout(1:im),info,mask,owned)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(owned)) then 
+      owned_ = owned
+    else
+      owned_ = .false.
+    end if
+
+
+    if (present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+        do i=1, is
+          if (mask(i)) then 
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end if
+        end do
+      else if (idxmap%is_valid()) then 
+        do i=1,is
+          if (mask(i)) then 
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end if
+        end do
+      else 
+        idxout(1:is) = -1
+        info = -1
+      end if
+
+    else  if (.not.present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+        do i=1, is
+          if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+            idxout(i) = idxin(i) 
+          else 
+            idxout(i) = -1
+          end if
+        end do
+      else if (idxmap%is_valid()) then 
+        do i=1,is
+          if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+            idxout(i) = idxin(i) 
+          else 
+            idxout(i) = -1
+          end if
+        end do
+      else 
+        idxout(1:is) = -1
+        info = -1
+      end if
+
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2
@@ -480,12 +585,82 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: is, im, i
     
+
+    info = 0
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(lidx)) then 
+      if (size(lidx) < im) then 
+        info = -1
+        return
+      end if
+    end if
+
+
+    if (idxmap%is_asb()) then 
+      ! State is wrong for this one ! 
+      idxout = -1
+      info   = -1
+
+    else if (idxmap%is_valid()) then 
+      if (present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, is
+            if (mask(i)) then
+              if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+                idxout(i) = idxin(i) 
+              else 
+                idxout(i) = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+
+          do i=1, is
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end do
+        end if
+      else if (.not.present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, is
+            if (mask(i)) then 
+              if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+                idxout(i) = idxin(i) 
+              else 
+                idxout(i) = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+          do i=1, is
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end do
+        end if
+      end if
+    else 
+      idxout = -1
+      info   = -1
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2_ins

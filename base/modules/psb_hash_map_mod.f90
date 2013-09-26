@@ -73,6 +73,7 @@ module psb_hash_map_mod
     procedure, pass(idxmap)  :: asb       => hash_asb
     procedure, pass(idxmap)  :: free      => hash_free
     procedure, pass(idxmap)  :: clone     => hash_clone
+    procedure, pass(idxmap)  :: reinit    => hash_reinit
     procedure, nopass        :: get_fmt   => hash_get_fmt
 
     procedure, nopass        :: row_extendable => hash_row_extendable
@@ -1452,5 +1453,55 @@ contains
   end subroutine hash_cpy
 
     
+
+  subroutine hash_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_hash_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt, ntot
+    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    character(len=20)  :: name='hash_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+    call psb_get_erraction(err_act)
+    ictxt = idxmap%get_ctxt()
+    nr = idxmap%get_lr()
+    nc = idxmap%get_lc()
+    ntot = idxmap%get_gr()
+    if (nc>nr) then 
+      lidx = (/(k,k=1,nc)/)
+      idx  = (/(k,k=1,nc)/)
+      call idxmap%l2gip(idx,info)
+    end if
+    if (info /= 0) &
+         & write(0,*) 'From l2gip',info
+    
+    call idxmap%free()
+    call hash_init_vlu(idxmap,ictxt,ntot,nr,idx(1:nr),info)
+    if (nc>nr) then 
+      call idxmap%g2lip_ins(idx(nr+1:nc),info,lidx=lidx(nr+1:nc))
+    end if
+
+      
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine hash_reinit
+
   
 end module psb_hash_map_mod
