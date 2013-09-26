@@ -244,9 +244,10 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  idxout(1:nv) = idxin(1:nv)
-  call psi_idx_ins_cnv(nv,idxout,desc,info,mask=mask,lidx=lidx)
+  
+!!$  idxout(1:nv) = idxin(1:nv)
+!!$  call psi_idx_ins_cnv(nv,idxout,desc,info,mask=mask,lidx=lidx)
+  call desc%indxmap%g2l_ins(idxin(1:nv),idxout(1:nv),info,mask=mask,lidx=lidx)
 
   call psb_erractionrestore(err_act)
   return

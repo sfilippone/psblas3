@@ -240,9 +240,10 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
     goto 9999
   end if
 
-  idxout(1:nv) = idxin(1:nv) 
-  call psi_idx_cnv1(nv,idxout,desc,info,mask=mask,owned=owned)  
-
+!!$  idxout(1:nv) = idxin(1:nv) 
+!!$  call psi_idx_cnv1(nv,idxout,desc,info,mask=mask,owned=owned)  
+  call desc%indxmap%g2l(idxin(1:nv),idxout(1:nv),info,mask=mask,owned=owned)
+  
   call psb_erractionrestore(err_act)
   return
 
