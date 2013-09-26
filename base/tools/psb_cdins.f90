@@ -246,15 +246,15 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-    mask_ => mask
-  else
-    allocate(mask__(nz))
-    mask_ => mask__
-    mask_ = .true.
+!!$    mask_ => mask
+!!$  else
+!!$    allocate(mask__(nz))
+!!$    mask_ => mask__
+!!$    mask_ = .true.
   end if
 
   if (present(jla)) then 
-    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask_,lidx=lidx)
+    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask,lidx=lidx)
   else
     allocate(jla_(nz),stat=info)
     if (info /= psb_success_) then 
@@ -262,7 +262,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask_,lidx=lidx)
+    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask,lidx=lidx)
     deallocate(jla_)
   end if
 

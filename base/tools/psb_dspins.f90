@@ -178,10 +178,8 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         goto 9999
       end if
 
-      ila(1:nz) = ia(1:nz)
-      jla(1:nz) = ja(1:nz)
-      call psb_glob_to_loc(ila(1:nz),desc_a,info,iact='I')
-      call psb_glob_to_loc(jla(1:nz),desc_a,info,iact='I')
+      call psb_glob_to_loc(ia(1:nz),ila(1:nz),desc_a,info,iact='I')
+      call psb_glob_to_loc(ja(1:nz),jla(1:nz),desc_a,info,iact='I')
 
       call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
       if (info /= psb_success_) then

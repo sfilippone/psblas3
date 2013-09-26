@@ -2676,10 +2676,10 @@ contains
     implicit none 
 
     integer(psb_ipk_), intent(in) :: nz, imin,imax,jmin,jmax,maxsz
-    integer(psb_ipk_), intent(in) :: ia(:),ja(:)
-    integer(psb_ipk_), intent(inout) :: nza,ia1(:),ia2(:)
-    real(psb_dpk_), intent(in) :: val(:)
-    real(psb_dpk_), intent(inout) :: aspk(:)
+    integer(psb_ipk_), intent(in) :: ia(*),ja(*)
+    integer(psb_ipk_), intent(inout) :: nza,ia1(*),ia2(*)
+    real(psb_dpk_), intent(in) :: val(*)
+    real(psb_dpk_), intent(inout) :: aspk(*)
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_), intent(in), optional  :: gtl(:)
     integer(psb_ipk_) :: i,ir,ic,ng
@@ -2696,10 +2696,10 @@ contains
           ic = gtl(ic) 
           if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
             nza = nza + 1 
-            if (nza > maxsz) then 
-              info = -91
-              return
-            endif
+!!$            if (nza > maxsz) then 
+!!$              info = -91
+!!$              return
+!!$            endif
             ia1(nza) = ir
             ia2(nza) = ic
             aspk(nza) = val(i)
@@ -2713,10 +2713,10 @@ contains
         ic = ja(i) 
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
-          if (nza > maxsz) then 
-            info = -92
-            return
-          endif
+!!$          if (nza > maxsz) then 
+!!$            info = -92
+!!$            return
+!!$          endif
           ia1(nza) = ir
           ia2(nza) = ic
           aspk(nza) = val(i)
