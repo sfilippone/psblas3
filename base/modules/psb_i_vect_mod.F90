@@ -66,6 +66,7 @@ module psb_i_vect_mod
     procedure, pass(x) :: amax     => i_vect_amax
     procedure, pass(x) :: asum     => i_vect_asum
     procedure, pass(x) :: all      => i_vect_all
+    procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
     procedure, pass(x) :: asb      => i_vect_asb
     procedure, pass(x) :: sync     => i_vect_sync
@@ -437,10 +438,10 @@ contains
   subroutine i_vect_all(n, x, info, mold)
 
     implicit none 
-    integer(psb_ipk_), intent(in)                 :: n
+    integer(psb_ipk_), intent(in)       :: n
     class(psb_i_vect_type), intent(out) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
-    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), intent(out)      :: info
     
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -458,6 +459,21 @@ contains
     end if
 
   end subroutine i_vect_all
+
+  subroutine i_vect_reall(n, x, info)
+
+    implicit none 
+    integer(psb_ipk_), intent(in)         :: n
+    class(psb_i_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)        :: info
+  
+    info = 0 
+    if (.not.allocated(x%v)) &
+         & call x%all(n,info)
+    if (info == 0) &
+         & call x%asb(n,info)
+
+  end subroutine i_vect_reall
 
   subroutine i_vect_zero(x)
     use psi_serial_mod

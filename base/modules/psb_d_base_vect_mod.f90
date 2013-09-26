@@ -389,6 +389,7 @@ contains
     class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
     if (info /= 0) &
