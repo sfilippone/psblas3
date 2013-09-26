@@ -393,7 +393,7 @@ contains
     if (present(mask)) then 
 
       if (idxmap%is_asb()) then 
-        do i=1, is
+        do i=1, im
           if (mask(i)) then 
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               idxout(i) = idxin(i) 
@@ -403,7 +403,7 @@ contains
           end if
         end do
       else if (idxmap%is_valid()) then 
-        do i=1,is
+        do i=1,im
           if (mask(i)) then 
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               idxout(i) = idxin(i) 
@@ -413,14 +413,14 @@ contains
           end if
         end do
       else 
-        idxout(1:is) = -1
+        idxout(1:im) = -1
         info = -1
       end if
 
     else  if (.not.present(mask)) then 
 
       if (idxmap%is_asb()) then 
-        do i=1, is
+        do i=1, im
           if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
             idxout(i) = idxin(i) 
           else 
@@ -428,7 +428,7 @@ contains
           end if
         end do
       else if (idxmap%is_valid()) then 
-        do i=1,is
+        do i=1,im
           if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
             idxout(i) = idxin(i) 
           else 
@@ -436,7 +436,7 @@ contains
           end if
         end do
       else 
-        idxout(1:is) = -1
+        idxout(1:im) = -1
         info = -1
       end if
 
@@ -614,7 +614,7 @@ contains
     else if (idxmap%is_valid()) then 
       if (present(lidx)) then 
         if (present(mask)) then 
-          do i=1, is
+          do i=1, im
             if (mask(i)) then
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 idxout(i) = idxin(i) 
@@ -626,7 +626,7 @@ contains
 
         else if (.not.present(mask)) then 
 
-          do i=1, is
+          do i=1, im
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               idxout(i) = idxin(i) 
             else 
@@ -636,7 +636,7 @@ contains
         end if
       else if (.not.present(lidx)) then 
         if (present(mask)) then 
-          do i=1, is
+          do i=1, im
             if (mask(i)) then 
               if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 idxout(i) = idxin(i) 
@@ -647,7 +647,7 @@ contains
           end do
 
         else if (.not.present(mask)) then 
-          do i=1, is
+          do i=1, im
             if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               idxout(i) = idxin(i) 
             else 
