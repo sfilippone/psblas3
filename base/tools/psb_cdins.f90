@@ -45,7 +45,7 @@
 !    ila(:)   - integer(psb_ipk_), optional              The row indices in local numbering
 !    jla(:)   - integer(psb_ipk_), optional              The col indices in local numbering
 !
-subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
+subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla, dontcheck)
   use psb_base_mod, psb_protect_name => psb_cdinsrc
   use psi_mod
   implicit none
@@ -55,7 +55,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
-
+  logical, intent(in), optional                :: dontcheck
   !LOCALS.....
 
   integer(psb_ipk_) :: ictxt,dectype,mglob, nglob
@@ -64,11 +64,25 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
+  logical                :: dontcheck_
   character(len=20)      :: name
 
   info = psb_success_
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
+  if (present(dontcheck)) then 
+    dontcheck_ = dontcheck
+  else
+    dontcheck_ = .false.
+  end if
+  
+  if (.not. dontcheck) then 
+    if (.not.desc_a%is_bld()) then 
+      info = psb_err_invalid_cd_state_  
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+  end if
 
   ictxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
@@ -78,12 +92,6 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   ncol    = desc_a%get_local_cols()
 
   call psb_info(ictxt, me, np)
-
-  if (.not.desc_a%is_bld()) then 
-    info = psb_err_invalid_cd_state_  
-    call psb_errpush(info,name)
-    goto 9999
-  endif
 
   if (nz < 0) then 
     info = 1111
@@ -121,7 +129,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   if (present(ila).and.present(jla)) then 
     call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
     if (info == psb_success_) &
-         & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
+         & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0),dontcheck=.true.)
   else
     if (present(ila).or.present(jla)) then 
       write(psb_err_unit,*) 'Inconsistent call : ',present(ila),present(jla)
@@ -134,7 +142,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
     end if
     call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
     if (info == psb_success_) &
-         & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
+         & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0),dontcheck=.true.)
     deallocate(ila_)
   end if
   if (info /= psb_success_) goto 9999
@@ -168,7 +176,7 @@ end subroutine psb_cdinsrc
 !    mask(:)  - logical, optional, target
 !    lidx(:)  - integer(psb_ipk_), optional    User-defined local col indices
 !
-subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
+subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx,dontcheck)
   use psb_base_mod, psb_protect_name => psb_cdinsc
   use psi_mod
   implicit none
@@ -180,6 +188,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   integer(psb_ipk_), optional, intent(out) :: jla(:)
   logical, optional, target, intent(in)    :: mask(:) 
   integer(psb_ipk_), intent(in), optional  :: lidx(:)
+  logical, intent(in), optional                :: dontcheck
 
 
   !LOCALS.....
@@ -190,13 +199,26 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
-  logical, allocatable, target  :: mask__(:) 
-  logical, pointer       :: mask_(:) 
+  logical                :: dontcheck_
   character(len=20)      :: name
+  
 
   info = psb_success_
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
+  if (present(dontcheck)) then 
+    dontcheck_ = dontcheck
+  else
+    dontcheck_ = .false.
+  end if
+  
+  if (.not. dontcheck) then 
+    if (.not.desc%is_bld()) then 
+      info = psb_err_invalid_cd_state_  
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+  end if
 
   ictxt   = desc%get_context()
   dectype = desc%get_dectype()
@@ -206,12 +228,6 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   ncol    = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
-
-  if (.not.desc%is_bld()) then 
-    info = psb_err_invalid_cd_state_  
-    call psb_errpush(info,name)
-    goto 9999
-  endif
 
   if (nz < 0) then 
     info = 1111
@@ -246,11 +262,6 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-!!$    mask_ => mask
-!!$  else
-!!$    allocate(mask__(nz))
-!!$    mask_ => mask__
-!!$    mask_ = .true.
   end if
 
   if (present(jla)) then 

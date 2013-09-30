@@ -75,11 +75,11 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   name = 'psb_dspins'
   call psb_erractionsave(err_act)
 
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+!!$  if (.not.desc_a%is_ok()) then
+!!$    info = psb_err_invalid_cd_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
 
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -133,7 +133,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=ierr)
         goto 9999
       end if
-      call  psb_cdins(nz,ia,ja,desc_a,info,ila=ila,jla=jla)
+      call  psb_cdins(nz,ia,ja,desc_a,info,ila=ila,jla=jla,dontcheck=.true.)
 
       if (info /= psb_success_) then
         ierr(1) = info
@@ -284,7 +284,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 
     call psb_glob_to_loc(ia(1:nz),ila(1:nz),desc_ar,info,iact='I',owned=.true.)
 
-    call psb_cdins(nz,ja,desc_ac,info,jla=jla, mask=(ila(1:nz)>0))
+    call psb_cdins(nz,ja,desc_ac,info,jla=jla, mask=(ila(1:nz)>0),dontcheck=.true.)
 
     if (psb_errstatus_fatal()) then
       ierr(1) = info 
