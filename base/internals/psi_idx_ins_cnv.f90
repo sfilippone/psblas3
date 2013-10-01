@@ -81,13 +81,13 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask,lidx)
   ncol  = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
-
-  if ((.not.allocated(desc%indxmap)).or.&
-       & (.not.desc%is_bld())) then 
-    info =  psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+!!$
+!!$  if ((.not.allocated(desc%indxmap)).or.&
+!!$       & (.not.desc%is_bld())) then 
+!!$    info =  psb_err_invalid_cd_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
 
   if (nv < 0) then 
     info = 1111
@@ -219,12 +219,12 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask,lidx)
 
   call psb_info(ictxt, me, np)
 
-  if ((.not.allocated(desc%indxmap)).or.&
-       & (.not.desc%is_bld())) then 
-    info =  psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+!!$  if ((.not.allocated(desc%indxmap)).or.&
+!!$       & (.not.desc%is_bld())) then 
+!!$    info =  psb_err_invalid_cd_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
 
   if (nv < 0) then 
     info = 1111

@@ -91,15 +91,14 @@ module psb_cd_tools_mod
   end interface
 
   interface psb_cdins
-    subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla,dontcheck)
+    subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a
       integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
       integer(psb_ipk_), intent(out)               :: info
       integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
-      logical, intent(in), optional                :: dontcheck
     end subroutine psb_cdinsrc
-    subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx,dontcheck)
+    subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       import :: psb_ipk_, psb_desc_type
       type(psb_desc_type), intent(inout)         :: desc
       integer(psb_ipk_), intent(in)              :: nz,ja(:)
@@ -107,7 +106,6 @@ module psb_cd_tools_mod
       integer(psb_ipk_), optional, intent(out)   :: jla(:)
       logical, optional, target, intent(in)      :: mask(:)
       integer(psb_ipk_), intent(in), optional    :: lidx(:)
-      logical, intent(in), optional                :: dontcheck
     end subroutine psb_cdinsc
   end interface
 
