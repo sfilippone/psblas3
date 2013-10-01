@@ -765,7 +765,6 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-    
 
   iwork => null()
   ! check for presence/size of a work area

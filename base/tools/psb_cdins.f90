@@ -121,9 +121,6 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
     call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
     if (info == psb_success_) &
          & call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
-!!$    call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
-!!$    if (info == psb_success_) &
-!!$         & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
   else
     if (present(ila).or.present(jla)) then 
       write(psb_err_unit,*) 'Inconsistent call : ',present(ila),present(jla)
@@ -139,10 +136,6 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       jla_(1:nz) = ja(1:nz)
       call desc_a%indxmap%g2lip_ins(jla_(1:nz),info,mask=(ila_(1:nz)>0))
     end if
-
-!!$    call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
-!!$    if (info == psb_success_) &
-!!$         & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
     deallocate(ila_)
   end if
   if (info /= psb_success_) goto 9999
@@ -256,9 +249,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   end if
 
   if (present(jla)) then 
-!!$    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask,lidx=lidx)
     call desc%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=mask,lidx=lidx)
-
   else
     allocate(jla_(nz),stat=info)
     if (info /= psb_success_) then 
@@ -266,7 +257,6 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-!!$    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask,lidx=lidx)
     call desc%indxmap%g2l_ins(ja(1:nz),jla_(1:nz),info,mask=mask,lidx=lidx)
     deallocate(jla_)
   end if

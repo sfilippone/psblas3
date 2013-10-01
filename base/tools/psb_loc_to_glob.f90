@@ -66,6 +66,12 @@ subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
   info=psb_success_
   name='psb_loc_to_glob2'
   call psb_erractionsave(err_act)
+  if (.not.desc_a%is_valid()) then 
+    info =  psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
 
   if (present(iact)) then
     act=iact
@@ -171,6 +177,11 @@ subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
   info=psb_success_
   name='psb_loc_to_glob'
   call psb_erractionsave(err_act)
+  if (.not.desc_a%is_valid()) then 
+    info =  psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   if (present(iact)) then
     act=iact

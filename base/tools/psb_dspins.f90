@@ -75,12 +75,6 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   name = 'psb_dspins'
   call psb_erractionsave(err_act)
 
-!!$  if (.not.desc_a%is_ok()) then
-!!$    info = psb_err_invalid_cd_state_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  end if
-
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
 
@@ -133,7 +127,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
              & a_err='allocate',i_err=ierr)
         goto 9999
       end if
-!!$      call  psb_cdins(nz,ia,ja,desc_a,info,ila=ila,jla=jla,good_desc=.true.)
+
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
       call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
 
@@ -180,8 +174,6 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         goto 9999
       end if
 
-!!$      call psb_glob_to_loc(ia(1:nz),ila(1:nz),desc_a,info,iact='I')
-!!$      call psb_glob_to_loc(ja(1:nz),jla(1:nz),desc_a,info,iact='I')
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
       call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
 
@@ -286,8 +278,6 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
     end if
 
     call desc_ar%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
-    
-!!$    call psb_cdins(nz,ja,desc_ac,info,jla=jla, mask=(ila(1:nz)>0))
     call desc_ac%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info, mask=(ila(1:nz)>0))
 
     if (psb_errstatus_fatal()) then
