@@ -136,7 +136,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       jla_(1:nz) = ja(1:nz)
       call desc_a%indxmap%g2lip_ins(jla_(1:nz),info,mask=(ila_(1:nz)>0))
     end if
-    deallocate(ila_)
+    deallocate(ila_,jla_,stat=info)
   end if
   if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
