@@ -529,7 +529,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for first idx_cnv', desc_ov%indxmap%get_state()
 
-      call psi_idx_cnv(iszr,workr,maskr,desc_ov,info)
+      call desc_ov%indxmap%g2l(workr(1:iszr),maskr(1:iszr),info)
       iszs = count(maskr(1:iszr)<=0)
       if (iszs > size(works)) call psb_realloc(iszs,works,info)
       j = 0
@@ -549,7 +549,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for fnd_owner', desc_ov%indxmap%get_state()
-      call psi_fnd_owner(iszs,works,temp,desc_a,info)
+      call desc_a%indxmap%fnd_owner(works(1:iszs),temp,info)
       n_col = desc_ov%get_local_cols()
 
       if (debug_level >= psb_debug_outer_) &
@@ -559,7 +559,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       do i=1,iszs
         idx = works(i)
         n_col   = desc_ov%get_local_cols()
-        call psi_idx_ins_cnv(idx,lidx,desc_ov,info)
+        call desc_ov%indxmap%g2l_ins(idx,lidx,info)
         if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as

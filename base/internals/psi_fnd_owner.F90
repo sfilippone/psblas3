@@ -104,7 +104,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     goto 9999
   endif
 
-  if (.not.(psb_is_ok_desc(desc))) then 
+  if (.not.(desc%is_ok())) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid desc')
     goto 9999      
   end if

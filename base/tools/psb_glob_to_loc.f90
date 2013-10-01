@@ -59,10 +59,9 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer(psb_ipk_) :: n
+  integer(psb_ipk_) :: n, ictxt, iam, np 
   character                          :: act
   integer(psb_ipk_) :: int_err(5), err_act
-  logical                            :: owned_
   integer(psb_ipk_), parameter                 :: zero=0
   character(len=20)   :: name
 
@@ -70,6 +69,15 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   info=psb_success_
   name = 'glob_to_loc'
   call psb_erractionsave(err_act)
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ictxt = desc_a%get_context()
+  call psb_info(ictxt,iam,np)
+
 
   if (present(iact)) then
     act=iact
@@ -77,15 +85,16 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
     act='I'
   endif
   act = psb_toupper(act)
-  if (present(owned)) then 
-    owned_=owned
+  if (present(iact)) then
+    act=iact
   else
-    owned_=.false.
-  end if
-    
-  int_err  = 0
+    act='I'
+  endif
+
+  act = psb_toupper(act)
+
   n = size(x)
-  call psi_idx_cnv(n,x,y,desc_a,info,owned=owned_)
+  call desc_a%indxmap%g2l(x(1:n),y(1:n),info,owned=owned)    
 
   select case(act)
   case('E','I')
@@ -181,7 +190,6 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   integer(psb_ipk_) :: n
   character                        :: act
   integer(psb_ipk_) :: err_act
-  logical                          :: owned_
   integer(psb_ipk_), parameter               :: zero=0
   character(len=20)   :: name
   integer(psb_ipk_) :: ictxt, iam, np
@@ -189,25 +197,27 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   name = 'glob_to_loc'
+
+  call psb_erractionsave(err_act)
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
   ictxt = desc_a%get_context()
   call psb_info(ictxt,iam,np)
-  call psb_erractionsave(err_act)
+
 
   if (present(iact)) then
     act=iact
   else
     act='I'
   endif
-  if (present(owned)) then 
-    owned_=owned
-  else
-    owned_=.false.
-  end if
 
   act = psb_toupper(act)
 
-  n = size(x)
-  call psi_idx_cnv(n,x,desc_a,info,owned=owned_)
+  call desc_a%indxmap%g2lip(x,info,owned=owned)    
 
   select case(act)
   case('E','I')

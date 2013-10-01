@@ -77,12 +77,11 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionsave(err_act)
   name = 'psb_insvi'
 
-  if (.not.psb_is_ok_desc(desc_a)) then
-    int_err(1)=3110
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     return
   end if
-
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -97,11 +96,6 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl,local)
     info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
-    call psb_errpush(info,name,int_err)
-    goto 9999
-  else if (.not.psb_is_ok_desc(desc_a)) then
-    info = psb_err_input_matrix_unassembled_
-    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name,int_err)
     goto 9999
   else if (size(x, dim=1) < desc_a%get_local_rows()) then
@@ -138,7 +132,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
@@ -268,12 +262,11 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionsave(err_act)
   name = 'psb_iinsi'
 
-  if (.not.psb_is_ok_desc(desc_a)) then
-    int_err(1)=3110
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     return
   end if
-
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -288,11 +281,6 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl,local)
     info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
-    call psb_errpush(info,name,int_err)
-    goto 9999
-  else if (.not.psb_is_ok_desc(desc_a)) then
-    info = psb_err_input_matrix_unassembled_
-    int_err(1) = desc_a%get_dectype()
     call psb_errpush(info,name,int_err)
     goto 9999
   else if (size(x, dim=1) < desc_a%get_local_rows()) then
@@ -332,7 +320,7 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
 
   select case(dupl_) 
@@ -487,7 +475,7 @@ subroutine psb_iins_vect(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   call x%ins(m,irl,val,dupl_,info) 
   if (info /= 0) then 
