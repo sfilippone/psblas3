@@ -69,6 +69,12 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   info = psb_success_
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
+  
+  if (.not.desc_a%is_bld()) then 
+    info = psb_err_invalid_cd_state_  
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   ictxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
@@ -78,12 +84,6 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   ncol    = desc_a%get_local_cols()
 
   call psb_info(ictxt, me, np)
-
-  if (.not.desc_a%is_bld()) then 
-    info = psb_err_invalid_cd_state_  
-    call psb_errpush(info,name)
-    goto 9999
-  endif
 
   if (nz < 0) then 
     info = 1111
@@ -119,23 +119,25 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   end if
 
   if (present(ila).and.present(jla)) then 
-    call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
+    call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
     if (info == psb_success_) &
-         & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
+         & call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
   else
     if (present(ila).or.present(jla)) then 
       write(psb_err_unit,*) 'Inconsistent call : ',present(ila),present(jla)
     endif
-    allocate(ila_(nz),stat=info)
+    allocate(ila_(nz),jla_(nz),stat=info)
     if (info /= psb_success_) then 
       info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     end if
-    call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
-    if (info == psb_success_) &
-         & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
-    deallocate(ila_)
+    call desc_a%indxmap%g2l(ia(1:nz),ila_(1:nz),info,owned=.true.)
+    if (info == psb_success_) then 
+      jla_(1:nz) = ja(1:nz)
+      call desc_a%indxmap%g2lip_ins(jla_(1:nz),info,mask=(ila_(1:nz)>0))
+    end if
+    deallocate(ila_,jla_,stat=info)
   end if
   if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
@@ -190,13 +192,18 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila_(:), jla_(:)
-  logical, allocatable, target  :: mask__(:) 
-  logical, pointer       :: mask_(:) 
   character(len=20)      :: name
+  
 
   info = psb_success_
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
+
+  if (.not.desc%is_bld()) then 
+    info = psb_err_invalid_cd_state_  
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   ictxt   = desc%get_context()
   dectype = desc%get_dectype()
@@ -206,12 +213,6 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   ncol    = desc%get_local_cols()
 
   call psb_info(ictxt, me, np)
-
-  if (.not.desc%is_bld()) then 
-    info = psb_err_invalid_cd_state_  
-    call psb_errpush(info,name)
-    goto 9999
-  endif
 
   if (nz < 0) then 
     info = 1111
@@ -246,15 +247,10 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-    mask_ => mask
-  else
-    allocate(mask__(nz))
-    mask_ => mask__
-    mask_ = .true.
   end if
 
   if (present(jla)) then 
-    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask_,lidx=lidx)
+    call desc%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=mask,lidx=lidx)
   else
     allocate(jla_(nz),stat=info)
     if (info /= psb_success_) then 
@@ -262,7 +258,7 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
       call psb_errpush(info,name)
       goto 9999
     end if
-    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask_,lidx=lidx)
+    call desc%indxmap%g2l_ins(ja(1:nz),jla_(1:nz),info,mask=mask,lidx=lidx)
     deallocate(jla_)
   end if
 
