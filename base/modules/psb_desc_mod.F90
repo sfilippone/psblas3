@@ -40,8 +40,6 @@ module psb_desc_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_i_vect_mod
-!!$
-!!$  use psb_hash_mod 
 
   implicit none
 
@@ -227,7 +225,8 @@ module psb_desc_mod
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
     procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
     procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
-    procedure, pass(desc) :: get_context     => psb_cd_get_context
+    procedure, pass(desc) :: get_context     => psb_cd_get_context    
+    procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
     procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
@@ -243,6 +242,7 @@ module psb_desc_mod
     procedure, pass(desc) :: nullify         => nullify_desc
 
     procedure, pass(desc) :: get_fmt         => cd_get_fmt
+    procedure, pass(desc) :: fnd_owner       => cd_fnd_owner
     procedure, pass(desc) :: l2gs1           => cd_l2gs1
     procedure, pass(desc) :: l2gs2           => cd_l2gs2
     procedure, pass(desc) :: l2gv1           => cd_l2gv1
@@ -293,7 +293,7 @@ module psb_desc_mod
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
-       & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins
+       & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
 
 
   integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
@@ -1565,5 +1565,45 @@ contains
     Return
 
   end subroutine cd_g2lv2_ins
+
+
+  subroutine cd_fnd_owner(idx,iprc,desc,info)
+    use psb_error_mod
+    implicit none 
+    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_fnd_owner'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%fnd_owner(idx,iprc,info)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_fnd_owner
+
 
 end module psb_desc_mod

@@ -109,10 +109,10 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     goto 9999      
   end if
 
-  call desc%indxmap%fnd_owner(idx(1:nv),iprc,info)
+  call desc%fnd_owner(idx(1:nv),iprc,info)
   
   if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='indxmap%fnd_owner') 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='desc%fnd_owner') 
     goto 9999      
   end if
   call psb_erractionrestore(err_act)

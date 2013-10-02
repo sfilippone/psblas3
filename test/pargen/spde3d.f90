@@ -256,7 +256,7 @@ program spde3d
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
+    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
   end if
 
 
