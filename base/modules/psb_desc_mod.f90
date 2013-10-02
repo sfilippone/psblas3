@@ -419,7 +419,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_lr()
     else
       val = -1
@@ -431,7 +431,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_lc()
     else
       val = -1
@@ -443,7 +443,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_gr()
     else
       val = -1
@@ -456,7 +456,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_gc()
     else
       val = -1
