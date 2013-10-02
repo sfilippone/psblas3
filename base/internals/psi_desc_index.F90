@@ -261,7 +261,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
       end do
     else
       
-      call desc%l2g(index_in(i+1:i+nerv),&
+      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
            & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
            & info) 
 
@@ -310,13 +310,13 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + 1 
     nerv = sdsz(proc+1) 
     desc_index(i) = nerv
-    call desc%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+    call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          &  desc_index(i+1:i+nerv),info)
       
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd
-    call desc%g2l(rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
+    call desc%indxmap%g2l(rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
          &  desc_index(i+1:i+nesd),info)
     i = i + nesd + 1 
   end do

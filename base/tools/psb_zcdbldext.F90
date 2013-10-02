@@ -523,7 +523,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for first idx_cnv', desc_ov%indxmap%get_state()
 
-      call desc_ov%g2l(workr(1:iszr),maskr(1:iszr),info)
+      call desc_ov%indxmap%g2l(workr(1:iszr),maskr(1:iszr),info)
       iszs = count(maskr(1:iszr)<=0)
       if (iszs > size(works)) call psb_realloc(iszs,works,info)
       j = 0
@@ -553,7 +553,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       do i=1,iszs
         idx = works(i)
         n_col   = desc_ov%get_local_cols()
-        call desc_ov%g2l_ins(idx,lidx,info)
+        call desc_ov%indxmap%g2l_ins(idx,lidx,info)
         if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as
