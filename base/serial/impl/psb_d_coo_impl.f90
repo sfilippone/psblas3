@@ -3458,398 +3458,86 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
   case(0) !  Row major order
 
-    if (.false.)  then 
 
-      call msort_up(nzin,ia(1:),iaux(1:),iret)
+    call msort_up(nzin,ia(1:),iaux(1:),iret)
+    if (iret == 0) &
+         & call psb_ip_reord(nzin,val,ia,ja,iaux)
+    i    = 1
+    j    = i
+    do while (i <= nzin)
+      do while ((ia(j) == ia(i)))
+        j = j+1
+        if (j > nzin) exit
+      enddo
+      nzl = j - i
+      call msort_up(nzl,ja(i:),iaux(1:),iret)
       if (iret == 0) &
-           & call psb_ip_reord(nzin,val,ia,ja,iaux)
-      i    = 1
-      j    = i
-      do while (i <= nzin)
-        do while ((ia(j) == ia(i)))
-          j = j+1
-          if (j > nzin) exit
-        enddo
-        nzl = j - i
-        call msort_up(nzl,ja(i:),iaux(1:),iret)
-        if (iret == 0) &
-             & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-             & ja(i:i+nzl-1),iaux)
-        i = j
+           & call psb_ip_reord(nzl,val(i:i+nzl-1),&
+           & ja(i:i+nzl-1),iaux)
+      i = j
+    enddo
+
+    i = 1
+    irw = ia(i)
+    icl = ja(i)
+    j = 1
+
+    select case(dupl_)
+    case(psb_dupl_ovwrt_)
+
+      do 
+        j = j + 1
+        if (j > nzin) exit
+        if ((ia(j) == irw).and.(ja(j) == icl)) then 
+          val(i) = val(j)
+        else
+          i = i+1
+          val(i) = val(j)
+          ia(i) = ia(j)
+          ja(i) = ja(j)
+          irw = ia(i) 
+          icl = ja(i) 
+        endif
       enddo
 
-      i = 1
-      irw = ia(i)
-      icl = ja(i)
-      j = 1
+    case(psb_dupl_add_)
 
-      select case(dupl_)
-      case(psb_dupl_ovwrt_)
-
-        do 
-          j = j + 1
-          if (j > nzin) exit
-          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-            val(i) = val(j)
-          else
-            i = i+1
-            val(i) = val(j)
-            ia(i) = ia(j)
-            ja(i) = ja(j)
-            irw = ia(i) 
-            icl = ja(i) 
-          endif
-        enddo
-
-      case(psb_dupl_add_)
-
-        do 
-          j = j + 1
-          if (j > nzin) exit
-          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-            val(i) = val(i) + val(j)
-          else
-            i = i+1
-            val(i) = val(j)
-            ia(i) = ia(j)
-            ja(i) = ja(j)
-            irw = ia(i) 
-            icl = ja(i) 
-          endif
-        enddo
-
-      case(psb_dupl_err_)
-        do 
-          j = j + 1
-          if (j > nzin) exit
-          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-            call psb_errpush(psb_err_duplicate_coo,name)          
-            goto 9999
-          else
-            i = i+1
-            val(i) = val(j)
-            ia(i) = ia(j)
-            ja(i) = ja(j)
-            irw = ia(i) 
-            icl = ja(i) 
-          endif
-        enddo
-      case default
-        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-        info =-7
-      end select
-
-!!$      write(0,*) 'End of fix_coo ia',ia(1:i)
-!!$      write(0,*) 'End of fix_coo ja',ja(1:i)
-
-    else     if (.true.)  then 
-
-      call msort_up(nzin,ia(1:),iaux(1:),iret)
-      if (iret == 0) &
-           & call psb_ip_reord(nzin,val,ia,ja,iaux)
-
-      i    = 1
-      j    = 1
-      ki   = 0
-      select case(dupl_)
-      case(psb_dupl_ovwrt_)
-
-        do while (i <= nzin)
-          do while ((ia(j) == ia(i)))
-            j = j+1
-            if (j > nzin) exit
-          enddo
-          nzl = j - i
-          call msort_up(nzl,ja(i:),iaux(1:),iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-               & ja(i:i+nzl-1),iaux)
-          kx      = 0
-          ki      = ki + 1 
-          val(ki) = val(i+kx)
-          ia(ki)  = ia(i+kx)
-          ja(ki)  = ja(i+kx)
-          irw     = ia(ki) 
-          icl     = ja(ki)
-
-          do kx = 1,nzl-1
-            if (ja(i+kx) == icl) then 
-              val(ki) = val(i+kx)
-            else
-              ki = ki+1
-              val(ki) = val(i+kx)
-              ja(ki)  = ja(i+kx)
-              ia(ki)  = irw
-              icl     = ja(ki) 
-            endif
-          enddo
-
-          i = j
-        enddo
-
-      case(psb_dupl_add_)
-
-
-        do while (i <= nzin)
-          do while ((ia(j) == ia(i)))
-            j = j+1
-            if (j > nzin) exit
-          enddo
-          nzl = j - i
-          call msort_up(nzl,ja(i:),iaux(1:),iret)
-          if (iret == 0) &
-               & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-               & ja(i:i+nzl-1),iaux)
-          kx      = 0
-          ki      = ki + 1 
-          val(ki) = val(i+kx)
-          ia(ki)  = ia(i+kx)
-          ja(ki)  = ja(i+kx)
-          irw     = ia(ki) 
-          icl     = ja(ki)
-          do kx = 1,nzl-1
-            if (ja(i+kx) == icl) then 
-              val(ki) = val(ki) + val(i+kx)
-            else
-              ki = ki+1
-              val(ki) = val(i+kx)
-              ja(ki)  = ja(i+kx)
-              ia(ki)  = irw
-              icl     = ja(ki) 
-!!$              write(0,*) 'ki icl kx',ki,icl,kx,' ja',ja(ki)
-            endif
-
-          enddo
-          i = j
-        enddo
-
-      case(psb_dupl_err_)
-
-
-        do while (i <= nzin)
-          do while ((ia(j) == ia(i)))
-            j = j+1
-            if (j > nzin) exit
-          enddo
-          nzl = j - i
-
-          if (.false.) then 
-            call msort_up(nzl,ja(i:),iaux(1:),iret)
-            if (iret == 0) &
-                 & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-                 & ja(i:i+nzl-1),iaux)
-            kx      = 0
-            ki      = ki + 1 
-            val(ki) = val(i+kx)
-            ia(ki)  = ia(i+kx)
-            ja(ki)  = ja(i+kx)
-            irw     = ia(ki) 
-            icl     = ja(ki)
-            do kx = 1,nzl-1
-              if (ja(i+kx) == icl) then 
-                call psb_errpush(psb_err_duplicate_coo,name)          
-                goto 9999
-              else
-                ki = ki+1
-                val(ki) = val(i+kx)
-                ja(ki)  = ja(i+kx)
-                ia(ki)  = irw
-                icl     = ja(ki) 
-              endif
-
-            enddo
-
-          else
-
-            call psb_msort(ja(i:i+nzl-1),ix=iaux,dir=psb_sort_up_)
-            kx      = 0
-            ki      = ki + 1 
-            val(ki) = val(i+iaux(1+kx)-1)
-            ia(ki)  = ia(i+kx)
-            ja(ki)  = ja(i+kx)
-            irw     = ia(ki) 
-            icl     = ja(ki)
-            do kx = 1,nzl-1
-              if (ja(i+kx) == icl) then 
-                call psb_errpush(psb_err_duplicate_coo,name)          
-                goto 9999
-              else
-                ki = ki+1
-                val(ki) = val(i+iaux(1+kx)-1)
-                ja(ki)  = ja(i+kx)
-                ia(ki)  = irw
-                icl     = ja(ki) 
-              endif
-
-            enddo
-          end if
-
-          i = j
-        enddo
-
-      case default
-        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-        info =-7
-      end select
-
-      i = ki
-
-
-    else if (.false.) then 
-
-
-      allocate(itx(nzin),jtx(nzin),vtx(nzin),stat=info) 
-      if (info /= psb_success_) return
-      call psb_msort(ia(1:nzin),ix=iaux,dir=psb_sort_up_)
-      do i=1, nzin
-        ixp    = iaux(i)
-        vtx(i) = val(ixp)
-        itx(i) = ia(i)
-        jtx(i) = ja(ixp)
-      end do
-!!$      call psb_msort(itx(1:nzin),ix=iaux,dir=psb_sort_up_)
-!!$      do i=1, nzin
-!!$        ixp    = iaux(i)
-!!$        val(i) = vtx(ixp) 
-!!$        ia(i)  = itx(i) 
-!!$        ja(i)  = jtx(ixp) 
-!!$      end do
-!!$      
-      i    = 1
-      j    = i
-      ki   = 1
-      do while (i <= nzin)
-        do while ((itx(j) == itx(i)))
-          j = j+1
-          if (j > nzin) exit
-        enddo
-        nzl = j - i
-        call msort_up(nzl,jtx(i:),iaux(1:),iret)
-        if (iret == 0) &
-             & call psb_ip_reord(nzl,vtx(i:i+nzl-1),&
-             & jtx(i:i+nzl-1),iaux)
-
-        ia(ki:ki+nzl-1)  = itx(i:i+nzl-1)
-        val(ki) = vtx(i) 
-        ja(ki)  = jtx(i) 
-        icl     = jtx(i)
-        kx      = 0
-        select case(dupl_)
-        case(psb_dupl_ovwrt_)
-          do 
-            kx = kx + 1
-            if (kx >= nzl) exit
-            if (jtx(i+kx) == icl) then 
-              val(ki) = vtx(i+kx)
-            else
-              ki = ki+1
-              val(ki) = vtx(i+kx)
-              ja(ki)  = ja(i+kx)
-              icl     = ja(i+kx) 
-            endif
-          enddo
-
-        case(psb_dupl_add_)
-
-          do 
-            kx = kx + 1
-            if (kx >= nzl) exit
-            if (jtx(i+kx) == icl) then 
-              val(ki) = val(ki) + vtx(i+kx)
-            else
-              ki      = ki+1
-              val(ki) = vtx(i+kx)
-              ja(ki)  = ja(i+kx)
-              icl     = ja(i+kx) 
-            endif
-          enddo
-
-        case(psb_dupl_err_)
-          do 
-            kx = kx + 1
-            if (kx >= nzl) exit
-            if (jtx(i+kx) == icl) then 
-              call psb_errpush(psb_err_duplicate_coo,name)          
-              goto 9999
-            else
-              ki      = ki+1
-              val(ki) = vtx(i+kx)
-              ja(ki)  = ja(i+kx)
-              icl     = ja(i+kx) 
-            endif
-          enddo
-        case default
-          write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-          info =-7
-        end select
-
-        i = j
+      do 
+        j = j + 1
+        if (j > nzin) exit
+        if ((ia(j) == irw).and.(ja(j) == icl)) then 
+          val(i) = val(i) + val(j)
+        else
+          i = i+1
+          val(i) = val(j)
+          ia(i) = ia(j)
+          ja(i) = ja(j)
+          irw = ia(i) 
+          icl = ja(i) 
+        endif
       enddo
-      i = ki
-!!$
-!!$      i = 1
-!!$      irw = ia(i)
-!!$      icl = ja(i)
-!!$      j = 1
-!!$
-!!$      select case(dupl_)
-!!$      case(psb_dupl_ovwrt_)
-!!$
-!!$        do 
-!!$          j = j + 1
-!!$          if (j > nzin) exit
-!!$          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-!!$            val(i) = val(j)
-!!$          else
-!!$            i = i+1
-!!$            val(i) = val(j)
-!!$            ia(i) = ia(j)
-!!$            ja(i) = ja(j)
-!!$            irw = ia(i) 
-!!$            icl = ja(i) 
-!!$          endif
-!!$        enddo
-!!$
-!!$      case(psb_dupl_add_)
-!!$
-!!$        do 
-!!$          j = j + 1
-!!$          if (j > nzin) exit
-!!$          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-!!$            val(i) = val(i) + val(j)
-!!$          else
-!!$            i = i+1
-!!$            val(i) = val(j)
-!!$            ia(i) = ia(j)
-!!$            ja(i) = ja(j)
-!!$            irw = ia(i) 
-!!$            icl = ja(i) 
-!!$          endif
-!!$        enddo
-!!$
-!!$      case(psb_dupl_err_)
-!!$        do 
-!!$          j = j + 1
-!!$          if (j > nzin) exit
-!!$          if ((ia(j) == irw).and.(ja(j) == icl)) then 
-!!$            call psb_errpush(psb_err_duplicate_coo,name)          
-!!$            goto 9999
-!!$          else
-!!$            i = i+1
-!!$            val(i) = val(j)
-!!$            ia(i) = ia(j)
-!!$            ja(i) = ja(j)
-!!$            irw = ia(i) 
-!!$            icl = ja(i) 
-!!$          endif
-!!$        enddo
-!!$      case default
-!!$        write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
-!!$        info =-7
-!!$      end select
-!!$
-!!$    end if
-    end if
+
+    case(psb_dupl_err_)
+      do 
+        j = j + 1
+        if (j > nzin) exit
+        if ((ia(j) == irw).and.(ja(j) == icl)) then 
+          call psb_errpush(psb_err_duplicate_coo,name)          
+          goto 9999
+        else
+          i = i+1
+          val(i) = val(j)
+          ia(i) = ia(j)
+          ja(i) = ja(j)
+          irw = ia(i) 
+          icl = ja(i) 
+        endif
+      enddo
+    case default
+      write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
+      info =-7
+    end select
+
     if(debug_level >= psb_debug_serial_)&
          & write(debug_unit,*)  trim(name),': end second loop'
 
