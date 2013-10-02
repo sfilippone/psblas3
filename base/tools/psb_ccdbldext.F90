@@ -254,7 +254,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     Do j=0,n_elem_recv-1
 
       idx = desc_a%ovrlap_index(counter+psb_elem_recv_+j)
-      call desc_ov%indxmap%l2g(idx,gidx,info) 
+      call desc_ov%l2g(idx,gidx,info) 
       If (gidx < 0) then 
         info=-3
         call psb_errpush(info,name)
@@ -355,7 +355,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         end If
 
         idx = halo(counter+psb_elem_recv_+j)
-        call desc_ov%indxmap%l2g(idx,gidx,info) 
+        call desc_ov%l2g(idx,gidx,info) 
         If (gidx < 0) then 
           info=-3
           call psb_errpush(info,name)
@@ -399,7 +399,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       Do j=0,n_elem_send-1
 
         idx = halo(counter+psb_elem_send_+j)
-        call desc_ov%indxmap%l2g(idx,gidx,info) 
+        call desc_ov%l2g(idx,gidx,info) 
         If (gidx < 0) then 
           info=-3
           call psb_errpush(info,name)
@@ -435,7 +435,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-          call desc_ov%indxmap%l2g(icol(1:n_elem),&
+          call desc_ov%l2g(icol(1:n_elem),&
                & works(idxs+tot_elem+1:idxs+tot_elem+n_elem),&
                & info) 
 
@@ -523,7 +523,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for first idx_cnv', desc_ov%indxmap%get_state()
 
-      call desc_ov%indxmap%g2l(workr(1:iszr),maskr(1:iszr),info)
+      call desc_ov%g2l(workr(1:iszr),maskr(1:iszr),info)
       iszs = count(maskr(1:iszr)<=0)
       if (iszs > size(works)) call psb_realloc(iszs,works,info)
       j = 0
@@ -543,7 +543,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
          & ': going for fnd_owner', desc_ov%indxmap%get_state()
-      call desc_a%indxmap%fnd_owner(works(1:iszs),temp,info)
+      call desc_a%fnd_owner(works(1:iszs),temp,info)
       n_col = desc_ov%get_local_cols()
 
       if (debug_level >= psb_debug_outer_) &
@@ -553,7 +553,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       do i=1,iszs
         idx = works(i)
         n_col   = desc_ov%get_local_cols()
-        call desc_ov%indxmap%g2l_ins(idx,lidx,info)
+        call desc_ov%g2l_ins(idx,lidx,info)
         if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as
