@@ -80,7 +80,7 @@ subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
   endif
   act=psb_toupper(act)
 
-  call desc_a%indxmap%l2g(x,y,info) 
+  call desc_a%l2g(x,y,info) 
 
   if (info /= psb_success_) then
     select case(act)
@@ -190,7 +190,7 @@ subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
   endif
   act = psb_toupper(act)
 
-  call desc_a%indxmap%l2gip(x,info) 
+  call desc_a%l2gip(x,info) 
 
   if (info /= psb_success_) then
     select case(act)

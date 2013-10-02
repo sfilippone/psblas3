@@ -169,7 +169,7 @@ program pdgenspmv
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth
     bdwdth = times*nbytes/(tt2*1.d6)
     write(psb_out_unit,'("MBYTES/S                  (trans): ",F20.3)') bdwdth
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
+    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     
   end if

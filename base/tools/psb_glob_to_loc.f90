@@ -94,7 +94,7 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   act = psb_toupper(act)
 
   n = size(x)
-  call desc_a%indxmap%g2l(x(1:n),y(1:n),info,owned=owned)    
+  call desc_a%g2l(x(1:n),y(1:n),info,owned=owned)    
 
   select case(act)
   case('E','I')
@@ -217,7 +217,7 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
 
   act = psb_toupper(act)
 
-  call desc_a%indxmap%g2lip(x,info,owned=owned)    
+  call desc_a%g2lip(x,info,owned=owned)    
 
   select case(act)
   case('E','I')

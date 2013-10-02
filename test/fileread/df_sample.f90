@@ -289,7 +289,7 @@ program df_sample
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
-         &  desc_a%indxmap%get_fmt()
+         &  desc_a%get_fmt()
   end if
 !!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
