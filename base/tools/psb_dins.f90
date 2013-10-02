@@ -134,7 +134,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call desc_a%g2l(irw(1:m),irl(1:m),info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
@@ -280,7 +280,7 @@ subroutine psb_dins_vect(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call desc_a%g2l(irw(1:m),irl(1:m),info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   call x%ins(m,irl,val,dupl_,info) 
   if (info /= 0) then 
@@ -400,7 +400,7 @@ subroutine psb_dins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call desc_a%g2l(irw(1:m),irl(1:m),info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   
   do i=1,n
@@ -569,7 +569,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl,local)
   if (local_) then 
     irl(1:m) = irw(1:m)
   else
-    call desc_a%g2l(irw(1:m),irl(1:m),info,owned=.true.)
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
   
   select case(dupl_) 
