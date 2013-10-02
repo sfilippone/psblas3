@@ -62,7 +62,6 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   integer(psb_ipk_) :: n, ictxt, iam, np 
   character                          :: act
   integer(psb_ipk_) :: int_err(5), err_act
-  logical                            :: owned_
   integer(psb_ipk_), parameter                 :: zero=0
   character(len=20)   :: name
 
@@ -191,7 +190,6 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   integer(psb_ipk_) :: n
   character                        :: act
   integer(psb_ipk_) :: err_act
-  logical                          :: owned_
   integer(psb_ipk_), parameter               :: zero=0
   character(len=20)   :: name
   integer(psb_ipk_) :: ictxt, iam, np
