@@ -75,7 +75,7 @@ module psb_indx_map_mod
   !!  
   !!  1. Each global index I is owned by at least one process;
   !!
-  !!  2. On each process, indices from 1 to N_ROW (desc%get_local_rows())
+  !!  2. On each process, indices from 1 to N_ROW (desc%indxmap%get_lr())
   !!     are locally owned; the value of N_ROW can be determined upon allocation 
   !!     based on the index distribution (see also the interface to CDALL).
   !!
