@@ -1,5 +1,13 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/10/01: New desc_type methods calling into indxmap methods.
+	
+2013/09/30: Restructure index conversion methods, simplify.
+	
+2013/09/26: Simplify checks in  matrix-vector products
+	
+2013/08/01: Defined new get_fmt method for vectors
+	
 2013/06/19: Fixed type match bug in daxpby/saxpby/zaxpby. 
 	
 2013/06/05: Fix INTENT in APPEND methods. 	
