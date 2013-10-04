@@ -46,6 +46,7 @@ module psb_c_vect_mod
   contains
     procedure, pass(x) :: get_nrows => c_vect_get_nrows
     procedure, pass(x) :: sizeof   => c_vect_sizeof
+    procedure, pass(x) :: get_fmt  => c_vect_get_fmt
     procedure, pass(x) :: dot_v    => c_vect_dot_v
     procedure, pass(x) :: dot_a    => c_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -65,6 +66,7 @@ module psb_c_vect_mod
     procedure, pass(x) :: amax     => c_vect_amax
     procedure, pass(x) :: asum     => c_vect_asum
     procedure, pass(x) :: all      => c_vect_all
+    procedure, pass(x) :: reall    => c_vect_reall
     procedure, pass(x) :: zero     => c_vect_zero
     procedure, pass(x) :: asb      => c_vect_asb
     procedure, pass(x) :: sync     => c_vect_sync
@@ -217,6 +219,14 @@ contains
     if (allocated(x%v)) res = x%v%sizeof()
   end function c_vect_sizeof
 
+  function c_vect_get_fmt(x) result(res)
+    implicit none 
+    class(psb_c_vect_type), intent(in) :: x
+    character(len=5) :: res
+    res = 'NULL'
+    if (allocated(x%v)) res = x%v%get_fmt()
+  end function c_vect_get_fmt
+  
   function c_vect_dot_v(n,x,y) result(res)
     implicit none 
     class(psb_c_vect_type), intent(inout) :: x, y
@@ -428,10 +438,10 @@ contains
   subroutine c_vect_all(n, x, info, mold)
 
     implicit none 
-    integer(psb_ipk_), intent(in)                 :: n
+    integer(psb_ipk_), intent(in)       :: n
     class(psb_c_vect_type), intent(out) :: x
     class(psb_c_base_vect_type), intent(in), optional :: mold
-    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), intent(out)      :: info
     
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -449,6 +459,21 @@ contains
     end if
 
   end subroutine c_vect_all
+
+  subroutine c_vect_reall(n, x, info)
+
+    implicit none 
+    integer(psb_ipk_), intent(in)         :: n
+    class(psb_c_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)        :: info
+  
+    info = 0 
+    if (.not.allocated(x%v)) &
+         & call x%all(n,info)
+    if (info == 0) &
+         & call x%asb(n,info)
+
+  end subroutine c_vect_reall
 
   subroutine c_vect_zero(x)
     use psi_serial_mod

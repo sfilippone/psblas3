@@ -2630,8 +2630,12 @@ subroutine psb_d_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then 
       call a%reallocate(max(nza+nz,int(1.5*isza)))
-      isza = a%get_size()
     endif
+    isza = a%get_size()
+    if (isza < (nza+nz)) then 
+      info = psb_err_alloc_dealloc_; call psb_errpush(info,name)
+      goto 9999
+    end if
 
     call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
          & imin,imax,jmin,jmax,info,gtl)
@@ -2696,10 +2700,6 @@ contains
           ic = gtl(ic) 
           if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
             nza = nza + 1 
-            if (nza > maxsz) then 
-              info = -91
-              return
-            endif
             ia1(nza) = ir
             ia2(nza) = ic
             aspk(nza) = val(i)
@@ -2713,10 +2713,6 @@ contains
         ic = ja(i) 
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
-          if (nza > maxsz) then 
-            info = -92
-            return
-          endif
           ia1(nza) = ir
           ia2(nza) = ic
           aspk(nza) = val(i)
@@ -2729,7 +2725,7 @@ contains
 
   subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info,gtl)
-
+ 
     use psb_const_mod
     use psb_realloc_mod
     use psb_string_mod
@@ -3416,6 +3412,7 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_d_base_mat_mod, psb_protect_name => psb_d_fix_coo_inner
   use psb_string_mod
   use psb_ip_reord_mod
+  use psb_sort_mod
   implicit none 
 
   integer(psb_ipk_), intent(in)           :: nzin, dupl
@@ -3426,10 +3423,12 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
   !locals
   integer(psb_ipk_), allocatable :: iaux(:)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_
-  integer(psb_ipk_) :: i,j, irw, icl, err_act
+  integer(psb_ipk_) :: i,j, irw, icl, err_act, ixp,ki,kx
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
   character(len=20)    :: name = 'psb_fixcoo'
+  real(psb_dpk_), allocatable    :: vtx(:)
+  integer(psb_ipk_), allocatable :: itx(:), jtx(:) 
 
   info  = psb_success_
 
@@ -3459,6 +3458,7 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
   case(0) !  Row major order
 
+
     call msort_up(nzin,ia(1:),iaux(1:),iret)
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
@@ -3473,7 +3473,7 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       call msort_up(nzl,ja(i:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-           & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
+           & ja(i:i+nzl-1),iaux)
       i = j
     enddo
 
@@ -3537,7 +3537,6 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
       info =-7
     end select
-
 
     if(debug_level >= psb_debug_serial_)&
          & write(debug_unit,*)  trim(name),': end second loop'

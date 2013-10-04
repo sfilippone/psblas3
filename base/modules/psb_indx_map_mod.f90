@@ -1,3 +1,4 @@
+
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.1
 !!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
@@ -158,6 +159,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: asb   => base_asb
     procedure, pass(idxmap)  :: free  => base_free
     procedure, pass(idxmap)  :: clone => base_clone
+    procedure, pass(idxmap)  :: reinit => base_reinit
 
     procedure, pass(idxmap)  :: l2gs1  => base_l2gs1
     procedure, pass(idxmap)  :: l2gs2  => base_l2gs2
@@ -196,7 +198,7 @@ module psb_indx_map_mod
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
        & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins,&
        & base_g2lv2_ins, base_init_vl, base_is_null,&
-       & base_row_extendable, base_clone
+       & base_row_extendable, base_clone, base_reinit
   
   !> Function: psb_indx_map_fnd_owner
   !! \memberof psb_indx_map
@@ -878,5 +880,31 @@ contains
     end if
     return
   end subroutine base_clone
+
+
+  subroutine base_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_indx_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='base_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(psb_err_missing_override_method_,&
+         & name,a_err=idxmap%get_fmt())
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+  end subroutine base_reinit
 
 end module psb_indx_map_mod

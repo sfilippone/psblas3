@@ -97,7 +97,8 @@ module psb_d_base_vect_mod
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => d_base_get_nrows
-    procedure, pass(x) :: sizeof   => d_base_sizeof
+    procedure, pass(x) :: sizeof    => d_base_sizeof
+    procedure, nopass  :: get_fmt   => d_base_get_fmt
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
@@ -388,6 +389,7 @@ contains
     class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
     if (info /= 0) &
@@ -550,7 +552,19 @@ contains
 
   end function d_base_sizeof
 
+  !
+  !> Function  base_get_fmt
+  !! \memberof  psb_d_base_vect_type
+  !! \brief  Format
+  !!           
+  !
+  function d_base_get_fmt() result(res)
+    implicit none 
+    character(len=5) :: res
+    res = 'BASE'
+  end function d_base_get_fmt
   
+
   !
   !
   !

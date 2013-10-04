@@ -55,6 +55,7 @@ module psb_repl_map_mod
     procedure, pass(idxmap)  :: asb       => repl_asb
     procedure, pass(idxmap)  :: free      => repl_free
     procedure, pass(idxmap)  :: clone     => repl_clone
+    procedure, pass(idxmap)  :: reinit    => repl_reinit
     procedure, nopass        :: get_fmt   => repl_get_fmt
 
     procedure, pass(idxmap)  :: l2gs1 => repl_l2gs1
@@ -195,11 +196,49 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: i
+    logical :: owned_
     
+    info = 0
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%l2gip(idxout(1:im),info,mask,owned)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(owned)) then 
+      owned_ = owned
+    else
+      owned_ = .false.
+    end if
+
+    if (present(mask)) then 
+
+      do i=1, im
+        if (mask(i)) then 
+          if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
+            idxout(i) = idxin(i)
+          else 
+            idxout(i) = -1
+          end if
+        end if
+      end do
+
+    else  if (.not.present(mask)) then 
+
+      do i=1, im
+          if ((1<=idxin(i)).and.(idxin(i) <= idxmap%local_rows)) then
+            idxout(i) = idxin(i)
+          else 
+            idxout(i) = -1
+          end if
+      end do
+
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_l2gv2
@@ -330,12 +369,79 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: is, im,i
+    logical :: owned_
+
+    info = 0
     
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip(idxout(1:im),info,mask,owned)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(owned)) then 
+      owned_ = owned
+    else
+      owned_ = .false.
+    end if
+
+
+    if (present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+        do i=1, im
+          if (mask(i)) then 
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end if
+        end do
+      else if (idxmap%is_valid()) then 
+        do i=1,im
+          if (mask(i)) then 
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end if
+        end do
+      else 
+        idxout(1:im) = -1
+        info = -1
+      end if
+
+    else  if (.not.present(mask)) then 
+
+      if (idxmap%is_asb()) then 
+        do i=1, im
+          if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+            idxout(i) = idxin(i) 
+          else 
+            idxout(i) = -1
+          end if
+        end do
+      else if (idxmap%is_valid()) then 
+        do i=1,im
+          if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+            idxout(i) = idxin(i) 
+          else 
+            idxout(i) = -1
+          end if
+        end do
+      else 
+        idxout(1:im) = -1
+        info = -1
+      end if
+
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2
@@ -479,12 +585,82 @@ contains
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
-    integer(psb_ipk_) :: is, im
+    integer(psb_ipk_) :: is, im, i
     
+
+    info = 0
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+
+    if (present(mask)) then 
+      if (size(mask) < im) then 
+        info = -1
+        return
+      end if
+    end if
+    if (present(lidx)) then 
+      if (size(lidx) < im) then 
+        info = -1
+        return
+      end if
+    end if
+
+
+    if (idxmap%is_asb()) then 
+      ! State is wrong for this one ! 
+      idxout = -1
+      info   = -1
+
+    else if (idxmap%is_valid()) then 
+      if (present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, im
+            if (mask(i)) then
+              if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+                idxout(i) = idxin(i) 
+              else 
+                idxout(i) = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+
+          do i=1, im
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end do
+        end if
+      else if (.not.present(lidx)) then 
+        if (present(mask)) then 
+          do i=1, im
+            if (mask(i)) then 
+              if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+                idxout(i) = idxin(i) 
+              else 
+                idxout(i) = -1
+              end if
+            end if
+          end do
+
+        else if (.not.present(mask)) then 
+          do i=1, im
+            if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
+              idxout(i) = idxin(i) 
+            else 
+              idxout(i) = -1
+            end if
+          end do
+        end if
+      end if
+    else 
+      idxout = -1
+      info   = -1
+    end if
+
     if (is > im) info = -3 
 
   end subroutine repl_g2lv2_ins
@@ -629,4 +805,25 @@ contains
     end if
     return
   end subroutine repl_clone
+
+  subroutine repl_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_repl_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl
+    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    character(len=20)  :: name='repl_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+
+    call idxmap%set_state(psb_desc_bld_)
+
+    return
+
+  end subroutine repl_reinit
+
 end module psb_repl_map_mod

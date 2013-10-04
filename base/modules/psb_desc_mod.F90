@@ -219,7 +219,8 @@ module psb_desc_mod
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
     procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
     procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
-    procedure, pass(desc) :: get_context     => psb_cd_get_context
+    procedure, pass(desc) :: get_context     => psb_cd_get_context    
+    procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
     procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
@@ -231,8 +232,42 @@ module psb_desc_mod
     procedure, pass(desc) :: destroy         => psb_cd_destroy
     procedure, pass(desc) :: nullify         => nullify_desc
 
+    procedure, pass(desc) :: get_fmt         => cd_get_fmt
+    procedure, pass(desc) :: fnd_owner       => cd_fnd_owner
+    procedure, pass(desc) :: l2gs1           => cd_l2gs1
+    procedure, pass(desc) :: l2gs2           => cd_l2gs2
+    procedure, pass(desc) :: l2gv1           => cd_l2gv1
+    procedure, pass(desc) :: l2gv2           => cd_l2gv2
+    generic, public       :: l2g             => l2gs2, l2gv2
+    generic, public       :: l2gip           => l2gs1, l2gv1                            
+
+    procedure, pass(desc) :: g2ls1           => cd_g2ls1
+    procedure, pass(desc) :: g2ls2           => cd_g2ls2
+    procedure, pass(desc) :: g2lv1           => cd_g2lv1
+    procedure, pass(desc) :: g2lv2           => cd_g2lv2
+    generic, public       :: g2l             => g2ls2, g2lv2
+    generic, public       :: g2lip           => g2ls1, g2lv1
+
+    procedure, pass(desc) :: g2ls1_ins       => cd_g2ls1_ins
+    procedure, pass(desc) :: g2ls2_ins       => cd_g2ls2_ins
+    procedure, pass(desc) :: g2lv1_ins       => cd_g2lv1_ins
+    procedure, pass(desc) :: g2lv2_ins       => cd_g2lv2_ins
+    generic, public       :: g2l_ins         => g2ls2_ins, g2lv2_ins
+    generic, public       :: g2lip_ins       => g2ls1_ins, g2lv1_ins
+    
+
   end type psb_desc_type
 
+
+  interface 
+    subroutine psb_cd_clone(desc, desc_out, info)
+      import psb_desc_type, psb_ipk_
+      class(psb_desc_type), intent(inout), target :: desc
+      class(psb_desc_type), intent(inout)         :: desc_out
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine psb_cd_clone
+  end interface
+      
   interface psb_sizeof
     module procedure psb_cd_sizeof
   end interface psb_sizeof
@@ -246,7 +281,11 @@ module psb_desc_mod
   end interface psb_free
 
 
-  private :: nullify_desc
+  private :: nullify_desc, cd_get_fmt,&
+       & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
+       & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
+       & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
+
 
   integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
 
@@ -409,7 +448,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_lr()
     else
       val = -1
@@ -421,7 +460,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_lc()
     else
       val = -1
@@ -433,7 +472,7 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_gr()
     else
       val = -1
@@ -446,13 +485,26 @@ contains
     integer(psb_ipk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
-    if (psb_is_ok_desc(desc)) then 
+    if (allocated(desc%indxmap)) then 
       val = desc%indxmap%get_gc()
     else
       val = -1
     endif
 
   end function psb_cd_get_global_cols
+
+  function cd_get_fmt(desc) result(val)
+    implicit none 
+    character(len=5) :: val 
+    class(psb_desc_type), intent(in) :: desc
+
+    if (allocated(desc%indxmap)) then 
+      val = desc%indxmap%get_fmt()
+    else
+      val = 'NULL'
+    endif
+
+  end function cd_get_fmt
 
   function psb_cd_get_context(desc) result(val)
     use psb_error_mod
@@ -899,89 +951,529 @@ contains
 
   end Subroutine psb_cd_get_recv_idx
 
-  subroutine psb_cd_clone(desc, desc_out, info)
 
-    use psb_error_mod
-    use psb_penv_mod
-    use psb_realloc_mod
+  subroutine cd_l2gs1(idx,desc,info,mask,owned)
+    use psb_error_mod 
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_l2g'
 
-    implicit none
-    !....parameters...
-
-    class(psb_desc_type), intent(inout), target :: desc
-    class(psb_desc_type), intent(inout)         :: desc_out
-    integer(psb_ipk_), intent(out)              :: info
-    !locals
-    integer(psb_ipk_) :: np,me,ictxt, err_act
-    integer(psb_ipk_) :: debug_level, debug_unit
-    character(len=20)   :: name
-
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-
-    if (psb_get_errstatus() /= 0) return 
-    info = psb_success_
+    info  = psb_success_
     call psb_erractionsave(err_act)
-    name = 'psb_cdcpy'
 
-    if (desc%is_valid()) then 
-      ictxt = desc%get_context()
-
-      ! check on blacs grid 
-      call psb_info(ictxt, me, np)
-      if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),': Entered'
-      if (np == -1) then
-        info = psb_err_context_error_
-        call psb_errpush(info,name)
-        goto 9999
-      endif
-
-      desc_out%base_desc  => desc%base_desc
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%halo_index,desc_out%halo_index,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%ext_index,desc_out%ext_index,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%ovrlap_index,&
-           & desc_out%ovrlap_index,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%bnd_elem,desc_out%bnd_elem,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%ovrlap_elem,desc_out%ovrlap_elem,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%ovr_mst_idx,desc_out%ovr_mst_idx,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%lprm,desc_out%lprm,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
-      if ((info == psb_success_).and.(allocated(desc%indxmap))) &
-           & call desc%indxmap%clone(desc_out%indxmap,info)
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%l2gs1(idx,info,mask=mask,owned=owned)
     else
-      call desc_out%free(info)
+      info = psb_err_invalid_cd_state_
     end if
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
+    if (info /= psb_success_) then 
       call psb_errpush(info,name)
       goto 9999
-    endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Done'
+    end if
 
     call psb_erractionrestore(err_act)
     return
 
 9999 continue
     call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
+    if (err_act == psb_act_abort_) then
+      call psb_error()
       return
-    else
-      call psb_error(ictxt)
     end if
+    Return
+
+  end subroutine cd_l2gs1
+
+  subroutine cd_l2gs2(idxin,idxout,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_l2g'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%l2gs2(idxin,idxout,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
     return
 
-  end subroutine psb_cd_clone
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_l2gs2
+
+
+  subroutine cd_l2gv1(idx,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_l2g'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%l2gv1(idx,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_l2gv1
+
+  subroutine cd_l2gv2(idxin,idxout,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_l2g'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%l2gv2(idxin,idxout,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_l2gv2
+
+
+  subroutine cd_g2ls1(idx,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2ls1(idx,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_g2ls1
+
+  subroutine cd_g2ls2(idxin,idxout,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2ls2(idxin,idxout,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2ls2
+
+
+  subroutine cd_g2lv1(idx,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2lv1(idx,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2lv1
+
+  subroutine cd_g2lv2(idxin,idxout,desc,info,mask,owned)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    logical, intent(in), optional :: owned
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2lv2(idxin,idxout,info,mask=mask,owned=owned)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2lv2
+
+
+
+  subroutine cd_g2ls1_ins(idx,desc,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    integer(psb_ipk_), intent(in), optional :: lidx
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l_ins'
+    logical, parameter :: debug=.false.
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2ls1_ins(idx,info,mask=mask,lidx=lidx)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2ls1_ins
+
+  subroutine cd_g2ls2_ins(idxin,idxout,desc,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask
+    integer(psb_ipk_), intent(in), optional :: lidx
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l_ins'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2ls2_ins(idxin,idxout,info,mask=mask,lidx=lidx)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2ls2_ins
+
+
+  subroutine cd_g2lv1_ins(idx,desc,info,mask, lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l_ins'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2lv1_ins(idx,info,mask=mask,lidx=lidx)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+
+  end subroutine cd_g2lv1_ins
+
+  subroutine cd_g2lv2_ins(idxin,idxout,desc,info,mask,lidx)
+    use psb_error_mod
+    implicit none 
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_ipk_), intent(out)   :: info 
+    logical, intent(in), optional :: mask(:)
+    integer(psb_ipk_), intent(in), optional :: lidx(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_g2l_ins'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%g2lv2_ins(idxin,idxout,info,mask=mask,lidx=lidx)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_g2lv2_ins
+
+
+  subroutine cd_fnd_owner(idx,iprc,desc,info)
+    use psb_error_mod
+    implicit none 
+    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act
+    character(len=20)  :: name='cd_fnd_owner'
+    logical, parameter :: debug=.false.
+
+
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+
+    if (allocated(desc%indxmap)) then 
+      call desc%indxmap%fnd_owner(idx,iprc,info)
+    else
+      info = psb_err_invalid_cd_state_
+    end if
+    if (info /= psb_success_) then 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    Return
+
+  end subroutine cd_fnd_owner
 
 
 end module psb_desc_mod

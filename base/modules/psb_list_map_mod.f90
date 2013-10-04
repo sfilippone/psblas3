@@ -54,6 +54,7 @@ module psb_list_map_mod
     procedure, pass(idxmap)  :: asb       => list_asb
     procedure, pass(idxmap)  :: free      => list_free
     procedure, pass(idxmap)  :: clone     => list_clone
+    procedure, pass(idxmap)  :: reinit    => list_reinit
     procedure, nopass        :: get_fmt   => list_get_fmt
     procedure, nopass        :: row_extendable => list_row_extendable
 
@@ -704,5 +705,27 @@ contains
     end if
     return
   end subroutine list_clone
+
+
+  subroutine list_reinit(idxmap,info)
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psb_list_map), intent(inout)    :: idxmap
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl
+    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    character(len=20)  :: name='list_reinit'
+    logical, parameter :: debug=.false.
+
+    info = psb_success_
+
+    call idxmap%set_state(psb_desc_bld_)
+
+    return
+
+  end subroutine list_reinit
+
 
 end module psb_list_map_mod

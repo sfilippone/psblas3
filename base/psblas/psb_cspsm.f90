@@ -606,15 +606,6 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   endif
 
 
-  ! just this case right now
-  ia = 1
-  ja = 1
-  ix = 1
-  iy = 1
-  ik = 1
-  jx = 1
-  jy = 1
-
   if (present(choice)) then     
     choice_ = choice
   else
@@ -645,10 +636,13 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   ncol = desc_a%get_local_cols()
   lldx = x%get_nrows()
   lldy = y%get_nrows()
+  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
+  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
 
-  if((lldx < ncol).or.(lldy < ncol)) then
-    info=psb_err_lld_case_not_implemented_
-    call psb_errpush(info,name)
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_from_subroutine_
+    ch_err='reall'
+    call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
@@ -679,35 +673,6 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   iwork(1)=0.d0
-
-  ! checking for matrix correctness
-  call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
-  ! checking for vectors correctness
-  if (info == psb_success_) &
-       & call psb_chkvect(m,ik,lldx,ix,jx,desc_a,info,iix,jjx)
-  if (info == psb_success_)&
-       & call psb_chkvect(m,ik,lldy,iy,jy,desc_a,info,iiy,jjy)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect/mat'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  if(ja /= ix) then
-    ! this case is not yet implemented
-    info = psb_err_ja_nix_ia_niy_unsupported_
-  end if
-
-  if((iix /= 1).or.(iiy /= 1)) then
-    ! this case is not yet implemented
-    info = psb_err_ix_n1_iy_n1_unsupported_
-  end if
-
-  if(info /= psb_success_) then
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   ! Perform local triangular system solve
   if (present(diag)) then 

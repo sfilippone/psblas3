@@ -145,8 +145,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level() 
 
-  ictxt = desc%indxmap%get_ctxt()
-  icomm = desc%indxmap%get_mpic()
+  ictxt = desc%get_context()
+  icomm = desc%get_mpic()
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = psb_err_context_error_
@@ -310,14 +310,14 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + 1 
     nerv = sdsz(proc+1) 
     desc_index(i) = nerv
-    call psi_idx_cnv(nerv,sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-         &  desc_index(i+1:i+nerv),desc,info)
+    call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+         &  desc_index(i+1:i+nerv),info)
       
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd
-    call psi_idx_cnv(nesd,rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
-         &  desc_index(i+1:i+nesd),desc,info)
+    call desc%indxmap%g2l(rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
+         &  desc_index(i+1:i+nesd),info)
     i = i + nesd + 1 
   end do
   desc_index(i) = - 1 
