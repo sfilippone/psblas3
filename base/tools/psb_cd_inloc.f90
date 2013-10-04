@@ -235,7 +235,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
       end do
     end if
   end if
-  if (idx(1) == -1) then 
+  if (ix(1) == -1) then 
     do i=1, loc_row
       ix(i) = i 
     end do
