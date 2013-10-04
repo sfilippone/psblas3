@@ -1465,7 +1465,7 @@ contains
     integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.
-    write(0,*) 'Going through hash_reinit'
+
     info = psb_success_
     call psb_get_erraction(err_act)
     ictxt = idxmap%get_ctxt()
