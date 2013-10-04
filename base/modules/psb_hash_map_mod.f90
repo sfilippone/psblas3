@@ -909,7 +909,7 @@ contains
     call psb_get_mpicomm(ictxt,idxmap%mpic)
 
     lc2 = int(1.5*nl) 
-    allocate(idxmap%loc_to_glob(lc2),stat=info) 
+    call psb_realloc(lc2,idxmap%loc_to_glob,info) 
     if (info /= 0)  then
       info = -2
       return
@@ -1461,27 +1461,25 @@ contains
     implicit none 
     class(psb_hash_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt, ntot
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt, ntot, me, np
     integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.
-
+    write(0,*) 'Going through hash_reinit'
     info = psb_success_
     call psb_get_erraction(err_act)
     ictxt = idxmap%get_ctxt()
     nr = idxmap%get_lr()
     nc = idxmap%get_lc()
     ntot = idxmap%get_gr()
-    if (nc>nr) then 
-      lidx = (/(k,k=1,nc)/)
-      idx  = (/(k,k=1,nc)/)
-      call idxmap%l2gip(idx,info)
-    end if
-    if (info /= 0) &
-         & write(0,*) 'From l2gip',info
-    
+
+
+    lidx = (/(k,k=1,nc)/)
+    idx  = (/(k,k=1,nc)/)
+    call idxmap%l2gip(idx,info)
+
     call idxmap%free()
-    call hash_init_vlu(idxmap,ictxt,ntot,nr,idx(1:nr),info)
+    call hash_init_vlu(idxmap,ictxt,ntot,nr,idx(1:nr),info) 
     if (nc>nr) then 
       call idxmap%g2lip_ins(idx(nr+1:nc),info,lidx=lidx(nr+1:nc))
     end if
