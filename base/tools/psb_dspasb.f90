@@ -55,7 +55,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
 
   !...Parameters....
-  type(psb_dspmat_type), intent (inout)  :: a
+  class(psb_dspmat_type), intent (inout)  :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_),optional, intent(in)            :: dupl, upd

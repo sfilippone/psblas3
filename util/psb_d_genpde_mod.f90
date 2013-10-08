@@ -66,7 +66,7 @@ module psb_d_genpde_mod
       implicit none
       procedure(d_func_3d)  :: a1,a2,a3,c,b1,b2,b3,g
       integer(psb_ipk_)     :: idim
-      type(psb_dspmat_type) :: a
+      class(psb_dspmat_type) :: a
       type(psb_d_vect_type) :: xv,bv
       type(psb_desc_type)   :: desc_a
       integer(psb_ipk_)     :: ictxt, info
@@ -110,7 +110,7 @@ module psb_d_genpde_mod
       implicit none
       procedure(d_func_2d)  :: a1,a2,c,b1,b2,g
       integer(psb_ipk_)     :: idim
-      type(psb_dspmat_type) :: a
+      class(psb_dspmat_type) :: a
       type(psb_d_vect_type) :: xv,bv
       type(psb_desc_type)   :: desc_a
       integer(psb_ipk_)     :: ictxt, info

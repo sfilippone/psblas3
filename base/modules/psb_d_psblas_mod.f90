@@ -294,7 +294,7 @@ module psb_d_psblas_mod
          & desc_a, info, trans, work,doswap)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
-      type(psb_dspmat_type), intent(in)        :: a
+      class(psb_dspmat_type), intent(in)    :: a
       real(psb_dpk_), intent(inout), target :: x(:)
       real(psb_dpk_), intent(inout), target :: y(:)
       real(psb_dpk_), intent(in)            :: alpha, beta
@@ -308,7 +308,7 @@ module psb_d_psblas_mod
          & desc_a, info, trans, work,doswap)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
-      type(psb_dspmat_type), intent(in)    :: a
+      class(psb_dspmat_type), intent(in)   :: a
       type(psb_d_vect_type), intent(inout) :: x
       type(psb_d_vect_type), intent(inout) :: y
       real(psb_dpk_), intent(in)        :: alpha, beta

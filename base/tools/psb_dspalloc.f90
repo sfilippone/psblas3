@@ -47,7 +47,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   !....parameters...
   type(psb_desc_type), intent(in) :: desc_a
-  type(psb_dspmat_type), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(in)      :: nnz
 

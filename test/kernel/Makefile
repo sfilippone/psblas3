@@ -12,9 +12,10 @@ DBOBJS=dpsbench.o
 DTOBJS=d_file_spmv.o   	
 STOBJS=s_file_spmv.o   	
 DPGOBJS=pdgenspmv.o
+PPOBJS=pgenpmv.o
 EXEDIR=./runs
 
-all: d_file_spmv s_file_spmv pdgenspmv
+all: d_file_spmv s_file_spmv pdgenspmv pgenpmv
 
 
 dpsbench: $(DBOBJS)
@@ -28,6 +29,9 @@ d_file_spmv: $(DTOBJS)
 pdgenspmv: $(DPGOBJS)
 	$(F90LINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv pdgenspmv $(EXEDIR) 
+pgenpmv: $(PPOBJS)
+	$(F90LINK) $(LOPT) $(PPOBJS) -o pgenpmv $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv pgenpmv $(EXEDIR) 
 
 
 s_file_spmv: $(STOBJS)

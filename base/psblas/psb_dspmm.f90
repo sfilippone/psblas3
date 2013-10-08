@@ -424,8 +424,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(in)             :: alpha, beta
   real(psb_dpk_), intent(inout), target  :: x(:)
   real(psb_dpk_), intent(inout), target  :: y(:)
-  type(psb_dspmat_type), intent(in)        :: a
-  type(psb_desc_type), intent(in)          :: desc_a
+  class(psb_dspmat_type), intent(in)     :: a
+  type(psb_desc_type), intent(in)        :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
@@ -685,7 +685,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(in)            :: alpha, beta
   type(psb_d_vect_type), intent(inout)     :: x
   type(psb_d_vect_type), intent(inout)     :: y
-  type(psb_dspmat_type), intent(in)        :: a
+  class(psb_dspmat_type), intent(in)       :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
   real(psb_dpk_), optional, target, intent(inout) :: work(:)
@@ -886,3 +886,203 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   end if
   return
 end subroutine psb_dspmv_vect
+
+
+subroutine psb_d_p_csmv_vect(alpha,a,x,beta,y,info,trans) 
+  use psb_base_mod
+  use psb_d_parmat_mod, psb_protect_name => psb_d_p_csmv_vect
+  use psi_mod
+  implicit none
+  class(psb_d_parmat_type), intent(in)   :: a
+  real(psb_dpk_), intent(in)        :: alpha, beta
+  type(psb_d_vect_type), intent(inout) :: x
+  type(psb_d_vect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(out)       :: info
+  character, optional, intent(in)      :: trans
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
+       & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
+       & ib, ip, idx
+  integer(psb_ipk_), parameter       :: nb=4
+  real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), allocatable :: xvsave(:)
+  character                :: trans_
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw, doswap_
+  integer(psb_ipk_) :: debug_level, debug_unit
+
+  name='psb_dspmv'
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=a%desc%get_context()
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(trans)) then     
+    trans_ = psb_toupper(trans)
+  else
+    trans_ = 'N'
+  endif
+  if ( (trans_ == 'N').or.(trans_ == 'T')&
+       & .or.(trans_ == 'C')) then
+  else
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  m    = a%desc%get_global_rows()
+  n    = a%desc%get_global_cols()
+  nrow = a%desc%get_local_rows()
+  ncol = a%desc%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
+  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
+
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_from_subroutine_
+    ch_err='reall'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork= 2*ncol
+  
+  aliw=.true.
+
+  if (aliw) then
+    allocate(iwork(liwork),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+  endif
+
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
+
+  if (trans_ == 'N') then
+    !  Matrix is not transposed
+
+    call psi_swapdata(psb_swap_send_,&
+         & dzero,x%v,a%desc,iwork,info,data=psb_comm_halo_)
+    
+    if (info ==0) call psb_csmm(alpha,a%a_d,x,beta,y,info)
+    
+    if (info ==0) call psi_swapdata(psb_swap_recv_,&
+         & dzero,x%v,a%desc,iwork,info,data=psb_comm_halo_)
+
+    if (info ==0) call psb_csmm(alpha,a%a_nd,x,done,y,info)
+    
+
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+  else
+    !  Matrix is transposed
+      info = psb_err_missing_override_method_
+      ch_err='psb_csmm'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
+    ! 
+    call psi_ovrl_save(x%v,xvsave,a%desc,info)
+    if (info == psb_success_) call psi_ovrl_upd(x%v,a%desc,psb_avg_,info)
+
+!!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
+!!$    yp(nrow+1:ncol) = dzero
+    
+    !  local Matrix-vector product
+!!$    if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
+
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' csmm ', info
+
+    if (info == psb_success_) call psi_ovrl_restore(x%v,xvsave,a%desc,info)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err='psb_csmm'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+    
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+           & done,y%v,a%desc,iwork,info)
+      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & done,y%v,a%desc,iwork,info,data=psb_comm_ovr_)
+      
+      if (debug_level >= psb_debug_comp_) &
+           & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
+        ch_err='PSI_SwapTran'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+
+  end if
+
+  if (aliw) deallocate(iwork,stat=info)
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err='Deallocate iwork'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  nullify(iwork)
+
+  call psb_erractionrestore(err_act)
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ictxt)
+    write(debug_unit,*) me,' ',trim(name),' Returning '
+  endif
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_d_p_csmv_vect
+    

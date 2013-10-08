@@ -241,7 +241,7 @@ Module psb_d_tools_mod
            & psb_d_base_vect_type, psb_d_vect_type, &
            & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_dspmat_type), intent(inout) :: a
+      class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(out)               :: info
       integer(psb_ipk_), optional, intent(in)      :: nnz
     end subroutine psb_dspalloc
@@ -252,7 +252,7 @@ Module psb_d_tools_mod
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_base_vect_type, psb_d_vect_type, &
            & psb_dspmat_type, psb_d_base_sparse_mat
-      type(psb_dspmat_type), intent (inout)   :: a
+      class(psb_dspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
       integer(psb_ipk_),optional, intent(in)            :: dupl, upd
@@ -267,7 +267,7 @@ Module psb_d_tools_mod
            & psb_d_base_vect_type, psb_d_vect_type, &
            & psb_dspmat_type, psb_d_base_sparse_mat
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_dspmat_type), intent(inout)       ::a
+      class(psb_dspmat_type), intent(inout)       ::a
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dspfree
   end interface

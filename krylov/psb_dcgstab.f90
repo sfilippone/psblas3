@@ -99,7 +99,7 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   use psb_d_krylov_conv_mod
   use psb_krylov_mod
   implicit none
-  type(psb_dspmat_type), intent(in)  :: a
+  class(psb_dspmat_type), intent(in)  :: a
   class(psb_dprec_type), Intent(inout)  :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   type(psb_d_vect_type), Intent(inout)   :: b

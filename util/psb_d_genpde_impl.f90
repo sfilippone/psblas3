@@ -55,7 +55,7 @@ subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   implicit none
   procedure(d_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
   integer(psb_ipk_)     :: idim
-  type(psb_dspmat_type) :: a
+  class(psb_dspmat_type) :: a
   type(psb_d_vect_type) :: xv,bv
   type(psb_desc_type)   :: desc_a
   integer(psb_ipk_)     :: ictxt, info
@@ -370,7 +370,7 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   implicit none
   procedure(d_func_2d)  :: b1,b2,c,a1,a2,g
   integer(psb_ipk_)     :: idim
-  type(psb_dspmat_type) :: a
+  class(psb_dspmat_type) :: a
   type(psb_d_vect_type) :: xv,bv
   type(psb_desc_type)   :: desc_a
   integer(psb_ipk_)     :: ictxt, info
@@ -391,8 +391,8 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
   integer(psb_ipk_) :: np, iam, nr, nt
   integer(psb_ipk_) :: icoeff
-  integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
-  real(psb_dpk_), allocatable :: val(:)
+  integer(psb_ipk_), allocatable :: irow(:),icol(:),myidx(:)
+  real(psb_dpk_), allocatable    :: val(:)
   ! deltah dimension of each grid cell
   ! deltat discretization time
   real(psb_dpk_)            :: deltah, sqdeltah, deltah2

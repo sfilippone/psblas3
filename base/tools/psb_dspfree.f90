@@ -45,7 +45,7 @@ subroutine psb_dspfree(a, desc_a,info)
 
   !....parameters...
   type(psb_desc_type), intent(in)       :: desc_a
-  type(psb_dspmat_type), intent(inout) :: a
+  class(psb_dspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(out)                  :: info
   !...locals....
   integer(psb_ipk_) :: ictxt,err_act

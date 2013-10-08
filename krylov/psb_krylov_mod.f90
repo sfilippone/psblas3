@@ -90,7 +90,7 @@ Module psb_krylov_mod
       use psb_prec_mod, only : psb_dprec_type
       
       character(len=*)                      :: method
-      Type(psb_dspmat_type), Intent(in)     :: a
+      class(psb_dspmat_type), Intent(in)    :: a
       Type(psb_desc_type), Intent(in)       :: desc_a
       class(psb_dprec_type), intent(inout)  :: prec 
       type(psb_d_vect_type), Intent(inout)  :: b

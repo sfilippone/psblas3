@@ -86,7 +86,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   use psb_krylov_mod, psb_protect_name => psb_dkrylov_vect
 
   character(len=*)                     :: method
-  Type(psb_dspmat_type), Intent(in)    :: a
+  class(psb_dspmat_type), Intent(in)   :: a
   Type(psb_desc_type), Intent(in)      :: desc_a
   class(psb_dprec_type), intent(inout) :: prec 
   type(psb_d_vect_type), Intent(inout) :: b
@@ -132,7 +132,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
-      type(psb_dspmat_type), intent(in)    :: a
+      class(psb_dspmat_type), intent(in)   :: a
       type(psb_desc_type), intent(in)      :: desc_a
       type(psb_d_vect_type), Intent(inout) :: b
       type(psb_d_vect_type), Intent(inout) :: x

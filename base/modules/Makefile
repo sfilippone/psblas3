@@ -27,6 +27,7 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 	psb_ip_reord_mod.o\
 	psb_check_mod.o psb_hash_mod.o\
 	psb_base_mat_mod.o  psb_mat_mod.o\
+	psb_d_parmat_mod.o \
 	psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_mat_mod.o \
 	psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_mat_mod.o \
 	psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o psb_c_mat_mod.o \
@@ -133,6 +134,8 @@ psb_s_comm_mod.o: psb_s_vect_mod.o psb_desc_mod.o psb_mat_mod.o
 psb_d_comm_mod.o: psb_d_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
 psb_c_comm_mod.o: psb_c_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
 psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
+
+psb_d_parmat_mod.o: psb_d_mat_mod.o psb_d_vect_mod.o psb_error_mod.o psb_desc_mod.o
 
 psb_base_mod.o: $(MODULES)
 
