@@ -942,6 +942,111 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
 end subroutine psb_s_csgetblk
 
 
+subroutine psb_s_tril(a,b,info,diag,imin,imax,&
+     & jmin,jmax,rscale,cscale)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_tril
+  implicit none 
+  class(psb_sspmat_type), intent(in)      :: a
+  class(psb_sspmat_type), intent(inout)   :: b
+  integer(psb_ipk_),intent(out)           :: info
+  integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional           :: rscale,cscale
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='tril'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat), allocatable  :: acoo
+
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+
+  if (info == psb_success_) then 
+    call a%a%tril(acoo,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%cscnv(info,mold=a%a)
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+
+end subroutine psb_s_tril
+
+subroutine psb_s_triu(a,b,info,diag,imin,imax,&
+     & jmin,jmax,rscale,cscale)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_base_mat_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_triu
+  implicit none 
+  class(psb_sspmat_type), intent(in)      :: a
+  class(psb_sspmat_type), intent(inout)   :: b
+  integer(psb_ipk_),intent(out)           :: info
+  integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional           :: rscale,cscale
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='triu'
+  logical, parameter :: debug=.false.
+  type(psb_s_coo_sparse_mat), allocatable  :: acoo
+
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(acoo,stat=info)    
+
+  if (info == psb_success_) then 
+    call a%a%tril(acoo,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info == psb_success_) call b%cscnv(info,mold=a%a)
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+
+end subroutine psb_s_triu
 
 
 subroutine psb_s_csclip(a,b,info,&
