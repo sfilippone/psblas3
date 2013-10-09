@@ -1025,7 +1025,7 @@ subroutine psb_s_triu(a,b,info,diag,imin,imax,&
   allocate(acoo,stat=info)    
 
   if (info == psb_success_) then 
-    call a%a%tril(acoo,info,diag,imin,imax,&
+    call a%a%triu(acoo,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
   else
     info = psb_err_alloc_dealloc_
