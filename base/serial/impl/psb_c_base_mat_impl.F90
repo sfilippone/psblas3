@@ -636,6 +636,7 @@ subroutine psb_c_base_tril(a,b,info,&
          & nzin=nzin)
     if (info /= psb_success_) goto 9999
     call b%set_nzeros(nzin+nzout)
+    nzin = nzin+nzout 
   end do
   call b%fix(info)
   nzout = b%get_nzeros()
@@ -745,6 +746,7 @@ subroutine psb_c_base_triu(a,b,info,&
          & nzin=nzin)
     if (info /= psb_success_) goto 9999
     call b%set_nzeros(nzin+nzout)
+    nzin = nzin+nzout 
   end do
   call b%fix(info)
   nzout = b%get_nzeros()
