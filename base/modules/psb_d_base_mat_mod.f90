@@ -62,6 +62,8 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: csgetblk      => psb_d_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_d_base_get_diag
     generic, public    :: csget         => csgetrow, csgetblk 
+    procedure, pass(a) :: tril          => psb_d_base_tril
+    procedure, pass(a) :: triu          => psb_d_base_triu
     procedure, pass(a) :: csclip        => psb_d_base_csclip 
     procedure, pass(a) :: cp_to_coo     => psb_d_base_cp_to_coo   
     procedure, pass(a) :: cp_from_coo   => psb_d_base_cp_from_coo 
@@ -312,7 +314,7 @@ module psb_d_base_mat_mod
   !!  \param info  return code
   !!  \param jmin [1] minimum col index 
   !!  \param jmax [a\%get_ncols()] maximum col index 
-  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
@@ -350,7 +352,7 @@ module psb_d_base_mat_mod
   !!  \param imax [a%get_nrows()] the minimum row index we are interested in 
   !!  \param jmin [1] minimum col index 
   !!  \param jmax [a\%get_ncols()] maximum col index 
-  !!  \param iren(:) [none] an array to return renumbered indices   (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
   !!          ( iren cannot be specified with rscale/cscale)
@@ -364,11 +366,93 @@ module psb_d_base_mat_mod
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
       class(psb_d_coo_sparse_mat), intent(out) :: b
-      integer(psb_ipk_),intent(out)                  :: info
-      integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_ipk_),intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional  :: imin,imax,jmin,jmax
+      logical, intent(in), optional            :: rscale,cscale
     end subroutine psb_d_base_csclip
   end interface
+  !
+  !> Function  tril:
+  !! \memberof  psb_d_base_sparse_mat
+  !! \brief  Copy the lower triangle, i.e. all entries
+  !!         A(I,J) such that J-I <= DIAG
+  !!         default value is DIAG=0, i.e. lower triangle up to
+  !!         the main diagonal.
+  !!         DIAG=-1 means copy the strictly lower triangle
+  !!         DIAG= 1 means copy the lower triangle plus the first diagonal
+  !!                 of the upper triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         
+  !!  \param b     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!           
+  !
+  interface 
+    subroutine psb_d_base_tril(a,b,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
+      class(psb_d_base_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+    end subroutine psb_d_base_tril
+  end interface
+  
+  !
+  !> Function  triu:
+  !! \memberof  psb_d_base_sparse_mat
+  !! \brief  Copy the upper triangle, i.e. all entries
+  !!         A(I,J) such that DIAG <= J-I
+  !!         default value is DIAG=0, i.e. upper triangle from 
+  !!         the main diagonal up.
+  !!         DIAG= 1 means copy the strictly upper triangle
+  !!         DIAG=-1 means copy the upper triangle plus the first diagonal
+  !!                 of the lower triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         
+  !!  \param b     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!           
+  !
+  interface 
+    subroutine psb_d_base_triu(a,b,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
+      class(psb_d_base_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+    end subroutine psb_d_base_triu
+  end interface
+  
   
   !
   !> Function  get_diag:

@@ -122,6 +122,8 @@ module psb_c_mat_mod
     procedure, pass(a) :: csgetrow    => psb_c_csgetrow
     procedure, pass(a) :: csgetblk    => psb_c_csgetblk
     generic, public    :: csget       => csgetptn, csgetrow, csgetblk 
+    procedure, pass(a) :: tril        => psb_c_tril
+    procedure, pass(a) :: triu        => psb_c_triu
     procedure, pass(a) :: m_csclip    => psb_c_csclip
     procedure, pass(a) :: b_csclip    => psb_c_b_csclip
     generic, public    :: csclip      => b_csclip, m_csclip
@@ -420,6 +422,31 @@ module psb_c_mat_mod
     end subroutine psb_c_csgetblk
   end interface
   
+  interface 
+    subroutine psb_c_tril(a,b,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in)      :: a
+      class(psb_cspmat_type), intent(inout)   :: b
+      integer(psb_ipk_),intent(out)           :: info
+      integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional           :: rscale,cscale
+    end subroutine psb_c_tril
+  end interface
+  
+  interface 
+    subroutine psb_c_triu(a,b,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale)
+      import :: psb_ipk_, psb_cspmat_type, psb_spk_
+      class(psb_cspmat_type), intent(in)      :: a
+      class(psb_cspmat_type), intent(inout)   :: b
+      integer(psb_ipk_),intent(out)           :: info
+      integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional           :: rscale,cscale
+    end subroutine psb_c_triu
+  end interface
+
+
   interface 
     subroutine psb_c_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
