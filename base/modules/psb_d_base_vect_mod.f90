@@ -769,6 +769,7 @@ contains
     select type(xx => x)
     type is (psb_d_base_vect_type)
       n = min(size(y%v), size(xx%v))
+      !$omp parallel do private(i) schedule(static,64)
       do i=1, n 
         y%v(i) = y%v(i)*xx%v(i)
       end do
@@ -795,6 +796,7 @@ contains
 
     info = 0
     n = min(size(y%v), size(x))
+    !$omp parallel do private(i) schedule(static,64)
     do i=1, n 
       y%v(i) = y%v(i)*x(i)
     end do
@@ -830,6 +832,7 @@ contains
       if (beta == done) then 
         return 
       else
+        !$omp parallel do private(i) schedule(static,64)
         do i=1, n
           z%v(i) = beta*z%v(i)
         end do
@@ -837,42 +840,51 @@ contains
     else
       if (alpha == done) then 
         if (beta == dzero) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = y(i)*x(i)
           end do
         else if (beta == done) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
         else 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
         end if
       else if (alpha == -done) then 
         if (beta == dzero) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = -y(i)*x(i)
           end do
         else if (beta == done) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
         if (beta == dzero) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = alpha*y(i)*x(i)
           end do
         else if (beta == done) then 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
         else 
+        !$omp parallel do private(i) schedule(static,64)
           do i=1, n 
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do

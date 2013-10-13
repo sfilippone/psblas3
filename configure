@@ -658,8 +658,8 @@ INSTALL_DIR
 INSTALL
 MPIFCC
 AR
-F90LINK
-FLINK
+EXTRA90LINKOPT
+EXTRALINKOPT
 MODEXT
 FMFLAG
 FIFLAG
@@ -785,6 +785,7 @@ with_library_path
 with_include_path
 with_module_path
 enable_dependency_tracking
+enable_openmp
 enable_long_integers
 with_blas
 with_lapack
@@ -1441,6 +1442,7 @@ Optional Features:
                           in serial mode.
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-openmp         Specify whether to enable OPENMP compilation
   --enable-long-integers  Specify usage of 64 bits integers.
 
 Optional Packages:
@@ -7367,6 +7369,35 @@ fi
 #		The same for pg (Portland Group compilers).
 ###############################################################################
 
+{ $as_echo "$as_me:$LINENO: checking whether we want serial  mpi stubs" >&5
+$as_echo_n "checking whether we want serial  mpi stubs... " >&6; }
+# Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then
+  enableval=$enable_openmp;
+pac_cv_openmp="yes";
+
+
+fi
+
+if test x"$pac_cv_openmp" == x"yes" ; then
+   { $as_echo "$as_me:$LINENO: result: yes." >&5
+$as_echo "yes." >&6; }
+else
+ pac_cv_openmp="no";
+ { $as_echo "$as_me:$LINENO: result: no." >&5
+$as_echo "no." >&6; }
+fi
+
+
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   if test "X$psblas_cv_fc" == "Xgcc" ; then
+      F90COPT="$F90COPT -fopenmp";
+      FCOPT="$FCOPT -fopenmp";
+      EXTRALINKOPT=" -fopenmp";
+      EXTRA90LINKOPT=" -fopenmp";
+   fi
+fi
 
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
@@ -11646,7 +11677,8 @@ fi
    	MPF90                 : ${MPF90}
 	MPF77                 : ${MPF77}
 	MPCC                  : ${MPICC}
-	FLINK                 : ${FLINK}
+	EXTRA90LINKOPT        : ${EXTRA90LINKOPT}
+	EXTRALINKOPT          : ${EXTRALINKOPT}
 
 	FDEFINES              : ${FDEFINES}
 	CDEFINES              : ${CDEFINES}
@@ -11679,7 +11711,8 @@ $as_echo "$as_me:
    	MPF90                 : ${MPF90}
 	MPF77                 : ${MPF77}
 	MPCC                  : ${MPICC}
-	FLINK                 : ${FLINK}
+	EXTRA90LINKOPT        : ${EXTRA90LINKOPT}
+	EXTRALINKOPT          : ${EXTRALINKOPT}
 
 	FDEFINES              : ${FDEFINES}
 	CDEFINES              : ${CDEFINES}

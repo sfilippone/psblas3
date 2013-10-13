@@ -152,6 +152,7 @@ contains
       if (beta == dzero) then 
 
         if (alpha == done) then 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -162,6 +163,7 @@ contains
 
         else if (alpha == -done) then 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -172,6 +174,7 @@ contains
 
         else 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -186,6 +189,7 @@ contains
       else if (beta == done) then 
 
         if (alpha == done) then 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -196,6 +200,7 @@ contains
 
         else if (alpha == -done) then 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -206,6 +211,7 @@ contains
 
         else 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -219,6 +225,7 @@ contains
       else if (beta == -done) then 
 
         if (alpha == done) then 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -229,6 +236,7 @@ contains
 
         else if (alpha == -done) then 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -239,6 +247,7 @@ contains
 
         else 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -252,6 +261,7 @@ contains
       else 
 
         if (alpha == done) then 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -262,6 +272,7 @@ contains
 
         else if (alpha == -done) then 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
@@ -272,6 +283,7 @@ contains
 
         else 
 
+          !$omp parallel do private(i,acc,j) schedule(static,64)
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1

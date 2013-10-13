@@ -504,7 +504,16 @@ fi
 #		should be valid options.
 #		The same for pg (Portland Group compilers).
 ###############################################################################
-
+PAC_ARG_ENABLE_OPENMP
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   if test "X$psblas_cv_fc" == "Xgcc" ; then
+      F90COPT="$F90COPT -fopenmp";
+      FCOPT="$FCOPT -fopenmp";
+      EXTRALINKOPT=" -fopenmp";
+      EXTRA90LINKOPT=" -fopenmp";
+   fi   
+fi
 
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
@@ -763,8 +772,8 @@ AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
 AC_SUBST(MPIF77)
-AC_SUBST(FLINK)
-AC_SUBST(F90LINK)
+AC_SUBST(EXTRALINKOPT)
+AC_SUBST(EXTRA90LINKOPT)
 AC_SUBST(LIBS)
 AC_SUBST(AR)
 AC_SUBST(RANLIB)
@@ -829,8 +838,8 @@ AC_MSG_NOTICE([
    	MPF90                 : ${MPF90}
 	MPF77                 : ${MPF77}
 	MPCC                  : ${MPICC}
-dnl	F90LINK               : ${F90LINK}
-	FLINK                 : ${FLINK}
+	EXTRA90LINKOPT        : ${EXTRA90LINKOPT}
+	EXTRALINKOPT          : ${EXTRALINKOPT}
 
 	FDEFINES              : ${FDEFINES}
 	CDEFINES              : ${CDEFINES}

@@ -77,6 +77,7 @@ C
       if (alpha.eq.dzero) then 
         if (beta.eq.dzero) then 
           do j=1, n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = dzero
             enddo 
@@ -88,12 +89,14 @@ c$$$
 
         else if (beta.eq.-done) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = - y(i,j)
             enddo
           enddo
         else  
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) =  beta*y(i,j)
             enddo
@@ -104,12 +107,14 @@ c$$$
 
         if (beta.eq.dzero) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = x(i,j)
             enddo
           enddo
         else if (beta.eq.done) then
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = x(i,j) + y(i,j)
             enddo
@@ -117,12 +122,14 @@ c$$$
 
         else if (beta.eq.-done) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = x(i,j) - y(i,j)
             enddo
           enddo
         else  
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = x(i,j) + beta*y(i,j)
             enddo
@@ -133,12 +140,14 @@ c$$$
 
         if (beta.eq.dzero) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = -x(i,j)
             enddo
           enddo
         else if (beta.eq.done) then
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = -x(i,j) + y(i,j)
             enddo
@@ -146,12 +155,14 @@ c$$$
 
         else if (beta.eq.-done) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = -x(i,j) - y(i,j)
             enddo
           enddo
         else  
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = -x(i,j) + beta*y(i,j)
             enddo
@@ -162,12 +173,14 @@ c$$$
 
         if (beta.eq.dzero) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = alpha*x(i,j)
             enddo
           enddo
         else if (beta.eq.done) then
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = alpha*x(i,j) + y(i,j)
             enddo
@@ -175,12 +188,14 @@ c$$$
 
         else if (beta.eq.-done) then 
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = alpha*x(i,j) - y(i,j)
             enddo
           enddo
         else  
           do j=1,n 
+C$omp parallel do private(i) schedule(static,64)
             do i=1,m 
               y(i,j) = alpha*x(i,j) + beta*y(i,j)
             enddo
