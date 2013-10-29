@@ -3855,7 +3855,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    for ac_prog in mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90 ftn
+    for ac_prog in mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90 mpifort mpif95 mpif90 ftn
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
