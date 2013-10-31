@@ -254,6 +254,44 @@ rm -f conftest*])
 
 
 
+dnl @synopsis PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will determine if the fortran compiler MPIFC provides mpi_f08
+dnl
+dnl If yes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl 
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl Modified Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([MPI Fortran 2008 interface])
+cat > conftest.$ac_ext <<EOF
+           program test
+             use mpi_f08
+           end program test
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  pac_cv_mpi_f08="yes";
+  AC_MSG_RESULT([ use mpi_f08. ])
+  ifelse([$1], , :, [rm -rf conftest*
+  $1])
+else
+  pac_cv_mpi_f08="no";
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+  AC_MSG_RESULT([ no. ])
+ifelse([$2], , , [  rm -rf conftest*
+  $2
+])dnl
+fi
+rm -f conftest*])
+
+
+
 dnl @synopsis PAC_ARG_WITH_FLAGS(lcase_name, UCASE_NAME)
 dnl
 dnl Test for --with-lcase_name="compiler/loader flags".  if defined, prepend 
