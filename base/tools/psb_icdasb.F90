@@ -115,10 +115,12 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
        & write(debug_unit, *) me,' ',trim(name),': start'
 
   if (allocated(desc%indxmap)) then 
-    call psi_ldsc_pre_halo(desc,ext_hv_,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='ldsc_pre_halo')
-      goto 9999
+    if (.not.ext_hv_) then 
+      call psi_bld_tmphalo(desc,info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='bld_tmphalo')
+        goto 9999
+      end if
     end if
 
     ! Take out the lists for ovrlap, halo and ext...

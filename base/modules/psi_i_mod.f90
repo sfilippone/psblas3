@@ -120,15 +120,6 @@ module psi_i_mod
     end subroutine psi_fnd_owner
   end interface
 
-  interface psi_ldsc_pre_halo
-    subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
-      import :: psb_desc_type, psb_ipk_
-      type(psb_desc_type), intent(inout) :: desc
-      logical, intent(in)  :: ext_hv
-      integer(psb_ipk_), intent(out) :: info
-    end subroutine psi_ldsc_pre_halo
-  end interface
-
   interface psi_bld_tmphalo
     subroutine psi_bld_tmphalo(desc,info)
       import :: psb_desc_type, psb_ipk_

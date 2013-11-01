@@ -108,9 +108,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%halo_index,info)
-!!$  cdesc%matrix_data(psb_thal_xch_) = nxch
-!!$  cdesc%matrix_data(psb_thal_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_thal_rcv_) = nrcv 
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
@@ -124,9 +121,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%ext_index,info)
-!!$  cdesc%matrix_data(psb_text_xch_) = nxch
-!!$  cdesc%matrix_data(psb_text_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_text_rcv_) = nrcv 
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
@@ -143,9 +137,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
 
-!!$  cdesc%matrix_data(psb_tovr_xch_) = nxch
-!!$  cdesc%matrix_data(psb_tovr_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_tovr_rcv_) = nrcv 
 
   ! next  ovrlap_elem 
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
@@ -170,10 +161,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
     goto 9999
   end if
-
-!!$  cdesc%matrix_data(psb_tmov_xch_) = nxch
-!!$  cdesc%matrix_data(psb_tmov_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_tmov_rcv_) = nrcv 
 
   ! finally bnd_elem
   call psi_crea_bnd_elem(idx_out,cdesc,info)
