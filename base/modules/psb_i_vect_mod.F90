@@ -152,7 +152,7 @@ contains
 
   function  i_vect_get_vect(x) result(res)
     class(psb_i_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), allocatable                 :: res(:)
+    integer(psb_ipk_), allocatable         :: res(:)
     integer(psb_ipk_) :: info
 
     if (allocated(x%v)) then
@@ -558,10 +558,10 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_i_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
-    integer(psb_ipk_), intent(in)               :: irl(:)
-    integer(psb_ipk_), intent(in)        :: val(:)
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in)          :: n, dupl
+    integer(psb_ipk_), intent(in)          :: irl(:)
+    integer(psb_ipk_), intent(in)          :: val(:)
+    integer(psb_ipk_), intent(out)         :: info
 
     integer(psb_ipk_) :: i
 
@@ -578,21 +578,24 @@ contains
 
   subroutine i_vect_cnv(x,mold)
     class(psb_i_vect_type), intent(inout) :: x
-    class(psb_i_base_vect_type), intent(in) :: mold
+    class(psb_i_base_vect_type), intent(in), optional :: mold
     class(psb_i_base_vect_type), allocatable :: tmp
-    integer(psb_ipk_), allocatable          :: invect(:)
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_)                        :: info
 
+
+    if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(tmp,stat=info,mold=mold)
 #else
       call mold%mold(tmp,info)
 #endif
-    call x%v%sync()
-    if (info == psb_success_) call tmp%bld(x%v%v)
-    call x%v%free(info)
-    call move_alloc(tmp,x%v)
-
+      if (allocated(x%v)) then 
+        call x%v%sync()
+        if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%free(info)
+      end if
+      call move_alloc(tmp,x%v)
+    end if
   end subroutine i_vect_cnv
 
 end module psb_i_vect_mod

@@ -574,7 +574,7 @@ contains
   !    
   function  i_base_get_vect(x) result(res)
     class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), allocatable                 :: res(:)
+    integer(psb_ipk_), allocatable             :: res(:)
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 

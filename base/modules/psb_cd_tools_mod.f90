@@ -73,9 +73,9 @@ module psb_cd_tools_mod
       implicit none
       !....parameters...
 
-      type(psb_desc_type), intent(in)  :: desc_in
-      type(psb_desc_type), intent(out) :: desc_out
-      integer(psb_ipk_), intent(out)             :: info
+      type(psb_desc_type), intent(inout) :: desc_in
+      type(psb_desc_type), intent(out)   :: desc_out
+      integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_cdcpy
   end interface
 
@@ -113,7 +113,7 @@ module psb_cd_tools_mod
     Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
       import :: psb_ipk_, psb_desc_type
       Implicit None
-      Type(psb_desc_type), Intent(in), target :: desc_a
+      Type(psb_desc_type), Intent(inout), target :: desc_a
       integer(psb_ipk_), intent(in)                     :: in_list(:)
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer(psb_ipk_), intent(out)                    :: info
@@ -144,11 +144,12 @@ module psb_cd_tools_mod
   end interface
 
   interface psb_icdasb
-    subroutine psb_icdasb(desc,info,ext_hv)
-      import :: psb_ipk_, psb_desc_type
+    subroutine psb_icdasb(desc,info,ext_hv, mold)
+      import :: psb_ipk_, psb_desc_type, psb_i_base_vect_type
       Type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out)               :: info
       logical, intent(in),optional       :: ext_hv
+      class(psb_i_base_vect_type), optional, intent(in) :: mold
     end subroutine psb_icdasb
   end interface
 
@@ -200,12 +201,13 @@ contains
 
   end subroutine psb_get_boundary
 
-  subroutine psb_cdasb(desc,info)
+  subroutine psb_cdasb(desc,info,mold)
 
     Type(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(out)               :: info
+    integer(psb_ipk_), intent(out)     :: info
+    class(psb_i_base_vect_type), optional, intent(in) :: mold
 
-    call psb_icdasb(desc,info,ext_hv=.false.)
+    call psb_icdasb(desc,info,ext_hv=.false.,mold=mold)
   end subroutine psb_cdasb
 
 end module psb_cd_tools_mod

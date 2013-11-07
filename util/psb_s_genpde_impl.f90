@@ -34,7 +34,7 @@
 !  the rhs. 
 !
 subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-     & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,nrl)
+     & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,imold,nrl)
   use psb_base_mod
   use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde3d
   !
@@ -63,6 +63,7 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   procedure(s_func_3d), optional :: f
   class(psb_s_base_sparse_mat), optional :: amold
   class(psb_s_base_vect_type), optional :: vmold
+  class(psb_i_base_vect_type), optional :: imold
   integer(psb_ipk_), optional :: nrl
 
   ! Local variables.
@@ -285,7 +286,7 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_cdasb(desc_a,info)
+  call psb_cdasb(desc_a,info,mold=imold)
   tcdasb = psb_wtime()-t1
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -349,7 +350,7 @@ end subroutine psb_s_gen_pde3d
 !  the rhs. 
 !
 subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-     & a1,a2,b1,b2,c,g,info,f,amold,vmold,nrl)
+     & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,nrl)
   use psb_base_mod
   use psb_s_genpde_mod, psb_protect_name => psb_s_gen_pde2d
   !
@@ -378,6 +379,7 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   procedure(s_func_2d), optional :: f
   class(psb_s_base_sparse_mat), optional :: amold
   class(psb_s_base_vect_type), optional :: vmold
+  class(psb_i_base_vect_type), optional :: imold
   integer(psb_ipk_), optional :: nrl
 
   ! Local variables.
@@ -575,7 +577,7 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_cdasb(desc_a,info)
+  call psb_cdasb(desc_a,info,mold=imold)
   tcdasb = psb_wtime()-t1
   call psb_barrier(ictxt)
   t1 = psb_wtime()

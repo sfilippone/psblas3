@@ -50,6 +50,7 @@ module psb_d_linmap_mod
     procedure, pass(map) :: is_asb   => d_is_asb
     procedure, pass(map) :: free     => d_free
     procedure, pass(map) :: clone    => d_clone
+    procedure, pass(map) :: cnv      => psb_d_map_cscnv
   end type psb_dlinmap_type
 
 
@@ -159,17 +160,23 @@ contains
   end function d_is_asb
 
 
-  subroutine psb_d_map_cscnv(map,info,type,mold)    
+  subroutine psb_d_map_cscnv(map,info,type,mold,imold)    
+    use psb_i_vect_mod
     use psb_d_mat_mod
     implicit none
-    type(psb_dlinmap_type), intent(inout)  :: map
+    class(psb_dlinmap_type), intent(inout)  :: map
     integer(psb_ipk_), intent(out)                   :: info
     character(len=*), intent(in), optional :: type
     class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    class(psb_i_base_vect_type), intent(in), optional  :: imold
 
     call map%map_X2Y%cscnv(info,type=type,mold=mold)
     if (info == psb_success_)&
          & call map%map_Y2X%cscnv(info,type=type,mold=mold)
+    if (present(imold)) then 
+      call map%desc_X%cnv(mold=imold)
+      call map%desc_Y%cnv(mold=imold)
+    end if
 
   end subroutine psb_d_map_cscnv
 

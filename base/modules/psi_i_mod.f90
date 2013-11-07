@@ -139,11 +139,12 @@ module psi_i_mod
   end interface
 
   interface psi_cnv_dsc
-    subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
-      import :: psb_desc_type, psb_ipk_
+    subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
+      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
       type(psb_desc_type), intent(inout) :: cdesc
       integer(psb_ipk_), intent(out)               :: info
+      class(psb_i_base_vect_type), optional, intent(in) :: mold
     end subroutine psi_cnv_dsc
   end interface
 

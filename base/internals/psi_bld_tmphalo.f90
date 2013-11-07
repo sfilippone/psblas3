@@ -81,7 +81,7 @@ subroutine psi_bld_tmphalo(desc,info)
     goto 9999
   endif
 
-  if (.not.(psb_is_bld_desc(desc).and.allocated(desc%indxmap))) then 
+  if (.not.(desc%is_bld())) then 
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999

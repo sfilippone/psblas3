@@ -1726,3 +1726,114 @@ LIBS="$SAVE_LIBS";
 CPPFLAGS="$SAVE_CPPFLAGS";
 ])dnl 
 
+dnl @synopsis PAC_CHECK_METIS
+dnl
+dnl Will try to find the METIS library and headers.
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_METIS,
+[AC_ARG_WITH(metis, AC_HELP_STRING([--with-metis=LIBNAME], [Specify the library name for METIS library. 
+Default: "-lmetis"]),
+        [psblas_cv_metis=$withval],
+        [psblas_cv_metis='-lmetis'])
+AC_ARG_WITH(metisdir, AC_HELP_STRING([--with-metisdir=DIR], [Specify the directory for METIS library and includes.]),
+        [psblas_cv_metisdir=$withval],
+        [psblas_cv_metisdir=''])
+AC_ARG_WITH(metisincdir, AC_HELP_STRING([--with-metisincdir=DIR], [Specify the directory for METIS includes.]),
+        [psblas_cv_metisincdir=$withval],
+        [psblas_cv_metisincdir=''])
+AC_ARG_WITH(metislibdir, AC_HELP_STRING([--with-metislibdir=DIR], [Specify the directory for METIS library.]),
+        [psblas_cv_metislibdir=$withval],
+        [psblas_cv_metislibdir=''])
+
+AC_LANG([C])
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$psblas_cv_metisdir" != "x"; then 
+   METIS_LIBDIR="-L$psblas_cv_metisdir"
+   LIBS="-L$psblas_cv_metisdir $LIBS"
+   METIS_INCLUDES="-I$psblas_cv_metisdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metisincdir" != "x"; then 
+   METIS_INCLUDES="-I$psblas_cv_metisincdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metislibdir" != "x"; then 
+   LIBS="-L$psblas_cv_metislibdir $LIBS"
+   METIS_LIBDIR="-L$psblas_cv_metislibdir"
+fi
+
+AC_MSG_NOTICE([metis dir $psblas_cv_metisdir])
+AC_CHECK_HEADER([metis.h],
+ [pac_metis_header_ok=yes],
+ [pac_metis_header_ok=no; METIS_INCLUDES=""])
+if test "x$pac_metis_header_ok" == "xno" ; then
+dnl Maybe Include or include subdirs? 
+  unset ac_cv_header_metis_h
+  METIS_INCLUDES="-I$psblas_cv_metisdir/include -I$psblas_cv_metisdir/Include "
+  CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+
+ AC_MSG_CHECKING([for metis_h in $METIS_INCLUDES])
+ AC_CHECK_HEADER([metis.h],
+    [pac_metis_header_ok=yes],
+    [pac_metis_header_ok=no; METIS_INCLUDES=""])
+fi
+if test "x$pac_metis_header_ok" == "xno" ; then
+dnl Maybe new structure with METIS UFconfig METIS? 
+   unset ac_cv_header_metis_h
+   METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
+   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+   AC_CHECK_HEADER([metis.h],
+     [pac_metis_header_ok=yes],
+     [pac_metis_header_ok=no; METIS_INCLUDES=""])
+fi
+
+
+if test "x$pac_metis_header_ok" == "xyes" ; then 
+      psblas_cv_metis_includes="$METIS_INCLUDES"
+      METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      LIBS="$METIS_LIBS -lm $LIBS";
+      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+     if test "x$pac_metis_lib_ok" == "xno" ; then 
+        dnl Maybe Lib or lib? 
+        METIS_LIBDIR="-L$psblas_cv_metisdir/Lib -L$psblas_cv_metisdir/lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
+        
+      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+     fi
+     if test "x$pac_metis_lib_ok" == "xno" ; then 
+        dnl Maybe METIS/Lib? 
+        METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
+      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+     fi
+fi
+LIBS="$SAVE_LIBS";
+CPPFLAGS="$SAVE_CPPFLAGS";
+])dnl 
+
+

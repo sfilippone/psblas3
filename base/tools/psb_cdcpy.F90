@@ -44,9 +44,9 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   implicit none
   !....parameters...
 
-  type(psb_desc_type), intent(in)  :: desc_in
-  type(psb_desc_type), intent(out) :: desc_out
-  integer(psb_ipk_), intent(out)             :: info
+  type(psb_desc_type), intent(inout) :: desc_in
+  type(psb_desc_type), intent(out)   :: desc_out
+  integer(psb_ipk_), intent(out)     :: info
 
   !locals
   integer(psb_ipk_) :: np,me,ictxt, err_act
@@ -73,27 +73,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
     goto 9999
   endif
 
-!!$  call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_index,&
-       & desc_out%ovrlap_index,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
-  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
-
-  if (allocated(desc_in%indxmap)) then 
-
-#ifdef SOURCE_WORKAROUND
-    call desc_in%indxmap%clone(desc_out%indxmap,info)
-#else 
-    if (info == psb_success_)&
-         & allocate(desc_out%indxmap, source=desc_in%indxmap, stat=info) 
-#endif   
-    
-  end if
+  call desc_in%clone(desc_out,info)
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_

@@ -82,7 +82,6 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     return
   end if
-
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -268,7 +267,6 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     return
   end if
-
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)

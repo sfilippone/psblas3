@@ -1,5 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/11/07: Merged integer vector changes.
+	
 2013/10/01: New desc_type methods calling into indxmap methods.
 	
 2013/09/30: Restructure index conversion methods, simplify.

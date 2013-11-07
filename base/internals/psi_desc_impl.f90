@@ -60,7 +60,7 @@ subroutine psi_renum_index(iperm,idx,info)
 
 end subroutine psi_renum_index
 
-subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
+subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   use psi_mod, psi_protect_name =>  psi_cnv_dsc
   use psb_realloc_mod
@@ -70,6 +70,7 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
   integer(psb_ipk_), intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
   type(psb_desc_type), intent(inout) :: cdesc
   integer(psb_ipk_), intent(out)               :: info
+  class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !     ....local scalars....      
   integer(psb_ipk_) :: np,me
@@ -107,9 +108,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%halo_index,info)
-!!$  cdesc%matrix_data(psb_thal_xch_) = nxch
-!!$  cdesc%matrix_data(psb_thal_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_thal_rcv_) = nrcv 
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
@@ -123,9 +121,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%ext_index,info)
-!!$  cdesc%matrix_data(psb_text_xch_) = nxch
-!!$  cdesc%matrix_data(psb_text_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_text_rcv_) = nrcv 
 
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
@@ -142,9 +137,6 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
     goto 9999
   end if
 
-!!$  cdesc%matrix_data(psb_tovr_xch_) = nxch
-!!$  cdesc%matrix_data(psb_tovr_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_tovr_rcv_) = nrcv 
 
   ! next  ovrlap_elem 
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
@@ -170,13 +162,15 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
     goto 9999
   end if
 
-!!$  cdesc%matrix_data(psb_tmov_xch_) = nxch
-!!$  cdesc%matrix_data(psb_tmov_snd_) = nsnd
-!!$  cdesc%matrix_data(psb_tmov_rcv_) = nrcv 
-
   ! finally bnd_elem
   call psi_crea_bnd_elem(idx_out,cdesc,info)
   if (info == psb_success_) call psb_move_alloc(idx_out,cdesc%bnd_elem,info)
+
+  call cdesc%v_halo_index%bld(cdesc%halo_index,mold=mold)
+  call cdesc%v_ext_index%bld(cdesc%ext_index,mold=mold)
+  call cdesc%v_ovrlap_index%bld(cdesc%ovrlap_index,mold=mold)
+  call cdesc%v_ovr_mst_idx%bld(cdesc%ovr_mst_idx,mold=mold)
+
 
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_bnd_elem')

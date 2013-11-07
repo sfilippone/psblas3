@@ -124,7 +124,7 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   complex(psb_spk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, nr, ictxt
-  character(len=20), parameter   :: name='psb_map_X2Y'
+  character(len=20), parameter   :: name='psb_map_X2Yv'
 
   info = psb_success_
   if (.not.map%is_asb()) then 
@@ -153,8 +153,9 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
+    else 
+      call yt%free(info)
     end if
-    call yt%free(info)
 
   case(psb_map_gen_linear_)
 
@@ -180,10 +181,11 @@ subroutine psb_c_map_X2Y_vect(alpha,x,beta,y,map,info,work)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
+    else
+      call xt%free(info)
+      call yt%free(info)
     end if
    
-    call xt%free(info)
-    call yt%free(info)
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
@@ -287,7 +289,7 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
   complex(psb_spk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, ictxt
-  character(len=20), parameter   :: name='psb_map_Y2X'
+  character(len=20), parameter   :: name='psb_map_Y2Xv'
 
   info = psb_success_
   if (.not.map%is_asb()) then 
@@ -316,8 +318,9 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
+    else
+      call yt%free(info)
     end if
-    call yt%free(info)
 
   case(psb_map_gen_linear_)
 
@@ -342,10 +345,10 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
+    else
+      call xt%free(info)
+      call yt%free(info)
     end if
-   
-    call xt%free(info)
-    call yt%free(info)
 
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input'

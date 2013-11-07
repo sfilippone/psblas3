@@ -21,6 +21,10 @@ ppde3d: ppde3d.o
 	$(F90LINK)  ppde3d.o -o ppde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde3d $(EXEDIR)
 
+ppde3d_ext: ppde3d_ext.o 
+	$(F90LINK)  ppde3d_ext.o -o ppde3d_ext $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv ppde3d_ext $(EXEDIR)
+
 
 spde3d: spde3d.o 
 	$(F90LINK) spde3d.o  -o spde3d $(PSBLAS_LIB) $(LDLIBS)
@@ -37,7 +41,7 @@ spde2d: spde2d.o
 
 
 clean: 
-	/bin/rm -f ppde3d.o spde3d.o  ppde2d.o spde2d.o  \
+	/bin/rm -f ppde3d.o spde3d.o  ppde2d.o spde2d.o ppde3d_ext.o  \
 	$(EXEDIR)/ppde3d $(EXEDIR)/spde3d $(EXEDIR)/ppde2d $(EXEDIR)/spde2d 
 verycleanlib: 
 	(cd ../..; make veryclean)

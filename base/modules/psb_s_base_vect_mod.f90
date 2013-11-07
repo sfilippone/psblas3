@@ -46,6 +46,7 @@ module psb_s_base_vect_mod
   
   use psb_const_mod
   use psb_error_mod
+  use psb_i_base_vect_mod
 
 
   !> \namespace  psb_base_mod  \class psb_s_base_vect_type
@@ -141,9 +142,11 @@ module psb_s_base_vect_mod
     !
     procedure, pass(x) :: gthab    => s_base_gthab
     procedure, pass(x) :: gthzv    => s_base_gthzv
-    generic, public    :: gth      => gthab, gthzv
+    procedure, pass(x) :: gthzv_x  => s_base_gthzv_x
+    generic, public    :: gth      => gthab, gthzv, gthzv_x
     procedure, pass(y) :: sctb     => s_base_sctb
-    generic, public    :: sct      => sctb
+    procedure, pass(y) :: sctb_x   => s_base_sctb_x
+    generic, public    :: sct      => sctb, sctb_x
   end type psb_s_base_vect_type
 
   public  :: psb_s_base_vect
@@ -1051,6 +1054,26 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
+  subroutine s_base_gthzv_x(i,n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    real(psb_spk_) ::  y(:)
+    class(psb_s_base_vect_type) :: x
+    
+    call x%gth(n,idx%v(i:),y)
+
+  end subroutine s_base_gthzv_x
+
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_gthzv
+  !! \memberof  psb_s_base_vect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
   subroutine s_base_gthzv(n,idx,x,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -1086,5 +1109,16 @@ contains
     call y%set_host()
 
   end subroutine s_base_sctb
+
+  subroutine s_base_sctb_x(i,n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    real(psb_spk_) :: beta, x(:)
+    class(psb_s_base_vect_type) :: y
+    
+    call y%sct(n,idx%v(i:),x,beta)
+
+  end subroutine s_base_sctb_x
 
 end module psb_s_base_vect_mod
