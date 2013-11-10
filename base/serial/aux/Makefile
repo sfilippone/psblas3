@@ -22,8 +22,9 @@ OBJS=$(FOBJS)
 # Note that we are regenerating most of libsparker.a on the fly. 
 SPARKERDIR=..
 LIBDIR=../..
+INCDIR=../..
 MODDIR=../../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(SPARKERDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(SPARKERDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
 #
 # No change should be needed below 

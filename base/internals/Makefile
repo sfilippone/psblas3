@@ -18,8 +18,9 @@ MPFOBJS = psi_dswapdata.o psi_dswaptran.o\
 	psi_desc_index.o psi_extrct_dl.o \
 	psi_fnd_owner.o psb_indx_map_fnd_owner.o
 LIBDIR=..
+INCDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR)
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 CINCLUDES=-I. 
 
 lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2) $(MPFOBJS) 

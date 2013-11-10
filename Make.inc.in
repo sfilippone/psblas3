@@ -49,6 +49,7 @@ INSTALL_DIR=@INSTALL_DIR@
 INSTALL_LIBDIR=@INSTALL_LIBDIR@
 INSTALL_INCLUDEDIR=@INSTALL_INCLUDEDIR@
 INSTALL_DOCSDIR=@INSTALL_DOCSDIR@
+INSTALL_SAMPLESDIR=@INSTALL_SAMPLESDIR@
 
 # the following is the flag for /bin/cp which shall copy the file only for updating (timestamp based)--on GNU Linux, '-u'
 CPUPDFLAG=

@@ -10,8 +10,9 @@ OBJS =  psb_dgather.o psb_dhalo.o psb_dovrl.o \
 MPFOBJS=psb_dscatter.o psb_zscatter.o psb_iscatter.o psb_cscatter.o psb_sscatter.o\
 	psb_dspgather.o psb_sspgather.o psb_zspgather.o psb_cspgather.o
 LIBDIR=..
+INCDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
 lib: mpfobjs $(OBJS) 
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)

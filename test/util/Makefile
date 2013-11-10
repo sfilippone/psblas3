@@ -1,16 +1,14 @@
-include ../../Make.inc
 #
 # Libraries used
 #
-LIBDIR=../../lib/
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+BASEDIR=../..
+LIBDIR=$(BASEDIR)/lib/
+INCDIR=$(BASEDIR)/include/
+include $(INCDIR)/Make.inc.psblas
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 
-#
-#  We are using the public domain tool METIS from U. Minnesota. To get it
-#  check URL http://www.cs.umn.edu:~karypis
-#  
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 ZH2MOBJS=zhb2mm.o 
 DH2MOBJS=dhb2mm.o 

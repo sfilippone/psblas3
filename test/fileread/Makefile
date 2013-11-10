@@ -1,12 +1,14 @@
-include ../../Make.inc
 #
 # Libraries used
 #
-LIBDIR=../../lib/
+BASEDIR=../..
+LIBDIR=$(BASEDIR)/lib/
+INCDIR=$(BASEDIR)/include/
+include $(INCDIR)/Make.inc.psblas
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 SFOBJS=getp.o  sf_sample.o   
 DFOBJS=getp.o  df_sample.o   

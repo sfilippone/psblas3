@@ -88,7 +88,11 @@ case $docsdir in
    \/* )   eval "INSTALL_DOCSDIR=$docsdir";;
    * ) eval "INSTALL_DOCSDIR=$INSTALL_DIR/docs";;
 esac
-AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR])
+case $samplesdir in 
+   \/* )   eval "INSTALL_SAMPLESDIR=$samplesdir";;
+   * ) eval "INSTALL_SAMPLESDIR=$INSTALL_DIR/samples";;
+esac
+AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR $INSTALL_SAMPLESDIR])
 
 # Note that the following line won't save from troubles.
 AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
@@ -777,6 +781,7 @@ AC_SUBST(INSTALL_DIR)
 AC_SUBST(INSTALL_LIBDIR)
 AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_DOCSDIR)
+AC_SUBST(INSTALL_SAMPLESDIR)
 
 AC_SUBST(BLAS_LIBS)
 AC_SUBST(AMD_LIBS)

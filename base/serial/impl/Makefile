@@ -16,8 +16,9 @@ OBJS=$(BOBJS) $(SOBJS)  $(DOBJS)  $(COBJS)  $(ZOBJS)
 # Note that we are regenerating most of libsparker.a on the fly. 
 SPARKERDIR=..
 LIBDIR=../..
+INCDIR=../..
 MODDIR=../../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(SPARKERDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(SPARKERDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 #LIBNAME=libsparker.a	
 LIBFILE=$(LIBDIR)/$(LIBNAME)
 

@@ -2,6 +2,7 @@ include ../Make.inc
 
 
 LIBDIR=../lib
+INCDIR=../include
 
 HERE=.
 
@@ -22,18 +23,18 @@ COBJS=psb_amd_order.o
 OBJS=$(MODOBJS) $(IMPLOBJS) $(COBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
 
 
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
 
 $(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-$(OBJS): $(LIBDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(INCDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
 
 $(IMPLOBJS): $(BASEOBJS)
