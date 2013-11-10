@@ -1,6 +1,7 @@
 include Make.inc
 
 all: libd based precd kryld utild
+	/bin/cp Make.inc Make.inc.psblas
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -25,7 +26,7 @@ install: all
 	(./mkdir.sh  $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) && \
-	   $(INSTALL_DATA) Make.inc lib/*$(.mod) $(INSTALL_INCLUDEDIR))
+	   $(INSTALL_DATA) Make.inc.psblas lib/*$(.mod) $(INSTALL_INCLUDEDIR))
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 clean: 
