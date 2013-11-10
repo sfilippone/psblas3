@@ -1,9 +1,9 @@
-#
-# Libraries used
 BASEDIR=../..
-LIBDIR=$(BASEDIR)/lib
 INCDIR=$(BASEDIR)/include
 include $(INCDIR)/Make.inc.psblas
+#
+# Libraries used
+LIBDIR=$(BASEDIR)/lib
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
