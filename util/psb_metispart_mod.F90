@@ -280,7 +280,7 @@ contains
         numflag  = 1
         wgflag   = 0
 
-        write(*,*) 'Before allocation',nparts
+!!$        write(*,*) 'Before allocation',nparts
 
         irpl=irp
         jal = ja
@@ -289,23 +289,23 @@ contains
         wgh_ = -1.0
         if(present(weights)) then
           if (size(weights) == nptl) then 
-            write(*,*) 'weights present',weights
+!!$            write(*,*) 'weights present',weights
             ! call METIS_PartGraphRecursive(n,irp,ja,idummy,jdummy,&
             !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
             info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
                  & nptl,weights,gvl)
 
           else
-            write(*,*) 'weights absent',wgh_
+            !write(*,*) 'weights absent',wgh_
             info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
                  & nptl,wgh_,gvl)
           end if
         else
-          write(*,*) 'weights absent',wgh_
+          !write(*,*) 'weights absent',wgh_
           info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
                & nptl,wgh_,gvl)
         endif
-        write(*,*) 'after allocation',info
+        !write(*,*) 'after allocation',info
 
         do i=1, n
           graph_vect(i) = gvl(i) - 1 
