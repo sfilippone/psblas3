@@ -1795,6 +1795,14 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
       AC_MSG_RESULT($pac_metis_lib_ok)
      fi
 fi
+if test "x$pac_metis_lib_ok" == "xyes" ; then 
+      AC_MSG_CHECKING([for METIS_SetDefaultOptions in $LIBS])
+      AC_TRY_LINK_FUNC(METIS_SetDefaultOptions, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok="no. Unusable METIS version, sorry."; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+fi
+
 LIBS="$SAVE_LIBS";
 CPPFLAGS="$SAVE_CPPFLAGS";
 ])dnl 
