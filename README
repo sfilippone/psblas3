@@ -67,7 +67,7 @@ prerequisites (see also SERIAL below):
    your platform you may try ATLAS available from
    http://math-atlas.sourceforge.net/ 
 
-3. We have had good results with  the METIS library, from 
+3. We have had good results with  the METIS library, version 5, from 
    http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
    This is optional; it is  used in the util and test/fileread
    directories but only if you specify --with-metis.

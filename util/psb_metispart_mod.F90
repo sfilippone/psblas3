@@ -136,15 +136,26 @@ contains
     end if
   end subroutine getv_mtpart
   
-  subroutine d_mat_build_mtpart(a,nparts)
+  subroutine d_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
     type(psb_dspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
+    real(psb_dpk_), optional :: weights(:)
+    real(psb_spk_), allocatable :: wgh_(:)
     
 
     select type (aa=>a%a) 
     type is (psb_d_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+      if (present(weights)) then 
+        if (size(weights)==nparts) then 
+          wgh_ = weights
+        end if
+      end if
+      if (allocated(wgh_)) then 
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+      else
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+      end if
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
@@ -153,15 +164,44 @@ contains
   end subroutine d_mat_build_mtpart
 
   
-  subroutine s_mat_build_mtpart(a,nparts)
+  subroutine z_mat_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    type(psb_zspmat_type), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_dpk_), optional :: weights(:)
+    real(psb_spk_), allocatable :: wgh_(:)
+    
+
+    select type (aa=>a%a) 
+    type is (psb_z_csr_sparse_mat)
+      if (present(weights)) then 
+        if (size(weights)==nparts) then 
+          wgh_ = weights
+        end if
+      end if
+      if (allocated(wgh_)) then 
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+      else
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+      end if
+    class default
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
+      call psb_abort(ictxt)
+    end select
+
+  end subroutine z_mat_build_mtpart
+
+  
+  subroutine s_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
     type(psb_sspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
     
 
     select type (aa=>a%a) 
     type is (psb_s_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
@@ -170,32 +210,16 @@ contains
   end subroutine s_mat_build_mtpart
 
   
-  subroutine z_mat_build_mtpart(a,nparts)
-    use psb_base_mod
-    type(psb_zspmat_type), intent(in) :: a
-    integer(psb_ipk_) :: nparts
-    
-
-    select type (aa=>a%a) 
-    type is (psb_z_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
-    class default
-      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-      call psb_abort(ictxt)
-    end select
-    
-  end subroutine z_mat_build_mtpart
-
-  
-  subroutine c_mat_build_mtpart(a,nparts)
+  subroutine c_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
     type(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
     
 
     select type (aa=>a%a) 
     type is (psb_c_csr_sparse_mat)
-      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
@@ -203,33 +227,52 @@ contains
 
   end subroutine c_mat_build_mtpart
 
-
-  subroutine build_mtpart(n,fida,ia1,ia2,nparts)
+  subroutine build_mtpart(n,fida,ja,irp,nparts,weights)
     use psb_base_mod
+    implicit none 
     integer(psb_ipk_) :: nparts
-    integer(psb_ipk_) :: ia1(:), ia2(:)
+    integer(psb_ipk_) :: ja(:), irp(:)
     integer(psb_ipk_) :: n, i,numflag,nedc,wgflag
     character(len=5)     :: fida
     integer(psb_ipk_), parameter :: nb=512
     real(psb_dpk_), parameter :: seed=12345.d0
-    integer(psb_ipk_) :: iopt(10),idummy(2),jdummy(2)
+    integer(psb_ipk_) :: iopt(10),idummy(2),jdummy(2), info
+    real(psb_spk_),optional :: weights(:)
+    integer(psb_ipk_) :: nl,nptl
+    integer(psb_ipk_), allocatable :: irpl(:),jal(:),gvl(:)
+    real(psb_spk_),allocatable  :: wgh_(:)
 
 #if defined(HAVE_METIS)
     interface 
-      subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
-           & wgflag,numflag,nparts,iopt,nedc,part)
-        import :: psb_ipk_
-        integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
-        integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      end subroutine METIS_PartGraphRecursive
-    end interface    
-    
-    allocate(graph_vect(n),stat=info)
-    
+      ! subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
+      !     & wgflag,numflag,nparts,weights,iopt,nedc,part) bind(c)
+      !   use iso_c_binding
+      !   integer(c_int) :: n,wgflag,numflag,nparts,nedc
+      !   integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
+      !   real(c_float)  :: weights(*)
+      !   !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
+      !   !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
+      ! end subroutine METIS_PartGraphRecursive
+
+      function METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
+           & nparts,weights,part) bind(c,name="metis_PartGraphRecursive_C") result(res)
+        use iso_c_binding
+        integer(c_int) :: res
+        integer(c_int) :: n,nparts
+        integer(c_int) :: ixadj(*),iadj(*),ivwg(*),iajw(*),part(*)
+        real(c_float)  :: weights(*)
+        !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
+        !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
+      end function METIS_PartGraphRecursive
+    end interface
+
+    call psb_realloc(n,graph_vect,info)
+    if (info == psb_success_) allocate(gvl(n),wgh_(nparts),stat=info)
+
     if (info /= psb_success_) then
-       write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
-	    & ' failure.'
-       return
+      write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
+           & ' failure.'
+      return
     endif
     if (nparts > 1) then
       if (psb_toupper(fida) == 'CSR') then 
@@ -237,11 +280,35 @@ contains
         numflag  = 1
         wgflag   = 0
 
-        call METIS_PartGraphRecursive(n,ia2,ia1,idummy,jdummy,&
-             & wgflag,numflag,nparts,iopt,nedc,graph_vect)
+        write(*,*) 'Before allocation',nparts
+
+        irpl=irp
+        jal = ja
+        nl = n
+        nptl = nparts
+        wgh_ = -1.0
+        if(present(weights)) then
+          if (size(weights) == nptl) then 
+            write(*,*) 'weights present',weights
+            ! call METIS_PartGraphRecursive(n,irp,ja,idummy,jdummy,&
+            !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
+            info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+                 & nptl,weights,gvl)
+
+          else
+            write(*,*) 'weights absent',wgh_
+            info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+                 & nptl,wgh_,gvl)
+          end if
+        else
+          write(*,*) 'weights absent',wgh_
+          info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+               & nptl,wgh_,gvl)
+        endif
+        write(*,*) 'after allocation',info
 
         do i=1, n
-          graph_vect(i) = graph_vect(i) - 1
+          graph_vect(i) = gvl(i) - 1 
         enddo
       else
         write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: matrix format ',&
@@ -259,7 +326,7 @@ contains
 
     return
 
-  end subroutine build_mtpart 
+  end subroutine build_mtpart
 
 
   subroutine free_part(info)

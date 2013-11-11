@@ -19,8 +19,8 @@ IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 	psb_c_renum_impl.o psb_z_renum_impl.o \
 	psb_d_genpde_impl.o psb_s_genpde_impl.o
 MODOBJS=psb_util_mod.o $(BASEOBJS)
-COBJS=psb_amd_order.o
-OBJS=$(MODOBJS) $(IMPLOBJS) $(COBJS)
+COBJS=metis_int.o psb_amd_order.o
+OBJS=$(COBJS) $(MODOBJS) $(IMPLOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
@@ -36,6 +36,7 @@ $(HERE)/$(LIBNAME): $(OBJS)
 
 $(OBJS): $(INCDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
+psb_metispart_mod.o: metis_int.o
 
 $(IMPLOBJS): $(BASEOBJS)
 

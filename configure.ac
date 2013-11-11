@@ -703,26 +703,17 @@ RSB_LIBS="$want_rsb_libs"
 LIBS="$RSB_LIBS ${LIBS}"
 dnl AC_CHECK_HEADERS([rsb.h], [ LIBS="${LIBS} $want_rsb_libs"], [])
 
-AC_ARG_WITH(metis, AC_HELP_STRING([--with-metis=LIB], [Specify -lMETISLIBNAME or the absolute library filename.]),
-        [psblas_cv_metis="$withval"],
-        [psblas_cv_metis=''])
 
+PAC_CHECK_METIS
+if test "x$psblas_cv_have_metis" == "xyes" ; then 
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_METIS $FDEFINES"
+   CDEFINES="-DHAVE_METIS_ $psblas_cv_metis_includes $CDEFINES"
+fi
 
-if test "x$psblas_cv_metis" != "x" ; then
-	AC_CHECK_LIB("m",METIS_PartGraphRecursive, psblas_cv_have_metis=yes; METIS_LIBS="$psblas_cv_metis", psblas_cv_have_metis=no,["$psblas_cv_metis"])
-else
-	save_LIBS="$LIBS";
-	LIBS="-lm $LIBS";	
-	AC_CHECK_LIB(metis,METIS_PartGraphRecursive,psblas_cv_have_metis=yes;METIS_LIBS="-lmetis", psblas_cv_have_metis=no)
-	LIBS="$save_LIBS";	
-fi
-if test "x$psblas_cv_have_metis" == "xyes" ; then
-  FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_METIS"
-fi
 
 PAC_CHECK_AMD
 if test "x$psblas_cv_have_amd" == "xyes" ; then 
-   FDEFINES="$mld_cv_define_prepend-DHAVE_AMD $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DHAVE_AMD $FDEFINES"
    CDEFINES="-DHAVE_AMD_ $psblas_cv_amd_includes $CDEFINES"
 fi
 

@@ -10,7 +10,7 @@ kryld: precd based
 
 libd:
 	(if test ! -d lib ; then mkdir lib; fi)
-	(if test ! -d include ; then mkdir include; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas; fi)
+	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas;)
 based:
 	cd base && $(MAKE) lib
 precd:
@@ -26,7 +26,7 @@ install: all
 	(./mkdir.sh  $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) && \
-	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_INCLUDEDIR))
+	   $(INSTALL_DATA) include/*$(.mod) $(INSTALL_INCLUDEDIR))
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
@@ -40,16 +40,10 @@ clean:
 check: all
 	make check -C test/serial
 
-cleanlib:
-	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
-	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
-
-veryclean: cleanlib
-	cd base && $(MAKE) veryclean
-	cd prec && $(MAKE) veryclean 
-	cd krylov && $(MAKE) veryclean
-	cd util && $(MAKE) veryclean
+veryclean: clean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
+	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
+	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
 
