@@ -71,10 +71,10 @@ module psb_const_mod
   ! 
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.0.0"
+  character(len=*), parameter    :: psb_version_string_ = "3.1.2"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter   :: psb_version_minor_  = 0
-  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 1
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 2
 
   !
   !     Handy & miscellaneous constants
