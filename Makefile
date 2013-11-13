@@ -10,7 +10,7 @@ kryld: precd based
 
 libd:
 	(if test ! -d lib ; then mkdir lib; fi)
-	(if test ! -d include ; then mkdir include; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas; fi)
+	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 based:
 	cd base && $(MAKE) lib
 precd:
