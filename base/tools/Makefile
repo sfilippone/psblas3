@@ -25,8 +25,9 @@ MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o 
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
 
 LIBDIR=..
+INCDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) $(FIFLAG)$(MODDIR)
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(FIFLAG)$(MODDIR)
 
 lib: mpfobjs $(FOBJS) 
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(FOBJS)

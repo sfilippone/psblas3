@@ -3,12 +3,11 @@ include ../Make.inc
 
 HERE=.
 LIBDIR=../lib
+INCDIR=../include
 
-#MODOBJS= psb_base_inner_krylov_mod.o \
-#	psb_s_inner_krylov_mod.o psb_c_inner_krylov_mod.o psb_d_inner_krylov_mod.o psb_z_inner_krylov_mod.o \
-#	psb_krylov_mod.o
 MODOBJS= psb_base_krylov_conv_mod.o \
-	psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o \
+	psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o \
+	psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o \
 	psb_krylov_mod.o
 F90OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
         psb_dcgstab.o psb_dcg.o psb_dcgs.o \
@@ -24,19 +23,19 @@ OBJS=$(F90OBJS) $(MODOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(METHDLIBNAME)	
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
 
 
 psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o
 psb_krylov_conv_mod.o: psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o 
 $(F90OBJS): $(MODOBJS)
-$(OBJS): $(LIBDIR)/$(PRECMODNAME)$(.mod)  $(LIBDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(INCDIR)/$(PRECMODNAME)$(.mod)  $(INCDIR)/$(BASEMODNAME)$(.mod)
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

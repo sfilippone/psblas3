@@ -12,12 +12,10 @@ OBJS=$(FOBJS)
 #
 # Where the library should go, and how it is called. 
 # Note that we are regenerating most of libsparker.a on the fly. 
-SPARKERDIR=..
 LIBDIR=../..
+INCDIR=../..
 MODDIR=../../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(SPARKERDIR) $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
-#LIBNAME=libsparker.a	
-#LIBNAME=$(BASELIBNAME)
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 LIBFILE=$(LIBDIR)/$(LIBNAME)
 
 #

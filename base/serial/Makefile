@@ -12,8 +12,9 @@ FOBJS = psb_lsame.o psi_serial_impl.o psb_sort_impl.o \
 	psb_sasum_s.o psb_dasum_s.o psb_casum_s.o psb_zasum_s.o 
 
 LIBDIR=..
+INCDIR=..
 MODDIR=../modules
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
 lib: auxd  f77d impld lib1 $(FOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)

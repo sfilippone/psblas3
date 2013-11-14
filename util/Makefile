@@ -2,6 +2,7 @@ include ../Make.inc
 
 
 LIBDIR=../lib
+INCDIR=../include
 
 HERE=.
 
@@ -19,21 +20,21 @@ IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 	psb_d_genpde_impl.o psb_s_genpde_impl.o
 MODOBJS=psb_util_mod.o $(BASEOBJS)
 COBJS=metis_int.o psb_amd_order.o
-OBJS=$(COBJS) $(MODOBJS) $(IMPLOBJS)# $(COBJS)
+OBJS=$(COBJS) $(MODOBJS) $(IMPLOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
 
 
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(LIBDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
 
 $(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-$(OBJS): $(LIBDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(INCDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
 psb_metispart_mod.o: metis_int.o
 
