@@ -10,7 +10,7 @@ kryld: precd based
 
 libd:
 	(if test ! -d lib ; then mkdir lib; fi)
-	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas;)
+	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 based:
 	cd base && $(MAKE) lib
 precd:
@@ -40,10 +40,16 @@ clean:
 check: all
 	make check -C test/serial
 
-veryclean: clean
+cleanlib:
+	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
+	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
+
+veryclean: cleanlib
+	cd base && $(MAKE) veryclean
+	cd prec && $(MAKE) veryclean 
+	cd krylov && $(MAKE) veryclean
+	cd util && $(MAKE) veryclean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
-	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
-	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
 
