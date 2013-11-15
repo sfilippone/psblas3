@@ -83,7 +83,7 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   logical, parameter :: debug=.false.
   character(len=20)  :: name
 
-  name='psi_bld_cdesc'
+  name='psi_cnv_desc'
   call psb_get_erraction(err_act)
   debug_level = psb_get_debug_level()
   debug_unit  = psb_get_debug_unit()

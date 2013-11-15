@@ -90,7 +90,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
     goto 9999
   endif
 
-  if (.not.psb_is_ok_desc(desc)) then 
+  if (.not.desc%is_ok()) then 
     info = psb_err_spmat_invalid_state_
     int_err(1) = dectype
     call psb_errpush(info,name)
@@ -161,8 +161,6 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
     goto 9999
   endif
 
-  if (present(mold)) &
-       & call desc%cnv(mold)
   
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Done'
