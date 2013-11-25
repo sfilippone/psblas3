@@ -2273,7 +2273,8 @@ subroutine psb_z_cp_csc_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
-  ! This is to have fix_coo called behind the scenes
+  ! We need to make a copy because mv_from will have to
+  ! sort in column-major order.
   call tmp%cp_from_coo(b,info)
   if (info == psb_success_) call a%mv_from_coo(tmp,info)
 

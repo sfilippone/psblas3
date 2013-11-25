@@ -398,6 +398,8 @@ subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz)
     call a%set_triangle(.false.)
     call a%set_unit(.false.)
     call a%set_dupl(psb_dupl_def_)
+    ! An empty matrix is sorted!
+    call a%set_sorted(.true.)
   end if
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
@@ -2725,7 +2727,7 @@ contains
 
   subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info,gtl)
- 
+
     use psb_const_mod
     use psb_realloc_mod
     use psb_string_mod
@@ -2974,7 +2976,8 @@ subroutine psb_d_cp_coo_to_coo(a,b,info)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
 
-  call b%fix(info)
+
+  if (.not.b%is_sorted()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3020,7 +3023,7 @@ subroutine psb_d_cp_coo_from_coo(a,b,info)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
 
-  call a%fix(info)
+  if (.not.a%is_sorted()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3132,14 +3135,13 @@ subroutine psb_d_mv_coo_to_coo(a,b,info)
   info = psb_success_
   b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
-  call b%reallocate(a%get_nzeros())
 
   call move_alloc(a%ia, b%ia)
   call move_alloc(a%ja, b%ja)
   call move_alloc(a%val, b%val)
   call a%free()
 
-  call b%fix(info)
+  if (.not.b%is_sorted()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3177,13 +3179,12 @@ subroutine psb_d_mv_coo_from_coo(a,b,info)
   info = psb_success_
   a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
   call a%set_nzeros(b%get_nzeros())
-  call a%reallocate(b%get_nzeros())
 
   call move_alloc(b%ia , a%ia   )
   call move_alloc(b%ja , a%ja   )
   call move_alloc(b%val, a%val )
   call b%free()
-  call a%fix(info)
+  if (.not.a%is_sorted()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3412,7 +3413,6 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
   use psb_d_base_mat_mod, psb_protect_name => psb_d_fix_coo_inner
   use psb_string_mod
   use psb_ip_reord_mod
-  use psb_sort_mod
   implicit none 
 
   integer(psb_ipk_), intent(in)           :: nzin, dupl
@@ -3423,12 +3423,10 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
   !locals
   integer(psb_ipk_), allocatable :: iaux(:)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_
-  integer(psb_ipk_) :: i,j, irw, icl, err_act, ixp,ki,kx
+  integer(psb_ipk_) :: i,j, irw, icl, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
   character(len=20)    :: name = 'psb_fixcoo'
-  real(psb_dpk_), allocatable    :: vtx(:)
-  integer(psb_ipk_), allocatable :: itx(:), jtx(:) 
 
   info  = psb_success_
 
@@ -3458,7 +3456,6 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
   case(0) !  Row major order
 
-
     call msort_up(nzin,ia(1:),iaux(1:),iret)
     if (iret == 0) &
          & call psb_ip_reord(nzin,val,ia,ja,iaux)
@@ -3473,7 +3470,7 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       call msort_up(nzl,ja(i:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzl,val(i:i+nzl-1),&
-           & ja(i:i+nzl-1),iaux)
+           & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
       i = j
     enddo
 
@@ -3537,6 +3534,7 @@ subroutine psb_d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
       write(psb_err_unit,*) 'Error in fix_coo: unsafe dupl',dupl_
       info =-7
     end select
+
 
     if(debug_level >= psb_debug_serial_)&
          & write(debug_unit,*)  trim(name),': end second loop'

@@ -2802,9 +2802,90 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
-  ! This is to have fix_coo called behind the scenes
-  call tmp%cp_from_coo(b,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+ 
+  if (.not.b%is_sorted()) then 
+    ! This is to have fix_coo called behind the scenes
+    call tmp%cp_from_coo(b,info)
+    if (info /= psb_success_) return
+    
+    nr  = tmp%get_nrows()
+    nc  = tmp%get_ncols()
+    nza = tmp%get_nzeros()
+    
+    a%psb_z_base_sparse_mat = tmp%psb_z_base_sparse_mat
+    
+    ! Dirty trick: call move_alloc to have the new data allocated just once.
+    call move_alloc(tmp%ia,itemp)
+    call move_alloc(tmp%ja,a%ja)
+    call move_alloc(tmp%val,a%val)
+    call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    call tmp%free()
+  else
+    
+    if (info /= psb_success_) return
+    
+    nr  = b%get_nrows()
+    nc  = b%get_ncols()
+    nza = b%get_nzeros()
+    
+    a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
+    
+    ! Dirty trick: call move_alloc to have the new data allocated just once.
+    call psb_safe_ab_cpy(b%ia,itemp,info)
+    if (info /= psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
+    if (info /= psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
+    if (info /= psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    
+  endif
+    
+  if (nza <= 0) then 
+    a%irp(:) = 1
+  else
+    a%irp(1) = 1
+    if (nr < itemp(nza)) then 
+      write(debug_unit,*) trim(name),': RWSHR=.false. : ',&
+           &nr,itemp(nza),' Expect trouble!'
+      info = 12
+    end if
+
+    j = 1 
+    i = 1
+    irw = itemp(j) 
+
+    outer: do 
+      inner: do 
+        if (i >= irw) exit inner
+        if (i>nr) then 
+          write(debug_unit,*) trim(name),&
+               & 'Strange situation: i>nr ',i,nr,j,nza,irw
+          exit outer
+        end if
+        a%irp(i+1) = a%irp(i) 
+        i = i + 1
+      end do inner
+      j = j + 1
+      if (j > nza) exit
+      if (itemp(j) /= irw) then 
+        a%irp(i+1) = j
+        irw = itemp(j) 
+        i = i + 1
+      endif
+      if (i>nr) exit
+    enddo outer
+    !
+    ! Cleanup empty rows at the end
+    !
+    if (j /= (nza+1)) then 
+      write(debug_unit,*) trim(name),': Problem from loop :',j,nza
+      info = 13
+    endif
+    do 
+      if (i>nr) exit
+      a%irp(i+1) = j
+      i = i + 1
+    end do
+
+  endif
 
 end subroutine psb_z_cp_csr_from_coo
 
@@ -2845,8 +2926,8 @@ subroutine psb_z_cp_csr_to_coo(a,b,info)
     end do
   end do
   call b%set_nzeros(a%get_nzeros())
-  call b%fix(info)
-
+  call b%set_sorted()
+  call b%set_asb()
 
 end subroutine psb_z_cp_csr_to_coo
 
@@ -2888,8 +2969,8 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
     end do
   end do
   call a%free()
-  call b%fix(info)
-
+  call b%set_sorted()
+  call b%set_asb()
 
 end subroutine psb_z_mv_csr_to_coo
 
@@ -2920,7 +3001,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   debug_level = psb_get_debug_level()
 
 
-  call b%fix(info)
+  if (.not.b%is_sorted()) call b%fix(info)
   if (info /= psb_success_) return
 
   nr  = b%get_nrows()

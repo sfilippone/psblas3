@@ -398,6 +398,8 @@ subroutine  psb_c_coo_allocate_mnnz(m,n,a,nz)
     call a%set_triangle(.false.)
     call a%set_unit(.false.)
     call a%set_dupl(psb_dupl_def_)
+    ! An empty matrix is sorted!
+    call a%set_sorted(.true.)
   end if
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
@@ -2974,7 +2976,8 @@ subroutine psb_c_cp_coo_to_coo(a,b,info)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
 
-  call b%fix(info)
+
+  if (.not.b%is_sorted()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3020,7 +3023,7 @@ subroutine psb_c_cp_coo_from_coo(a,b,info)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
 
-  call a%fix(info)
+  if (.not.a%is_sorted()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3132,14 +3135,13 @@ subroutine psb_c_mv_coo_to_coo(a,b,info)
   info = psb_success_
   b%psb_c_base_sparse_mat = a%psb_c_base_sparse_mat
   call b%set_nzeros(a%get_nzeros())
-  call b%reallocate(a%get_nzeros())
 
   call move_alloc(a%ia, b%ia)
   call move_alloc(a%ja, b%ja)
   call move_alloc(a%val, b%val)
   call a%free()
 
-  call b%fix(info)
+  if (.not.b%is_sorted()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3177,13 +3179,12 @@ subroutine psb_c_mv_coo_from_coo(a,b,info)
   info = psb_success_
   a%psb_c_base_sparse_mat = b%psb_c_base_sparse_mat
   call a%set_nzeros(b%get_nzeros())
-  call a%reallocate(b%get_nzeros())
 
   call move_alloc(b%ia , a%ia   )
   call move_alloc(b%ja , a%ja   )
   call move_alloc(b%val, a%val )
   call b%free()
-  call a%fix(info)
+  if (.not.a%is_sorted()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
