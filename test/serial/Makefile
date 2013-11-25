@@ -1,16 +1,14 @@
-include ../../Make.inc
 #
 # Libraries used
 #
-LIBDIR=../../lib/
-OPTDIR=../../opt
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_base
+BASEDIR=../..
+INCDIR=$(BASEDIR)/include/
+include $(INCDIR)/Make.inc.psblas
+LIBDIR=$(BASEDIR)/lib/
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
-#
-# Compilers and such
-#
-CCOPT= -g
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).  $(FMFLAG)$(OPTDIR)
+
+FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 
 EXEDIR=./runs
