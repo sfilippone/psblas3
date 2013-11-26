@@ -4,7 +4,8 @@ include ../../../Make.inc
 # The object files
 #
 FOBJS =  iaxpby.o daxpby.o saxpby.o \
-	caxpby.o  zaxpby.o smmp.o
+	caxpby.o  zaxpby.o symbmm.o \
+	cnumbmm.o dnumbmm.o snumbmm.o znumbmm.o
 
 
 OBJS=$(FOBJS)
