@@ -1821,7 +1821,7 @@ contains
     call move_alloc(a%ja,a%ia)
     call move_alloc(itemp,a%ja)
     
-    call a%fix(info)
+    call a%set_sorted(.false.)
     
     return
     
@@ -1839,7 +1839,6 @@ contains
     if (psb_s_is_complex_) a%val(:) = (a%val(:))
 
   end subroutine s_coo_transc_1mat
-
 
 
 end module psb_s_base_mat_mod
