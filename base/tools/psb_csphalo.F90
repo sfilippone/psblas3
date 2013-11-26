@@ -160,6 +160,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end select
 
+
   sdsz(:)=0
   rvsz(:)=0
   l1  = 0
@@ -340,7 +341,7 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
   call acoo%set_nzeros(l1)
-
+  call acoo%set_sorted(.false.)
 
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),&
