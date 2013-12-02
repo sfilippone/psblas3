@@ -21,25 +21,13 @@ c == =====================================================================
       use psb_sort_mod, only: psb_msort
 c
       integer(psb_ipk_) ::       ia(*), ja(*), diaga,
-     *  ib(*), jb(*), diagb,
-     *  diagc,
-     *  index(*)
+     *  ib(*), jb(*), diagb,  diagc,  index(*)
       integer(psb_ipk_), allocatable :: ic(:),jc(:)
       integer(psb_ipk_) :: nze, info
+      
 c
 c       symbolic matrix multiply c=a*b
 c
-c$$$      open(iunit)
-c$$$      write(iunit,*) 'SYMBMM: ',n,m,l
-c$$$      write(iunit,*) 'SYMBMM: A:'
-c$$$      do i=1,n
-c$$$        write(iunit,*) 'Row:',i,' : ',ja(ia(i):ia(i+1)-1)
-c$$$      enddo
-c$$$      write(iunit,*) 'SYMBMM: B:'
-c$$$      do i=1,m
-c$$$        write(iunit,*) 'Row:',i,' : ',jb(ib(i):ib(i+1)-1)
-c$$$      enddo
-      
       if (size(ic) < n+1) then 
         write(psb_err_unit,*)
      +    'Called realloc in SYMBMM '
@@ -64,8 +52,6 @@ c
 c    main loop
 c
       do 50 i=1,n
-c$$$        write(psb_err_unit,*)
-c$$$        'SYMBMM: 1 loop ',i,n,ia(i),ia(i+1)
         istart=-1
         length=0
 c
@@ -127,12 +113,7 @@ c
           index(jc(j))=0
  40     continue
         call psb_msort(jc(ic(i):ic(i)+length -1))
-c$$$        write(iunit,*) length,' : ',jc(ic(i):ic(i)+length-1)
         index(i) = 0
  50   continue
-c$$$      close(iunit)
-c$$$      iunit = iunit + 1
-c$$$      write(psb_err_unit,*)
-c$$$      'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
       return
       end
