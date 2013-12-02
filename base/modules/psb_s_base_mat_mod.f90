@@ -1296,9 +1296,9 @@ module psb_s_base_mat_mod
   !! 
   !
   interface 
-    subroutine psb_s_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir) 
+    subroutine psb_s_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir) 
       import :: psb_ipk_, psb_spk_
-      integer(psb_ipk_), intent(in)           :: nzin,dupl
+      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
       integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
       real(psb_spk_), intent(inout) :: val(:)
       integer(psb_ipk_), intent(out)          :: nzout, info

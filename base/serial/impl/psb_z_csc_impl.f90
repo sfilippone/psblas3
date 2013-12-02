@@ -2392,7 +2392,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   debug_level = psb_get_debug_level()
 
 
-  call b%fix(info, idir=ione)
+  call b%fix(info, idir=psb_col_major_)
   if (info /= psb_success_) return
 
   nr  = b%get_nrows()
