@@ -419,7 +419,8 @@ subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_) :: err_act, nzin, nzout
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
-  logical :: append_
+  integer :: jmin_, jmax_
+  logical :: append_, rscale_, cscale_
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
@@ -435,6 +436,43 @@ subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
   else
     nzin = 0
   endif
+  if (present(rscale)) then 
+    rscale_=rscale
+  else
+    rscale_=.false.
+  end if
+  if (present(cscale)) then 
+    cscale_=cscale
+  else
+    cscale_=.false.
+  end if
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+  
+  if (append_.and.(rscale_.or.cscale_)) then 
+    write(psb_err_unit,*) &
+         & 'z_csgetblk: WARNING: dubious input: append_ and rscale_|cscale_'
+  end if
+
+  if (rscale_) then 
+    call b%set_nrows(imax-imin+1)
+  else
+    call b%set_nrows(max(min(imax,a%get_nrows()),b%get_nrows()))
+  end if
+
+  if (cscale_) then 
+    call b%set_ncols(jmax_-jmin_+1)
+  else
+    call b%set_ncols(max(min(jmax_,a%get_ncols()),b%get_ncols()))
+  end if
 
   call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
