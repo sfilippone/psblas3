@@ -1942,6 +1942,7 @@ subroutine psb_c_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  nz = 0
 
   if (present(jmin)) then
     jmin_ = jmin
@@ -1954,10 +1955,7 @@ subroutine psb_c_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) then 
-    nz = 0
-    return
-  end if
+  if ((imax<imin).or.(jmax_<jmin_)) return
 
   if (present(append)) then
     append_=append
@@ -2025,7 +2023,7 @@ contains
 
     class(psb_c_csr_sparse_mat), intent(in)    :: a
     integer(psb_ipk_) :: imin,imax,jmin,jmax
-    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_ipk_), intent(inout)               :: nz
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     integer(psb_ipk_), intent(in)                  :: nzin
     logical, intent(in)                  :: append
@@ -2119,6 +2117,7 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  nz = 0
   
   if (present(jmin)) then
     jmin_ = jmin
@@ -2131,10 +2130,7 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) then 
-    nz = 0
-    return
-  end if
+  if ((imax<imin).or.(jmax_<jmin_)) return
 
   if (present(append)) then
     append_=append
@@ -2203,7 +2199,7 @@ contains
 
     class(psb_c_csr_sparse_mat), intent(in)    :: a
     integer(psb_ipk_) :: imin,imax,jmin,jmax
-    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_ipk_), intent(inout)               :: nz
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_), intent(in)                  :: nzin
