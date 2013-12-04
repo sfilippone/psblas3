@@ -2029,7 +2029,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, nrd,ncd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='csr_getptn'
 
@@ -2050,9 +2050,12 @@ contains
       nzin_ = 0
     endif
 
-    nzt = a%irp(lrw+1)-a%irp(irw)
+    nrd = max(1,a%get_nrows())
+    ncd = max(1,a%get_ncols())
+    nzt = min((a%irp(lrw+1)-a%irp(irw)),&
+         & ((nza+ncd-1)/ncd)*(lcl+1-icl),&
+         & ((nza+nrd-1)/nrd)*(lrw+1-irw))
     nz = 0 
-
 
     call psb_ensure_size(nzin_+nzt,ia,info)
     if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
@@ -2206,7 +2209,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, nrd, ncd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getrow'
 
@@ -2227,9 +2230,12 @@ contains
       nzin_ = 0
     endif
 
-    nzt = a%irp(lrw+1)-a%irp(irw)
+    nrd = max(1,a%get_nrows())
+    ncd = max(1,a%get_ncols())
+    nzt = min((a%irp(lrw+1)-a%irp(irw)),&
+         & ((nza+ncd-1)/ncd)*(lcl+1-icl),&
+         & ((nza+nrd-1)/nrd)*(lrw+1-irw))
     nz = 0 
-
 
     call psb_ensure_size(nzin_+nzt,ia,info)
     if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
