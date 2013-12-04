@@ -224,7 +224,7 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
         ntl = ntl+nn
       end if
     end do
-    call psb_msort_unique(neigh(ill+1:ill+ntl),nn)
+    call psb_msort_unique(neigh(ill+1:ill+ntl),nn,dir=psb_sort_up_)
     ifl = ill + 1
     ill = ill + nn
   end do
