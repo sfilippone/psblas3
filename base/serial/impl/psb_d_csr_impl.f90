@@ -2051,12 +2051,11 @@ contains
     else
       nzin_ = 0
     endif
-
-    nrd = max(1,a%get_nrows())
-    ncd = max(1,a%get_ncols())
-    nzt = min((a%irp(lrw+1)-a%irp(irw)),&
-         & ((nza+ncd-1)/ncd)*(lcl+1-icl),&
-         & ((nza+nrd-1)/nrd)*(lrw+1-irw))
+    !
+    ! This is a row-oriented routine, so the following is a
+    ! good choice. 
+    !
+    nzt = (a%irp(lrw+1)-a%irp(irw))
     nz = 0 
 
     call psb_ensure_size(nzin_+nzt,ia,info)
@@ -2234,11 +2233,11 @@ contains
       nzin_ = 0
     endif
 
-    nrd = max(1,a%get_nrows())
-    ncd = max(1,a%get_ncols())
-    nzt = min((a%irp(lrw+1)-a%irp(irw)),&
-         & ((nza+ncd-1)/ncd)*(lcl+1-icl),&
-         & ((nza+nrd-1)/nrd)*(lrw+1-irw))
+    !
+    ! This is a row-oriented routine, so the following is a
+    ! good choice. 
+    !
+    nzt = (a%irp(lrw+1)-a%irp(irw))
     nz = 0 
 
     call psb_ensure_size(nzin_+nzt,ia,info)

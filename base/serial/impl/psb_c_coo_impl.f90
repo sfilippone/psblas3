@@ -2124,7 +2124,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw
+    integer(psb_ipk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw,nrd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getptn'
 
@@ -2234,7 +2234,8 @@ contains
       if (debug_level >= psb_debug_serial_) &
            & write(debug_unit,*)  trim(name),': unsorted '
 
-      nzt = (nza*(lrw-irw+1))/max(a%get_nrows(),1)
+      nrd = max(a%get_nrows(),1)
+      nzt = ((nza+nrd-1)/nrd)*(lrw-irw+1)
       call psb_ensure_size(nzin_+nzt,ia,info)
       if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
       if (info /= psb_success_) return
@@ -2246,7 +2247,7 @@ contains
                & (jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
             k = k + 1 
             if (k > nzt) then
-              nzt = k 
+              nzt = k + nzt
               call psb_ensure_size(nzin_+nzt,ia,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
               if (info /= psb_success_) return
@@ -2262,7 +2263,7 @@ contains
                & (jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
             k = k + 1 
             if (k > nzt) then
-              nzt = k 
+              nzt = k + nzt
               call psb_ensure_size(nzin_+nzt,ia,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
               if (info /= psb_success_) return
@@ -2403,7 +2404,7 @@ contains
     logical, intent(in)                            :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw, nra, nca
+    integer(psb_ipk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw, nra, nca, nrd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getrow'
 
@@ -2518,7 +2519,8 @@ contains
       if (debug_level >= psb_debug_serial_) &
            & write(debug_unit,*)  trim(name),': unsorted '
 
-      nzt = (nza*(lrw-irw+1))/max(a%get_nrows(),1)
+      nrd = max(a%get_nrows(),1)
+      nzt = ((nza+nrd-1)/nrd)*(lrw-irw+1)
       call psb_ensure_size(nzin_+nzt,ia,info)
       if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
       if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
@@ -2531,7 +2533,7 @@ contains
                & (jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
             k = k + 1 
             if (k > nzt) then
-              nzt = k 
+              nzt = k + nzt
               call psb_ensure_size(nzin_+nzt,ia,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
@@ -2549,7 +2551,7 @@ contains
                & (jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
             k = k + 1 
             if (k > nzt) then
-              nzt = k 
+              nzt = k + nzt
               call psb_ensure_size(nzin_+nzt,ia,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
               if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
