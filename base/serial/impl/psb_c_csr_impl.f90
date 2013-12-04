@@ -2029,7 +2029,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, nrd,ncd
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl,nrd,ncd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='csr_getptn'
 
@@ -2039,6 +2039,8 @@ contains
     nza = a%get_nzeros()
     irw = imin
     lrw = min(imax,a%get_nrows())
+    icl = jmin
+    lcl = min(jmax,a%get_ncols())
     if (irw<0) then 
       info = psb_err_pivot_too_small_
       return
@@ -2209,7 +2211,7 @@ contains
     logical, intent(in)                  :: append
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
-    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, nrd, ncd
+    integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl, nrd, ncd
     integer(psb_ipk_) :: debug_level, debug_unit
     character(len=20) :: name='coo_getrow'
 
@@ -2219,6 +2221,8 @@ contains
     nza = a%get_nzeros()
     irw = imin
     lrw = min(imax,a%get_nrows())
+    icl = jmin
+    lcl = min(jmax,a%get_ncols())
     if (irw<0) then 
       info = psb_err_pivot_too_small_
       return
