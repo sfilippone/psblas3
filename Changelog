@@ -1,5 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/12/02: Reimplement coo%fix method: use more memory if available, but
+	    faster. Fix small interfacing problems with getrow/getblk/getptn.
+	
+2013/11/25: Limit usage of coo%fix method.
+	
 2013/11/07: Merged integer vector changes.
 	
 2013/10/01: New desc_type methods calling into indxmap methods.
