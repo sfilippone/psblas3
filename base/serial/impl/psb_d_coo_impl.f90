@@ -3455,6 +3455,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   dupl_ = dupl
 
 
+
   allocate(iaux(max(nr,nc,nzin)+2),stat=info) 
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
@@ -3462,24 +3463,32 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
     goto 9999
   end if
 
-
-  allocate(ias(nzin),jas(nzin),vs(nzin),ix2(max(nr,nc)), stat=info)
+  allocate(ias(nzin),jas(nzin),vs(nzin),ix2(max(nr,nc,nzin)), stat=info)
   use_buffers = (info == 0)
-
+  
   select case(idir_) 
 
   case(psb_row_major_) 
     !  Row major order
-
     if (use_buffers) then 
-      iaux(:)=0
-
-      iaux(ia(1)) = iaux(ia(1)) + 1
-      srt_inp = .true. 
-      do i=2,nzin
-        iaux(ia(i)) = iaux(ia(i)) + 1
-        srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
-      end do
+      if (.not.(  (ia(1) < 1).or.(ia(1)> nr)) ) then 
+        iaux(:) = 0
+        iaux(ia(1)) = iaux(ia(1)) + 1
+        srt_inp = .true. 
+        do i=2,nzin
+          if (  (ia(i) < 1).or.(ia(i)> nr)) then 
+            use_buffers = .false.
+            exit
+          end if
+          iaux(ia(i)) = iaux(ia(i)) + 1
+          srt_inp = srt_inp .and.(ia(i-1)<=ia(i))
+        end do
+      else
+        use_buffers=.false.
+      end if
+    end if
+    ! Check again use_buffers.
+    if (use_buffers) then 
       if (srt_inp) then 
         ! If input was already row-major 
         ! we can do it row-by-row here.
@@ -3782,14 +3791,26 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   case(psb_col_major_) 
 
     if (use_buffers) then 
-      iaux(:)=0
+      iaux(:) = 0
+      if (.not.(  (ja(1) < 1).or.(ja(1)> nc)) ) then 
+        iaux(ja(1)) = iaux(ja(1)) + 1
+        srt_inp = .true. 
+        do i=2,nzin
+          if (  (ja(i) < 1).or.(ja(i)> nc)) then 
+            use_buffers = .false.
+            exit
+          end if
+          iaux(ja(i)) = iaux(ja(i)) + 1
+          srt_inp = srt_inp .and.(ja(i-1)<=ja(i))
+        end do
+      else
+        use_buffers=.false.
+      end if
+    end if
+    !use_buffers=use_buffers.and.srt_inp
+    ! Check again use_buffers.
+    if (use_buffers) then 
 
-      iaux(ja(1)) = iaux(ja(1)) + 1
-      srt_inp = .true. 
-      do i=2,nzin
-        iaux(ja(i)) = iaux(ja(i)) + 1
-        srt_inp = srt_inp .and.(ja(i-1)<=ja(i))
-      end do
       if (srt_inp) then 
         ! If input was already col-major 
         ! we can do it col-by-col here.
@@ -3883,17 +3904,16 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         enddo
 
       else  if (.not.srt_inp) then 
-        ! If input was not already row-major 
+        ! If input was not already col-major 
         ! we have to sort all
-
         ip     = iaux(1)
         iaux(1) = 0
-        do i=2, nr
+        do i=2, nc
           is = iaux(i) 
           iaux(i) = ip
           ip = ip + is
         end do
-        iaux(nr+1) = ip
+        iaux(nc+1) = ip
 
         do i=1,nzin
           icl = ja(i)
@@ -3914,7 +3934,6 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
-
             select case(dupl_)
             case(psb_dupl_ovwrt_)
               k = k + 1
