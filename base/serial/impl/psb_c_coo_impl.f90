@@ -3463,7 +3463,7 @@ subroutine psb_c_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
     goto 9999
   end if
 
-  allocate(ias(nzin),jas(nzin),vs(nzin),ix2(max(nr,nc,nzin)), stat=info)
+  allocate(ias(nzin),jas(nzin),vs(nzin),ix2(max(nr,nc,nzin)+2), stat=info)
   use_buffers = (info == 0)
   
   select case(idir_) 
