@@ -51,6 +51,33 @@ module psb_z_serial_mod
     end function psb_zasum_s
   end interface psb_asum
 
+  interface psb_spspmm
+    subroutine psb_zspspmm(a,b,c,info)
+      use psb_z_mat_mod, only : psb_zspmat_type
+      import :: psb_ipk_
+      implicit none 
+      type(psb_zspmat_type), intent(in)  :: a,b
+      type(psb_zspmat_type), intent(out) :: c
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_zspspmm
+    subroutine psb_zcsrspspmm(a,b,c,info)
+      use psb_z_mat_mod, only : psb_z_csr_sparse_mat
+      import :: psb_ipk_
+      implicit none 
+      class(psb_z_csr_sparse_mat), intent(in) :: a,b
+      type(psb_z_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_zcsrspspmm
+    subroutine psb_zcscspspmm(a,b,c,info)
+      use psb_z_mat_mod, only : psb_z_csc_sparse_mat
+      import :: psb_ipk_
+      implicit none 
+      class(psb_z_csc_sparse_mat), intent(in) :: a,b
+      type(psb_z_csc_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_zcscspspmm
+  end interface
+
   interface psb_symbmm
     subroutine psb_zsymbmm(a,b,c,info)
       use psb_z_mat_mod, only : psb_zspmat_type

@@ -51,6 +51,33 @@ module psb_c_serial_mod
     end function psb_casum_s
   end interface psb_asum
 
+  interface psb_spspmm
+    subroutine psb_cspspmm(a,b,c,info)
+      use psb_c_mat_mod, only : psb_cspmat_type
+      import :: psb_ipk_
+      implicit none 
+      type(psb_cspmat_type), intent(in)  :: a,b
+      type(psb_cspmat_type), intent(out) :: c
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_cspspmm
+    subroutine psb_ccsrspspmm(a,b,c,info)
+      use psb_c_mat_mod, only : psb_c_csr_sparse_mat
+      import :: psb_ipk_
+      implicit none 
+      class(psb_c_csr_sparse_mat), intent(in) :: a,b
+      type(psb_c_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccsrspspmm
+    subroutine psb_ccscspspmm(a,b,c,info)
+      use psb_c_mat_mod, only : psb_c_csc_sparse_mat
+      import :: psb_ipk_
+      implicit none 
+      class(psb_c_csc_sparse_mat), intent(in) :: a,b
+      type(psb_c_csc_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_ccscspspmm
+  end interface
+
   interface psb_symbmm
     subroutine psb_csymbmm(a,b,c,info)
       use psb_c_mat_mod, only : psb_cspmat_type

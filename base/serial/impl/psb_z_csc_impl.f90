@@ -2521,7 +2521,7 @@ subroutine psb_z_cp_csc_to_fmt(a,b,info)
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
+  integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2535,9 +2535,11 @@ subroutine psb_z_cp_csc_to_fmt(a,b,info)
 
   type is (psb_z_csc_sparse_mat) 
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
-    if (info == 0) call psb_safe_cpy( a%icp, b%icp , info)
-    if (info == 0) call psb_safe_cpy( a%ia , b%ia  , info)
-    if (info == 0) call psb_safe_cpy( a%val, b%val , info)
+    nc = a%get_ncols()
+    nz = a%get_nzeros()
+    if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
+    if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
+    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2602,7 +2604,7 @@ subroutine psb_z_cp_csc_from_fmt(a,b,info)
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
+  integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2615,9 +2617,11 @@ subroutine psb_z_cp_csc_from_fmt(a,b,info)
 
   type is (psb_z_csc_sparse_mat) 
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-    if (info == 0) call psb_safe_cpy( b%icp, a%icp , info)
-    if (info == 0) call psb_safe_cpy( b%ia , a%ia  , info)
-    if (info == 0) call psb_safe_cpy( b%val, a%val , info)
+    nc = b%get_ncols()
+    nz = b%get_nzeros()
+    if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
+    if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
+    if (info == 0) call psb_safe_cpy( b%val(1:nz),   a%val , info)
 
   class default
     call b%cp_to_coo(tmp,info)
@@ -2985,3 +2989,124 @@ subroutine psb_z_csc_print(iout,a,iv,head,ivr,ivc)
 
 end subroutine psb_z_csc_print
 
+subroutine psb_zcscspspmm(a,b,c,info)
+  use psb_z_mat_mod
+  use psb_serial_mod, psb_protect_name => psb_zcscspspmm
+
+  implicit none 
+
+  class(psb_z_csc_sparse_mat), intent(in) :: a,b
+  type(psb_z_csc_sparse_mat), intent(out)  :: c
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_ipk_) :: nze, ma,na,mb,nb, nzc, nza, nzb,nzeb
+  character(len=20) :: name
+  integer(psb_ipk_) :: err_act
+  name='psb_cscspspmm'
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
+
+
+  if ( mb /= na ) then 
+    write(psb_err_unit,*) 'Mismatch in SPSPMM: ',ma,na,mb,nb
+  endif
+  nza = a%get_nzeros()
+  nzb = b%get_nzeros()
+  nzc = 2*(nza+nzb)
+  nze = ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) )
+  nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
+  ! Estimate number of nonzeros on output.
+  ! Turns out this is often a large  overestimate.
+  call c%allocate(ma,nb,min(nzc,nze,nzeb))
+
+
+  call csc_spspmm(a,b,c,info)
+
+  call c%set_asb()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+     call psb_error()
+     return
+  end if
+  return
+
+contains
+  
+  subroutine csc_spspmm(a,b,c,info)
+    implicit none 
+    type(psb_z_csc_sparse_mat), intent(in)  :: a,b
+    type(psb_z_csc_sparse_mat), intent(inout) :: c
+    integer(psb_ipk_), intent(out)          :: info
+    integer(psb_ipk_)              :: ma,na,mb,nb
+    integer(psb_ipk_), allocatable :: icol(:), idxs(:), iaux(:)
+    complex(psb_dpk_), allocatable    :: col(:)
+    type(psb_int_heap)             :: heap
+    integer(psb_ipk_)              :: i,j,k,irw,icl,icf, iret, &
+         & nzc,nnzre, isz, ipb, irwsz, nrc, nze
+    complex(psb_dpk_)                 :: cfb
+
+
+    info = psb_success_
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+
+    nze = min(size(c%val),size(c%ia))
+    isz = max(ma,na,mb,nb)
+    call psb_realloc(isz,col,info)
+    if (info == 0) call psb_realloc(isz,idxs,info)
+    if (info == 0) call psb_realloc(isz,icol,info)
+    if (info /= 0) return 
+    col  = dzero
+    icol = 0
+    nzc  = 1    
+    do j = 1,nb
+      c%icp(j) = nzc
+      nrc = 0 
+      do k = b%icp(j), b%icp(j+1)-1
+        icl = b%ia(k)
+        cfb = b%val(k)
+        irwsz = a%icp(icl+1)-a%icp(icl)
+        do i = a%icp(icl),a%icp(icl+1)-1
+          irw = a%ia(i)
+          if (icol(irw)<j) then 
+            nrc = nrc + 1 
+            idxs(nrc) = irw
+            icol(irw) = j
+          end if
+          col(irw)  = col(irw)  + cfb*a%val(i)
+        end do
+      end do
+      if (nrc > 0 ) then 
+        if ((nzc+nrc)>nze) then 
+          nze = max(nb*((nzc+j-1)/j),nzc+2*nrc)
+          call psb_realloc(nze,c%val,info)
+          if (info == 0) call psb_realloc(nze,c%ia,info)
+          if (info /= 0) return
+        end if
+        call psb_msort(idxs(1:nrc))
+        do i=1, nrc
+          irw        = idxs(i) 
+          c%ia(nzc)  = irw 
+          c%val(nzc) = col(irw) 
+          col(irw)   = dzero
+          nzc        = nzc + 1 
+        end do
+      end if
+    end do
+
+    c%icp(nb+1) = nzc
+
+  end subroutine csc_spspmm
+
+end subroutine psb_zcscspspmm
