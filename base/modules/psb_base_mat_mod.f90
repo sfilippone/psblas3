@@ -370,7 +370,7 @@ module psb_base_mat_mod
   !
   !> Function  reallocate_nz
   !! \memberof  psb_base_sparse_mat
-  !! \brief One--parameters version of (re)allocate
+  !! \brief One--parameter version of (re)allocate
   !!
   !!  \param nz  number of nonzeros to allocate for
   !
