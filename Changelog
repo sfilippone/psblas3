@@ -1,5 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2013/12/12: New sparse-sparse matrix product, with CSR-CSR, CSC-CSC new
+	    versions, while keeping the old version at hand. 
+	
+2013/12/04: Fix computation of output space for getrow & friends.
+	
 2013/12/02: Reimplement coo%fix method: use more memory if available, but
 	    faster. Fix small interfacing problems with getrow/getblk/getptn.
 	
