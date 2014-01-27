@@ -266,7 +266,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
   if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
     call acoo%allocate(nrow,ncol,nnzero)
     do i=1,nnzero
-      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
     call acoo%set_nzeros(nnzero)
     call acoo%fix(info)
@@ -279,7 +279,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
     ! we de-symmetrize what we are about to read
     call acoo%allocate(nrow,ncol,2*nnzero)
     do i=1,nnzero
-      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
     nzr = nnzero
     do i=1,nnzero
@@ -311,6 +311,9 @@ subroutine smm_mat_read(a, info, iunit, filename)
   return
 902 info=902
   write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
+  return
+905 info=905
+  write(psb_err_unit,*) 'READ_MATRIX: Error at line',i
   return
 993 info=993
   write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'

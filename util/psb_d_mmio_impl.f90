@@ -276,7 +276,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
     ! we de-symmetrize what we are about to read
     call acoo%allocate(nrow,ncol,2*nnzero)
     do i=1,nnzero
-      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
     nzr = nnzero
     do i=1,nnzero

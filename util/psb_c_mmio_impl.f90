@@ -285,7 +285,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
     ! we de-symmetrize what we are about to read
     call acoo%allocate(nrow,ncol,2*nnzero)
     do i=1,nnzero
-      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),are,aim
       acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
     end do
     nzr = nnzero
@@ -308,7 +308,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
     ! we de-symmetrize what we are about to read
     call acoo%allocate(nrow,ncol,2*nnzero)
     do i=1,nnzero
-      read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),are,aim
       acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
     end do
     nzr = nnzero
@@ -339,6 +339,9 @@ subroutine cmm_mat_read(a, info, iunit, filename)
   return
 902 info=902
   write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
+  return
+905 info=905
+  write(psb_err_unit,*) 'READ_MATRIX: Error at line',i
   return
 993 info=993
   write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
