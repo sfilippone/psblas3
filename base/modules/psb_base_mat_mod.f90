@@ -122,7 +122,7 @@ module psb_base_mat_mod
     logical, private     :: upper
     !> Is the matrix diagonal stored or assumed unitary? (only if  triangular)
     logical, private     :: unitd
-    !> Are the coefficients sorted by row and column indices? 
+    !> Are the coefficients sorted ?
     logical, private     :: sorted
   contains 
 
@@ -149,6 +149,8 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_lower    => psb_base_is_lower
     procedure, pass(a) :: is_triangle => psb_base_is_triangle
     procedure, pass(a) :: is_unit     => psb_base_is_unit
+    procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
+    procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
     
     ! == = =================================
     !
@@ -647,6 +649,21 @@ contains
     logical :: res
     res = a%sorted
   end function psb_base_is_sorted
+
+
+  function psb_base_is_by_rows(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = .false.
+  end function psb_base_is_by_rows
+
+  function psb_base_is_by_cols(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = .false.
+  end function psb_base_is_by_cols
 
   
   !
