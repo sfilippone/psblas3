@@ -1,15 +1,11 @@
-include ../../Make.inc
-#
-# Libraries used
-#
-LIBDIR=../../lib/
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_base 
+BASEDIR=../..
+INCDIR=$(BASEDIR)/include/
+include $(INCDIR)/Make.inc.psblas
+LIBDIR=$(BASEDIR)/lib/
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
-#
-# Compilers and such
-#
 CCOPT= -g
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 PSBTOBJS=psbtf.o psb_mvsv_tester.o  \
 	psb_s_mvsv_tester.o psb_d_mvsv_tester.o psb_c_mvsv_tester.o \
