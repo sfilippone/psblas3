@@ -1164,6 +1164,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
 
 
   class(psb_s_base_sparse_mat), allocatable  :: altmp
+  class(psb_s_base_sparse_mat), pointer      :: mld
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='cscnv'
   logical, parameter :: debug=.false.
@@ -1205,7 +1206,12 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
       goto 9999
     end select
   else
-    allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
+#if defined(HAVE_MOLD)
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+#else
+    mld = psb_get_mat_default(a)
+    call mld%mold(altmp,info)
+#endif
   end if
 
   if (info /= psb_success_) then 
@@ -1265,6 +1271,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
 
 
   class(psb_s_base_sparse_mat), allocatable  :: altmp
+  class(psb_s_base_sparse_mat), pointer      :: mld
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='cscnv_ip'
   logical, parameter :: debug=.false.
@@ -1313,7 +1320,12 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
       goto 9999
     end select
   else
-    allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
+#if defined(HAVE_MOLD)
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+#else
+    mld = psb_get_mat_default(a)
+    call mld%mold(altmp,info)
+#endif
   end if
 
   if (info /= psb_success_) then 

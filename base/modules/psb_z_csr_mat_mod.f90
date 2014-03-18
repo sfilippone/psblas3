@@ -61,6 +61,7 @@ module psb_z_csr_mat_mod
     complex(psb_dpk_), allocatable :: val(:)
 
   contains
+    procedure, pass(a) :: is_by_rows  => z_csr_is_by_rows
     procedure, pass(a) :: get_size    => z_csr_get_size
     procedure, pass(a) :: get_nzeros  => z_csr_get_nzeros
     procedure, nopass  :: get_fmt     => z_csr_get_fmt
@@ -102,7 +103,8 @@ module psb_z_csr_mat_mod
   end type psb_z_csr_sparse_mat
 
   private :: z_csr_get_nzeros, z_csr_free,  z_csr_get_fmt, &
-       & z_csr_get_size, z_csr_sizeof, z_csr_get_nz_row
+       & z_csr_get_size, z_csr_sizeof, z_csr_get_nz_row, &
+       & z_csr_is_by_rows
 
   !> \memberof psb_z_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
@@ -518,6 +520,16 @@ contains
   !
   !
   ! == ===================================
+
+
+  
+  function z_csr_is_by_rows(a) result(res)
+    implicit none 
+    class(psb_z_csr_sparse_mat), intent(in) :: a
+    logical  :: res
+    res = .true.
+     
+  end function z_csr_is_by_rows
 
   
   function z_csr_sizeof(a) result(res)

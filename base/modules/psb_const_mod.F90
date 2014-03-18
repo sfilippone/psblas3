@@ -113,8 +113,9 @@ module psb_const_mod
   integer(psb_ipk_), parameter :: psb_iflag_=2, psb_ichk_=3
   integer(psb_ipk_), parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
 
-  integer(psb_ipk_), parameter :: psb_row_major_ = 0 
-  integer(psb_ipk_), parameter :: psb_col_major_ = 1
+  integer(psb_ipk_), parameter :: psb_unsorted_  = 0 
+  integer(psb_ipk_), parameter :: psb_row_major_ = 1 
+  integer(psb_ipk_), parameter :: psb_col_major_ = 2
   
   ! Duplicate coefficients handling
   ! These are usually set while calling spcnv as one of its

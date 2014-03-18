@@ -92,6 +92,8 @@ module psb_z_mat_mod
     procedure, pass(a) :: is_upd      => psb_z_is_upd
     procedure, pass(a) :: is_asb      => psb_z_is_asb
     procedure, pass(a) :: is_sorted   => psb_z_is_sorted
+    procedure, pass(a) :: is_by_rows  => psb_z_is_by_rows
+    procedure, pass(a) :: is_by_cols  => psb_z_is_by_cols
     procedure, pass(a) :: is_upper    => psb_z_is_upper
     procedure, pass(a) :: is_lower    => psb_z_is_lower
     procedure, pass(a) :: is_triangle => psb_z_is_triangle
@@ -183,8 +185,20 @@ module psb_z_mat_mod
 
   private :: psb_z_get_nrows, psb_z_get_ncols, psb_z_get_nzeros, psb_z_get_size, &
        & psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, &
-       & psb_z_is_upd, psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, &
+       & psb_z_is_upd, psb_z_is_asb, psb_z_is_sorted, &
+       & psb_z_is_by_rows, psb_z_is_by_cols, psb_z_is_upper, &
        & psb_z_is_lower, psb_z_is_triangle, psb_z_get_nz_row
+
+  class(psb_z_base_sparse_mat), allocatable, target, &
+       & save, private :: psb_z_base_mat_default
+
+  interface psb_set_mat_default
+    module procedure psb_z_set_mat_default
+  end interface
+
+  interface psb_get_mat_default
+    module procedure psb_z_get_mat_default
+  end interface
 
   interface psb_sizeof
     module procedure psb_z_sizeof
@@ -812,6 +826,43 @@ module psb_z_mat_mod
 contains 
 
 
+  
+  subroutine  psb_z_set_mat_default(a) 
+    implicit none 
+    class(psb_z_base_sparse_mat), intent(in) :: a
+    
+    if (allocated(psb_z_base_mat_default)) then 
+      deallocate(psb_z_base_mat_default)
+    end if
+    allocate(psb_z_base_mat_default, mold=a)
+
+  end subroutine psb_z_set_mat_default
+  
+  function psb_z_get_mat_default(a) result(res)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    class(psb_z_base_sparse_mat), pointer :: res
+    
+    res => psb_z_get_base_mat_default()
+    
+  end function psb_z_get_mat_default
+
+  
+  function psb_z_get_base_mat_default() result(res)
+    implicit none 
+    class(psb_z_base_sparse_mat), pointer :: res
+    
+    if (.not.allocated(psb_z_base_mat_default)) then 
+      allocate(psb_z_csr_sparse_mat :: psb_z_base_mat_default)
+    end if
+
+    res => psb_z_base_mat_default
+    
+  end function psb_z_get_base_mat_default
+
+
+
+
   ! == ===================================
   !
   !
@@ -1006,6 +1057,32 @@ contains
     end if
 
   end function psb_z_is_sorted
+
+  function psb_z_is_by_rows(a) result(res)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_by_rows()
+    else
+      res = .false.
+    end if
+
+  end function psb_z_is_by_rows
+
+  function psb_z_is_by_cols(a) result(res)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_by_cols()
+    else
+      res = .false.
+    end if
+
+  end function psb_z_is_by_cols
 
 
 

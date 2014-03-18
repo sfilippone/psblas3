@@ -3375,7 +3375,7 @@ subroutine psb_s_fix_coo(a,info,idir)
   if (present(idir)) then 
     idir_ = idir
   else
-    idir_ = 0
+    idir_ = psb_row_major_
   endif
   
   nra = a%get_nrows()

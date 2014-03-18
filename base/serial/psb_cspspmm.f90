@@ -56,6 +56,10 @@ subroutine psb_cspspmm(a,b,c,info)
     goto 9999
   endif
 
+
+  ! 
+  ! Shortcuts for special cases
+  !
   done_spmm = .false. 
   select type(aa=>a%a)
   class is (psb_c_csr_sparse_mat) 
@@ -90,6 +94,9 @@ subroutine psb_cspspmm(a,b,c,info)
 
   end select
   
+  !
+  ! General code
+  !
   if (.not.done_spmm) then 
     call psb_symbmm(a,b,c,info)
     if (info == psb_success_) call psb_numbmm(a,b,c)

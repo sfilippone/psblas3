@@ -60,6 +60,7 @@ module psb_z_csc_mat_mod
     complex(psb_dpk_), allocatable :: val(:)
 
   contains
+    procedure, pass(a) :: is_by_cols  => z_csc_is_by_cols
     procedure, pass(a) :: get_size    => z_csc_get_size
     procedure, pass(a) :: get_nzeros  => z_csc_get_nzeros
     procedure, nopass  :: get_fmt     => z_csc_get_fmt
@@ -515,6 +516,15 @@ contains
   !
   !
   ! == ===================================
+
+  
+  function z_csc_is_by_cols(a) result(res)
+    implicit none 
+    class(psb_z_csc_sparse_mat), intent(in) :: a
+    logical  :: res
+    res = .true.
+     
+  end function z_csc_is_by_cols
 
   
   function z_csc_sizeof(a) result(res)

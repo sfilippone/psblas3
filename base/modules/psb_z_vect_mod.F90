@@ -93,8 +93,54 @@ module psb_z_vect_mod
   interface psb_z_vect
     module procedure constructor, size_const
   end interface psb_z_vect
+ 
+  class(psb_z_base_vect_type), allocatable, target,&
+       & save, private :: psb_z_base_vect_default
+
+  interface psb_set_vect_default
+    module procedure psb_z_set_vect_default
+  end interface
+
+  interface psb_get_vect_default
+    module procedure psb_z_get_vect_default
+  end interface
+
 
 contains
+
+  
+  subroutine  psb_z_set_vect_default(v) 
+    implicit none 
+    class(psb_z_base_vect_type), intent(in) :: v
+    
+    if (allocated(psb_z_base_vect_default)) then 
+      deallocate(psb_z_base_vect_default)
+    end if
+    allocate(psb_z_base_vect_default, mold=v)
+
+  end subroutine psb_z_set_vect_default
+  
+  function psb_z_get_vect_default(v) result(res)
+    implicit none 
+    class(psb_z_vect_type), intent(in) :: v
+    class(psb_z_base_vect_type), pointer :: res
+    
+    res => psb_z_get_base_vect_default()
+    
+  end function psb_z_get_vect_default
+
+  
+  function psb_z_get_base_vect_default() result(res)
+    implicit none 
+    class(psb_z_base_vect_type), pointer :: res
+    
+    if (.not.allocated(psb_z_base_vect_default)) then 
+      allocate(psb_z_base_vect_type :: psb_z_base_vect_default)
+    end if
+
+    res => psb_z_base_vect_default
+    
+  end function psb_z_get_base_vect_default
 
   
   subroutine z_vect_clone(x,y,info)
@@ -115,6 +161,7 @@ contains
     class(psb_z_vect_type), intent(out) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
+    class(psb_z_base_vect_type), pointer :: mld
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -123,7 +170,12 @@ contains
       call mold%mold(x%v,info)
 #endif
     else
-      allocate(psb_z_base_vect_type :: x%v,stat=info)
+#ifdef HAVE_MOLD
+      allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
+#else 
+      mld = psb_z_get_base_vect_default()
+      call mld%mold(x%v,info)
+#endif
     endif
 
     if (info == psb_success_) call x%v%bld(invect)
@@ -136,6 +188,7 @@ contains
     class(psb_z_vect_type), intent(out) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
+    class(psb_z_base_vect_type), pointer :: mld
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -144,7 +197,12 @@ contains
       call mold%mold(x%v,info)
 #endif
     else
-      allocate(psb_z_base_vect_type :: x%v,stat=info)
+#ifdef HAVE_MOLD
+      allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
+#else 
+      mld = psb_z_get_base_vect_default()
+      call mld%mold(x%v,info)
+#endif
     endif
     if (info == psb_success_) call x%v%bld(n)
 
@@ -184,10 +242,7 @@ contains
     type(psb_z_vect_type) :: this
     integer(psb_ipk_) :: info
 
-    allocate(psb_z_base_vect_type :: this%v, stat=info)
-
-    if (info == 0) call this%v%bld(x)
-
+    call this%bld(x)
     call this%asb(size(x,kind=psb_ipk_),info)
 
   end function constructor
@@ -198,7 +253,7 @@ contains
     type(psb_z_vect_type) :: this
     integer(psb_ipk_) :: info
 
-    allocate(psb_z_base_vect_type :: this%v, stat=info)
+    call this%bld(n)
     call this%asb(n,info)
 
   end function size_const
