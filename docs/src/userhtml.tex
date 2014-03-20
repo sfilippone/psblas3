@@ -15,6 +15,7 @@
 \usepackage{graphicx}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
+\usepackage{listings}
 
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
@@ -23,7 +24,7 @@
 % \relax
 % \pdfcompresslevel=0             %-- 0 = none, 9 = best
 % \pdfinfo{                       %-- Info dictionary of PDF output  /Author (Alfredo Buttari)
-%   /Title (Parallel Sparse BLAS V. 3.1)
+%   /Title (Parallel Sparse BLAS V. 3.2)
 %   /Subject (Parallel Sparse Basic Linear Algebra Subroutines)
 %   /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners)
 %   /Creator (pdfLaTeX)
@@ -46,6 +47,11 @@
 \stepcounter{subroutine}%
       \subsection*{\flushleft #1---#2 \endflushleft}%
       \addcontentsline{toc}{subsubsection}{#1}%
+      \markright{#1}}%
+\newcommand{\subsubsubroutine}[2]{%
+\stepcounter{subroutine}%
+      \subsubsection*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{paragraph}{#1}%
       \markright{#1}}%
 \newcommand{\examplename}{Example}
 \newcommand{\syntaxname}{Syntax}
@@ -78,6 +84,8 @@
 \newcommand{\vbasedata}{\hypertarget{vbasedata}{{\tt psb\_T\_base\_vect\_type}}}
 
 \begin{document}
+\lstset{language=Fortran}
+
 {\LARGE\bfseries PSBLAS\\[.8ex] User's and Reference
   Guide}\\[\baselineskip]
 \emph{\large A reference guide for the Parallel Sparse BLAS library}\\[3ex]
@@ -86,9 +94,9 @@
  University of Rome ``Tor Vergata'', Italy\\[2ex]
 %\\[10ex]
 %\today
-Software version: 3.1\\
+Software version: 3.2\\
 %\today
-June 14, 2013.
+March 31st, 2014.
 \cleardoublepage
 \begingroup
   \renewcommand*{\thepage}{toc}

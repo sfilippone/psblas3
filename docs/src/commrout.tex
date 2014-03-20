@@ -8,8 +8,7 @@ The routines in this chapter implement various global communication operators
 on vectors associated with a discretization mesh. For auxiliary communication
 routines not tied to a discretization space see~\ref{sec:toolsrout}.
 
-\clearpage\subsection*{psb\_halo --- Halo Data Communication}    
-\addcontentsline{toc}{subsection}{psb\_halo}
+\clearpage\subroutine{psb\_halo}{Halo Data Communication}    
 
 These subroutines gathers the values of the halo
 elements, and  (optionally) scale the result:
@@ -37,10 +36,10 @@ Long Precision Complex & psb\_halo \\
 \caption{Data types\label{tab:f90halo}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_halo(x, desc_a, info)
 call psb_halo(x, desc_a, info, alpha, work, data)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -167,8 +166,7 @@ following:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_ovrl --- Overlap Update}    
-\addcontentsline{toc}{subsection}{psb\_ovrl}
+\clearpage\subroutine{psb\_ovrl}{Overlap Update}    
 
 These subroutines applies an overlap operator to the input vector:
 
@@ -196,10 +194,10 @@ Long Precision Complex & psb\_ovrl \\
 \caption{Data types\label{tab:f90ovrl}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_ovrl(x, desc_a, info)
 call psb_ovrl(x, desc_a, info, update=update_type, work=work)
-\end{verbatim} 
+\end{lstlisting} 
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -359,8 +357,7 @@ following (showing a transition among the two subdomains)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_gather --- Gather Global Dense Matrix}
-\addcontentsline{toc}{subsection}{psb\_gather}
+\clearpage\subroutine{psb\_gather}{Gather Global Dense Matrix}
 
 These subroutines collect the portions of global dense matrix
 distributed over all process into one single array stored on one
@@ -392,10 +389,10 @@ Long Precision Complex & psb\_gather \\
 \caption{Data types\label{tab:gather}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_gather(glob_x, loc_x, desc_a, info, root)
 call psb_gather(glob_x, loc_x, desc_a, info, root)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -461,8 +458,7 @@ An integer value; 0 means no error has been detected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_scatter --- Scatter Global Dense Matrix}
-\addcontentsline{toc}{subsection}{psb\_scatter}
+\clearpage\subroutine{psb\_scatter}{Scatter Global Dense Matrix}
 
 These subroutines scatters the portions of global dense matrix owned
 by a process to all the processes in the processes grid.
@@ -493,10 +489,10 @@ Long Precision Complex & psb\_scatter \\
 \caption{Data types\label{tab:scatter}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_scatter(glob_x, loc_x, desc_a, info, root)
 call psb_scatter(glob_x, loc_x, desc_a, info, root)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.

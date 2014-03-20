@@ -11,9 +11,8 @@ the module \verb|psb_krylov_mod|.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_krylov \label{krylov} --- Krylov Methods Driver
+\clearpage\subroutine{psb\_krylov \label{krylov}}{Krylov Methods Driver
       Routine}
-\addcontentsline{toc}{subsection}{krylov}
 
 This subroutine is a driver that provides a general interface for all
 the Krylov-Subspace family methods implemented in PSBLAS version 2. 
@@ -28,10 +27,10 @@ later). In the above formulae, $x_i$ is the tentative solution and
 $r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration. 
 
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,irst,istop,cond)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.

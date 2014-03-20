@@ -2,12 +2,11 @@
 \section{Parallel environment routines}
 \label{sec:parenv}
 
-\clearpage\subsection*{psb\_init --- Initializes PSBLAS parallel environment}
-\addcontentsline{toc}{subsection}{psb\_init}
+\clearpage\subroutine{psb\_init}{Initializes PSBLAS parallel environment}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_init(icontxt, np, basectxt, ids)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine initializes the PSBLAS parallel environment, defining
 a virtual parallel machine.
@@ -60,13 +59,12 @@ Specified as: an integer variable.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_info --- Return information about  PSBLAS parallel
+\clearpage\subroutine{psb\_info}{Return information about  PSBLAS parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_info}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_info(icontxt, iam, np)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine returns information about  the PSBLAS parallel environment, defining
 a virtual parallel machine.
@@ -108,13 +106,12 @@ Specified as: an integer variable. \
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_exit --- Exit from  PSBLAS parallel environment}
-\addcontentsline{toc}{subsection}{psb\_exit}
+\clearpage\subroutine{psb\_exit}{Exit from  PSBLAS parallel environment}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_exit(icontxt)
 call psb_exit(icontxt,close)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine exits from the  PSBLAS parallel virtual  machine.
 \begin{description}
@@ -151,12 +148,11 @@ Specified as: a logical  variable, default value: true.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_get\_mpicomm --- Get the MPI communicator}
-\addcontentsline{toc}{subsection}{psb\_get\_mpicomm}
+\clearpage\subroutine{psb\_get\_mpicomm}{Get the MPI communicator}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_get_mpicomm(icontxt, icomm)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine returns the MPI communicator associated with a PSBLAS context
 \begin{description}
@@ -179,12 +175,11 @@ Intent: {\bf out}.\\
 \end{description}
 
 
-\clearpage\subsection*{psb\_get\_rank --- Get the MPI rank}
-\addcontentsline{toc}{subsection}{psb\_get\_rank}
+\clearpage\subroutine{psb\_get\_rank}{Get the MPI rank}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_get_rank(rank, icontxt, id)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine returns the MPI rank of the  PSBLAS process $id$
 \begin{description}
@@ -214,12 +209,11 @@ Intent: {\bf out}.\\
 
 
 
-\clearpage\subsection*{psb\_wtime --- Wall clock timing}
-\addcontentsline{toc}{subsection}{psb\_wtime}
+\clearpage\subroutine{psb\_wtime}{Wall clock timing}
 
-\begin{verbatim}
+\begin{lstlisting}
 time = psb_wtime()
-\end{verbatim}
+\end{lstlisting}
 
 This function returns a wall clock timer. The resolution of the timer
 is dependent on the underlying parallel environment implementation.
@@ -231,13 +225,12 @@ Returned  as: a  \verb|real(psb_dpk_)|  variable.
 \end{description}
 
 
-\clearpage\subsection*{psb\_barrier --- Sinchronization point  parallel
+\clearpage\subroutine{psb\_barrier}{Sinchronization point  parallel
   environment}
-\addcontentsline{toc}{subsection}{psb\_barrier}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_barrier(icontxt)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine acts as an explicit synchronization point for  the  PSBLAS
 parallel virtual  machine. 
@@ -253,12 +246,11 @@ Specified as: an integer variable.
 \end{description}
 
 
-\clearpage\subsection*{psb\_abort --- Abort a computation}
-\addcontentsline{toc}{subsection}{psb\_abort}
+\clearpage\subroutine{psb\_abort}{Abort a computation}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_abort(icontxt)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine aborts computation on the parallel virtual machine. 
 \begin{description}
@@ -276,12 +268,11 @@ Specified as: an integer variable.
 
 
 
-\clearpage\subsection*{psb\_bcast --- Broadcast data}
-\addcontentsline{toc}{subsection}{psb\_bcast}
+\clearpage\subroutine{psb\_bcast}{Broadcast data}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_bcast(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a broadcast operation based on the
 underlying communication library. 
@@ -322,12 +313,11 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\clearpage\subsection*{psb\_sum --- Global sum}
-\addcontentsline{toc}{subsection}{psb\_sum}
+\clearpage\subroutine{psb\_sum}{Global sum}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_sum(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a sum reduction  operation based on the
 underlying communication library. 
@@ -377,12 +367,11 @@ Type, kind, rank and size must agree on all processes.
 
 
 
-\clearpage\subsection*{psb\_max --- Global maximum}
-\addcontentsline{toc}{subsection}{psb\_max}
+\clearpage\subroutine{psb\_max}{Global maximum}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_max(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a maximum valuereduction
 operation based on the underlying communication library. 
@@ -431,12 +420,11 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_min --- Global minimum}
-\addcontentsline{toc}{subsection}{psb\_min}
+\clearpage\subroutine{psb\_min}{Global minimum}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_min(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a minimum value reduction
 operation based on the underlying communication library. 
@@ -485,12 +473,11 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_amx --- Global maximum absolute value}
-\addcontentsline{toc}{subsection}{psb\_amx}
+\clearpage\subroutine{psb\_amx}{Global maximum absolute value}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_amx(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a maximum absolute value reduction
 operation based on the underlying communication library. 
@@ -539,12 +526,11 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
-\clearpage\subsection*{psb\_amn --- Global minimum absolute value}
-\addcontentsline{toc}{subsection}{psb\_amn}
+\clearpage\subroutine{psb\_amn}{Global minimum absolute value}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_amn(icontxt, dat, root)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine implements a minimum absolute value reduction
 operation based on the underlying communication library. 
@@ -594,12 +580,11 @@ Type, kind, rank and size must agree on all processes.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_snd --- Send data}
-\addcontentsline{toc}{subsection}{psb\_snd}
+\clearpage\subroutine{psb\_snd}{Send data}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_snd(icontxt, dat, dst, m)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine sends a packet of data to a destination.
 \begin{description}
@@ -646,12 +631,11 @@ same value on sending and receiving processes.
 \end{enumerate}
 
 
-\clearpage\subsection*{psb\_rcv --- Receive data}
-\addcontentsline{toc}{subsection}{psb\_rcv}
+\clearpage\subroutine{psb\_rcv}{Receive data}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_rcv(icontxt, dat, src, m)
-\end{verbatim}
+\end{lstlisting}
 
 This subroutine receives a packet of data to a destination.
 \begin{description}

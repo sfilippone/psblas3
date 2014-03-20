@@ -9,13 +9,12 @@ module \verb|psb_util_mod|.
 
 %\subroutine{PSB\_HBIO\_MOD}{Input/Output in Harwell-Boeing format}
 
-\clearpage\subsection*{hb\_read --- Read a sparse matrix from a file in the
+\clearpage\subroutine{hb\_read}{Read a sparse matrix from a file in the
   Harwell--Boeing format}
-\addcontentsline{toc}{subsubsection}{hb\_read}
 
-\begin{verbatim}
+\begin{lstlisting}
 call hb_read(a, iret, iunit, filename, b, mtitle)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -52,13 +51,12 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{hb\_write --- Write a sparse matrix to a  file
+\clearpage\subroutine{hb\_write}{Write a sparse matrix to a  file
   in the Harwell--Boeing format}
-\addcontentsline{toc}{subsubsection}{hb\_write}
 
-\begin{verbatim}
+\begin{lstlisting}
 call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
-\end{verbatim}
+\end{lstlisting}
 
 
 
@@ -105,13 +103,12 @@ An integer value; 0 means no error has been detected.
 
 %\subroutine{PSB\_MMIO\_MOD}{Input/Output in MatrixMarket format}
 
-\clearpage\subsection*{mm\_mat\_read --- Read a sparse matrix from a
+\clearpage\subroutine{mm\_mat\_read}{Read a sparse matrix from a
   file in the MatrixMarket format}
-\addcontentsline{toc}{subsubsection}{mm\_mat\_read}
 
-\begin{verbatim}
+\begin{lstlisting}
 call mm_mat_read(a, iret, iunit, filename)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -136,12 +133,11 @@ Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\clearpage\subsection*{mm\_vet\_read --- Read a dense vector from a
+\clearpage\subroutine{mm\_vet\_read}{Read a dense vector from a
   file in the MatrixMarket format}
-\addcontentsline{toc}{subsubsection}{mm\_vet\_read }
-\begin{verbatim}
+\begin{lstlisting}
 call mm_vet_read(b, iret, iunit, filename)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -170,12 +166,11 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{mm\_mat\_write --- Write a sparse matrix to a
+\clearpage\subroutine{mm\_mat\_write}{Write a sparse matrix to a
   file in the MatrixMarket format}
-\addcontentsline{toc}{subsubsection}{mm\_mat\_write}
-\begin{verbatim}
+\begin{lstlisting}
 call mm_mat_write(a, mtitle, iret, iunit, filename)
-\end{verbatim}
+\end{lstlisting}
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf  On Entry ]

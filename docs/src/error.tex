@@ -41,7 +41,7 @@ explicitly.
   \begin{Sbox}
     \begin{minipage}[tl]{0.95\textwidth}
 \small
-\begin{verbatim}
+\begin{lstlisting}
 subroutine psb_foo(some args, info)
    ...
    if(error detected) then
@@ -66,7 +66,7 @@ subroutine psb_foo(some args, info)
    end if
 
 end subroutine psb_foo
-\end{verbatim}
+\end{lstlisting}
     \end{minipage}
   \end{Sbox}
   \setlength{\fboxsep}{8pt}
@@ -119,13 +119,12 @@ Aborting...
 \end{figure}
 
 
-\clearpage\subsection*{psb\_errpush --- Pushes an error code onto the error
+\clearpage\subroutine{psb\_errpush}{Pushes an error code onto the error
   stack}
-\addcontentsline{toc}{subsection}{psb\_errpush}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_errpush(err_c, r_name, i_err, a_err)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -150,13 +149,12 @@ Type: {\bf optional}\\
 Specified as: a string.\\
 \end{description}
 
-\clearpage\subsection*{psb\_error --- Prints the error stack content and aborts
+\clearpage\subroutine{psb\_error}{Prints the error stack content and aborts
   execution}
-\addcontentsline{toc}{subsection}{psb\_error}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_error(icontxt)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -170,13 +168,12 @@ Specified as: an integer.
 
 
 
-\clearpage\subsection*{psb\_set\_errverbosity --- Sets the verbosity of error
+\clearpage\subroutine{psb\_set\_errverbosity}{Sets the verbosity of error
   messages.}
-\addcontentsline{toc}{subsection}{psb\_set\_errverbosity}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_set_errverbosity(v)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -188,14 +185,13 @@ Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
-\clearpage\subsection*{psb\_set\_erraction --- Set the type of action to be
+\clearpage\subroutine{psb\_set\_erraction}{Set the type of action to be
   taken  upon error condition.}
-\addcontentsline{toc}{subsection}{psb\_set\_erraction}
 
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_set_erraction(err_act)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -210,12 +206,11 @@ Specified as: an integer. Possible values: \verb|psb_act_ret|,
 
 
 
-%% \clearpage\subsection*{psb\_errcomm --- Error communication routine}
-%\addcontentsline{toc}{subsection}{psb\_errcomm}
+%% \clearpage\subroutine{psb\_errcomm}{Error communication routine}
 
-\begin{verbatim}
-call psb_errcomm(icontxt, err)
-\end{verbatim}
+%% \begin{lstlisting}
+%% call psb_errcomm(icontxt, err)
+%% \end{lstlisting}
 
 %% \begin{description}
 %% \item[\bf On Entry]

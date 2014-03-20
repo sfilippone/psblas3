@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 3.1.
+This directory contains  the PSBLAS library, version 3.2.
 
 
 This version requires a working Fortran 2003 compiler; we do not use
@@ -36,7 +36,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 
-See docs/psblas-3.1.pdf; an HTML version of the same document is
+See docs/psblas-3.2.pdf; an HTML version of the same document is
 available in docs/html. 
 Please consult the sample programs, especially 
 test/pargen/ppde[23]d.f90
@@ -122,7 +122,7 @@ COMPILER NOTES.
 This code is confirmed to work with the following compilers (or
 later versions thereof): 
        NAGware 5.2;
-       GNU 4.6.1;  
+       GNU 4.7.3;  
        Cray CCE 8.0.1;
 
 They are all recognized by the configure script. 
@@ -137,8 +137,8 @@ Compiler Error) at build time. We do not yet know whether XLF 14
 compiles correctly. 
 
 For the GNU compilers 4.6.x we are aware of a number of memory management
-issues that might surface in your applications; all of them (that
-we're aware of) are solved in version 4.7.2.  
+issues that might surface in your applications; most of them (that
+we're aware of) are solved in version 4.7.2 or later.  
 
 The Intel compiler up to version 12.1 fails to compile, as of the last
 version we got access to. 
@@ -172,7 +172,7 @@ interested in the package  MLD2P4 from http://www.mld2p4.it
 
 Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
 
-Credits for version 3.0:
+Credits for version 3:
 Salvatore  Filippone
 Alfredo    Buttari
 

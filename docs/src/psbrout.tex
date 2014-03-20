@@ -5,8 +5,7 @@
 %      DENSE MATRIX SUM
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage\subsection*{psb\_geaxpby --- General Dense Matrix Sum}
-\addcontentsline{toc}{subsection}{psb\_geaxpby}
+\clearpage\subroutine{psb\_geaxpby}{General Dense Matrix Sum}
 
 This subroutine is an interface to the computational kernel for
 dense matrix sum:
@@ -17,9 +16,9 @@ dense matrix sum:
 %% \item[$y$] represents the global dense submatrix $y_{:, :}$
 %% \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_geaxpby(alpha, x, beta, y, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 %% \syntax*{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
 
 %( calculating y <- alpha*x+beta*y )
@@ -114,8 +113,7 @@ An integer value; 0 means no error has been detected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_gedot --- Dot Product}
-\addcontentsline{toc}{subsection}{psb\_gedot}
+\clearpage\subroutine{psb\_gedot}{Dot Product}
 
 This function computes dot product between two vectors $x$ and
 $y$.\\
@@ -130,9 +128,9 @@ Else if $x$ and $y$ are complex vectors then it computes dot-product as:
 %% \item[$y$] represents the global subvector $y_{:,jy}$
 %% \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_gedot(x, y, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 %% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
 \begin{table}[h]
 \begin{center}
@@ -206,8 +204,7 @@ An integer value; 0 means no error has been detected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_gedots --- Generalized Dot Product}
-\addcontentsline{toc}{subsection}{psb\_gedots}
+\clearpage\subroutine{psb\_gedots}{Generalized Dot Product}
 
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  $x$ and $y$: 
@@ -217,9 +214,9 @@ usual convention applies, i.e. the conjugate transpose of $x$ is
 used. If $x$ and $y$ are of rank one, then $res$ is a scalar, else it
 is a rank one array. 
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_gedots(res, x, y, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ll}
@@ -280,8 +277,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_geamax --- Infinity-Norm of Vector}    
-\addcontentsline{toc}{subsection}{psb\_geamax}
+\clearpage\subroutine{psb\_geamax}{Infinity-Norm of Vector}    
 
 This function computes 
  the infinity-norm of a vector $x$.\\
@@ -295,9 +291,9 @@ else if $x$ is a complex vector then it computes the infinity-norm  as:
 %% \item[$x$] represents the global subvector $x_{:,jx}$
 %% \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_geamax(x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 %% \syntax*{psb\_geamax}{x, desc\_a, info, jx}
 
 \begin{table}[h]
@@ -358,16 +354,15 @@ An integer value; 0 means no error has been detected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\clearpage\subsection*{psb\_geamaxs --- Generalized Infinity Norm}
-\addcontentsline{toc}{subsection}{psb\_geamaxs}
+\clearpage\subroutine{psb\_geamaxs}{Generalized Infinity Norm}
 
 This subroutine computes a series of  infinity norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \max_k |x(k,i)| \]
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_geamaxs(res, x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{table}[h]
 \begin{center}
@@ -420,8 +415,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_geasum --- 1-Norm of Vector}    
-\addcontentsline{toc}{subsection}{psb\_geasum}
+\clearpage\subroutine{psb\_geasum}{1-Norm of Vector}    
 
 This function computes the 1-norm of a vector $x$.\\
 If $x$ is a real vector
@@ -431,9 +425,9 @@ else if $x$ is a complex vector then it computes 1-norm  as:
 \[ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
 
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_geasum(x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{table}[h]
 \begin{center}
@@ -482,8 +476,7 @@ An integer value; 0 means no error has been detected.
 \end{description}
 
 
-\clearpage\subsection*{psb\_geasums --- Generalized 1-Norm of Vector}    
-\addcontentsline{toc}{subsection}{psb\_geasums}
+\clearpage\subroutine{psb\_geasums}{Generalized 1-Norm of Vector}    
 
 This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  $x$: 
@@ -496,9 +489,9 @@ else if $x$ is a complex vector then it computes 1-norm  as:
 \[ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
 
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_geasums(res, x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{table}[h]
 \begin{center}
@@ -556,8 +549,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_genrm2 --- 2-Norm of Vector}    
-\addcontentsline{toc}{subsection}{psb\_geasums}
+\clearpage\subroutine{psb\_genrm2}{2-Norm of Vector}    
 
 This function computes the 2-norm of a vector $x$.\\
 If $x$ is a  real  vector
@@ -586,9 +578,9 @@ Long Precision Real&Long Precision Complex & psb\_genrm2 \\
 \caption{Data types\label{tab:f90nrm2}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_genrm2(x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 %% \syntax*{psb\_genrm2}{x, desc\_a, info, jx}
 
 \begin{description}
@@ -630,17 +622,16 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_genrm2s --- Generalized 2-Norm of Vector}    
-\addcontentsline{toc}{subsection}{psb\_genrm2s}
+\clearpage\subroutine{psb\_genrm2s}{Generalized 2-Norm of Vector}    
 
 This subroutine computes a series of  2-norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \|x(:,i)\|_2 \]
 
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_genrm2s(res, x, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{table}[h]
 \begin{center}
@@ -698,8 +689,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spnrm1 --- 1-Norm of Sparse Matrix}    
-\addcontentsline{toc}{subsection}{psb\_spnrm1}
+\clearpage\subroutine{psb\_spnrm1}{1-Norm of Sparse Matrix}    
 
 This function computes the 1-norm of a matrix $A$:\\
 
@@ -725,9 +715,9 @@ Long Precision Complex & psb\_spnrm1 \\
 \caption{Data types\label{tab:f90nrm1}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_spnrm1(A, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -762,8 +752,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spnrmi --- Infinity Norm of Sparse Matrix}    
-\addcontentsline{toc}{subsection}{psb\_spnrmi}
+\clearpage\subroutine{psb\_spnrmi}{Infinity Norm of Sparse Matrix}    
 
 This function computes the infinity-norm of a matrix $A$:\\
 
@@ -789,9 +778,9 @@ Long Precision Complex & psb\_spnrmi \\
 \caption{Data types\label{tab:f90nrmi}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 psb_spnrmi(A, desc_a, info)
-\end{verbatim}
+\end{lstlisting}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -826,8 +815,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spmm --- Sparse Matrix by Dense Matrix Product}   
-\addcontentsline{toc}{subsection}{psb\_spmm}
+\clearpage\subroutine{psb\_spmm}{Sparse Matrix by Dense Matrix Product}   
 
 This subroutine computes the Sparse Matrix by Dense Matrix Product:
 
@@ -867,11 +855,11 @@ Long Precision Complex & psb\_spmm \\
 \caption{Data types\label{tab:f90spmm}}
 \end{table}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_spmm(alpha, a, x, beta, y, desc_a, info)
 call psb_spmm(alpha, a, x, beta, y,desc_a, info, &
              & trans, work)
-\end{verbatim} 
+\end{lstlisting} 
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -978,8 +966,7 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spsm --- Triangular System Solve}   
-\addcontentsline{toc}{subsection}{psb\_spsm}
+\clearpage\subroutine{psb\_spsm}{Triangular System Solve}   
 
 This subroutine computes the Triangular System Solve:
 
@@ -1004,11 +991,11 @@ where:
 \item[$D$] is the scaling diagonal matrix.
 \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
 call psb_spsm(alpha, t, x, beta, y, desc_a, info)
 call psb_spsm(alpha, t, x, beta, y, desc_a, info,&
              & trans, unit, choice, diag, work)
-\end{verbatim} 
+\end{lstlisting} 
 
 \begin{table}[h]
 \begin{center}
