@@ -247,7 +247,7 @@ program s_file_spmv
   call psb_sum(ictxt,descsize)
   
   if (iam==psb_root_) then 
-    flops = 1.d1*2*annz
+    flops = 2.d0*times*annz
     tflops=flops
     write(psb_out_unit,'("Matrix: ",a)') mtrx_file
     write(psb_out_unit,'("Test on                          : ",i20," processors")') np
