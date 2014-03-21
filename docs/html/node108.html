@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Utilities</TITLE>
-<META NAME="description" CONTENT="Utilities">
+<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,73 +18,138 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node114.html">
-<LINK REL="previous" HREF="node103.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node109.html">
+<LINK REL="previous" HREF="node107.html">
+<LINK REL="up" HREF="node105.html">
 <LINK REL="next" HREF="node109.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1564"
+<A NAME="tex2html1566"
   HREF="node109.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1560"
-  HREF="userhtml.html">
+<A NAME="tex2html1562"
+  HREF="node105.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1554"
+<A NAME="tex2html1556"
   HREF="node107.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1562"
+<A NAME="tex2html1564"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1565"
-  HREF="node109.html">hb_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1561"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1555"
-  HREF="node107.html">psb_set_erraction   Set</A>
- &nbsp; <B>  <A NAME="tex2html1563"
+<B> Next:</B> <A NAME="tex2html1567"
+  HREF="node109.html">psb_precdescr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1563"
+  HREF="node105.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1557"
+  HREF="node107.html">psb_precbld   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1565"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000100000000000000000"></A>
-<A NAME="sec:util"></A>
+<H2><A NAME="SECTION000113000000000000000">
+psb_precaply -- Preconditioner application
+  routine</A>
+</H2>
+
+<P>
+<PRE>
+call psb_precaply(prec,x,y,desc_a,info,trans,work)
+call psb_precaply(prec,x,desc_a,info,trans)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Utilities
-</H1>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>. 
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+</DL>
 
 <P>
-We have some utitlities available for input and output of
-sparsematrices; the interfaces to these routines are available in the
-module <code>psb_util_mod</code>.
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html1566"
-  HREF="node109.html">hb_read -- Read a sparse matrix from a file in the
-  Harwell-Boeing format</A>
-<LI><A NAME="tex2html1567"
-  HREF="node110.html">hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
-<LI><A NAME="tex2html1568"
-  HREF="node111.html">mm_mat_read -- Read a sparse matrix from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1569"
-  HREF="node112.html">mm_vet_read -- Read a dense vector from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1570"
-  HREF="node113.html">mm_mat_write -- Write a sparse matrix to a
-  file in the MatrixMarket format</A>
-</UL>
-<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

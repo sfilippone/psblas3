@@ -18,7 +18,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node108.html">
+<LINK REL="next" HREF="node104.html">
 <LINK REL="previous" HREF="node86.html">
 <LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node104.html">
@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1502"
+<A NAME="tex2html1501"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1498"
+<A NAME="tex2html1497"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1492"
+<A NAME="tex2html1491"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1500"
+<A NAME="tex2html1499"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1503"
-  HREF="node104.html">psb_errpush   Pushes</A>
-<B> Up:</B> <A NAME="tex2html1499"
+<B> Next:</B> <A NAME="tex2html1502"
+  HREF="node104.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1498"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1493"
+<B> Previous:</B> <A NAME="tex2html1492"
   HREF="node102.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1501"
+ &nbsp; <B>  <A NAME="tex2html1500"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -94,7 +94,7 @@ explicitly.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="6914"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="6908"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
 The layout of a generic <TT>psb_foo</TT>
@@ -107,8 +107,8 @@ The layout of a generic <TT>psb_foo</TT>
  $\fbox{\TheSbox}$
  -->
 <IMG
- WIDTH="562" HEIGHT="466" ALIGN="MIDDLE" BORDER="0"
- SRC="img139.png"
+ WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
  ALT="\fbox{\TheSbox}">
 </DIV></TD></TR>
 </TABLE>
@@ -124,7 +124,7 @@ called by <code>psb_spasb</code> ... by process 0 (i.e. the root process).
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="6915"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="6909"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
 A sample PSBLAS-2.0 error
@@ -137,55 +137,206 @@ A sample PSBLAS-2.0 error
  $\fbox{\TheSbox}$
  -->
 <IMG
- WIDTH="562" HEIGHT="466" ALIGN="MIDDLE" BORDER="0"
- SRC="img139.png"
+ WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
  ALT="\fbox{\TheSbox}">
 </DIV></TD></TR>
 </TABLE>
 </DIV>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+ifstarsubroutinesubroutinepsb_errpushPushes an error code onto the error
+  stack
 
-<UL>
-<LI><A NAME="tex2html1504"
-  HREF="node104.html">psb_errpush -- Pushes an error code onto the error
-  stack</A>
-<LI><A NAME="tex2html1505"
-  HREF="node105.html">psb_error -- Prints the error stack content and aborts
-  execution</A>
-<LI><A NAME="tex2html1506"
-  HREF="node106.html">psb_set_errverbosity -- Sets the verbosity of error
-  messages.</A>
-<LI><A NAME="tex2html1507"
-  HREF="node107.html">psb_set_erraction -- Set the type of action to be
-  taken  upon error condition.</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<BR>
+<IMG
+ WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img145.png"
+ ALT="\begin{lstlisting}
+call psb_errpush(err_c, r_name, i_err, a_err)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_c</STRONG></DT>
+<DD>the error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+<DT><STRONG>r_name</STRONG></DT>
+<DD>the soutine where the error has been caught.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a string.
+<BR></DD>
+<DT><STRONG>i_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: an integer array
+<BR></DD>
+<DT><STRONG>a_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: a string.
+<BR></DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinepsb_errorPrints the error stack content and aborts
+  execution
+
+<P>
+<BR>
+<IMG
+ WIDTH="213" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img146.png"
+ ALT="\begin{lstlisting}
+call psb_error(icontxt)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinepsb_set_errverbositySets the verbosity of error
+  messages.
+
+<P>
+<BR>
+<IMG
+ WIDTH="261" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img147.png"
+ ALT="\begin{lstlisting}
+call psb_set_errverbosity(v)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>v</STRONG></DT>
+<DD>the verbosity level
+<BR>
+Scope: <B>global</B>
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinepsb_set_erractionSet the type of action to be
+  taken  upon error condition.
+
+<P>
+<BR>
+<IMG
+ WIDTH="289" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img148.png"
+ ALT="\begin{lstlisting}
+call psb_set_erraction(err_act)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_act</STRONG></DT>
+<DD>the type of action.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer. Possible values: <code>psb_act_ret</code>,
+<code>psb_act_abort</code>. 
+</DD>
+</DL>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1502"
+<A NAME="tex2html1501"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1498"
+<A NAME="tex2html1497"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1492"
+<A NAME="tex2html1491"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1500"
+<A NAME="tex2html1499"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1503"
-  HREF="node104.html">psb_errpush   Pushes</A>
-<B> Up:</B> <A NAME="tex2html1499"
+<B> Next:</B> <A NAME="tex2html1502"
+  HREF="node104.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1498"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1493"
+<B> Previous:</B> <A NAME="tex2html1492"
   HREF="node102.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1501"
+ &nbsp; <B>  <A NAME="tex2html1500"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

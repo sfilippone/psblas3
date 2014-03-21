@@ -25,26 +25,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html911"
+<A NAME="tex2html910"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html907"
+<A NAME="tex2html906"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html903"
+<A NAME="tex2html902"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html909"
+<A NAME="tex2html908"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html912"
+<B> Next:</B> <A NAME="tex2html911"
   HREF="node58.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html908"
+<B> Up:</B> <A NAME="tex2html907"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html904"
+<B> Previous:</B> <A NAME="tex2html903"
   HREF="node56.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html910"
+ &nbsp; <B>  <A NAME="tex2html909"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -69,7 +69,7 @@ loc\_x_i \leftarrow scatter(glob\_x)
 
 <IMG
  WIDTH="167" HEIGHT="28" BORDER="0"
- SRC="img77.png"
+ SRC="img80.png"
  ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -77,20 +77,20 @@ loc\_x_i \leftarrow scatter(glob\_x)
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img69.png"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
  ALT="$glob\_x$"></STRONG></DT>
 <DD>is the global matrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
  ALT="$glob\_x_{1:m,1:n}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img71.png"
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img73.png"
  ALT="$loc\_x_i$"></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <IMG
@@ -99,8 +99,8 @@ process <IMG
  ALT="$i$">.
 </DD>
 <DT><STRONG><IMG
- WIDTH="54" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img78.png"
+ WIDTH="53" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img81.png"
  ALT="$scatter$"></STRONG></DT>
 <DD>is the scatter function.
 </DD>
@@ -108,7 +108,7 @@ process <IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3038"></A>
+<DIV ALIGN="CENTER"><A NAME="3042"></A>
 <TABLE>
 <CAPTION><STRONG>Table 17:</STRONG>
 Data types</CAPTION>
@@ -116,8 +116,8 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
  ALT="$x_i, y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -144,10 +144,15 @@ Data types</CAPTION>
 <BR>
 
 <P>
-<PRE>
+<BR>
+<IMG
+ WIDTH="480" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img82.png"
+ ALT="\begin{lstlisting}
 call psb_scatter(glob_x, loc_x, desc_a, info, root)
 call psb_scatter(glob_x, loc_x, desc_a, info, root)
-</PRE>
+\end{lstlisting}">
+<BR>
 
 <P>
 <DL>
@@ -182,7 +187,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <IMG
  WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ SRC="img77.png"
  ALT="$root=-1$"> all
   the processes have a copy of the global vector.
 <BR>
@@ -197,10 +202,10 @@ Specified as: an integer variable <!-- MATH
  -->
 <IMG
  WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img75.png"
+ SRC="img78.png"
  ALT="$-1\le root\le np-1$">, default <IMG
  WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
+ SRC="img79.png"
  ALT="$-1$">. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
@@ -209,8 +214,8 @@ Specified as: an integer variable <!-- MATH
 <DT><STRONG>loc_x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img69.png"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
  ALT="$glob\_x$">. 
 <BR>
 Scope: <B>local</B> 
@@ -238,26 +243,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html911"
+<A NAME="tex2html910"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html907"
+<A NAME="tex2html906"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html903"
+<A NAME="tex2html902"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html909"
+<A NAME="tex2html908"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html912"
+<B> Next:</B> <A NAME="tex2html911"
   HREF="node58.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html908"
+<B> Up:</B> <A NAME="tex2html907"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html904"
+<B> Previous:</B> <A NAME="tex2html903"
   HREF="node56.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html910"
+ &nbsp; <B>  <A NAME="tex2html909"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_errverbosity -- Sets the verbosity of error messages.</TITLE>
-<META NAME="description" CONTENT="psb_set_errverbosity -- Sets the verbosity of error messages.">
+<TITLE>psb_precinit -- Initialize a preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precinit -- Initialize a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,7 +20,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node107.html">
 <LINK REL="previous" HREF="node105.html">
-<LINK REL="up" HREF="node103.html">
+<LINK REL="up" HREF="node105.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
@@ -30,7 +30,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
 <A NAME="tex2html1538"
-  HREF="node103.html">
+  HREF="node105.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html1532"
   HREF="node105.html">
@@ -40,25 +40,24 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
 <B> Next:</B> <A NAME="tex2html1543"
-  HREF="node107.html">psb_set_erraction   Set</A>
+  HREF="node107.html">psb_precbld   Builds</A>
 <B> Up:</B> <A NAME="tex2html1539"
-  HREF="node103.html">Error handling</A>
+  HREF="node105.html">Preconditioner routines</A>
 <B> Previous:</B> <A NAME="tex2html1533"
-  HREF="node105.html">psb_error   Prints</A>
+  HREF="node105.html">Preconditioner routines</A>
  &nbsp; <B>  <A NAME="tex2html1541"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00093000000000000000">
-psb_set_errverbosity -- Sets the verbosity of error
-  messages.</A>
+<H2><A NAME="SECTION000111000000000000000">
+psb_precinit -- Initialize a  preconditioner</A>
 </H2>
 
 <P>
 <PRE>
-call psb_set_errverbosity(v)
+call psb_precinit(prec, ptype, info)
 </PRE>
 
 <P>
@@ -69,16 +68,70 @@ call psb_set_errverbosity(v)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the verbosity level
-<BR>
-Scope: <B>global</B>
+<DT><STRONG>ptype</STRONG></DT>
+<DD>the type of preconditioner. 
+Scope: <B>global</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer.
+Specified as: a character string, see usage notes.
+</DD>
+<DT><STRONG><B>On Exit</B></STRONG></DT>
+<DD><P>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Error code: if no error, 0 is returned.
+</DD>
+</DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+Legal inputs to this subroutine are interpreted depending on the
+<IMG
+ WIDTH="41" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img154.png"
+ ALT="$ptype$"> string as follows<A NAME="tex2html30"
+  HREF="footnode.html#foot7249"><SUP>3</SUP></A>:
+<DL>
+<DT><STRONG>NONE</STRONG></DT>
+<DD>No preconditioning, i.e. the preconditioner is just a copy
+  operator.
+</DD>
+<DT><STRONG>DIAG</STRONG></DT>
+<DD>Diagonal scaling; each entry of the input vector is
+  multiplied by the reciprocal of the sum of the absolute values of
+  the coefficients in the corresponding row of matrix  <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">;
+</DD>
+<DT><STRONG>BJAC</STRONG></DT>
+<DD>Precondition by a  factorization of the
+  block-diagonal of matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">, where block boundaries are determined
+  by the data allocation boundaries for each process; requires no
+  communication. Only the incomplete factorization <IMG
+ WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img155.png"
+ ALT="$ILU(0)$"> is
+  currently implemented.  
 </DD>
 </DL>
 

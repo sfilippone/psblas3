@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_vet_read -- Read a dense vector from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_vet_read -- Read a dense vector from a file in the MatrixMarket format">
+<TITLE>psb_krylov -- Krylov Methods Driver Routine</TITLE>
+<META NAME="description" CONTENT="psb_krylov -- Krylov Methods Driver Routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,99 +18,377 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node113.html">
 <LINK REL="previous" HREF="node111.html">
-<LINK REL="up" HREF="node108.html">
+<LINK REL="up" HREF="node111.html">
 <LINK REL="next" HREF="node113.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1617"
+<A NAME="tex2html1611"
   HREF="node113.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1613"
-  HREF="node108.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html1607"
   HREF="node111.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1603"
+  HREF="node111.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1615"
+<A NAME="tex2html1609"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1618"
-  HREF="node113.html">mm_mat_write   Write</A>
-<B> Up:</B> <A NAME="tex2html1614"
-  HREF="node108.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1608"
-  HREF="node111.html">mm_mat_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1616"
+<B> Next:</B> <A NAME="tex2html1612"
+  HREF="node113.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1608"
+  HREF="node111.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1604"
+  HREF="node111.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1610"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000104000000000000000">
-mm_vet_read -- Read a dense vector from a
-  file in the MatrixMarket format</A>
+<H2><A NAME="SECTION000121000000000000000"></A><A NAME="krylov"></A>
+<BR>
+psb_krylov  -- Krylov Methods Driver
+      Routine
 </H2>
 
-<PRE>
-call mm_vet_read(b, iret, iunit, filename)
-</PRE>
+<P>
+This subroutine is a driver that provides a general interface for all
+the Krylov-Subspace family methods implemented in PSBLAS version 2. 
+
+<P>
+The stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="204" HEIGHT="44" BORDER="0"
+ SRC="img156.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+or the 2-norm residual reduction
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{\|b\|_2} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="121" HEIGHT="44" BORDER="0"
+ SRC="img157.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert b\Vert _2} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+according to the value passed through the  istop argument (see
+later). In the above formulae, <IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img158.png"
+ ALT="$x_i$"> is the tentative solution and
+<IMG
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img159.png"
+ ALT="$r_i=b-Ax_i$"> the corresponding residual at the <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">-th iteration. 
+
+<P>
+<BR>
+<IMG
+ WIDTH="482" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img160.png"
+ ALT="\begin{lstlisting}
+call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
+&amp; itmax,iter,err,itrace,irst,istop,cond)
+\end{lstlisting}">
+<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be read.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default input unit  5 (i.e. standard input
-in Unix jargon) is used. Default: <code>-</code>. 
+<DT><STRONG>method</STRONG></DT>
+<DD>a string that defines the iterative method to be
+  used. Supported values are:
+  <DL>
+<DT><STRONG>CG:</STRONG></DT>
+<DD>the Conjugate Gradient method;
+  
 </DD>
-<DT><STRONG>iunit</STRONG></DT>
-<DD>The Fortran file unit number.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
-</DD>
-</DL>
+<DT><STRONG>CGS:</STRONG></DT>
+<DD>the Conjugate Gradient Stabilized method;
 
 <P>
-<DL>
+</DD>
+<DT><STRONG>BICG:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient method;
+  
+</DD>
+<DT><STRONG>BICGSTAB:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method;
+  
+</DD>
+<DT><STRONG>BICGSTABL:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method with restarting;
+  
+</DD>
+<DT><STRONG>RGMRES:</STRONG></DT>
+<DD>the Generalized Minimal Residual method with restarting.
+  
+</DD>
+</DL>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the local portion of global sparse matrix
+<IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>The data structure containing the preconditioner.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>The RHS vector. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The initial guess. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>eps</STRONG></DT>
+<DD>The stopping tolerance. 
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a real number. 
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>itmax</STRONG></DT>
+<DD>The maximum number of iterations to perform.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Default: <IMG
+ WIDTH="100" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img161.png"
+ ALT="$itmax = 1000$">.
+<BR>
+Specified as: an integer variable <IMG
+ WIDTH="75" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img162.png"
+ ALT="$itmax \ge 1$">.
+</DD>
+<DT><STRONG>itrace</STRONG></DT>
+<DD>If <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img112.png"
+ ALT="$&gt;0$"> print out an informational message about
+  convergence  every <IMG
+ WIDTH="46" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img163.png"
+ ALT="$itrace$"> iterations.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR></DD>
+<DT><STRONG>irst</STRONG></DT>
+<DD>An integer specifying the restart parameter.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: <IMG
+ WIDTH="59" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img164.png"
+ ALT="$irst&gt;0$">. This is employed for the BiCGSTABL or RGMRES
+methods, otherwise it is ignored. 
+
+<P>
+</DD>
+<DT><STRONG>istop</STRONG></DT>
+<DD>An integer specifying the stopping criterion.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+of the residual. Default: 2. 
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side(s).
+<DT><STRONG>x</STRONG></DT>
+<DD>The computed solution. 
 <BR>
-Type: <B>required</B> 
+Scope: <B>local</B> 
 <BR>
-An  array of type real or complex, rank 2 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side, otherwise will be left in the UNALLOCATED state. 
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
 </DD>
-<DT><STRONG>iret</STRONG></DT>
+<DT><STRONG>iter</STRONG></DT>
+<DD>The number of iterations performed.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: an integer variable.
+</DD>
+<DT><STRONG>err</STRONG></DT>
+<DD>The convergence estimate on exit.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number.
+</DD>
+<DT><STRONG>cond</STRONG></DT>
+<DD>An estimate of the condition number of matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">; only
+  available with the <IMG
+ WIDTH="29" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img165.png"
+ ALT="$CG$"> method.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number.
+</DD>
+<DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
+Scope: <B>local</B> 
+<BR>
 Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
 <BR>
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 
 <P>
-<BR><HR>
+
+<P>
+
+<P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1611"
+  HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1607"
+  HREF="node111.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1603"
+  HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1609"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1612"
+  HREF="node113.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1608"
+  HREF="node111.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1604"
+  HREF="node111.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1610"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

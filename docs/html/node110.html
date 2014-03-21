@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format</TITLE>
-<META NAME="description" CONTENT="hb_write -- Write a sparse matrix to a file in the Harwell-Boeing format">
+<TITLE>clone -- clone current preconditioner</TITLE>
+<META NAME="description" CONTENT="clone -- clone current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,47 +18,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node111.html">
 <LINK REL="previous" HREF="node109.html">
-<LINK REL="up" HREF="node108.html">
+<LINK REL="up" HREF="node105.html">
 <LINK REL="next" HREF="node111.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1593"
+<A NAME="tex2html1588"
   HREF="node111.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1589"
-  HREF="node108.html">
+<A NAME="tex2html1584"
+  HREF="node105.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1583"
+<A NAME="tex2html1580"
   HREF="node109.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1591"
+<A NAME="tex2html1586"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1594"
-  HREF="node111.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1590"
-  HREF="node108.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1584"
-  HREF="node109.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1592"
+<B> Next:</B> <A NAME="tex2html1589"
+  HREF="node111.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1585"
+  HREF="node105.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1581"
+  HREF="node109.html">psb_precdescr   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1587"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000102000000000000000">
-hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
+<H2><A NAME="SECTION000115000000000000000">
+clone -- clone  current
+  preconditioner</A>
 </H2>
 
-<P>
 <PRE>
-call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
+call  prec%clone(precout,info)
 </PRE>
 
 <P>
@@ -66,59 +64,14 @@ call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix to be written.
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
 <BR>
-Type:<B>required</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-An  array of type real or complex, rank 1 and having the ALLOCATABLE
-attribute; will be allocated and filled in if the input file contains
-a right hand side. 
-</DD>
-<DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written to.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: a character variable containing a valid file name, or
-<code>-</code>, in which case the default output unit  6 (i.e. standard output
-in Unix jargon) is used. Default: <code>-</code>. 
-</DD>
-<DT><STRONG>iunit</STRONG></DT>
-<DD>The Fortran file unit number.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
-</DD>
-<DT><STRONG>key</STRONG></DT>
-<DD>Matrix key.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 8 holding the
-matrix key as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
-<DT><STRONG>mtitle</STRONG></DT>
-<DD>Matrix title.
-<BR>
-Type: <B>Optional</B> 
-<BR>
-A charachter variable of length 72 holding the
-matrix title as specified by the Harwell-Boeing format and to be
-written to file.
-</DD>
+Scope: <B>local</B>.
+<BR></DD>
 </DL>
 
 <P>
@@ -126,40 +79,16 @@ written to file.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>iret</STRONG></DT>
-<DD>Error code.
-<BR>
-Type: <B>required</B> 
-<BR>
-An integer value; 0 means no error has been detected. 
+<DT><STRONG>precout</STRONG></DT>
+<DD>A copy of the input object.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1593"
-  HREF="node111.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1589"
-  HREF="node108.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1583"
-  HREF="node109.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1591"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1594"
-  HREF="node111.html">mm_mat_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1590"
-  HREF="node108.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1584"
-  HREF="node109.html">hb_read   Read</A>
- &nbsp; <B>  <A NAME="tex2html1592"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

@@ -26,33 +26,34 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html839"
+<A NAME="tex2html838"
   HREF="node52.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html835"
+<A NAME="tex2html834"
   HREF="node39.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html829"
+<A NAME="tex2html828"
   HREF="node50.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html837"
+<A NAME="tex2html836"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html840"
+<B> Next:</B> <A NAME="tex2html839"
   HREF="node52.html">psb_spsm   Triangular</A>
-<B> Up:</B> <A NAME="tex2html836"
+<B> Up:</B> <A NAME="tex2html835"
   HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html830"
+<B> Previous:</B> <A NAME="tex2html829"
   HREF="node50.html">psb_spnrmi   Infinity</A>
- &nbsp; <B>  <A NAME="tex2html838"
+ &nbsp; <B>  <A NAME="tex2html837"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION000512000000000000000">
-psb_spmm -- Sparse Matrix by Dense Matrix Product</A>
+psb_spmm -- Sparse Matrix by Dense Matrix
+  Product</A>
 </H2>
 
 <P>
@@ -69,7 +70,7 @@ y \leftarrow \alpha  A  x + \beta y
  -->
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_no_tra"></A><IMG
- WIDTH="102" HEIGHT="27" BORDER="0"
+ WIDTH="101" HEIGHT="27" BORDER="0"
  SRC="img44.png"
  ALT="\begin{displaymath}
 y \leftarrow \alpha A x + \beta y
@@ -125,16 +126,16 @@ where:
  SRC="img20.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense matrix <IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img47.png"
  ALT="$x_{:, :}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></STRONG></DT>
 <DD>is the global dense matrix <IMG
- WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img48.png"
  ALT="$y_{:, :}$">
 </DD>
@@ -151,7 +152,7 @@ where:
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1649"></A>
+<DIV ALIGN="CENTER"><A NAME="1653"></A>
 <TABLE>
 <CAPTION><STRONG>Table 12:</STRONG>
 Data types</CAPTION>
@@ -165,13 +166,13 @@ Data types</CAPTION>
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">, <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">, <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$">, <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img23.png"
  ALT="$\beta$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -212,7 +213,7 @@ call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="15" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$">.
 <BR>
@@ -260,13 +261,13 @@ Table&nbsp;<A HREF="#tab:f90spmm">12</A>.  The rank of <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"> must be the same of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>beta</STRONG></DT>
 <DD>the scalar <IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img23.png"
  ALT="$\beta$">.
 <BR>
@@ -281,7 +282,7 @@ Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f9
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">. 
 
@@ -295,7 +296,7 @@ Intent: <B>inout</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">12</A>. The rank of <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"> must be the same of <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
@@ -356,7 +357,7 @@ Specified as: a rank one array of the same type of <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"> and <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"> with
 the TARGET attribute. 
@@ -368,7 +369,7 @@ the TARGET attribute.
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of result matrix <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">.
 <BR>
@@ -398,26 +399,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html839"
+<A NAME="tex2html838"
   HREF="node52.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html835"
+<A NAME="tex2html834"
   HREF="node39.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html829"
+<A NAME="tex2html828"
   HREF="node50.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html837"
+<A NAME="tex2html836"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html840"
+<B> Next:</B> <A NAME="tex2html839"
   HREF="node52.html">psb_spsm   Triangular</A>
-<B> Up:</B> <A NAME="tex2html836"
+<B> Up:</B> <A NAME="tex2html835"
   HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html830"
+<B> Previous:</B> <A NAME="tex2html829"
   HREF="node50.html">psb_spnrmi   Infinity</A>
- &nbsp; <B>  <A NAME="tex2html838"
+ &nbsp; <B>  <A NAME="tex2html837"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

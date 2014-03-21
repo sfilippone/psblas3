@@ -26,33 +26,34 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html974"
+<A NAME="tex2html973"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html970"
+<A NAME="tex2html969"
   HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html964"
+<A NAME="tex2html963"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html972"
+<A NAME="tex2html971"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html975"
+<B> Next:</B> <A NAME="tex2html974"
   HREF="node61.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html971"
+<B> Up:</B> <A NAME="tex2html970"
   HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html965"
+<B> Previous:</B> <A NAME="tex2html964"
   HREF="node59.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html973"
+ &nbsp; <B>  <A NAME="tex2html972"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00072000000000000000">
-psb_cdins -- Communication descriptor insert routine</A>
+psb_cdins -- Communication descriptor insert
+  routine</A>
 </H2>
 
 <P>
@@ -67,16 +68,16 @@ discretization mesh (and isomorphic to the sparsity pattern of a
 linear system coefficient matrix), storing them as necessary into the
 communication descriptor. In the first form the edges are specified as
 pairs of indices <IMG
- WIDTH="76" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img95.png"
+ WIDTH="77" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img99.png"
  ALT="$ia(i),ja(i)$">; the starting index <IMG
- WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img96.png"
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img100.png"
  ALT="$ia(i)$"> should
 belong to the current process. 
 In the second form only the remote indices <IMG
- WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img97.png"
+ WIDTH="38" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
  ALT="$ja(i)$"> are specified. 
 
 <P>
@@ -108,8 +109,8 @@ Type: <B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>ja</STRONG></DT>
@@ -122,8 +123,8 @@ Type: <B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>mask</STRONG></DT>
@@ -137,8 +138,8 @@ Type: <B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: a logical  array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">, default <code>.true.</code>.
 </DD>
 <DT><STRONG>lidx</STRONG></DT>
@@ -151,8 +152,8 @@ Type: <B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">.
 </DD>
 </DL>
@@ -194,8 +195,8 @@ Type: <B>optional</B>.
 Intent: <B>out</B>.
 <BR>
 Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">.
 </DD>
 <DT><STRONG>jla</STRONG></DT>
@@ -208,8 +209,8 @@ Type: <B>optional</B>.
 Intent: <B>out</B>.
 <BR>
 Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img98.png"
+ WIDTH="21" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img102.png"
  ALT="$nz$">.
 
 <P>
@@ -233,26 +234,26 @@ nor the end vertex belong to the current process.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html974"
+<A NAME="tex2html973"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html970"
+<A NAME="tex2html969"
   HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html964"
+<A NAME="tex2html963"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html972"
+<A NAME="tex2html971"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html975"
+<B> Next:</B> <A NAME="tex2html974"
   HREF="node61.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html971"
+<B> Up:</B> <A NAME="tex2html970"
   HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html965"
+<B> Previous:</B> <A NAME="tex2html964"
   HREF="node59.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html973"
+ &nbsp; <B>  <A NAME="tex2html972"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

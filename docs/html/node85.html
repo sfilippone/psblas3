@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Sorting utilities</TITLE>
-<META NAME="description" CONTENT="Sorting utilities">
+<TITLE>Sorting utilities -- </TITLE>
+<META NAME="description" CONTENT="Sorting utilities -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -25,33 +25,33 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1272"
+<A NAME="tex2html1271"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1268"
+<A NAME="tex2html1267"
   HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1264"
+<A NAME="tex2html1263"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1270"
+<A NAME="tex2html1269"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1273"
+<B> Next:</B> <A NAME="tex2html1272"
   HREF="node86.html">Parallel environment routines</A>
-<B> Up:</B> <A NAME="tex2html1269"
+<B> Up:</B> <A NAME="tex2html1268"
   HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1265"
+<B> Previous:</B> <A NAME="tex2html1264"
   HREF="node84.html">psb_sizeof   Memory</A>
- &nbsp; <B>  <A NAME="tex2html1271"
+ &nbsp; <B>  <A NAME="tex2html1270"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION000727000000000000000">
-Sorting utilities</A>
+Sorting utilities -- </A>
 </H2>
 
 <P>
@@ -73,7 +73,7 @@ call psb_hsort(x,ix,dir,flag)
 <P>
 These  serial routines sort a sequence <IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img111.png"
+ SRC="img115.png"
  ALT="$X$"> into ascending or
 descending  order. The argument meaning is identical for the three
 calls; the only difference is the algorithm used to accomplish the
@@ -99,7 +99,7 @@ Type:<B>optional</B>.
 <BR>
 Specified as: an integer array of (at least) the same size as <IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img111.png"
+ SRC="img115.png"
  ALT="$X$">.
 </DD>
 <DT><STRONG>dir</STRONG></DT>
@@ -123,7 +123,7 @@ default <code>psb_lsort_up_</code>.
 <DT><STRONG>flag</STRONG></DT>
 <DD>Whether to keep the original values in <IMG
  WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img112.png"
+ SRC="img116.png"
  ALT="$IX$">.
 <BR>
 Type:<B>optional</B>.
@@ -185,10 +185,10 @@ position as the corresponding entries in <IMG
  -->
 <IMG
  WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img113.png"
+ SRC="img117.png"
  ALT="$flag = psb\_sort\_ovw\_idx\_$"> then the entries in <IMG
  WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img114.png"
+ SRC="img118.png"
  ALT="$ix(1:n)$">
   where <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
@@ -202,7 +202,7 @@ position as the corresponding entries in <IMG
  -->
 <IMG
  WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img115.png"
+ SRC="img119.png"
  ALT="$ix(i) \leftarrow
 i$">; thus, upon return from the subroutine, for each
   index <IMG
@@ -210,10 +210,10 @@ i$">; thus, upon return from the subroutine, for each
  SRC="img4.png"
  ALT="$i$"> we have in <IMG
  WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img116.png"
+ SRC="img120.png"
  ALT="$ix(i)$"> the position that the item <IMG
  WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img117.png"
+ SRC="img121.png"
  ALT="$x(i)$">
   occupied in the original data sequence;
 </LI>
@@ -222,16 +222,16 @@ i$">; thus, upon return from the subroutine, for each
  -->
 <IMG
  WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img118.png"
+ SRC="img122.png"
  ALT="$flag = psb\_sort\_keep\_idx\_$"> the routine will assume that
   the entries in <IMG
  WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img119.png"
+ SRC="img123.png"
  ALT="$ix(:)$"> have already been initialized by the user;
 </LI>
 <LI>The three sorting algorithms have a similar <IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
+ SRC="img124.png"
  ALT="$O(n \log n)$"> expected
   running time; in the average case quicksort will be the
   fastest and merge-sort the slowest. However note that:
@@ -239,7 +239,7 @@ i$">; thus, upon return from the subroutine, for each
 <OL>
 <LI>The worst case running time for quicksort is <IMG
  WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="img121.png"
+ SRC="img125.png"
  ALT="$O(n^2)$">; the algorithm
   implemented here follows the well-known median-of-three heuristics,
   but the worst case may still apply;
@@ -247,7 +247,7 @@ i$">; thus, upon return from the subroutine, for each
 <LI>The worst case running time for merge-sort and heap-sort is
   <IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img120.png"
+ SRC="img124.png"
  ALT="$O(n \log n)$"> as the average case;
 </LI>
 <LI>The merge-sort algorithm is implemented to take advantage of 
@@ -266,26 +266,26 @@ i$">; thus, upon return from the subroutine, for each
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1272"
+<A NAME="tex2html1271"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1268"
+<A NAME="tex2html1267"
   HREF="node58.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1264"
+<A NAME="tex2html1263"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1270"
+<A NAME="tex2html1269"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1273"
+<B> Next:</B> <A NAME="tex2html1272"
   HREF="node86.html">Parallel environment routines</A>
-<B> Up:</B> <A NAME="tex2html1269"
+<B> Up:</B> <A NAME="tex2html1268"
   HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1265"
+<B> Previous:</B> <A NAME="tex2html1264"
   HREF="node84.html">psb_sizeof   Memory</A>
- &nbsp; <B>  <A NAME="tex2html1271"
+ &nbsp; <B>  <A NAME="tex2html1270"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

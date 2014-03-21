@@ -143,7 +143,7 @@ as follows:
   % \begin{Sbox}
 \begin{center}
     \begin{minipage}[tl]{0.9\textwidth}
-\begin{lstlisting} 
+\begin{verbatim} 
 type psb_desc_type 
     class(psb_indx_map), allocatable :: indxmap
     integer, allocatable  :: halo_index(:)
@@ -153,7 +153,7 @@ type psb_desc_type
     integer, allocatable  :: ovr_mst_idx(:)
     integer, allocatable  :: bnd_elem(:)
 end type psb_desc_type 
-\end{lstlisting}
+\end{verbatim}
     \end{minipage}
   \end{center}
 % \end{Sbox}
@@ -178,11 +178,12 @@ state, which can take the following values:
 
 \subsubsection{Descriptor Methods} 
 
-\subsubsubroutine{get\_local\_rows}{Get number of local rows}
+\subsubsection*{get\_local\_rows --- Get number of local rows}
+\addcontentsline{toc}{paragraph}{get\_local\_rows}
 
-\begin{lstlisting}
+\begin{verbatim}
 nr = desc%get_local_rows()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -203,15 +204,16 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsubroutine{get\_local\_cols}{Get number of local cols}
+\subsubsection*{get\_local\_cols --- Get number of local cols}
+\addcontentsline{toc}{paragraph}{get\_local\_cols}
 
-\begin{lstlisting}
+\begin{verbatim}
 nc = desc%get_local_cols()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
-\item[\bf On Entry]
 \item[Type:] Asynchronous.
+\item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
@@ -229,15 +231,16 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsubroutine{get\_global\_rows}{Get number of global rows}
+\subsubsection*{get\_global\_rows --- Get number of global rows}
+\addcontentsline{toc}{paragraph}{get\_global\_rows}
 
-\begin{lstlisting}
+\begin{verbatim}
 nr = desc%get_global_rows()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
-\item[\bf On Entry]
 \item[Type:] Asynchronous.
+\item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
 % Type: {\bf required}.\\
@@ -251,11 +254,12 @@ Scope: {\bf local}.\\
   global index space. 
 \end{description}
 
-\subsubsubroutine{get\_global\_cols}{Get number of global cols}
+\subsubsection*{get\_global\_cols --- Get number of global cols}
+\addcontentsline{toc}{paragraph}{get\_global\_cols}
 
-\begin{lstlisting}
+\begin{verbatim}
 nr = desc%get_global_cols()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -274,11 +278,12 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsubroutine{get\_context}{Get communication context}
+\subsubsection*{get\_context --- Get communication context}
+\addcontentsline{toc}{paragraph}{get\_context}
 
-\begin{lstlisting}
+\begin{verbatim}
 ictxt = desc%get_context()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -295,11 +300,12 @@ Scope: {\bf local}.\\
 \item[Function value] The communication context.
 \end{description}
 
-\subsubsubroutine{Clone}{clone current object}
+\subsubsection*{Clone --- clone current object}
+\addcontentsline{toc}{paragraph}{Clone}
 
-\begin{lstlisting}
+\begin{verbatim}
 call  desc%clone(descout,info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -318,12 +324,13 @@ Scope: {\bf local}.\\
 \end{description}
 
 
-\subsubsubroutine{psb\_cd\_get\_large\_threshold}{Get threshold for
+\subsubsection*{psb\_cd\_get\_large\_threshold --- Get threshold for
   index mapping switch}
+\addcontentsline{toc}{paragraph}{psb\_cd\_get\_large\_threshold}
 
-\begin{lstlisting}
+\begin{verbatim}
 ith = psb_cd_get_large_threshold()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -334,12 +341,13 @@ ith = psb_cd_get_large_threshold()
 
 
 
-\subsubsubroutine{psb\_cd\_set\_large\_threshold}{Set threshold for
+\subsubsection*{psb\_cd\_set\_large\_threshold --- Set threshold for
   index mapping switch}
+\addcontentsline{toc}{paragraph}{psb\_cd\_set\_large\_threshold}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cd_set_large_threshold(ith)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -414,15 +422,11 @@ library at runtime via the \verb|psb_spasb| routine.
   % \begin{Sbox}
 \begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
-\begin{lstlisting}
-
+\begin{verbatim}
   type :: psb_Tspmat_type
-
     class(psb_T_base_sparse_mat), allocatable  :: a 
-
   end type  psb_Tspmat_type
-
-\end{lstlisting}
+\end{verbatim}
     \end{minipage}
   \end{center}
 % \end{Sbox}
@@ -459,11 +463,12 @@ variants are obtained by conversion to/from it.
 
 \subsubsection{Sparse Matrix Methods}
 
-\subsubsubroutine{get\_nrows}{Get number of  rows in a sparse  matrix}
+\subsubsection*{get\_nrows --- Get number of  rows in a sparse  matrix}
+\addcontentsline{toc}{paragraph}{get\_nrows}
 
-\begin{lstlisting}
+\begin{verbatim}
 nr = a%get_nrows()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -481,11 +486,13 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{get\_ncols}{Get number of  columns in a  sparse matrix}
+\subsubsection*{get\_ncols --- Get number of  columns in a  sparse
+  matrix}
+\addcontentsline{toc}{paragraph}{get\_ncols}
 
-\begin{lstlisting}
+\begin{verbatim}
 nc = a%get_ncols()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -503,12 +510,13 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{get\_nnzeros}{Get number of nonzero elements
+\subsubsection*{get\_nnzeros --- Get number of nonzero elements
   in a sparse matrix}
+\addcontentsline{toc}{paragraph}{get\_nnzeros}
 
-\begin{lstlisting}
+\begin{verbatim}
 nz = a%get_nnzeros()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -532,12 +540,13 @@ Scope: {\bf local}\\
   value for the same matrix may be different for different storage choices.
 \end{enumerate}
 
-\subsubsubroutine{get\_size }{Get maximum number of nonzero elements
+\subsubsection*{get\_size  --- Get maximum number of nonzero elements
   in a sparse matrix}
+\addcontentsline{toc}{paragraph}{get\_size }
 
-\begin{lstlisting}
+\begin{verbatim}
 maxnz = a%get_size()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -555,12 +564,13 @@ Scope: {\bf local}\\
   be stored in sparse matrix \verb|a| using its current memory allocation.
 \end{description}
 
-\subsubsubroutine{sizeof }{Get memory occupation in bytes
+\subsubsection*{sizeof  --- Get memory occupation in bytes
 of  a sparse matrix}
+\addcontentsline{toc}{paragraph}{sizeof }
 
-\begin{lstlisting}
+\begin{verbatim}
 memory_size = a%sizeof()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -578,11 +588,12 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{get\_fmt }{Short description of the dynamic type}
+\subsubsection*{get\_fmt  --- Short description of the dynamic type}
+\addcontentsline{toc}{paragraph}{get\_fmt }
 
-\begin{lstlisting}
+\begin{verbatim}
 write(*,*) a%get_fmt()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -601,13 +612,14 @@ Scope: {\bf local}\\
   \verb|CSR| and \verb|CSC|. 
 \end{description}
 
-\subsubsubroutine{is\_bld, is\_upd, is\_asb }{Status check}
+\subsubsection*{is\_bld, is\_upd, is\_asb  --- Status check}
+\addcontentsline{toc}{paragraph}{is\_bld, is\_upd, is\_asb }
 
-\begin{lstlisting}
+\begin{verbatim}
 if (a%is_bld()) then 
 if (a%is_upd()) then 
 if (a%is_asb()) then 
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -626,11 +638,12 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{clone}{Clone current object}
+\subsubsection*{clone --- Clone current object}
+\addcontentsline{toc}{paragraph}{clone}
 
-\begin{lstlisting}
+\begin{verbatim}
 call  a%clone(b,info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -699,7 +712,7 @@ private memory.
   % \begin{Sbox}
 \begin{center}
     \begin{minipage}[tl]{0.85\textwidth}
-\begin{lstlisting}
+\begin{verbatim}
   type psb_T_base_vect_type
     TYPE(KIND_), allocatable :: v(:)
   end type psb_T_base_vect_type
@@ -708,7 +721,7 @@ private memory.
     class(psb_T_base_vect_type), allocatable :: v 
   end type  psb_T_vect_type
 
-\end{lstlisting}
+\end{verbatim}
     \end{minipage}
   \end{center}
 % \end{Sbox}
@@ -722,11 +735,12 @@ private memory.
 \end{figure}
 
 \subsubsection{Vector Methods}
-\subsubsubroutine{get\_nrows}{Get number of  rows in a dense vector}
+\subsubsection*{get\_nrows --- Get number of  rows in a dense vector}
+\addcontentsline{toc}{paragraph}{get\_nrows}
 
-\begin{lstlisting}
+\begin{verbatim}
 nr = v%get_nrows()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -744,12 +758,13 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{sizeof }{Get memory occupation in bytes
+\subsubsection*{sizeof  --- Get memory occupation in bytes
 of  a dense vector}
+\addcontentsline{toc}{paragraph}{sizeof }
 
-\begin{lstlisting}
+\begin{verbatim}
 memory_size = v%sizeof()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -767,11 +782,12 @@ Scope: {\bf local}\\
 \end{description}
 
 
-\subsubsubroutine{get\_vect }{Get a copy of the vector contents}
+\subsubsection*{get\_vect  --- Get a copy of the vector contents}
+\addcontentsline{toc}{paragraph}{get\_vect }
 
-\begin{lstlisting}
+\begin{verbatim}
 extv = v%get_vect()
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -789,10 +805,11 @@ Scope: {\bf local}\\
   vector contents.
 \end{description}
 
-\subsubsubroutine{clone}{Clone current object}
-\begin{lstlisting}
+\subsubsection*{clone --- Clone current object}
+\addcontentsline{toc}{paragraph}{clone}
+\begin{verbatim}
 call  x%clone(y,info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -840,13 +857,13 @@ dynamic type corresponding to the desired preconditioner.
   % \begin{Sbox}
 \begin{center}
     \begin{minipage}[tl]{0.9\textwidth}
-\begin{lstlisting}
+\begin{verbatim}
 
   type psb_Tprec_type
     class(psb_T_base_prec_type), allocatable :: prec
   end type psb_Tprec_type
 
-\end{lstlisting}
+\end{verbatim}
     \end{minipage}
   \end{center}
 % \end{Sbox}

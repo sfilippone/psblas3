@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html889"
+<A NAME="tex2html888"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html885"
+<A NAME="tex2html884"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html879"
+<A NAME="tex2html878"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html887"
+<A NAME="tex2html886"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html890"
+<B> Next:</B> <A NAME="tex2html889"
   HREF="node56.html">psb_gather   Gather</A>
-<B> Up:</B> <A NAME="tex2html886"
+<B> Up:</B> <A NAME="tex2html885"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html880"
+<B> Previous:</B> <A NAME="tex2html879"
   HREF="node54.html">psb_halo   Halo</A>
- &nbsp; <B>  <A NAME="tex2html888"
+ &nbsp; <B>  <A NAME="tex2html887"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -69,7 +69,7 @@ x \leftarrow Q x
 
 <IMG
  WIDTH="55" HEIGHT="27" BORDER="0"
- SRC="img59.png"
+ SRC="img60.png"
  ALT="\begin{displaymath}x \leftarrow Q x \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -87,22 +87,22 @@ where:
 </DD>
 <DT><STRONG><IMG
  WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img60.png"
+ SRC="img61.png"
  ALT="$Q$"></STRONG></DT>
 <DD>is the overlap operator; it is the composition of two
 operators <IMG
  WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img61.png"
+ SRC="img62.png"
  ALT="$ P_a$"> and <IMG
  WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img62.png"
+ SRC="img63.png"
  ALT="$ P^{T}$">. 
 </DD>
 </DL>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3033"></A>
+<DIV ALIGN="CENTER"><A NAME="3037"></A>
 <TABLE>
 <CAPTION><STRONG>Table 15:</STRONG>
 Data types</CAPTION>
@@ -135,10 +135,15 @@ Data types</CAPTION>
 <BR>
 
 <P>
-<PRE>
+<BR>
+<IMG
+ WIDTH="576" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img64.png"
+ ALT="\begin{lstlisting}
 call psb_ovrl(x, desc_a, info)
 call psb_ovrl(x, desc_a, info, update=update_type, work=work)
-</PRE> 
+\end{lstlisting}">
+<BR> 
 
 <P>
 <DL>
@@ -183,14 +188,14 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>update = psb_add_</STRONG></DT>
 <DD>Sum overlap entries, i.e. apply <IMG
- WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img63.png"
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img65.png"
  ALT="$P^T$">;
 </DD>
 <DT><STRONG>update = psb_avg_</STRONG></DT>
 <DD>Average overlap entries, i.e. apply <IMG
- WIDTH="44" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="img64.png"
+ WIDTH="45" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img66.png"
  ALT="$P_aP^T$">;
 </DD>
 </DL>
@@ -203,7 +208,7 @@ Default: <!-- MATH
  -->
 <IMG
  WIDTH="166" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img65.png"
+ SRC="img67.png"
  ALT="$update\_type = psb\_avg\_ $">
 <BR>
 Scope: <B>global</B> 
@@ -267,18 +272,18 @@ An integer value; 0 means no error has been detected.
 </LI>
 <LI>The operator <IMG
  WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img62.png"
+ SRC="img63.png"
  ALT="$ P^{T}$"> performs the reduction sum of overlap
 elements; it is a ``prolongation'' operator <IMG
- WIDTH="27" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
- SRC="img63.png"
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img65.png"
  ALT="$P^T$"> that
 replicates overlap elements, accounting for the physical replication
 of data;
 </LI>
 <LI>The operator <IMG
  WIDTH="22" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img61.png"
+ SRC="img62.png"
  ALT="$ P_a$"> performs a scaling on the overlap elements by
 the amount of replication; thus, when combined with the reduction
 operator, it implements the average of replicated elements over all of
@@ -288,7 +293,7 @@ their instances.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:try8x8_ov"></A><A NAME="3035"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:try8x8_ov"></A><A NAME="3039"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 8:</STRONG>
 Sample discretization mesh.</CAPTION>
@@ -296,7 +301,7 @@ Sample discretization mesh.</CAPTION>
 <DIV ALIGN="CENTER">
 <IMG
  WIDTH="533" HEIGHT="453" ALIGN="BOTTOM" BORDER="0"
- SRC="img67.png"
+ SRC="img69.png"
  ALT="\includegraphics[scale=0.65]{figures/try8x8_ov.eps}">
 
 <!-- MATH
@@ -304,7 +309,7 @@ Sample discretization mesh.</CAPTION>
  -->
 <IMG
  WIDTH="76" HEIGHT="2" ALIGN="BOTTOM" BORDER="0"
- SRC="img66.png"
+ SRC="img68.png"
  ALT="\rotatebox{-90}{\includegraphics[scale=0.65]{figures/try8x8_ov}}">
 
 </DIV></TD></TR>
@@ -734,26 +739,26 @@ Process  1</FONT></TD>
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html889"
+<A NAME="tex2html888"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html885"
+<A NAME="tex2html884"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html879"
+<A NAME="tex2html878"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html887"
+<A NAME="tex2html886"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html890"
+<B> Next:</B> <A NAME="tex2html889"
   HREF="node56.html">psb_gather   Gather</A>
-<B> Up:</B> <A NAME="tex2html886"
+<B> Up:</B> <A NAME="tex2html885"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html880"
+<B> Previous:</B> <A NAME="tex2html879"
   HREF="node54.html">psb_halo   Halo</A>
- &nbsp; <B>  <A NAME="tex2html888"
+ &nbsp; <B>  <A NAME="tex2html887"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

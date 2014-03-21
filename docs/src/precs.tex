@@ -23,11 +23,12 @@ module  \verb|psb_prec_mod|.
 
 
 
-\clearpage\subroutine{psb\_precinit}{Initialize a  preconditioner}
+\clearpage\subsection*{psb\_precinit --- Initialize a  preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precinit}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_precinit(prec, ptype, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -79,11 +80,12 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \end{description}
 
 
-\clearpage\subroutine{psb\_precbld}{Builds a preconditioner}
+\clearpage\subsection*{psb\_precbld --- Builds a preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precbld}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_precbld(a, desc_a, prec, info,amold,vmold)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -137,12 +139,14 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{psb\_precaply}{Preconditioner application routine}
+\clearpage\subsection*{psb\_precaply --- Preconditioner application
+  routine}
+\addcontentsline{toc}{subsection}{psb\_precaply}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_precaply(prec,x,y,desc_a,info,trans,work)
 call psb_precaply(prec,x,desc_a,info,trans)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -190,13 +194,14 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{psb\_precdescr}{Prints a description of current
+\clearpage\subsection*{psb\_precdescr --- Prints a description of current
   preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precdescr}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_precdescr(prec)
 call psb_precdescr(prec, iout)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -215,11 +220,12 @@ Specified as: an integer number.
 
 
 
-\clearpage\subroutine{clone}{clone  current
+\clearpage\subsection*{clone --- clone  current
   preconditioner}
-\begin{lstlisting}
+\addcontentsline{toc}{subsection}{clone}
+\begin{verbatim}
 call  prec%clone(precout,info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.

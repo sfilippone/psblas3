@@ -5,15 +5,16 @@
 %
 %%   psb_cdall %%
 %
-\subroutine{psb\_cdall}{Allocates a communication descriptor}
+\subsection*{psb\_cdall --- Allocates a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdall}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
 call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
-\end{lstlisting}
+\end{verbatim}
 
 This subroutine initializes the communication descriptor associated
 with an index space. One of the  optional arguments
@@ -108,14 +109,14 @@ An integer value; 0 means no error has been detected.
   optional argument   is specified, then it is mandatory to 
   specify the argument \verb|mg| as well.  
   The subroutine must conform to the following interface: 
-\begin{lstlisting}
+\begin{verbatim}
   interface 
      subroutine psb_parts(glob_index,mg,np,pv,nv)
        integer, intent (in)  :: glob_index,np,mg
        integer, intent (out) :: nv, pv(*)
      end subroutine psb_parts
   end interface
-\end{lstlisting}
+\end{verbatim}
   The input arguments are:
   \begin{description}
     \item[glob\_index] The global index to be mapped;
@@ -195,12 +196,14 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdins %%
 %
-\clearpage\subroutine{psb\_cdins}{Communication descriptor insert routine}
+\clearpage\subsection*{psb\_cdins --- Communication descriptor insert
+  routine}
+\addcontentsline{toc}{subsection}{psb\_cdins}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
 call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
-\end{lstlisting}
+\end{verbatim}
 
 This subroutine examines the edges of the graph associated with the
 discretization mesh (and isomorphic to the sparsity pattern of a
@@ -289,11 +292,13 @@ nor the end vertex belong to the current process.
 %
 %%   psb_cdasb %%
 %
-\clearpage\subroutine{psb\_cdasb}{Communication descriptor assembly routine}
+\clearpage\subsection*{psb\_cdasb --- Communication descriptor assembly
+  routine}
+\addcontentsline{toc}{subsection}{psb\_cdasb}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdasb(desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -330,11 +335,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\clearpage\subroutine{psb\_cdcpy}{Copies a communication descriptor}
+\clearpage\subsection*{psb\_cdcpy --- Copies a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdcpy}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdcpy(desc_in, desc_out, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -365,11 +371,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdfree %%
 %
-\clearpage\subroutine{psb\_cdfree}{Frees a communication descriptor}
+\clearpage\subsection*{psb\_cdfree --- Frees a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdfree}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdfree(desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -395,12 +402,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\clearpage\subroutine{psb\_cdbldext}{Build an extended  communication
+\clearpage\subsection*{psb\_cdbldext --- Build an extended  communication
   descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdbldext}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
-\end{lstlisting}
+\end{verbatim}
 
 This subroutine builds an extended communication descriptor, based on
 the input descriptor \verb|desc_a| and on the stencil specified
@@ -464,8 +472,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_cdren %%
 %% %
-%% \subroutine{psb\_cdren}{Applies a renumeration to a
+%% \subsection*{psb\_cdren --- Applies a renumeration to a
 %% communication descriptor}
+%% \addcontentsline{toc}{subsection}{psb\_cdren}
 
 %% \syntax{call psb\_cdren}{trans, iperm, desc\_a, info}
 
@@ -500,7 +509,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_descprt %%
 %
-%% \subroutine{psb\_cdprt}{Prints a descriptor}
+%% \subsection*{psb\_cdprt --- Prints a descriptor}
+%%\addcontentsline{toc}{subsection}{psb\_cdprt}
 
 %% \syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
 
@@ -529,11 +539,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spalloc %%
 %
-\clearpage\subroutine{psb\_spall}{Allocates a sparse matrix}
+\clearpage\subsection*{psb\_spall --- Allocates a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spall}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_spall(a, desc_a, info, nnz)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -580,12 +591,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spins %%
 %
-\clearpage\subroutine{psb\_spins}{Insert a cloud of elements into a sparse
+\clearpage\subsection*{psb\_spins --- Insert a cloud of elements into a sparse
   matrix}
+\addcontentsline{toc}{subsection}{psb\_spins}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -685,11 +697,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spasb %%
 %
-\clearpage\subroutine{psb\_spasb}{Sparse matrix assembly routine}
+\clearpage\subsection*{psb\_spasb --- Sparse matrix assembly routine}
+\addcontentsline{toc}{subsection}{psb\_spasb}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -759,8 +772,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_spcnv %%
 %% %
-%% \subroutine{psb\_spcnv}{Converts a sparse matrix storage
+%% \subsection*{psb\_spcnv --- Converts a sparse matrix storage
 %% format}
+%%\addcontentsline{toc}{subsection}{psb\_spcnv}
 
 %% \syntax{call psb\_spcnv}{a, b, desc\_a, info}
 
@@ -793,11 +807,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spfree %%
 %
-\clearpage\subroutine{psb\_spfree}{Frees a sparse matrix}
+\clearpage\subsection*{psb\_spfree --- Frees a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spfree}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_spfree(a, desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -829,12 +844,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_sprn %%
 %
-\clearpage\subroutine{psb\_sprn}{Reinit sparse matrix structure for psblas
+\clearpage\subsection*{psb\_sprn --- Reinit sparse matrix structure for psblas
   routines.}
+\addcontentsline{toc}{subsection}{psb\_sprn}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_sprn(a, decsc_a, info, clear)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -872,7 +888,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spupdate %%
 %
-%% \subroutine{psb\_spupdate}{Updates a sparse matrix.}
+%% \subsection*{psb\_spupdate --- Updates a sparse matrix.}
+%%\addcontentsline{toc}{subsection}{psb\_spupdate}
 
 %% \syntax{call psb\_spupdate}{a, ia, ja, blck, desc\_a, info, ix, jx, updflag}
 
@@ -886,8 +903,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_csrp %%
 %% %
-%% \subroutine{psb\_csrp}{Applies a right permutation to a sparse
+%% \subsection*{psb\_csrp --- Applies a right permutation to a sparse
 %% matrix}
+%%\addcontentsline{toc}{subsection}{psb\_csrp}
 
 %% \syntax{call psb\_csrp}{trans, iperm, a, info}
 
@@ -917,11 +935,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_alloc %%
 %
-\clearpage\subroutine{psb\_geall}{Allocates a dense matrix}
+\clearpage\subsection*{psb\_geall --- Allocates a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geall}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_geall(x, desc_a, info, n, lb)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -964,11 +983,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\clearpage\subroutine{psb\_geins}{Dense matrix insertion routine}
+\clearpage\subsection*{psb\_geins --- Dense matrix insertion routine}
+\addcontentsline{toc}{subsection}{psb\_geins}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1036,11 +1056,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_asb %%
 %
-\clearpage\subroutine{psb\_geasb}{Assembly a dense matrix}
+\clearpage\subsection*{psb\_geasb --- Assembly a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geasb}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_geasb(x, desc_a, info, mold)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -1075,11 +1096,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_free %%
 %
-\clearpage\subroutine{psb\_gefree}{Frees a dense matrix}
+\clearpage\subsection*{psb\_gefree --- Frees a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_gefree}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_gefree(x, desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -1112,12 +1134,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_gelp %%
 %
-\clearpage\subroutine{psb\_gelp}{Applies a left permutation to a dense
+\clearpage\subsection*{psb\_gelp --- Applies a left permutation to a dense
   matrix}
+\addcontentsline{toc}{subsection}{psb\_gelp}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_gelp(trans, iperm, x, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1152,13 +1175,14 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_glob_to_loc %%
 %
-\clearpage\subroutine{psb\_glob\_to\_loc}{Global to local indices
+\clearpage\subsection*{psb\_glob\_to\_loc --- Global to local indices
   convertion}
+\addcontentsline{toc}{subsection}{psb\_glob\_to\_loc}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
 call psb_glob_to_loc(x, desc_a, info, iact,owned)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1219,13 +1243,14 @@ An integer value; 0 means no error has been detected.
 \end{enumerate}
 
 
-\clearpage\subroutine{psb\_loc\_to\_glob}{Local to global indices
+\clearpage\subsection*{psb\_loc\_to\_glob --- Local to global indices
   conversion}
+\addcontentsline{toc}{subsection}{psb\_loc\_to\_glob}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_loc_to_glob(x, y, desc_a, info, iact)
 call psb_loc_to_glob(x, desc_a, info, iact)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1275,11 +1300,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_loc_to_glob %%
 %
-\clearpage\subroutine{psb\_is\_owned }{}
+\clearpage\subsection*{psb\_is\_owned  --- }
+\addcontentsline{toc}{subsection}{psb\_is\_owned }
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_is_owned(x, desc_a)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1314,11 +1340,12 @@ Intent: {\bf out}.\\
 \end{enumerate}
 
 
-\clearpage\subroutine{psb\_owned\_index }{}
+\clearpage\subsection*{psb\_owned\_index  --- }
+\addcontentsline{toc}{subsection}{psb\_owned\_index }
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_owned_index(y, x, desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1365,11 +1392,12 @@ An integer value; 0 means no error has been detected.
 \end{enumerate}
 
 
-\clearpage\subroutine{psb\_is\_local }{}
+\clearpage\subsection*{psb\_is\_local  --- }
+\addcontentsline{toc}{subsection}{psb\_is\_local }
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_is_local(x, desc_a)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1403,11 +1431,12 @@ Intent: {\bf out}.\\
   indices
 \end{enumerate}
 
-\clearpage\subroutine{psb\_local\_index }{}
+\clearpage\subsection*{psb\_local\_index  --- }
+\addcontentsline{toc}{subsection}{psb\_local\_index }
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_local_index(y, x, desc_a, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1458,11 +1487,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\clearpage\subroutine{psb\_get\_boundary}{Extract list of boundary elements}
+\clearpage\subsection*{psb\_get\_boundary --- Extract list of boundary
+  elements}
+\addcontentsline{toc}{subsection}{psb\_get\_boundary}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_get_boundary(bndel, desc, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1499,11 +1530,13 @@ An integer value; 0 means no error has been detected.
   number of boundary elements. 
 \end{enumerate}
 
-\clearpage\subroutine{psb\_get\_overlap}{Extract list of overlap elements}
+\clearpage\subsection*{psb\_get\_overlap --- Extract list of overlap
+  elements}
+\addcontentsline{toc}{subsection}{psb\_get\_overlap}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_get_overlap(ovrel, desc, info)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1541,12 +1574,14 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{psb\_sp\_getrow}{Extract row(s) from a sparse matrix}
+\clearpage\subsection*{psb\_sp\_getrow --- Extract row(s) from a sparse
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_sp\_getrow}
 
-\begin{lstlisting}
+\begin{verbatim}
 call psb_sp_getrow(row, a, nz, ia, ja, val, info, &
               & append, nzin, lrw)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1633,16 +1668,17 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{psb\_sizeof}{Memory occupation}
+\clearpage\subsection*{psb\_sizeof --- Memory occupation}
+\addcontentsline{toc}{subsection}{psb\_sizeof}
 
 This function computes the memory occupation of a PSBLAS object.
 
 
-\begin{lstlisting}
+\begin{verbatim}
 isz = psb_sizeof(a)
 isz = psb_sizeof(desc_a)
 isz = psb_sizeof(prec)
-\end{lstlisting}
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1671,7 +1707,8 @@ Returned  as: an \verb|integer(psb_long_int_k_)| number.
 \end{description}
 
 
-\clearpage\subroutine{Sorting utilities}{}
+\clearpage\subsection*{Sorting utilities --- }
+\addcontentsline{toc}{subsection}{Sorting utilities}
 
 {\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort
   algorithm}
@@ -1680,11 +1717,11 @@ Returned  as: an \verb|integer(psb_long_int_k_)| number.
   algorithm}
 
 {\par\noindent\large\bfseries psb\_hsort --- Sorting by the Heapsort  algorithm}
-\begin{lstlisting}
+\begin{verbatim}
 call psb_msort(x,ix,dir,flag)
 call psb_qsort(x,ix,dir,flag)
 call psb_hsort(x,ix,dir,flag)
-\end{lstlisting}
+\end{verbatim}
 
 These  serial routines sort a sequence $X$ into ascending or
 descending  order. The argument meaning is identical for the three

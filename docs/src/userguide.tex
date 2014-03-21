@@ -49,11 +49,13 @@
       \subsubsection*{\flushleft #1---#2 \endflushleft}%
       \addcontentsline{toc}{subsubsection}{#1}%
       \markright{#1}}%
+
 \newcommand{\subsubsubroutine}[2]{%
 \stepcounter{subroutine}%
       \subsubsection*{\flushleft #1---#2 \endflushleft}%
       \addcontentsline{toc}{paragraph}{#1}%
       \markright{#1}}%
+
 \newcommand{\examplename}{Example}
 \newcommand{\syntaxname}{Syntax}
 \def\syntax{\@ifstar{\@ssyntax}{\@syntax}}%

@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html901"
+<A NAME="tex2html900"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html897"
+<A NAME="tex2html896"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html891"
+<A NAME="tex2html890"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html899"
+<A NAME="tex2html898"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html902"
+<B> Next:</B> <A NAME="tex2html901"
   HREF="node57.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html898"
+<B> Up:</B> <A NAME="tex2html897"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html892"
+<B> Previous:</B> <A NAME="tex2html891"
   HREF="node55.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html900"
+ &nbsp; <B>  <A NAME="tex2html899"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -70,8 +70,8 @@ glob\_x \leftarrow collect(loc\_x_i)
  -->
 
 <IMG
- WIDTH="162" HEIGHT="28" BORDER="0"
- SRC="img68.png"
+ WIDTH="163" HEIGHT="28" BORDER="0"
+ SRC="img70.png"
  ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -79,20 +79,20 @@ glob\_x \leftarrow collect(loc\_x_i)
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img69.png"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
  ALT="$glob\_x$"></STRONG></DT>
 <DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <IMG
- WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
  ALT="$glob\_x_{1:m,1:n}$">
 </DD>
 <DT><STRONG><IMG
- WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img71.png"
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img73.png"
  ALT="$loc\_x_i$"></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <IMG
@@ -102,7 +102,7 @@ process <IMG
 </DD>
 <DT><STRONG><IMG
  WIDTH="49" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img72.png"
+ SRC="img74.png"
  ALT="$collect$"></STRONG></DT>
 <DD>is the collect function.
 </DD>
@@ -110,7 +110,7 @@ process <IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3037"></A>
+<DIV ALIGN="CENTER"><A NAME="3041"></A>
 <TABLE>
 <CAPTION><STRONG>Table 16:</STRONG>
 Data types</CAPTION>
@@ -118,8 +118,8 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img73.png"
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
  ALT="$x_i, y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -146,10 +146,15 @@ Data types</CAPTION>
 <BR>
 
 <P>
-<PRE>
+<BR>
+<IMG
+ WIDTH="471" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img76.png"
+ ALT="\begin{lstlisting}
 call psb_gather(glob_x, loc_x, desc_a, info, root)
 call psb_gather(glob_x, loc_x, desc_a, info, root)
-</PRE>
+\end{lstlisting}">
+<BR>
 
 <P>
 <DL>
@@ -162,8 +167,8 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DT><STRONG>loc_x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img69.png"
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
  ALT="$glob\_x$">. 
 <BR>
 Scope: <B>local</B> 
@@ -189,7 +194,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <IMG
  WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ SRC="img77.png"
  ALT="$root=-1$"> all
   the processes will have a copy of the global vector.
 <BR>
@@ -204,10 +209,10 @@ Specified as: an integer variable <!-- MATH
  -->
 <IMG
  WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img75.png"
+ SRC="img78.png"
  ALT="$-1\le root\le np-1$">, default <IMG
  WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
+ SRC="img79.png"
  ALT="$-1$">. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
@@ -240,26 +245,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html901"
+<A NAME="tex2html900"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html897"
+<A NAME="tex2html896"
   HREF="node53.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html891"
+<A NAME="tex2html890"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html899"
+<A NAME="tex2html898"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html902"
+<B> Next:</B> <A NAME="tex2html901"
   HREF="node57.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html898"
+<B> Up:</B> <A NAME="tex2html897"
   HREF="node53.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html892"
+<B> Previous:</B> <A NAME="tex2html891"
   HREF="node55.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html900"
+ &nbsp; <B>  <A NAME="tex2html899"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 
