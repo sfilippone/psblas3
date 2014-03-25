@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precinit -- Initialize a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precinit -- Initialize a preconditioner">
+<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,118 +20,132 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node116.html">
 <LINK REL="previous" HREF="node114.html">
-<LINK REL="up" HREF="node114.html">
+<LINK REL="up" HREF="node112.html">
 <LINK REL="next" HREF="node116.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1656"
+<A NAME="tex2html1671"
   HREF="node116.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1652"
-  HREF="node114.html">
+<A NAME="tex2html1667"
+  HREF="node112.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1646"
+<A NAME="tex2html1661"
   HREF="node114.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1654"
+<A NAME="tex2html1669"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1657"
-  HREF="node116.html">psb_precbld   Builds</A>
-<B> Up:</B> <A NAME="tex2html1653"
-  HREF="node114.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1647"
-  HREF="node114.html">Preconditioner routines</A>
- &nbsp; <B>  <A NAME="tex2html1655"
+<B> Next:</B> <A NAME="tex2html1672"
+  HREF="node116.html">psb_precdescr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1668"
+  HREF="node112.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1662"
+  HREF="node114.html">psb_precbld   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1670"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000111000000000000000">
-psb_precinit -- Initialize a  preconditioner</A>
+<H2><A NAME="SECTION000113000000000000000">
+psb_precaply -- Preconditioner application
+  routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precinit(prec, ptype, info)
+call psb_precaply(prec,x,y,desc_a,info,trans,work)
+call psb_precaply(prec,x,desc_a,info,trans)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ptype</STRONG></DT>
-<DD>the type of preconditioner. 
-Scope: <B>global</B> 
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a character string, see usage notes.
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>. 
 </DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor.
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>out</B>.
+Intent: <B>in</B>.
 <BR>
-Error code: if no error, 0 is returned.
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-Legal inputs to this subroutine are interpreted depending on the
-<IMG
- WIDTH="41" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img141.png"
- ALT="$ptype$"> string as follows<A NAME="tex2html30"
-  HREF="footnode.html#foot7247"><SUP>3</SUP></A>:
+
+<P>
 <DL>
-<DT><STRONG>NONE</STRONG></DT>
-<DD>No preconditioning, i.e. the preconditioner is just a copy
-  operator.
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>DIAG</STRONG></DT>
-<DD>Diagonal scaling; each entry of the input vector is
-  multiplied by the reciprocal of the sum of the absolute values of
-  the coefficients in the corresponding row of matrix  <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">;
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
 </DD>
-<DT><STRONG>BJAC</STRONG></DT>
-<DD>Precondition by a  factorization of the
-  block-diagonal of matrix <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization <IMG
- WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img142.png"
- ALT="$ILU(0)$"> is
-  currently implemented.  
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

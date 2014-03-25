@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_is_local -- </TITLE>
-<META NAME="description" CONTENT="psb_is_local -- ">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,56 +20,56 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node80.html">
 <LINK REL="previous" HREF="node78.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node80.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1201"
+<A NAME="tex2html1222"
   HREF="node80.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1197"
-  HREF="node58.html">
+<A NAME="tex2html1218"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1191"
+<A NAME="tex2html1212"
   HREF="node78.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1199"
+<A NAME="tex2html1220"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1202"
-  HREF="node80.html">psb_local_index</A>
-<B> Up:</B> <A NAME="tex2html1198"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1192"
-  HREF="node78.html">psb_owned_index</A>
- &nbsp; <B>  <A NAME="tex2html1200"
+<B> Next:</B> <A NAME="tex2html1223"
+  HREF="node80.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1219"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1213"
+  HREF="node78.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html1221"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000721000000000000000">
-psb_is_local  -- </A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_is_local(x, desc_a)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>Integer index.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>The communication descriptor.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -77,18 +77,22 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a scalar integer.
+Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B>.
 <BR>
-Type:<B>required</B>.
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
 </DD>
 </DL>
 
@@ -97,31 +101,30 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>A logical mask which is true if 
-  <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is  local to the current process
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be assembled.
+<BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
 <BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
 </DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>This routine returns a <code>.true.</code> value for an index
-  that is local to the current process, including the halo
-  indices
-</LI>
-</OL>
-
-<P>
 <BR><HR>
 
 </BODY>

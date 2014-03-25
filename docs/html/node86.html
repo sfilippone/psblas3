@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Parallel environment routines</TITLE>
-<META NAME="description" CONTENT="Parallel environment routines">
+<TITLE>psb_is_local -- </TITLE>
+<META NAME="description" CONTENT="psb_is_local -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,89 +18,110 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node103.html">
-<LINK REL="previous" HREF="node58.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node87.html">
+<LINK REL="previous" HREF="node85.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node87.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1283"
+<A NAME="tex2html1306"
   HREF="node87.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1279"
-  HREF="userhtml.html">
+<A NAME="tex2html1302"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1273"
+<A NAME="tex2html1296"
   HREF="node85.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1281"
+<A NAME="tex2html1304"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1284"
-  HREF="node87.html">psb_init   Initializes</A>
-<B> Up:</B> <A NAME="tex2html1280"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1274"
-  HREF="node85.html">Sorting utilities</A>
- &nbsp; <B>  <A NAME="tex2html1282"
+<B> Next:</B> <A NAME="tex2html1307"
+  HREF="node87.html">psb_local_index</A>
+<B> Up:</B> <A NAME="tex2html1303"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1297"
+  HREF="node85.html">psb_owned_index</A>
+ &nbsp; <B>  <A NAME="tex2html1305"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00080000000000000000"></A>
-<A NAME="sec:parenv"></A>
-<BR>
-Parallel environment routines
-</H1>
+<H2><A NAME="SECTION000721000000000000000">
+psb_is_local  -- </A>
+</H2>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<PRE>
+call psb_is_local(x, desc_a)
+</PRE>
 
-<UL>
-<LI><A NAME="tex2html1285"
-  HREF="node87.html">psb_init -- Initializes PSBLAS parallel
-  environment</A>
-<LI><A NAME="tex2html1286"
-  HREF="node88.html">psb_info -- Return information about  PSBLAS parallel
-  environment</A>
-<LI><A NAME="tex2html1287"
-  HREF="node89.html">psb_exit -- Exit from  PSBLAS parallel
-  environment</A>
-<LI><A NAME="tex2html1288"
-  HREF="node90.html">psb_get_mpicomm -- Get the MPI communicator</A>
-<LI><A NAME="tex2html1289"
-  HREF="node91.html">psb_get_rank -- Get the MPI rank</A>
-<LI><A NAME="tex2html1290"
-  HREF="node92.html">psb_wtime -- Wall clock timing</A>
-<LI><A NAME="tex2html1291"
-  HREF="node93.html">psb_barrier -- Sinchronization point  parallel
-  environment</A>
-<LI><A NAME="tex2html1292"
-  HREF="node94.html">psb_abort -- Abort a computation</A>
-<LI><A NAME="tex2html1293"
-  HREF="node95.html">psb_bcast -- Broadcast data</A>
-<LI><A NAME="tex2html1294"
-  HREF="node96.html">psb_sum -- Global sum</A>
-<LI><A NAME="tex2html1295"
-  HREF="node97.html">psb_max -- Global maximum</A>
-<LI><A NAME="tex2html1296"
-  HREF="node98.html">psb_min -- Global minimum</A>
-<LI><A NAME="tex2html1297"
-  HREF="node99.html">psb_amx -- Global maximum absolute value</A>
-<LI><A NAME="tex2html1298"
-  HREF="node100.html">psb_amn -- Global minimum absolute value</A>
-<LI><A NAME="tex2html1299"
-  HREF="node101.html">psb_snd -- Send data</A>
-<LI><A NAME="tex2html1300"
-  HREF="node102.html">psb_rcv -- Receive data</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer index.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a scalar integer.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A logical mask which is true if 
+  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is  local to the current process
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is local to the current process, including the halo
+  indices
+</LI>
+</OL>
+
+<P>
 <BR><HR>
 
 </BODY>

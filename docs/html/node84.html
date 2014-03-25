@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sizeof -- Memory occupation</TITLE>
-<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
+<TITLE>psb_is_owned -- </TITLE>
+<META NAME="description" CONTENT="psb_is_owned -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,49 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node85.html">
 <LINK REL="previous" HREF="node83.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node85.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1261"
+<A NAME="tex2html1282"
   HREF="node85.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1257"
-  HREF="node58.html">
+<A NAME="tex2html1278"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1251"
+<A NAME="tex2html1272"
   HREF="node83.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1259"
+<A NAME="tex2html1280"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1262"
-  HREF="node85.html">Sorting utilities</A>
-<B> Up:</B> <A NAME="tex2html1258"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1252"
-  HREF="node83.html">psb_sp_getrow   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1260"
+<B> Next:</B> <A NAME="tex2html1283"
+  HREF="node85.html">psb_owned_index</A>
+<B> Up:</B> <A NAME="tex2html1279"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1273"
+  HREF="node83.html">psb_loc_to_glob   Local</A>
+ &nbsp; <B>  <A NAME="tex2html1281"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000726000000000000000">
-psb_sizeof -- Memory occupation</A>
+<H2><A NAME="SECTION000719000000000000000">
+psb_is_owned  -- </A>
 </H2>
 
 <P>
-This function computes the memory occupation of a PSBLAS object.
-
-<P>
 <PRE>
-isz = psb_sizeof(a)
-isz = psb_sizeof(desc_a)
-isz = psb_sizeof(prec)
+call psb_is_owned(x, desc_a)
 </PRE>
 
 <P>
@@ -73,12 +68,8 @@ isz = psb_sizeof(prec)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-<IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">. 
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer index.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -86,40 +77,49 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
+Specified as: a scalar integer.
+<BR></DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>Communication descriptor.
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation of the object specified in
-  the calling sequence, in bytes.
-<BR>
+<DD>A logical mask which is true if 
+  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is  owned by the current process
 Scope: <B>local</B> 
 <BR>
-Returned  as: an <code>integer(psb_long_int_k_)</code> number.
-</DD>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is strictly owned by the current process, excluding the halo
+  indices
+</LI>
+</OL>
 
 <P>
 <BR><HR>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>Parallel environment routines</TITLE>
+<META NAME="description" CONTENT="Parallel environment routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,74 +18,89 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node94.html">
-<LINK REL="previous" HREF="node92.html">
-<LINK REL="up" HREF="node86.html">
+<LINK REL="next" HREF="node110.html">
+<LINK REL="previous" HREF="node65.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node94.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1383"
+<A NAME="tex2html1388"
   HREF="node94.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1379"
-  HREF="node86.html">
+<A NAME="tex2html1384"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1373"
+<A NAME="tex2html1378"
   HREF="node92.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1381"
+<A NAME="tex2html1386"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1384"
-  HREF="node94.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1380"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1374"
-  HREF="node92.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1382"
+<B> Next:</B> <A NAME="tex2html1389"
+  HREF="node94.html">psb_init   Initializes</A>
+<B> Up:</B> <A NAME="tex2html1385"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1379"
+  HREF="node92.html">Sorting utilities</A>
+ &nbsp; <B>  <A NAME="tex2html1387"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
+<H1><A NAME="SECTION00080000000000000000"></A>
+<A NAME="sec:parenv"></A>
+<BR>
+Parallel environment routines
+</H1>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1390"
+  HREF="node94.html">psb_init -- Initializes PSBLAS parallel
   environment</A>
-</H2>
-
-<P>
-<PRE>
-call psb_barrier(icontxt)
-</PRE>
-
-<P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
-</DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
-</DD>
-</DL>
-
-<P>
+<LI><A NAME="tex2html1391"
+  HREF="node95.html">psb_info -- Return information about  PSBLAS parallel
+  environment</A>
+<LI><A NAME="tex2html1392"
+  HREF="node96.html">psb_exit -- Exit from  PSBLAS parallel
+  environment</A>
+<LI><A NAME="tex2html1393"
+  HREF="node97.html">psb_get_mpicomm -- Get the MPI communicator</A>
+<LI><A NAME="tex2html1394"
+  HREF="node98.html">psb_get_rank -- Get the MPI rank</A>
+<LI><A NAME="tex2html1395"
+  HREF="node99.html">psb_wtime -- Wall clock timing</A>
+<LI><A NAME="tex2html1396"
+  HREF="node100.html">psb_barrier -- Sinchronization point  parallel
+  environment</A>
+<LI><A NAME="tex2html1397"
+  HREF="node101.html">psb_abort -- Abort a computation</A>
+<LI><A NAME="tex2html1398"
+  HREF="node102.html">psb_bcast -- Broadcast data</A>
+<LI><A NAME="tex2html1399"
+  HREF="node103.html">psb_sum -- Global sum</A>
+<LI><A NAME="tex2html1400"
+  HREF="node104.html">psb_max -- Global maximum</A>
+<LI><A NAME="tex2html1401"
+  HREF="node105.html">psb_min -- Global minimum</A>
+<LI><A NAME="tex2html1402"
+  HREF="node106.html">psb_amx -- Global maximum absolute value</A>
+<LI><A NAME="tex2html1403"
+  HREF="node107.html">psb_amn -- Global minimum absolute value</A>
+<LI><A NAME="tex2html1404"
+  HREF="node108.html">psb_snd -- Send data</A>
+<LI><A NAME="tex2html1405"
+  HREF="node109.html">psb_rcv -- Receive data</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

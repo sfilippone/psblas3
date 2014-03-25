@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
-<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
+<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
+<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node37.html">
 <LINK REL="previous" HREF="node35.html">
-<LINK REL="up" HREF="node32.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node37.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html649"
+<A NAME="tex2html667"
   HREF="node37.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html645"
-  HREF="node32.html">
+<A NAME="tex2html663"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html639"
+<A NAME="tex2html657"
   HREF="node35.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html647"
+<A NAME="tex2html665"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html650"
+<B> Next:</B> <A NAME="tex2html668"
   HREF="node37.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html646"
-  HREF="node32.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html640"
-  HREF="node35.html">sizeof   Get</A>
- &nbsp; <B>  <A NAME="tex2html648"
+<B> Up:</B> <A NAME="tex2html664"
+  HREF="node21.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html658"
+  HREF="node35.html">triu   Return</A>
+ &nbsp; <B>  <A NAME="tex2html666"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043400000000000000">
-get_vect  -- Get a copy of the vector contents</A>
+<H3><A NAME="SECTION000421500000000000000">
+psb_set_mat_default -- Set default  storage format</A>
 </H3>
 
 <P>
 <PRE>
-extv = v%get_vect()
+call  psb_set_mat_default(a)
 </PRE>
 
 <P>
@@ -68,21 +68,11 @@ extv = v%get_vect()
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the dense vector
+<DT><STRONG>a</STRONG></DT>
+<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
+  a new default storage format.
 <BR>
-Scope: <B>local</B>
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>An allocatable array holding a copy of the dense
-  vector contents.
+Type: required.
 </DD>
 </DL>
 

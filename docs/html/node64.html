@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdbldext -- Build an extended communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdbldext -- Build an extended communication descriptor">
+<TITLE>psb_scatter -- Scatter Global Dense Matrix</TITLE>
+<META NAME="description" CONTENT="psb_scatter -- Scatter Global Dense Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,53 +18,143 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node65.html">
 <LINK REL="previous" HREF="node63.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node60.html">
 <LINK REL="next" HREF="node65.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1021"
+<A NAME="tex2html1015"
   HREF="node65.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1017"
-  HREF="node58.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html1011"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1007"
   HREF="node63.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1019"
+<A NAME="tex2html1013"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1022"
-  HREF="node65.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1018"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1012"
-  HREF="node63.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1020"
+<B> Next:</B> <A NAME="tex2html1016"
+  HREF="node65.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html1012"
+  HREF="node60.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1008"
+  HREF="node63.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html1014"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00076000000000000000">
-psb_cdbldext -- Build an extended  communication
-  descriptor</A>
+<H2><A NAME="SECTION00064000000000000000">
+psb_scatter -- Scatter Global Dense Matrix</A>
 </H2>
 
 <P>
-<PRE>
-call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
-</PRE>
+These subroutines scatters the portions of global dense matrix owned
+by a process to all the processes in the processes grid.
 
 <P>
-This subroutine builds an extended communication descriptor, based on
-the input descriptor <code>desc_a</code> and on the stencil specified
-through the input sparse matrix <code>a</code>. 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+loc\_x_i \leftarrow scatter(glob\_x)
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="167" HEIGHT="28" BORDER="0"
+ SRC="img80.png"
+ ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+where:
+<DL>
+<DT><STRONG><IMG
+ WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
+ ALT="$glob\_x$"></STRONG></DT>
+<DD>is the global matrix <!-- MATH
+ $glob\_x_{1:m,1:n}$
+ -->
+<IMG
+ WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
+ ALT="$glob\_x_{1:m,1:n}$">
+</DD>
+<DT><STRONG><IMG
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img73.png"
+ ALT="$loc\_x_i$"></STRONG></DT>
+<DD>is the local portion of global dense matrix on
+process <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">.
+</DD>
+<DT><STRONG><IMG
+ WIDTH="54" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img81.png"
+ ALT="$scatter$"></STRONG></DT>
+<DD>is the scatter function.
+</DD>
+</DL>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="3192"></A>
+<TABLE>
+<CAPTION><STRONG>Table 17:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="34" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
+ ALT="$x_i, y$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Integer</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<BR>
+<IMG
+ WIDTH="480" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img82.png"
+ ALT="\begin{lstlisting}
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+\end{lstlisting}">
+<BR>
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -72,72 +162,70 @@ through the input sparse matrix <code>a</code>.
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>A sparse matrix
-Scope:<B>local</B>.
+<DT><STRONG>glob_x</STRONG></DT>
+<DD>The array that must be scattered into local pieces.
 <BR>
-Type:<B>required</B>.
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data type.
+Specified as: a rank one or two array.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DD>contains data structures for communications.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>nl</STRONG></DT>
-<DD>the number of additional layers desired.
-<BR>
-Scope:<B>global</B>.
-<BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value <IMG
- WIDTH="48" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img103.png"
- ALT="$nl\ge 0$">. 
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>extype</STRONG></DT>
-<DD>the kind of estension required.
+<DT><STRONG>root</STRONG></DT>
+<DD>The process that holds the global copy. If <IMG
+ WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img77.png"
+ ALT="$root=-1$"> all
+  the processes have a copy of the global vector.
 <BR>
-Scope:<B>global</B>.
+Scope: <B>global</B> 
 <BR>
-Type:<B>optional </B>.
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value
-<code>psb_ovt_xhal_</code>, <code>psb_ovt_asov_</code>, default: <code>psb_ovt_xhal_</code>
-
-<P>
+Specified as: an integer variable <!-- MATH
+ $-1\le root\le np-1$
+ -->
+<IMG
+ WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1\le root\le np-1$">, default <IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.png"
+ ALT="$-1$">. 
 </DD>
-</DL>
-
-<P>
-<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the extended communication descriptor.
+<DT><STRONG>loc_x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
+ ALT="$glob\_x$">. 
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a rank one or two array containing numbers of the type
+indicated in Table&nbsp;<A HREF="#tab:scatter">17</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -153,46 +241,28 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>Specifying <code>psb_ovt_xhal_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor for a domain partition in which
-  the additional layers are fetched as part of an (extended) halo;
-  however the index-to-process mapping is identical to that of the
-  base descriptor;
-</LI>
-<LI>Specifying <code>psb_ovt_asov_</code> for the <code>extype</code> argument
-  the user will obtain a descriptor with an overlapped decomposition:
-  the additional layer is aggregated to  the local subdomain (and thus
-  is an overlap), and a new halo extending beyond the last additional
-  layer is formed. 
-</LI>
-</OL>
-
-<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1021"
+<A NAME="tex2html1015"
   HREF="node65.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1017"
-  HREF="node58.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html1011"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1007"
   HREF="node63.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1019"
+<A NAME="tex2html1013"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1022"
-  HREF="node65.html">psb_spall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1018"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1012"
-  HREF="node63.html">psb_cdfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1020"
+<B> Next:</B> <A NAME="tex2html1016"
+  HREF="node65.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html1012"
+  HREF="node60.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1008"
+  HREF="node63.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html1014"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
-<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
+<TITLE>psb_sizeof -- Memory occupation</TITLE>
+<META NAME="description" CONTENT="psb_sizeof -- Memory occupation">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,105 +20,105 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node92.html">
 <LINK REL="previous" HREF="node90.html">
-<LINK REL="up" HREF="node86.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node92.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1359"
+<A NAME="tex2html1366"
   HREF="node92.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1355"
-  HREF="node86.html">
+<A NAME="tex2html1362"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1349"
+<A NAME="tex2html1356"
   HREF="node90.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1357"
+<A NAME="tex2html1364"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1360"
-  HREF="node92.html">psb_wtime   Wall</A>
-<B> Up:</B> <A NAME="tex2html1356"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1350"
-  HREF="node90.html">psb_get_mpicomm   Get</A>
- &nbsp; <B>  <A NAME="tex2html1358"
+<B> Next:</B> <A NAME="tex2html1367"
+  HREF="node92.html">Sorting utilities</A>
+<B> Up:</B> <A NAME="tex2html1363"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1357"
+  HREF="node90.html">psb_sp_getrow   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1365"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00085000000000000000">
-psb_get_rank -- Get the MPI rank</A>
+<H2><A NAME="SECTION000726000000000000000">
+psb_sizeof -- Memory occupation</A>
 </H2>
 
 <P>
+This function computes the memory occupation of a PSBLAS object.
+
+<P>
 <PRE>
-call psb_get_rank(rank, icontxt, id)
+isz = psb_sizeof(a)
+isz = psb_sizeof(desc_a)
+isz = psb_sizeof(prec)
 </PRE>
 
 <P>
-This subroutine returns the MPI rank of the  PSBLAS process <IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img130.png"
- ALT="$id$">
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
-</DD>
-<DT><STRONG>id</STRONG></DT>
-<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. <!-- MATH
- $0 \le id \le np-1$
- -->
+<DT><STRONG>a</STRONG></DT>
+<DD>A sparse matrix
 <IMG
- WIDTH="114" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img131.png"
- ALT="$0 \le id \le np-1$"> </DD>
-</DL>
-
-<P>
-<DL>
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>Communication descriptor.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>rank</STRONG></DT>
-<DD>The MPI rank associated with the  PSBLAS process <IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img130.png"
- ALT="$id$">.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The memory occupation of the object specified in
+  the calling sequence, in bytes.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>out</B>.
-<BR></DD>
+Returned  as: an <code>integer(psb_long_int_k_)</code> number.
+</DD>
 </DL>
 
 <P>

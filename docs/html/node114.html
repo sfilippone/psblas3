@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>About this document ...</TITLE>
-<META NAME="description" CONTENT="About this document ...">
+<TITLE>psb_precbld -- Builds a preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precbld -- Builds a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,52 +18,143 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node115.html">
 <LINK REL="previous" HREF="node113.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="up" HREF="node112.html">
+<LINK REL="next" HREF="node115.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_g.png"> 
-<A NAME="tex2html1629"
-  HREF="userhtml.html">
+<A NAME="tex2html1659"
+  HREF="node115.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1655"
+  HREF="node112.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1625"
+<A NAME="tex2html1649"
   HREF="node113.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1631"
+<A NAME="tex2html1657"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Up:</B> <A NAME="tex2html1630"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1626"
-  HREF="node113.html">Bibliography</A>
- &nbsp; <B>  <A NAME="tex2html1632"
+<B> Next:</B> <A NAME="tex2html1660"
+  HREF="node115.html">psb_precaply   Preconditioner</A>
+<B> Up:</B> <A NAME="tex2html1656"
+  HREF="node112.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1650"
+  HREF="node113.html">psb_precinit   Initialize</A>
+ &nbsp; <B>  <A NAME="tex2html1658"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000140000000000000000">
-About this document ...</A>
-</H1>
- <P>
-This document was generated using the
-<A HREF="http://www.latex2html.org/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 2008 (1.71)
+<H2><A NAME="SECTION000112000000000000000">
+psb_precbld -- Builds a preconditioner</A>
+</H2>
+
 <P>
-Copyright &#169; 1993, 1994, 1995, 1996,
-<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
-Computer Based Learning Unit, University of Leeds.
+<PRE>
+call psb_precbld(a, desc_a, prec, info,amold,vmold)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the system sparse matrix.
+Scope: <B>local</B> 
 <BR>
-Copyright &#169; 1997, 1998, 1999,
-<A HREF="http://www.maths.mq.edu.au/~ross/">Ross Moore</A>, 
-Mathematics Department, Macquarie University, Sydney.
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>, target.
+<BR>
+Specified as: a sparse matrix data structure spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor. 
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>, target.
+<BR>
+Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>amold</STRONG></DT>
+<DD>The desired dynamic type for the internal matrix storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
+</DD>
+<DT><STRONG>vmold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>. 
+
 <P>
-The command line arguments were: <BR>
- <STRONG>latex2html</STRONG> <TT>-local_icons -noaddress -dir ../../html userhtml.tex</TT>
+</DD>
+</DL>
+
 <P>
-The translation was initiated by Salvatore Filippone on 2014-03-20
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
+<BR></DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
 <BR><HR>
 
 </BODY>

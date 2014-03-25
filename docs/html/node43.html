@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geamax -- Infinity-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_geamax -- Infinity-Norm of Vector">
+<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
+<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,219 +26,68 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html742"
+<A NAME="tex2html754"
   HREF="node44.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html738"
+<A NAME="tex2html750"
   HREF="node39.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html732"
+<A NAME="tex2html744"
   HREF="node42.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html740"
+<A NAME="tex2html752"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html743"
-  HREF="node44.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html739"
-  HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html733"
-  HREF="node42.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html741"
+<B> Next:</B> <A NAME="tex2html755"
+  HREF="node44.html">clone   Clone</A>
+<B> Up:</B> <A NAME="tex2html751"
+  HREF="node39.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html745"
+  HREF="node42.html">sizeof   Get</A>
+ &nbsp; <B>  <A NAME="tex2html753"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00054000000000000000">
-psb_geamax -- Infinity-Norm of Vector</A>
-</H2>
-
-<P>
-This function computes 
- the infinity-norm of a vector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">.
-<BR>
-If <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is a real  vector
-it computes infinity norm as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-amax \leftarrow \max_i |x_i|
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="118" HEIGHT="36" BORDER="0"
- SRC="img29.png"
- ALT="\begin{displaymath}amax \leftarrow \max_i \vert x_i\vert\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-else if <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is a complex vector then it computes the infinity-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="232" HEIGHT="36" BORDER="0"
- SRC="img30.png"
- ALT="\begin{displaymath}amax \leftarrow \max_i {(\vert re(x_i)\vert + \vert im(x_i)\vert)}\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
+<H3><A NAME="SECTION00043400000000000000">
+get_vect  -- Get a copy of the vector contents</A>
+</H3>
 
 <P>
 <PRE>
-psb_geamax(x, desc_a, info)
+extv = v%get_vect()
 </PRE>
-
-<P>
-<BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1645"></A>
-<TABLE>
-<CAPTION><STRONG>Table 4:</STRONG>
-Data types</CAPTION>
-<TR><TD>
-<DIV ALIGN="CENTER">
-<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="44" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img31.png"
- ALT="$amax$"></TD>
-<TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
-</TR>
-</TABLE>
-</DIV>
-</TD></TR>
-</TABLE>
-</DIV><P></P>
-<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">. 
-
+<DT><STRONG>v</STRONG></DT>
+<DD>the dense vector
 <BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>  
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90amax">4</A>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>contains data structures for communications.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of type descdata<TT>psb_desc_type</TT>.
+Scope: <B>local</B>
+<BR></DD>
+</DL>
 
 <P>
-</DD>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>is the infinity norm of subvector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Specified as: a long precision real number.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+<DD>An allocatable array holding a copy of the dense
+  vector contents.
 </DD>
 </DL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html742"
-  HREF="node44.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html738"
-  HREF="node39.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html732"
-  HREF="node42.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html740"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html743"
-  HREF="node44.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html739"
-  HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html733"
-  HREF="node42.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html741"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

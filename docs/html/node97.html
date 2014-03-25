@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_max -- Global maximum</TITLE>
-<META NAME="description" CONTENT="psb_max -- Global maximum">
+<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
+<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,52 +20,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node98.html">
 <LINK REL="previous" HREF="node96.html">
-<LINK REL="up" HREF="node86.html">
+<LINK REL="up" HREF="node93.html">
 <LINK REL="next" HREF="node98.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1431"
+<A NAME="tex2html1452"
   HREF="node98.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1427"
-  HREF="node86.html">
+<A NAME="tex2html1448"
+  HREF="node93.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1421"
+<A NAME="tex2html1442"
   HREF="node96.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1429"
+<A NAME="tex2html1450"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1432"
-  HREF="node98.html">psb_min   Global</A>
-<B> Up:</B> <A NAME="tex2html1428"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1422"
-  HREF="node96.html">psb_sum   Global</A>
- &nbsp; <B>  <A NAME="tex2html1430"
+<B> Next:</B> <A NAME="tex2html1453"
+  HREF="node98.html">psb_get_rank   Get</A>
+<B> Up:</B> <A NAME="tex2html1449"
+  HREF="node93.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1443"
+  HREF="node96.html">psb_exit   Exit</A>
+ &nbsp; <B>  <A NAME="tex2html1451"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000811000000000000000">
-psb_max -- Global maximum</A>
+<H2><A NAME="SECTION00084000000000000000">
+psb_get_mpicomm -- Get the MPI communicator</A>
 </H2>
 
 <P>
 <PRE>
-call psb_max(icontxt, dat, root)
+call psb_get_mpicomm(icontxt, icomm)
 </PRE>
 
 <P>
-This subroutine implements a maximum valuereduction
-operation based on the underlying communication library. 
+This subroutine returns the MPI communicator associated with a PSBLAS context
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,39 +81,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>The local contribution to the global maximum.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer or  real variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Process to hold the final maximum, or <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
- ALT="$-1$"> to make it available
-  on all processes.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $-1<= root <= np-1$
- -->
-<IMG
- WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img133.png"
- ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
-<BR></DD>
 </DL>
 
 <P>
@@ -122,57 +88,19 @@ Specified as: an integer value <!-- MATH
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On destination process(es), the result of the maximum operation.
+<DT><STRONG>icomm</STRONG></DT>
+<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer or  real variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
-</DD>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>The <code>dat</code> argument is both input and output, and its
-  value may be changed even on processes different from the final
-  result destination.
-</LI>
-<LI>The <code>dat</code> argument may also be a long integer scalar.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1431"
-  HREF="node98.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1427"
-  HREF="node86.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1421"
-  HREF="node96.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1429"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1432"
-  HREF="node98.html">psb_min   Global</A>
-<B> Up:</B> <A NAME="tex2html1428"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1422"
-  HREF="node96.html">psb_sum   Global</A>
- &nbsp; <B>  <A NAME="tex2html1430"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

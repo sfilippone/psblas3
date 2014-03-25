@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
-<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
+<TITLE>clone -- clone current preconditioner</TITLE>
+<META NAME="description" CONTENT="clone -- clone current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,106 +18,60 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node118.html">
 <LINK REL="previous" HREF="node116.html">
-<LINK REL="up" HREF="node114.html">
+<LINK REL="up" HREF="node112.html">
 <LINK REL="next" HREF="node118.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1680"
+<A NAME="tex2html1693"
   HREF="node118.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1676"
-  HREF="node114.html">
+<A NAME="tex2html1689"
+  HREF="node112.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1670"
+<A NAME="tex2html1685"
   HREF="node116.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1678"
+<A NAME="tex2html1691"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1681"
-  HREF="node118.html">psb_precdescr   Prints</A>
-<B> Up:</B> <A NAME="tex2html1677"
-  HREF="node114.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1671"
-  HREF="node116.html">psb_precbld   Builds</A>
- &nbsp; <B>  <A NAME="tex2html1679"
+<B> Next:</B> <A NAME="tex2html1694"
+  HREF="node118.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1690"
+  HREF="node112.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1686"
+  HREF="node116.html">psb_precdescr   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1692"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000113000000000000000">
-psb_precaply -- Preconditioner application routine</A>
+<H2><A NAME="SECTION000115000000000000000">
+clone -- clone  current
+  preconditioner</A>
 </H2>
 
-<P>
 <PRE>
-call psb_precaply(prec,x,y,desc_a,info,trans,work)
-call psb_precaply(prec,x,desc_a,info,trans)
+call  prec%clone(precout,info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
-Scope: <B>local</B> 
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the source vector.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>. 
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>trans</STRONG></DT>
-<DD>Scope:  
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character.
-</DD>
-<DT><STRONG>work</STRONG></DT>
-<DD>an optional work space
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a double precision array.
-</DD>
+Scope: <B>local</B>.
+<BR></DD>
 </DL>
 
 <P>
@@ -125,26 +79,11 @@ Specified as: a double precision array.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>the destination vector.
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+<DT><STRONG>precout</STRONG></DT>
+<DD>A copy of the input object.
 </DD>
 <DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
+<DD>Return code. 
 </DD>
 </DL>
 

@@ -18,44 +18,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node38.html">
 <LINK REL="previous" HREF="node36.html">
-<LINK REL="up" HREF="node32.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node38.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html659"
+<A NAME="tex2html679"
   HREF="node38.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html655"
-  HREF="node32.html">
+<A NAME="tex2html675"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html651"
+<A NAME="tex2html669"
   HREF="node36.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html657"
+<A NAME="tex2html677"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html660"
-  HREF="node38.html">Preconditioner data structure</A>
-<B> Up:</B> <A NAME="tex2html656"
-  HREF="node32.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html652"
-  HREF="node36.html">get_vect   Get</A>
- &nbsp; <B>  <A NAME="tex2html658"
+<B> Next:</B> <A NAME="tex2html680"
+  HREF="node38.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html676"
+  HREF="node21.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html670"
+  HREF="node36.html">psb_set_mat_default   Set</A>
+ &nbsp; <B>  <A NAME="tex2html678"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043500000000000000">
+<H3><A NAME="SECTION000421600000000000000">
 clone -- Clone current object</A>
 </H3>
 
+<P>
 <PRE>
-call  x%clone(y,info)
+call  a%clone(b,info)
 </PRE>
 
 <P>
@@ -66,8 +68,8 @@ call  x%clone(y,info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the dense vector.
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix.
 <BR>
 Scope: <B>local</B>.
 <BR></DD>
@@ -78,7 +80,7 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
+<DT><STRONG>b</STRONG></DT>
 <DD>A copy of the input object.
 </DD>
 <DT><STRONG>info</STRONG></DT>

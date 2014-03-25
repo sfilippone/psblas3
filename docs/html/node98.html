@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_min -- Global minimum</TITLE>
-<META NAME="description" CONTENT="psb_min -- Global minimum">
+<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
+<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,52 +20,54 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node86.html">
+<LINK REL="up" HREF="node93.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1443"
+<A NAME="tex2html1464"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1439"
-  HREF="node86.html">
+<A NAME="tex2html1460"
+  HREF="node93.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1433"
+<A NAME="tex2html1454"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1441"
+<A NAME="tex2html1462"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1444"
-  HREF="node99.html">psb_amx   Global</A>
-<B> Up:</B> <A NAME="tex2html1440"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1434"
-  HREF="node97.html">psb_max   Global</A>
- &nbsp; <B>  <A NAME="tex2html1442"
+<B> Next:</B> <A NAME="tex2html1465"
+  HREF="node99.html">psb_wtime   Wall</A>
+<B> Up:</B> <A NAME="tex2html1461"
+  HREF="node93.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1455"
+  HREF="node97.html">psb_get_mpicomm   Get</A>
+ &nbsp; <B>  <A NAME="tex2html1463"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000812000000000000000">
-psb_min -- Global minimum</A>
+<H2><A NAME="SECTION00085000000000000000">
+psb_get_rank -- Get the MPI rank</A>
 </H2>
 
 <P>
 <PRE>
-call psb_min(icontxt, dat, root)
+call psb_get_rank(rank, icontxt, id)
 </PRE>
 
 <P>
-This subroutine implements a minimum value reduction
-operation based on the underlying communication library. 
+This subroutine returns the MPI rank of the  PSBLAS process <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img130.png"
+ ALT="$id$">
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,39 +84,22 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>The local contribution to the global minimum.
+<DT><STRONG>id</STRONG></DT>
+<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
 <BR>
 Scope: <B>local</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer  or real variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Process to hold the final value, or <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
- ALT="$-1$"> to make it available
-  on all processes.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value <!-- MATH
- $-1<= root <= np-1$
+Specified as: an integer value. <!-- MATH
+ $0 \le id \le np-1$
  -->
 <IMG
- WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img133.png"
- ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
-<BR></DD>
+ WIDTH="114" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img131.png"
+ ALT="$0 \le id \le np-1$"> </DD>
 </DL>
 
 <P>
@@ -122,59 +107,22 @@ Specified as: an integer value <!-- MATH
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On destination process(es), the result of the minimum operation.
+<DT><STRONG>rank</STRONG></DT>
+<DD>The MPI rank associated with the  PSBLAS process <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img130.png"
+ ALT="$id$">.
 <BR>
-Scope: <B>global</B>.
+Scope: <B>local</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer  or  real variable, which may be a
-scalar, or a rank 1 or 2 array. 
-<BR>
-Type, kind, rank and size must agree on all processes.
-</DD>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>The <code>dat</code> argument is both input and output, and its
-  value may be changed even on processes different from the final
-  result destination.
-</LI>
-<LI>The <code>dat</code> argument may also be a long integer scalar.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1443"
-  HREF="node99.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1439"
-  HREF="node86.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1433"
-  HREF="node97.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1441"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1444"
-  HREF="node99.html">psb_amx   Global</A>
-<B> Up:</B> <A NAME="tex2html1440"
-  HREF="node86.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1434"
-  HREF="node97.html">psb_max   Global</A>
- &nbsp; <B>  <A NAME="tex2html1442"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

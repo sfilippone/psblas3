@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_nrows -- Get number of rows in a dense vector</TITLE>
-<META NAME="description" CONTENT="get_nrows -- Get number of rows in a dense vector">
+<TITLE>tril -- Return the lower triangle</TITLE>
+<META NAME="description" CONTENT="tril -- Return the lower triangle">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,47 +20,50 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node35.html">
 <LINK REL="previous" HREF="node33.html">
-<LINK REL="up" HREF="node32.html">
+<LINK REL="up" HREF="node21.html">
 <LINK REL="next" HREF="node35.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html625"
+<A NAME="tex2html643"
   HREF="node35.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html621"
-  HREF="node32.html">
+<A NAME="tex2html639"
+  HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html615"
+<A NAME="tex2html633"
   HREF="node33.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html623"
+<A NAME="tex2html641"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html626"
-  HREF="node35.html">sizeof   Get</A>
-<B> Up:</B> <A NAME="tex2html622"
-  HREF="node32.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html616"
-  HREF="node33.html">Vector Methods</A>
- &nbsp; <B>  <A NAME="tex2html624"
+<B> Next:</B> <A NAME="tex2html644"
+  HREF="node35.html">triu   Return</A>
+<B> Up:</B> <A NAME="tex2html640"
+  HREF="node21.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html634"
+  HREF="node33.html">clip_diag   Cut</A>
+ &nbsp; <B>  <A NAME="tex2html642"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043200000000000000">
-get_nrows -- Get number of  rows in a dense vector</A>
+<H3><A NAME="SECTION000421300000000000000">
+tril -- Return the lower triangle</A>
 </H3>
 
-<P>
 <PRE>
-nr = v%get_nrows()
+    call a%tril(b,info[,&amp;
+       &amp; diag,imin,imax,jmin,jmax,rscale,cscale])
 </PRE>
 
 <P>
+Returns the lower triangular part of submatrix
+<code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
+the range <code>1:imax-imin+1,1:jmax-jmin+1</code>.   
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -68,20 +71,37 @@ nr = v%get_nrows()
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the dense vector
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix.
 <BR>
-Scope: <B>local</B>
+A variable of type <code>psb_Tspmat_type</code>.
+<BR>
+Scope: <B>local</B>.
 <BR></DD>
+<DT><STRONG>diag</STRONG></DT>
+<DD>How many additional diagonals above the main one, default 0.
+</DD>
+<DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
+<DD>Minimum and maximum row and column indices.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>rscale,cscale</STRONG></DT>
+<DD>Whether to rescale row/column indices.
+Type: optional.
+</DD>
 </DL>
-
-<P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>The number of  rows  of dense vector <code>v</code>.
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy  of a subtriangle of <code>a</code>.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

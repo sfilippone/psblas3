@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
-<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
+<TITLE>psb_cdbldext -- Build an extended communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdbldext -- Build an extended communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,100 +20,67 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node72.html">
 <LINK REL="previous" HREF="node70.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node72.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1105"
+<A NAME="tex2html1126"
   HREF="node72.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1101"
-  HREF="node58.html">
+<A NAME="tex2html1122"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1095"
+<A NAME="tex2html1116"
   HREF="node70.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1103"
+<A NAME="tex2html1124"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1106"
-  HREF="node72.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html1102"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1096"
-  HREF="node70.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1104"
+<B> Next:</B> <A NAME="tex2html1127"
+  HREF="node72.html">psb_spall   Allocates</A>
+<B> Up:</B> <A NAME="tex2html1123"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1117"
+  HREF="node70.html">psb_cdfree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html1125"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000713000000000000000">
-psb_geins -- Dense matrix insertion routine</A>
+<H2><A NAME="SECTION00076000000000000000">
+psb_cdbldext -- Build an extended  communication
+  descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
+call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
 </PRE>
 
 <P>
+This subroutine builds an extended communication descriptor, based on
+the input descriptor <code>desc_a</code> and on the stencil specified
+through the input sparse matrix <code>a</code>. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>m</STRONG></DT>
-<DD>Number of rows in <IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img109.png"
- ALT="$val$"> to be inserted.
-<BR>
+<DT><STRONG>a</STRONG></DT>
+<DD>A sparse matrix
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>irw</STRONG></DT>
-<DD>Indices of the rows to be inserted. Specifically, row <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$">
-  of <IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img109.png"
- ALT="$val$"> will be inserted into the local row corresponding to the
-  global row index <IMG
- WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img110.png"
- ALT="$irw(i)$">.
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the dense submatrix to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank 1 or 2  array.
-Specified as: an integer value.
+Specified as: a structured data type.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -124,29 +91,33 @@ Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
-<DT><STRONG>dupl</STRONG></DT>
-<DD>How to handle duplicate coefficients.
+<DT><STRONG>nl</STRONG></DT>
+<DD>the number of additional layers desired.
 <BR>
-Scope: <B>global</B>.
+Scope:<B>global</B>.
 <BR>
-Type: <B>optional</B>.
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
-<code>psb_dupl_add_</code>.
+Specified as: an integer value <IMG
+ WIDTH="48" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$nl\ge 0$">. 
 </DD>
-<DT><STRONG>local</STRONG></DT>
-<DD>Whether the entries in the index vector <code>irw</code>,
-   are already in local  numbering. 
+<DT><STRONG>extype</STRONG></DT>
+<DD>the kind of estension required.
 <BR>
-Scope:<B>local</B>.
+Scope:<B>global</B>.
 <BR>
-Type:<B>optional</B>.
+Type:<B>optional </B>.
 <BR>
-Specified as: a logical value; default: <code>.false.</code>.
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value
+<code>psb_ovt_xhal_</code>, <code>psb_ovt_asov_</code>, default: <code>psb_ovt_xhal_</code>
 
 <P>
 </DD>
@@ -157,18 +128,17 @@ Specified as: a logical value; default: <code>.false.</code>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the output dense matrix.
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the extended communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>, of
-type real, complex or integer.
-<BR></DD>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -186,36 +156,43 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>Dense vectors/matrices do not have an associated state;
+<LI>Specifying <code>psb_ovt_xhal_</code> for the <code>extype</code> argument
+  the user will obtain a descriptor for a domain partition in which
+  the additional layers are fetched as part of an (extended) halo;
+  however the index-to-process mapping is identical to that of the
+  base descriptor;
 </LI>
-<LI>Duplicate entries are either overwritten or added, there is no
-  provision for raising an error condition. 
+<LI>Specifying <code>psb_ovt_asov_</code> for the <code>extype</code> argument
+  the user will obtain a descriptor with an overlapped decomposition:
+  the additional layer is aggregated to  the local subdomain (and thus
+  is an overlap), and a new halo extending beyond the last additional
+  layer is formed. 
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1105"
+<A NAME="tex2html1126"
   HREF="node72.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1101"
-  HREF="node58.html">
+<A NAME="tex2html1122"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1095"
+<A NAME="tex2html1116"
   HREF="node70.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1103"
+<A NAME="tex2html1124"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1106"
-  HREF="node72.html">psb_geasb   Assembly</A>
-<B> Up:</B> <A NAME="tex2html1102"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1096"
-  HREF="node70.html">psb_geall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1104"
+<B> Next:</B> <A NAME="tex2html1127"
+  HREF="node72.html">psb_spall   Allocates</A>
+<B> Up:</B> <A NAME="tex2html1123"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1117"
+  HREF="node70.html">psb_cdfree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html1125"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

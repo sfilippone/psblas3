@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasum -- 1-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_geasum -- 1-Norm of Vector">
+<TITLE>Preconditioner data structure</TITLE>
+<META NAME="description" CONTENT="Preconditioner data structure">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,226 +18,73 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node46.html">
-<LINK REL="previous" HREF="node44.html">
-<LINK REL="up" HREF="node39.html">
+<LINK REL="previous" HREF="node39.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node46.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html766"
+<A NAME="tex2html774"
   HREF="node46.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html762"
-  HREF="node39.html">
+<A NAME="tex2html770"
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html756"
+<A NAME="tex2html766"
   HREF="node44.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html764"
+<A NAME="tex2html772"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html767"
-  HREF="node46.html">psb_geasums   Generalized</A>
-<B> Up:</B> <A NAME="tex2html763"
-  HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html757"
-  HREF="node44.html">psb_geamaxs   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html765"
+<B> Next:</B> <A NAME="tex2html775"
+  HREF="node46.html">Computational routines</A>
+<B> Up:</B> <A NAME="tex2html771"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Previous:</B> <A NAME="tex2html767"
+  HREF="node44.html">clone   Clone</A>
+ &nbsp; <B>  <A NAME="tex2html773"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00056000000000000000">
-psb_geasum -- 1-Norm of Vector</A>
+<H2><A NAME="SECTION00044000000000000000"></A>
+<A NAME="sec:prec"></A>
+<BR>
+Preconditioner data structure
 </H2>
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
 
 <P>
-This function computes the 1-norm of a vector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">.
-<BR>
-If <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is a real vector
-it computes 1-norm as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-asum \leftarrow  \|x_i\|
-\end{displaymath}
- -->
+A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
+figure&nbsp;<A HREF="#fig:prectype">6</A>. The <code>psb_prec_type</code> 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor.The internal preconditioner is allocated appropriately with the
+dynamic type corresponding to the desired preconditioner. 
 
-<IMG
- WIDTH="92" HEIGHT="28" BORDER="0"
- SRC="img33.png"
- ALT="\begin{displaymath}asum \leftarrow \Vert x_i\Vert\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-else if <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is a complex vector then it computes 1-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="205" HEIGHT="28" BORDER="0"
- SRC="img34.png"
- ALT="\begin{displaymath}asum \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-
-<P>
-<PRE>
-psb_geasum(x, desc_a, info)
-</PRE>
-
-<P>
-<BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1647"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="855"></A>
 <TABLE>
-<CAPTION><STRONG>Table 6:</STRONG>
-Data types</CAPTION>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
+The PSBLAS defined data type that contains a preconditioner.</CAPTION>
+<TR><TD><FONT SIZE="-1">  </FONT>
+<DIV ALIGN="CENTER"></DIV><TABLE  WIDTH="90%">
 <TR><TD>
-<DIV ALIGN="CENTER">
-<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img35.png"
- ALT="$asum$"></TD>
-<TD ALIGN="LEFT"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geasum</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geasum</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geasum</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geasum</TD>
-</TR>
+<PRE>
+  type psb_Tprec_type
+    class(psb_T_base_prec_type), allocatable :: prec
+  end type psb_Tprec_type
+</PRE></TD></TR>
+</TABLE>
+<DIV ALIGN="CENTER"></DIV></TD></TR>
 </TABLE>
 </DIV>
-</TD></TR>
-</TABLE>
-</DIV><P></P>
-<BR>
 
 <P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">. 
-
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90asum">6</A>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>contains data structures for communications.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of type descdata<TT>psb_desc_type</TT>.
-
-<P>
-</DD>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>is the 1-norm of vector <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Specified as: a long precision real  number.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
-</DL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html766"
-  HREF="node46.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html762"
-  HREF="node39.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html756"
-  HREF="node44.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html764"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html767"
-  HREF="node46.html">psb_geasums   Generalized</A>
-<B> Up:</B> <A NAME="tex2html763"
-  HREF="node39.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html757"
-  HREF="node44.html">psb_geamaxs   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html765"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

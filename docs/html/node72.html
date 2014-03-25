@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
+<TITLE>psb_spall -- Allocates a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spall -- Allocates a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node73.html">
 <LINK REL="previous" HREF="node71.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node73.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1117"
+<A NAME="tex2html1138"
   HREF="node73.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1113"
-  HREF="node58.html">
+<A NAME="tex2html1134"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1107"
+<A NAME="tex2html1128"
   HREF="node71.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1115"
+<A NAME="tex2html1136"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1118"
-  HREF="node73.html">psb_gefree   Frees</A>
-<B> Up:</B> <A NAME="tex2html1114"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1108"
-  HREF="node71.html">psb_geins   Dense</A>
- &nbsp; <B>  <A NAME="tex2html1116"
+<B> Next:</B> <A NAME="tex2html1139"
+  HREF="node73.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html1135"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1129"
+  HREF="node71.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html1137"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000714000000000000000">
-psb_geasb -- Assembly a dense matrix</A>
+<H2><A NAME="SECTION00077000000000000000">
+psb_spall -- Allocates a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info, mold)
+call psb_spall(a, desc_a, info, nnz)
 </PRE>
 
 <P>
@@ -69,30 +69,27 @@ call psb_geasb(x, desc_a, info, mold)
 <DD>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DD>the communication descriptor.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
-<DT><STRONG>mold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>nnz</STRONG></DT>
+<DD>An estimate of the number of nonzeroes in the local
+  part of the assembled matrix.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>global</B>.
 <BR>
 Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
-only allowed when <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+Specified as: an integer value. 
 </DD>
 </DL>
 
@@ -101,18 +98,17 @@ only allowed when <IMG
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be assembled.
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be allocated.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE or an
-object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
-<BR></DD>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -125,7 +121,49 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<BR><HR>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>On exit from this routine the sparse matrix  is in the build
+  state.
+</LI>
+<LI>The descriptor may be in either the build or assembled state.
+</LI>
+<LI>Providing a good estimate for the number of nonzeroes <IMG
+ WIDTH="31" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img104.png"
+ ALT="$nnz$"> in
+  the assembled matrix may substantially improve performance in the
+  matrix build phase, as it will reduce or eliminate the need for
+  (potentially multiple) data reallocations. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1138"
+  HREF="node73.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1134"
+  HREF="node65.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1128"
+  HREF="node71.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1136"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1139"
+  HREF="node73.html">psb_spins   Insert</A>
+<B> Up:</B> <A NAME="tex2html1135"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1129"
+  HREF="node71.html">psb_cdbldext   Build</A>
+ &nbsp; <B>  <A NAME="tex2html1137"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

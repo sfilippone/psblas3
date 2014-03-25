@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Iterative Methods</TITLE>
-<META NAME="description" CONTENT="Iterative Methods">
+<TITLE>Utilities</TITLE>
+<META NAME="description" CONTENT="Utilities">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,62 +18,429 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node113.html">
-<LINK REL="previous" HREF="node105.html">
+<LINK REL="next" HREF="node112.html">
+<LINK REL="previous" HREF="node110.html">
 <LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node112.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1600"
+<A NAME="tex2html1618"
   HREF="node112.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1596"
+<A NAME="tex2html1614"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1590"
+<A NAME="tex2html1608"
   HREF="node110.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1598"
+<A NAME="tex2html1616"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1601"
-  HREF="node112.html">psb_krylov   Krylov</A>
-<B> Up:</B> <A NAME="tex2html1597"
+<B> Next:</B> <A NAME="tex2html1619"
+  HREF="node112.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1615"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1591"
-  HREF="node110.html">clone   clone</A>
- &nbsp; <B>  <A NAME="tex2html1599"
+<B> Previous:</B> <A NAME="tex2html1609"
+  HREF="node110.html">Error handling</A>
+ &nbsp; <B>  <A NAME="tex2html1617"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000120000000000000000"></A>
-<A NAME="sec:methods"></A>
+<H1><A NAME="SECTION000100000000000000000"></A>
+<A NAME="sec:util"></A>
 <BR>
-Iterative Methods
+Utilities
 </H1>
 
 <P>
-In this chapter we provide routines for preconditioners and iterative
-methods. The interfaces for Krylov subspace methods are available in
-the module <code>psb_krylov_mod</code>.
+We have some utitlities available for input and output of
+sparsematrices; the interfaces to these routines are available in the
+module <code>psb_util_mod</code>.
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+ifstarsubroutinesubroutinehb_readRead a sparse matrix from a file in the
+  Harwell-Boeing format
 
-<UL>
-<LI><A NAME="tex2html1602"
-  HREF="node112.html">psb_krylov  -- Krylov Methods Driver
-      Routine</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
+<P>
+<BR>
+<IMG
+ WIDTH="461" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img149.png"
+ ALT="\begin{lstlisting}
+call hb_read(a, iret, iunit, filename, b, mtitle)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>Optional</B> 
+<BR>
+An  array of type real or complex, rank 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
+</DD>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 72 holding a copy of the
+matrix title as specified by the Harwell-Boeing format and contained
+in the input file.
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinehb_writeWrite a sparse matrix to a  file
+  in the Harwell-Boeing format
+
+<P>
+<BR>
+<IMG
+ WIDTH="538" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="\begin{lstlisting}
+call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix to be written.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+An  array of type real or complex, rank 1 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side. 
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written to.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+<DT><STRONG>key</STRONG></DT>
+<DD>Matrix key.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 8 holding the
+matrix key as specified by the Harwell-Boeing format and to be
+written to file.
+</DD>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 72 holding the
+matrix title as specified by the Harwell-Boeing format and to be
+written to file.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinemm_mat_readRead a sparse matrix from a
+  file in the MatrixMarket format
+
+<P>
+<BR>
+<IMG
+ WIDTH="394" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img151.png"
+ ALT="\begin{lstlisting}
+call mm_mat_read(a, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinemm_vet_readRead a dense vector from a
+  file in the MatrixMarket format
+<BR>
+<IMG
+ WIDTH="394" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img152.png"
+ ALT="\begin{lstlisting}
+call mm_vet_read(b, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>required</B> 
+<BR>
+An  array of type real or complex, rank 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+ifstarsubroutinesubroutinemm_mat_writeWrite a sparse matrix to a
+  file in the MatrixMarket format
+<BR>
+<IMG
+ WIDTH="480" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img153.png"
+ ALT="\begin{lstlisting}
+call mm_mat_write(a, mtitle, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix to be written.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>required</B> 
+<BR>
+A charachter variable holding a descriptive title for the matrix to be
+ written to file.
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written to.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1618"
+  HREF="node112.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1614"
+  HREF="userhtml.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1608"
+  HREF="node110.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1616"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1619"
+  HREF="node112.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1615"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1609"
+  HREF="node110.html">Error handling</A>
+ &nbsp; <B>  <A NAME="tex2html1617"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

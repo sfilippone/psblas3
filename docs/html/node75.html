@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_glob_to_loc -- Global to local indices convertion</TITLE>
-<META NAME="description" CONTENT="psb_glob_to_loc -- Global to local indices convertion">
+<TITLE>psb_spfree -- Frees a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spfree -- Frees a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,67 +20,65 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node76.html">
 <LINK REL="previous" HREF="node74.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node76.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1153"
+<A NAME="tex2html1174"
   HREF="node76.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1149"
-  HREF="node58.html">
+<A NAME="tex2html1170"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1143"
+<A NAME="tex2html1164"
   HREF="node74.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1151"
+<A NAME="tex2html1172"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1154"
-  HREF="node76.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1150"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1144"
-  HREF="node74.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1152"
+<B> Next:</B> <A NAME="tex2html1175"
+  HREF="node76.html">psb_sprn   Reinit</A>
+<B> Up:</B> <A NAME="tex2html1171"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1165"
+  HREF="node74.html">psb_spasb   Sparse</A>
+ &nbsp; <B>  <A NAME="tex2html1173"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000717000000000000000">
-psb_glob_to_loc -- Global to local indices
-  convertion</A>
+<H2><A NAME="SECTION000710000000000000000">
+psb_spfree -- Frees a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
-call psb_glob_to_loc(x, desc_a, info, iact,owned)
+call psb_spfree(a, desc_a, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>An integer vector of indices to be converted.
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be freed.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>
 <BR>
-Intent: <B>in, inout</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one integer array.
-<BR></DD>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
@@ -92,73 +90,12 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
-</DD>
-<DT><STRONG>owned</STRONG></DT>
-<DD>Specfies valid range of input 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-If true, then only indices strictly owned by the current process are
-considered valid, if false then halo indices are also
-accepted. Default: false. 
-</DD>
 </DL>
 
 <P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>If <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is not present,
-  then <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is overwritten with the translated integer indices. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one integer array.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>If <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is  present,
-  then <IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is overwritten with the translated integer indices, and <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">
-  is left unchanged. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a rank one integer array.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -174,42 +111,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>If an input index is out of range, then the corresponding output
-  index is set to a negative number;
-</LI>
-<LI>The default <code>I</code>gnore means that the negative output is the
-  only action taken on an out-of-range input.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1153"
-  HREF="node76.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1149"
-  HREF="node58.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1143"
-  HREF="node74.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1151"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1154"
-  HREF="node76.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1150"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1144"
-  HREF="node74.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1152"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

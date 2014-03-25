@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sprn -- Reinit sparse matrix structure for psblas routines.</TITLE>
-<META NAME="description" CONTENT="psb_sprn -- Reinit sparse matrix structure for psblas routines.">
+<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,67 +20,55 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node70.html">
 <LINK REL="previous" HREF="node68.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node70.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1081"
+<A NAME="tex2html1102"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1077"
-  HREF="node58.html">
+<A NAME="tex2html1098"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1071"
+<A NAME="tex2html1092"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1079"
+<A NAME="tex2html1100"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1082"
-  HREF="node70.html">psb_geall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1078"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1072"
-  HREF="node68.html">psb_spfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1080"
+<B> Next:</B> <A NAME="tex2html1103"
+  HREF="node70.html">psb_cdfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1099"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1093"
+  HREF="node68.html">psb_cdasb   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html1101"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000711000000000000000">
-psb_sprn -- Reinit sparse matrix structure for psblas
-  routines.</A>
+<H2><A NAME="SECTION00074000000000000000">
+psb_cdcpy -- Copies a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_sprn(a, decsc_a, info, clear)
+call psb_cdcpy(desc_in, desc_out, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix to be reinitialized.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
+<DT><STRONG>desc_in</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -90,17 +78,8 @@ Type:<B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>clear</STRONG></DT>
-<DD>Choose whether to zero out matrix coefficients
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: true.
+
+<P>
 </DD>
 </DL>
 
@@ -108,6 +87,17 @@ Default: true.
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the communication descriptor copy.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -121,13 +111,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>On exit from this routine the sparse matrix is in the update
-  state. 
-</LI>
-</OL>
 
 <P>
 <BR><HR>

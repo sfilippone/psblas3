@@ -637,6 +637,196 @@ Scope: {\bf local}\\
   matrix is in the Build, Update or Assembled state, respectively. 
 \end{description}
 
+\subsubsection*{is\_lower, is\_upper, is\_triangle, is\_unit  ---
+  Format  check}
+\addcontentsline{toc}{paragraph}{is\_lower, is\_upper, is\_triangle, is\_unit}
+
+\begin{verbatim}
+if (a%is_triangle()) then 
+if (a%is_upper()) then 
+if (a%is_lower()) then 
+if (a%is_unit()) then 
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix\\
+Scope: {\bf local}\\
+% Type: {\bf required}\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \spdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] A \verb|logical| value indicating whether the
+  matrix is triangular; if \verb|is_triangle()| returns \verb|.true.|
+  check also if it is lower, upper and with a unit (i.e. assumed)
+  diagonal. 
+\end{description}
+
+
+\subsubsection*{cscnv --- Convert to a different storage format}
+\addcontentsline{toc}{paragraph}{cscnv}
+
+\begin{verbatim}
+call  a%cscnv(b,info [, type, mold, dupl])
+call  a%cscnv(info [, type, mold, dupl])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\item[type] a string requesting a new format.\\
+Type: optional.
+\item[mold] a variable of \verb|class(psb_T_base_sparse_mat)|  requesting a new format.\\
+Type: optional.
+\item[dupl] an integer value specifing how to handle duplicates (see
+  Named Constants below)
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[b,a] A copy  of \verb|a| with a new storage format.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
+
+\subsubsection*{csclip --- Reduce to a submatrix}
+\addcontentsline{toc}{paragraph}{csclip}
+\begin{verbatim}
+    call a%csclip(b,info[,&
+       & imin,imax,jmin,jmax,rscale,cscale])
+\end{verbatim}
+
+Returns the submatrix \verb|A(imin:imax,jmin:jmax)|, optionally
+rescaling row/col indices to the range
+\verb|1:imax-imin+1,1:jmax-jmin+1|.  
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
+Type: optional.
+\item[rscale,cscale] Whether to rescale row/column indices.
+Type: optional.
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[b] A copy  of a submatrix of \verb|a|.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
+\subsubsection*{clip\_diag --- Cut out main diagonal}
+\addcontentsline{toc}{paragraph}{clip\_diag}
+\begin{verbatim}
+    call a%clip_diag(b,info)
+\end{verbatim}
+
+Returns a copy of \verb|a| without the main diagonal.
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[b] A copy  of  \verb|a| without the main diagonal.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
+
+\subsubsection*{tril --- Return the lower triangle}
+\addcontentsline{toc}{paragraph}{tril}
+\begin{verbatim}
+    call a%tril(b,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale])
+\end{verbatim}
+
+Returns the lower triangular part of submatrix
+\verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
+the range \verb|1:imax-imin+1,1:jmax-jmin+1|.   
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\item[diag] How many additional diagonals above the main one, default 0.
+\item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
+Type: optional.
+\item[rscale,cscale] Whether to rescale row/column indices.
+Type: optional.
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[b] A copy  of a subtriangle of \verb|a|.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
+\subsubsection*{triu --- Return the upper triangle}
+\addcontentsline{toc}{paragraph}{triu}
+\begin{verbatim}
+    call a%triu(b,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale])
+\end{verbatim}
+
+Returns the upper triangular part of submatrix
+\verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
+the range \verb|1:imax-imin+1,1:jmax-jmin+1|.   
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\item[diag] How many additional diagonals below the main one, default 0.
+\item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
+Type: optional.
+\item[rscale,cscale] Whether to rescale row/column indices.
+Type: optional.
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[b] A copy  of a subtriangle of \verb|a|.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
+
+
+
+\subsubsection*{psb\_set\_mat\_default --- Set default  storage format}
+\addcontentsline{toc}{paragraph}{psb\_set\_mat\_default}
+
+
+\begin{verbatim}
+call  psb_set_mat_default(a)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] a variable of \verb|class(psb_T_base_sparse_mat)|  requesting
+  a new default storage format.\\ 
+Type: required.
+\end{description}
+
+
+
+
 
 \subsubsection*{clone --- Clone current object}
 \addcontentsline{toc}{paragraph}{clone}

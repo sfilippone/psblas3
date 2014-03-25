@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
-<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
+<TITLE>psb_gelp -- Applies a left permutation to a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gelp -- Applies a left permutation to a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node82.html">
 <LINK REL="previous" HREF="node80.html">
-<LINK REL="up" HREF="node58.html">
+<LINK REL="up" HREF="node65.html">
 <LINK REL="next" HREF="node82.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1225"
+<A NAME="tex2html1246"
   HREF="node82.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1221"
-  HREF="node58.html">
+<A NAME="tex2html1242"
+  HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1215"
+<A NAME="tex2html1236"
   HREF="node80.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1223"
+<A NAME="tex2html1244"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1226"
-  HREF="node82.html">psb_get_overlap   Extract</A>
-<B> Up:</B> <A NAME="tex2html1222"
-  HREF="node58.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1216"
-  HREF="node80.html">psb_local_index</A>
- &nbsp; <B>  <A NAME="tex2html1224"
+<B> Next:</B> <A NAME="tex2html1247"
+  HREF="node82.html">psb_glob_to_loc   Global</A>
+<B> Up:</B> <A NAME="tex2html1243"
+  HREF="node65.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1237"
+  HREF="node80.html">psb_gefree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html1245"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000723000000000000000">
-psb_get_boundary -- Extract list of boundary
-  elements</A>
+<H2><A NAME="SECTION000716000000000000000">
+psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_boundary(bndel, desc, info)
+call psb_gelp(trans, iperm, x, info)
 </PRE>
 
 <P>
@@ -69,17 +69,51 @@ call psb_get_boundary(bndel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>trans</STRONG></DT>
+<DD>A character that specifies whether to permute <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$A^T$">.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
+Specified as: a single character with value 'N' for <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or 'T' for <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$A^T$">.
+<BR></DD>
+<DT><STRONG>iperm</STRONG></DT>
+<DD>An integer array containing permutation information.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer one-dimensional array.
+<BR></DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be permuted.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a one or two dimensional array.
+<BR></DD>
 </DL>
 
 <P>
@@ -87,19 +121,6 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>bndel</STRONG></DT>
-<DD>The list of boundary elements on the calling process, in
-  local numbering.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -112,19 +133,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>If there are no boundary elements (i.e., if the local part of
-  the connectivity graph is self-contained) the output vector is set
-  to the ``not allocated'' state. 
-</LI>
-<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
-  number of boundary elements. 
-</LI>
-</OL>
 
 <P>
 <BR><HR>
