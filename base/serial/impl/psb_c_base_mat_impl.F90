@@ -720,7 +720,7 @@ subroutine psb_c_base_triu(a,b,info,&
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='tril'
+  character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
 
