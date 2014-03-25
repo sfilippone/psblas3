@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>triu -- Return the upper triangle</TITLE>
-<META NAME="description" CONTENT="triu -- Return the upper triangle">
+<TITLE>tril -- Return the lower triangle</TITLE>
+<META NAME="description" CONTENT="tril -- Return the lower triangle">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,42 +26,42 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html655"
+<A NAME="tex2html658"
   HREF="node36.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html651"
+<A NAME="tex2html654"
   HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html645"
+<A NAME="tex2html648"
   HREF="node34.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html653"
+<A NAME="tex2html656"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html656"
-  HREF="node36.html">psb_set_mat_default   Set</A>
-<B> Up:</B> <A NAME="tex2html652"
+<B> Next:</B> <A NAME="tex2html659"
+  HREF="node36.html">triu   Return</A>
+<B> Up:</B> <A NAME="tex2html655"
   HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html646"
-  HREF="node34.html">tril   Return</A>
- &nbsp; <B>  <A NAME="tex2html654"
+<B> Previous:</B> <A NAME="tex2html649"
+  HREF="node34.html">clip_diag   Cut</A>
+ &nbsp; <B>  <A NAME="tex2html657"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000421400000000000000">
-triu -- Return the upper triangle</A>
+tril -- Return the lower triangle</A>
 </H3>
 
 <PRE>
-    call a%triu(b,info[,&amp;
+    call a%tril(b,info[,&amp;
        &amp; diag,imin,imax,jmin,jmax,rscale,cscale])
 </PRE>
 
 <P>
-Returns the upper triangular part of submatrix
+Returns the lower triangular part of submatrix
 <code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
 the range <code>1:imax-imin+1,1:jmax-jmin+1</code>.   
 <DL>
@@ -79,7 +79,7 @@ A variable of type <code>psb_Tspmat_type</code>.
 Scope: <B>local</B>.
 <BR></DD>
 <DT><STRONG>diag</STRONG></DT>
-<DD>How many additional diagonals below the main one, default 0.
+<DD>How many additional diagonals above the main one, default 0.
 </DD>
 <DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
 <DD>Minimum and maximum row and column indices.

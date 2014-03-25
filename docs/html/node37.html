@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>clone -- Clone current object</TITLE>
-<META NAME="description" CONTENT="clone -- Clone current object">
+<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
+<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,38 +26,38 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html679"
+<A NAME="tex2html682"
   HREF="node38.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html675"
+<A NAME="tex2html678"
   HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html669"
+<A NAME="tex2html672"
   HREF="node36.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html677"
+<A NAME="tex2html680"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html680"
-  HREF="node38.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html676"
+<B> Next:</B> <A NAME="tex2html683"
+  HREF="node38.html">clone   Clone</A>
+<B> Up:</B> <A NAME="tex2html679"
   HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html670"
-  HREF="node36.html">psb_set_mat_default   Set</A>
- &nbsp; <B>  <A NAME="tex2html678"
+<B> Previous:</B> <A NAME="tex2html673"
+  HREF="node36.html">triu   Return</A>
+ &nbsp; <B>  <A NAME="tex2html681"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000421600000000000000">
-clone -- Clone current object</A>
+psb_set_mat_default -- Set default  storage format</A>
 </H3>
 
 <P>
 <PRE>
-call  a%clone(b,info)
+call  psb_set_mat_default(a)
 </PRE>
 
 <P>
@@ -69,22 +69,10 @@ call  a%clone(b,info)
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix.
+<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
+  a new default storage format.
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+Type: required.
 </DD>
 </DL>
 

@@ -725,6 +725,28 @@ A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
+\subsubsection*{get\_diag --- Get main diagonal}
+\addcontentsline{toc}{paragraph}{get\_diag}
+\begin{verbatim}
+    call a%get_diag(d,info)
+\end{verbatim}
+
+Returns a copy of  the main diagonal.
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[d] A copy  of the main diagonal.\\
+A one-dimensional array of the appropriate type.
+\item[info] Return code. 
+\end{description}
+
+
 \subsubsection*{clip\_diag --- Cut out main diagonal}
 \addcontentsline{toc}{paragraph}{clip\_diag}
 \begin{verbatim}

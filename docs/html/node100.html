@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>psb_wtime -- Wall clock timing</TITLE>
+<META NAME="description" CONTENT="psb_wtime -- Wall clock timing">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,68 +20,60 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node101.html">
 <LINK REL="previous" HREF="node99.html">
-<LINK REL="up" HREF="node93.html">
+<LINK REL="up" HREF="node94.html">
 <LINK REL="next" HREF="node101.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1488"
+<A NAME="tex2html1491"
   HREF="node101.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1484"
-  HREF="node93.html">
+<A NAME="tex2html1487"
+  HREF="node94.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1478"
+<A NAME="tex2html1481"
   HREF="node99.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1486"
+<A NAME="tex2html1489"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1489"
-  HREF="node101.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1485"
-  HREF="node93.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1479"
-  HREF="node99.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1487"
+<B> Next:</B> <A NAME="tex2html1492"
+  HREF="node101.html">psb_barrier   Sinchronization</A>
+<B> Up:</B> <A NAME="tex2html1488"
+  HREF="node94.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1482"
+  HREF="node99.html">psb_get_rank   Get</A>
+ &nbsp; <B>  <A NAME="tex2html1490"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
-  environment</A>
+<H2><A NAME="SECTION00086000000000000000">
+psb_wtime -- Wall clock timing</A>
 </H2>
 
 <P>
 <PRE>
-call psb_barrier(icontxt)
+time = psb_wtime()
 </PRE>
 
 <P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
+This function returns a wall clock timer. The resolution of the timer
+is dependent on the underlying parallel environment implementation.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DT><STRONG><B>On Exit </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context identifying the virtual
-  parallel machine.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>the elapsed time in seconds.
 <BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer variable.
+Returned  as: a  <code>real(psb_dpk_)</code>  variable.
 </DD>
 </DL>
 

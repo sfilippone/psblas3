@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>clip_diag -- Cut out main diagonal</TITLE>
-<META NAME="description" CONTENT="clip_diag -- Cut out main diagonal">
+<TITLE>get_diag -- Get main diagonal</TITLE>
+<META NAME="description" CONTENT="get_diag -- Get main diagonal">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,41 +26,41 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html631"
+<A NAME="tex2html634"
   HREF="node34.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html627"
+<A NAME="tex2html630"
   HREF="node21.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html621"
+<A NAME="tex2html624"
   HREF="node32.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html629"
+<A NAME="tex2html632"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html632"
-  HREF="node34.html">tril   Return</A>
-<B> Up:</B> <A NAME="tex2html628"
+<B> Next:</B> <A NAME="tex2html635"
+  HREF="node34.html">clip_diag   Cut</A>
+<B> Up:</B> <A NAME="tex2html631"
   HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html622"
+<B> Previous:</B> <A NAME="tex2html625"
   HREF="node32.html">csclip   Reduce</A>
- &nbsp; <B>  <A NAME="tex2html630"
+ &nbsp; <B>  <A NAME="tex2html633"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000421200000000000000">
-clip_diag -- Cut out main diagonal</A>
+get_diag -- Get main diagonal</A>
 </H3>
 
 <PRE>
-    call a%clip_diag(b,info)
+    call a%get_diag(d,info)
 </PRE>
 
 <P>
-Returns a copy of <code>a</code> without the main diagonal.
+Returns a copy of  the main diagonal.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -80,10 +80,10 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>A copy  of  <code>a</code> without the main diagonal.
+<DT><STRONG>d</STRONG></DT>
+<DD>A copy  of the main diagonal.
 <BR>
-A variable of type <code>psb_Tspmat_type</code>.
+A one-dimensional array of the appropriate type.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Return code. 

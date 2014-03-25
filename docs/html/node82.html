@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_glob_to_loc -- Global to local indices convertion</TITLE>
-<META NAME="description" CONTENT="psb_glob_to_loc -- Global to local indices convertion">
+<TITLE>psb_gelp -- Applies a left permutation to a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_gelp -- Applies a left permutation to a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,46 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node83.html">
 <LINK REL="previous" HREF="node81.html">
-<LINK REL="up" HREF="node65.html">
+<LINK REL="up" HREF="node66.html">
 <LINK REL="next" HREF="node83.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1258"
+<A NAME="tex2html1261"
   HREF="node83.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1254"
-  HREF="node65.html">
+<A NAME="tex2html1257"
+  HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1248"
+<A NAME="tex2html1251"
   HREF="node81.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1256"
+<A NAME="tex2html1259"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1259"
-  HREF="node83.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1255"
-  HREF="node65.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1249"
-  HREF="node81.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1257"
+<B> Next:</B> <A NAME="tex2html1262"
+  HREF="node83.html">psb_glob_to_loc   Global</A>
+<B> Up:</B> <A NAME="tex2html1258"
+  HREF="node66.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1252"
+  HREF="node81.html">psb_gefree   Frees</A>
+ &nbsp; <B>  <A NAME="tex2html1260"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000717000000000000000">
-psb_glob_to_loc -- Global to local indices
-  convertion</A>
+<H2><A NAME="SECTION000716000000000000000">
+psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
-call psb_glob_to_loc(x, desc_a, info, iact,owned)
+call psb_gelp(trans, iperm, x, info)
 </PRE>
 
 <P>
@@ -70,95 +69,57 @@ call psb_glob_to_loc(x, desc_a, info, iact,owned)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>An integer vector of indices to be converted.
+<DT><STRONG>trans</STRONG></DT>
+<DD>A character that specifies whether to permute <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$A^T$">.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in, inout</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: a rank one integer array.
+Specified as: a single character with value 'N' for <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"> or 'T' for <IMG
+ WIDTH="26" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="img111.png"
+ ALT="$A^T$">.
 <BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor.
+<DT><STRONG>iperm</STRONG></DT>
+<DD>An integer array containing permutation information.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
+Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
-</DD>
-<DT><STRONG>owned</STRONG></DT>
-<DD>Specfies valid range of input 
-Scope: <B>global</B> 
+Specified as: an integer one-dimensional array.
+<BR></DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be permuted.
 <BR>
-Type: <B>optional</B>
+Scope: <B>local</B> 
 <BR>
-Intent: <B>in</B>.
+Type: <B>required</B>
 <BR>
-If true, then only indices strictly owned by the current process are
-considered valid, if false then halo indices are also
-accepted. Default: false. 
-</DD>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a one or two dimensional array.
+<BR></DD>
 </DL>
 
 <P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>If <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is not present,
-  then <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is overwritten with the translated integer indices. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one integer array.
-</DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>If <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is  present,
-  then <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> is overwritten with the translated integer indices, and <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$">
-  is left unchanged. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: a rank one integer array.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -174,42 +135,7 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>If an input index is out of range, then the corresponding output
-  index is set to a negative number;
-</LI>
-<LI>The default <code>I</code>gnore means that the negative output is the
-  only action taken on an out-of-range input.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1258"
-  HREF="node83.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1254"
-  HREF="node65.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1248"
-  HREF="node81.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1256"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1259"
-  HREF="node83.html">psb_loc_to_glob   Local</A>
-<B> Up:</B> <A NAME="tex2html1255"
-  HREF="node65.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1249"
-  HREF="node81.html">psb_gelp   Applies</A>
- &nbsp; <B>  <A NAME="tex2html1257"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

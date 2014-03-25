@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
+<TITLE>psb_geins -- Dense matrix insertion routine</TITLE>
+<META NAME="description" CONTENT="psb_geins -- Dense matrix insertion routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,79 +20,135 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node80.html">
 <LINK REL="previous" HREF="node78.html">
-<LINK REL="up" HREF="node65.html">
+<LINK REL="up" HREF="node66.html">
 <LINK REL="next" HREF="node80.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1222"
+<A NAME="tex2html1225"
   HREF="node80.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1218"
-  HREF="node65.html">
+<A NAME="tex2html1221"
+  HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1212"
+<A NAME="tex2html1215"
   HREF="node78.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1220"
+<A NAME="tex2html1223"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1223"
-  HREF="node80.html">psb_gefree   Frees</A>
-<B> Up:</B> <A NAME="tex2html1219"
-  HREF="node65.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1213"
-  HREF="node78.html">psb_geins   Dense</A>
- &nbsp; <B>  <A NAME="tex2html1221"
+<B> Next:</B> <A NAME="tex2html1226"
+  HREF="node80.html">psb_geasb   Assembly</A>
+<B> Up:</B> <A NAME="tex2html1222"
+  HREF="node66.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1216"
+  HREF="node78.html">psb_geall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html1224"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000714000000000000000">
-psb_geasb -- Assembly a dense matrix</A>
+<H2><A NAME="SECTION000713000000000000000">
+psb_geins -- Dense matrix insertion routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info, mold)
+call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>The communication descriptor.
+<DT><STRONG>m</STRONG></DT>
+<DD>Number of rows in <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img109.png"
+ ALT="$val$"> to be inserted.
 <BR>
-Scope: <B>local</B> 
+Scope:<B>local</B>.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
-<BR></DD>
-<DT><STRONG>mold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
+Specified as: an integer value.
+</DD>
+<DT><STRONG>irw</STRONG></DT>
+<DD>Indices of the rows to be inserted. Specifically, row <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">
+  of <IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img109.png"
+ ALT="$val$"> will be inserted into the local row corresponding to the
+  global row index <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img110.png"
+ ALT="$irw(i)$">.
+Scope:<B>local</B>.
 <BR>
-Scope: <B>local</B>.
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array.
+</DD>
+<DT><STRONG>val</STRONG></DT>
+<DD>the dense submatrix to be inserted.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank 1 or 2  array.
+Specified as: an integer value.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>How to handle duplicate coefficients.
+<BR>
+Scope: <B>global</B>.
 <BR>
 Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
-only allowed when <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
+<code>psb_dupl_add_</code>.
+</DD>
+<DT><STRONG>local</STRONG></DT>
+<DD>Whether the entries in the index vector <code>irw</code>,
+   are already in local  numbering. 
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a logical value; default: <code>.false.</code>.
+
+<P>
 </DD>
 </DL>
 
@@ -102,7 +158,7 @@ only allowed when <IMG
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be assembled.
+<DD>the output dense matrix.
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -110,8 +166,8 @@ Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE or an
-object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>, of
+type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -125,7 +181,43 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<BR><HR>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>Dense vectors/matrices do not have an associated state;
+</LI>
+<LI>Duplicate entries are either overwritten or added, there is no
+  provision for raising an error condition. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1225"
+  HREF="node80.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1221"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1215"
+  HREF="node78.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1223"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1226"
+  HREF="node80.html">psb_geasb   Assembly</A>
+<B> Up:</B> <A NAME="tex2html1222"
+  HREF="node66.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1216"
+  HREF="node78.html">psb_geall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html1224"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

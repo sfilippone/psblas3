@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_genrm2 -- 2-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_genrm2 -- 2-Norm of Vector">
+<TITLE>psb_geasums -- Generalized 1-Norm of Vector</TITLE>
+<META NAME="description" CONTENT="psb_geasums -- Generalized 1-Norm of Vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,43 +20,63 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node55.html">
 <LINK REL="previous" HREF="node53.html">
-<LINK REL="up" HREF="node46.html">
+<LINK REL="up" HREF="node47.html">
 <LINK REL="next" HREF="node55.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html895"
+<A NAME="tex2html898"
   HREF="node55.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html891"
-  HREF="node46.html">
+<A NAME="tex2html894"
+  HREF="node47.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html885"
+<A NAME="tex2html888"
   HREF="node53.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html893"
+<A NAME="tex2html896"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html896"
-  HREF="node55.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html892"
-  HREF="node46.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html886"
-  HREF="node53.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html894"
+<B> Next:</B> <A NAME="tex2html899"
+  HREF="node55.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html895"
+  HREF="node47.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html889"
+  HREF="node53.html">psb_geasum   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html897"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00058000000000000000">
-psb_genrm2 -- 2-Norm of Vector</A>
+<H2><A NAME="SECTION00057000000000000000">
+psb_geasums -- Generalized 1-Norm of Vector</A>
 </H2>
 
 <P>
-This function computes the 2-norm of a vector <IMG
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$">: 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+res(i) \leftarrow \max_k |x(k,i)|
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="147" HEIGHT="36" BORDER="0"
+ SRC="img32.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+This function computes the 1-norm of a vector <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
@@ -64,77 +84,82 @@ This function computes the 2-norm of a vector <IMG
 If <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is a  real  vector
-it computes 2-norm as:
+ ALT="$x$"> is a real vector 
+it computes 1-norm as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^T x}
+res(i) \leftarrow  \|x_i\|
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img38.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
+ WIDTH="94" HEIGHT="28" BORDER="0"
+ SRC="img36.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is a complex vector then it computes 2-norm  as:
+ ALT="$x$"> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^H x}
+res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img39.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
+ WIDTH="206" HEIGHT="28" BORDER="0"
+ SRC="img37.png"
+ ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 
 <P>
+<PRE>
+call psb_geasums(res, x, desc_a, info)
+</PRE>
+
+<P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1799"></A>
+<DIV ALIGN="CENTER"><A NAME="1819"></A>
 <TABLE>
-<CAPTION><STRONG>Table 8:</STRONG>
+<CAPTION><STRONG>Table 7:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img40.png"
- ALT="$nrm2$"></TD>
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$res$"></TD>
 <TD ALIGN="LEFT"><IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
 <TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
 <TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
+<TD ALIGN="LEFT">psb_geasums</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -142,11 +167,6 @@ Data types</CAPTION>
 </TABLE>
 </DIV><P></P>
 <BR>
-
-<P>
-<PRE>
-psb_genrm2(x, desc_a, info)
-</PRE>
 
 <P>
 <DL>
@@ -161,7 +181,8 @@ psb_genrm2(x, desc_a, info)
 <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$">.
+ ALT="$x$">. 
+
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -169,9 +190,9 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90nrm2">8</A>.
+Table&nbsp;<A HREF="#tab:f90asums">7</A>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -189,17 +210,18 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function Value</STRONG></DT>
-<DD>is the 2-norm of subvector <IMG
+<DT><STRONG>res</STRONG></DT>
+<DD>contains the 1-norm of (the columns of) <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Type: <B>required</B> 
+Intent: <B>out</B>.
 <BR>
-Specified as: a long precision real number.
+Short as: a long precision real  number.
+Specified as: a long precision real  number.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -217,26 +239,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html895"
+<A NAME="tex2html898"
   HREF="node55.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html891"
-  HREF="node46.html">
+<A NAME="tex2html894"
+  HREF="node47.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html885"
+<A NAME="tex2html888"
   HREF="node53.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html893"
+<A NAME="tex2html896"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html896"
-  HREF="node55.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html892"
-  HREF="node46.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html886"
-  HREF="node53.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html894"
+<B> Next:</B> <A NAME="tex2html899"
+  HREF="node55.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html895"
+  HREF="node47.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html889"
+  HREF="node53.html">psb_geasum   1-Norm</A>
+ &nbsp; <B>  <A NAME="tex2html897"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

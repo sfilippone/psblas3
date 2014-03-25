@@ -7,10 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>sizeof -- Get memory occupation in bytes
-of a dense vector</TITLE>
-<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
-of a dense vector">
+<TITLE>get_nrows -- Get number of rows in a dense vector</TITLE>
+<META NAME="description" CONTENT="get_nrows -- Get number of rows in a dense vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -22,45 +20,44 @@ of a dense vector">
 
 <LINK REL="next" HREF="node43.html">
 <LINK REL="previous" HREF="node41.html">
-<LINK REL="up" HREF="node39.html">
+<LINK REL="up" HREF="node40.html">
 <LINK REL="next" HREF="node43.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html742"
+<A NAME="tex2html745"
   HREF="node43.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html738"
-  HREF="node39.html">
+<A NAME="tex2html741"
+  HREF="node40.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html732"
+<A NAME="tex2html735"
   HREF="node41.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html740"
+<A NAME="tex2html743"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html743"
-  HREF="node43.html">get_vect   Get</A>
-<B> Up:</B> <A NAME="tex2html739"
-  HREF="node39.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html733"
-  HREF="node41.html">get_nrows   Get</A>
- &nbsp; <B>  <A NAME="tex2html741"
+<B> Next:</B> <A NAME="tex2html746"
+  HREF="node43.html">sizeof   Get</A>
+<B> Up:</B> <A NAME="tex2html742"
+  HREF="node40.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html736"
+  HREF="node41.html">Vector Methods</A>
+ &nbsp; <B>  <A NAME="tex2html744"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043300000000000000">
-sizeof  -- Get memory occupation in bytes
-of  a dense vector</A>
+<H3><A NAME="SECTION00043200000000000000">
+get_nrows -- Get number of  rows in a dense vector</A>
 </H3>
 
 <P>
 <PRE>
-memory_size = v%sizeof()
+nr = v%get_nrows()
 </PRE>
 
 <P>
@@ -84,7 +81,7 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation in bytes.
+<DD>The number of  rows  of dense vector <code>v</code>.
 </DD>
 </DL>
 

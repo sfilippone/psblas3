@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_spnrmi -- Infinity Norm of Sparse Matrix</TITLE>
-<META NAME="description" CONTENT="psb_spnrmi -- Infinity Norm of Sparse Matrix">
+<TITLE>psb_spnrm1 -- 1-Norm of Sparse Matrix</TITLE>
+<META NAME="description" CONTENT="psb_spnrm1 -- 1-Norm of Sparse Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,43 +20,43 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node58.html">
 <LINK REL="previous" HREF="node56.html">
-<LINK REL="up" HREF="node46.html">
+<LINK REL="up" HREF="node47.html">
 <LINK REL="next" HREF="node58.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html931"
+<A NAME="tex2html934"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html927"
-  HREF="node46.html">
+<A NAME="tex2html930"
+  HREF="node47.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html921"
+<A NAME="tex2html924"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html929"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html932"
-  HREF="node58.html">psb_spmm   Sparse</A>
-<B> Up:</B> <A NAME="tex2html928"
-  HREF="node46.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html922"
-  HREF="node56.html">psb_spnrm1   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html930"
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node58.html">psb_spnrmi   Infinity</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node47.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node56.html">psb_genrm2s   Generalized</A>
+ &nbsp; <B>  <A NAME="tex2html933"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000511000000000000000">
-psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
+<H2><A NAME="SECTION000510000000000000000">
+psb_spnrm1 -- 1-Norm of Sparse Matrix</A>
 </H2>
 
 <P>
-This function computes the infinity-norm of a matrix <IMG
+This function computes the 1-norm of a matrix <IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$">:
@@ -66,14 +66,14 @@ This function computes the infinity-norm of a matrix <IMG
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-nrmi \leftarrow \|A\|_\infty
+nrm1 \leftarrow \|A\|_1
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="101" HEIGHT="28" BORDER="0"
- SRC="img43.png"
- ALT="\begin{displaymath}nrmi \leftarrow \Vert A\Vert _\infty \end{displaymath}">
+ WIDTH="98" HEIGHT="28" BORDER="0"
+ SRC="img42.png"
+ ALT="\begin{displaymath}nrm1 \leftarrow \Vert A\Vert _1 \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
@@ -92,9 +92,9 @@ where:
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1802"></A>
+<DIV ALIGN="CENTER"><A NAME="1822"></A>
 <TABLE>
-<CAPTION><STRONG>Table 11:</STRONG>
+<CAPTION><STRONG>Table 10:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
@@ -106,16 +106,16 @@ Data types</CAPTION>
 <TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_spnrmi</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_spnrmi</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spnrmi</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_spnrmi</TD>
+<TD ALIGN="LEFT">psb_spnrm1</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -126,7 +126,7 @@ Data types</CAPTION>
 
 <P>
 <PRE>
-psb_spnrmi(A, desc_a, info)
+psb_spnrm1(A, desc_a, info)
 </PRE>
 
 <P>
@@ -167,7 +167,7 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>is the infinity-norm of sparse submatrix <IMG
+<DD>is the 1-norm of sparse submatrix <IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
  ALT="$A$">.
@@ -192,26 +192,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html931"
+<A NAME="tex2html934"
   HREF="node58.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html927"
-  HREF="node46.html">
+<A NAME="tex2html930"
+  HREF="node47.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html921"
+<A NAME="tex2html924"
   HREF="node56.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html929"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html932"
-  HREF="node58.html">psb_spmm   Sparse</A>
-<B> Up:</B> <A NAME="tex2html928"
-  HREF="node46.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html922"
-  HREF="node56.html">psb_spnrm1   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html930"
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node58.html">psb_spnrmi   Infinity</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node47.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node56.html">psb_genrm2s   Generalized</A>
+ &nbsp; <B>  <A NAME="tex2html933"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 
