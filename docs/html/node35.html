@@ -79,7 +79,9 @@ A variable of type <code>psb_Tspmat_type</code>.
 Scope: <B>local</B>.
 <BR></DD>
 <DT><STRONG>diag</STRONG></DT>
-<DD>How many additional diagonals above the main one, default 0.
+<DD>Include diagonals up to this one; <code>diag=1</code> means the
+  first superdiagonal, <code>diag=-1</code> means the first subdiagonal. 
+Default 0.
 </DD>
 <DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
 <DD>Minimum and maximum row and column indices.

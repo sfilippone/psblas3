@@ -785,7 +785,9 @@ the range \verb|1:imax-imin+1,1:jmax-jmin+1|.
 \item[a] the sparse matrix.\\
 A variable of type \verb|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
-\item[diag] How many additional diagonals above the main one, default 0.
+\item[diag] Include diagonals up to this one; \verb|diag=1| means the
+  first superdiagonal, \verb|diag=-1| means the first subdiagonal. 
+Default 0.
 \item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
 Type: optional.
 \item[rscale,cscale] Whether to rescale row/column indices.
@@ -814,7 +816,9 @@ the range \verb|1:imax-imin+1,1:jmax-jmin+1|.
 \item[a] the sparse matrix.\\
 A variable of type \verb|psb_Tspmat_type|.\\
 Scope: {\bf local}.\\
-\item[diag] How many additional diagonals below the main one, default 0.
+\item[diag] Include diagonals up to this one; \verb|diag=1| means the
+  first superdiagonal, \verb|diag=-1| means the first subdiagonal. 
+Default 0.
 \item[imin,imax,jmin,jmax] Minimum and maximum row and column indices.\\
 Type: optional.
 \item[rscale,cscale] Whether to rescale row/column indices.
