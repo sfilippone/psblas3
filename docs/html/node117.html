@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
+<TITLE>mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_write -- Write a sparse matrix to a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,75 +20,102 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node118.html">
 <LINK REL="previous" HREF="node116.html">
-<LINK REL="up" HREF="node113.html">
+<LINK REL="up" HREF="node112.html">
 <LINK REL="next" HREF="node118.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1698"
+<A NAME="tex2html1705"
   HREF="node118.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1694"
-  HREF="node113.html">
+<A NAME="tex2html1701"
+  HREF="node112.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1688"
+<A NAME="tex2html1695"
   HREF="node116.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1696"
+<A NAME="tex2html1703"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1699"
-  HREF="node118.html">clone   clone</A>
-<B> Up:</B> <A NAME="tex2html1695"
-  HREF="node113.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1689"
-  HREF="node116.html">psb_precaply   Preconditioner</A>
- &nbsp; <B>  <A NAME="tex2html1697"
+<B> Next:</B> <A NAME="tex2html1706"
+  HREF="node118.html">mm_array_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1702"
+  HREF="node112.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1696"
+  HREF="node116.html">mm_array_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1704"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000114000000000000000">
-psb_precdescr -- Prints a description of current
-  preconditioner</A>
+<H2><A NAME="SECTION000105000000000000000">
+mm_mat_write -- Write a sparse matrix to a
+  file in the MatrixMarket format</A>
 </H2>
 
 <P>
-<PRE>
-call psb_precdescr(prec)
-call psb_precdescr(prec, iout)
-</PRE>
-
-<P>
+<BR>
+<IMG
+ WIDTH="480" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img153.png"
+ ALT="\begin{lstlisting}
+call mm_mat_write(a, mtitle, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-Scope: <B>local</B> 
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix to be written.
 <BR>
-Type: <B>required</B>
+Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
-<DT><STRONG>iout</STRONG></DT>
-<DD>output unit.
-Scope: <B>local</B> 
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
 <BR>
-Type: <B>optiona</B>
+Type: <B>required</B> 
 <BR>
-Intent: <B>in</B>.
+A charachter variable holding a descriptive title for the matrix to be
+ written to file.
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written to.
 <BR>
-Specified as: an integer number. 
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

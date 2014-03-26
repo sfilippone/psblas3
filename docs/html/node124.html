@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
-<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
+<TITLE>clone -- clone current preconditioner</TITLE>
+<META NAME="description" CONTENT="clone -- clone current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,46 +18,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node38.html">
-<LINK REL="previous" HREF="node36.html">
-<LINK REL="up" HREF="node21.html">
-<LINK REL="next" HREF="node38.html">
+<LINK REL="previous" HREF="node123.html">
+<LINK REL="up" HREF="node119.html">
+<LINK REL="next" HREF="node125.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html688"
-  HREF="node38.html">
+<A NAME="tex2html1790"
+  HREF="node125.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html684"
-  HREF="node21.html">
+<A NAME="tex2html1786"
+  HREF="node119.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html678"
-  HREF="node36.html">
+<A NAME="tex2html1782"
+  HREF="node123.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html686"
+<A NAME="tex2html1788"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html689"
-  HREF="node38.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html685"
-  HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html679"
-  HREF="node36.html">triu   Return</A>
- &nbsp; <B>  <A NAME="tex2html687"
+<B> Next:</B> <A NAME="tex2html1791"
+  HREF="node125.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1787"
+  HREF="node119.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1783"
+  HREF="node123.html">psb_precdescr   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1789"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421600000000000000">
-psb_set_mat_default -- Set default  storage format</A>
-</H3>
+<H2><A NAME="SECTION000115000000000000000">
+clone -- clone  current
+  preconditioner</A>
+</H2>
 
-<P>
 <PRE>
-call  psb_set_mat_default(a)
+call  prec%clone(precout,info)
 </PRE>
 
 <P>
@@ -68,11 +67,23 @@ call  psb_set_mat_default(a)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
-  a new default storage format.
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
 <BR>
-Type: required.
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>precout</STRONG></DT>
+<DD>A copy of the input object.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

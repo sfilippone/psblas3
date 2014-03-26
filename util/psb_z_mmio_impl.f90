@@ -32,6 +32,79 @@
 subroutine mm_zvet_read(b, info, iunit, filename)   
   use psb_base_mod
   implicit none
+  complex(psb_dpk_), allocatable, intent(out)  :: b(:)
+  integer(psb_ipk_), intent(out)        :: info
+  integer(psb_ipk_), optional, intent(in)          :: iunit
+  character(len=*), optional, intent(in) :: filename
+  integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j,infile
+  real(psb_dpk_)       :: bre, bim 
+  character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+       & line*1024
+
+  info = psb_success_
+  if (present(filename)) then
+    if (filename == '-') then 
+      infile=5
+    else
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=99
+      endif
+      open(infile,file=filename, status='OLD', err=901, action='READ')
+    endif
+  else 
+    if (present(iunit)) then 
+      infile=iunit
+    else
+      infile=5
+    endif
+  endif
+
+  read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+
+  if ( (object /= 'matrix').or.(fmt /= 'array')) then
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
+    info = -3
+    return
+  end if
+
+  do 
+    read(infile,fmt='(a)') line
+    if (line(1:1) /= '%')  exit
+  end do
+
+  read(line,fmt=*)nrow,ncol
+
+  if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+    allocate(b(nrow),stat = ircode)
+    if (ircode /= 0)   goto 993
+    do i=1, nrow
+      read(infile,fmt=*,end=902) bre,bim
+      b(i,j) = cmplx(bre,bim,kind=psb_dpk_)
+    end do
+  end if      ! read right hand sides
+  if (infile /= 5) close(infile)
+
+  return 
+  ! open failed
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
+       & infile,' for input'
+  info = -1
+  return
+
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
+       & ' during input'
+  info = -2
+  return
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
+  info = -3
+  return
+end subroutine mm_zvet_read
+
+subroutine mm_zvet2_read(b, info, iunit, filename)   
+  use psb_base_mod
+  implicit none
   complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
   integer(psb_ipk_), intent(out)        :: info
   integer(psb_ipk_), optional, intent(in)          :: iunit
@@ -103,7 +176,7 @@ subroutine mm_zvet_read(b, info, iunit, filename)
 993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
-end subroutine mm_zvet_read
+end subroutine mm_zvet2_read
 
 subroutine mm_zvet2_write(b, header, info, iunit, filename)   
   use psb_base_mod

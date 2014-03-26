@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Communication routines</TITLE>
-<META NAME="description" CONTENT="Communication routines">
+<TITLE>Iterative Methods</TITLE>
+<META NAME="description" CONTENT="Iterative Methods">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,45 +18,49 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node66.html">
-<LINK REL="previous" HREF="node47.html">
+<LINK REL="next" HREF="node127.html">
+<LINK REL="previous" HREF="node119.html">
 <LINK REL="up" HREF="userhtml.html">
-<LINK REL="next" HREF="node62.html">
+<LINK REL="next" HREF="node126.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html986"
-  HREF="node62.html">
+<A NAME="tex2html1802"
+  HREF="node126.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html982"
+<A NAME="tex2html1798"
   HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html976"
-  HREF="node60.html">
+<A NAME="tex2html1792"
+  HREF="node124.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html984"
+<A NAME="tex2html1800"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html987"
-  HREF="node62.html">psb_halo   Halo</A>
-<B> Up:</B> <A NAME="tex2html983"
+<B> Next:</B> <A NAME="tex2html1803"
+  HREF="node126.html">psb_krylov   Krylov</A>
+<B> Up:</B> <A NAME="tex2html1799"
   HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html977"
-  HREF="node60.html">psb_spsm   Triangular</A>
- &nbsp; <B>  <A NAME="tex2html985"
+<B> Previous:</B> <A NAME="tex2html1793"
+  HREF="node124.html">clone   clone</A>
+ &nbsp; <B>  <A NAME="tex2html1801"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00060000000000000000">
-Communication routines</A>
+<H1><A NAME="SECTION000120000000000000000"></A>
+<A NAME="sec:methods"></A>
+<BR>
+Iterative Methods
 </H1>
-The routines in this chapter implement various global communication operators
-on vectors associated with a discretization mesh. For auxiliary communication
-routines not tied to a discretization space see&nbsp;<A HREF="node66.html#sec:toolsrout">6</A>.
+
+<P>
+In this chapter we provide routines for preconditioners and iterative
+methods. The interfaces for Krylov subspace methods are available in
+the module <code>psb_krylov_mod</code>.
 
 <P>
 <BR><HR>
@@ -64,14 +68,9 @@ routines not tied to a discretization space see&nbsp;<A HREF="node66.html#sec:to
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
 <UL>
-<LI><A NAME="tex2html988"
-  HREF="node62.html">psb_halo -- Halo Data Communication</A>
-<LI><A NAME="tex2html989"
-  HREF="node63.html">psb_ovrl -- Overlap Update</A>
-<LI><A NAME="tex2html990"
-  HREF="node64.html">psb_gather -- Gather Global Dense Matrix</A>
-<LI><A NAME="tex2html991"
-  HREF="node65.html">psb_scatter -- Scatter Global Dense Matrix</A>
+<LI><A NAME="tex2html1804"
+  HREF="node126.html">psb_krylov  -- Krylov Methods Driver
+      Routine</A>
 </UL>
 <!--End of Table of Child-Links-->
 <BR><HR>

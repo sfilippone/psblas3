@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>About this document ...</TITLE>
-<META NAME="description" CONTENT="About this document ...">
+<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,52 +18,81 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node124.html">
 <LINK REL="previous" HREF="node122.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="up" HREF="node119.html">
+<LINK REL="next" HREF="node124.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_g.png"> 
-<A NAME="tex2html1743"
-  HREF="userhtml.html">
+<A NAME="tex2html1780"
+  HREF="node124.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1776"
+  HREF="node119.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1739"
+<A NAME="tex2html1770"
   HREF="node122.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1745"
+<A NAME="tex2html1778"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Up:</B> <A NAME="tex2html1744"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1740"
-  HREF="node122.html">Bibliography</A>
- &nbsp; <B>  <A NAME="tex2html1746"
+<B> Next:</B> <A NAME="tex2html1781"
+  HREF="node124.html">clone   clone</A>
+<B> Up:</B> <A NAME="tex2html1777"
+  HREF="node119.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1771"
+  HREF="node122.html">psb_precaply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1779"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000140000000000000000">
-About this document ...</A>
-</H1>
- <P>
-This document was generated using the
-<A HREF="http://www.latex2html.org/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 2008 (1.71)
+<H2><A NAME="SECTION000114000000000000000">
+psb_precdescr -- Prints a description of current
+  preconditioner</A>
+</H2>
+
 <P>
-Copyright &#169; 1993, 1994, 1995, 1996,
-<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
-Computer Based Learning Unit, University of Leeds.
+<PRE>
+call psb_precdescr(prec)
+call psb_precdescr(prec, iout)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Copyright &#169; 1997, 1998, 1999,
-<A HREF="http://www.maths.mq.edu.au/~ross/">Ross Moore</A>, 
-Mathematics Department, Macquarie University, Sydney.
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
+Scope: <B>local</B> 
+<BR>
+Type: <B>optiona</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number. 
+</DD>
+</DL>
+
 <P>
-The command line arguments were: <BR>
- <STRONG>latex2html</STRONG> <TT>-local_icons -noaddress -dir ../../html userhtml.tex</TT>
-<P>
-The translation was initiated by Salvatore Filippone on 2013-06-10
 <BR><HR>
 
 </BODY>

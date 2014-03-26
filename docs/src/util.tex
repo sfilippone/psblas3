@@ -9,8 +9,10 @@ module \verb|psb_util_mod|.
 
 %\subroutine{PSB\_HBIO\_MOD}{Input/Output in Harwell-Boeing format}
 
-\clearpage\subroutine{hb\_read}{Read a sparse matrix from a file in the
+\clearpage\subsection*{ hb\_read --- Read a sparse matrix from a file in the
   Harwell--Boeing format}
+\addcontentsline{toc}{subsection}{hb\_read}
+
 
 \begin{lstlisting}
 call hb_read(a, iret, iunit, filename, b, mtitle)
@@ -51,8 +53,10 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{hb\_write}{Write a sparse matrix to a  file
+\clearpage\subsection*{hb\_write --- Write a sparse matrix to a  file
   in the Harwell--Boeing format}
+\addcontentsline{toc}{subsection}{hb\_write}
+
 
 \begin{lstlisting}
 call hb_write(a, iret, iunit, filename, key, rhs, mtitle)
@@ -103,8 +107,9 @@ An integer value; 0 means no error has been detected.
 
 %\subroutine{PSB\_MMIO\_MOD}{Input/Output in MatrixMarket format}
 
-\clearpage\subroutine{mm\_mat\_read}{Read a sparse matrix from a
+\clearpage\subsection*{mm\_mat\_read --- Read a sparse matrix from a
   file in the MatrixMarket format}
+\addcontentsline{toc}{subsection}{mm\_mat\_read}
 
 \begin{lstlisting}
 call mm_mat_read(a, iret, iunit, filename)
@@ -133,10 +138,13 @@ Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\clearpage\subroutine{mm\_vet\_read}{Read a dense vector from a
+
+\clearpage\subsection*{mm\_array\_read --- Read a dense array from a
   file in the MatrixMarket format}
+\addcontentsline{toc}{subsection}{mm\_array\_read}
+
 \begin{lstlisting}
-call mm_vet_read(b, iret, iunit, filename)
+call mm_array_read(b, iret, iunit, filename)
 \end{lstlisting}
 
 \begin{description}
@@ -156,7 +164,7 @@ Specified as: an integer value. Only meaningful if filename is not \verb|-|.
 \item[\bf On Return]
 \item[b] Rigth hand side(s).\\
 Type: {\bf required} \\
-An  array of type real or complex, rank 2 and having the ALLOCATABLE
+An  array of type real or complex, rank 1 or 2 and having the ALLOCATABLE
 attribute; will be allocated and filled in if the input file contains
 a right hand side, otherwise will be left in the UNALLOCATED state. 
 \item[iret] Error code.\\
@@ -166,8 +174,11 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subroutine{mm\_mat\_write}{Write a sparse matrix to a
+\clearpage\subsection*{mm\_mat\_write --- Write a sparse matrix to a
   file in the MatrixMarket format}
+\addcontentsline{toc}{subsection}{mm\_mat\_write}
+
+
 \begin{lstlisting}
 call mm_mat_write(a, mtitle, iret, iunit, filename)
 \end{lstlisting}
@@ -185,6 +196,38 @@ A charachter variable holding a descriptive title for the matrix to be
 Type:{\bf optional}.\\
 Specified as: a character variable containing a valid file name, or
 \verb|-|, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: \verb|-|. 
+\item[iunit] The Fortran file unit number.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. Only meaningful if filename is not \verb|-|.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[iret] Error code.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+\clearpage\subsection*{mm\_array\_write ---  Write a dense array from a
+  file in the MatrixMarket format}
+\addcontentsline{toc}{subsection}{mm\_array\_write}
+
+\begin{lstlisting}
+call mm_array_write(b, iret, iunit, filename)
+\end{lstlisting}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf  On Entry ]
+\item[b] Rigth hand side(s).\\
+Type: {\bf required} \\
+An  array of type real or complex, rank 1 or 2; will be written..\
+\item[filename] The name of the file to be written.\\
+Type:{\bf optional}.\\
+Specified as: a character variable containing a valid file name, or
+\verb|-|, in which case the default input unit  5 (i.e. standard input
 in Unix jargon) is used. Default: \verb|-|. 
 \item[iunit] The Fortran file unit number.\\
 Type:{\bf optional}.\\

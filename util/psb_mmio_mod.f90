@@ -36,14 +36,14 @@ module psb_mmio_mod
        & psb_sspmat_type, psb_cspmat_type, &
        & psb_dspmat_type, psb_zspmat_type
 
-  public mm_mat_read, mm_mat_write, mm_vet_read, mm_vet_write
+  public mm_mat_read, mm_mat_write, mm_vet_read, mm_vet_write,&
+       & mm_array_read, mm_array_write
 
-  interface mm_vet_read
-
+  interface mm_array_read
     subroutine mm_svet_read(b, info, iunit, filename)   
       import :: psb_spk_, psb_ipk_
       implicit none
-      real(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      real(psb_spk_), allocatable, intent(out)  :: b(:)
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -51,7 +51,7 @@ module psb_mmio_mod
     subroutine mm_dvet_read(b, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_
       implicit none
-      real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      real(psb_dpk_), allocatable, intent(out)  :: b(:)
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -59,7 +59,7 @@ module psb_mmio_mod
     subroutine mm_cvet_read(b, info, iunit, filename)   
       import :: psb_spk_, psb_ipk_
       implicit none
-      complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      complex(psb_spk_), allocatable, intent(out)  :: b(:)
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
@@ -67,15 +67,190 @@ module psb_mmio_mod
     subroutine mm_zvet_read(b, info, iunit, filename)   
       import :: psb_dpk_, psb_ipk_
       implicit none
-      complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      complex(psb_dpk_), allocatable, intent(out)  :: b(:)
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet_read
+    subroutine mm_svet2_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      real(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svet2_read
+    subroutine mm_dvet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_dvet2_read
+    subroutine mm_cvet2_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_cvet2_read
+    subroutine mm_zvet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_zvet2_read
   end interface
 
-  interface mm_vet_write
+  interface mm_vet_read
+    subroutine mm_svet_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      real(psb_spk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svet_read
+    subroutine mm_dvet_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      real(psb_dpk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_dvet_read
+    subroutine mm_cvet_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      complex(psb_spk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_cvet_read
+    subroutine mm_zvet_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      complex(psb_dpk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_zvet_read
+    subroutine mm_svet2_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      real(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svet2_read
+    subroutine mm_dvet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_dvet2_read
+    subroutine mm_cvet2_read(b, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_cvet2_read
+    subroutine mm_zvet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_zvet2_read
+  end interface
 
+
+  interface mm_array_write
+    subroutine mm_svet2_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      real(psb_spk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svet2_write
+    subroutine mm_svet1_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      real(psb_spk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_svet1_write
+    subroutine mm_dvet2_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      real(psb_dpk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_dvet2_write
+    subroutine mm_dvet1_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      real(psb_dpk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_dvet1_write
+    subroutine mm_cvet2_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      complex(psb_spk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_cvet2_write
+    subroutine mm_cvet1_write(b, header, info, iunit, filename)   
+      import :: psb_spk_, psb_ipk_
+      implicit none
+      complex(psb_spk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_cvet1_write
+    subroutine mm_zvet2_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      complex(psb_dpk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_zvet2_write
+    subroutine mm_zvet1_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      complex(psb_dpk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_zvet1_write
+  end interface
+
+
+  interface mm_vet_write
     subroutine mm_svet2_write(b, header, info, iunit, filename)   
       import :: psb_spk_, psb_ipk_
       implicit none

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precbld -- Builds a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precbld -- Builds a preconditioner">
+<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,108 +20,75 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node116.html">
 <LINK REL="previous" HREF="node114.html">
-<LINK REL="up" HREF="node113.html">
+<LINK REL="up" HREF="node112.html">
 <LINK REL="next" HREF="node116.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1674"
+<A NAME="tex2html1681"
   HREF="node116.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1670"
-  HREF="node113.html">
+<A NAME="tex2html1677"
+  HREF="node112.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1664"
+<A NAME="tex2html1671"
   HREF="node114.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1672"
+<A NAME="tex2html1679"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1675"
-  HREF="node116.html">psb_precaply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1671"
-  HREF="node113.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1665"
-  HREF="node114.html">psb_precinit   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1673"
+<B> Next:</B> <A NAME="tex2html1682"
+  HREF="node116.html">mm_array_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1678"
+  HREF="node112.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1672"
+  HREF="node114.html">hb_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1680"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000112000000000000000">
-psb_precbld -- Builds a preconditioner</A>
+<H2><A NAME="SECTION000103000000000000000">
+mm_mat_read -- Read a sparse matrix from a
+  file in the MatrixMarket format</A>
 </H2>
 
 <P>
-<PRE>
-call psb_precbld(a, desc_a, prec, info,amold,vmold)
-</PRE>
+<BR>
+<IMG
+ WIDTH="394" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img151.png"
+ ALT="\begin{lstlisting}
+call mm_mat_read(a, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the system sparse matrix.
-Scope: <B>local</B> 
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
 <BR>
-Type: <B>required</B>
+Type:<B>optional</B>.
 <BR>
-Intent: <B>in</B>, target.
-<BR>
-Specified as: a sparse matrix data structure spdata<TT>psb_Tspmat_type</TT>.
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
 <BR>
-Scope: <B>local</B> 
+Type:<B>optional</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor. 
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>, target.
-<BR>
-Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>amold</STRONG></DT>
-<DD>The desired dynamic type for the internal matrix storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
-</DD>
-<DT><STRONG>vmold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>. 
-
-<P>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
 </DD>
 </DL>
 
@@ -130,25 +97,17 @@ Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_typ
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
 <BR>
-Scope: <B>local</B> 
+Type:<B>required</B>.
 <BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>info</STRONG></DT>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>iret</STRONG></DT>
 <DD>Error code.
 <BR>
-Scope: <B>local</B> 
-<BR>
 Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
 <BR>
 An integer value; 0 means no error has been detected. 
 </DD>
