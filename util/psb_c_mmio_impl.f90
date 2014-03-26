@@ -81,7 +81,7 @@ subroutine mm_cvet_read(b, info, iunit, filename)
     if (ircode /= 0)   goto 993
     do i=1, nrow
       read(infile,fmt=*,end=902) bre,bim
-      b(i,j) = cmplx(bre,bim,kind=psb_spk_)
+      b(i) = cmplx(bre,bim,kind=psb_spk_)
     end do
   end if      ! read right hand sides
   if (infile /= 5) close(infile)

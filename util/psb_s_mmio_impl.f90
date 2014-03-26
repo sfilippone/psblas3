@@ -171,7 +171,7 @@ subroutine mm_svet2_read(b, info, iunit, filename)
 993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
-end subroutine mm_svet_read
+end subroutine mm_svet2_read
 
 subroutine mm_svet2_write(b, header, info, iunit, filename)   
   use psb_base_mod

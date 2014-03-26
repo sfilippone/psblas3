@@ -122,7 +122,7 @@ program df_sample
       call mm_mat_read(aux_a,info,iunit=iunit,filename=mtrx_file)
       if (info == psb_success_) then 
         if (rhs_file /= 'NONE') then
-          call mm_vet_read(aux_b,info,iunit=iunit,filename=rhs_file)
+          call mm_array_read(aux_b,info,iunit=iunit,filename=rhs_file)
         end if
       end if
       
