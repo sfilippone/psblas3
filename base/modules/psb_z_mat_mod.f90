@@ -797,13 +797,21 @@ module psb_z_mat_mod
   end interface
 
   
+!!$  interface 
+!!$    subroutine psb_z_get_diag(a,d,info)
+!!$      import :: psb_ipk_, psb_zspmat_type, psb_dpk_
+!!$      class(psb_zspmat_type), intent(in) :: a
+!!$      complex(psb_dpk_), intent(out)         :: d(:)
+!!$      integer(psb_ipk_), intent(out)                 :: info
+!!$    end subroutine psb_z_get_diag
+!!$  end interface
   interface 
-    subroutine psb_z_get_diag(a,d,info)
+    function psb_z_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_zspmat_type, psb_dpk_
       class(psb_zspmat_type), intent(in) :: a
-      complex(psb_dpk_), intent(out)         :: d(:)
-      integer(psb_ipk_), intent(out)                 :: info
-    end subroutine psb_z_get_diag
+      complex(psb_dpk_), allocatable         :: d(:)
+      integer(psb_ipk_), intent(out)       :: info
+    end function psb_z_get_diag
   end interface
   
   interface psb_scal

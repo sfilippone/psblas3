@@ -797,13 +797,21 @@ module psb_d_mat_mod
   end interface
 
   
+!!$  interface 
+!!$    subroutine psb_d_get_diag(a,d,info)
+!!$      import :: psb_ipk_, psb_dspmat_type, psb_dpk_
+!!$      class(psb_dspmat_type), intent(in) :: a
+!!$      real(psb_dpk_), intent(out)         :: d(:)
+!!$      integer(psb_ipk_), intent(out)                 :: info
+!!$    end subroutine psb_d_get_diag
+!!$  end interface
   interface 
-    subroutine psb_d_get_diag(a,d,info)
+    function psb_d_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
-      real(psb_dpk_), intent(out)         :: d(:)
-      integer(psb_ipk_), intent(out)                 :: info
-    end subroutine psb_d_get_diag
+      real(psb_dpk_), allocatable         :: d(:)
+      integer(psb_ipk_), intent(out)       :: info
+    end function psb_d_get_diag
   end interface
   
   interface psb_scal

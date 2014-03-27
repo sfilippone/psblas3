@@ -2437,14 +2437,53 @@ subroutine psb_c_aclsum(d,a,info)
 end subroutine psb_c_aclsum
 
 
-subroutine psb_c_get_diag(a,d,info)
+!!$
+!!$subroutine psb_c_get_diag(a,d,info)
+!!$  use psb_c_mat_mod, psb_protect_name => psb_c_get_diag
+!!$  use psb_error_mod
+!!$  use psb_const_mod
+!!$  implicit none 
+!!$  class(psb_cspmat_type), intent(in) :: a
+!!$  complex(psb_spk_), intent(out)          :: d(:)
+!!$  integer(psb_ipk_), intent(out)                 :: info
+!!$
+!!$  integer(psb_ipk_) :: err_act
+!!$  character(len=20)  :: name='get_diag'
+!!$  logical, parameter :: debug=.false.
+!!$
+!!$  info = psb_success_
+!!$  call psb_erractionsave(err_act)
+!!$  if (.not.allocated(a%a)) then 
+!!$    info = psb_err_invalid_mat_state_
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  endif
+!!$
+!!$  call a%a%get_diag(d,info)
+!!$  if (info /= psb_success_) goto 9999
+!!$
+!!$  call psb_erractionrestore(err_act)
+!!$  return
+!!$
+!!$9999 continue
+!!$  call psb_erractionrestore(err_act)
+!!$
+!!$  if (err_act == psb_act_abort_) then
+!!$    call psb_error()
+!!$    return
+!!$  end if
+!!$  return
+!!$
+!!$end subroutine psb_c_get_diag
+
+function psb_c_get_diag(a,info) result(d)
   use psb_c_mat_mod, psb_protect_name => psb_c_get_diag
   use psb_error_mod
   use psb_const_mod
   implicit none 
   class(psb_cspmat_type), intent(in) :: a
-  complex(psb_spk_), intent(out)          :: d(:)
-  integer(psb_ipk_), intent(out)                 :: info
+  complex(psb_spk_), allocatable         :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='get_diag'
@@ -2457,7 +2496,12 @@ subroutine psb_c_get_diag(a,d,info)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  allocate(d(max(1,min(a%a%get_nrows(),a%a%get_ncols()))), stat=info)
+  if (info /= 0) then 
+    info = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
   call a%a%get_diag(d,info)
   if (info /= psb_success_) goto 9999
 
@@ -2473,7 +2517,7 @@ subroutine psb_c_get_diag(a,d,info)
   end if
   return
 
-end subroutine psb_c_get_diag
+end function psb_c_get_diag
 
 
 subroutine psb_c_scal(d,a,info,side)

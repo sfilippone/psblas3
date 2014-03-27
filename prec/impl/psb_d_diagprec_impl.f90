@@ -111,28 +111,13 @@ subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
     goto 9999
   end if
 
-  if (size(work) >= x%get_nrows()) then 
-    ww => work
-  else
-    allocate(ww(x%get_nrows()),stat=info)
-    if (info /= psb_success_) then 
-      ierr(1) = x%get_nrows()
-      call psb_errpush(psb_err_alloc_request_,name,&
-           & i_err=ierr,a_err='real(psb_dpk_)')
-      goto 9999      
-    end if
-  end if
-
 
   call y%mlt(alpha,prec%dv,x,beta,info,conjgx=trans)
 
-  if (size(work) < x%get_nrows()) then 
-    deallocate(ww,stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_, &
-           & name,a_err='Deallocate')
-      goto 9999      
-    end if
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_, &
+         & name,a_err='vect%mlt')
+    goto 9999      
   end if
 
   call psb_erractionrestore(err_act)
@@ -270,22 +255,9 @@ subroutine psb_d_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   call psb_erractionsave(err_act)
 
   info = psb_success_
-  nrow = desc_a%get_local_cols()
-  if (allocated(prec%d)) then 
-    if (size(prec%d) < nrow) then 
-      deallocate(prec%d,stat=info)
-    end if
-  end if
-  if ((info == psb_success_).and.(.not.allocated(prec%d))) then 
-    allocate(prec%d(nrow), stat=info)
-  end if
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+  nrow = desc_a%get_local_rows()
 
-  call a%get_diag(prec%d,info) 
+  prec%d=a%get_diag(info) 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_
     call psb_errpush(info,name, a_err='get_diag')
@@ -299,6 +271,7 @@ subroutine psb_d_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
       prec%d(i) = done/prec%d(i)
     endif
   end do
+  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=done)
   allocate(prec%dv,stat=info) 
   if (info == 0) then 
     if (present(vmold)) then 

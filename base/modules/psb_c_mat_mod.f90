@@ -797,13 +797,21 @@ module psb_c_mat_mod
   end interface
 
   
+!!$  interface 
+!!$    subroutine psb_c_get_diag(a,d,info)
+!!$      import :: psb_ipk_, psb_cspmat_type, psb_spk_
+!!$      class(psb_cspmat_type), intent(in) :: a
+!!$      complex(psb_spk_), intent(out)         :: d(:)
+!!$      integer(psb_ipk_), intent(out)                 :: info
+!!$    end subroutine psb_c_get_diag
+!!$  end interface
   interface 
-    subroutine psb_c_get_diag(a,d,info)
+    function psb_c_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_spk_), intent(out)         :: d(:)
-      integer(psb_ipk_), intent(out)                 :: info
-    end subroutine psb_c_get_diag
+      complex(psb_spk_), allocatable         :: d(:)
+      integer(psb_ipk_), intent(out)       :: info
+    end function psb_c_get_diag
   end interface
   
   interface psb_scal
