@@ -107,6 +107,12 @@ module psb_mmio_mod
   end interface
 
 
+  interface mm_vet_read
+    procedure mm_svet_read, mm_dvet_read, mm_cvet_read,&
+         & mm_zvet_read, mm_svet2_read, mm_dvet2_read, &
+         & mm_cvet2_read, mm_zvet2_read
+  end interface
+
 
   interface mm_array_write
     subroutine mm_svet2_write(b, header, info, iunit, filename)   
@@ -182,6 +188,13 @@ module psb_mmio_mod
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet1_write
   end interface
+
+  interface mm_vet_write
+    procedure mm_svet1_write, mm_dvet1_write, mm_cvet1_write,&
+         & mm_zvet1_write, mm_svet2_write, mm_dvet2_write, &
+         & mm_cvet2_write, mm_zvet2_write
+  end interface
+
 
 
   interface mm_mat_read

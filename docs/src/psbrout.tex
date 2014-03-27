@@ -280,8 +280,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_geamax --- Infinity-Norm of Vector}
-\addcontentsline{toc}{subsection}{psb\_geamax}    
+\clearpage\subsection*{psb\_normi --- Infinity-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_normi}    
 
 This function computes 
  the infinity-norm of a vector $x$.\\
@@ -297,6 +297,7 @@ else if $x$ is a complex vector then it computes the infinity-norm  as:
 
 \begin{verbatim}
 psb_geamax(x, desc_a, info)
+psb_normi(x, desc_a, info)
 \end{verbatim}
 %% \syntax*{psb\_geamax}{x, desc\_a, info, jx}
 
@@ -420,8 +421,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_geasum --- 1-Norm of Vector}
-\addcontentsline{toc}{subsection}{psb\_geasum}    
+\clearpage\subsection*{psb\_norm1 --- 1-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_norm1}    
 
 This function computes the 1-norm of a vector $x$.\\
 If $x$ is a real vector
@@ -433,6 +434,7 @@ else if $x$ is a complex vector then it computes 1-norm  as:
 
 \begin{verbatim}
 psb_geasum(x, desc_a, info)
+psb_norm1(x, desc_a, info)
 \end{verbatim}
 
 \begin{table}[h]
@@ -556,8 +558,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_genrm2 --- 2-Norm of Vector}
-\addcontentsline{toc}{subsection}{psb\_genrm2}    
+\clearpage\subsection*{psb\_norm2 --- 2-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_norm2}    
 
 This function computes the 2-norm of a vector $x$.\\
 If $x$ is a  real  vector
@@ -588,6 +590,7 @@ Long Precision Real&Long Precision Complex & psb\_genrm2 \\
 
 \begin{verbatim}
 psb_genrm2(x, desc_a, info)
+psb_norm2(x, desc_a, info)
 \end{verbatim}
 %% \syntax*{psb\_genrm2}{x, desc\_a, info, jx}
 
@@ -698,8 +701,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spnrm1 --- 1-Norm of Sparse Matrix}
-\addcontentsline{toc}{subsection}{psb\_spnrm1}    
+\clearpage\subsection*{psb\_norm1 --- 1-Norm of Sparse Matrix}
+\addcontentsline{toc}{subsection}{psb\_norm1}    
 
 This function computes the 1-norm of a matrix $A$:\\
 
@@ -727,6 +730,7 @@ Long Precision Complex & psb\_spnrm1 \\
 
 \begin{verbatim}
 psb_spnrm1(A, desc_a, info)
+psb_norm1(A, desc_a, info)
 \end{verbatim}
 
 \begin{description}
@@ -762,8 +766,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\clearpage\subsection*{psb\_spnrmi --- Infinity Norm of Sparse Matrix}
-\addcontentsline{toc}{subsection}{psb\_spnrmi}    
+\clearpage\subsection*{psb\_normi --- Infinity Norm of Sparse Matrix}
+\addcontentsline{toc}{subsection}{psb\_normi}    
 
 This function computes the infinity-norm of a matrix $A$:\\
 
@@ -791,6 +795,7 @@ Long Precision Complex & psb\_spnrmi \\
 
 \begin{verbatim}
 psb_spnrmi(A, desc_a, info)
+psb_normi(A, desc_a, info)
 \end{verbatim}
 
 \begin{description}
