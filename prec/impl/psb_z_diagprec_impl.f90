@@ -264,14 +264,15 @@ subroutine psb_z_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
     goto 9999
   end if
 
+  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=zone)
   do i=1,nrow
     if (prec%d(i) == dzero) then
-      prec%d(i) = done
+      prec%d(i) = zone
     else
-      prec%d(i) = done/prec%d(i)
+      prec%d(i) = zone/prec%d(i)
     endif
   end do
-  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=zone)
+
   allocate(prec%dv,stat=info) 
   if (info == 0) then 
     if (present(vmold)) then 

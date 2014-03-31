@@ -2284,13 +2284,13 @@ function psb_z_csnm1(a) result(res)
 end function psb_z_csnm1
 
 
-subroutine psb_z_rowsum(d,a,info)
+function psb_z_rowsum(a,info) result(d)
   use psb_z_mat_mod, psb_protect_name => psb_z_rowsum
   use psb_error_mod
   use psb_const_mod
   implicit none 
   class(psb_zspmat_type), intent(in) :: a
-  complex(psb_dpk_), intent(out)     :: d(:)
+  complex(psb_dpk_), allocatable     :: d(:)
   integer(psb_ipk_), intent(out)               :: info
 
   integer(psb_ipk_) :: err_act
@@ -2304,9 +2304,9 @@ subroutine psb_z_rowsum(d,a,info)
     call psb_errpush(info,name)
     goto 9999
   endif
-
-  call a%a%rowsum(d)
+  allocate(d(max(1,a%a%get_nrows())), stat=info)
   if (info /= psb_success_) goto 9999
+  call a%a%rowsum(d)
 
   call psb_erractionrestore(err_act)
   return
@@ -2320,16 +2320,16 @@ subroutine psb_z_rowsum(d,a,info)
   end if
   return
 
-end subroutine psb_z_rowsum
+end function psb_z_rowsum
 
-subroutine psb_z_arwsum(d,a,info)
+function psb_z_arwsum(a,info) result(d)
   use psb_z_mat_mod, psb_protect_name => psb_z_arwsum
   use psb_error_mod
   use psb_const_mod
   implicit none 
   class(psb_zspmat_type), intent(in) :: a
-  real(psb_dpk_), intent(out)          :: d(:)
-  integer(psb_ipk_), intent(out)                 :: info
+  real(psb_dpk_), allocatable           :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='arwsum'
@@ -2342,9 +2342,10 @@ subroutine psb_z_arwsum(d,a,info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  allocate(d(max(1,a%a%get_nrows())), stat=info)
+  if (info /= psb_success_) goto 9999
 
   call a%a%arwsum(d)
-  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2358,16 +2359,16 @@ subroutine psb_z_arwsum(d,a,info)
   end if
   return
 
-end subroutine psb_z_arwsum
+end function psb_z_arwsum
 
-subroutine psb_z_colsum(d,a,info)
+function psb_z_colsum(a,info) result(d)
   use psb_z_mat_mod, psb_protect_name => psb_z_colsum
   use psb_error_mod
   use psb_const_mod
   implicit none 
   class(psb_zspmat_type), intent(in) :: a
-  complex(psb_dpk_), intent(out)     :: d(:)
-  integer(psb_ipk_), intent(out)               :: info
+  complex(psb_dpk_), allocatable         :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='colsum'
@@ -2380,9 +2381,10 @@ subroutine psb_z_colsum(d,a,info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  if (info /= psb_success_) goto 9999
 
   call a%a%colsum(d)
-  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2396,16 +2398,16 @@ subroutine psb_z_colsum(d,a,info)
   end if
   return
 
-end subroutine psb_z_colsum
+end function psb_z_colsum
 
-subroutine psb_z_aclsum(d,a,info)
+function psb_z_aclsum(a,info) result(d)
   use psb_z_mat_mod, psb_protect_name => psb_z_aclsum
   use psb_error_mod
   use psb_const_mod
   implicit none 
   class(psb_zspmat_type), intent(in) :: a
-  real(psb_dpk_), intent(out)        :: d(:)
-  integer(psb_ipk_), intent(out)               :: info
+  real(psb_dpk_), allocatable           :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='aclsum'
@@ -2418,9 +2420,10 @@ subroutine psb_z_aclsum(d,a,info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  if (info /= psb_success_) goto 9999
 
   call a%a%aclsum(d)
-  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2434,47 +2437,8 @@ subroutine psb_z_aclsum(d,a,info)
   end if
   return
 
-end subroutine psb_z_aclsum
+end function psb_z_aclsum
 
-
-!!$
-!!$subroutine psb_z_get_diag(a,d,info)
-!!$  use psb_z_mat_mod, psb_protect_name => psb_z_get_diag
-!!$  use psb_error_mod
-!!$  use psb_const_mod
-!!$  implicit none 
-!!$  class(psb_zspmat_type), intent(in) :: a
-!!$  complex(psb_dpk_), intent(out)          :: d(:)
-!!$  integer(psb_ipk_), intent(out)                 :: info
-!!$
-!!$  integer(psb_ipk_) :: err_act
-!!$  character(len=20)  :: name='get_diag'
-!!$  logical, parameter :: debug=.false.
-!!$
-!!$  info = psb_success_
-!!$  call psb_erractionsave(err_act)
-!!$  if (.not.allocated(a%a)) then 
-!!$    info = psb_err_invalid_mat_state_
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  endif
-!!$
-!!$  call a%a%get_diag(d,info)
-!!$  if (info /= psb_success_) goto 9999
-!!$
-!!$  call psb_erractionrestore(err_act)
-!!$  return
-!!$
-!!$9999 continue
-!!$  call psb_erractionrestore(err_act)
-!!$
-!!$  if (err_act == psb_act_abort_) then
-!!$    call psb_error()
-!!$    return
-!!$  end if
-!!$  return
-!!$
-!!$end subroutine psb_z_get_diag
 
 function psb_z_get_diag(a,info) result(d)
   use psb_z_mat_mod, psb_protect_name => psb_z_get_diag

@@ -264,14 +264,15 @@ subroutine psb_c_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
     goto 9999
   end if
 
+  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=cone)
   do i=1,nrow
     if (prec%d(i) == dzero) then
-      prec%d(i) = done
+      prec%d(i) = cone
     else
-      prec%d(i) = done/prec%d(i)
+      prec%d(i) = cone/prec%d(i)
     endif
   end do
-  call psb_realloc(desc_a%get_local_cols(),prec%d,info,pad=cone)
+
   allocate(prec%dv,stat=info) 
   if (info == 0) then 
     if (present(vmold)) then 

@@ -761,50 +761,41 @@ module psb_c_mat_mod
   end interface
 
   interface 
-    subroutine psb_c_rowsum(d,a,info) 
+    function psb_c_rowsum(a,info) result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_spk_), intent(out)     :: d(:)
+      complex(psb_spk_), allocatable      :: d(:)
       integer(psb_ipk_), intent(out)               :: info
-    end subroutine psb_c_rowsum
+    end function psb_c_rowsum
   end interface
 
   interface 
-    subroutine psb_c_arwsum(d,a,info) 
+    function psb_c_arwsum(a,info) result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_spk_), intent(out)        :: d(:)
+      real(psb_spk_), allocatable        :: d(:)
       integer(psb_ipk_), intent(out)               :: info
-    end subroutine psb_c_arwsum
+    end function psb_c_arwsum
   end interface
   
   interface 
-    subroutine psb_c_colsum(d,a,info) 
+    function psb_c_colsum(a,info) result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      complex(psb_spk_), intent(out)     :: d(:)
+      complex(psb_spk_), allocatable      :: d(:)
       integer(psb_ipk_), intent(out)               :: info
-    end subroutine psb_c_colsum
+    end function psb_c_colsum
   end interface
 
   interface 
-    subroutine psb_c_aclsum(d,a,info) 
+    function psb_c_aclsum(a,info)  result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_
       class(psb_cspmat_type), intent(in) :: a
-      real(psb_spk_), intent(out)        :: d(:)
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_c_aclsum
+      real(psb_spk_), allocatable        :: d(:)
+      integer(psb_ipk_), intent(out)        :: info
+    end function psb_c_aclsum
   end interface
 
-  
-!!$  interface 
-!!$    subroutine psb_c_get_diag(a,d,info)
-!!$      import :: psb_ipk_, psb_cspmat_type, psb_spk_
-!!$      class(psb_cspmat_type), intent(in) :: a
-!!$      complex(psb_spk_), intent(out)         :: d(:)
-!!$      integer(psb_ipk_), intent(out)                 :: info
-!!$    end subroutine psb_c_get_diag
-!!$  end interface
   interface 
     function psb_c_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_cspmat_type, psb_spk_

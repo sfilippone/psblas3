@@ -91,20 +91,22 @@ function psb_cspnrm1(a,desc_a,info)  result(res)
     goto 9999
   end if
 
-  call psb_geall(v,desc_a,info)
-  if(info == psb_success_) then 
-    v = czero
-    call psb_geasb(v,desc_a,info)
-  end if
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='geall/asb'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
+!!$  call psb_geall(v,desc_a,info)
+!!$  if(info == psb_success_) then 
+!!$    v = czero
+!!$    call psb_geasb(v,desc_a,info)
+!!$  end if
+!!$  if(info /= psb_success_) then
+!!$    info=psb_err_from_subroutine_
+!!$    ch_err='geall/asb'
+!!$    call psb_errpush(info,name,a_err=ch_err)
+!!$    goto 9999
+!!$  end if
   
   if ((m /= 0).and.(n /= 0)) then
-    call a%aclsum(v,info)
+    v = a%aclsum(info)
+    if (info == psb_success_) &
+         & call psb_realloc(desc_a%get_local_cols(),v,info,pad=szero)
     if (info == psb_success_) call psb_halo(v,desc_a,info,tran='T')
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
