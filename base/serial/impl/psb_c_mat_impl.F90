@@ -748,7 +748,7 @@ subroutine psb_c_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (.not.a%is_bld()) then 
+  if (.not.(a%is_bld().or.a%is_upd())) then 
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
