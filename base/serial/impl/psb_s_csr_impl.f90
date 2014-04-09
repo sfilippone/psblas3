@@ -2400,8 +2400,7 @@ subroutine psb_s_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
          & imin,imax,jmin,jmax,info,gtl)
 
     if (info /= psb_success_) then  
-
-      info = psb_err_invalid_mat_state_
+      info = psb_err_internal_error_
     end if
 
   else 
