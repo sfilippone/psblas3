@@ -3388,7 +3388,7 @@ subroutine psb_c_fix_coo(a,info,idir)
   else
     i = nza
   end if
-  call a%set_sorted()
+  call a%set_sort_status(idir_)
   call a%set_nzeros(i)
   call a%set_asb()
 

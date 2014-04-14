@@ -130,6 +130,8 @@ module psb_z_base_mat_mod
     integer(psb_ipk_), allocatable :: ja(:)
     !> Coefficient values. 
     complex(psb_dpk_), allocatable :: val(:)
+
+    integer, private     :: sort_status=psb_unsorted_
     
   contains
     !
@@ -160,6 +162,13 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: print        => psb_z_coo_print
     procedure, pass(a) :: free         => z_coo_free
     procedure, pass(a) :: mold         => psb_z_coo_mold
+    procedure, pass(a) :: is_sorted    => z_coo_is_sorted
+    procedure, pass(a) :: is_by_rows   => z_coo_is_by_rows
+    procedure, pass(a) :: is_by_cols   => z_coo_is_by_cols
+    procedure, pass(a) :: set_by_rows  => z_coo_set_by_rows
+    procedure, pass(a) :: set_by_cols  => z_coo_set_by_cols
+    procedure, pass(a) :: set_sort_status => z_coo_set_sort_status
+
     !
     ! This is COO specific
     !
@@ -1292,7 +1301,7 @@ module psb_z_base_mat_mod
   !! \param val(:) Coefficients
   !! \param nzout  Number of entries after sorting/duplicate handling
   !! \param info   return code
-  !! \param idir [0] Sort in: row major order (0) or col major order (1)
+  !! \param idir [psb_row_major_] Sort in row major order or col major order 
   !! 
   !
   interface 
@@ -1311,7 +1320,7 @@ module psb_z_base_mat_mod
   !! \memberof  psb_z_coo_sparse_mat
   !! \brief Make sure the entries are sorted and duplicates are handled.
   !! \param info   return code
-  !! \param idir [0] Sort in: row major order (0) or col major order (1)
+  !! \param idir [psb_row_major_] Sort in row major order or col major order 
   !!
   !
   interface 
@@ -1742,6 +1751,29 @@ contains
     res  = a%nnz
   end function z_coo_get_nzeros
   
+  function z_coo_is_by_rows(a) result(res)
+    implicit none 
+    class(psb_z_coo_sparse_mat), intent(in) :: a
+    logical :: res
+    res  = (a%sort_status == psb_row_major_)
+  end function z_coo_is_by_rows
+  
+  function z_coo_is_by_cols(a) result(res)
+    implicit none 
+    class(psb_z_coo_sparse_mat), intent(in) :: a
+    logical :: res
+    res  = (a%sort_status == psb_col_major_)
+  end function z_coo_is_by_cols
+  
+  function z_coo_is_sorted(a) result(res)
+    implicit none 
+    class(psb_z_coo_sparse_mat), intent(in) :: a
+    logical :: res
+    res  = (a%sort_status == psb_row_major_) &
+         & .or.(a%sort_status == psb_col_major_)
+  end function z_coo_is_sorted
+  
+ 
   
   ! == ==================================
   !
@@ -1764,6 +1796,34 @@ contains
     a%nnz = nz
     
   end subroutine z_coo_set_nzeros
+  
+  subroutine  z_coo_set_sort_status(ist,a)
+    implicit none 
+    integer(psb_ipk_), intent(in)   :: ist
+    class(psb_z_coo_sparse_mat), intent(inout) :: a
+    
+    a%sort_status = ist
+    call a%set_sorted((a%sort_status == psb_row_major_) &
+         & .or.(a%sort_status == psb_col_major_))   
+  end subroutine z_coo_set_sort_status
+ 
+  
+  subroutine  z_coo_set_by_rows(a)
+    implicit none 
+    class(psb_z_coo_sparse_mat), intent(inout) :: a
+    
+    a%sort_status = psb_row_major_
+    call a%set_sorted()
+  end subroutine z_coo_set_by_rows
+ 
+  
+  subroutine  z_coo_set_by_cols(a)
+    implicit none 
+    class(psb_z_coo_sparse_mat), intent(inout) :: a
+    
+    a%sort_status = psb_col_major_
+    call a%set_sorted()
+  end subroutine z_coo_set_by_cols
   
   ! == ==================================
   !
