@@ -217,7 +217,7 @@ subroutine mm_zvet2_write(b, header, info, iunit, filename)
   ncol = size(b,2) 
   write(outfile,*) nrow,ncol
 
-  write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+  write(frmtv,'(a,i0,a)') '(',2*ncol,'(es26.18,1x))'
 
   do i=1,size(b,1) 
     write(outfile,frmtv) b(i,1:ncol)
@@ -273,7 +273,7 @@ subroutine mm_zvet1_write(b, header, info, iunit, filename)
   ncol = 1
   write(outfile,*) nrow,ncol
 
-  write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+  write(frmtv,'(a,i0,a)') '(',2*ncol,'(es26.18,1x))'
 
   do i=1,size(b,1) 
     write(outfile,frmtv) b(i)
