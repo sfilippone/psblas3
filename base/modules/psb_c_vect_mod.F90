@@ -164,7 +164,7 @@ contains
     class(psb_c_base_vect_type), pointer :: mld
 
     if (allocated(x%v)) &
-         & call x%v%free(info)
+         & call x%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -195,7 +195,7 @@ contains
 
 
     if (allocated(x%v)) &
-         & call x%v%free(info)
+         & call x%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
