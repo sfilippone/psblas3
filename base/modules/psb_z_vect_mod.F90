@@ -158,10 +158,13 @@ contains
   
   subroutine z_vect_bld_x(x,invect,mold)
     complex(psb_dpk_), intent(in)          :: invect(:)
-    class(psb_z_vect_type), intent(out) :: x
+    class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
     class(psb_z_base_vect_type), pointer :: mld
+
+    if (allocated(x%v)) &
+         & call x%v%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -185,10 +188,14 @@ contains
 
   subroutine z_vect_bld_n(x,n,mold)
     integer(psb_ipk_), intent(in) :: n
-    class(psb_z_vect_type), intent(out) :: x
+    class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
     class(psb_z_base_vect_type), pointer :: mld
+
+
+    if (allocated(x%v)) &
+         & call x%v%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -493,11 +500,14 @@ contains
   subroutine z_vect_all(n, x, info, mold)
 
     implicit none 
-    integer(psb_ipk_), intent(in)       :: n
-    class(psb_z_vect_type), intent(out) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
     
+    if (allocated(x%v)) &
+         & call x%free(info)
+
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)

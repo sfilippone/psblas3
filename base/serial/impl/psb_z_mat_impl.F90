@@ -618,7 +618,7 @@ subroutine psb_z_csall(nr,nc,a,info,nz)
   use psb_z_base_mat_mod
   use psb_error_mod
   implicit none 
-  class(psb_zspmat_type), intent(out) :: a
+  class(psb_zspmat_type), intent(inout) :: a
   integer(psb_ipk_), intent(in)             :: nr,nc
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: nz
@@ -628,6 +628,8 @@ subroutine psb_z_csall(nr,nc,a,info,nz)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
+
+  call a%free()
 
   info = psb_success_
   allocate(psb_z_coo_sparse_mat :: a%a, stat=info)
@@ -968,8 +970,8 @@ subroutine psb_z_tril(a,b,info,diag,imin,imax,&
     call psb_errpush(info,name)
     goto 9999
   endif
-
   allocate(acoo,stat=info)    
+  call b%free()
 
   if (info == psb_success_) then 
     call a%a%tril(acoo,info,diag,imin,imax,&
@@ -1023,6 +1025,7 @@ subroutine psb_z_triu(a,b,info,diag,imin,imax,&
   endif
 
   allocate(acoo,stat=info)    
+  call b%free()
 
   if (info == psb_success_) then 
     call a%a%triu(acoo,info,diag,imin,imax,&
@@ -1059,7 +1062,7 @@ subroutine psb_z_csclip(a,b,info,&
   implicit none
 
   class(psb_zspmat_type), intent(in) :: a
-  class(psb_zspmat_type), intent(out) :: b
+  class(psb_zspmat_type), intent(inout) :: b
   integer(psb_ipk_),intent(out)                  :: info
   integer(psb_ipk_), intent(in), optional        :: imin,imax,jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
@@ -1078,7 +1081,7 @@ subroutine psb_z_csclip(a,b,info,&
   endif
 
   allocate(acoo,stat=info)    
-  
+  call b%free()
   if (info == psb_success_) then 
     call a%a%csclip(acoo,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
@@ -1155,8 +1158,8 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
   use psb_string_mod
   use psb_z_mat_mod, psb_protect_name => psb_z_cscnv
   implicit none 
-  class(psb_zspmat_type), intent(in)    :: a
-  class(psb_zspmat_type), intent(out)   :: b
+  class(psb_zspmat_type), intent(in)      :: a
+  class(psb_zspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
   integer(psb_ipk_),optional, intent(in)           :: dupl, upd
   character(len=*), optional, intent(in) :: type
@@ -1177,6 +1180,7 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   endif
+  call b%free()
   if (count( (/present(mold),present(type) /)) > 1) then
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
@@ -1426,8 +1430,8 @@ subroutine psb_z_clip_d(a,b,info)
   use psb_z_mat_mod, psb_protect_name => psb_z_clip_d
   implicit none
 
-  class(psb_zspmat_type), intent(in) :: a
-  class(psb_zspmat_type), intent(out) :: b
+  class(psb_zspmat_type), intent(in)    :: a
+  class(psb_zspmat_type), intent(inout) :: b
   integer(psb_ipk_),intent(out)                  :: info
 
   integer(psb_ipk_) :: err_act
@@ -1547,10 +1551,11 @@ subroutine psb_z_mv_from(a,b)
   use psb_string_mod
   use psb_z_mat_mod, psb_protect_name => psb_z_mv_from
   implicit none 
-  class(psb_zspmat_type), intent(out) :: a
+  class(psb_zspmat_type), intent(inout) :: a
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
 
+  call a%free()
 #if defined(HAVE_MOLD)
   allocate(a%a,mold=b, stat=info)
 #else
@@ -1577,6 +1582,7 @@ subroutine psb_z_cp_from(a,b)
   call psb_erractionsave(err_act)
   info = psb_success_
   
+  call a%free()
   !
   ! Note: it is tempting to use SOURCE allocation below;
   ! however this would run the risk of messing up with data
@@ -1610,9 +1616,9 @@ subroutine psb_z_mv_to(a,b)
   use psb_z_mat_mod, psb_protect_name => psb_z_mv_to
   implicit none 
   class(psb_zspmat_type), intent(inout) :: a
-  class(psb_z_base_sparse_mat), intent(out) :: b
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
-
+  
   call b%mv_from_fmt(a%a,info)
 
   return
@@ -1625,7 +1631,7 @@ subroutine psb_z_cp_to(a,b)
   use psb_z_mat_mod, psb_protect_name => psb_z_cp_to
   implicit none 
   class(psb_zspmat_type), intent(in) :: a
-  class(psb_z_base_sparse_mat), intent(out) :: b
+  class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_) :: info
 
   call b%cp_from_fmt(a%a,info)
@@ -1652,7 +1658,7 @@ subroutine psb_zspmat_type_move(a,b,info)
   use psb_z_mat_mod, psb_protect_name => psb_zspmat_type_move
   implicit none 
   class(psb_zspmat_type), intent(inout) :: a
-  class(psb_zspmat_type), intent(out)   :: b
+  class(psb_zspmat_type), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                   :: info
 
   integer(psb_ipk_) :: err_act
@@ -1660,6 +1666,7 @@ subroutine psb_zspmat_type_move(a,b,info)
   logical, parameter :: debug=.false.
 
   info = psb_success_
+  call b%free()
   call move_alloc(a%a,b%a)
 
   return
@@ -1743,7 +1750,7 @@ subroutine psb_z_transp_2mat(a,b)
   use psb_z_mat_mod, psb_protect_name => psb_z_transp_2mat
   implicit none 
   class(psb_zspmat_type), intent(in)  :: a
-  class(psb_zspmat_type), intent(out) :: b
+  class(psb_zspmat_type), intent(inout) :: b
 
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='transp'
@@ -1756,7 +1763,7 @@ subroutine psb_z_transp_2mat(a,b)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  call b%free()
 #if defined(HAVE_MOLD)
   allocate(b%a,mold=a%a,stat=info)
 #else
@@ -1823,8 +1830,8 @@ subroutine psb_z_transc_2mat(a,b)
   use psb_string_mod
   use psb_z_mat_mod, psb_protect_name => psb_z_transc_2mat
   implicit none 
-  class(psb_zspmat_type), intent(in)  :: a
-  class(psb_zspmat_type), intent(out) :: b
+  class(psb_zspmat_type), intent(in)    :: a
+  class(psb_zspmat_type), intent(inout) :: b
 
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='transc'
@@ -1837,7 +1844,7 @@ subroutine psb_z_transc_2mat(a,b)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  call b%free()
 #if defined(HAVE_MOLD)
   allocate(b%a,mold=a%a,stat=info)
 #else
