@@ -1982,9 +1982,11 @@ subroutine psb_z_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='z_csc_csput'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza
+  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
   info = psb_success_
 
   if (nz <= 0) then 
@@ -2025,9 +2027,13 @@ subroutine psb_z_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     call  psb_z_csc_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
 
-    if (info /= psb_success_) then  
-
-      info = psb_err_invalid_mat_state_
+    if (info < 0) then 
+      info = psb_err_internal_error_
+    else if (info > 0) then 
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Discarded entries not  belonging to us.'                    
+      info = psb_success_
     end if
 
   else 
@@ -2116,20 +2122,13 @@ contains
               if (ip>0) then 
                 a%val(i1+ip-1) = val(i)
               else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Was searching ',ir,' in: ',i1,i2,&
-                     & ' : ',a%ia(i1:i2-1)
-                info = i
-                return
+                info = max(info,3)
               end if
-
             else
-
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'
+              info = max(info,2)
             end if
+          else
+            info = max(info,1)
           end if
         end do
 
@@ -2152,19 +2151,13 @@ contains
               if (ip>0) then 
                 a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
               else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Was searching ',ir,' in: ',i1,i2,&
-                     & ' : ',a%ia(i1:i2-1)
-                info = i
-                return
+                info = max(info,3)
               end if
             else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'
+              info = max(info,2)
             end if
-
+          else
+            info = max(info,1)
           end if
         end do
 
@@ -2197,18 +2190,10 @@ contains
             if (ip>0) then 
               a%val(i1+ip-1) = val(i)
             else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Was searching ',ir,' in: ',i1,i2,&
-                   & ' : ',a%ia(i1:i2-1)
-              info = i
-              return
+              info = max(info,3)
             end if
-
           else
-            if (debug_level >= psb_debug_serial_) &
-                 & write(debug_unit,*) trim(name),&
-                 & ': Discarding col that does not belong to us.'
+            info = max(info,2)
           end if
 
         end do
@@ -2229,17 +2214,10 @@ contains
             if (ip>0) then 
               a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
             else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Was searching ',ir,' in: ',i1,i2,&
-                   & ' : ',a%ia(i1:i2-1)
-              info = i
-              return
+              info = max(info,3)
             end if
           else
-            if (debug_level >= psb_debug_serial_) &
-                 & write(debug_unit,*) trim(name),&
-                 & ': Discarding col that does not belong to us.'
+              info = max(info,2)
           end if
         end do
 

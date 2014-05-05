@@ -2591,9 +2591,11 @@ subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='s_coo_csput_impl'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza
+  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
   info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
   call psb_erractionsave(err_act)
 
   if (nz < 0) then 
@@ -2648,10 +2650,15 @@ subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
     call  s_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
-    if (info /= psb_success_) then 
-      info = psb_err_invalid_mat_state_
-    end if
 
+    if (info < 0) then 
+      info = psb_err_internal_error_
+    else if (info > 0) then 
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Discarded entries not  belonging to us.'                    
+      info = psb_success_
+    end if
   else 
     ! State is wrong.
     info = psb_err_invalid_mat_state_
@@ -2798,14 +2805,13 @@ contains
               if (ip>0) then 
                 a%val(i1+ip-1) = val(i)
               else
-                info = i 
-                return
+                info = max(info,3)
               end if
             else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'
+              info = max(info,2)
             endif
+          else
+            info = max(info,1)
           end if
         end do
       case(psb_dupl_add_)
@@ -2841,14 +2847,13 @@ contains
               if (ip>0) then 
                 a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
               else
-                info = i 
-                return
+                info = max(info,3)
               end if
             else
-              if (debug_level >= psb_debug_serial_) &
-                   & write(debug_unit,*) trim(name),&
-                   & ': Discarding row that does not belong to us.'              
+              info = max(info,2)
             end if
+          else
+            info = max(info,1)
           end if
         end do
 
@@ -2893,9 +2898,10 @@ contains
             if (ip>0) then 
               a%val(i1+ip-1) = val(i)
             else
-              info = i 
-              return
+              info = max(info,3)
             end if
+          else
+            info = max(info,2)
           end if
         end do
 
@@ -2929,9 +2935,10 @@ contains
             if (ip>0) then 
               a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
             else
-              info = i 
-              return
+              info = max(info,3)
             end if
+          else
+            info = max(info,2)
           end if
         end do
 
