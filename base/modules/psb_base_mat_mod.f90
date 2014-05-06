@@ -140,6 +140,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_state   => psb_base_get_state
     procedure, pass(a) :: get_dupl    => psb_base_get_dupl
     procedure, nopass  :: get_fmt     => psb_base_get_fmt
+    procedure, nopass  :: has_update  => psb_base_has_update
     procedure, pass(a) :: is_null     => psb_base_is_null
     procedure, pass(a) :: is_bld      => psb_base_is_bld
     procedure, pass(a) :: is_upd      => psb_base_is_upd
@@ -436,6 +437,16 @@ contains
     character(len=5) :: res
     res = 'NULL'
   end function psb_base_get_fmt
+  !         
+  !> Function  has_update
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Does the forma have the UPDATE functionality? 
+  !
+  function psb_base_has_update() result(res)
+    implicit none 
+    logical  :: res
+    res = .true.
+  end function psb_base_has_update
   
   !
   ! Standard getter functions: self-explaining. 

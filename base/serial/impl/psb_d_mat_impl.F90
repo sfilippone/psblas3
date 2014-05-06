@@ -1244,8 +1244,8 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
   end if
 
   call move_alloc(altmp,b%a)
-  call b%set_asb() 
   call b%trim()
+  call b%asb() 
   call psb_erractionrestore(err_act)
   return
 
@@ -1300,58 +1300,59 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
     call psb_errpush(info,name,a_err='TYPE, MOLD')
     goto 9999
   end if
-
-  if (present(mold)) then 
+  if (a%is_bld()) then 
+    if (present(mold)) then 
 
 #if defined(HAVE_MOLD)
-    allocate(altmp, mold=mold,stat=info) 
+      allocate(altmp, mold=mold,stat=info) 
 #else
-    call mold%mold(altmp,info)
+      call mold%mold(altmp,info)
 #endif
 
-  else if (present(type)) then 
+    else if (present(type)) then 
 
-    select case (psb_toupper(type))
-    case ('CSR')
-      allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
-    case ('COO')
-      allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
-    case ('CSC')
-      allocate(psb_d_csc_sparse_mat :: altmp, stat=info) 
-    case default
-      info = psb_err_format_unknown_ 
-      call psb_errpush(info,name,a_err=type)
+      select case (psb_toupper(type))
+      case ('CSR')
+        allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
+      case ('COO')
+        allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
+      case ('CSC')
+        allocate(psb_d_csc_sparse_mat :: altmp, stat=info) 
+      case default
+        info = psb_err_format_unknown_ 
+        call psb_errpush(info,name,a_err=type)
+        goto 9999
+      end select
+    else
+#if defined(HAVE_MOLD)
+      allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+#else
+      mld = psb_get_mat_default(a)
+      call mld%mold(altmp,info)
+#endif
+    end if
+
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
       goto 9999
-    end select
-  else
-#if defined(HAVE_MOLD)
-    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
-#else
-    mld = psb_get_mat_default(a)
-    call mld%mold(altmp,info)
-#endif
+    end if
+
+    if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
+         & a%get_fmt(),' to ',altmp%get_fmt()
+
+    call altmp%mv_from_fmt(a%a, info)
+
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err="mv_from")
+      goto 9999
+    end if
+
+    call move_alloc(altmp,a%a)
   end if
-
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
-       & a%get_fmt(),' to ',altmp%get_fmt()
-
-  call altmp%mv_from_fmt(a%a, info)
-
-  if (info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err="mv_from")
-    goto 9999
-  end if
-
-  call move_alloc(altmp,a%a)
-  call a%set_asb() 
   call a%trim()
+  call a%asb() 
   call psb_erractionrestore(err_act)
   return
 
@@ -1869,7 +1870,36 @@ subroutine psb_d_transc_2mat(a,b)
 
 end subroutine psb_d_transc_2mat
 
+subroutine psb_d_asb(a)
+  use psb_d_mat_mod, psb_protect_name => psb_d_asb
+  use psb_error_mod
+  implicit none 
 
+  class(psb_dspmat_type), intent(inout) :: a   
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='reinit'
+
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%asb()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+end subroutine psb_d_asb
 
 
 subroutine psb_d_reinit(a,clear)
@@ -1889,7 +1919,13 @@ subroutine psb_d_reinit(a,clear)
     goto 9999
   endif
 
-  call a%a%reinit(clear)
+  if (a%a%has_update()) then 
+    call a%a%reinit(clear)
+  else
+    info = psb_err_missing_override_method_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   call psb_erractionrestore(err_act)
   return

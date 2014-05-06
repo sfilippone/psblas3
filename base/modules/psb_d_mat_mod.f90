@@ -136,6 +136,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: print_n     => psb_d_n_sparse_print
     generic, public    :: print       => print_i, print_n
     procedure, pass(a) :: mold        => psb_d_mold
+    procedure, pass(a) :: asb         => psb_d_asb
     procedure, pass(a) :: transp_1mat => psb_d_transp_1mat
     procedure, pass(a) :: transp_2mat => psb_d_transp_2mat
     generic, public    :: transp      => transp_1mat, transp_2mat
@@ -491,6 +492,13 @@ module psb_d_mat_mod
       class(psb_dspmat_type), intent(inout)     :: a
       class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
     end subroutine psb_d_mold
+  end interface
+  
+  interface 
+    subroutine psb_d_asb(a) 
+      import :: psb_ipk_, psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+    end subroutine psb_d_asb
   end interface
   
   interface 
