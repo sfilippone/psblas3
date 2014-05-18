@@ -464,6 +464,7 @@ contains
 
   function psb_wtime()
     use psb_const_mod
+    use mpi_constants
 #ifdef MPI_MOD
     use mpi
 #endif
