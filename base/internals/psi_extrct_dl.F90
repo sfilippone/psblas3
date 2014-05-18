@@ -132,7 +132,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 #endif
   !     ....scalar parameters...
   logical :: is_bld, is_upd
-  integer(psb_mpik_) :: ictxt
+  integer(psb_ipk_) :: ictxt
   integer(psb_ipk_) :: np,dl_lda,mode, info
 
   !     ....array parameters....
@@ -145,17 +145,17 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: i,pointer_dep_list,proc,j,err_act
   integer(psb_ipk_) :: err
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpik_) :: icomm, me, npr, dl_mpi, minfo
+  integer(psb_mpik_) :: iictxt, icomm, me, npr, dl_mpi, minfo
   character  name*20
   name='psi_extrct_dl'
 
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-
+  iictxt = ictxt 
   info = psb_success_
 
-  call psb_info(ictxt,me,npr)
+  call psb_info(iictxt,me,npr)
   do i=0,np 
     length_dl(i) = 0
   enddo
@@ -263,8 +263,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
   if (err /= 0) goto 9999
 
-  call psb_sum(ictxt,length_dl(0:np))
-  call psb_get_mpicomm(ictxt,icomm )
+  call psb_sum(iictxt,length_dl(0:np))
+  call psb_get_mpicomm(iictxt,icomm )
   allocate(itmp(dl_lda),stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_

@@ -1461,7 +1461,8 @@ contains
     implicit none 
     class(psb_hash_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt, ntot, me, np
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ntot
+    integer(psb_mpik_) :: ictxt, me, np
     integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.

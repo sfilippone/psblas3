@@ -103,7 +103,7 @@ module psi_i_mod
          & length_dl,np,dl_lda,mode,info)
       import :: psb_desc_type, psb_ipk_, psb_mpik_
       logical :: is_bld, is_upd
-      integer(psb_mpik_) :: ictxt
+      integer(psb_ipk_) :: ictxt
       integer(psb_ipk_) :: np,dl_lda,mode, info
       integer(psb_ipk_) :: desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
     end subroutine psi_extract_dep_list

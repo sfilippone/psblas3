@@ -419,7 +419,7 @@ subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_) :: err_act, nzin, nzout
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
-  integer :: jmin_, jmax_
+  integer(psb_ipk_) :: jmin_, jmax_
   logical :: append_, rscale_, cscale_
   logical, parameter :: debug=.false.
 
