@@ -1,5 +1,18 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2014/06/11: Check for bug on multiple generic names. 
+	
+2014/04/14: Sort status in COO. Changes in error handling for CSPUT.
+	
+2014/03/31: get_diag, rowsum & friends changed into functions. 
+	
+2014/03/26: TRIL/TRIU interfaces. Fixed mm_array_read/write. 
+            Multiple generic names for norms and io.
+	
+2014/03/18: New defaults for MOLD & friends. 
+	
+2014/01/27: Fixed error conditions on mmio. 	
+
 2013/12/12: New sparse-sparse matrix product, with CSR-CSR, CSC-CSC new
 	    versions, while keeping the old version at hand. 
 	
