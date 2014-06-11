@@ -582,6 +582,11 @@ PAC_FORTRAN_TEST_VOLATILE(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
 )
 
+PAC_FORTRAN_TEST_GENERICS( 
+	[],
+	[FDEFINES="$psblas_cv_define_prepend-DBAD_GENERICS $FDEFINES"]
+)
+
 PAC_FORTRAN_TEST_FLUSH( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
 )

@@ -600,6 +600,63 @@ cd ..
 rm -fr tmpdir_$i])
 
 
+dnl @synopsis PAC_FORTRAN_TEST_GENERICS( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile a program checking the GENERIC Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_GENERICS,
+ac_objext='.o'
+ac_ext='f90'
+ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FCFLAGS conftest.$ac_ext  1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([test GENERIC interfaces])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module iface
+
+  interface foo 
+    subroutine i_sub_foo(v)
+      integer, intent(inout) :: v(:)
+    end subroutine i_sub_foo
+  end interface foo
+
+  interface bar
+    procedure i_sub_foo
+  end interface bar
+
+end module iface
+EOF
+if AC_TRY_EVAL(ac_compile) && test -s conftest${ac_objext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
+
 
 dnl @synopsis PAC_FORTRAN_TEST_EXTENDS( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
