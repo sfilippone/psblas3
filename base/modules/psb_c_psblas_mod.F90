@@ -144,12 +144,14 @@ module psb_c_psblas_mod
     end function psb_camax_vect
   end interface
 
+#if ! defined(BAD_GENERICS)
   interface psb_genrmi
     procedure psb_camax, psb_camaxv, psb_camax_vect
   end interface 
   interface psb_normi
     procedure psb_camax, psb_camaxv, psb_camax_vect
   end interface 
+#endif
 
   interface psb_geamaxs
     subroutine  psb_camaxvs(res,x,desc_a,info)
@@ -218,13 +220,14 @@ module psb_c_psblas_mod
     end subroutine psb_cmasum
   end interface
 
+#if ! defined(BAD_GENERICS)
   interface psb_genrm1
     procedure psb_casum, psb_casumv, psb_casum_vect
   end interface 
   interface psb_norm1
     procedure psb_casum, psb_casumv, psb_casum_vect
   end interface 
-
+#endif
 
   interface psb_genrm2
     function psb_cnrm2(x, desc_a, info, jx)
@@ -254,9 +257,11 @@ module psb_c_psblas_mod
     end function psb_cnrm2_vect
   end interface
 
+#if ! defined(BAD_GENERICS)
   interface psb_norm2
     procedure psb_cnrm2, psb_cnrm2v, psb_cnrm2_vect
   end interface 
+#endif
 
   interface psb_genrm2s
     subroutine  psb_cnrm2vs(res,x,desc_a,info)
@@ -281,9 +286,11 @@ module psb_c_psblas_mod
     end function psb_cnrmi
   end interface
 
+#if ! defined(BAD_GENERICS)
   interface psb_normi
     procedure psb_cnrmi
   end interface 
+#endif
 
   interface psb_spnrm1
     function psb_cspnrm1(a, desc_a,info)
@@ -296,9 +303,11 @@ module psb_c_psblas_mod
     end function psb_cspnrm1
   end interface
   
+#if ! defined(BAD_GENERICS)
   interface psb_norm1
     procedure psb_cspnrm1
   end interface 
+#endif
 
   interface psb_spmm
     subroutine psb_cspmm(alpha, a, x, beta, y, desc_a, info,&
