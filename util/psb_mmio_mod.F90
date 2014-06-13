@@ -38,7 +38,7 @@ module psb_mmio_mod
 
   public mm_mat_read, mm_mat_write, mm_array_read, mm_array_write
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   public mm_vet_read, mm_vet_write
 #endif
 
@@ -110,7 +110,7 @@ module psb_mmio_mod
   end interface
 
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface mm_vet_read
     procedure mm_svet_read, mm_dvet_read, mm_cvet_read,&
          & mm_zvet_read, mm_svet2_read, mm_dvet2_read, &
@@ -194,7 +194,7 @@ module psb_mmio_mod
     end subroutine mm_zvet1_write
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface mm_vet_write
     procedure mm_svet1_write, mm_dvet1_write, mm_cvet1_write,&
          & mm_zvet1_write, mm_svet2_write, mm_dvet2_write, &

@@ -144,7 +144,7 @@ module psb_z_psblas_mod
     end function psb_zamax_vect
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_zamax, psb_zamaxv, psb_zamax_vect
   end interface 
@@ -220,7 +220,7 @@ module psb_z_psblas_mod
     end subroutine psb_zmasum
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_zasum, psb_zasumv, psb_zasum_vect
   end interface 
@@ -257,7 +257,7 @@ module psb_z_psblas_mod
     end function psb_znrm2_vect
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_znrm2, psb_znrm2v, psb_znrm2_vect
   end interface 
@@ -286,7 +286,7 @@ module psb_z_psblas_mod
     end function psb_znrmi
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_znrmi
   end interface 
@@ -303,7 +303,7 @@ module psb_z_psblas_mod
     end function psb_zspnrm1
   end interface
   
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_zspnrm1
   end interface 

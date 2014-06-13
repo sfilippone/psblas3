@@ -144,7 +144,7 @@ module psb_s_psblas_mod
     end function psb_samax_vect
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrmi
     procedure psb_samax, psb_samaxv, psb_samax_vect
   end interface 
@@ -220,7 +220,7 @@ module psb_s_psblas_mod
     end subroutine psb_smasum
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_sasum, psb_sasumv, psb_sasum_vect
   end interface 
@@ -257,7 +257,7 @@ module psb_s_psblas_mod
     end function psb_snrm2_vect
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_snrm2, psb_snrm2v, psb_snrm2_vect
   end interface 
@@ -286,7 +286,7 @@ module psb_s_psblas_mod
     end function psb_snrmi
   end interface
 
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_normi
     procedure psb_snrmi
   end interface 
@@ -303,7 +303,7 @@ module psb_s_psblas_mod
     end function psb_sspnrm1
   end interface
   
-#if ! defined(BAD_GENERICS)
+#if ! defined(HAVE_BUGGY_GENERICS)
   interface psb_norm1
     procedure psb_sspnrm1
   end interface 
