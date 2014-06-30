@@ -180,13 +180,20 @@ subroutine  psb_cscatterm(globx, locx, desc_a, info, iroot)
 
       ! root has to gather loc_glob from each process
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
-      if(info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        ch_err='Allocate'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
+    else
+      !
+      ! This is to keep debugging compilers from being upset by 
+      ! calling an external MPI function with an unallocated array;
+      ! the Fortran side would complain even if the MPI side does
+      ! not use the unallocated stuff. 
+      ! 
+      allocate(l_t_g_all(1),scatterv(1),stat=info)
+    end if
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call mpi_gatherv(ltg,nrow,&
@@ -213,7 +220,14 @@ subroutine  psb_cscatterm(globx, locx, desc_a, info, iroot)
 
     end do
 
-    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    deallocate(all_dim, l_t_g_all, displ, ltg, scatterv,stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='deallocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
   end if
 
   call psb_erractionrestore(err_act)
@@ -376,7 +390,14 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, iroot)
     call psb_get_rank(rootrank,ictxt,root)
 
     ! root has to gather size information
-    allocate(displ(np),all_dim(np),ltg(nrow))
+    allocate(displ(np),all_dim(np),ltg(nrow),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
     do i=1, nrow
       ltg(i) = i
     end do
@@ -397,7 +418,22 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, iroot)
       endif
       
       ! root has to gather loc_glob from each process
-      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
+      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
+      
+    else
+      !
+      ! This is to keep debugging compilers from being upset by 
+      ! calling an external MPI function with an unallocated array;
+      ! the Fortran side would complain even if the MPI side does
+      ! not use the unallocated stuff. 
+      ! 
+      allocate(l_t_g_all(1),scatterv(1),stat=info)
+    end if
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call mpi_gatherv(ltg,nrow,&
@@ -420,7 +456,13 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, iroot)
          & psb_mpi_c_spk_,locx,nrow,&
          & psb_mpi_c_spk_,rootrank,icomm,info)
 
-    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    deallocate(all_dim, l_t_g_all, displ, ltg, scatterv,stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='deallocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   call psb_erractionrestore(err_act)
