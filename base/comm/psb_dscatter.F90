@@ -376,7 +376,13 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     call psb_get_rank(rootrank,ictxt,root)
 
     ! root has to gather size information
-    allocate(displ(np),all_dim(np),ltg(nrow))
+    allocate(displ(np),all_dim(np),ltg(nrow),stat=info)
+    if (info /= 0) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
     do i=1, nrow
       ltg(i) = i
     end do
@@ -397,8 +403,16 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
       endif
       
       ! root has to gather loc_glob from each process
-      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
+      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
+    else
+      allocate(l_t_g_all(1),scatterv(1),stat=info)
     end if
+    if (info /= 0) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
 
     call mpi_gatherv(ltg,nrow,&
          & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
@@ -419,8 +433,15 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
     call mpi_scatterv(scatterv,all_dim,displ,&
          & psb_mpi_r_dpk_,locx,nrow,&
          & psb_mpi_r_dpk_,rootrank,icomm,info)
+    
+    deallocate(all_dim, l_t_g_all, displ, scatterv,stat=info)
+    if (info /= 0) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+
   end if
 
   call psb_erractionrestore(err_act)
