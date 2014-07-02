@@ -113,7 +113,16 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
     call a%set_ncols(n_col)
   end if
 
-  call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  if (a%is_bld()) then 
+    call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  else if (a%is_upd()) then 
+    call a%asb()
+  else
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+    
+  end if
 
   
   IF (debug_level >= psb_debug_ext_) then 

@@ -3820,4 +3820,47 @@ Contains
 
 #endif
 
+
+  subroutine i_trans(a,at)
+    implicit none 
+    integer(psb_ipk_) :: nr,nc
+    integer(psb_ipk_) :: a(:,:)
+    integer(psb_ipk_), allocatable, intent(out) :: at(:,:)
+    integer(psb_ipk_) :: i,j,ib, ii
+    integer(psb_ipk_), parameter :: nb=32
+    
+    nr = size(a,1)
+    nc = size(a,2)
+    allocate(at(nc,nr))
+    do i=1,nr,nb
+      ib=min(nb,nr-i+1)
+      do ii=i,i+ib-1
+        do j=1,nc
+          at(j,ii) = a(ii,j)
+        end do
+      end do
+    end do
+  end subroutine i_trans
+
+  subroutine d_trans(a,at)
+    implicit none 
+    integer(psb_ipk_) :: nr,nc
+    real(psb_dpk_) :: a(:,:)
+    real(psb_dpk_), allocatable, intent(out) :: at(:,:)
+    integer(psb_ipk_) :: i,j,ib, ii
+    integer(psb_ipk_), parameter :: nb=32
+    
+    nr = size(a,1)
+    nc = size(a,2)
+    allocate(at(nc,nr))
+    do i=1,nr,nb
+      ib=min(nb,nr-i+1)
+      do ii=i,i+ib-1
+        do j=1,nc
+          at(j,ii) = a(ii,j)
+        end do
+      end do
+    end do
+  end subroutine d_trans
+
 end module psb_realloc_mod

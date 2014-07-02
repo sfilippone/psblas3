@@ -68,6 +68,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
+  real(psb_dpk_) :: t1,t2,t3,tcnv,tcsput
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
@@ -159,13 +160,17 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     nrow = desc_a%get_local_rows()
     ncol = desc_a%get_local_cols()
     if (local_) then
-      call a%csput(nz,ia,ja,val,ione,nrow,ione,ncol,info)
+      t1=psb_wtime()
+      call a%csput(nz,ia,ja,val,ione,nrow,ione,ncol,info)      
+      tcsput=psb_wtime() - t1
+      tcnv=0.0
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='a%csput')
         goto 9999
       end if
     else
+      t1=psb_wtime()
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
         ierr(1) = info
@@ -176,14 +181,18 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
       call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
-
+      t2 = psb_Wtime()
       call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
+      t3=psb_wtime()
+      tcnv=t2-t1
+      tcsput=t3-t2
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='a%csput')
         goto 9999
       end if
     end if
+!!$    write(0,*)'SPINS times: ',tcnv,tcsput
   else
     info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)

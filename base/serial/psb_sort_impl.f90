@@ -102,7 +102,7 @@ function  psb_iblsrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_iblsrch
   implicit none
   integer(psb_ipk_) :: ipos, key, n
-  integer(psb_ipk_) :: v(n)
+  integer(psb_ipk_) :: v(:)
 
   integer(psb_ipk_) :: lb, ub, m
 
@@ -144,7 +144,7 @@ function  psb_ibsrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_ibsrch
   implicit none
   integer(psb_ipk_) :: ipos, key, n
-  integer(psb_ipk_) :: v(n)
+  integer(psb_ipk_) :: v(:)
 
   integer(psb_ipk_) :: lb, ub, m
 
@@ -170,7 +170,7 @@ function psb_issrch(key,n,v) result(ipos)
   use psb_sort_mod, psb_protect_name => psb_issrch
   implicit none
   integer(psb_ipk_) :: ipos, key, n
-  integer(psb_ipk_) :: v(n)
+  integer(psb_ipk_) :: v(:)
 
   integer(psb_ipk_) :: i
 

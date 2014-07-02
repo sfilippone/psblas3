@@ -1300,57 +1300,57 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
     call psb_errpush(info,name,a_err='TYPE, MOLD')
     goto 9999
   end if
-  if (a%is_bld()) then 
-    if (present(mold)) then 
+
+  if (present(mold)) then 
 
 #if defined(HAVE_MOLD)
-      allocate(altmp, mold=mold,stat=info) 
+    allocate(altmp, mold=mold,stat=info) 
 #else
-      call mold%mold(altmp,info)
+    call mold%mold(altmp,info)
 #endif
 
-    else if (present(type)) then 
+  else if (present(type)) then 
 
-      select case (psb_toupper(type))
-      case ('CSR')
-        allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
-      case ('COO')
-        allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
-      case ('CSC')
-        allocate(psb_d_csc_sparse_mat :: altmp, stat=info) 
-      case default
-        info = psb_err_format_unknown_ 
-        call psb_errpush(info,name,a_err=type)
-        goto 9999
-      end select
-    else
+    select case (psb_toupper(type))
+    case ('CSR')
+      allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
+    case ('COO')
+      allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
+    case ('CSC')
+      allocate(psb_d_csc_sparse_mat :: altmp, stat=info) 
+    case default
+      info = psb_err_format_unknown_ 
+      call psb_errpush(info,name,a_err=type)
+      goto 9999
+    end select
+  else
 #if defined(HAVE_MOLD)
-      allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
+    allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
 #else
-      mld = psb_get_mat_default(a)
-      call mld%mold(altmp,info)
+    mld = psb_get_mat_default(a)
+    call mld%mold(altmp,info)
 #endif
-    end if
-
-    if (info /= psb_success_) then 
-      info = psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
-         & a%get_fmt(),' to ',altmp%get_fmt()
-
-    call altmp%mv_from_fmt(a%a, info)
-
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err="mv_from")
-      goto 9999
-    end if
-
-    call move_alloc(altmp,a%a)
   end if
+
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
+       & a%get_fmt(),' to ',altmp%get_fmt()
+
+  call altmp%mv_from_fmt(a%a, info)
+
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err="mv_from")
+    goto 9999
+  end if
+
+  call move_alloc(altmp,a%a)
+
   call a%trim()
   call a%asb() 
   call psb_erractionrestore(err_act)

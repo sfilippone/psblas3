@@ -90,7 +90,7 @@ module psb_sort_mod
     function  psb_iblsrch(key,n,v) result(ipos)
       import :: psb_ipk_
       integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(n)
+      integer(psb_ipk_) :: v(:)
     end function psb_iblsrch
   end interface
 
@@ -98,7 +98,7 @@ module psb_sort_mod
     function  psb_ibsrch(key,n,v) result(ipos)
       import :: psb_ipk_
       integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(n)
+      integer(psb_ipk_) :: v(:)
     end function psb_ibsrch
   end interface
 
@@ -107,7 +107,7 @@ module psb_sort_mod
       import :: psb_ipk_
       implicit none
       integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(n)
+      integer(psb_ipk_) :: v(:)
     end function psb_issrch
   end interface
 

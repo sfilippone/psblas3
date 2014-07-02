@@ -180,12 +180,15 @@ module psb_base_mat_mod
     ! == = =================================  
     procedure, pass(a) :: get_neigh  => psb_base_get_neigh
     procedure, pass(a) :: free       => psb_base_free
+    procedure, pass(a) :: asb        => psb_base_mat_asb
     procedure, pass(a) :: trim       => psb_base_trim
     procedure, pass(a) :: reinit     => psb_base_reinit
     procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
     procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
     generic,   public  :: allocate   => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
+
+
     procedure, pass(a) :: csgetptn => psb_base_csgetptn
     generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => psb_base_sparse_print
@@ -196,6 +199,19 @@ module psb_base_mat_mod
     procedure, pass(a) :: transc_1mat => psb_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_base_transc_2mat
     generic, public    :: transc => transc_1mat, transc_2mat
+    ! Sync: centerpiece of handling of external storage.
+    ! Any derived class having extra storage upon sync
+    ! will guarantee that both fortran/host side and
+    ! external side contain the same data. The base
+    ! version is only a placeholder. 
+    !
+    procedure, pass(a) :: sync          => psb_base_mat_sync
+    procedure, pass(a) :: is_host       => psb_base_mat_is_host
+    procedure, pass(a) :: is_dev        => psb_base_mat_is_dev
+    procedure, pass(a) :: is_sync       => psb_base_mat_is_sync
+    procedure, pass(a) :: set_host      => psb_base_mat_set_host
+    procedure, pass(a) :: set_dev       => psb_base_mat_set_dev
+    procedure, pass(a) :: set_sync      => psb_base_mat_set_sync
  
   end type psb_base_sparse_mat
 
@@ -743,6 +759,114 @@ contains
     call a%transp() 
   end subroutine psb_base_transc_1mat
 
+
+
+  !
+  !> Function  base_asb:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Sync: base version calls sync and the set_asb.
+  !!           
+  !
+  subroutine psb_base_mat_asb(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+    call a%sync()
+    call a%set_asb()
+  end subroutine psb_base_mat_asb
+  !
+  ! The base version of SYNC & friends does nothing, it's just
+  ! a placeholder.
+  ! 
+  !
+  !> Function  base_sync:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Sync: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_sync(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_sync
+
+  !
+  !> Function  base_set_host:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_host: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_host(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_host
+
+  !
+  !> Function  base_set_dev:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_dev: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_dev(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_dev
+
+  !
+  !> Function  base_set_sync:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_sync: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_sync(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_sync
+
+  !
+  !> Function  base_is_dev:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on eaternal device    .
+  !!           
+  !
+  function psb_base_mat_is_dev(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+  
+    res = .false.
+  end function psb_base_mat_is_dev
+  
+  !
+  !> Function  base_is_host
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on standard memory    .
+  !!           
+  !
+  function psb_base_mat_is_host(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+
+    res = .true.
+  end function psb_base_mat_is_host
+
+  !
+  !> Function  base_is_sync
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on sync               .
+  !!           
+  !
+  function psb_base_mat_is_sync(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+
+    res = .true.
+  end function psb_base_mat_is_sync
 
 end module psb_base_mat_mod
 

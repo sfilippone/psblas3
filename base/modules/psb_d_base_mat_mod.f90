@@ -76,20 +76,6 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mold          => psb_d_base_mold 
     procedure, pass(a) :: clone         => psb_d_base_clone
     procedure, pass(a) :: make_nonunit  => psb_d_base_make_nonunit
-    procedure, pass(a) :: asb           => d_base_mat_asb
-    ! Sync: centerpiece of handling of external storage.
-    ! Any derived class having extra storage upon sync
-    ! will guarantee that both fortran/host side and
-    ! external side contain the same data. The base
-    ! version is only a placeholder. 
-    !
-    procedure, pass(a) :: sync          => d_base_mat_sync
-    procedure, pass(a) :: is_host       => d_base_mat_is_host
-    procedure, pass(a) :: is_dev        => d_base_mat_is_dev
-    procedure, pass(a) :: is_sync       => d_base_mat_is_sync
-    procedure, pass(a) :: set_host      => d_base_mat_set_host
-    procedure, pass(a) :: set_dev       => d_base_mat_set_dev
-    procedure, pass(a) :: set_sync      => d_base_mat_set_sync
 
     
     !
@@ -1919,113 +1905,6 @@ contains
 
   end subroutine d_coo_transc_1mat
 
-
-  !
-  !> Function  base_asb:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Sync: base version calls sync and the set_asb.
-  !!           
-  !
-  subroutine d_base_mat_asb(a)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(inout) :: a
-    
-    call a%sync()
-    call a%set_asb()
-  end subroutine d_base_mat_asb
-  !
-  ! The base version of SYNC & friends does nothing, it's just
-  ! a placeholder.
-  ! 
-  !
-  !> Function  base_sync:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Sync: base version is a no-op.
-  !!           
-  !
-  subroutine d_base_mat_sync(a)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(inout) :: a
-    
-  end subroutine d_base_mat_sync
-
-  !
-  !> Function  base_set_host:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Set_host: base version is a no-op.
-  !!           
-  !
-  subroutine d_base_mat_set_host(a)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(inout) :: a
-    
-  end subroutine d_base_mat_set_host
-
-  !
-  !> Function  base_set_dev:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Set_dev: base version is a no-op.
-  !!           
-  !
-  subroutine d_base_mat_set_dev(a)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(inout) :: a
-    
-  end subroutine d_base_mat_set_dev
-
-  !
-  !> Function  base_set_sync:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Set_sync: base version is a no-op.
-  !!           
-  !
-  subroutine d_base_mat_set_sync(a)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(inout) :: a
-    
-  end subroutine d_base_mat_set_sync
-
-  !
-  !> Function  base_is_dev:
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Is  vector on eaternal device    .
-  !!           
-  !
-  function d_base_mat_is_dev(a) result(res)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(in) :: a
-    logical  :: res
-  
-    res = .false.
-  end function d_base_mat_is_dev
-  
-  !
-  !> Function  base_is_host
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Is  vector on standard memory    .
-  !!           
-  !
-  function d_base_mat_is_host(a) result(res)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(in) :: a
-    logical  :: res
-
-    res = .true.
-  end function d_base_mat_is_host
-
-  !
-  !> Function  base_is_sync
-  !! \memberof  psb_d_base_sparse_mat
-  !! \brief Is  vector on sync               .
-  !!           
-  !
-  function d_base_mat_is_sync(a) result(res)
-    implicit none 
-    class(psb_d_base_sparse_mat), intent(in) :: a
-    logical  :: res
-
-    res = .true.
-  end function d_base_mat_is_sync
 
 
 

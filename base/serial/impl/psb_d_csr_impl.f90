@@ -2459,7 +2459,7 @@ contains
     debug_level = psb_get_debug_level()
 
     dupl = a%get_dupl()
-
+!!$    write(0,*) 'Going through csr_srch_upd'
     if (.not.a%is_sorted()) then 
       info = -4
       return
