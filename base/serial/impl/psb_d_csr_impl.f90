@@ -2338,10 +2338,10 @@ end subroutine psb_d_csr_csgetblk
 
 
 
-subroutine psb_d_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_d_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_csput
+  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_csput_a
   implicit none 
 
   class(psb_d_csr_sparse_mat), intent(inout) :: a
@@ -2353,7 +2353,7 @@ subroutine psb_d_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='d_csr_csput'
+  character(len=20)  :: name='d_csr_csput_a'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
@@ -2604,7 +2604,7 @@ contains
 
   end subroutine psb_d_csr_srch_upd
 
-end subroutine psb_d_csr_csput
+end subroutine psb_d_csr_csput_a
 
 
 subroutine psb_d_csr_reinit(a,clear)

@@ -327,9 +327,9 @@ subroutine psb_d_base_mv_from_fmt(a,b,info)
 
 end subroutine psb_d_base_mv_from_fmt
 
-subroutine psb_d_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_d_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput_a
   implicit none 
   class(psb_d_base_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
@@ -354,7 +354,56 @@ subroutine psb_d_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   end if
   return
 
-end subroutine psb_d_base_csput
+end subroutine psb_d_base_csput_a
+
+
+subroutine psb_d_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_error_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput_v
+  use psb_d_base_vect_mod
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(inout) :: a
+  class(psb_d_base_vect_type), intent(inout)  :: val
+  class(psb_i_base_vect_type), intent(inout)  :: ia, ja
+  integer(psb_ipk_), intent(in)               :: nz, imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: gtl(:)
+
+  integer(psb_ipk_) :: err_act, nzin, nzout
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='csput_v'
+  integer :: jmin_, jmax_
+  logical :: append_, rscale_, cscale_
+  logical, parameter :: debug=.false.
+  
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  
+  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+  else
+    info = psb_err_invalid_mat_state_
+  endif
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_base_csput_v
+
+
 
 subroutine psb_d_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -456,7 +505,7 @@ subroutine psb_d_base_csgetblk(imin,imax,a,b,info,&
   else
     jmax_ = a%get_ncols()
   endif
-  
+
   if (append_.and.(rscale_.or.cscale_)) then 
     write(psb_err_unit,*) &
          & 'd_csgetblk: WARNING: dubious input: append_ and rscale_|cscale_'
@@ -682,7 +731,7 @@ subroutine psb_d_base_tril(a,b,info,&
        & b%ia(1:nzout) = b%ia(1:nzout) - imin_ + 1
   if (cscale_) &
        & b%ja(1:nzout) = b%ja(1:nzout) - jmin_ + 1
-  
+
   if ((diag_ <= 0).and.(imin_ == jmin_)) then 
     call b%set_triangle(.true.)
     call b%set_lower(.true.)
@@ -792,7 +841,7 @@ subroutine psb_d_base_triu(a,b,info,&
        & b%ia(1:nzout) = b%ia(1:nzout) - imin_ + 1
   if (cscale_) &
        & b%ja(1:nzout) = b%ja(1:nzout) - jmin_ + 1
-  
+
   if ((diag_ >= 0).and.(imin_ == jmin_)) then 
     call b%set_triangle(.true.)
     call b%set_upper(.true.)
@@ -820,7 +869,7 @@ subroutine psb_d_base_clone(a,b,info)
   use psb_d_base_mat_mod, psb_protect_name => psb_d_base_clone
   use psb_error_mod
   implicit none 
-  
+
   class(psb_d_base_sparse_mat), intent(inout)              :: a
   class(psb_d_base_sparse_mat), allocatable, intent(inout) :: b
   integer(psb_ipk_), intent(out) :: info 
@@ -843,7 +892,7 @@ subroutine psb_d_base_clone(a,b,info)
   call a%mold(b,info)
 #endif
   if (info == psb_success_) call b%cp_from_fmt(a, info)    
-    
+
 end subroutine psb_d_base_clone
 
 subroutine psb_d_base_make_nonunit(a)
@@ -852,7 +901,7 @@ subroutine psb_d_base_make_nonunit(a)
   implicit none 
   class(psb_d_base_sparse_mat), intent(inout) :: a
   type(psb_d_coo_sparse_mat) :: tmp
-  
+
   integer(psb_ipk_) :: i, j, m, n, nz, mnm, info 
 
   if (a%is_unit()) then 
@@ -920,11 +969,11 @@ subroutine psb_d_base_transp_2mat(a,b)
 
   info = psb_success_
   select type(b)
-  class is (psb_d_base_sparse_mat)
+    class is (psb_d_base_sparse_mat)
     call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call tmp%transp()
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
-  class default
+    class default
     info = psb_err_invalid_dynamic_type_
   end select
   if (info /= psb_success_) then 
@@ -960,11 +1009,11 @@ subroutine psb_d_base_transc_2mat(a,b)
 
   info = psb_success_
   select type(b)
-  class is (psb_d_base_sparse_mat)
+    class is (psb_d_base_sparse_mat)
     call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call tmp%transc()
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
-  class default
+    class default
     info = psb_err_invalid_dynamic_type_
   end select
   if (info /= psb_success_) then 
@@ -1271,7 +1320,7 @@ subroutine psb_d_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
 
       if (size(d,1) < nar) then
         info = psb_err_input_asize_small_i_
-             ierr(1) = 9; ierr(2) = nar; 
+        ierr(1) = 9; ierr(2) = nar; 
         call psb_errpush(info,name,i_err=ierr)
         goto 9999
       end if
@@ -1407,7 +1456,7 @@ subroutine psb_d_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     else if (psb_toupper(scale_) == 'L') then 
       if (size(d,1) < nar) then
         info = psb_err_input_asize_small_i_
-             ierr(1) = 9; ierr(2) = nar; 
+        ierr(1) = 9; ierr(2) = nar; 
         call psb_errpush(info,name,i_err=ierr)
         goto 9999
       end if
