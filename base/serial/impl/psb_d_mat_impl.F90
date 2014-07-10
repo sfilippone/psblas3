@@ -733,8 +733,8 @@ end subroutine psb_d_trim
 
 
 
-subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_d_mat_mod, psb_protect_name => psb_d_csput
+subroutine psb_d_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_d_mat_mod, psb_protect_name => psb_d_csput_a
   use psb_d_base_mat_mod
   use psb_error_mod
   implicit none 
@@ -745,7 +745,7 @@ subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='csput'
+  character(len=20)  :: name='csput_a'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -771,7 +771,54 @@ subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     return
   end if
 
-end subroutine psb_d_csput
+end subroutine psb_d_csput_a
+
+subroutine psb_d_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_d_mat_mod, psb_protect_name => psb_d_csput_v
+  use psb_d_base_mat_mod
+  use psb_d_vect_mod, only : psb_d_vect_type
+  use psb_i_vect_mod, only : psb_i_vect_type
+  use psb_error_mod
+  implicit none 
+  class(psb_dspmat_type), intent(inout) :: a
+  type(psb_d_vect_type), intent(inout)  :: val
+  type(psb_i_vect_type), intent(inout)  :: ia, ja
+  integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: gtl(:)
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csput_a'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.(a%is_bld().or.a%is_upd())) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+  else
+    info = psb_err_invalid_mat_state_
+  endif
+
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+end subroutine psb_d_csput_v
 
 
 subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&

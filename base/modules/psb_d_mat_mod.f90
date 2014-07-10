@@ -119,7 +119,9 @@ module psb_d_mat_mod
     procedure, pass(a) :: csall       => psb_d_csall
     procedure, pass(a) :: free        => psb_d_free
     procedure, pass(a) :: trim        => psb_d_trim
-    procedure, pass(a) :: csput       => psb_d_csput 
+    procedure, pass(a) :: csput_a     => psb_d_csput_a
+    procedure, pass(a) :: csput_v     => psb_d_csput_v 
+    generic, public    :: csput       => csput_a,  csput_v
     procedure, pass(a) :: csgetptn    => psb_d_csgetptn
     procedure, pass(a) :: csgetrow    => psb_d_csgetrow
     procedure, pass(a) :: csgetblk    => psb_d_csgetblk
@@ -379,14 +381,28 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_d_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: gtl(:)
-    end subroutine psb_d_csput
+    end subroutine psb_d_csput_a
+  end interface
+  
+  interface 
+    subroutine psb_d_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_i_vect_mod, only : psb_i_vect_type
+      import :: psb_ipk_, psb_dspmat_type, psb_dpk_
+      class(psb_dspmat_type), intent(inout) :: a
+      type(psb_d_vect_type), intent(inout)  :: val
+      type(psb_i_vect_type), intent(inout)  :: ia, ja
+      integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: gtl(:)
+    end subroutine psb_d_csput_v
   end interface
   
   interface 

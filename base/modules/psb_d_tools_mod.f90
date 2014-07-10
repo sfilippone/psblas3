@@ -286,6 +286,20 @@ Module psb_d_tools_mod
       logical, intent(in), optional        :: rebuild
       logical, intent(in), optional        :: local
     end subroutine psb_dspins
+    subroutine psb_dspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
+      use psb_i_vect_mod, only : psb_i_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
+           & psb_d_base_vect_type, psb_d_vect_type,&
+           & psb_dspmat_type, psb_d_base_sparse_mat
+      type(psb_desc_type), intent(inout)   :: desc_a
+      type(psb_dspmat_type), intent(inout) :: a
+      integer(psb_ipk_), intent(in)        :: nz
+      type(psb_i_vect_type), intent(inout) :: ia,ja
+      type(psb_d_vect_type), intent(inout) :: val
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: rebuild
+      logical, intent(in), optional        :: local
+    end subroutine psb_dspins_v
     subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_base_vect_type, psb_d_vect_type, &
