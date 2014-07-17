@@ -672,7 +672,7 @@ module psb_d_multivect_mod
   use psb_d_base_multivect_mod
   use psb_const_mod
 
-  private
+  !private
 
   type psb_d_multivect_type
     class(psb_d_base_multivect_type), allocatable :: v 
@@ -725,6 +725,7 @@ module psb_d_multivect_mod
   public  :: psb_d_multivect, psb_d_multivect_type,&
        & psb_set_multivect_default, psb_get_multivect_default
 
+  private
   interface psb_d_multivect
     module procedure constructor, size_const
   end interface
