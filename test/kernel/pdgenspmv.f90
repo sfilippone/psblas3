@@ -114,9 +114,11 @@ program pdgenspmv
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
+
   do i=1,times 
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
   end do
+
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
