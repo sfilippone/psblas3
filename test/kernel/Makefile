@@ -10,12 +10,11 @@ LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
-
 DTOBJS=d_file_spmv.o   	
 STOBJS=s_file_spmv.o   	
 DPGOBJS=pdgenspmv.o
 PWFOBJS = power_file.o
-PWFROBJS = power_file_real.o
+PWFROBJS = power_file_real.o #eig_mod.o
 ARNOBJS =arnoldi_file.o
 ARNROBJS =arnoldi_file_real.o
 SIROBJS=shift_invert_real.o
@@ -60,12 +59,20 @@ analyse: analyse.o
 	$(F90LINK) $(LOPT) analyse.o -o analyse $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv analyse /server/tamestoy/TEMP/MaxEigenAdj/ 
 
+an_lapl: an_lapl.o
+	$(F90LINK) $(LOPT) an_lapl.o -o an_lapl $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv an_lapl /server/tamestoy/TEMP/SCALING-BA 
+
 laplacian: laplacian.o
 	$(F90LINK) $(LOPT) laplacian.o -o laplacian $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv laplacian $(EXEDIR) 
 
 test_chseqr: test_chseqr.o
 	$(F90LINK) $(LOPT) test_chseqr.o -o test_chseqr $(PSBLAS_LIB) $(LDLIBS)  
+
+#eig_mod.o: eig_mod.f90
+	#$(F90LINK) $(LOPT) -c eig_mod.f90  $(PSBLAS_LIB) $(LDLIBS)  
+	#gfortran -c eig_mod.f90	
 
 clean: 
 	/bin/rm -f *.o
