@@ -740,6 +740,7 @@ BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
 METHDLIBNAME=libpsb_krylov.a
 UTILLIBNAME=libpsb_util.a
+EIGENLIBNAME=libpsb_eigen.a
 
 ###############################################################################
 # Variable substitutions : the Make.inc.in will have these @VARIABLES@
@@ -816,6 +817,7 @@ AC_SUBST(BASELIBNAME)
 AC_SUBST(PRECLIBNAME)
 AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
+AC_SUBST(EIGENLIBNAME)
 
 ###############################################################################
 # the following files will be created by Automake

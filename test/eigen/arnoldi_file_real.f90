@@ -1,4 +1,4 @@
-!!$
+!!$ 
 !!$              Parallel Sparse BLAS  version 3.1
 !!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
@@ -38,16 +38,16 @@ program arnoldi_file
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_zspmat_type) :: a, aux_a
+  type(psb_dspmat_type) :: a, b, aux_a
 
   ! dense matrices
-  complex(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  complex(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
-  complex(psb_dpk_), allocatable, target ::  H(:,:),eig(:),work(:),Z(:,:)
+  real(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
+  real(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
+  complex(psb_dpk_), allocatable, target :: H(:,:),eig(:),work(:),Z(:,:)
   integer, allocatable :: indexes(:)
-  type(psb_z_vect_type), allocatable, target ::  V(:)
-  complex(psb_dpk_), pointer  :: b_col_glob(:)
-  type(psb_z_vect_type)    :: b_col, x_col, r_col
+  type(psb_d_vect_type), allocatable, target ::  V(:)
+  real(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_d_vect_type)    :: b_col, x_col, r_col
 
 
   ! communications data structure
@@ -75,7 +75,7 @@ program arnoldi_file
        &scale,resmx,resmxp, flops, bdwdth
   real(psb_dpk_) :: tt1, tt2, tflops
   real (psb_dpk_) :: norm
-  complex (psb_dpk_) :: dotprod 
+  real (psb_dpk_) :: dotprod 
   integer(psb_ipk_) :: nrhs, nrow, n_row, nv, ne
   integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
 
@@ -98,13 +98,12 @@ program arnoldi_file
   ! Hello world
   !
   if (iam == psb_root_) then 
-    write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
-    write(*,*) 'This is the ',trim(name),' sample program'
+    !write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
+    !write(*,*) 'This is the ',trim(name),' sample program'
     read(psb_inp_unit,*) mtrx_file
     read(psb_inp_unit,*) filefmt
     read(psb_inp_unit,*) ipart
     read(psb_inp_unit,*) dim_H
-    write (psb_out_unit, '("Hessenberg matrix dim is ",i20)') dim_H     
   end if
   call psb_bcast(ictxt,mtrx_file)
   call psb_bcast(ictxt,filefmt)
@@ -133,7 +132,10 @@ program arnoldi_file
       ! For Harwell-Boeig we have a single file which may or may not
       ! contain an RHS.
       call hb_read(aux_a,info,iunit=iunit,b=aux_b,filename=mtrx_file)
-      
+    
+    case ('AD')
+      call adj_read(aux_a,mtrx_file,iunit,desc_a,info)
+ 
     case default
       info = -1 
       write(psb_err_unit,*) 'Wrong choice for fileformat ', filefmt
@@ -152,8 +154,8 @@ program arnoldi_file
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
     else
-      write(psb_out_unit,'("Generating an rhs...")')
-      write(psb_out_unit,'(" ")')
+     ! write(psb_out_unit,'("Generating an rhs...")')
+     ! write(psb_out_unit,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
         call psb_errpush(psb_err_alloc_dealloc_,name)
@@ -194,8 +196,8 @@ program arnoldi_file
     
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
-      write(psb_out_unit,'("Partition type: graph")')
-      write(psb_out_unit,'(" ")')
+      !write(psb_out_unit,'("Partition type: graph")')
+      !write(psb_out_unit,'(" ")')
       !      write(psb_err_unit,'("Build type: graph")')
       call build_mtpart(aux_a,np)
 
@@ -207,10 +209,12 @@ program arnoldi_file
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
 
   else 
-    if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
+    !if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
+
+  call lapl(a,b)
 
   allocate(H(dim_H,dim_H),stat = alloc_stat)
   do i=1,dim_h
@@ -223,63 +227,52 @@ program arnoldi_file
 	  call psb_geall(V(i),desc_a,info)
 	  call psb_geasb(V(i),desc_a,info)
   enddo
-
-  call V(1)%set(zone)
+  call V(1)%set(done)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt, t2)
 
-  if (iam==psb_root_) then
-    write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-    write(psb_out_unit,'(" ")')
-  end if
-
+ ! if (iam==psb_root_) then
+    !write(psb_out_unit,'(" ")')
+    !write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+    !write(psb_out_unit,'(" ")')
+  !end if
 
   call psb_barrier(ictxt)
-  t1 = psb_wtime() 
   
-  norm = psb_genrm2(V(1),desc_a,info)
-  if (iam==psb_root_) write(psb_out_unit,'("norma iniziale    :"F20.3)')norm
-!  H(2,1)=dcmplx(norm,0.0)
-  H(2,1)=norm*zone
+  norm = psb_norm2(V(1),desc_a,info)
+  H(2,1)=cmplx(norm,0.0)
   norm = 1/norm
   !normalisation of V(1)  
-  call psb_geaxpby(zzero,V(1),norm*zone,V(1),desc_a, info)
+  call psb_geaxpby(dzero,V(1),norm,V(1),desc_a, info)
   do i=2,dim_H+1
-          call psb_spmm(zone,a,V(i-1),zzero,V(i),desc_a,info,'n') !we do V(i)=a*V(i-1)
+          call psb_spmm(done,b,V(i-1),dzero,V(i),desc_a,info,'n') !we do V(i)=b*V(i-1)
           ! Gram-Schmitt's reorthogonalisation
           do j=1,i-1 
                 dotprod= psb_gedot(V(i),V(j),desc_a,info) ! dotprod = (V(i) dot V(j))
-                call psb_geaxpby(-dotprod,V(j),zone,V(i),desc_a, info) !V(i)=V(i)-V(j)*dotprod
-                if(iam==psb_root_) write(*,'("dotprod : "i5, g20.4,g20.4)') i,real(dotprod),aimag(dotprod)
-                H(j,i-1)=dotprod
+                call psb_geaxpby(-dotprod,V(j),done,V(i),desc_a, info) !V(i)=V(i)-V(j)*dotprod
+                H(j,i-1)=cmplx(dotprod,0.0)
           end do
-        norm = psb_genrm2(V(i),desc_a,info)
-        if (iam==psb_root_) then
-                write(psb_out_unit,'("norma finale    :"i20,F20.3)')i,norm
-                write(psb_out_unit,'("")')
-        end if
+        norm = psb_norm2(V(i),desc_a,info)
+  !      write(psb_out_unit,'("norma finale    :"i20,F20.3)')i,norm
+   !     write(psb_out_unit,'("")')
         if (i .ne. dim_H+1) then
                 H(i,i-1)=cmplx(norm,0.0)
-                !H(i,i-1)=norm*zone
         endif
         norm=1/norm
-        call psb_geaxpby(zzero,V(i),norm*zone,V(i),desc_a, info)        
-  enddo
-  do i=2,dim_H
-        if (iam==psb_root_) write(*,'("basse diagonale de H : "i5, g20.4,g20.4)') i,real(H(i,i-1)),aimag(H(i,i-1))
+        call psb_geaxpby(dzero,V(i),norm,V(i),desc_a, info)        
   enddo
 
   write(psb_out_unit,'("")')
 
-  allocate(eig(dim_H),work(dim_h),stat = info)
-  allocate(Z(dim_H,dim_H),stat = alloc_stat)
-  call ZHSEQR('E','N',dim_H,1,dim_H,H,dim_H,eig,Z,dim_H,work,3*dim_H,info)
-       
-  !sort H's eigenvalues
-  allocate(indexes(1:dim_H))
-  call psb_qsort(eig,indexes,psb_alsort_up_,psb_sort_ovw_idx_)
-  
+  if (iam==psb_root_) then
+        allocate(eig(dim_H),work(dim_h),Z(dim_H,dim_H),stat = info)
+        call ZHSEQR('E','N',dim_H,1,dim_H,H,dim_H,eig,Z,dim_H,work,dim_H,info)
+      
+        !sort H's eigenvalues
+        allocate(indexes(1:dim_H))
+        call psb_qsort(eig,indexes,psb_alsort_up_,psb_sort_ovw_idx_)
+  end if
+
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
@@ -295,19 +288,21 @@ program arnoldi_file
   if (iam==psb_root_) then 
     flops = 2.d0*times*annz
     tflops=flops
-    write(psb_out_unit,'("Matrix: ",a)') mtrx_file
-    write(psb_out_unit,'("Test on                          : ",i20," processors")') np
-    write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
-    write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
+   ! write(psb_out_unit,'("Matrix: ",a)') mtrx_file
+   ! write(psb_out_unit,'("Test on                          : ",i20," processors")') np
+   ! write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
+   ! write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
     
-    write(*,'("valeurs propres de H : ")')
-   OPEN(unit=10, file=mtrx_file(1:3)//'.txt')
-    do i=dim_H/3,dim_H
-       write(psb_out_unit,'(g20.4,g20.4)')real(eig(i)),aimag(eig(i))
-       write(10,'(g20.4,g20.4)')real(eig(i)),aimag(eig(i))
-    enddo
-    CLOSE(10)
-   
+    open(15, FILE="resultats.dat", position = 'append',ACTION="WRITE")
+    write (15, '(a,F20.6,F20.6,F20.4)')mtrx_file,real(eig(dim_H)),real(eig(dim_H-1)),t2
+    close(15)
+    DEALLOCATE (work,eig,Z)
+ 
+    !write(*,'("valeurs propres de H : ")') 
+    !do i=dim_H/3,dim_H
+      ! write(psb_out_unit,'(g20.4,g20.4)')real(eig(i)),aimag(eig(i))
+    !enddo
+ 
     tflops = tflops / (tt2)
    !
     ! This computation is valid for CSR
@@ -323,19 +318,89 @@ program arnoldi_file
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_cdfree(desc_a,info)
-  do i=1,dim_H
-        call psb_gefree(V(i),desc_a,info)
-  end do
+  do i=1,dim_H        
+        call psb_gefree(V(i), desc_a,info)
+  enddo
   DEALLOCATE (H)
-  DEALLOCATE (eig,V)
-  DEALLOCATE (work)
-  DEALLOCATE (Z)
+  DEALLOCATE (V)
 9999 continue
   if(info /= 0) then
     call psb_error(ictxt)
   end if
   call psb_exit(ictxt)
   stop
+
+contains
+
+  subroutine adj_read (a,filename,iunit,desc_a,info)
+    type(psb_dspmat_type), intent (inout) :: a
+    character(len=40) :: filename
+    integer (psb_ipk_) :: iunit
+    type(psb_desc_type):: desc_a
+    integer (psb_ipk_) :: info
+
+    integer(psb_ipk_) :: i,nnzero,nrows
+    integer (psb_ipk_) ::  iError
+    type(psb_d_coo_sparse_mat) :: acoo
+
+    open(iunit, FILE=filename, STATUS="OLD", ACTION="READ")
+    read(iunit, *) nrows , nnzero
+
+    call acoo%allocate(nrows,nrows,nnzero)
+    do i = 1,nnzero
+        read(iunit, *) acoo%ia(i),acoo%ja(i)
+        acoo%ia(i)=acoo%ia(i)+1
+        acoo%ja(i)=acoo%ja(i)+1
+        acoo%val(i)=1.0
+    end do
+    close(UNIT=iunit)
+    !call psb_spall(a,desc_a,info,nnzero)
+    !call psb_spins(nnzero, ia, ja, val, a, desc_a, info)
+    call acoo%set_nzeros(nnzero)
+    call acoo%fix(info)
+    call a%mv_from(acoo)
+    call a%cscnv(info,type='csr')
+  end subroutine adj_read
+
+
+  subroutine lapl(a,b)
+        type(psb_dspmat_type),intent(in)::a
+        type(psb_dspmat_type),intent(out)::b
+
+        type(psb_d_coo_sparse_mat) :: acoo
+        integer(psb_ipk_) :: nz,n,info,i
+        real(psb_dpk_), allocatable :: K(:)
+
+        call a%cp_to(acoo)
+        nz=acoo%get_nzeros()
+        n=a%get_nrows()
+        allocate(K(n))
+        do i=1,n
+                K(i)=0
+        enddo
+        do i=1,nz
+                K(acoo%ia(i))=K(acoo%ia(i))+acoo%val(i)
+                acoo%val(i)=-acoo%val(i)
+        enddo
+        call acoo%reallocate(nz+n)
+        do i=1,n
+                acoo%val(nz+i)=K(i)
+                acoo%ia(nz+i)= i
+                acoo%ja(nz+i)= i
+        enddo
+        call acoo%set_nzeros(nz+n)
+        call acoo%fix(info)
+        call b%mv_from(acoo)
+        !if(iam==psb_root_) then
+          !      write(psb_out_unit,'("nz, n",i10,i10," 1")') nz,n
+         !       write(psb_out_unit,'("b%get_nzeros ?",i10, " 1")') b%get_nzeros()
+        !else
+          !      write(psb_out_unit,'("nz,n",i10,i10," 2")') nz,n
+         !       write(psb_out_unit,'("b%get_nzeros ?",i10, " 2")')b%get_nzeros()
+        !end if
+        call b%cscnv(info,'CSR')
+        deallocate (K)
+  end subroutine lapl
 
 end program arnoldi_file
 

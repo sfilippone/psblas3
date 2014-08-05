@@ -1,6 +1,6 @@
 include Make.inc
 
-all: libd based precd kryld utild
+all: libd based precd kryld utild eigend
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -19,6 +19,8 @@ kryld:
 	cd krylov && $(MAKE) lib
 utild:
 	cd util&& $(MAKE) lib 
+eigend:
+	cd eigen&& $(MAKE) lib 
 
 install: all
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) &&\
@@ -36,6 +38,7 @@ clean:
 	cd prec && $(MAKE) clean 
 	cd krylov && $(MAKE) clean
 	cd util && $(MAKE) clean
+	cd eigen && $(MAKE) clean
 
 check: all
 	make check -C test/serial
