@@ -80,11 +80,13 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   call psb_info(ictxt, me, np)
 
   if (nz < 0) then 
+    write(0,*)name, ' NZ ',nz
     info = 1111
     call psb_errpush(info,name)
     goto 9999
   end if
   if (size(ia) < nz) then 
+    write(0,*) name,' IA ',size(ia),nz
     info = 1111
     call psb_errpush(info,name)
     goto 9999
@@ -92,16 +94,19 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   if (size(ja) < nz) then 
     info = 1111
+    write(0,*) name,' jA ',size(ja),nz
     call psb_errpush(info,name)
     goto 9999
   end if
   if (size(val) < nz) then 
     info = 1111
+    write(0,*) name,' VAL ',size(val),nz
     call psb_errpush(info,name)
     goto 9999
   end if
-  if (nz == 0) return
 
+  if (nz == 0) return
+  
   if (present(rebuild)) then 
     rebuild_ = rebuild
   else
@@ -130,7 +135,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
 
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
-      call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
+      if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
 
       if (info /= psb_success_) then
         ierr(1) = info
@@ -180,9 +185,9 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
 
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
-      call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
+      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
       t2 = psb_Wtime()
-      call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
+      if (info == 0) call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
       t3=psb_wtime()
       tcnv=t2-t1
       tcsput=t3-t2

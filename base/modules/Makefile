@@ -109,7 +109,7 @@ psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o: psb
 psb_serial_mod.o: psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o 
 psb_i_vect_mod.o: psb_i_base_vect_mod.o
 psb_s_vect_mod.o: psb_s_base_vect_mod.o
-psb_d_vect_mod.o: psb_d_base_vect_mod.o
+psb_d_vect_mod.o: psb_d_base_vect_mod.o psb_i_vect_mod.o
 psb_c_vect_mod.o: psb_c_base_vect_mod.o
 psb_z_vect_mod.o: psb_z_base_vect_mod.o
 psb_tools_mod.o: psb_cd_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\

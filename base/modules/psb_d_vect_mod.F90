@@ -40,6 +40,7 @@
 module psb_d_vect_mod
 
   use psb_d_base_vect_mod
+  use psb_i_vect_mod
 
   type psb_d_vect_type
     class(psb_d_base_vect_type), allocatable :: v 
@@ -76,7 +77,9 @@ module psb_d_vect_mod
     procedure, pass(y) :: sctb     => d_vect_sctb
     generic, public    :: sct      => sctb
     procedure, pass(x) :: free     => d_vect_free
-    procedure, pass(x) :: ins      => d_vect_ins
+    procedure, pass(x) :: ins_a    => d_vect_ins_a
+    procedure, pass(x) :: ins_v    => d_vect_ins_v
+    generic, public    :: ins      => ins_v, ins_a
     procedure, pass(x) :: bld_x    => d_vect_bld_x
     procedure, pass(x) :: bld_n    => d_vect_bld_n
     generic, public    :: bld      => bld_x, bld_n
@@ -619,7 +622,7 @@ contains
         
   end subroutine d_vect_free
 
-  subroutine d_vect_ins(n,irl,val,dupl,x,info)
+  subroutine d_vect_ins_a(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
     class(psb_d_vect_type), intent(inout)  :: x
@@ -635,10 +638,31 @@ contains
       info = psb_err_invalid_vect_state_
       return
     end if
-    
+
     call  x%v%ins(n,irl,val,dupl,info)
-    
-  end subroutine d_vect_ins
+
+  end subroutine d_vect_ins_a
+
+  subroutine d_vect_ins_v(n,irl,val,dupl,x,info)
+    use psi_serial_mod
+    implicit none 
+    class(psb_d_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: n, dupl
+    class(psb_i_vect_type), intent(inout)       :: irl
+    class(psb_d_vect_type), intent(inout)       :: val
+    integer(psb_ipk_), intent(out)              :: info
+
+    integer(psb_ipk_) :: i
+
+    info = 0
+    if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then 
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    call  x%v%ins(n,irl%v,val%v,dupl,info)
+
+  end subroutine d_vect_ins_v
 
 
   subroutine d_vect_cnv(x,mold)
