@@ -5,74 +5,42 @@ BASEDIR=../..
 INCDIR=$(BASEDIR)/include/
 include $(INCDIR)/Make.inc.psblas
 LIBDIR=$(BASEDIR)/lib/
-PSBLAS_LIB= -L$(LIBDIR) -leigen -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_eigen -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+
 LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
-DTOBJS=d_file_spmv.o   	
-STOBJS=s_file_spmv.o   	
-DPGOBJS=pdgenspmv.o
-PWFOBJS = power_file.o
-PWFROBJS = power_file_real.o #eig_mod.o
-ARNOBJS =arnoldi_file.o
-ARNROBJS =arnoldi_file_real.o
-SIROBJS=shift_invert_real.o
+PWFROBJS = power_file_real.o 
 EXEDIR=./runs
 
-all: d_file_spmv s_file_spmv pdgenspmv power_file power_file_real 
+all: power_file_real maxA_and_lapl_extremums test_enea_dagostino test_realnet
 
-
-d_file_spmv: $(DTOBJS)
-	$(F90LINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv d_file_spmv $(EXEDIR) 
-
-pdgenspmv: $(DPGOBJS)
-	$(F90LINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv pdgenspmv $(EXEDIR) 
-
-s_file_spmv: $(STOBJS)
-	$(F90LINK) $(LOPT) $(STOBJS) -o s_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv s_file_spmv $(EXEDIR) 
-
-power_file: $(PWFOBJS)
-	$(F90LINK) $(LOPT) $(PWFOBJS) -o power_file $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv power_file $(EXEDIR) 
 
 power_file_real: $(PWFROBJS)
 	$(F90LINK) $(LOPT) $(PWFROBJS) -o power_file_real $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv power_file_real $(EXEDIR) 
 
-arnoldi_file: $(ARNOBJS)
-	$(F90LINK) $(LOPT) $(ARNOBJS) -o arnoldi_file $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv arnoldi_file $(EXEDIR) 
+maxA_and_lapl_extremums: maxA_and_lapl_extremums.o
+	$(F90LINK) $(LOPT) maxA_and_lapl_extremums.o -o maxA_and_lapl_extremums $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/cp maxA_and_lapl_extremums test_dagostino
+	/bin/mv maxA_and_lapl_extremums $(EXEDIR) 
 
-arnoldi_file_real: $(ARNROBJS) .
-	$(F90LINK) $(LOPT) $(ARNROBJS) -o arnoldi_file_real $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv arnoldi_file_real $(EXEDIR) 
+test_enea_dagostino:test_enea_dagostino.o
+	$(F90LINK) $(LOPT) test_enea_dagostino.o -o test_enea_dagostino $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv test_enea_dagostino test_dagostino
 
-shift_invert_real: $(SIROBJS)
-	$(F90LINK) $(LOPT) $(SIROBJS) -o shift_invert_real $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv shift_invert_real $(EXEDIR) 
+adj_to_mm : adj_to_mm.o
+	$(F90LINK) $(LOPT) adj_to_mm.o -o adj_to_mm $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv adj_to_mm $(EXEDIR)
 
-analyse: analyse.o
-	$(F90LINK) $(LOPT) analyse.o -o analyse $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv analyse /server/tamestoy/TEMP/MaxEigenAdj/ 
+test_realnet:test_realnet.o
+	$(F90LINK) $(LOPT) test_realnet.o -o test_realnet $(PSBLAS_LIB) $(LDLIBS) 
+	/bin/mv test_realnet test_dagostino
 
-an_lapl: an_lapl.o
-	$(F90LINK) $(LOPT) an_lapl.o -o an_lapl $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv an_lapl /server/tamestoy/TEMP/SCALING-BA 
-
-laplacian: laplacian.o
-	$(F90LINK) $(LOPT) laplacian.o -o laplacian $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv laplacian $(EXEDIR) 
-
-test_chseqr: test_chseqr.o
-	$(F90LINK) $(LOPT) test_chseqr.o -o test_chseqr $(PSBLAS_LIB) $(LDLIBS)  
-
-#eig_mod.o: eig_mod.f90
-	#$(F90LINK) $(LOPT) -c eig_mod.f90  $(PSBLAS_LIB) $(LDLIBS)  
-	#gfortran -c eig_mod.f90	
+analyse_results: analyse_results.o
+	$(F90LINK) $(LOPT) analyse_results.o -o analyse_results $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv analyse_results /server/tamestoy/TEMP/SCALING-BA 
 
 clean: 
 	/bin/rm -f *.o

@@ -32,6 +32,7 @@
 program power_file_real
   use psb_base_mod
   use psb_util_mod
+  use psb_eigen_mod
   implicit none
 
   ! input parameters
@@ -97,6 +98,7 @@ program power_file_real
   if (iam == psb_root_) then 
     !write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     !write(*,*) 'This is the ',trim(name),' sample program'
+   write(psb_out_unit,'("debut")')
     read(psb_inp_unit,*) mtrx_file
     read(psb_inp_unit,*) filefmt
     read(psb_inp_unit,*) ipart
@@ -132,7 +134,7 @@ program power_file_real
       call hb_read(aux_a,info,iunit=iunit,b=aux_b,filename=mtrx_file)
 
     case ('AD')
-        call adj_read(aux_a,mtrx_file,iunit,desc_a,info)
+        call psb_d_adj_read(aux_a,mtrx_file,iunit,info)
       
     case default
       info = -1 
@@ -212,12 +214,7 @@ program power_file_real
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
 
-  call psb_geall(x_col,desc_a,info)
-  call x_col%set(done)
-  call psb_geasb(x_col,desc_a,info)
   t2 = psb_wtime() - t1
-
-
   call psb_amx(ictxt, t2)
 
   if (iam==psb_root_) then
@@ -227,25 +224,8 @@ program power_file_real
   end if
 
   call psb_barrier(ictxt)
-  call psb_spmm(done,a,x_col,dzero,b_col,desc_a,info,'n') !we do b_col=a*x_col
-  norm = psb_norm2(b_col,desc_a,info)
-  norm = 1/norm
-  !normalisation of b_col in x_col  
-  call psb_geaxpby(dzero,x_col,norm,b_col,desc_a, info)
-  x_col=b_col
-  lambda=0
-  lambda2=1000
-  do while (abs(lambda-lambda2)>precisione .AND. times<300)
-    !if(iam==psb_root_) write (psb_out_unit,'(F20.6,i20)')abs(lambda-lambda2), times     
-    times=times+1
-    lambda2=lambda 
-    call psb_spmm(done,a,x_col,dzero,b_col,desc_a,info,'n')
-    norm = psb_norm2(b_col,desc_a,info)
-    lambda = psb_gedot(b_col,x_col,desc_a,info) ! lambda = (A*x_col dot x_col)
-    norm = 1/norm
-    call psb_geaxpby(dzero,x_col,norm,b_col,desc_a, info)
-    x_col=b_col
-  end do
+  call psb_d_power_vect(a,x_col,lambda,precisione,iter,500,desc_a,info)
+
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2) 
@@ -270,7 +250,7 @@ program power_file_real
    ! write(psb_out_unit,'("Time for ",i0," iteration (s)         : ",F20.3)')times, t2
    ! write(psb_out_unit,'("Time per iteration    (ms)         : ",F20.3)') t2*1.d3/(1.d0*times)
     open(15, FILE="resultats.dat", position = 'append',ACTION="WRITE")
-    write (15, '(a,F20.6,F20.4)')mtrx_file,lambda,t2
+    write (15, '(a,F20.6,i20)')mtrx_file,lambda,iter
    ! write (psb_out_unit, '("entropy vect propre :",g20.4)')entropy(x_col) 
     close(15)
   end if
