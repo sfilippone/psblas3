@@ -1,0 +1,3 @@
+realnet.dat       ! input adjacency format file
+realnet.mm        ! output MM format file
+1                 ! first row's index (usually 0 or 1) 

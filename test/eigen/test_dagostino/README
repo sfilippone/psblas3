@@ -8,18 +8,18 @@ for Dr Gregorio D'Agostino's tests.
   example of use : mpirun -np 2 ./MaxA_and_lapl_extremums < maxA.inp
   		(open maxA.inp to see what input is needed for the program)
 
-  exit : a row at the end of the file maxA_results.dat containg 
+  exit : a row at the end of the file maxA_results.dat containing 
 	nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
 
 
 
 ------------------test_realnet---------------------------
- : does the same thing than MaxA_and_lapl_extremums but was created
-   to be launched by 
+ : does the same thing than MaxA_and_lapl_extremums. It is a little different and
+  was created to be launched by step_test.sh
 
   example of use : not to be directly used by a user
 
-  exit : a row at the end of the file test_realnet.dat containg
+  exit : a row at the end of the file plot_data.dat containg
         nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
 
 
@@ -34,3 +34,12 @@ for Dr Gregorio D'Agostino's tests.
  L'output e il file plot_data.dat di 6 colonne e (totNzero-start)/10000 righe. Ogni riga contiene :
         nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
 
+
+----------------------adj_to_mm--------------------
+ : reads a file containing the coordinate description of an adjacence
+   sparse matrix (values are always 1) and stores it into 'a' 
+
+  example of use : ./adj_to_mm < adj_to_mm.inp
+		(open adj_to_mm.inp to know what input is needed)
+
+ 
