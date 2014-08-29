@@ -786,7 +786,7 @@ contains
   !
   subroutine psb_base_mat_sync(a)
     implicit none 
-    class(psb_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), target, intent(in) :: a
     
   end subroutine psb_base_mat_sync
 

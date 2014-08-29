@@ -117,7 +117,7 @@ module psb_d_base_mat_mod
   
   private :: d_base_mat_sync, d_base_mat_is_host, d_base_mat_is_dev, &
        & d_base_mat_is_sync, d_base_mat_set_host, d_base_mat_set_dev,&
-       & d_base_mat_set_sync, d_base_mat_asb
+       & d_base_mat_set_sync
 
   !> \namespace  psb_base_mod  \class  psb_d_coo_sparse_mat
   !! \extends psb_d_base_mat_mod::psb_d_base_sparse_mat

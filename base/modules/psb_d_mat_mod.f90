@@ -511,9 +511,10 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_asb(a) 
-      import :: psb_ipk_, psb_dspmat_type
+    subroutine psb_d_asb(a,mold) 
+      import :: psb_ipk_, psb_dspmat_type, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
+      class(psb_d_base_sparse_mat), optional, intent(in) :: mold
     end subroutine psb_d_asb
   end interface
   

@@ -349,6 +349,7 @@ contains
         ! !$      goto 9999
       end select
     end if
+    call x%set_host()
     if (info /= 0) then 
       call psb_errpush(info,'base_vect_ins')
       return
@@ -370,8 +371,9 @@ contains
     info = 0
     if (psb_errstatus_fatal()) return 
 
-    call irl%sync()
-    call val%sync()
+    if (irl%is_dev()) call irl%sync()
+    if (val%is_dev()) call val%sync()
+    if (x%is_dev())   call x%sync()
     call x%ins(n,irl%v,val%v,dupl,info)
 
     if (info /= 0) then 
@@ -425,7 +427,7 @@ contains
          & call psb_realloc(n,x%v,info)
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-
+    call x%sync()
   end subroutine d_base_asb
 
 
@@ -609,7 +611,7 @@ contains
     real(psb_dpk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
     
-    if (.not.allocated(x%v)) return 
+    !if (.not.allocated(x%v)) return 
     call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 

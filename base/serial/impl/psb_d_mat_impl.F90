@@ -1917,12 +1917,14 @@ subroutine psb_d_transc_2mat(a,b)
 
 end subroutine psb_d_transc_2mat
 
-subroutine psb_d_asb(a)
+subroutine psb_d_asb(a,mold)
   use psb_d_mat_mod, psb_protect_name => psb_d_asb
   use psb_error_mod
   implicit none 
 
   class(psb_dspmat_type), intent(inout) :: a   
+  class(psb_d_base_sparse_mat), optional, intent(in) :: mold
+  class(psb_d_base_sparse_mat), allocatable :: tmp
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='reinit'
 
@@ -1934,6 +1936,15 @@ subroutine psb_d_asb(a)
   endif
 
   call a%a%asb()
+  if (present(mold)) then 
+    if (.not.same_type_as(a%a,mold)) then 
+      allocate(tmp,mold=mold)
+      call tmp%mv_from_fmt(a%a,info)
+      call a%a%free()
+      call move_alloc(tmp,a%a)
+    end if
+  end if
+  
 
   call psb_erractionrestore(err_act)
   return

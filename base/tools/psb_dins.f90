@@ -336,7 +336,7 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
-  name = 'psb_dinsvi'
+  name = 'psb_dinsvi_vect_v'
 
   if (.not.desc_a%is_ok()) then
     info = psb_err_invalid_cd_state_
@@ -399,12 +399,12 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
     lval = val%get_vect()
     call desc_a%indxmap%g2lip(irl(1:m),info,owned=.true.)
     call x%ins(m,irl,lval,dupl_,info) 
+
   end if
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
   end if
-  deallocate(irl)
 
   call psb_erractionrestore(err_act)
   return

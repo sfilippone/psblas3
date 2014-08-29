@@ -116,7 +116,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   if (a%is_bld()) then 
     call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
   else if (a%is_upd()) then 
-    call a%asb()
+    call a%asb(mold=mold)
   else
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
