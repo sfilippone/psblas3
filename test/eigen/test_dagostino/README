@@ -1,0 +1,36 @@
+This directory "test_dagostino" contains all the executables and scripts needed
+for Dr Gregorio D'Agostino's tests.
+
+-----------------MaxA_and_lapl_extremums---------------------
+ : calculate the max eigenvalue of a matrix and the max and min
+   eigenvalues of it's laplacian.
+
+  example of use : mpirun -np 2 ./MaxA_and_lapl_extremums < maxA.inp
+  		(open maxA.inp to see what input is needed for the program)
+
+  exit : a row at the end of the file maxA_results.dat containg 
+	nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
+
+
+
+------------------test_realnet---------------------------
+ : does the same thing than MaxA_and_lapl_extremums but was created
+   to be launched by 
+
+  example of use : not to be directly used by a user
+
+  exit : a row at the end of the file test_realnet.dat containg
+        nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
+
+
+
+-------------------step_test.sh------------------------------
+ : usa molte volte test_realnet su una stessa matrice troncandola a vario numero di non zeri. 
+   Parte da "start" non zeri fino al "totNnzero" facendo 10000 link alla volta.
+
+ example of use : ./step_test.sh 2 599880 7799880 step_test.inp
+ 		(step_test.inp contains exactly the same lines than maxA.inp)	
+
+ L'output e il file plot_data.dat di 6 colonne e (totNzero-start)/10000 righe. Ogni riga contiene :
+        nnzeroA  maxA  MaxLapl  2ndLapl  minLapl  execTime
+

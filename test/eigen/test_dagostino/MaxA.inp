@@ -1,0 +1,8 @@
+Real10BA10000RLSext01     ! name of the matrix 
+AD                        ! matrix type (here adjacency)  
+0                         ! partition type 
+1.d-22                    ! wanted precision for the power method
+50                        ! hessenberg matrix's dimension for Arnoldi and shift-invert
+1.d-6                     ! pointed sigma for shift-invert 
+DIAG                      ! preconditionner type for shift-invert
+CG                        ! krylov method for system solving

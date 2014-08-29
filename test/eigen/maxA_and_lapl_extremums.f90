@@ -227,11 +227,11 @@ program maxA_and_lapl_extremums
   call psb_barrier(ictxt)
   t4 = psb_wtime() - t1
   
-  if (iam==psb_root_) then 
-    open (15, FILE="resultats.dat", position = 'append',ACTION="WRITE")
-    write (15,'(a,F20.6,i20,F20.4)')mtrx_file,lambda,iter,t2
-    write (15,'(F20.6,F20.6,F20.4)')real(eig(dim_H)),real(eig(dim_H-1)),t3
-    write (15,'(F20.6,F20.6,F20.4)')real(eigmin(dim_H)),real(eigmin(dim_H-1)),t4
+  t1=t2+t3+t4
+  if (iam==psb_root_) then
+    open (15, FILE="maxA_results.dat", position = 'append',ACTION="WRITE")
+    write(15,'(i20,F20.6,F20.6,F20.6,F20.6,F20.4)')aux_a%get_nzeros(),lambda,real(eig(dim_H)),&
+                &real(eig(dim_H-1)),real(eigmin(dim_H-1)),t1
     close(15)
   end if
 

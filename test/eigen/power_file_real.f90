@@ -134,7 +134,7 @@ program power_file_real
       call hb_read(aux_a,info,iunit=iunit,b=aux_b,filename=mtrx_file)
 
     case ('AD')
-        call psb_d_adj_read(aux_a,mtrx_file,iunit,info)
+        call psb_d_adj_read(aux_a,mtrx_file,1,iunit,info)
       
     case default
       info = -1 

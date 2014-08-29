@@ -14,7 +14,7 @@ FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 PWFROBJS = power_file_real.o 
 EXEDIR=./runs
 
-all: power_file_real maxA_and_lapl_extremums test_enea_dagostino test_realnet
+all: power_file_real maxA_and_lapl_extremums test_realnet
 
 
 power_file_real: $(PWFROBJS)
