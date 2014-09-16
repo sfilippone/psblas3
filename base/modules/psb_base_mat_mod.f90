@@ -124,6 +124,8 @@ module psb_base_mat_mod
     logical, private     :: unitd
     !> Are the coefficients sorted ?
     logical, private     :: sorted
+    logical, private     :: repeatable_updates=.false.
+
   contains 
 
     ! == = =================================
@@ -152,6 +154,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_unit     => psb_base_is_unit
     procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
+    procedure, pass(a) :: is_repeatable_updates     => psb_base_is_repeatable_updates
     
     ! == = =================================
     !
@@ -171,6 +174,8 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_lower    => psb_base_set_lower
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
     procedure, pass(a) :: set_unit     => psb_base_set_unit
+
+    procedure, pass(a) :: set_repeatable_updates     => psb_base_set_repeatable_updates
 
 
     ! == = =================================
@@ -614,6 +619,18 @@ contains
     end if
   end subroutine psb_base_set_upper
 
+  subroutine psb_base_set_repeatable_updates(a,val) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%repeatable_updates = val
+    else
+      a%repeatable_updates = .true.
+    end if
+  end subroutine psb_base_set_repeatable_updates
+
   function psb_base_is_triangle(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -692,6 +709,13 @@ contains
     res = .false.
   end function psb_base_is_by_cols
 
+  function psb_base_is_repeatable_updates(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%repeatable_updates
+  end function psb_base_is_repeatable_updates
+
   
   !
   !  TRANSP: note sorted=.false.
@@ -712,6 +736,7 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
+    b%repeatable_updates = .false.
     
   end subroutine psb_base_transp_2mat
 
@@ -730,6 +755,7 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
+    b%repeatable_updates = .false.
 
   end subroutine psb_base_transc_2mat
 
@@ -748,6 +774,7 @@ contains
     a%unitd     = a%unitd
     a%upper     = .not.a%upper
     a%sorted    = .false.
+    a%repeatable_updates = .false.
     
   end subroutine psb_base_transp_1mat
 

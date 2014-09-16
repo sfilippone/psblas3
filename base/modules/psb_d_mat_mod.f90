@@ -98,6 +98,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: is_lower    => psb_d_is_lower
     procedure, pass(a) :: is_triangle => psb_d_is_triangle
     procedure, pass(a) :: is_unit     => psb_d_is_unit
+    procedure, pass(a) :: is_repeatable_updates     => psb_d_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_d_get_fmt
     procedure, pass(a) :: sizeof      => psb_d_sizeof
 
@@ -114,6 +115,9 @@ module psb_d_mat_mod
     procedure, pass(a) :: set_lower    => psb_d_set_lower
     procedure, pass(a) :: set_triangle => psb_d_set_triangle
     procedure, pass(a) :: set_unit     => psb_d_set_unit
+
+    procedure, pass(a) :: set_repeatable_updates     => psb_d_set_repeatable_updates
+
 
     ! Memory/data management 
     procedure, pass(a) :: csall       => psb_d_csall
@@ -1107,6 +1111,31 @@ contains
     end if
 
   end function psb_d_is_by_cols
+
+
+  function psb_d_is_repeatable_updates(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_repeatable_updates()
+    else
+      res = .false.
+    end if
+
+  end function psb_d_is_repeatable_updates
+
+  subroutine psb_d_set_repeatable_updates(a,val) 
+    implicit none 
+    class(psb_dspmat_type), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (allocated(a%a)) then 
+      call a%a%set_repeatable_updates(val)
+    end if
+    
+  end subroutine psb_d_set_repeatable_updates
 
 
 

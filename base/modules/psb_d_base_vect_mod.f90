@@ -1704,16 +1704,17 @@ contains
   function  d_base_mv_get_vect(x) result(res)
     class(psb_d_base_multivect_type), intent(inout) :: x
     real(psb_dpk_), allocatable                 :: res(:,:)
-    integer(psb_ipk_) :: info
-    
+    integer(psb_ipk_) :: info,m,n
+    m = x%get_nrows()
+    n = x%get_ncols()
     if (.not.allocated(x%v)) return 
     call x%sync()
-    allocate(res(x%get_nrows(),x%get_ncols()),stat=info) 
+    allocate(res(m,n),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_mv_get_vect')
       return
     end if
-    res(:,:) = x%v(:,:)
+    res(1:m,1:n) = x%v(1:m,1:n)
   end function d_base_mv_get_vect
     
   !
