@@ -33,7 +33,23 @@
 module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
+  ! This is the default PSBLAS integer, can be 4 or 8 bytes.
+#if defined(LONG_INTEGERS)
+  integer, parameter  :: psb_ipk_ = int64
+#else  
+  integer, parameter  :: psb_ipk_ = int32
 #endif
+  ! This is always an 8-byte  integer.
+  integer, parameter  :: psb_long_int_k_ = int64
+  ! This is always a 4-byte integer, for MPI-related stuff
+  integer, parameter  :: psb_mpik_ = int32
+  !
+  ! These must be the kind parameter corresponding to psb_mpi_r_dpk_
+  ! and psb_mpi_r_spk_
+  !
+  integer(psb_mpik_), parameter  :: psb_spk_   = real32
+  integer(psb_mpik_), parameter  :: psb_dpk_   = real64
+#else
   ! This is the default PSBLAS integer, can be 4 or 8 bytes.
 #if defined(LONG_INTEGERS)
   integer, parameter  :: ndig=12
@@ -56,6 +72,8 @@ module psb_const_mod
   integer(psb_mpik_), parameter  :: psb_dpk_p_ = 15
   integer(psb_mpik_), parameter  :: psb_dpk_r_ = 307
   integer(psb_mpik_), parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
+#endif
+
   integer(psb_ipk_), save        :: psb_sizeof_dp, psb_sizeof_sp
   integer(psb_ipk_), save        :: psb_sizeof_int, psb_sizeof_long_int
   !
