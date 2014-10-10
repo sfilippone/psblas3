@@ -228,7 +228,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_imaxs
@@ -352,7 +352,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_max,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_i4maxs
@@ -479,7 +479,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_i8maxs
@@ -605,7 +605,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_smaxs
@@ -728,7 +728,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_dmaxs
@@ -859,7 +859,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_imins
@@ -983,7 +983,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_min,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_i4mins
@@ -1110,7 +1110,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_i8mins
@@ -1237,7 +1237,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_smins
@@ -1360,7 +1360,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_dmins
@@ -1493,7 +1493,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -1620,7 +1620,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -1748,7 +1748,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -1876,7 +1876,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_samxs
@@ -1999,7 +1999,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_damxs
@@ -2124,7 +2124,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_camxs
@@ -2247,7 +2247,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_zamxs
@@ -2380,7 +2380,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -2507,7 +2507,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -2635,7 +2635,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -2763,7 +2763,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_samns
@@ -2886,7 +2886,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_damns
@@ -3011,7 +3011,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_camns
@@ -3134,7 +3134,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_zamns
@@ -3266,7 +3266,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -3394,7 +3394,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -3521,7 +3521,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -3646,7 +3646,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 
 #endif    
@@ -3774,7 +3774,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_ssums
@@ -3897,7 +3897,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_dsums
@@ -4022,7 +4022,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_csums
@@ -4145,7 +4145,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_zsums
@@ -4274,7 +4274,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_s_nrm2s
@@ -4309,7 +4309,7 @@ contains
       dat = dat_
     else
       call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_dnrm2_op,root_,ictxt,info)
-      dat = dat_
+      if (iam == root_) dat = dat_
     endif
 #endif    
   end subroutine psb_d_nrm2s
