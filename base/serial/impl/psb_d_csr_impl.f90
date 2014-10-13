@@ -2788,7 +2788,10 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
- 
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+
   if (.not.b%is_sorted()) then 
     ! This is to have fix_coo called behind the scenes
     call tmp%cp_from_coo(b,info)
