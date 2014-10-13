@@ -224,12 +224,12 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
     call psb_erractionrestore(err_act)
     return
   case('W')
-    if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
+    if ((info /= psb_success_).or.(count(x(:)<0) >0)) then
       write(psb_err_unit,'("Error ",i5," in subroutine glob_to_loc")') info
     end if
   case('A')
-    if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
-      write(psb_err_unit,*) count(x(1:n)<0)
+    if ((info /= psb_success_).or.(count(x(:)<0) >0)) then
+      write(psb_err_unit,*) count(x(:)<0)
       call psb_errpush(info,name)
       goto 9999
     end if
