@@ -67,7 +67,7 @@ psb_z_base_mat_mod.o: psb_z_base_vect_mod.o
 psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psb_i_base_vect_mod.o 
 psb_i_base_vect_mod.o psb_c_base_vect_mod.o psb_s_base_vect_mod.o psb_d_base_vect_mod.o psb_z_base_vect_mod.o: psi_serial_mod.o psb_realloc_mod.o
 psb_s_mat_mod.o: psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_vect_mod.o
-psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_vect_mod.o
+psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_vect_mod.o psb_i_vect_mod.o
 psb_c_mat_mod.o: psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o psb_c_vect_mod.o
 psb_z_mat_mod.o: psb_z_base_mat_mod.o psb_z_csr_mat_mod.o psb_z_csc_mat_mod.o psb_z_vect_mod.o
 psb_s_csc_mat_mod.o psb_s_csr_mat_mod.o: psb_s_base_mat_mod.o 
@@ -108,10 +108,10 @@ psb_check_mod.o: psb_desc_mod.o
 psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o: psb_mat_mod.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o
 psb_serial_mod.o: psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o 
 psb_i_vect_mod.o: psb_i_base_vect_mod.o
-psb_s_vect_mod.o: psb_s_base_vect_mod.o
-psb_d_vect_mod.o: psb_d_base_vect_mod.o
-psb_c_vect_mod.o: psb_c_base_vect_mod.o
-psb_z_vect_mod.o: psb_z_base_vect_mod.o
+psb_s_vect_mod.o: psb_s_base_vect_mod.o psb_i_vect_mod.o
+psb_d_vect_mod.o: psb_d_base_vect_mod.o psb_i_vect_mod.o
+psb_c_vect_mod.o: psb_c_base_vect_mod.o psb_i_vect_mod.o
+psb_z_vect_mod.o: psb_z_base_vect_mod.o psb_i_vect_mod.o
 psb_tools_mod.o: psb_cd_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_i_tools_mod.o psb_c_tools_mod.o  psb_z_tools_mod.o  
 psb_cd_tools_mod.o psb_i_tools_mod.o psb_s_tools_mod.o psb_d_tools_mod.o psb_c_tools_mod.o psb_z_tools_mod.o: psb_desc_mod.o psi_mod.o  psb_mat_mod.o

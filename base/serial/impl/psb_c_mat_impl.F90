@@ -733,8 +733,8 @@ end subroutine psb_c_trim
 
 
 
-subroutine psb_c_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-  use psb_c_mat_mod, psb_protect_name => psb_c_csput
+subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_c_mat_mod, psb_protect_name => psb_c_csput_a
   use psb_c_base_mat_mod
   use psb_error_mod
   implicit none 
@@ -745,7 +745,7 @@ subroutine psb_c_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
   integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='csput'
+  character(len=20)  :: name='csput_a'
   logical, parameter :: debug=.false.
 
   info = psb_success_
@@ -771,7 +771,54 @@ subroutine psb_c_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     return
   end if
 
-end subroutine psb_c_csput
+end subroutine psb_c_csput_a
+
+subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_c_mat_mod, psb_protect_name => psb_c_csput_v
+  use psb_c_base_mat_mod
+  use psb_c_vect_mod, only : psb_c_vect_type
+  use psb_i_vect_mod, only : psb_i_vect_type
+  use psb_error_mod
+  implicit none 
+  class(psb_cspmat_type), intent(inout) :: a
+  type(psb_c_vect_type), intent(inout)  :: val
+  type(psb_i_vect_type), intent(inout)  :: ia, ja
+  integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: gtl(:)
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csput_v'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (.not.(a%is_bld().or.a%is_upd())) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    call a%a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+  else
+    info = psb_err_invalid_mat_state_
+  endif
+
+  if (info /= psb_success_) goto 9999 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+end subroutine psb_c_csput_v
 
 
 subroutine psb_c_csgetptn(imin,imax,a,nz,ia,ja,info,&
@@ -1244,8 +1291,8 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
   end if
 
   call move_alloc(altmp,b%a)
-  call b%set_asb() 
   call b%trim()
+  call b%asb() 
   call psb_erractionrestore(err_act)
   return
 
@@ -1870,7 +1917,47 @@ subroutine psb_c_transc_2mat(a,b)
 end subroutine psb_c_transc_2mat
 
 
+subroutine psb_c_asb(a,mold)
+  use psb_c_mat_mod, psb_protect_name => psb_c_asb
+  use psb_error_mod
+  implicit none 
 
+  class(psb_cspmat_type), intent(inout) :: a   
+  class(psb_c_base_sparse_mat), optional, intent(in) :: mold
+  class(psb_c_base_sparse_mat), allocatable :: tmp
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='c_asb'
+
+  call psb_erractionsave(err_act)
+  if (a%is_null()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%asb()
+  if (present(mold)) then 
+    if (.not.same_type_as(a%a,mold)) then 
+      allocate(tmp,mold=mold)
+      call tmp%mv_from_fmt(a%a,info)
+      call a%a%free()
+      call move_alloc(tmp,a%a)
+    end if
+  end if
+  
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+end subroutine psb_c_asb
 
 subroutine psb_c_reinit(a,clear)
   use psb_c_mat_mod, psb_protect_name => psb_c_reinit
@@ -1889,7 +1976,13 @@ subroutine psb_c_reinit(a,clear)
     goto 9999
   endif
 
-  call a%a%reinit(clear)
+  if (a%a%has_update()) then 
+    call a%a%reinit(clear)
+  else
+    info = psb_err_missing_override_method_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   call psb_erractionrestore(err_act)
   return

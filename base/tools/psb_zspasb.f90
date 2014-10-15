@@ -33,10 +33,10 @@
 !
 ! Subroutine: psb_zspasb
 !    Assemble sparse matrix
-! 
+!
 ! Arguments: 
-!    a        - type(psb_zspmat_type).          The sparse matrix to be assembled
-!    desc_a   - type(psb_desc_type).            The communication descriptor.
+!    a        - type(psb_zspmat_type).     The sparse matrix to be allocated.      
+!    desc_a   - type(psb_desc_type).       The communication descriptor.
 !    info     - integer.                     return code.
 !    afmt     - character(optional)          The desired output storage format.
 !    upd      - character(optional).         How will the matrix be updated? 
@@ -55,7 +55,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
 
 
   !...Parameters....
-  type(psb_zspmat_type), intent (inout)   :: a
+  type(psb_zspmat_type), intent (inout)  :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_),optional, intent(in)            :: dupl, upd
@@ -88,12 +88,12 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
-    info = psb_err_spmat_invalid_state_
-    int_err(1) = desc_a%get_dectype()
+  if (.not.desc_a%is_asb()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
-  endif
+  end if
+
 
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit, *) me,' ',trim(name),&
@@ -113,7 +113,16 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
     call a%set_ncols(n_col)
   end if
 
-  call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  if (a%is_bld()) then 
+    call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  else if (a%is_upd()) then 
+    call a%asb(mold=mold)
+  else
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+    
+  end if
 
   
   IF (debug_level >= psb_debug_ext_) then 
@@ -122,10 +131,9 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
          & info,' ',ch_err
   end IF
   
-  if (info /= psb_no_err_) then    
+  if (psb_errstatus_fatal()) then    
     info=psb_err_from_subroutine_
-    ch_err='psb_spcnv'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='cscnv')
     goto 9999
   endif
 

@@ -327,9 +327,9 @@ subroutine psb_d_base_mv_from_fmt(a,b,info)
 
 end subroutine psb_d_base_mv_from_fmt
 
-subroutine psb_d_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_d_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput_a
   implicit none 
   class(psb_d_base_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
@@ -354,7 +354,56 @@ subroutine psb_d_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   end if
   return
 
-end subroutine psb_d_base_csput
+end subroutine psb_d_base_csput_a
+
+subroutine psb_d_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_error_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_csput_v
+  use psb_d_base_vect_mod
+  implicit none 
+  class(psb_d_base_sparse_mat), intent(inout) :: a
+  class(psb_d_base_vect_type), intent(inout)  :: val
+  class(psb_i_base_vect_type), intent(inout)  :: ia, ja
+  integer(psb_ipk_), intent(in)               :: nz, imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: gtl(:)
+
+  integer(psb_ipk_) :: err_act, nzin, nzout
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='csput_v'
+  integer :: jmin_, jmax_
+  logical :: append_, rscale_, cscale_
+  logical, parameter :: debug=.false.
+  
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  
+  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if (val%is_dev()) call val%sync()
+    if (ia%is_dev()) call ia%sync()
+    if (ja%is_dev()) call ja%sync()
+    call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
+  else
+    info = psb_err_invalid_mat_state_
+  endif
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_base_csput_v
 
 subroutine psb_d_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)

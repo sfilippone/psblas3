@@ -2573,11 +2573,11 @@ contains
 end subroutine psb_s_coo_csgetrow
 
 
-subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_s_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
   use psb_sort_mod
-  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_csput
+  use psb_s_base_mat_mod, psb_protect_name => psb_s_coo_csput_a
   implicit none 
 
   class(psb_s_coo_sparse_mat), intent(inout) :: a
@@ -2589,7 +2589,7 @@ subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='s_coo_csput_impl'
+  character(len=20)  :: name='s_coo_csput_a_impl'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
@@ -2953,7 +2953,7 @@ contains
 
   end subroutine s_coo_srch_upd
 
-end subroutine psb_s_coo_csput
+end subroutine psb_s_coo_csput_a
 
 
 subroutine psb_s_cp_coo_to_coo(a,b,info) 

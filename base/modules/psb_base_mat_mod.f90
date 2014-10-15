@@ -124,6 +124,8 @@ module psb_base_mat_mod
     logical, private     :: unitd
     !> Are the coefficients sorted ?
     logical, private     :: sorted
+    logical, private     :: repeatable_updates=.false.
+
   contains 
 
     ! == = =================================
@@ -140,6 +142,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_state   => psb_base_get_state
     procedure, pass(a) :: get_dupl    => psb_base_get_dupl
     procedure, nopass  :: get_fmt     => psb_base_get_fmt
+    procedure, nopass  :: has_update  => psb_base_has_update
     procedure, pass(a) :: is_null     => psb_base_is_null
     procedure, pass(a) :: is_bld      => psb_base_is_bld
     procedure, pass(a) :: is_upd      => psb_base_is_upd
@@ -151,6 +154,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_unit     => psb_base_is_unit
     procedure, pass(a) :: is_by_rows  => psb_base_is_by_rows
     procedure, pass(a) :: is_by_cols  => psb_base_is_by_cols
+    procedure, pass(a) :: is_repeatable_updates     => psb_base_is_repeatable_updates
     
     ! == = =================================
     !
@@ -171,6 +175,8 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_triangle => psb_base_set_triangle
     procedure, pass(a) :: set_unit     => psb_base_set_unit
 
+    procedure, pass(a) :: set_repeatable_updates     => psb_base_set_repeatable_updates
+
 
     ! == = =================================
     !
@@ -179,12 +185,15 @@ module psb_base_mat_mod
     ! == = =================================  
     procedure, pass(a) :: get_neigh  => psb_base_get_neigh
     procedure, pass(a) :: free       => psb_base_free
+    procedure, pass(a) :: asb        => psb_base_mat_asb
     procedure, pass(a) :: trim       => psb_base_trim
     procedure, pass(a) :: reinit     => psb_base_reinit
     procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
     procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
     generic,   public  :: allocate   => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
+
+
     procedure, pass(a) :: csgetptn => psb_base_csgetptn
     generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => psb_base_sparse_print
@@ -195,6 +204,19 @@ module psb_base_mat_mod
     procedure, pass(a) :: transc_1mat => psb_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_base_transc_2mat
     generic, public    :: transc => transc_1mat, transc_2mat
+    ! Sync: centerpiece of handling of external storage.
+    ! Any derived class having extra storage upon sync
+    ! will guarantee that both fortran/host side and
+    ! external side contain the same data. The base
+    ! version is only a placeholder. 
+    !
+    procedure, pass(a) :: sync          => psb_base_mat_sync
+    procedure, pass(a) :: is_host       => psb_base_mat_is_host
+    procedure, pass(a) :: is_dev        => psb_base_mat_is_dev
+    procedure, pass(a) :: is_sync       => psb_base_mat_is_sync
+    procedure, pass(a) :: set_host      => psb_base_mat_set_host
+    procedure, pass(a) :: set_dev       => psb_base_mat_set_dev
+    procedure, pass(a) :: set_sync      => psb_base_mat_set_sync
  
   end type psb_base_sparse_mat
 
@@ -436,6 +458,16 @@ contains
     character(len=5) :: res
     res = 'NULL'
   end function psb_base_get_fmt
+  !         
+  !> Function  has_update
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Does the forma have the UPDATE functionality? 
+  !
+  function psb_base_has_update() result(res)
+    implicit none 
+    logical  :: res
+    res = .true.
+  end function psb_base_has_update
   
   !
   ! Standard getter functions: self-explaining. 
@@ -587,6 +619,18 @@ contains
     end if
   end subroutine psb_base_set_upper
 
+  subroutine psb_base_set_repeatable_updates(a,val) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%repeatable_updates = val
+    else
+      a%repeatable_updates = .true.
+    end if
+  end subroutine psb_base_set_repeatable_updates
+
   function psb_base_is_triangle(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -665,6 +709,13 @@ contains
     res = .false.
   end function psb_base_is_by_cols
 
+  function psb_base_is_repeatable_updates(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%repeatable_updates
+  end function psb_base_is_repeatable_updates
+
   
   !
   !  TRANSP: note sorted=.false.
@@ -685,6 +736,7 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
+    b%repeatable_updates = .false.
     
   end subroutine psb_base_transp_2mat
 
@@ -703,6 +755,7 @@ contains
     b%unitd     = a%unitd
     b%upper     = .not.a%upper
     b%sorted    = .false.
+    b%repeatable_updates = .false.
 
   end subroutine psb_base_transc_2mat
 
@@ -721,6 +774,7 @@ contains
     a%unitd     = a%unitd
     a%upper     = .not.a%upper
     a%sorted    = .false.
+    a%repeatable_updates = .false.
     
   end subroutine psb_base_transp_1mat
 
@@ -732,6 +786,114 @@ contains
     call a%transp() 
   end subroutine psb_base_transc_1mat
 
+
+
+  !
+  !> Function  base_asb:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Sync: base version calls sync and the set_asb.
+  !!           
+  !
+  subroutine psb_base_mat_asb(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+    call a%sync()
+    call a%set_asb()
+  end subroutine psb_base_mat_asb
+  !
+  ! The base version of SYNC & friends does nothing, it's just
+  ! a placeholder.
+  ! 
+  !
+  !> Function  base_sync:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Sync: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_sync(a)
+    implicit none 
+    class(psb_base_sparse_mat), target, intent(in) :: a
+    
+  end subroutine psb_base_mat_sync
+
+  !
+  !> Function  base_set_host:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_host: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_host(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_host
+
+  !
+  !> Function  base_set_dev:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_dev: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_dev(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_dev
+
+  !
+  !> Function  base_set_sync:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Set_sync: base version is a no-op.
+  !!           
+  !
+  subroutine psb_base_mat_set_sync(a)
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+  end subroutine psb_base_mat_set_sync
+
+  !
+  !> Function  base_is_dev:
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on eaternal device    .
+  !!           
+  !
+  function psb_base_mat_is_dev(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+  
+    res = .false.
+  end function psb_base_mat_is_dev
+  
+  !
+  !> Function  base_is_host
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on standard memory    .
+  !!           
+  !
+  function psb_base_mat_is_host(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+
+    res = .true.
+  end function psb_base_mat_is_host
+
+  !
+  !> Function  base_is_sync
+  !! \memberof  psb_base_sparse_mat
+  !! \brief Is matrix on sync               .
+  !!           
+  !
+  function psb_base_mat_is_sync(a) result(res)
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    logical  :: res
+
+    res = .true.
+  end function psb_base_mat_is_sync
 
 end module psb_base_mat_mod
 

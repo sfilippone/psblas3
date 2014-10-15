@@ -57,7 +57,9 @@ module psb_c_base_mat_mod
     !
     ! Data management methods: defined here, but (mostly) not implemented.
     !    
-    procedure, pass(a) :: csput         => psb_c_base_csput  
+    procedure, pass(a) :: csput_a       => psb_c_base_csput_a
+    procedure, pass(a) :: csput_v       => psb_c_base_csput_v 
+    generic, public    :: csput         => csput_a,  csput_v
     procedure, pass(a) :: csgetrow      => psb_c_base_csgetrow
     procedure, pass(a) :: csgetblk      => psb_c_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_c_base_get_diag
@@ -112,6 +114,10 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: aclsum      => psb_c_base_aclsum
   end type psb_c_base_sparse_mat
   
+  private :: c_base_mat_sync, c_base_mat_is_host, c_base_mat_is_dev, &
+       & c_base_mat_is_sync, c_base_mat_set_host, c_base_mat_set_dev,&
+       & c_base_mat_set_sync
+  
   !> \namespace  psb_base_mod  \class  psb_c_coo_sparse_mat
   !! \extends psb_c_base_mat_mod::psb_c_base_sparse_mat
   !! 
@@ -151,7 +157,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: mv_from_coo  => psb_c_mv_coo_from_coo
     procedure, pass(a) :: mv_to_fmt    => psb_c_mv_coo_to_fmt
     procedure, pass(a) :: mv_from_fmt  => psb_c_mv_coo_from_fmt
-    procedure, pass(a) :: csput        => psb_c_coo_csput
+    procedure, pass(a) :: csput_a       => psb_c_coo_csput_a
     procedure, pass(a) :: get_diag     => psb_c_coo_get_diag
     procedure, pass(a) :: csgetrow     => psb_c_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_c_coo_csgetptn
@@ -250,14 +256,27 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_c_base_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_
       class(psb_c_base_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: gtl(:)
-    end subroutine psb_c_base_csput
+    end subroutine psb_c_base_csput_a
+  end interface
+  
+  interface 
+    subroutine psb_c_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type,&
+           & psb_i_base_vect_type
+      class(psb_c_base_sparse_mat), intent(inout) :: a
+      class(psb_c_base_vect_type), intent(inout)  :: val
+      class(psb_i_base_vect_type), intent(inout)  :: ia, ja
+      integer(psb_ipk_), intent(in)             :: nz, imin, imax,jmin,jmax
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: gtl(:)
+    end subroutine psb_c_base_csput_v
   end interface
   
   !
@@ -1464,7 +1483,7 @@ module psb_c_base_mat_mod
   !!
   !
   interface 
-    subroutine psb_c_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_c_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_c_coo_sparse_mat, psb_spk_
       class(psb_c_coo_sparse_mat), intent(inout) :: a
       complex(psb_spk_), intent(in)      :: val(:)
@@ -1472,7 +1491,7 @@ module psb_c_base_mat_mod
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: gtl(:)
-    end subroutine psb_c_coo_csput
+    end subroutine psb_c_coo_csput_a
   end interface
   
   !> 

@@ -88,7 +88,7 @@ module psb_s_csc_mat_mod
     procedure, pass(a) :: mv_from_coo => psb_s_mv_csc_from_coo
     procedure, pass(a) :: mv_to_fmt   => psb_s_mv_csc_to_fmt
     procedure, pass(a) :: mv_from_fmt => psb_s_mv_csc_from_fmt
-    procedure, pass(a) :: csput       => psb_s_csc_csput
+    procedure, pass(a) :: csput_a      => psb_s_csc_csput_a
     procedure, pass(a) :: get_diag    => psb_s_csc_get_diag
     procedure, pass(a) :: csgetptn    => psb_s_csc_csgetptn
     procedure, pass(a) :: csgetrow   => psb_s_csc_csgetrow
@@ -279,9 +279,9 @@ module psb_s_csc_mat_mod
   
   
   !> \memberof psb_s_csc_sparse_mat
-  !! \see psb_s_base_mat_mod::psb_s_base_csput
+  !! \see psb_s_base_mat_mod::psb_s_base_csput_a
   interface 
-    subroutine psb_s_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_s_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_s_csc_sparse_mat, psb_spk_
       class(psb_s_csc_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
@@ -289,7 +289,7 @@ module psb_s_csc_mat_mod
            &  imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: gtl(:)
-    end subroutine psb_s_csc_csput
+    end subroutine psb_s_csc_csput_a
   end interface
   
   !> \memberof psb_s_csc_sparse_mat

@@ -88,12 +88,12 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_desc(desc_a)) then 
-    info = psb_err_spmat_invalid_state_
-    int_err(1) = desc_a%get_dectype()
+  if (.not.desc_a%is_asb()) then
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
-  endif
+  end if
+
 
   if (debug_level >= psb_debug_ext_)&
        & write(debug_unit, *) me,' ',trim(name),&
@@ -113,7 +113,16 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
     call a%set_ncols(n_col)
   end if
 
-  call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  if (a%is_bld()) then 
+    call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
+  else if (a%is_upd()) then 
+    call a%asb(mold=mold)
+  else
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+    
+  end if
 
   
   IF (debug_level >= psb_debug_ext_) then 
@@ -122,10 +131,9 @@ subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
          & info,' ',ch_err
   end IF
   
-  if (info /= psb_no_err_) then    
+  if (psb_errstatus_fatal()) then    
     info=psb_err_from_subroutine_
-    ch_err='psb_spcnv'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='cscnv')
     goto 9999
   endif
 

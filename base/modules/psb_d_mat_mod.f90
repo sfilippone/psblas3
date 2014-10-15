@@ -98,6 +98,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: is_lower    => psb_d_is_lower
     procedure, pass(a) :: is_triangle => psb_d_is_triangle
     procedure, pass(a) :: is_unit     => psb_d_is_unit
+    procedure, pass(a) :: is_repeatable_updates => psb_d_is_repeatable_updates
     procedure, pass(a) :: get_fmt     => psb_d_get_fmt
     procedure, pass(a) :: sizeof      => psb_d_sizeof
 
@@ -114,12 +115,15 @@ module psb_d_mat_mod
     procedure, pass(a) :: set_lower    => psb_d_set_lower
     procedure, pass(a) :: set_triangle => psb_d_set_triangle
     procedure, pass(a) :: set_unit     => psb_d_set_unit
+    procedure, pass(a) :: set_repeatable_updates => psb_d_set_repeatable_updates
 
     ! Memory/data management 
     procedure, pass(a) :: csall       => psb_d_csall
     procedure, pass(a) :: free        => psb_d_free
     procedure, pass(a) :: trim        => psb_d_trim
-    procedure, pass(a) :: csput       => psb_d_csput 
+    procedure, pass(a) :: csput_a     => psb_d_csput_a
+    procedure, pass(a) :: csput_v     => psb_d_csput_v 
+    generic, public    :: csput       => csput_a,  csput_v
     procedure, pass(a) :: csgetptn    => psb_d_csgetptn
     procedure, pass(a) :: csgetrow    => psb_d_csgetrow
     procedure, pass(a) :: csgetblk    => psb_d_csgetblk
@@ -136,6 +140,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: print_n     => psb_d_n_sparse_print
     generic, public    :: print       => print_i, print_n
     procedure, pass(a) :: mold        => psb_d_mold
+    procedure, pass(a) :: asb         => psb_d_asb
     procedure, pass(a) :: transp_1mat => psb_d_transp_1mat
     procedure, pass(a) :: transp_2mat => psb_d_transp_2mat
     generic, public    :: transp      => transp_1mat, transp_2mat
@@ -378,16 +383,31 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine psb_d_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: gtl(:)
-    end subroutine psb_d_csput
+    end subroutine psb_d_csput_a
   end interface
+
   
+  interface 
+    subroutine psb_d_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+      use psb_d_vect_mod, only : psb_d_vect_type
+      use psb_i_vect_mod, only : psb_i_vect_type
+      import :: psb_ipk_, psb_dspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+      type(psb_d_vect_type), intent(inout)  :: val
+      type(psb_i_vect_type), intent(inout)  :: ia, ja
+      integer(psb_ipk_), intent(in)             :: nz, imin,imax,jmin,jmax
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: gtl(:)
+    end subroutine psb_d_csput_v
+  end interface
+ 
   interface 
     subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -491,6 +511,14 @@ module psb_d_mat_mod
       class(psb_dspmat_type), intent(inout)     :: a
       class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
     end subroutine psb_d_mold
+  end interface
+  
+  interface 
+    subroutine psb_d_asb(a,mold) 
+      import :: psb_ipk_, psb_dspmat_type, psb_d_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_d_base_sparse_mat), optional, intent(in) :: mold
+    end subroutine psb_d_asb
   end interface
   
   interface 
@@ -1083,6 +1111,31 @@ contains
 
   end function psb_d_is_by_cols
 
+
+
+  function psb_d_is_repeatable_updates(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical :: res
+
+    if (allocated(a%a)) then 
+      res = a%a%is_repeatable_updates()
+    else
+      res = .false.
+    end if
+
+  end function psb_d_is_repeatable_updates
+
+  subroutine psb_d_set_repeatable_updates(a,val) 
+    implicit none 
+    class(psb_dspmat_type), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (allocated(a%a)) then 
+      call a%a%set_repeatable_updates(val)
+    end if
+    
+  end subroutine psb_d_set_repeatable_updates
 
 
   function psb_d_get_nzeros(a) result(res)

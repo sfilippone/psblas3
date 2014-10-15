@@ -1,6 +1,23 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2014/10/15: Merged changes into trunk. Declare version 3.3
+	
+2014/10/10: Fix recutions when root /= -1	
+
+2014/09/10: Use int32/64 kinds & friends  from ISO_FORTRAN_ENV	
+	
+2014/08/30: New multivector types. Vector insertion now takes other
+  	    vectors as well as arrays. 
+	
+2014/07/10: CSPUT has now two specifics, with arrays or vector types.
+	    	
+	
+2014/07/02: Matrices have host/device status.	
+	
 2014/06/11: Check for bug on multiple generic names. 
+	
+2014/05/05: Make sure CSPUT ignores (at most a warning) indices not
+            belonging. 
 	
 2014/04/14: Sort status in COO. Changes in error handling for CSPUT.
 	
