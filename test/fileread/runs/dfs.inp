@@ -1,5 +1,5 @@
 11                  Number of inputs
-kivap005.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+matrix_0000_of_0001.mtx  !  kivap005.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
 NONE                  sherman3_b.mtx      http://www.cise.ufl.edu/research/sparse/matrices/index.html
 MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
 BiCG                Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
@@ -9,5 +9,5 @@ CSR                 Storage format CSR COO JAD
 2                   ISTOPC
 02100               ITMAX
 -1                  ITRACE
-002                 IRST     (restart for RGMRES and BiCGSTABL) 
+002                 IRST     (restart for RGMRES and 
 1.d-6               EPS

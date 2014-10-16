@@ -204,6 +204,8 @@ module psb_base_mat_mod
     procedure, pass(a) :: transc_1mat => psb_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_base_transc_2mat
     generic, public    :: transc => transc_1mat, transc_2mat
+
+    !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
     ! will guarantee that both fortran/host side and
