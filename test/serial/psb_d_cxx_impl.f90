@@ -2333,10 +2333,10 @@ end subroutine psb_d_cxx_csgetblk
 
 
 
-subroutine psb_d_cxx_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_d_cxx_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csput
+  use psb_d_cxx_mat_mod, psb_protect_name => psb_d_cxx_csput_a
   implicit none 
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
@@ -2618,7 +2618,7 @@ contains
 
   end subroutine psb_d_cxx_srch_upd
 
-end subroutine psb_d_cxx_csput
+end subroutine psb_d_cxx_csput_a
 
 
 subroutine psb_d_cxx_reinit(a,clear)
