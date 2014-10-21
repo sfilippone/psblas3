@@ -1627,6 +1627,7 @@ function psb_s_base_maxval(a) result(res)
 
 end function psb_s_base_maxval
 
+
 function psb_s_base_csnmi(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1638,21 +1639,34 @@ function psb_s_base_csnmi(a) result(res)
 
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='csnmi'
+  character(len=20)  :: name='csnm1'
+  real(psb_spk_), allocatable  :: vt(:) 
+    
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+  call psb_erractionsave(err_act)
   res = szero
+  call psb_realloc(a%get_nrows(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%arwsum(vt)
+  res = maxval(vt)  
 
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
   return
 
 end function psb_s_base_csnmi
@@ -1669,20 +1683,33 @@ function psb_s_base_csnm1(a) result(res)
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csnm1'
+  real(psb_spk_), allocatable  :: vt(:) 
+    
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+  call psb_erractionsave(err_act)
   res = szero
+  call psb_realloc(a%get_ncols(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%aclsum(vt)
+  res = maxval(vt)  
 
+  call psb_erractionrestore(err_act)
+  return
+
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
   return
 
 end function psb_s_base_csnm1
