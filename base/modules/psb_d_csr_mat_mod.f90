@@ -74,7 +74,6 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: scalv       => psb_d_csr_scal
     procedure, pass(a) :: maxval      => psb_d_csr_maxval
     procedure, pass(a) :: spnmi       => psb_d_csr_csnmi
-    procedure, pass(a) :: spnm1       => psb_d_csr_csnm1
     procedure, pass(a) :: rowsum      => psb_d_csr_rowsum
     procedure, pass(a) :: arwsum      => psb_d_csr_arwsum
     procedure, pass(a) :: colsum      => psb_d_csr_colsum
@@ -421,16 +420,6 @@ module psb_d_csr_mat_mod
     end function psb_d_csr_csnmi
   end interface
   
-  !> \memberof psb_d_csr_sparse_mat
-  !! \see psb_d_base_mat_mod::psb_d_base_csnm1
-  interface 
-    function psb_d_csr_csnm1(a) result(res)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
-      class(psb_d_csr_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
-    end function psb_d_csr_csnm1
-  end interface
-
   !> \memberof psb_d_csr_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_rowsum
   interface 

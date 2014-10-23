@@ -1326,45 +1326,6 @@ function psb_d_csr_csnmi(a) result(res)
 
 end function psb_d_csr_csnmi
 
-function psb_d_csr_csnm1(a) result(res)
-  use psb_error_mod
-  use psb_const_mod
-  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csr_csnm1
-
-  implicit none 
-  class(psb_d_csr_sparse_mat), intent(in) :: a
-  real(psb_dpk_)         :: res
-
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
-  logical   :: tra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='d_csr_csnm1'
-  logical, parameter :: debug=.false.
-
-
-  res = dzero
-  nnz = a%get_nzeros()
-  m = a%get_nrows()
-  n = a%get_ncols()
-  allocate(vt(n),stat=info)
-  if (info /= 0) return
-  vt(:) = dzero
-  do i=1, m
-    do j=a%irp(i),a%irp(i+1)-1
-      k = a%ja(j)
-      vt(k) = vt(k) + abs(a%val(j))
-    end do
-  end do
-  res = maxval(vt(1:n))
-  deallocate(vt,stat=info)
-
-  return
-
-end function psb_d_csr_csnm1
-
 subroutine psb_d_csr_rowsum(d,a) 
   use psb_error_mod
   use psb_const_mod

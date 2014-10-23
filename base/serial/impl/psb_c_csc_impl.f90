@@ -1094,47 +1094,6 @@ function psb_c_csc_maxval(a) result(res)
   end if
 end function psb_c_csc_maxval
 
-function psb_c_csc_csnmi(a) result(res)
-  use psb_error_mod
-  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csnmi
-  implicit none 
-  class(psb_c_csc_sparse_mat), intent(in) :: a
-  real(psb_spk_)         :: res
-
-  integer(psb_ipk_) :: i,j,k,m,n, nr, ir, jc, nc, info
-  real(psb_spk_), allocatable  :: acc(:) 
-  logical   :: tra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='c_csnmi'
-  logical, parameter :: debug=.false.
-
-
-  res = szero 
-  nr = a%get_nrows()
-  nc = a%get_ncols()
-  allocate(acc(nr),stat=info)
-  if (info /= psb_success_) then 
-    return
-  end if
-  if (a%is_unit()) then 
-    acc = sone
-  else
-    acc = szero
-  end if
-  do i=1, nc
-    do j=a%icp(i),a%icp(i+1)-1  
-      acc(a%ia(j)) = acc(a%ia(j)) + abs(a%val(j))
-    end do
-  end do
-  do i=1, nr
-    res = max(res,acc(i))
-  end do
-  deallocate(acc)
-
-end function psb_c_csc_csnmi
-
-
 function psb_c_csc_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod

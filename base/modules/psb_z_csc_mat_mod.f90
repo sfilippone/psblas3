@@ -72,7 +72,6 @@ module psb_z_csc_mat_mod
     procedure, pass(a) :: scals       => psb_z_csc_scals
     procedure, pass(a) :: scalv       => psb_z_csc_scal
     procedure, pass(a) :: maxval      => psb_z_csc_maxval
-    procedure, pass(a) :: spnmi       => psb_z_csc_csnmi
     procedure, pass(a) :: spnm1       => psb_z_csc_csnm1
     procedure, pass(a) :: rowsum      => psb_z_csc_rowsum
     procedure, pass(a) :: arwsum      => psb_z_csc_arwsum
@@ -406,16 +405,6 @@ module psb_z_csc_mat_mod
       class(psb_z_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_z_csc_maxval
-  end interface
-  
-  !> \memberof psb_z_csc_sparse_mat
-  !! \see psb_z_base_mat_mod::psb_z_base_csnmi
-  interface 
-    function psb_z_csc_csnmi(a) result(res)
-      import :: psb_ipk_, psb_z_csc_sparse_mat, psb_dpk_
-      class(psb_z_csc_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
-    end function psb_z_csc_csnmi
   end interface
   
   !> \memberof psb_z_csc_sparse_mat

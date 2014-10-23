@@ -1631,6 +1631,7 @@ end function psb_c_base_maxval
 function psb_c_base_csnmi(a) result(res)
   use psb_error_mod
   use psb_const_mod
+  use psb_realloc_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_csnmi
 
   implicit none 
@@ -1674,6 +1675,7 @@ end function psb_c_base_csnmi
 function psb_c_base_csnm1(a) result(res)
   use psb_error_mod
   use psb_const_mod
+  use psb_realloc_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_csnm1
 
   implicit none 
