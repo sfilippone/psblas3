@@ -1,5 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2014/10/22: Implement norm-1 and norm-infinity at base_sparse_mat relying
+	    on srwsum/aclsum.
+	
 2014/10/15: Merged changes into trunk. Declare version 3.3
 	
 2014/10/10: Fix recutions when root /= -1	
