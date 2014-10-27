@@ -142,7 +142,7 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
     if (size(aux_b,dim=1) == m_problem) then
@@ -151,6 +151,10 @@ program df_sample
       b_col_glob =>aux_b(:,1)
       call psb_gelp('N',perm(1:m_problem),&
            & b_col_glob(1:m_problem),info)
+      write(fnout,'(a,i3.3,a)') 'amat-',iam,'-gps.mtx'
+      call aux_a%print(fname=fnout)
+      write(fnout,'(a,i3.3,a)') 'rhs-',iam,'-gps.mtx'
+      call mm_array_write(b_col_glob(1:m_problem),'GPS RHS',info,filename=fnout)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')

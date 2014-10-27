@@ -1,4 +1,9 @@
-This directory contains  the PSBLAS library, version 3.2.
+This directory contains  the PSBLAS library, version 3.3.
+
+
+Existing codes will work untouched with version 3.3, but they will
+have to be recompiled; new methods have been added for the sake of GPU
+computations, plus the usual bunch of bug fixes.
 
 
 This version requires a working Fortran 2003 compiler; we do not use
