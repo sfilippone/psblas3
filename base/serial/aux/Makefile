@@ -35,9 +35,12 @@ lib: $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
+clsr.o  clsrx.o:  clcmp_mod.o
+calsr.o calsrx.o: calcmp_mod.o
+camsort_up.o camsort_dw.o casr.o  casrx.o:  cacmp_mod.o
 zlsr.o  zlsrx.o:  zlcmp_mod.o
 zalsr.o zalsrx.o: zalcmp_mod.o
-zasr.o  zasrx.o:  zacmp_mod.o
+zamsort_up.o zamsort_dw.o zasr.o  zasrx.o:  zacmp_mod.o
 
 clean: 
 	/bin/rm -f $(OBJS) *$(.mod)
