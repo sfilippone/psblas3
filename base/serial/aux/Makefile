@@ -4,9 +4,11 @@ include ../../../Make.inc
 #
 
 FOBJS  = isr.o isrx.o iasr.o iasrx.o msort_up.o msort_dw.o\
-	imsr.o imsrx.o imsru.o idot.o inrm2.o\
-	dsr.o dsrx.o dasr.o dasrx.o dmsr.o dmsrx.o  dmsort_up.o dmsort_dw.o \
-	ssr.o ssrx.o sasr.o sasrx.o smsr.o smsrx.o  smsort_up.o smsort_dw.o \
+	imsr.o imsrx.o imsru.o iamsort_up.o iamsort_dw.o idot.o inrm2.o\
+	dsr.o dsrx.o dasr.o dasrx.o dmsr.o dmsrx.o \
+	dmsort_up.o dmsort_dw.o   damsort_up.o damsort_dw.o \
+	ssr.o ssrx.o sasr.o sasrx.o smsr.o smsrx.o \
+	smsort_up.o smsort_dw.o   samsort_up.o samsort_dw.o \
 	clcmp_mod.o clsr.o clsrx.o  \
 	calcmp_mod.o calsr.o calsrx.o \
 	cacmp_mod.o casr.o casrx.o camsr.o camsrx.o camsort_up.o camsort_dw.o\

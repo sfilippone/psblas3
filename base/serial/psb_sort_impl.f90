@@ -208,7 +208,7 @@ subroutine imsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -273,7 +273,7 @@ subroutine smsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -337,7 +337,7 @@ subroutine dmsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -530,7 +530,7 @@ subroutine imsort_u(x,nout,dir)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
