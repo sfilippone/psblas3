@@ -1,5 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2014/11/12: Fix silly bug in MMIO: cycling through rank-2 dense read/write was
+            transposing! 	
 2014/10/22: Implement norm-1 and norm-infinity at base_sparse_mat relying
 	    on srwsum/aclsum.
 	
