@@ -182,7 +182,6 @@ module psb_cd_tools_mod
     subroutine psb_cd_switch_ovl_indxmap(desc,info) 
       import :: psb_ipk_, psb_desc_type
       implicit None
-      include 'parts.fh'
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_cd_switch_ovl_indxmap
