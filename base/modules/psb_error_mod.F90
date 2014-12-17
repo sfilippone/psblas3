@@ -53,7 +53,8 @@ module psb_error_mod
        & psb_get_erraction, psb_set_erraction, &
        & psb_get_debug_level, psb_set_debug_level,&
        & psb_get_debug_unit, psb_set_debug_unit,&
-       & psb_get_serial_debug_level, psb_set_serial_debug_level
+       & psb_get_serial_debug_level, psb_set_serial_debug_level,&
+       & psb_clean_errstack
 
  
   interface psb_error
@@ -93,8 +94,10 @@ module psb_error_mod
     character(len=20)        ::   routine=''       
     !  array of integer data to complete the error msg   
     integer(psb_ipk_),dimension(5)     ::   i_err_data=0     
-    !     real(psb_dpk_)(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
-    !     complex(dim=10)          ::   c_err_data=0.c0    !  array of complex data to complete the error msg
+    !     real(psb_dpk_)(dim=10) ::   r_err_data=0.d0   
+    !  array of real data to complete the error msg
+    !     complex(dim=10)          ::   c_err_data=0.c0    
+    !  array of complex data to complete the error msg
     !  array of character data to complete the error msg
     character(len=40)        ::   a_err_data=''      
     !  pointer to the next element in the stack 
@@ -332,19 +335,36 @@ contains
 
     type(psb_errstack_node), pointer     ::  old_node
 
-    err_c      =  error_stack%top%err_code
-    r_name     =  error_stack%top%routine
-    i_e_d      =  error_stack%top%i_err_data
-    a_e_d      =  error_stack%top%a_err_data
-
-    old_node   => error_stack%top
-    error_stack%top  => old_node%next
-    error_stack%n_elems = error_stack%n_elems - 1
+    if (error_stack%n_elems > 0) then 
+      err_c      =  error_stack%top%err_code
+      r_name     =  error_stack%top%routine
+      i_e_d      =  error_stack%top%i_err_data
+      a_e_d      =  error_stack%top%a_err_data
+      
+      old_node   => error_stack%top
+      error_stack%top  => old_node%next
+      error_stack%n_elems = error_stack%n_elems - 1
+      deallocate(old_node)
+    end if
     if (error_stack%n_elems == 0) error_status=0
-
-    deallocate(old_node)
+      
 
   end subroutine psb_errpop
+
+  ! Clean the error stack
+  subroutine psb_clean_errstack()
+
+    integer(psb_ipk_)        ::  err_c
+    character(len=20)        ::  r_name
+    character(len=40)        ::  a_e_d
+    integer(psb_ipk_)        ::  i_e_d(5)
+
+    
+    do while (psb_get_numerr() > 0)
+      call psb_errpop(err_c, r_name, i_e_d, a_e_d)
+    end do
+    
+  end subroutine psb_clean_errstack
 
 
   ! prints the error msg associated to a specific error code
