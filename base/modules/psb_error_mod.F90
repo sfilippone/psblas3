@@ -40,6 +40,8 @@ module psb_error_mod
   integer(psb_ipk_), parameter, public ::  psb_no_err_      = 0
   integer(psb_ipk_), parameter, public ::  psb_err_warning_ = 1
   integer(psb_ipk_), parameter, public ::  psb_err_fatal_   = 2
+
+  integer(psb_ipk_), parameter, public ::  psb_max_errmsg_len_   = 132
   
   !
   !     Error handling 
@@ -73,6 +75,7 @@ module psb_error_mod
       integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
   end interface psb_errcomm
+
 
 #if defined(LONG_INTEGERS)
   interface psb_error
@@ -370,11 +373,11 @@ contains
   ! prints the error msg associated to a specific error code
   subroutine psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
 
-    integer(psb_ipk_), intent(in)              ::  err_c
+    integer(psb_ipk_), intent(in)    ::  err_c
     character(len=20), intent(in)    ::  r_name
     character(len=40), intent(in)    ::  a_e_d
-    integer(psb_ipk_), intent(in)              ::  i_e_d(5)
-    integer(psb_mpik_), optional                ::  me
+    integer(psb_ipk_), intent(in)    ::  i_e_d(5)
+    integer(psb_mpik_), optional     ::  me
 
     if(present(me)) then
       write(psb_err_unit,&
