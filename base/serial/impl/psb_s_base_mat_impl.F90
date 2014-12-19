@@ -1640,7 +1640,7 @@ function psb_s_base_csnmi(a) result(res)
 
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='csnm1'
+  character(len=20)  :: name='csnmi'
   real(psb_spk_), allocatable  :: vt(:) 
     
   logical, parameter :: debug=.false.

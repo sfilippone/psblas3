@@ -17,11 +17,7 @@ function psb_base_get_nz_row(idx,a) result(res)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end function psb_base_get_nz_row
 
 function psb_base_get_nzeros(a) result(res)
@@ -42,11 +38,7 @@ function psb_base_get_nzeros(a) result(res)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end function psb_base_get_nzeros
 
 function psb_base_get_size(a) result(res)
@@ -67,11 +59,7 @@ function psb_base_get_size(a) result(res)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end function psb_base_get_size
 
 subroutine psb_base_reinit(a,clear)
@@ -93,11 +81,7 @@ subroutine psb_base_reinit(a,clear)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_reinit
 
 subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
@@ -122,11 +106,7 @@ subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_sparse_print
 
 subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
@@ -157,11 +137,7 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_csgetptn
 
 subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
@@ -234,11 +210,8 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
+9999 call psb_error_handler(err_act)
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
   return
 
 end subroutine psb_base_get_neigh
@@ -260,11 +233,7 @@ subroutine  psb_base_allocate_mnnz(m,n,a,nz)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_allocate_mnnz
 
 subroutine  psb_base_reallocate_nz(nz,a) 
@@ -283,11 +252,7 @@ subroutine  psb_base_reallocate_nz(nz,a)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_reallocate_nz
 
 subroutine  psb_base_free(a) 
@@ -305,11 +270,7 @@ subroutine  psb_base_free(a)
   ! so we throw an error.
   call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
-
+  call psb_error_handler(err_act)
 end subroutine psb_base_free
 
 subroutine  psb_base_trim(a) 

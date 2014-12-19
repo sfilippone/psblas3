@@ -51,7 +51,7 @@ module psb_error_mod
   public psb_errpush, psb_error, psb_get_errstatus,&
        & psb_errstatus_fatal, psb_errstatus_warning,&
        & psb_errstatus_ok, psb_warning_push,&
-       & psb_errpop, psb_errmsg, psb_errcomm, psb_get_numerr, &
+       & psb_errpop, psb_errcomm, psb_get_numerr, &
        & psb_get_errverbosity, psb_set_errverbosity, &
        & psb_erractionsave, psb_erractionrestore, &
        & psb_get_erraction, psb_set_erraction, &
@@ -62,7 +62,8 @@ module psb_error_mod
        & psb_get_serial_debug_level, psb_set_serial_debug_level,&
        & psb_clean_errstack, psb_error_handler, &
        & psb_ser_error_handler, psb_par_error_handler, &
-       & psb_ser_error_print_stack, psb_par_error_print_stack
+       & psb_ser_error_print_stack, psb_par_error_print_stack,&
+       & psb_error_print_stack, psb_errmsg, psb_ach_errmsg
 
 
   interface psb_error_handler
@@ -108,6 +109,7 @@ module psb_error_mod
   interface psb_errpop
     module procedure psb_errpop, psb_ach_errpop
   end interface
+
   interface psb_errmsg
     module procedure psb_errmsg, psb_ach_errmsg
   end interface
@@ -1022,13 +1024,13 @@ contains
 
 
   ! prints the error msg associated to a specific error code
-  subroutine psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
-
-    integer(psb_ipk_), intent(in)    ::  err_c
-    character(len=20), intent(in)    ::  r_name
-    character(len=40), intent(in)    ::  a_e_d
-    integer(psb_ipk_), intent(in)    ::  i_e_d(5)
-    integer(psb_mpik_), optional     ::  me
+  subroutine psb_errmsg(iunit, err_c, r_name, i_e_d, a_e_d,me)
+    integer(psb_ipk_), intent(in)  :: iunit
+    integer(psb_ipk_), intent(in)  ::  err_c
+    character(len=20), intent(in)  ::  r_name
+    character(len=40), intent(in)  ::  a_e_d
+    integer(psb_ipk_), intent(in)  ::  i_e_d(5)
+    integer(psb_mpik_), optional   ::  me
 
     integer(psb_ipk_) :: i
     character(len=psb_max_errmsg_len_), allocatable :: achmsg(:)
@@ -1036,7 +1038,7 @@ contains
     call psb_ach_errmsg(achmsg,err_c, r_name, i_e_d, a_e_d,me)
     
     do i=1,size(achmsg)
-      write(psb_err_unit,'(a)'),trim(achmsg(i))
+      write(iunit,'(a)'),trim(achmsg(i))
     end do
 
   end subroutine psb_errmsg

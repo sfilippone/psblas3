@@ -77,14 +77,9 @@ subroutine  psb_c_set_nrows(m,a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+  return
 
 end subroutine psb_c_set_nrows
 
@@ -110,14 +105,9 @@ subroutine  psb_c_set_ncols(n,a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+  return
 
 end subroutine psb_c_set_ncols
 
@@ -152,14 +142,9 @@ subroutine  psb_c_set_dupl(n,a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+  return
 
 end subroutine psb_c_set_dupl
 
@@ -189,14 +174,9 @@ subroutine  psb_c_set_null(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+  return
 
 end subroutine psb_c_set_null
 
@@ -222,13 +202,10 @@ subroutine  psb_c_set_bld(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_bld
 
@@ -254,13 +231,10 @@ subroutine  psb_c_set_upd(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 
 end subroutine psb_c_set_upd
@@ -287,13 +261,10 @@ subroutine  psb_c_set_asb(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_asb
 
@@ -320,13 +291,10 @@ subroutine psb_c_set_sorted(a,val)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_sorted
 
@@ -353,13 +321,10 @@ subroutine psb_c_set_triangle(a,val)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_triangle
 
@@ -386,13 +351,10 @@ subroutine psb_c_set_unit(a,val)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_unit
 
@@ -419,13 +381,10 @@ subroutine psb_c_set_lower(a,val)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_lower
 
@@ -452,13 +411,10 @@ subroutine psb_c_set_upper(a,val)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_set_upper
 
@@ -504,12 +460,8 @@ subroutine psb_c_sparse_print(iout,a,iv,head,ivr,ivc)
 
   return
 
-9999 continue
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_sparse_print
@@ -559,12 +511,8 @@ subroutine psb_c_n_sparse_print(fname,a,iv,head,ivr,ivc)
 
   return
 
-9999 continue
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_n_sparse_print
@@ -600,13 +548,8 @@ subroutine psb_c_get_neigh(a,idx,neigh,n,info,lev)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_get_neigh
@@ -643,12 +586,8 @@ subroutine psb_c_csall(nr,nc,a,info,nz)
 
   return
 
-9999 continue
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csall
@@ -675,13 +614,8 @@ subroutine  psb_c_reallocate_nz(nz,a)
 
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_reallocate_nz
@@ -721,12 +655,8 @@ subroutine  psb_c_trim(a)
 
   return
 
-9999 continue
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_trim
@@ -763,13 +693,10 @@ subroutine psb_c_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csput_a
 
@@ -810,13 +737,10 @@ subroutine psb_c_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csput_v
 
@@ -860,13 +784,10 @@ subroutine psb_c_csgetptn(imin,imax,a,nz,ia,ja,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csgetptn
 
@@ -911,13 +832,10 @@ subroutine psb_c_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csgetrow
 
@@ -980,13 +898,10 @@ subroutine psb_c_csgetblk(imin,imax,a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csgetblk
 
@@ -1033,13 +948,10 @@ subroutine psb_c_tril(a,b,info,diag,imin,imax,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 
 end subroutine psb_c_tril
@@ -1087,13 +999,10 @@ subroutine psb_c_triu(a,b,info,diag,imin,imax,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 
 end subroutine psb_c_triu
@@ -1142,13 +1051,10 @@ subroutine psb_c_csclip(a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_csclip
 
@@ -1187,13 +1093,10 @@ subroutine psb_c_b_csclip(a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_b_csclip
 
@@ -1296,13 +1199,10 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_cscnv
 
@@ -1402,13 +1302,10 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_cscnv_ip
 
@@ -1457,13 +1354,10 @@ subroutine psb_c_cscnv_base(a,b,info,dupl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_cscnv_base
 
@@ -1520,13 +1414,10 @@ subroutine psb_c_clip_d(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_clip_d
 
@@ -1582,13 +1473,10 @@ subroutine psb_c_clip_d_ip(a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_clip_d_ip
 
@@ -1647,13 +1535,10 @@ subroutine psb_c_cp_from(a,b)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine psb_c_cp_from
 
 
@@ -1744,13 +1629,10 @@ subroutine psb_cspmat_clone(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_cspmat_clone
 
@@ -1779,13 +1661,10 @@ subroutine psb_c_transp_1mat(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_transp_1mat
 
@@ -1825,13 +1704,10 @@ subroutine psb_c_transp_2mat(a,b)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_transp_2mat
 
@@ -1860,13 +1736,10 @@ subroutine psb_c_transc_1mat(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_transc_1mat
 
@@ -1906,13 +1779,10 @@ subroutine psb_c_transc_2mat(a,b)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_transc_2mat
 
@@ -1949,13 +1819,10 @@ subroutine psb_c_asb(a,mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_asb
 
@@ -1987,13 +1854,10 @@ subroutine psb_c_reinit(a,clear)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_c_reinit
 
@@ -2040,13 +1904,8 @@ subroutine psb_c_csmm(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csmm
@@ -2078,13 +1937,8 @@ subroutine psb_c_csmv(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csmv
@@ -2128,13 +1982,8 @@ subroutine psb_c_csmv_vect(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csmv_vect
@@ -2169,13 +2018,8 @@ subroutine psb_c_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_cssm
@@ -2210,13 +2054,8 @@ subroutine psb_c_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_cssv
@@ -2271,13 +2110,8 @@ subroutine psb_c_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_cssv_vect
@@ -2306,12 +2140,9 @@ function psb_c_maxval(a) result(res)
   res = a%a%maxval()
   return
 
-9999 continue
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
   return
 
 end function psb_c_maxval
@@ -2339,12 +2170,9 @@ function psb_c_csnmi(a) result(res)
   res = a%a%spnmi()
   return
 
-9999 continue
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
   return
 
 end function psb_c_csnmi
@@ -2373,12 +2201,9 @@ function psb_c_csnm1(a) result(res)
   res = a%a%spnm1()
   return
 
-9999 continue
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
   return
 
 end function psb_c_csnm1
@@ -2411,13 +2236,8 @@ function psb_c_rowsum(a,info) result(d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_c_rowsum
@@ -2450,13 +2270,8 @@ function psb_c_arwsum(a,info) result(d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_c_arwsum
@@ -2489,13 +2304,8 @@ function psb_c_colsum(a,info) result(d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_c_colsum
@@ -2528,13 +2338,8 @@ function psb_c_aclsum(a,info) result(d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_c_aclsum
@@ -2572,13 +2377,8 @@ function psb_c_get_diag(a,info) result(d)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_c_get_diag
@@ -2612,13 +2412,8 @@ subroutine psb_c_scal(d,a,info,side)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_scal
@@ -2651,13 +2446,8 @@ subroutine psb_c_scals(d,a,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_scals

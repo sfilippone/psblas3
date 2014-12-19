@@ -76,14 +76,14 @@ subroutine psb_serror()
       do while (psb_get_numerr() > izero)
         write(psb_err_unit,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
+        call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d)
         !            write(psb_err_unit,'(50("="))')
       end do
 
     else
 
       call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
+      call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
       end do
@@ -123,7 +123,7 @@ subroutine psb_perror(ictxt,abrt)
       do while (psb_get_numerr() > izero)
         write(psb_err_unit,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
+        call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d,iam)
         !            write(psb_err_unit,'(50("="))')
       end do
 #if defined(HAVE_FLUSH_STMT)
@@ -135,7 +135,7 @@ subroutine psb_perror(ictxt,abrt)
     else
 
       call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
+      call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d,iam)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
       end do
