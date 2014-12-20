@@ -147,13 +147,9 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapdatam
 
 subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
@@ -519,13 +515,9 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapidxm
 
 !
@@ -645,13 +637,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapdatav
 
 
@@ -1005,13 +993,9 @@ subroutine psi_zswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapidxv
 
 subroutine psi_zswapdata_vect(flag,beta,y,desc_a,work,info,data)
@@ -1082,13 +1066,9 @@ subroutine psi_zswapdata_vect(flag,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapdata_vect
 
 
@@ -1444,13 +1424,9 @@ subroutine psi_zswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswapidx_vect
 
 
@@ -1807,12 +1783,8 @@ subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrc
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_zswap_vidx_vect
 
