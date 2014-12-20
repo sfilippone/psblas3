@@ -160,14 +160,9 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 
 end subroutine psb_igatherm
 
@@ -319,14 +314,9 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 
 end subroutine psb_igatherv
 
@@ -437,13 +427,8 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 
 end subroutine psb_igather_vect

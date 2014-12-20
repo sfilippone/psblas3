@@ -208,14 +208,9 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 end subroutine psb_chalom
 
 
@@ -409,14 +404,9 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 end subroutine psb_chalov
 
 
@@ -560,12 +550,7 @@ subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
     return
-  end if
-  return
 end subroutine psb_chalo_vect

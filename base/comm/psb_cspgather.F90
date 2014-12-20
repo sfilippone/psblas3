@@ -149,12 +149,8 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-  return
+  call psb_error_handler(ictxt,err_act)
 
+  return
  
 end subroutine psb_csp_allgather

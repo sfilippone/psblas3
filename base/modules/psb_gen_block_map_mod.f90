@@ -1170,12 +1170,10 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
+
+9999 call psb_error_handler(err_act)
+
+  return
   end subroutine block_clone
 
 
@@ -1222,11 +1220,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+
+9999 call psb_error_handler(err_act)
+
     return
   end subroutine block_reinit
 
@@ -1270,11 +1266,9 @@ contains
 !!$    call psb_erractionrestore(err_act)
 !!$    return
 !!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$    if (err_act /= psb_act_ret_) then
-!!$      call psb_error()
-!!$    end if
+!!$
+!!$9999 call psb_error_handler(err_act)
+!!$
 !!$    return
 !!$  end subroutine block_reinit
 !!$

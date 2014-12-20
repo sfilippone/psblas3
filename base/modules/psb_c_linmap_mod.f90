@@ -247,10 +247,9 @@ contains
       ierr(1) = 2
       info = psb_err_missing_override_method_
       call psb_errpush(info,name,i_err=ierr)
-      call psb_get_erraction(err_act)
-      if (err_act /= psb_act_ret_) then
-        call psb_error()
-      end if
+      call psb_erractionsave(err_act)
+
+      call psb_error_handler(err_act)
     end select
 
       
