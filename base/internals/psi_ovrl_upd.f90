@@ -91,13 +91,8 @@ subroutine  psi_sovrl_updr1(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_updr1
 
@@ -163,13 +158,8 @@ subroutine  psi_sovrl_updr2(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_updr2
 
@@ -234,13 +224,8 @@ subroutine  psi_dovrl_updr1(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_updr1
 
@@ -306,13 +291,8 @@ subroutine  psi_dovrl_updr2(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_updr2
 
@@ -377,13 +357,8 @@ subroutine  psi_covrl_updr1(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_updr1
 
@@ -449,13 +424,8 @@ subroutine  psi_covrl_updr2(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_updr2
 
@@ -520,13 +490,8 @@ subroutine  psi_zovrl_updr1(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_updr1
 
@@ -592,13 +557,8 @@ subroutine  psi_zovrl_updr2(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_updr2
 
@@ -664,13 +624,8 @@ subroutine  psi_iovrl_updr1(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_updr1
 
@@ -737,13 +692,8 @@ subroutine  psi_iovrl_updr2(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_updr2
 
@@ -822,13 +772,8 @@ subroutine  psi_iovrl_upd_vect(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_upd_vect
 
@@ -906,13 +851,8 @@ subroutine  psi_sovrl_upd_vect(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_upd_vect
 
@@ -990,13 +930,8 @@ subroutine  psi_dovrl_upd_vect(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_upd_vect
 
@@ -1075,13 +1010,8 @@ subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_upd_vect
 
@@ -1159,13 +1089,8 @@ subroutine  psi_zovrl_upd_vect(x,desc_a,update,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_upd_vect
 

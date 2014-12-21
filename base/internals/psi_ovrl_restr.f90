@@ -65,13 +65,8 @@ subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_restrr1
 
@@ -118,13 +113,8 @@ subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_restrr2
 
@@ -165,13 +155,8 @@ subroutine  psi_dovrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_restrr1
 
@@ -219,13 +204,8 @@ subroutine  psi_dovrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_restrr2
 
@@ -266,13 +246,8 @@ subroutine  psi_covrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_restrr1
 
@@ -319,13 +294,8 @@ subroutine  psi_covrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_restrr2
 
@@ -366,13 +336,8 @@ subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_restrr1
 
@@ -419,13 +384,8 @@ subroutine  psi_zovrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_restrr2
 
@@ -466,13 +426,8 @@ subroutine  psi_iovrl_restrr1(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_restrr1
 
@@ -519,13 +474,8 @@ subroutine  psi_iovrl_restrr2(x,xs,desc_a,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_restrr2
 
@@ -559,19 +509,14 @@ subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
   endif
 
   isz = size(desc_a%ovrlap_elem,1)
-  
+
   call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,izero)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_iovrl_restr_vect
 
@@ -604,19 +549,14 @@ subroutine  psi_sovrl_restr_vect(x,xs,desc_a,info)
   endif
 
   isz = size(desc_a%ovrlap_elem,1)
-  
+
   call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,szero)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_sovrl_restr_vect
 
@@ -649,19 +589,14 @@ subroutine  psi_dovrl_restr_vect(x,xs,desc_a,info)
   endif
 
   isz = size(desc_a%ovrlap_elem,1)
-  
+
   call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,dzero)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_dovrl_restr_vect
 
@@ -696,19 +631,14 @@ subroutine  psi_covrl_restr_vect(x,xs,desc_a,info)
   endif
 
   isz = size(desc_a%ovrlap_elem,1)
-  
+
   call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,czero)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_covrl_restr_vect
 
@@ -741,19 +671,14 @@ subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
   endif
 
   isz = size(desc_a%ovrlap_elem,1)
-  
+
   call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psi_zovrl_restr_vect
 

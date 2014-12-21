@@ -143,15 +143,8 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
     return
-  else
-    call psb_error(ictxt)
-  end if
-  return
-
 
 end subroutine psi_bld_tmpovrl

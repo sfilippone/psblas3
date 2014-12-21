@@ -288,12 +288,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 9999 continue
 
   call psb_errpush(info,name,i_err=int_err)
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error()
-  endif
+  call psb_error_handler(err_act)
+
   return
 
 end subroutine psi_extract_dep_list

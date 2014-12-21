@@ -181,12 +181,8 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psi_cnv_dsc
@@ -493,13 +489,8 @@ subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_bld_ovr_mst
