@@ -70,18 +70,12 @@ program d_matgen
     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
-  if(info /= psb_success_) then
-    call psb_error(ictxt)
-  end if
 
   call psb_exit(ictxt)
   stop
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-  end if
+9999 call psb_error(ictxt)
+
   stop
 
 contains

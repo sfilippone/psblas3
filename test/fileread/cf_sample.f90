@@ -70,7 +70,7 @@ program cf_sample
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer(psb_ipk_) :: i,info,j,m_problem
+  integer(psb_ipk_) :: i,info,j,m_problem, err_act
   integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec
   real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
@@ -314,14 +314,12 @@ program cf_sample
   call psb_spfree(a, desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
-
-9999 continue
-  if(info /= psb_success_) then
-     call psb_error(ictxt)
-  end if
   call psb_exit(ictxt)
   stop
-  
+
+9999 call psb_error(ictxt)
+
+  stop
 end program cf_sample
   
 

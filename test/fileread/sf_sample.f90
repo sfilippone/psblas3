@@ -319,13 +319,12 @@ program sf_sample
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
 
-9999 continue
-  if(info /= psb_success_) then
-    call psb_error(ictxt)
-  end if
   call psb_exit(ictxt)
   stop
 
+9999 call psb_error(ictxt)
+
+  stop
 end program sf_sample
   
 
