@@ -100,9 +100,8 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
-
-  !....allocate aspk, ia1, ia2.....
   call a%free()
+  !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -120,14 +119,8 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_cspalloc

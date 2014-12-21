@@ -193,12 +193,8 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sspins
@@ -313,12 +309,8 @@ subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sspins_2desc
@@ -394,9 +386,9 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   if (desc_a%is_bld()) then 
 
 !!$    if (local_) then
-      info = psb_err_invalid_a_and_cd_state_
-      call psb_errpush(info,name)
-      goto 9999
+    info = psb_err_invalid_a_and_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
 !!$    else      
 !!$      allocate(ila(nz),jla(nz),stat=info)
 !!$      if (info /= psb_success_) then
@@ -444,7 +436,7 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         goto 9999
       end if
     else
-    info = psb_err_invalid_cd_state_
+      info = psb_err_invalid_cd_state_
 
 !!$      allocate(ila(nz),jla(nz),stat=info)
 !!$      if (info /= psb_success_) then
@@ -472,12 +464,8 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sspins_v

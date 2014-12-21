@@ -35,20 +35,20 @@
 !    frees a dense matrix structure
 ! 
 ! Arguments: 
-!    x(:,:)   - real, allocatable           The dense matrix to be freed.
-!    desc_a   - type(psb_desc_type).      The communication descriptor.
-!    info     - integer.                    Return code
+!    x(:,:)   - real, allocatable          The dense matrix to be freed.
+!    desc_a   - type(psb_desc_type).        The communication descriptor.
+!    info     - integer.                      Return code
 subroutine psb_dfree(x, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_dfree
   implicit none
 
   !....parameters...
-  real(psb_dpk_),allocatable, intent(inout)  :: x(:,:)
+  real(psb_dpk_),allocatable, intent(inout)    :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
 
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
@@ -57,12 +57,12 @@ subroutine psb_dfree(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_dfree'
   if (.not.psb_is_ok_desc(desc_a)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    return
   end if
 
-  ictxt = desc_a%get_context()
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -73,9 +73,9 @@ subroutine psb_dfree(x, desc_a, info)
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
@@ -90,12 +90,8 @@ subroutine psb_dfree(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dfree
@@ -106,7 +102,7 @@ end subroutine psb_dfree
 !    frees a dense matrix structure
 ! 
 ! Arguments: 
-!    x(:)     - real, allocatable         The dense matrix to be freed.
+!    x(:)     - real, allocatable        The dense matrix to be freed.
 !    desc_a   - type(psb_desc_type).      The communication descriptor.
 !    info     - integer.                    Return code
 subroutine psb_dfreev(x, desc_a, info)
@@ -115,9 +111,10 @@ subroutine psb_dfreev(x, desc_a, info)
   !....parameters...
   real(psb_dpk_),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info 
+  integer(psb_ipk_), intent(out)            :: info
+
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
@@ -126,24 +123,26 @@ subroutine psb_dfreev(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_dfreev'
 
+
   if (.not.psb_is_ok_desc(desc_a)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     return
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  ictxt = desc_a%get_context()
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
+
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
@@ -156,12 +155,8 @@ subroutine psb_dfreev(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dfreev
@@ -214,12 +209,8 @@ subroutine psb_dfree_vect(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dfree_vect
@@ -269,12 +260,8 @@ subroutine psb_dfree_vect_r2(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dfree_vect_r2

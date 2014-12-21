@@ -73,9 +73,9 @@ subroutine psb_cfree(x, desc_a, info)
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
@@ -85,17 +85,13 @@ subroutine psb_cfree(x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_cfree
@@ -129,44 +125,38 @@ subroutine psb_cfreev(x, desc_a, info)
 
 
   if (.not.psb_is_ok_desc(desc_a)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-     info = psb_err_context_error_
-     call psb_errpush(info,name)
-     goto 9999
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
 
   endif
 
   if (.not.allocated(x)) then
-     info=psb_err_forgot_spall_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   !deallocate x
   deallocate(x,stat=info)
   if (info /= psb_no_err_) then
-     info=psb_err_alloc_dealloc_
-     call psb_errpush(info,name)
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
   endif
-  
+
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-     return
-  else
-     call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_cfreev
@@ -219,12 +209,8 @@ subroutine psb_cfree_vect(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_cfree_vect
@@ -274,12 +260,8 @@ subroutine psb_cfree_vect_r2(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_cfree_vect_r2

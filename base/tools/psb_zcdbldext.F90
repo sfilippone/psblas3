@@ -433,7 +433,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
             call psb_errpush(info,name,a_err='csget')
             goto 9999
           end if
-          
+
           call psb_ensure_size((idxs+tot_elem+n_elem),works,info)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
@@ -527,7 +527,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       end if
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
-         & ': going for first idx_cnv', desc_ov%indxmap%get_state()
+           & ': going for first idx_cnv', desc_ov%indxmap%get_state()
 
       call desc_ov%indxmap%g2l(workr(1:iszr),maskr(1:iszr),info)
       iszs = count(maskr(1:iszr)<=0)
@@ -541,21 +541,21 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       end do
       ! Eliminate duplicates from request
       call psb_msort_unique(works(1:j),iszs)
-      
+
       !
       ! fnd_owner on desc_a because we want the procs who
       ! owned the rows from the beginning!
       !
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
-         & ': going for fnd_owner', desc_ov%indxmap%get_state()
+           & ': going for fnd_owner', desc_ov%indxmap%get_state()
       call desc_a%fnd_owner(works(1:iszs),temp,info)
       n_col = desc_ov%get_local_cols()
 
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),&
-         & ': Done fnd_owner', desc_ov%indxmap%get_state()
-      
+           & ': Done fnd_owner', desc_ov%indxmap%get_state()
+
       do i=1,iszs
         idx = works(i)
         n_col   = desc_ov%get_local_cols()
@@ -567,14 +567,14 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           ! will be less than those for HALO(J) whenever I<J
           !
           proc_id = temp(i) 
-          
+
           call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-ione)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-          
+
           t_halo_in(counter_t)   = proc_id
           t_halo_in(counter_t+1) = 1
           t_halo_in(counter_t+2) = lidx
@@ -695,7 +695,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(psb_err_from_subroutine_,name,a_err='icdasdb')
     goto 9999
   end if
-  
+
   call psb_cd_set_ovl_asb(desc_ov,info)
 
   if (info == psb_success_)  then 
@@ -716,13 +716,9 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
-  Return
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
 
 End Subroutine psb_zcdbldext
 

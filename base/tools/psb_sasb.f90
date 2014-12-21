@@ -32,14 +32,14 @@
 ! File: psb_sasb.f90
 !
 ! Subroutine: psb_sasb
-!    Assembles a dense matrix for PSBLAS routines.
+!    Assembles a dense matrix for PSBLAS routines
 !    Since the allocation may have been called with the desciptor 
 !    in the build state we make sure that X has a number of rows 
 !    allowing for the halo indices, reallocating if necessary. 
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:,:)  - real,allocatable        The matrix to be assembled.
+!    x(:,:)  - real, allocatable    The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                return code
 subroutine psb_sasb(x, desc_a, info)
@@ -47,7 +47,7 @@ subroutine psb_sasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  real(psb_spk_), allocatable, intent(inout)       ::  x(:,:)
+  real(psb_spk_), allocatable, intent(inout) ::  x(:,:)
   integer(psb_ipk_), intent(out)            ::  info
 
   ! local variables
@@ -83,8 +83,7 @@ subroutine psb_sasb(x, desc_a, info)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),' error ',&
-         & desc_a%get_dectype()
+         & write(debug_unit,*) me,' ',trim(name),' error '
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
@@ -122,12 +121,8 @@ subroutine psb_sasb(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sasb
@@ -172,15 +167,15 @@ end subroutine psb_sasb
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:)    - real,allocatable        The matrix to be assembled.
+!    x(:)    - real, allocatable    The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
-!    info    - integer.                Return code
+!    info    - integer.                Return  code
 subroutine psb_sasbv(x, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_sasbv
   implicit none
 
-  type(psb_desc_type), intent(in) ::  desc_a
-  real(psb_spk_), allocatable, intent(inout)   ::  x(:)
+  type(psb_desc_type), intent(in)                 ::  desc_a
+  real(psb_spk_), allocatable, intent(inout) ::  x(:)
   integer(psb_ipk_), intent(out)        ::  info
 
   ! local variables
@@ -240,15 +235,12 @@ subroutine psb_sasbv(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sasbv
+
 
 subroutine psb_sasb_vect(x, desc_a, info, mold, scratch)
   use psb_base_mod, psb_protect_name => psb_sasb_vect
@@ -319,12 +311,8 @@ subroutine psb_sasb_vect(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sasb_vect
@@ -407,12 +395,8 @@ subroutine psb_sasb_vect_r2(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_sasb_vect_r2
