@@ -334,12 +334,8 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 end subroutine psb_s_gen_pde3d
 
@@ -625,11 +621,7 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 end subroutine psb_s_gen_pde2d
