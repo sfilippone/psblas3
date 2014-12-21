@@ -76,7 +76,9 @@ module psb_i_vect_mod
     procedure, pass(y) :: sctb     => i_vect_sctb
     generic, public    :: sct      => sctb
     procedure, pass(x) :: free     => i_vect_free
-    procedure, pass(x) :: ins      => i_vect_ins
+    procedure, pass(x) :: ins_a    => i_vect_ins_a
+    procedure, pass(x) :: ins_v    => i_vect_ins_v
+    generic, public    :: ins      => ins_v, ins_a
     procedure, pass(x) :: bld_x    => i_vect_bld_x
     procedure, pass(x) :: bld_n    => i_vect_bld_n
     generic, public    :: bld      => bld_x, bld_n
@@ -609,7 +611,7 @@ contains
         
   end subroutine i_vect_free
 
-  subroutine i_vect_ins(n,irl,val,dupl,x,info)
+  subroutine i_vect_ins_a(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
     class(psb_i_vect_type), intent(inout)  :: x
@@ -628,8 +630,28 @@ contains
     
     call  x%v%ins(n,irl,val,dupl,info)
     
-  end subroutine i_vect_ins
+  end subroutine i_vect_ins_a
 
+  subroutine i_vect_ins_v(n,irl,val,dupl,x,info)
+    use psi_serial_mod
+    implicit none 
+    class(psb_i_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: n, dupl
+    class(psb_i_vect_type), intent(inout)       :: irl
+    class(psb_i_vect_type), intent(inout)       :: val
+    integer(psb_ipk_), intent(out)              :: info
+
+    integer(psb_ipk_) :: i
+
+    info = 0
+    if (.not.(allocated(x%v).and.allocated(irl%v).and.allocated(val%v))) then 
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    call  x%v%ins(n,irl%v,val%v,dupl,info)
+
+  end subroutine i_vect_ins_v
 
   subroutine i_vect_cnv(x,mold)
     class(psb_i_vect_type), intent(inout) :: x

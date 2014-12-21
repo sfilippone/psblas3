@@ -57,6 +57,14 @@ module psb_i_tools_mod
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n
     end subroutine psb_ialloc_vect
+    subroutine psb_ialloc_vect_r2(x, desc_a,info,n,lb)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_i_base_vect_type, psb_i_vect_type
+      type(psb_i_vect_type), allocatable, intent(out)  :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)   :: n, lb
+    end subroutine psb_ialloc_vect_r2
   end interface
 
 
@@ -82,6 +90,15 @@ module psb_i_tools_mod
       class(psb_i_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
     end subroutine psb_iasb_vect
+    subroutine psb_iasb_vect_r2(x, desc_a, info,mold, scratch)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_i_base_vect_type, psb_i_vect_type
+      type(psb_desc_type), intent(in)      ::  desc_a
+      type(psb_i_vect_type), intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out)                 ::  info
+      class(psb_i_base_vect_type), intent(in), optional :: mold
+      logical, intent(in), optional        :: scratch
+    end subroutine psb_iasb_vect_r2
   end interface
 
 
@@ -105,6 +122,13 @@ module psb_i_tools_mod
       type(psb_i_vect_type), intent(inout) :: x
       integer(psb_ipk_), intent(out)             ::  info
     end subroutine psb_ifree_vect
+    subroutine psb_ifree_vect_r2(x, desc_a, info)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_i_base_vect_type, psb_i_vect_type
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_i_vect_type), allocatable, intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out)             ::  info
+    end subroutine psb_ifree_vect_r2
   end interface
 
   interface psb_geins
@@ -142,6 +166,30 @@ module psb_i_tools_mod
       integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_iins_vect
+    subroutine psb_iins_vect_v(m,irw,val,x,desc_a,info,dupl,local)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_i_base_vect_type, psb_i_vect_type
+      integer(psb_ipk_), intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_i_vect_type), intent(inout) :: x
+      type(psb_i_vect_type), intent(inout)       :: irw
+      type(psb_i_vect_type), intent(inout)    :: val
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
+    end subroutine psb_iins_vect_v
+    subroutine psb_iins_vect_r2(m,irw,val,x,desc_a,info,dupl,local)
+      import :: psb_desc_type, psb_ipk_, &
+           & psb_i_base_vect_type, psb_i_vect_type
+      integer(psb_ipk_), intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_i_vect_type), intent(inout) :: x(:)
+      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_ipk_), intent(in)    :: val(:,:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
+    end subroutine psb_iins_vect_r2
   end interface
 
 

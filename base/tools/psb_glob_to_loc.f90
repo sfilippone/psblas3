@@ -114,16 +114,9 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error()
-  end if
   return
-
 
 end subroutine psb_glob_to_loc2v
 
@@ -238,14 +231,8 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error()
-  end if
   return
 
 end subroutine psb_glob_to_loc1v

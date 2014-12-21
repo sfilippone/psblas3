@@ -41,6 +41,7 @@
 !    info     - integer.                        Return code.
 !    clear    - logical, optional               Whether the coefficients should be zeroed
 !                                               default .true.          
+!
 Subroutine psb_dsprn(a, desc_a,info,clear)
   use psb_base_mod, psb_protect_name => psb_dsprn
   Implicit None
@@ -59,29 +60,23 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   logical             :: clear_
 
   info = psb_success_
-  if (psb_errstatus_fatal()) return 
   err  = 0
   int_err(1)=0
   name = 'psb_dsprn'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start '
 
-  if (a%is_bld()) then
+  if (psb_is_bld_desc(desc_a)) then
     ! Should do nothing, we are called redundantly
     return
   endif
-  if (.not.a%is_asb()) then
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=590     
     call psb_errpush(info,name)
     goto 9999
@@ -89,19 +84,15 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
   call a%reinit(clear=clear)
 
-  if (psb_errstatus_fatal()) goto 9999
+  if (info /= psb_success_) goto 9999
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': done'
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dsprn

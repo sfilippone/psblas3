@@ -39,22 +39,22 @@
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:,:)  - integer(psb_ipk_),allocatable                The matrix to be assembled.
-!    desc_a  - type(psb_desc_type).             The communication descriptor.
-!    info    - integer.                           return code
+!    x(:,:)  - integer, allocatable    The matrix to be assembled.
+!    desc_a  - type(psb_desc_type).  The communication descriptor.
+!    info    - integer.                return code
 subroutine psb_iasb(x, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_iasb
   implicit none
 
-  type(psb_desc_type), intent(in)     ::  desc_a
+  type(psb_desc_type), intent(in) ::  desc_a
   integer(psb_ipk_), allocatable, intent(inout) ::  x(:,:)
-  integer(psb_ipk_), intent(out)                ::  info
+  integer(psb_ipk_), intent(out)            ::  info
 
   ! local variables
-  integer(psb_ipk_) :: ictxt,np,me,nrow,ncol,err_act
-  integer(psb_ipk_) :: int_err(5), i1sz, i2sz
+  integer(psb_ipk_) :: ictxt,np,me,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz, i2sz
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name,ch_err
+  character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -83,8 +83,7 @@ subroutine psb_iasb(x, desc_a, info)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),' error ',&
-         & desc_a%get_dectype()
+         & write(debug_unit,*) me,' ',trim(name),' error '
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
@@ -107,7 +106,7 @@ subroutine psb_iasb(x, desc_a, info)
       goto 9999
     endif
   endif
-  
+
   ! ..update halo elements..
   call psb_halo(x,desc_a,info)
   if(info /= psb_success_) then
@@ -122,16 +121,11 @@ subroutine psb_iasb(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
-  return
-  
-end subroutine psb_iasb
+9999 call psb_error_handler(ictxt,err_act)
 
+  return
+
+end subroutine psb_iasb
 
 
 !!$ 
@@ -165,7 +159,7 @@ end subroutine psb_iasb
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_iasbv
+! Subroutine: psb_iasb
 !    Assembles a dense matrix for PSBLAS routines
 !    Since the allocation may have been called with the desciptor 
 !    in the build state we make sure that X has a number of rows 
@@ -173,16 +167,16 @@ end subroutine psb_iasb
 !    We also call the halo routine for good measure.
 ! 
 ! Arguments: 
-!    x(:)    - integer(psb_ipk_),allocatable                The matrix to be assembled.
-!    desc_a  - type(psb_desc_type).             The communication descriptor.
-!    info    - integer.                           return code
+!    x(:)    - integer, allocatable    The matrix to be assembled.
+!    desc_a  - type(psb_desc_type).  The communication descriptor.
+!    info    - integer.                Return  code
 subroutine psb_iasbv(x, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_iasbv
   implicit none
 
-  type(psb_desc_type), intent(in)     ::  desc_a
+  type(psb_desc_type), intent(in)                 ::  desc_a
   integer(psb_ipk_), allocatable, intent(inout) ::  x(:)
-  integer(psb_ipk_), intent(out)                ::  info
+  integer(psb_ipk_), intent(out)        ::  info
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me
@@ -225,8 +219,8 @@ subroutine psb_iasbv(x, desc_a, info)
       call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
-  endif  
-  
+  endif
+
   ! ..update halo elements..
   call psb_halo(x,desc_a,info)
   if(info /= psb_success_) then
@@ -241,14 +235,10 @@ subroutine psb_iasbv(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
-  
+
 end subroutine psb_iasbv
 
 
@@ -321,12 +311,92 @@ subroutine psb_iasb_vect(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_iasb_vect
+
+
+subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
+  use psb_base_mod, psb_protect_name => psb_iasb_vect_r2
+  implicit none
+
+  type(psb_desc_type), intent(in)      ::  desc_a
+  type(psb_i_vect_type), intent(inout) ::  x(:)
+  integer(psb_ipk_), intent(out)                 ::  info
+  class(psb_i_base_vect_type), intent(in), optional :: mold
+  logical, intent(in), optional        :: scratch
+
+  ! local variables
+  integer(psb_ipk_) :: ictxt,np,me, i, n 
+  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  logical :: scratch_
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
+
+  info = psb_success_
+  if (psb_errstatus_fatal()) return 
+
+  int_err(1) = 0
+  name = 'psb_igeasb_v'
+
+  ictxt       = desc_a%get_context()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  scratch_ = .false.
+  if (present(scratch)) scratch_ = scratch
+  call psb_info(ictxt, me, np)
+
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  else   if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  n    = size(x)
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+
+  if (scratch_) then 
+    do i=1,n
+      call x(i)%free(info)
+      call x(i)%bld(ncol,mold=mold)
+    end do
+
+  else
+    do i=1, n
+      call x(i)%asb(ncol,info)
+      if (info /= 0) exit
+      ! ..update halo elements..
+      call psb_halo(x(i),desc_a,info)
+      if (info /= 0) exit
+      if (present(mold)) then 
+        call x(i)%cnv(mold)
+      end if
+    end do
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_halo')
+      goto 9999
+    end if
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_iasb_vect_r2

@@ -65,7 +65,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
        &  present(parts),present(nl), present(repl) /)) /= 1) then 
     info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" vg, vl, parts, nl, repl")
-    goto 999 
+    goto 9999 
   endif
 
   desc%base_desc => null() 
@@ -78,7 +78,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     if (.not.present(mg)) then 
       info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
-      goto 999 
+      goto 9999 
     end if
     if (present(ng)) then 
       n_ = ng
@@ -92,12 +92,12 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     if (.not.present(mg)) then 
       info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
-      goto 999 
+      goto 9999 
     end if
     if (.not.repl) then 
       info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
-      goto 999 
+      goto 9999 
     end if
 
     call  psb_cdrep(mg, ictxt, desc, info)
@@ -145,21 +145,21 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
       class default 
         ! This cannot happen 
         info = psb_err_internal_error_
-        goto 999
+        goto 9999
       end select
     end if
     
     call psb_realloc(1,itmpsz, info)
     if (info /= 0) then 
       write(0,*) 'Error reallocating itmspz'
-      goto 999
+      goto 9999
     end if
     itmpsz(:) = -1
     call psi_bld_tmpovrl(itmpsz,desc,info)
 
   endif
 
-  if (info /= psb_success_) goto 999
+  if (info /= psb_success_) goto 9999
 
   ! Finish off 
   lr = desc%indxmap%get_lr()
@@ -168,23 +168,18 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_realloc')
-    Goto 999
+    Goto 9999
   end if
   desc%halo_index(:)           = -1
   desc%ext_index(:)            = -1
   call psb_cd_set_bld(desc,info)
-  if (info /= psb_success_) goto 999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
-999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
-  return
+9999 call psb_error_handler(ictxt,err_act)
 
+  return
 
 end subroutine psb_cdall

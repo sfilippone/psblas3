@@ -41,6 +41,7 @@
 !    info     - integer.                        Return code.
 !    clear    - logical, optional               Whether the coefficients should be zeroed
 !                                               default .true.          
+!
 Subroutine psb_ssprn(a, desc_a,info,clear)
   use psb_base_mod, psb_protect_name => psb_ssprn
   Implicit None
@@ -90,12 +91,8 @@ Subroutine psb_ssprn(a, desc_a,info,clear)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_ssprn
