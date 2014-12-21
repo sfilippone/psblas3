@@ -127,12 +127,7 @@ subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans,work)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 
 end subroutine psb_c_apply2_vect
@@ -204,12 +199,7 @@ subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans,work)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 
 end subroutine psb_c_apply1_vect
@@ -276,12 +266,7 @@ subroutine psb_c_apply2v(prec,x,y,desc_data,info,trans,work)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 
 end subroutine psb_c_apply2v
@@ -342,11 +327,7 @@ subroutine psb_c_apply1v(prec,x,desc_data,info,trans)
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  call psb_error_handler(err_act)
   return
 
 end subroutine psb_c_apply1v

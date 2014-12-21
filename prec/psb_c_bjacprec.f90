@@ -134,8 +134,8 @@ module psb_c_bjacprec
 contains
 
   subroutine psb_c_bjac_precdescr(prec,iout)
-    
-    Implicit None
+    use psb_error_mod
+    implicit none 
 
     class(psb_c_bjac_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
@@ -166,12 +166,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
     
   end subroutine psb_c_bjac_precdescr
@@ -239,12 +235,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
 
   end subroutine psb_c_bjac_precfree
@@ -270,7 +262,7 @@ contains
       if (info == psb_success_) deallocate(precout, stat=info)
     end if
     if (info == psb_success_) &
-       & allocate(psb_c_bjac_prec_type :: precout, stat=info)
+         & allocate(psb_c_bjac_prec_type :: precout, stat=info)
     if (info /= 0) goto 9999
     select type(pout => precout)
     type is (psb_c_bjac_prec_type) 
@@ -289,7 +281,7 @@ contains
         allocate(pout%dv,stat=info)
         if (info == 0) call prec%dv%clone(pout%dv,info)
       end if
-    class default
+      class default
       info = psb_err_internal_error_
     end select
     if (info /= 0) goto 9999
@@ -297,12 +289,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
 
   end subroutine psb_c_bjac_clone

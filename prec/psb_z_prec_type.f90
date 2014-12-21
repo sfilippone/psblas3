@@ -121,6 +121,8 @@ module psb_z_prec_type
 contains
 
   subroutine psb_zfile_prec_descr(p,iout)
+    use psb_base_mod
+    implicit none 
     type(psb_zprec_type), intent(in) :: p
     integer(psb_ipk_), intent(in), optional    :: iout
     integer(psb_ipk_) :: iout_,info
@@ -162,6 +164,8 @@ contains
 
 
   subroutine psb_z_precfree(p,info)
+    use psb_base_mod
+    implicit none 
     type(psb_zprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)                :: info
     integer(psb_ipk_) :: me, err_act,i
@@ -178,16 +182,15 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+    
     return
+
   end subroutine psb_z_precfree
 
   subroutine psb_z_prec_free(prec,info)
+    use psb_base_mod
+    implicit none 
     class(psb_zprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)         :: info
     integer(psb_ipk_) :: me, err_act,i
@@ -208,13 +211,10 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
+
   end subroutine psb_z_prec_free
 
   function psb_zprec_sizeof(prec) result(val)
