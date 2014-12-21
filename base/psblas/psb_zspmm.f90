@@ -348,13 +348,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspmm
 
@@ -612,7 +607,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     call psi_ovrl_save(x,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     yp(nrow+1:ncol) = zzero
-    
+
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 
@@ -626,13 +621,13 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    
+
     if (doswap_) then
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,yp,desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,yp,desc_a,iwork,info,data=psb_comm_ovr_)
-      
+
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
       if(info /= psb_success_) then
@@ -664,13 +659,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspmv
 
@@ -825,7 +815,7 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
 !!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
 !!$    yp(nrow+1:ncol) = zzero
-    
+
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 
@@ -839,13 +829,13 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    
+
     if (doswap_) then
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,y%v,desc_a,iwork,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
-      
+
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
       if(info /= psb_success_) then
@@ -877,12 +867,7 @@ subroutine  psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   endif
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspmv_vect

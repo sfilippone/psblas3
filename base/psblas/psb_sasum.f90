@@ -119,13 +119,8 @@ function psb_sasum (x,desc_a, info, jx) result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_sasum
 
@@ -197,13 +192,8 @@ function psb_sasum_vect(x, desc_a, info) result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 
 end function psb_sasum_vect
@@ -322,13 +312,8 @@ function psb_sasumv(x,desc_a, info) result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_sasumv
 
@@ -447,12 +432,7 @@ subroutine psb_sasumvs(res,x,desc_a, info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_sasumvs

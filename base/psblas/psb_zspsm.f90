@@ -276,16 +276,11 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspsm
-     
+
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.1
 !!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
@@ -539,17 +534,12 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspsv
-     
-     
+
+
 subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
   use psb_base_mod, psb_protect_name => psb_zspsv_vect
@@ -705,13 +695,8 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_zspsv_vect
-     
+

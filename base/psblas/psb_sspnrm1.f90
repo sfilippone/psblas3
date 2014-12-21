@@ -102,7 +102,7 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
 !!$    call psb_errpush(info,name,a_err=ch_err)
 !!$    goto 9999
 !!$  end if
-  
+
   if ((m /= 0).and.(n /= 0)) then
     v = a%aclsum(info)
     if (info == psb_success_) &
@@ -124,12 +124,7 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_sspnrm1
