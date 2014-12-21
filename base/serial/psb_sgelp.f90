@@ -117,14 +117,8 @@ subroutine psb_sgelp(trans,iperm,x,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_sgelp
@@ -245,14 +239,8 @@ subroutine psb_sgelpv(trans,iperm,x,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_sgelpv

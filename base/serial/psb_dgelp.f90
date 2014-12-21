@@ -117,14 +117,8 @@ subroutine psb_dgelp(trans,iperm,x,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error()
-  end if
   return
 
 end subroutine psb_dgelp
@@ -210,7 +204,7 @@ subroutine psb_dgelpv(trans,iperm,x,info)
     goto 9999
   end if
   itemp(:) = iperm(:) 
-  
+
   if (.not.psb_isaperm(i1sz,itemp)) then
     info=psb_err_iarg_invalid_value_
     int_err(1) = 1      
@@ -244,14 +238,8 @@ subroutine psb_dgelpv(trans,iperm,x,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error()
-  end if
   return
 
 end subroutine psb_dgelpv
