@@ -1,6 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
-
+2015/01/05: Fix silly bug in format conversion csr_from_coo.
+	
 2014/12/21: Change error handling routines to make them more flexible for
             C binding. More compact prologues/epilogues.
 	
