@@ -90,12 +90,8 @@ subroutine psb_zfree(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_zfree
@@ -159,14 +155,8 @@ subroutine psb_zfreev(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_zfreev
@@ -219,12 +209,8 @@ subroutine psb_zfree_vect(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_zfree_vect
@@ -274,12 +260,8 @@ subroutine psb_zfree_vect_r2(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_zfree_vect_r2

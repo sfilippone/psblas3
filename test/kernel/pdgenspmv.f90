@@ -189,11 +189,11 @@ program pdgenspmv
     goto 9999
   end if
 
-9999 continue
-  if(info /= psb_success_) then
-    call psb_error(ictxt)
-  end if
   call psb_exit(ictxt)
+  stop
+
+9999 call psb_error(ictxt)
+
   stop
 
 contains

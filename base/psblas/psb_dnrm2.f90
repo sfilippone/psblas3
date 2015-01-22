@@ -119,13 +119,8 @@ function psb_dnrm2(x, desc_a, info, jx)  result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_dnrm2
 
@@ -237,20 +232,15 @@ function psb_dnrm2v(x, desc_a, info)  result(res)
   else 	    
     res = dzero
   end if
-  
+
   call psb_nrm2(ictxt,res)
 
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_dnrm2v
 
@@ -333,13 +323,8 @@ function psb_dnrm2_vect(x, desc_a, info)  result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end function psb_dnrm2_vect
 
@@ -442,7 +427,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   if (desc_a%get_local_rows() > 0) then 
     ndim = desc_a%get_local_rows()
     res  = dnrm2( int(ndim,kind=psb_mpik_), x, int(ione,kind=psb_mpik_) )
-    
+
     ! adjust  because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx = desc_a%ovrlap_elem(i,1)
@@ -460,12 +445,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 end subroutine psb_dnrm2vs

@@ -171,14 +171,8 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dinsvi
@@ -265,7 +259,7 @@ subroutine psb_dins_vect(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     goto 9999
   endif
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
@@ -292,14 +286,8 @@ subroutine psb_dins_vect(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dins_vect
@@ -379,7 +367,7 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   endif
 
 
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
@@ -408,14 +396,8 @@ subroutine psb_dins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dins_vect_v
@@ -501,7 +483,7 @@ subroutine psb_dins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
     call psb_errpush(info,name)
     goto 9999
   endif
-    
+
   if (present(dupl)) then 
     dupl_ = dupl
   else
@@ -518,7 +500,7 @@ subroutine psb_dins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  
+
   do i=1,n
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
     if (info == 0) call x(i)%ins(m,irl,val(:,i),dupl_,info) 
@@ -533,14 +515,8 @@ subroutine psb_dins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dins_vect_r2
@@ -687,7 +663,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl,local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  
+
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
@@ -730,14 +706,8 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl,local)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dinsi

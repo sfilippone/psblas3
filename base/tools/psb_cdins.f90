@@ -142,14 +142,8 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_cdinsrc
@@ -264,14 +258,8 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_cdinsc

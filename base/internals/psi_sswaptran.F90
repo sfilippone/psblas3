@@ -152,13 +152,9 @@ subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_sswaptranm
 
 subroutine psi_stranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
@@ -526,13 +522,9 @@ subroutine psi_stranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_stranidxm
 !
 !
@@ -655,13 +647,9 @@ subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_sswaptranv
 
 
@@ -1031,13 +1019,9 @@ subroutine psi_stranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_stranidxv
 
 
@@ -1107,13 +1091,9 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_sswaptran_vect
 
 
@@ -1480,13 +1460,9 @@ subroutine psi_stranidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
+9999 call psb_error_handler(ictxt,err_act)
+
     return
-  end if
-  return
 end subroutine psi_stranidx_vect
 
 

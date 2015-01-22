@@ -59,11 +59,16 @@ subroutine dmsr(n,x,idir)
     call psb_error()
   endif
   
-  if (idir == psb_sort_up_) then 
+  select case(idir)
+  case (psb_sort_up_)
     call dmsort_up(n,x,iaux,iret)
-  else
+  case (psb_asort_up_)
+    call damsort_up(n,x,iaux,iret)
+  case (psb_asort_down_)
+    call damsort_dw(n,x,iaux,iret)
+  case (psb_sort_down_)
     call dmsort_dw(n,x,iaux,iret)
-  end if
+  end select
   
   if (iret == 0) call psb_ip_reord(n,x,iaux)
 

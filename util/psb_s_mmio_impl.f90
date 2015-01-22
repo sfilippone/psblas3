@@ -212,11 +212,7 @@ subroutine mm_svet2_write(b, header, info, iunit, filename)
   ncol = size(b,2) 
   write(outfile,*) nrow,ncol
 
-  write(frmtv,'(a,i0,a)') '(',ncol,'(es26.18,1x))'
-
-  do i=1,size(b,1) 
-    write(outfile,frmtv) b(i,1:ncol)
-  end do
+  write(outfile,fmt='(es26.18,1x)') ((b(i,j), i=1,nrow),j=1,ncol)
 
   if (outfile /= 6) close(outfile)
 

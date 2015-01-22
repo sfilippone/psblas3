@@ -112,13 +112,8 @@ subroutine psb_c_csr_csmv(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 contains
@@ -467,13 +462,9 @@ subroutine psb_c_csr_csmm(alpha,a,x,beta,y,info,trans)
 
   call psb_erractionrestore(err_act)
   return
-9999 continue
-  call psb_erractionrestore(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
   return
 
 contains
@@ -846,13 +837,8 @@ subroutine psb_c_csr_cssv(alpha,a,x,beta,y,info,trans)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 contains 
@@ -1105,13 +1091,8 @@ subroutine psb_c_csr_cssm(alpha,a,x,beta,y,info,trans)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 
@@ -1369,13 +1350,8 @@ subroutine psb_c_csr_rowsum(d,a)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_rowsum
@@ -1423,13 +1399,8 @@ subroutine psb_c_csr_arwsum(d,a)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_arwsum
@@ -1480,13 +1451,8 @@ subroutine psb_c_csr_colsum(d,a)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_colsum
@@ -1537,13 +1503,8 @@ subroutine psb_c_csr_aclsum(d,a)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_aclsum
@@ -1762,13 +1723,8 @@ subroutine  psb_c_csr_reallocate_nz(nz,a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_reallocate_nz
@@ -1863,13 +1819,8 @@ subroutine  psb_c_csr_allocate_mnnz(m,n,a,nz)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_allocate_mnnz
@@ -1962,13 +1913,8 @@ subroutine psb_c_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 contains
@@ -2142,13 +2088,8 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 contains
@@ -2286,13 +2227,8 @@ subroutine psb_c_csr_csgetblk(imin,imax,a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_csgetblk
@@ -2383,13 +2319,8 @@ subroutine psb_c_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 
@@ -2607,13 +2538,8 @@ subroutine psb_c_csr_reinit(a,clear)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_reinit
@@ -2642,13 +2568,8 @@ subroutine  psb_c_csr_trim(a)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_c_csr_trim
@@ -2781,9 +2702,9 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
     
     ! Dirty trick: call move_alloc to have the new data allocated just once.
     call psb_safe_ab_cpy(b%ia,itemp,info)
-    if (info /= psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
-    if (info /= psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
-    if (info /= psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
+    if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
+    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
     
   endif
     
@@ -3220,12 +3141,8 @@ subroutine psb_ccsrspspmm(a,b,c,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error()
-     return
-  end if
+9999 call psb_error_handler(err_act)
+
   return
 
 contains

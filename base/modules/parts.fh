@@ -1,8 +1,0 @@
-interface 
-   !.....user passed subroutine.....
-   subroutine parts(glob_index,nrow,np,pv,nv)
-     import :: psb_ipk_
-     integer(psb_ipk_), intent (in)  :: glob_index,np,nrow
-     integer(psb_ipk_), intent (out) :: nv, pv(*)
-   end subroutine parts
-end interface

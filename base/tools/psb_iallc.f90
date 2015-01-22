@@ -29,32 +29,34 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_ialloc.f90
+!
+! File: psb_iallc.f90
 !
 ! Function: psb_ialloc
-!    Allocates dense integer matrix for PSBLAS routines
+!    Allocates dense matrix for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
 ! 
 ! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
-!    info   - possibly returns an error code
+!    info   - Return code
 !    n      - optional number of columns.
 !    lb     - optional lower bound on column indices
 subroutine psb_ialloc(x, desc_a, info, n, lb)
   use psb_base_mod, psb_protect_name => psb_ialloc
+  use psi_mod
   implicit none
-  
+
   !....parameters...
   integer(psb_ipk_), allocatable, intent(out) :: x(:,:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_), optional, intent(in)     :: n, lb
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_),intent(out)                   :: info
+  integer(psb_ipk_), optional, intent(in)         :: n, lb
 
   !locals
   integer(psb_ipk_) :: np,me,err,nr,i,j,err_act
   integer(psb_ipk_) :: ictxt,n_
-  integer(psb_ipk_) :: int_err(5), exch(3)
+  integer(psb_ipk_) :: int_err(5),exch(3)
   character(len=20)   :: name
 
   name='psb_geall'
@@ -63,7 +65,7 @@ subroutine psb_ialloc(x, desc_a, info, n, lb)
   err=0
   int_err(1)=0
   call psb_erractionsave(err_act)
-  
+
   ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
@@ -109,31 +111,25 @@ subroutine psb_ialloc(x, desc_a, info, n, lb)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,n_,x,info,lb2=lb)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
     int_err(1)=nr*n_
-    call psb_errpush(info,name,int_err,a_err='integer')
+    call psb_errpush(info,name,int_err,a_err='integer(psb_ipk_)')
     goto 9999
   endif
-  
+
   x(:,:) = izero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_ialloc
-
-
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.1
@@ -166,6 +162,7 @@ end subroutine psb_ialloc
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! Function: psb_iallocv
 !    Allocates dense matrix for PSBLAS routines
 !    The descriptor may be in either the build or assembled state.
@@ -174,15 +171,16 @@ end subroutine psb_ialloc
 !    x(:)   - the matrix to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - return code
-subroutine psb_iallocv(x, desc_a, info,n)
+subroutine psb_iallocv(x, desc_a,info,n)
   use psb_base_mod, psb_protect_name => psb_iallocv
+  use psi_mod
   implicit none
 
   !....parameters...
   integer(psb_ipk_), allocatable, intent(out) :: x(:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)              :: info
-  integer(psb_ipk_), optional, intent(in)     :: n
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_),intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)   :: n
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
@@ -226,26 +224,22 @@ subroutine psb_iallocv(x, desc_a, info,n)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,x,info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
     int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='integer')
+    call psb_errpush(info,name,int_err,a_err='integer(psb_ipk_)')
     goto 9999
   endif
-  
+
   x(:) = izero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_iallocv
@@ -310,7 +304,7 @@ subroutine psb_ialloc_vect(x, desc_a,info,n)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='integer(psb_ipk_)')
+    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
     goto 9999
   endif
   call x%zero()
@@ -318,13 +312,111 @@ subroutine psb_ialloc_vect(x, desc_a,info,n)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_ialloc_vect
 
+subroutine psb_ialloc_vect_r2(x, desc_a,info,n,lb)
+  use psb_base_mod, psb_protect_name => psb_ialloc_vect_r2
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_i_vect_type), allocatable, intent(out)  :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_),intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)   :: n,lb
+
+  !locals
+  integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
+  integer(psb_ipk_) :: ictxt, int_err(5), exch(1)
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)  :: name
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  name='psb_geall'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check m and n parameters....
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (present(n)) then 
+    n_ = n
+  else
+    n_ = 1
+  endif
+  if (present(lb)) then 
+    lb_ = lb
+  else
+    lb_ = 1
+  endif
+
+  !global check on n parameters
+  if (me == psb_root_) then
+    exch(1)=n_
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+  else
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    if (exch(1) /= n_) then
+      info=psb_err_parm_differs_among_procs_
+      int_err(1)=1
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
+  endif
+  ! As this is a rank-1 array, optional parameter N is actually ignored.
+
+  !....allocate x .....
+  if (desc_a%is_asb().or.desc_a%is_upd()) then
+    nr = max(1,desc_a%get_local_cols())
+  else if (desc_a%is_bld()) then
+    nr = max(1,desc_a%get_local_rows())
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
+  endif
+
+  allocate(x(lb_:lb_+n_-1), stat=info)
+  if (info == 0) then 
+    do i=lb_, lb_+n_-1
+      allocate(psb_i_base_vect_type :: x(i)%v, stat=info) 
+      if (info == 0) call x(i)%all(nr,info)
+      if (info == 0) call x(i)%zero()
+      if (info /= 0) exit
+    end do
+  end if
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_alloc_request_
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    goto 9999
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_ialloc_vect_r2

@@ -2,7 +2,7 @@
 program d_matgen
   use psb_base_mod
   use psb_util_mod
-  use psb_d_cxx_mat_mod
+  use psb_d_xyz_mat_mod
   implicit none
 
   ! input parameters
@@ -29,7 +29,7 @@ program d_matgen
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps
   type(psb_d_csr_sparse_mat) :: acsr
-  type(psb_d_cxx_sparse_mat) :: acxx
+  type(psb_d_xyz_sparse_mat) :: axyz
   
   ! other variables
   integer(psb_ipk_) :: info, err_act
@@ -64,24 +64,18 @@ program d_matgen
          & a1,a2,a3,b1,b2,b3,c,g,info,amold=acsr)  
   else if (.false.) then 
     call psb_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
-         & a1,a2,a3,b1,b2,b3,c,g,info,amold=acxx)  
+         & a1,a2,a3,b1,b2,b3,c,g,info,amold=axyz)  
   end if
     
     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
-  if(info /= psb_success_) then
-    call psb_error(ictxt)
-  end if
 
   call psb_exit(ictxt)
   stop
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-  end if
+9999 call psb_error(ictxt)
+
   stop
 
 contains

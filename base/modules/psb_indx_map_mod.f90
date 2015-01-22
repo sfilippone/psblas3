@@ -462,9 +462,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_l2gs1
@@ -490,10 +488,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
+    call psb_error_handler(err_act)
 
   end subroutine base_l2gs2
 
@@ -517,9 +512,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
   end subroutine base_l2gv1
 
@@ -543,9 +536,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_l2gv2
@@ -570,9 +561,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2ls1
@@ -598,9 +587,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2ls2
@@ -625,9 +612,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2lv1
@@ -653,9 +638,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
 
@@ -682,9 +665,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2ls1_ins
@@ -710,9 +691,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2ls2_ins
@@ -738,9 +717,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2lv1_ins
@@ -766,9 +743,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_g2lv2_ins
@@ -791,9 +766,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   end subroutine base_asb
@@ -849,9 +822,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+  call psb_error_handler(err_act)
     return
   end subroutine base_init_vl
 
@@ -875,9 +846,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
   end subroutine base_clone
 
@@ -901,9 +870,7 @@ contains
     call psb_errpush(psb_err_missing_override_method_,&
          & name,a_err=idxmap%get_fmt())
 
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
   end subroutine base_reinit
 

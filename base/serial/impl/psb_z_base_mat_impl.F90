@@ -55,17 +55,14 @@ subroutine psb_z_base_cp_to_coo(a,b,info)
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_cp_to_coo
 
@@ -83,17 +80,14 @@ subroutine psb_z_base_cp_from_coo(a,b,info)
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_cp_from_coo
 
@@ -131,14 +125,8 @@ subroutine psb_z_base_cp_to_fmt(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-  return
   return
 
 end subroutine psb_z_base_cp_to_fmt
@@ -177,13 +165,8 @@ subroutine psb_z_base_cp_from_fmt(a,b,info)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_cp_from_fmt
@@ -221,13 +204,8 @@ subroutine psb_z_base_mv_to_coo(a,b,info)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_mv_to_coo
@@ -263,13 +241,8 @@ subroutine psb_z_base_mv_from_coo(a,b,info)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_mv_from_coo
@@ -342,17 +315,14 @@ subroutine psb_z_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   character(len=20)  :: name='csput'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_csput_a
 
@@ -394,13 +364,8 @@ subroutine psb_z_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_csput_v
@@ -428,17 +393,14 @@ subroutine psb_z_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_csgetrow
 
@@ -536,13 +498,8 @@ subroutine psb_z_base_csgetblk(imin,imax,a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_csgetblk
@@ -626,13 +583,8 @@ subroutine psb_z_base_csclip(a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_csclip
@@ -742,13 +694,8 @@ subroutine psb_z_base_tril(a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_tril
@@ -852,13 +799,8 @@ subroutine psb_z_base_triu(a,b,info,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_triu
@@ -938,17 +880,14 @@ subroutine psb_z_base_mold(a,b,info)
   character(len=20)  :: name='base_mold'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_mold
 
@@ -984,10 +923,8 @@ subroutine psb_z_base_transp_2mat(a,b)
   call psb_erractionrestore(err_act) 
 
   return
-9999 continue
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+
+9999 call psb_error_handler(err_act)
 
   return
 
@@ -1024,10 +961,8 @@ subroutine psb_z_base_transc_2mat(a,b)
   call psb_erractionrestore(err_act) 
 
   return
-9999 continue
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+
+9999 call psb_error_handler(err_act)
 
   return
 end subroutine psb_z_base_transc_2mat
@@ -1058,10 +993,8 @@ subroutine psb_z_base_transp_1mat(a)
   call psb_erractionrestore(err_act) 
 
   return
-9999 continue
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+
+9999 call psb_error_handler(err_act)
 
   return
 
@@ -1092,10 +1025,8 @@ subroutine psb_z_base_transc_1mat(a)
   call psb_erractionrestore(err_act) 
 
   return
-9999 continue
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
+
+9999 call psb_error_handler(err_act)
 
   return
 
@@ -1131,17 +1062,14 @@ subroutine psb_z_base_csmm(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='z_base_csmm'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_csmm
 
@@ -1161,17 +1089,14 @@ subroutine psb_z_base_csmv(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='z_base_csmv'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 
 end subroutine psb_z_base_csmv
@@ -1192,17 +1117,14 @@ subroutine psb_z_base_inner_cssm(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='z_base_inner_cssm'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_inner_cssm
 
@@ -1222,17 +1144,14 @@ subroutine psb_z_base_inner_cssv(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='z_base_inner_cssv'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_inner_cssv
 
@@ -1365,13 +1284,8 @@ subroutine psb_z_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 
@@ -1501,13 +1415,8 @@ subroutine psb_z_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 contains
   subroutine inner_vscal(n,d,x,y)
@@ -1551,17 +1460,14 @@ subroutine psb_z_base_scals(d,a,info)
   character(len=20)  :: name='z_scals'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_scals
 
@@ -1581,17 +1487,14 @@ subroutine psb_z_base_scal(d,a,info,side)
   character(len=20)  :: name='z_scal'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_scal
 
@@ -1611,19 +1514,15 @@ function psb_z_base_maxval(a) result(res)
   character(len=20)  :: name='maxval'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
+  res = dzero
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-  res = dzero
-
-  return
+  call psb_error_handler(err_act)
 
 end function psb_z_base_maxval
 
@@ -1640,7 +1539,7 @@ function psb_z_base_csnmi(a) result(res)
 
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='csnm1'
+  character(len=20)  :: name='csnmi'
   real(psb_dpk_), allocatable  :: vt(:) 
     
   logical, parameter :: debug=.false.
@@ -1661,13 +1560,8 @@ function psb_z_base_csnmi(a) result(res)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_z_base_csnmi
@@ -1705,13 +1599,8 @@ function psb_z_base_csnm1(a) result(res)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end function psb_z_base_csnm1
@@ -1728,18 +1617,14 @@ subroutine psb_z_base_rowsum(d,a)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_rowsum
 
@@ -1755,18 +1640,14 @@ subroutine psb_z_base_arwsum(d,a)
   character(len=20)  :: name='arwsum'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_arwsum
 
@@ -1782,18 +1663,14 @@ subroutine psb_z_base_colsum(d,a)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_colsum
 
@@ -1809,18 +1686,14 @@ subroutine psb_z_base_aclsum(d,a)
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_aclsum
 
@@ -1840,18 +1713,14 @@ subroutine psb_z_base_get_diag(a,d,info)
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
+  call psb_erractionsave(err_act)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
-  if (err_act /= psb_act_ret_) then
-    call psb_error()
-  end if
-
-  return
+  call psb_error_handler(err_act)
 
 end subroutine psb_z_base_get_diag
 
@@ -2029,13 +1898,8 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   return
 
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_vect_cssv
@@ -2072,15 +1936,9 @@ subroutine psb_z_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
 
   call psb_erractionrestore(err_act)
   return
+ 
+9999 call psb_error_handler(err_act)
 
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psb_z_base_inner_vect_sv

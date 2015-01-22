@@ -208,7 +208,7 @@ subroutine imsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -242,12 +242,12 @@ subroutine imsort(x,ix,dir,flag)
   else
     call imsr(n,x,dir_)
   end if
+  
+  return
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine imsort
 
 
@@ -273,7 +273,7 @@ subroutine smsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -308,11 +308,11 @@ subroutine smsort(x,ix,dir,flag)
     call smsr(n,x,dir_)
   end if
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine smsort
 
 subroutine dmsort(x,ix,dir,flag)
@@ -337,7 +337,7 @@ subroutine dmsort(x,ix,dir,flag)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -372,11 +372,11 @@ subroutine dmsort(x,ix,dir,flag)
     call dmsr(n,x,dir_)
   end if
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine dmsort
 
 subroutine camsort(x,ix,dir,flag)
@@ -436,11 +436,11 @@ subroutine camsort(x,ix,dir,flag)
     call camsr(n,x,dir_)
   end if
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine camsort
 
 subroutine zamsort(x,ix,dir,flag)
@@ -500,11 +500,11 @@ subroutine zamsort(x,ix,dir,flag)
     call zamsr(n,x,dir_)
   end if
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine zamsort
 
 
@@ -530,7 +530,7 @@ subroutine imsort_u(x,nout,dir)
     dir_= psb_sort_up_
   end if
   select case(dir_) 
-  case( psb_sort_up_, psb_sort_down_)
+  case( psb_sort_up_, psb_sort_down_, psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
     ierr(1) = 3; ierr(2) = dir_; 
@@ -543,11 +543,11 @@ subroutine imsort_u(x,nout,dir)
   call imsru(n,x,dir_,nout)
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine imsort_u
 
 
@@ -625,11 +625,11 @@ subroutine iqsort(x,ix,dir,flag)
 
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine iqsort
 
 
@@ -707,11 +707,11 @@ subroutine sqsort(x,ix,dir,flag)
 
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine sqsort
 
 subroutine dqsort(x,ix,dir,flag)
@@ -788,11 +788,11 @@ subroutine dqsort(x,ix,dir,flag)
 
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine dqsort
 
 
@@ -884,11 +884,11 @@ subroutine cqsort(x,ix,dir,flag)
 
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine cqsort
 
 
@@ -980,11 +980,11 @@ subroutine zqsort(x,ix,dir,flag)
 
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine zqsort
 
 
@@ -1095,11 +1095,11 @@ subroutine ihsort(x,ix,dir,flag)
   end if
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine ihsort
 
 
@@ -1208,11 +1208,11 @@ subroutine shsort(x,ix,dir,flag)
   end if
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine shsort
 
 
@@ -1321,11 +1321,11 @@ subroutine dhsort(x,ix,dir,flag)
   end if
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine dhsort
 
 
@@ -1434,11 +1434,11 @@ subroutine chsort(x,ix,dir,flag)
   end if
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine chsort
 
 
@@ -1547,11 +1547,11 @@ subroutine zhsort(x,ix,dir,flag)
   end if
 
 
-9999 continue 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 end subroutine zhsort
 
 

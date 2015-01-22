@@ -137,12 +137,11 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    
+
     ictxt = map%p_desc_Y%get_context()
     nr2   = map%p_desc_Y%get_global_rows()
     nc2   = map%p_desc_Y%get_local_cols() 
     call yt%bld(nc2,mold=x%v)
-!!$    write(0,*)'From map_aggr_X2Y apply: ',map%p_desc_X%v_halo_index%get_fmt()
     if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
     if (info == psb_success_) call psb_csmm(done,map%map_X2Y,x,dzero,yt,info)
     if ((info == psb_success_) .and. map%p_desc_Y%is_repl()) then
@@ -308,7 +307,6 @@ subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
     nr2   = map%p_desc_X%get_global_rows()
     nc2   = map%p_desc_X%get_local_cols() 
     call yt%bld(nc2,mold=y%v)
-!!$    write(0,*)'From map_aggr_Y2X apply: ',map%p_desc_Y%v_halo_index%get_fmt()
     if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
     if (info == psb_success_) call psb_csmm(done,map%map_Y2X,x,dzero,yt,info)
     if ((info == psb_success_) .and. map%p_desc_X%is_repl()) then

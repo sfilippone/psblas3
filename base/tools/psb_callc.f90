@@ -111,7 +111,7 @@ subroutine psb_calloc(x, desc_a, info, n, lb)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,n_,x,info,lb2=lb)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -119,18 +119,14 @@ subroutine psb_calloc(x, desc_a, info, n, lb)
     call psb_errpush(info,name,int_err,a_err='complex(psb_spk_)')
     goto 9999
   endif
-  
+
   x(:,:) = czero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_calloc
@@ -228,7 +224,7 @@ subroutine psb_callocv(x, desc_a,info,n)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,x,info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -236,21 +232,18 @@ subroutine psb_callocv(x, desc_a,info,n)
     call psb_errpush(info,name,int_err,a_err='complex(psb_spk_)')
     goto 9999
   endif
-  
+
   x(:) = czero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_callocv
+
 
 subroutine psb_calloc_vect(x, desc_a,info,n)
   use psb_base_mod, psb_protect_name => psb_calloc_vect
@@ -319,12 +312,8 @@ subroutine psb_calloc_vect(x, desc_a,info,n)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_calloc_vect
@@ -426,12 +415,8 @@ subroutine psb_calloc_vect_r2(x, desc_a,info,n,lb)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_calloc_vect_r2

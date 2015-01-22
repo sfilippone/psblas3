@@ -218,13 +218,8 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
 9999 continue
   call psb_errpush(info,name,i_err=ierr,a_err=ch_err)
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  call psb_error_handler(err_act)
   return
-
 
 end subroutine psb_z_bjac_apply_vect
 
@@ -372,13 +367,8 @@ subroutine psb_z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
 9999 continue
   call psb_errpush(info,name,i_err=ierr,a_err=ch_err)
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+  call psb_error_handler(err_act)
   return
-
 
 end subroutine psb_z_bjac_apply
 
@@ -411,13 +401,9 @@ subroutine psb_z_bjac_precinit(prec,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
+
 end subroutine psb_z_bjac_precinit
 
 
@@ -566,14 +552,8 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
-
 end subroutine psb_z_bjac_precbld
 
 subroutine psb_z_bjac_precseti(prec,what,val,info)
@@ -626,11 +606,6 @@ subroutine psb_z_bjac_precseti(prec,what,val,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine psb_z_bjac_precseti

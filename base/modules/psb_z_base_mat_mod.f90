@@ -153,7 +153,7 @@ module psb_z_base_mat_mod
     procedure, pass(a) :: mv_from_coo  => psb_z_mv_coo_from_coo
     procedure, pass(a) :: mv_to_fmt    => psb_z_mv_coo_to_fmt
     procedure, pass(a) :: mv_from_fmt  => psb_z_mv_coo_from_fmt
-    procedure, pass(a) :: csput_a       => psb_z_coo_csput_a
+    procedure, pass(a) :: csput_a      => psb_z_coo_csput_a
     procedure, pass(a) :: get_diag     => psb_z_coo_get_diag
     procedure, pass(a) :: csgetrow     => psb_z_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_z_coo_csgetptn

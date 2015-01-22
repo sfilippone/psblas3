@@ -83,8 +83,7 @@ subroutine psb_casb(x, desc_a, info)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),' error ',&
-         & desc_a%get_dectype()
+         & write(debug_unit,*) me,' ',trim(name),' error '
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
@@ -122,12 +121,8 @@ subroutine psb_casb(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_casb
@@ -240,15 +235,12 @@ subroutine psb_casbv(x, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_casbv
+
 
 subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   use psb_base_mod, psb_protect_name => psb_casb_vect
@@ -319,12 +311,8 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_casb_vect
@@ -385,7 +373,6 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
     end do
 
   else
-
     do i=1, n
       call x(i)%asb(ncol,info)
       if (info /= 0) exit
@@ -408,12 +395,8 @@ subroutine psb_casb_vect_r2(x, desc_a, info, mold, scratch)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_casb_vect_r2

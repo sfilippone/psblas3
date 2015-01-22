@@ -114,7 +114,7 @@ contains
 
   subroutine psb_c_diag_precinit(prec,info)
     Implicit None
-    
+
     class(psb_c_diag_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(out)                     :: info
     integer(psb_ipk_) :: err_act, nrow
@@ -124,47 +124,39 @@ contains
 
     info = psb_success_
 
-    
+
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
   end subroutine psb_c_diag_precinit
 
 
   subroutine psb_c_diag_precfree(prec,info)
-    
+
     Implicit None
 
     class(psb_c_diag_prec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)                :: info
-    
+
     integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='c_diag_precset'
-    
+
     call psb_erractionsave(err_act)
-    
+
     info = psb_success_
 
     if (allocated(prec%dv)) call prec%dv%free(info)
-    
+
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
-    
+
   end subroutine psb_c_diag_precfree
   
 
@@ -182,7 +174,7 @@ contains
     call psb_erractionsave(err_act)
 
     info = psb_success_
-   
+
     if (present(iout)) then 
       iout_ = iout
     else
@@ -194,18 +186,14 @@ contains
     call psb_erractionsave(err_act)
 
     info = psb_success_
-    
+
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
-    
+
   end subroutine psb_c_diag_precdescr
 
   function psb_c_diag_sizeof(prec) result(val)
@@ -247,7 +235,7 @@ contains
       if (info == psb_success_) deallocate(precout, stat=info)
     end if
     if (info == psb_success_) &
-       & allocate(psb_c_diag_prec_type :: precout, stat=info)
+         & allocate(psb_c_diag_prec_type :: precout, stat=info)
     if (info /= 0) goto 9999
     select type(pout => precout)
     type is (psb_c_diag_prec_type) 
@@ -258,7 +246,7 @@ contains
         if (info == 0) call prec%dv%clone(pout%dv,info)
       end if
       if (info == 0) call psb_safe_ab_cpy(prec%d,pout%d,info)
-    class default
+      class default
       info = psb_err_internal_error_
     end select
     if (info /= 0) goto 9999
@@ -266,12 +254,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
+
     return
 
   end subroutine psb_c_diag_clone

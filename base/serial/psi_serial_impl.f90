@@ -891,13 +891,8 @@ subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_iaxpbyv
@@ -952,13 +947,8 @@ subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_iaxpby
@@ -1009,13 +999,8 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_saxpbyv
@@ -1070,13 +1055,8 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_saxpby
@@ -1126,13 +1106,8 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_daxpbyv
@@ -1187,13 +1162,8 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 end subroutine psi_daxpby
 
@@ -1242,13 +1212,8 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_caxpbyv
@@ -1303,13 +1268,8 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 end subroutine psi_caxpby
 
@@ -1358,13 +1318,8 @@ subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 
 end subroutine psi_zaxpbyv
@@ -1419,13 +1374,8 @@ subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
   return
 end subroutine psi_zaxpby
 

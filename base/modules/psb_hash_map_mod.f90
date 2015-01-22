@@ -715,14 +715,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
     return
 
   end subroutine hash_g2lv1_ins
@@ -1421,12 +1415,10 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
+
+9999 call psb_error_handler(err_act)
+
+  return
   end subroutine hash_clone
 
 
@@ -1485,7 +1477,7 @@ contains
       call idxmap%g2lip_ins(idx(nr+1:nc),info,lidx=lidx(nr+1:nc))
     end if
 
-      
+
     if (info /= psb_success_) then 
       info = psb_err_from_subroutine_
       call psb_errpush(info,name)
@@ -1494,11 +1486,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
+
+9999 call psb_error_handler(err_act)
+
     return
   end subroutine hash_reinit
 

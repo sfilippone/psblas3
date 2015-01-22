@@ -11,7 +11,7 @@ FOBJS = psb_sallc.o psb_sasb.o  \
 	psb_dspfree.o psb_dspins.o psb_dsprn.o \
 	psb_sspalloc.o psb_sspasb.o \
 	psb_sspfree.o psb_sspins.o psb_ssprn.o\
-	psb_glob_to_loc.o psb_ialloc.o psb_iasb.o \
+	psb_glob_to_loc.o psb_iallc.o psb_iasb.o \
 	psb_ifree.o psb_iins.o psb_loc_to_glob.o\
 	psb_zallc.o psb_zasb.o psb_zfree.o psb_zins.o \
 	psb_zspalloc.o psb_zspasb.o psb_zspfree.o\

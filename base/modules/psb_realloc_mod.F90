@@ -32,7 +32,7 @@
 module psb_realloc_mod
   use psb_const_mod
   implicit none
-  
+
   !
   ! psb_realloc will reallocate the input array to have exactly 
   ! the size specified, possibly shortening it. 
@@ -86,7 +86,7 @@ module psb_realloc_mod
     module procedure psb_rp1p2z2
 
 #endif
-  end Interface
+  end Interface psb_realloc
 
   interface psb_move_alloc
     module procedure psb_smove_alloc1d
@@ -106,7 +106,7 @@ module psb_realloc_mod
     module procedure psb_cmove_alloc2d
     module procedure psb_zmove_alloc1d
     module procedure psb_zmove_alloc2d
-  end interface
+  end interface psb_move_alloc
 
   Interface psb_safe_ab_cpy
     module procedure psb_i_ab_cpy1d,psb_i_ab_cpy2d, &
@@ -114,7 +114,7 @@ module psb_realloc_mod
          & psb_c_ab_cpy1d, psb_c_ab_cpy2d,&
          & psb_d_ab_cpy1d, psb_d_ab_cpy2d,&
          & psb_z_ab_cpy1d, psb_z_ab_cpy2d
-  end Interface
+  end Interface psb_safe_ab_cpy
 
   Interface psb_safe_cpy
     module procedure psb_i_cpy1d,psb_i_cpy2d, &
@@ -122,7 +122,7 @@ module psb_realloc_mod
          & psb_c_cpy1d, psb_c_cpy2d,&
          & psb_d_cpy1d, psb_d_cpy2d,&
          & psb_z_cpy1d, psb_z_cpy2d
-  end Interface
+  end Interface psb_safe_cpy
 
   !
   ! psb_ensure_size will reallocate the input array if necessary
@@ -136,7 +136,7 @@ module psb_realloc_mod
 #endif
          & psb_scksz1d, psb_ccksz1d, &
          & psb_dcksz1d, psb_zcksz1d
-  end Interface
+  end Interface psb_ensure_size
 
   interface psb_size
     module procedure psb_isize1d, psb_isize2d,&
@@ -147,9 +147,9 @@ module psb_realloc_mod
          & psb_csize1d, psb_csize2d,&
          & psb_dsize1d, psb_dsize2d,&
          & psb_zsize1d, psb_zsize2d
-  end interface
-  
-  
+  end interface psb_size
+
+
 Contains
 
   subroutine psb_i_ab_cpy1d(vin,vout,info) 
@@ -191,14 +191,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_i_ab_cpy1d
@@ -243,18 +237,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_i_ab_cpy2d
-  
+
   subroutine psb_s_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -293,18 +281,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_s_ab_cpy1d
-  
+
   subroutine psb_s_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -345,14 +327,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_s_ab_cpy2d
@@ -395,18 +371,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_d_ab_cpy1d
-  
+
   subroutine psb_d_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -447,18 +417,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_d_ab_cpy2d
-  
+
   subroutine psb_c_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -497,18 +461,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_c_ab_cpy1d
-  
+
   subroutine psb_c_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -549,18 +507,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_c_ab_cpy2d
-  
+
   subroutine psb_z_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -598,18 +550,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_z_ab_cpy1d
-  
+
   subroutine psb_z_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -649,14 +595,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_z_ab_cpy2d
@@ -697,14 +637,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_i_cpy1d
@@ -747,18 +681,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_i_cpy2d
-  
+
   subroutine psb_s_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -795,18 +723,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_s_cpy1d
-  
+
   subroutine psb_s_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -845,18 +767,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_s_cpy2d
-  
+
   subroutine psb_d_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -892,18 +808,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_d_cpy1d
-  
+
   subroutine psb_d_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -942,18 +852,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_d_cpy2d
-  
+
   subroutine psb_c_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -990,18 +894,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_c_cpy1d
-  
+
   subroutine psb_c_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -1040,18 +938,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_c_cpy2d
-  
+
   subroutine psb_z_cpy1d(vin,vout,info) 
     use psb_error_mod
 
@@ -1087,18 +979,12 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_z_cpy1d
-  
+
   subroutine psb_z_cpy2d(vin,vout,info) 
     use psb_error_mod
 
@@ -1137,23 +1023,17 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_z_cpy2d
 
-  
+
   function psb_isize1d(vin)
     integer(psb_ipk_) :: psb_isize1d
     integer(psb_ipk_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_isize1d = 0
     else
@@ -1178,12 +1058,12 @@ Contains
       end if
     end if
   end function psb_isize2d
-  
+
 #if !defined(LONG_INTEGERS)  
   function psb_i8size1d(vin)
     integer(psb_ipk_) :: psb_i8size1d
     integer(psb_long_int_k_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_i8size1d = 0
     else
@@ -1209,11 +1089,11 @@ Contains
     end if
   end function psb_i8size2d
 #endif
-  
+
   function psb_ssize1d(vin)
     integer(psb_ipk_) :: psb_ssize1d
     real(psb_spk_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_ssize1d = 0
     else
@@ -1243,7 +1123,7 @@ Contains
   function psb_dsize1d(vin)
     integer(psb_ipk_) :: psb_dsize1d
     real(psb_dpk_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_dsize1d = 0
     else
@@ -1270,11 +1150,11 @@ Contains
     end if
   end function psb_dsize2d
 
-  
+
   function psb_csize1d(vin)
     integer(psb_ipk_) :: psb_csize1d
     complex(psb_spk_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_csize1d = 0
     else
@@ -1299,11 +1179,11 @@ Contains
       end if
     end if
   end function psb_csize2d
-  
+
   function psb_zsize1d(vin)
     integer(psb_ipk_) :: psb_zsize1d
     complex(psb_dpk_), allocatable, intent(in) :: vin(:)
-    
+
     if (.not.allocated(vin)) then 
       psb_zsize1d = 0
     else
@@ -1352,7 +1232,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1364,7 +1244,7 @@ Contains
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
-      
+
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
@@ -1375,14 +1255,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
 
@@ -1411,7 +1285,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1423,7 +1297,7 @@ Contains
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
-      
+
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
@@ -1434,14 +1308,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   End Subroutine psb_i8cksz1d
@@ -1469,7 +1337,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1492,14 +1360,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
 
@@ -1527,7 +1389,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1550,14 +1412,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
 
@@ -1586,7 +1442,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1608,14 +1464,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
 
@@ -1644,7 +1494,7 @@ Contains
       info=psb_err_from_subroutine_
       goto 9999
     end if
-    
+
     If (len > psb_size(v)) Then
       if (present(newsz)) then 
         isz = (max(len+1,newsz))
@@ -1666,14 +1516,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
 
@@ -1754,15 +1598,10 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
+
     return
-
 
   End Subroutine psb_reallocate1i
 
@@ -1832,13 +1671,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocate1s
@@ -1909,13 +1742,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocate1d
@@ -1986,13 +1813,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocate1c
@@ -2062,13 +1883,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocate1z
@@ -2159,13 +1974,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocates2
@@ -2255,13 +2064,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocated2
@@ -2352,13 +2155,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocatec2
@@ -2448,13 +2245,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocatez2
@@ -2543,13 +2334,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocatei2
@@ -2630,13 +2415,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
 
@@ -2725,13 +2504,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocatei8_2
@@ -2772,14 +2545,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   End Subroutine psb_reallocate2i
@@ -2824,14 +2591,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
   End Subroutine psb_reallocate2i1s
 
@@ -2872,14 +2633,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
   End Subroutine psb_reallocate2i1d
 
@@ -2921,14 +2676,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
   End Subroutine psb_reallocate2i1c
 
@@ -2967,14 +2716,8 @@ Contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
   End Subroutine psb_reallocate2i1z
 
@@ -2986,13 +2729,13 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC    
-    
-      call move_alloc(vin,vout)
+
+    call move_alloc(vin,vout)
 
 #else      
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3010,14 +2753,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3034,13 +2777,13 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC    
-    
-      call move_alloc(vin,vout)
+
+    call move_alloc(vin,vout)
 
 #else      
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3058,14 +2801,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3083,12 +2826,12 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3106,14 +2849,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3131,12 +2874,12 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3154,14 +2897,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3179,12 +2922,12 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3202,14 +2945,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3228,12 +2971,12 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3251,14 +2994,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3278,12 +3021,12 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
     allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
     if (info /= psb_success_) return
@@ -3301,14 +3044,14 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
 
-      call move_alloc(vin,vout)
+    call move_alloc(vin,vout)
 
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
-    end if    
+    end if
     if (.not.allocated(vin) ) return
-    
+
     allocate(vout(lbound(vin,1):ubound(vin,1),&
          & lbound(vin,2):ubound(vin,2)),stat=info)
     if (info /= psb_success_) return
@@ -3392,13 +3135,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
 
@@ -3484,13 +3221,7 @@ Contains
 
 9999 continue
     info = err
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
+    call psb_error_handler(err_act)
     return
 
   End Subroutine psb_reallocatei4_2
@@ -3828,7 +3559,7 @@ Contains
     integer(psb_ipk_), allocatable, intent(out) :: at(:,:)
     integer(psb_ipk_) :: i,j,ib, ii
     integer(psb_ipk_), parameter :: nb=32
-    
+
     nr = size(a,1)
     nc = size(a,2)
     allocate(at(nc,nr))
@@ -3849,7 +3580,7 @@ Contains
     real(psb_dpk_), allocatable, intent(out) :: at(:,:)
     integer(psb_ipk_) :: i,j,ib, ii
     integer(psb_ipk_), parameter :: nb=32
-    
+
     nr = size(a,1)
     nc = size(a,2)
     allocate(at(nc,nr))

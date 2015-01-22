@@ -59,18 +59,12 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
-  if (psb_errstatus_fatal()) return 
   call psb_erractionsave(err_act)
   name = 'psb_dspall'
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   ictxt   = desc_a%get_context()
   dectype = desc_a%get_dectype()
@@ -107,11 +101,11 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
   call a%free()
-
   !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
-  if (psb_errstatus_fatal()) then
+  if(info /= psb_success_) then
     info=psb_err_from_subroutine_
+    ch_err='sp_all'
     call psb_errpush(info,name,int_err)
     goto 9999
   end if
@@ -125,14 +119,8 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_ret_) then
-    return
-  else
-    call psb_error(ictxt)
-  end if
   return
 
 end subroutine psb_dspalloc

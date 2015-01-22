@@ -44,11 +44,11 @@ subroutine psb_dspfree(a, desc_a,info)
   implicit none
 
   !....parameters...
-  type(psb_desc_type), intent(in)       :: desc_a
+  type(psb_desc_type), intent(in)      :: desc_a
   type(psb_dspmat_type), intent(inout) :: a
-  integer(psb_ipk_), intent(out)                  :: info
+  integer(psb_ipk_), intent(out)        :: info
   !...locals....
-  integer(psb_ipk_) :: ictxt,err_act
+  integer(psb_ipk_) :: ictxt, err_act
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -56,31 +56,22 @@ subroutine psb_dspfree(a, desc_a,info)
   name = 'psb_dspfree'
   call psb_erractionsave(err_act)
 
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info = psb_err_forgot_spall_
     call psb_errpush(info,name)
-    goto 9999
+    return
   else
     ictxt = desc_a%get_context()
   end if
 
   !...deallocate a....
   call a%free()
-  if (psb_errstatus_fatal()) then 
-    info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='a%free')
-    goto 9999
-  end if
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dspfree

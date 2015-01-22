@@ -76,7 +76,7 @@ subroutine mm_cvet_read(b, info, iunit, filename)
 
   read(line,fmt=*)nrow,ncol
 
-  if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+  if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'general')) then
     allocate(b(nrow),stat = ircode)
     if (ircode /= 0)   goto 993
     do i=1, nrow
@@ -210,18 +210,14 @@ subroutine mm_cvet2_write(b, header, info, iunit, filename)
     endif
   endif
 
-  write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+  write(outfile,'(a)') '%%MatrixMarket matrix array complex general'
   write(outfile,'(a)') '% '//trim(header)
   write(outfile,'(a)') '% '
   nrow = size(b,1) 
   ncol = size(b,2) 
   write(outfile,*) nrow,ncol
 
-  write(frmtv,'(a,i0,a)') '(',2*ncol,'(es26.18,1x))'
-
-  do i=1,size(b,1) 
-    write(outfile,frmtv) b(i,1:ncol)
-  end do
+  write(outfile,fmt='(2(es26.18,1x))') ((b(i,j), i=1,nrow),j=1,ncol)
 
   if (outfile /= 6) close(outfile)
 
@@ -266,7 +262,7 @@ subroutine mm_cvet1_write(b, header, info, iunit, filename)
     endif
   endif
 
-  write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+  write(outfile,'(a)') '%%MatrixMarket matrix array complex general'
   write(outfile,'(a)') '% '//trim(header)
   write(outfile,'(a)') '% '
   nrow = size(b,1) 

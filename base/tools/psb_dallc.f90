@@ -48,7 +48,7 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
   implicit none
 
   !....parameters...
-  real(psb_dpk_), allocatable, intent(out)  :: x(:,:)
+  real(psb_dpk_), allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_),intent(out)                   :: info
   integer(psb_ipk_), optional, intent(in)         :: n, lb
@@ -56,7 +56,7 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
   !locals
   integer(psb_ipk_) :: np,me,err,nr,i,j,err_act
   integer(psb_ipk_) :: ictxt,n_
-  integer(psb_ipk_) :: int_err(5), exch(3)
+  integer(psb_ipk_) :: int_err(5),exch(3)
   character(len=20)   :: name
 
   name='psb_geall'
@@ -76,7 +76,7 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
   endif
 
   !... check m and n parameters....
-  if (.not.desc_a%is_ok()) then 
+  if (.not.psb_is_ok_desc(desc_a)) then 
     info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
@@ -111,7 +111,7 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,n_,x,info,lb2=lb)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -119,18 +119,14 @@ subroutine psb_dalloc(x, desc_a, info, n, lb)
     call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
     goto 9999
   endif
-  
+
   x(:,:) = dzero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dalloc
@@ -167,9 +163,8 @@ end subroutine psb_dalloc
 !!$ 
 !!$  
 !
-!
 ! Function: psb_dallocv
-!    Allocates dense matrix for PSBLAS routines. 
+!    Allocates dense matrix for PSBLAS routines
 !    The descriptor may be in either the build or assembled state.
 ! 
 ! Arguments: 
@@ -229,7 +224,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
-  
+
   call psb_realloc(nr,x,info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -237,21 +232,18 @@ subroutine psb_dallocv(x, desc_a,info,n)
     call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
     goto 9999
   endif
-  
+
   x(:) = dzero
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dallocv
+
 
 subroutine psb_dalloc_vect(x, desc_a,info,n)
   use psb_base_mod, psb_protect_name => psb_dalloc_vect
@@ -312,7 +304,7 @@ subroutine psb_dalloc_vect(x, desc_a,info,n)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
+    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
     goto 9999
   endif
   call x%zero()
@@ -320,12 +312,8 @@ subroutine psb_dalloc_vect(x, desc_a,info,n)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dalloc_vect
@@ -420,19 +408,15 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
     int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_dpk_)')
+    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
     goto 9999
   endif
 
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
+9999 call psb_error_handler(ictxt,err_act)
+
   return
 
 end subroutine psb_dalloc_vect_r2

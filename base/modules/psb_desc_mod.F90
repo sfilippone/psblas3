@@ -672,15 +672,11 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
+9999 call psb_error_handler(err_act)
+
     return
+
   end subroutine psb_cd_get_list
 
 
@@ -752,15 +748,10 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
     return
+
   end subroutine psb_cd_v_get_list
 
   !
@@ -792,18 +783,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      if (ictxt == -1) then
-        call psb_error()
-      else
-        call psb_error(ictxt)
-      end if
-    end if
+9999 call psb_error_handler(err_act)
     return
 
   end subroutine psb_cdfree
@@ -944,15 +925,10 @@ contains
 
     call psb_erractionrestore(err_act)
     return
+    
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error()
-    end if
     return
 
   end subroutine psb_cdtransfer
@@ -1053,14 +1029,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
     return
 
   end subroutine psb_cd_clone
@@ -1159,13 +1129,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error(ictxt)
-      return
-    end if
-    Return
+9999 call psb_error_handler(ictxt,err_act)
+
+    return
 
   end Subroutine psb_cd_get_recv_idx
 
@@ -1208,14 +1174,11 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
 
+9999 call psb_error_handler(err_act)
+
+    return
+  
   end subroutine cd_l2gs1
 
   subroutine cd_l2gs2(idxin,idxout,desc,info,mask,owned)
@@ -1248,14 +1211,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_l2gs2
 
@@ -1288,13 +1246,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
+
+    return
 
   end subroutine cd_l2gv1
 
@@ -1327,13 +1281,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
+
+    return
 
   end subroutine cd_l2gv2
 
@@ -1366,13 +1316,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
+
+    return
 
   end subroutine cd_g2ls1
 
@@ -1406,14 +1352,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_g2ls2
 
@@ -1446,14 +1387,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_g2lv1
 
@@ -1488,14 +1424,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_g2lv2
 
@@ -1529,14 +1460,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_g2ls1_ins
 
@@ -1571,14 +1497,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
-
+9999 call psb_error_handler(err_act)
+    
+    return
 
   end subroutine cd_g2ls2_ins
 
@@ -1613,14 +1534,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
 
+    return
 
   end subroutine cd_g2lv1_ins
 
@@ -1655,13 +1571,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
+    
+    return
 
   end subroutine cd_g2lv2_ins
 
@@ -1694,13 +1606,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    Return
+9999 call psb_error_handler(err_act)
+
+    return
 
   end subroutine cd_fnd_owner
 

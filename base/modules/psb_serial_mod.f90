@@ -325,7 +325,6 @@ contains
       end do
     end if
     return
-    return
   end subroutine zrot
   !
   !

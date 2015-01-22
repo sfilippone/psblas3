@@ -75,7 +75,9 @@ module psb_i_base_vect_mod
     ! Assembly does almost nothing here, but is important
     ! in derived classes. 
     !
-    procedure, pass(x) :: ins      => i_base_ins
+    procedure, pass(x) :: ins_a    => i_base_ins_a
+    procedure, pass(x) :: ins_v    => i_base_ins_v
+    generic, public    :: ins      => ins_a, ins_v
     procedure, pass(x) :: zero     => i_base_zero
     procedure, pass(x) :: asb      => i_base_asb
     procedure, pass(x) :: free     => i_base_free
@@ -295,7 +297,7 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine i_base_ins(n,irl,val,dupl,x,info)
+  subroutine i_base_ins_a(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
     class(psb_i_base_vect_type), intent(inout)  :: x
@@ -346,12 +348,41 @@ contains
 ! !$      goto 9999
       end select
     end if
+    call x%set_host()
     if (info /= 0) then 
       call psb_errpush(info,'base_vect_ins')
       return
     end if
 
-  end subroutine i_base_ins
+  end subroutine i_base_ins_a
+
+
+  subroutine i_base_ins_v(n,irl,val,dupl,x,info)
+    use psi_serial_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: n, dupl
+    class(psb_i_base_vect_type), intent(inout)  :: irl
+    class(psb_i_base_vect_type), intent(inout)  :: val
+    integer(psb_ipk_), intent(out)              :: info
+
+    integer(psb_ipk_) :: i, isz
+
+    info = 0
+    if (psb_errstatus_fatal()) return 
+
+    if (irl%is_dev()) call irl%sync()
+    if (val%is_dev()) call val%sync()
+    if (x%is_dev())   call x%sync()
+    call x%ins(n,irl%v,val%v,dupl,info)
+
+    if (info /= 0) then 
+      call psb_errpush(info,'base_vect_ins')
+      return
+    end if
+
+  end subroutine i_base_ins_v
+
 
   !
   !> Function  base_zero

@@ -69,13 +69,9 @@ subroutine psb_s_mat_renums(alg,mat,info,perm)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
+
 end subroutine psb_s_mat_renums
   
 subroutine psb_s_mat_renum(alg,mat,info,perm)
@@ -142,12 +138,7 @@ subroutine psb_s_mat_renum(alg,mat,info,perm)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 
 contains
@@ -235,13 +226,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
     return
+
   end subroutine psb_mat_renum_gps
 
 
@@ -343,13 +330,9 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
+9999 call psb_error_handler(err_act)
     return
+
   end subroutine psb_mat_renum_amd
 
 end subroutine psb_s_mat_renum

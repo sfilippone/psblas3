@@ -74,12 +74,12 @@ function psb_samax(x,desc_a, info, jx) result(res)
     call psb_errpush(info,name)
     goto 9999 
   endif
-  
+
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%get_global_rows()
@@ -87,16 +87,16 @@ function psb_samax(x,desc_a, info, jx) result(res)
 
   call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix /= 1) then
-     info=psb_err_ix_n1_iy_n1_unsupported_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
@@ -105,20 +105,15 @@ function psb_samax(x,desc_a, info, jx) result(res)
   else 
     res = szero
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
   return
 end function psb_samax
 
@@ -197,7 +192,7 @@ function psb_samaxv (x,desc_a, info) result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   jx = 1
 
@@ -206,16 +201,16 @@ function psb_samaxv (x,desc_a, info) result(res)
 
   call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix /= 1) then
-     info=psb_err_ix_n1_iy_n1_unsupported_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
@@ -224,20 +219,15 @@ function psb_samaxv (x,desc_a, info) result(res)
   else 
     res = szero
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
   return
 end function psb_samaxv
 
@@ -312,13 +302,8 @@ function psb_samax_vect(x, desc_a, info) result(res)
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
   return
 
 end function psb_samax_vect
@@ -407,16 +392,16 @@ subroutine psb_samaxvs(res,x,desc_a, info)
   ldx=size(x,1)
   call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix /= 1) then
-     info=psb_err_ix_n1_iy_n1_unsupported_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
@@ -425,20 +410,15 @@ subroutine psb_samaxvs(res,x,desc_a, info)
   else 
     res = szero
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
   return
 end subroutine psb_samaxvs
 
@@ -515,12 +495,12 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%get_global_rows()
@@ -528,16 +508,16 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
   ldx = size(x,1)
   call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
-     info=psb_err_from_subroutine_
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix /= 1) then
-     info=psb_err_ix_n1_iy_n1_unsupported_
-     call psb_errpush(info,name)
-     goto 9999
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   res(1:k) = szero
@@ -547,19 +527,14 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
       res(i) = psb_amax(desc_a%get_local_rows()-iix+1,x(:,jjx+i-1))
     end do
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, res(1:k))
-  
+
   call psb_erractionrestore(err_act)
   return  
 
-9999 continue
-  call psb_erractionrestore(err_act)
+9999 call psb_error_handler(ictxt,err_act)
 
-  if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
-  end if
   return
 end subroutine psb_smamaxs

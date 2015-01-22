@@ -58,11 +58,16 @@ subroutine smsr(n,x,idir)
     call psb_error()
   endif
   
-  if (idir == psb_sort_up_) then 
+  select case(idir)
+  case (psb_sort_up_)
     call smsort_up(n,x,iaux,iret)
-  else
+  case (psb_asort_up_)
+    call samsort_up(n,x,iaux,iret)
+  case (psb_asort_down_)
+    call samsort_dw(n,x,iaux,iret)
+  case (psb_sort_down_)
     call smsort_dw(n,x,iaux,iret)
-  end if
+  end select
   
   if (iret == 0) call psb_ip_reord(n,x,iaux)
 
