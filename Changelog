@@ -3,7 +3,7 @@ history.
 2015/01/05: Fix silly bug in format conversion csr_from_coo.
 	
 2014/12/21: Change error handling routines to make them more flexible for
-            C binding. More compact prologues/epilogues.
+            C binding. More compact prologues/epilogues. 
 	
 2014/11/12: Fix silly bug in MMIO: cycling through rank-2 dense read/write was
             transposing! 	
