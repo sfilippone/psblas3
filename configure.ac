@@ -517,7 +517,8 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
-    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
+dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
   else					     	     
     PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
  	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
