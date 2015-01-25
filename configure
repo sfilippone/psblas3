@@ -7033,6 +7033,48 @@ $as_echo "no" >&6; }
 fi
 rm -f conftest*
 
+ac_objext='.o'
+ac_ext='f90'
+ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FCFLAGS conftest.$ac_ext  1>&5'
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Fortran SUBMODULEs" >&5
+$as_echo_n "checking for Fortran SUBMODULEs... " >&6; }
+cat > conftest.$ac_ext <<EOF
+module test
+  interface
+    module subroutine foo(bar)
+      integer :: bar
+    end subroutine
+  end interface
+end module test
+
+submodule (test) test_impl
+contains
+  subroutine foo(bar)
+    integer :: bar
+    bar = 1
+  end subroutine foo
+end submodule test_impl
+EOF
+if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && test -s conftest${ac_objext}; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  :
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  as_fn_error $? "Sorry, cannot build PSBLAS without support for SUBMODULES.
+ Please get a Fortran compiler that supports it." "$LINENO" 5
+
+fi
+rm -f conftest*
+
 ac_exeext=''
 ac_ext='f90'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'

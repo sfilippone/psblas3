@@ -93,6 +93,52 @@ ifelse([$2], , , [  rm -rf conftest*
 fi
 rm -f conftest*])
 
+dnl @synopsis PAC_FORTRAN_HAVE_SUBMODULE( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program with SUBMODULEs (a Fortran 2008 feature).
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl
+dnl
+AC_DEFUN([PAC_FORTRAN_HAVE_SUBMODULE],
+ac_objext='.o'
+ac_ext='f90'
+ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FCFLAGS conftest.$ac_ext  1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([for Fortran SUBMODULEs])
+cat > conftest.$ac_ext <<EOF
+module test 
+  interface 
+    module subroutine foo(bar)
+      integer :: bar
+    end subroutine
+  end interface
+end module test
+
+submodule (test) test_impl
+contains
+  subroutine foo(bar)
+    integer :: bar
+    bar = 1
+  end subroutine foo
+end submodule test_impl
+EOF
+if AC_TRY_EVAL(ac_compile) && test -s conftest${ac_objext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [rm -rf conftest*
+  $1])
+else
+  AC_MSG_RESULT([no])	
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  rm -rf conftest*
+  $2
+])dnl
+fi
+rm -f conftest*])
+
 
 
 dnl @synopsis PAC_CHECK_HAVE_CRAYFTN( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
