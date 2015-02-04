@@ -335,10 +335,14 @@ subroutine dmm_mat_read(a, info, iunit, filename)
       read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i),acoo%val(i)
     end do
     call acoo%set_nzeros(nnzero)
-    call acoo%fix(info)
 
-    call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
+  else if ((psb_tolower(type) == 'pattern').and.(psb_tolower(sym) == 'general')) then
+    call acoo%allocate(nrow,ncol,nnzero)
+    do i=1,nnzero
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i)
+    end do
+    acoo%val(:) = done
+    call acoo%set_nzeros(nnzero)
 
   else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
     ! we are generally working with non-symmetric matrices, so
@@ -357,15 +361,34 @@ subroutine dmm_mat_read(a, info, iunit, filename)
       end if
     end do
     call acoo%set_nzeros(nzr)
-    call acoo%fix(info)
 
-    call a%mv_from(acoo)
-    call a%cscnv(ircode,type='csr')
+  else if ((psb_tolower(type) == 'pattern').and.(psb_tolower(sym) == 'symmetric')) then
+    call acoo%allocate(nrow,ncol,2*nnzero)
+    do i=1,nnzero
+      read(infile,fmt=*,end=902,err=905) acoo%ia(i),acoo%ja(i)
+    end do
+    acoo%val(:) = done
+    nzr = nnzero
+    do i=1,nnzero
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        nzr = nzr + 1
+        acoo%ia(nzr) = acoo%ja(i)
+        acoo%ja(nzr) = acoo%ia(i)
+      end if
+    end do
+    call acoo%set_nzeros(nzr)
 
   else
     write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
+
+  if (info == 0) then
+    call acoo%fix(info)
+    call a%mv_from(acoo)
+    call a%cscnv(ircode,type='csr')
+  end if
+
   if (infile /= 5) close(infile)
   return 
 
