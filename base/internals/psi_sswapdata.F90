@@ -643,6 +643,17 @@ subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
 end subroutine psi_sswapdatav
 
 
+
+!
+!
+! Subroutine: psi_sswapdataidxv
+!   Does the data exchange among processes. 
+!   
+!   The real workhorse: the outer routines will only choose the index list
+!   this one takes the index list and does the actual exchange. 
+!   
+!   
+! 
 subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_sswapidxv
@@ -998,6 +1009,15 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
     return
 end subroutine psi_sswapidxv
 
+!
+!
+! Subroutine: psi_sswapdata_vect
+!   Data exchange among processes.
+!
+!   Takes care of Y an exanspulated vector.
+!   
+!   
+! 
 subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_sswapdata_vect
@@ -1072,6 +1092,19 @@ subroutine psi_sswapdata_vect(flag,beta,y,desc_a,work,info,data)
 end subroutine psi_sswapdata_vect
 
 
+!
+!
+! Subroutine: psi_sswapidx_vect
+!   Data exchange among processes.
+!
+!   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
+!   of vectors. 
+!   
+!   The real workhorse: the outer routines will only choose the index list
+!   this one takes the index list and does the actual exchange. 
+!   
+!   
+! 
 subroutine psi_sswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_sswapidx_vect
@@ -1430,6 +1463,19 @@ subroutine psi_sswapidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,
 end subroutine psi_sswapidx_vect
 
 
+
+!
+!
+! Subroutine: psi_sswapvidx_vect
+!   Data exchange among processes.
+!
+!   Case where the index vector is also encapsulated. 
+!   
+!   The real workhorse: the outer routines will only choose the index list
+!   this one takes the index list and does the actual exchange. 
+!   
+!   
+! 
 subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_sswap_vidx_vect
