@@ -2667,7 +2667,7 @@ subroutine psb_c_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20)   :: name='c_cp_csr_from_coo'
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()

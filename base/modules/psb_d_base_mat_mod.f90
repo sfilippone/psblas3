@@ -428,8 +428,8 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_tril(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
-      class(psb_d_base_sparse_mat), intent(in)   :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: b
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
@@ -469,8 +469,8 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_triu(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
-      class(psb_d_base_sparse_mat), intent(in)   :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: b
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
