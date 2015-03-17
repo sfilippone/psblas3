@@ -1038,7 +1038,7 @@ contains
     call psb_ach_errmsg(achmsg,err_c, r_name, i_e_d, a_e_d,me)
     
     do i=1,size(achmsg)
-      write(iunit,'(a)'),trim(achmsg(i))
+      write(iunit,'(a)') trim(achmsg(i))
     end do
 
   end subroutine psb_errmsg
