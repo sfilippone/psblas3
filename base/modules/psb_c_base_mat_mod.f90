@@ -133,7 +133,7 @@ module psb_c_base_mat_mod
     !> Coefficient values. 
     complex(psb_spk_), allocatable :: val(:)
 
-    integer, private     :: sort_status=psb_unsorted_
+    integer, private   :: sort_status=psb_unsorted_
     
   contains
     !
@@ -170,6 +170,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: set_by_rows  => c_coo_set_by_rows
     procedure, pass(a) :: set_by_cols  => c_coo_set_by_cols
     procedure, pass(a) :: set_sort_status => c_coo_set_sort_status
+    procedure, pass(a) :: get_sort_status => c_coo_get_sort_status
 
     !
     ! This is COO specific
@@ -586,7 +587,7 @@ module psb_c_base_mat_mod
     subroutine psb_c_base_cp_from_coo(a,b,info) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_c_coo_sparse_mat, psb_spk_
       class(psb_c_base_sparse_mat), intent(inout) :: a
-      class(psb_c_coo_sparse_mat), intent(in) :: b
+      class(psb_c_coo_sparse_mat), intent(in)     :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_c_base_cp_from_coo
   end interface
@@ -656,7 +657,7 @@ module psb_c_base_mat_mod
     subroutine psb_c_base_mv_from_coo(a,b,info) 
       import :: psb_ipk_, psb_c_base_sparse_mat, psb_c_coo_sparse_mat, psb_spk_
       class(psb_c_base_sparse_mat), intent(inout) :: a
-      class(psb_c_coo_sparse_mat), intent(inout) :: b
+      class(psb_c_coo_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_c_base_mv_from_coo
   end interface
@@ -1367,7 +1368,7 @@ module psb_c_base_mat_mod
       import :: psb_ipk_, psb_c_coo_sparse_mat
       class(psb_c_coo_sparse_mat), intent(inout) :: a
       class(psb_c_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_c_cp_coo_from_coo
   end interface
   
@@ -1811,6 +1812,14 @@ contains
     a%nnz = nz
     
   end subroutine c_coo_set_nzeros
+  
+  function c_coo_get_sort_status(a) result(res)
+    implicit none 
+    integer(psb_ipk_)   :: res
+    class(psb_c_coo_sparse_mat), intent(in) :: a
+    
+    res = a%sort_status
+  end function c_coo_get_sort_status
   
   subroutine  c_coo_set_sort_status(ist,a)
     implicit none 

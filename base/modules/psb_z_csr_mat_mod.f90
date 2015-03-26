@@ -189,7 +189,7 @@ module psb_z_csr_mat_mod
       import :: psb_ipk_, psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
       class(psb_z_csr_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_z_cp_csr_from_coo
   end interface
   
