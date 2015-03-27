@@ -2139,8 +2139,7 @@ subroutine psb_z_cp_csc_from_coo(a,b,info)
 
   class(psb_z_csc_sparse_mat), intent(inout) :: a
   class(psb_z_coo_sparse_mat), intent(in)    :: b
-  integer(psb_ipk_), intent(out)                        :: info
-
+  integer(psb_ipk_), intent(out)               :: info
   type(psb_z_coo_sparse_mat)   :: tmp
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals

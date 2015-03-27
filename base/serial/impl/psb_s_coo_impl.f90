@@ -466,7 +466,7 @@ function  psb_s_coo_get_nz_row(idx,a) result(res)
 
   res = 0 
   nza = a%get_nzeros()
-  if (a%is_sorted()) then 
+  if (a%is_by_rows()) then 
     ! In this case we can do a binary search. 
     ip = psb_ibsrch(idx,nza,a%ia)
     if (ip /= -1) return
@@ -580,7 +580,7 @@ subroutine psb_s_coo_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == szero) then 
-    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1,kind=psb_ipk_),y,size(y,1,kind=psb_ipk_),info)
     do  i = 1, m
@@ -594,7 +594,7 @@ subroutine psb_s_coo_cssm(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1,kind=psb_ipk_),tmp,size(tmp,1,kind=psb_ipk_),info)
     do  i = 1, m
@@ -933,7 +933,7 @@ subroutine psb_s_coo_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == szero) then 
-    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,y,info)
     if (info /= psb_success_) then 
@@ -951,7 +951,7 @@ subroutine psb_s_coo_cssv(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,tmp,info)
     if (info /= psb_success_) then 
@@ -1650,7 +1650,7 @@ function psb_s_coo_csnmi(a) result(res)
   res = szero
   nnz = a%get_nzeros()
   is_unit = a%is_unit()
-  if (a%is_sorted()) then 
+  if (a%is_by_rows()) then 
     i   = 1
     j   = i
     res = szero 
@@ -2067,7 +2067,7 @@ contains
       nzin_ = 0
     endif
 
-    if (a%is_sorted()) then 
+    if (a%is_by_rows()) then 
       ! In this case we can do a binary search. 
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
@@ -2344,7 +2344,7 @@ contains
       nzin_ = 0
     endif
 
-    if (a%is_sorted()) then 
+    if (a%is_by_rows()) then 
       ! In this case we can do a binary search. 
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
@@ -2884,7 +2884,7 @@ subroutine psb_s_cp_coo_to_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   b%psb_s_base_sparse_mat = a%psb_s_base_sparse_mat
-
+  call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
   call b%reallocate(nz)
@@ -2894,7 +2894,7 @@ subroutine psb_s_cp_coo_to_coo(a,b,info)
   b%val(1:nz) = a%val(1:nz)
 
 
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -2912,7 +2912,7 @@ subroutine psb_s_cp_coo_from_coo(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_cp_coo_from_coo
   implicit none 
   class(psb_s_coo_sparse_mat), intent(inout) :: a
-  class(psb_s_coo_sparse_mat), intent(in) :: b
+  class(psb_s_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act
@@ -2925,7 +2925,7 @@ subroutine psb_s_cp_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   a%psb_s_base_sparse_mat = b%psb_s_base_sparse_mat
-
+  call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
   call a%reallocate(nz)
@@ -2934,7 +2934,7 @@ subroutine psb_s_cp_coo_from_coo(a,b,info)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
 
-  if (.not.a%is_sorted()) call a%fix(info)
+  if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3036,6 +3036,7 @@ subroutine psb_s_mv_coo_to_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   b%psb_s_base_sparse_mat = a%psb_s_base_sparse_mat
+  call b%set_sort_status(a%get_sort_status())
   call b%set_nzeros(a%get_nzeros())
 
   call move_alloc(a%ia, b%ia)
@@ -3043,7 +3044,7 @@ subroutine psb_s_mv_coo_to_coo(a,b,info)
   call move_alloc(a%val, b%val)
   call a%free()
 
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3077,13 +3078,14 @@ subroutine psb_s_mv_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   a%psb_s_base_sparse_mat = b%psb_s_base_sparse_mat
+  call a%set_sort_status(b%get_sort_status())
   call a%set_nzeros(b%get_nzeros())
 
   call move_alloc(b%ia , a%ia   )
   call move_alloc(b%ja , a%ja   )
   call move_alloc(b%val, a%val )
   call b%free()
-  if (.not.a%is_sorted()) call a%fix(info)
+  if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 

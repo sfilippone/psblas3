@@ -2658,7 +2658,7 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
 
   class(psb_s_csr_sparse_mat), intent(inout) :: a
   class(psb_s_coo_sparse_mat), intent(in)    :: b
-  integer(psb_ipk_), intent(out)                        :: info
+  integer(psb_ipk_), intent(out)               :: info
 
   type(psb_s_coo_sparse_mat)   :: tmp
   integer(psb_ipk_), allocatable :: itemp(:)
@@ -2667,13 +2667,13 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20)   :: name='s_cp_csr_from_coo'
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  if (.not.b%is_sorted()) then 
+  if (.not.b%is_by_rows()) then 
     ! This is to have fix_coo called behind the scenes
     call tmp%cp_from_coo(b,info)
     if (info /= psb_success_) return
@@ -2871,7 +2871,7 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   debug_level = psb_get_debug_level()
 
 
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
   if (info /= psb_success_) return
 
   nr  = b%get_nrows()

@@ -7385,7 +7385,37 @@ fi
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
 else
-  ac_exeext=''
+ ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking MPI Fortran 2008 interface" >&5
+$as_echo_n "checking MPI Fortran 2008 interface... " >&6; }
+cat > conftest.$ac_ext <<EOF
+           program test
+             use mpi_f08
+           end program test
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  pac_cv_mpi_f08="yes";
+  { $as_echo "$as_me:$LINENO: result:  use mpi_f08. " >&5
+$as_echo " use mpi_f08. " >&6; }
+  :
+else
+  pac_cv_mpi_f08="no";
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  { $as_echo "$as_me:$LINENO: result:  no. " >&5
+$as_echo " no. " >&6; }
+fi
+rm -f conftest*
+ if test x"$pac_cv_mpi_f08" == x"yes" ; then
+    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+  else
+    ac_exeext=''
 ac_ext='f90'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 { $as_echo "$as_me:$LINENO: checking MPI Fortran interface" >&5
@@ -7413,7 +7443,8 @@ $as_echo " include mpif.h " >&6; }
   FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"
 fi
 rm -f conftest*
-  fi
+ fi
+fi
 
 
 { $as_echo "$as_me:$LINENO: checking whether we want long (8 bytes) integers" >&5
@@ -9943,8 +9974,8 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
       psblas_cv_metis_includes="$METIS_INCLUDES"
       METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
       LIBS="$METIS_LIBS -lm $LIBS";
-      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
-$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphKway in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphKway in $METIS_LIBS... " >&6; }
       cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9958,11 +9989,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char METIS_PartGraphRecursive ();
+char METIS_PartGraphKway ();
 int
 main ()
 {
-return METIS_PartGraphRecursive ();
+return METIS_PartGraphKway ();
   ;
   return 0;
 }
@@ -10006,8 +10037,8 @@ $as_echo "$pac_metis_lib_ok" >&6; }
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
 
-      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
-$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphKway in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphKway in $METIS_LIBS... " >&6; }
       cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10021,11 +10052,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char METIS_PartGraphRecursive ();
+char METIS_PartGraphKway ();
 int
 main ()
 {
-return METIS_PartGraphRecursive ();
+return METIS_PartGraphKway ();
   ;
   return 0;
 }
@@ -10069,8 +10100,8 @@ $as_echo "$pac_metis_lib_ok" >&6; }
                 METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
-      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphRecursive in $METIS_LIBS" >&5
-$as_echo_n "checking for METIS_PartGraphRecursive in $METIS_LIBS... " >&6; }
+      { $as_echo "$as_me:$LINENO: checking for METIS_PartGraphKway in $METIS_LIBS" >&5
+$as_echo_n "checking for METIS_PartGraphKway in $METIS_LIBS... " >&6; }
       cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10084,11 +10115,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char METIS_PartGraphRecursive ();
+char METIS_PartGraphKway ();
 int
 main ()
 {
-return METIS_PartGraphRecursive ();
+return METIS_PartGraphKway ();
   ;
   return 0;
 }

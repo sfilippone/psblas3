@@ -2658,7 +2658,7 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
 
   class(psb_d_csr_sparse_mat), intent(inout) :: a
   class(psb_d_coo_sparse_mat), intent(in)    :: b
-  integer(psb_ipk_), intent(out)                        :: info
+  integer(psb_ipk_), intent(out)               :: info
 
   type(psb_d_coo_sparse_mat)   :: tmp
   integer(psb_ipk_), allocatable :: itemp(:)
@@ -2667,13 +2667,13 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20)   :: name='d_cp_csr_from_coo'
 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  if (.not.b%is_sorted()) then 
+  if (.not.b%is_by_rows()) then 
     ! This is to have fix_coo called behind the scenes
     call tmp%cp_from_coo(b,info)
     if (info /= psb_success_) return
@@ -2869,15 +2869,15 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
+  
 
-
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
   if (info /= psb_success_) return
 
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
-  
+
   a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
@@ -2886,6 +2886,7 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   call move_alloc(b%val,a%val)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
+
 
   if (nza <= 0) then 
     a%irp(:) = 1
@@ -2935,7 +2936,6 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
     end do
 
   endif
-
 
 end subroutine psb_d_mv_csr_from_coo
 

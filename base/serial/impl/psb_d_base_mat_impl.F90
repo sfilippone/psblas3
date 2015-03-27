@@ -113,9 +113,13 @@ subroutine psb_d_base_cp_to_fmt(a,b,info)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  call a%cp_to_coo(tmp,info)
-  if (info == psb_success_) call b%mv_from_coo(tmp,info)
-
+  select type(b)
+  type is (psb_d_coo_sparse_mat)
+    call a%cp_to_coo(b,info)
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='to/from coo')
@@ -151,9 +155,14 @@ subroutine psb_d_base_cp_from_fmt(a,b,info)
   ! 
   info  = psb_success_
   call psb_erractionsave(err_act)
-
-  call b%cp_to_coo(tmp,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  
+  select type(b)
+  type is (psb_d_coo_sparse_mat)
+    call a%cp_from_coo(b,info)
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
@@ -267,8 +276,13 @@ subroutine psb_d_base_mv_to_fmt(a,b,info)
   ! Default implementation
   ! 
   info = psb_success_
-  call a%mv_to_coo(tmp,info)
-  if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  select type(b)
+  type is (psb_d_coo_sparse_mat)
+    call a%mv_to_coo(b,info)
+  class default
+    call a%mv_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
 
   return
 
@@ -293,9 +307,13 @@ subroutine psb_d_base_mv_from_fmt(a,b,info)
   ! Default implementation
   ! 
   info = psb_success_
-  call b%mv_to_coo(tmp,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
-
+  select type(b)
+  type is (psb_d_coo_sparse_mat)
+    call a%mv_from_coo(b,info)
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
   return
 
 end subroutine psb_d_base_mv_from_fmt

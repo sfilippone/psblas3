@@ -653,6 +653,17 @@ subroutine psi_cswaptranv(flag,beta,y,desc_a,work,info,data)
 end subroutine psi_cswaptranv
 
 
+!
+!
+! Subroutine: psi_ctranidxv
+!   Does the data exchange among processes. 
+!   
+!   The real workhorse: the outer routines will only choose the index list
+!   this one takes the index list and does the actual exchange. 
+!   
+!   
+! 
+
 
 subroutine psi_ctranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
@@ -1025,6 +1036,16 @@ subroutine psi_ctranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 end subroutine psi_ctranidxv
 
 
+!
+!
+!
+!
+! Subroutine: psi_cswaptran_vect
+!   Data exchange among processes.
+!
+!   Takes care of Y an exanspulated vector.
+!   
+!   
 subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_cswaptran_vect

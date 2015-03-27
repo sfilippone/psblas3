@@ -186,7 +186,7 @@ module psb_d_csc_mat_mod
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_d_cp_csc_from_coo
   end interface
   

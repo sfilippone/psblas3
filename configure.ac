@@ -515,15 +515,16 @@ fi
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
 else 
-dnl PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
-dnl if test x"$pac_cv_mpi_f08" == x"yes" ; then
+ PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
+ if test x"$pac_cv_mpi_f08" == x"yes" ; then
 dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
-dnl  else					     	     
-  PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
-       [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
-     [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
-  fi
-dnl fi
+    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+  else					     	     
+    PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
+ 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ fi
+fi
 
 PAC_ARG_LONG_INTEGERS
 if test x"$pac_cv_long_integers" == x"yes" ; then
