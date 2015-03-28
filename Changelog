@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
+2015/07/28: Fix bug in transpose.
 2015/03/20: Introduce some optimizations for conversions to/from.	
 2015/01/05: Fix silly bug in format conversion csr_from_coo.
 	

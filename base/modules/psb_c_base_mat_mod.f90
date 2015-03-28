@@ -1873,6 +1873,7 @@ contains
     call a%set_nrows(izero)
     call a%set_ncols(izero)
     call a%set_nzeros(izero)
+    call a%set_sort_status(psb_unsorted_)
     
     return
     
@@ -1904,8 +1905,9 @@ contains
     call move_alloc(a%ia,itemp)
     call move_alloc(a%ja,a%ia)
     call move_alloc(itemp,a%ja)
-    
+        
     call a%set_sorted(.false.)
+    call a%set_sort_status(psb_unsorted_)
     
     return
     
