@@ -2664,7 +2664,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
+  integer(psb_ipk_) :: nza, nr, nc, i,j,k,ip,irw, err_act, ncl
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='z_cp_csr_from_coo'
@@ -2707,55 +2707,20 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
     
   endif
-    
-  if (nza <= 0) then 
-    a%irp(:) = 1
-  else
-    a%irp(1) = 1
-    if (nr < itemp(nza)) then 
-      write(debug_unit,*) trim(name),': RWSHR=.false. : ',&
-           &nr,itemp(nza),' Expect trouble!'
-      info = 12
-    end if
 
-    j = 1 
-    i = 1
-    irw = itemp(j) 
-
-    outer: do 
-      inner: do 
-        if (i >= irw) exit inner
-        if (i>nr) then 
-          write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nr,j,nza,irw
-          exit outer
-        end if
-        a%irp(i+1) = a%irp(i) 
-        i = i + 1
-      end do inner
-      j = j + 1
-      if (j > nza) exit
-      if (itemp(j) /= irw) then 
-        a%irp(i+1) = j
-        irw = itemp(j) 
-        i = i + 1
-      endif
-      if (i>nr) exit
-    enddo outer
-    !
-    ! Cleanup empty rows at the end
-    !
-    if (j /= (nza+1)) then 
-      write(debug_unit,*) trim(name),': Problem from loop :',j,nza
-      info = 13
-    endif
-    do 
-      if (i>nr) exit
-      a%irp(i+1) = j
-      i = i + 1
-    end do
-
-  endif
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
+  
 
 end subroutine psb_z_cp_csr_from_coo
 
@@ -2816,7 +2781,7 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
+  integer(psb_ipk_) :: nza, nr, nc,i,j,k,irw, err_act
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
@@ -2861,7 +2826,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
   logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
+  integer(psb_ipk_) :: nza, nr, nc, i,j,k, ip,irw, err_act, ncl
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='mv_from_coo'
@@ -2887,55 +2852,20 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
   call b%free()
 
-  if (nza <= 0) then 
-    a%irp(:) = 1
-  else
-    a%irp(1) = 1
-    if (nr < itemp(nza)) then 
-      write(debug_unit,*) trim(name),': RWSHR=.false. : ',&
-           &nr,itemp(nza),' Expect trouble!'
-      info = 12
-    end if
 
-    j = 1 
-    i = 1
-    irw = itemp(j) 
-
-    outer: do 
-      inner: do 
-        if (i >= irw) exit inner
-        if (i>nr) then 
-          write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nr,j,nza,irw
-          exit outer
-        end if
-        a%irp(i+1) = a%irp(i) 
-        i = i + 1
-      end do inner
-      j = j + 1
-      if (j > nza) exit
-      if (itemp(j) /= irw) then 
-        a%irp(i+1) = j
-        irw = itemp(j) 
-        i = i + 1
-      endif
-      if (i>nr) exit
-    enddo outer
-    !
-    ! Cleanup empty rows at the end
-    !
-    if (j /= (nza+1)) then 
-      write(debug_unit,*) trim(name),': Problem from loop :',j,nza
-      info = 13
-    endif
-    do 
-      if (i>nr) exit
-      a%irp(i+1) = j
-      i = i + 1
-    end do
-
-  endif
-
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
+  
 
 end subroutine psb_z_mv_csr_from_coo
 
