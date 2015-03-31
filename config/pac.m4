@@ -1210,6 +1210,19 @@ if test $pac_blas_ok = no; then
 			[], [-latlas])])
 
 fi
+if test $pac_blas_ok = no; then
+	AC_LANG([C])
+	AC_CHECK_LIB(atlas, ATL_xerbla,
+		[AC_LANG([Fortran])
+		 AC_CHECK_LIB(satlas, sgemm,
+		[AC_LANG([C])
+		 AC_CHECK_LIB(satlas, cblas_dgemm,
+			[pac_blas_ok=yes
+			 BLAS_LIBS="-lsatlas"],
+			[], [-lsatlas])],
+			[], [-lsatlas])])
+
+fi
 
 # BLAS in PhiPACK libraries? (requires generic BLAS lib, too)
 if test $pac_blas_ok = no; then
