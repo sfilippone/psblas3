@@ -135,6 +135,7 @@ module psb_s_base_vect_mod
     ! Scaling and norms
     !
     procedure, pass(x) :: scal     => s_base_scal
+    procedure, pass(x) :: absval   => s_base_absval
     procedure, pass(x) :: nrm2     => s_base_nrm2
     procedure, pass(x) :: amax     => s_base_amax
     procedure, pass(x) :: asum     => s_base_asum
@@ -639,6 +640,22 @@ contains
     x%v = val
     
   end subroutine s_base_set_scal
+
+  !
+  ! Overwrite with absolute value
+  !
+  !
+  !> Function  base_set_scal
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Set all entries to their respective absolute values.
+  !!
+  subroutine s_base_absval(x)
+    class(psb_s_base_vect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) &
+         &  x%v =  abs(x%v)
+
+  end subroutine s_base_absval
 
   !
   !> Function  base_set_vect
