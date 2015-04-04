@@ -2761,7 +2761,7 @@ subroutine psb_c_cp_csr_to_coo(a,b,info)
     end do
   end do
   call b%set_nzeros(a%get_nzeros())
-  call b%set_sorted()
+  call b%set_sort_status(psb_row_major_)
   call b%set_asb()
 
 end subroutine psb_c_cp_csr_to_coo
@@ -2804,7 +2804,7 @@ subroutine psb_c_mv_csr_to_coo(a,b,info)
     end do
   end do
   call a%free()
-  call b%set_sorted()
+  call b%set_sort_status(psb_row_major_)
   call b%set_asb()
 
 end subroutine psb_c_mv_csr_to_coo
