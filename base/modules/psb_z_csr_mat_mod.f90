@@ -54,11 +54,11 @@ module psb_z_csr_mat_mod
   type, extends(psb_z_base_sparse_mat) :: psb_z_csr_sparse_mat
 
     !> Pointers to beginning of rows in JA and VAL. 
-    integer(psb_ipk_), allocatable :: irp(:)
+    integer(psb_ipk_), allocatable, accelerated :: irp(:)
     !> Column indices.
-    integer(psb_ipk_), allocatable :: ja(:)
+    integer(psb_ipk_), allocatable, accelerated :: ja(:)
     !> Coefficient values. 
-    complex(psb_dpk_), allocatable :: val(:)
+    complex(psb_dpk_), allocatable, accelerated :: val(:)
 
   contains
     procedure, pass(a) :: is_by_rows  => z_csr_is_by_rows

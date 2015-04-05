@@ -519,7 +519,7 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_dpk_) :: acc
-  complex(psb_dpk_), allocatable :: tmp(:,:)
+  complex(psb_dpk_), allocatable, accelerated :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -629,7 +629,7 @@ contains
     integer(psb_ipk_), intent(out)                :: info
 
     integer(psb_ipk_) :: i,j,k,m, ir, jc
-    complex(psb_dpk_), allocatable  :: acc(:)
+    complex(psb_dpk_), allocatable, accelerated  :: acc(:)
 
     info = psb_success_
     allocate(acc(nc), stat=info)
@@ -875,7 +875,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   complex(psb_dpk_) :: acc
-  complex(psb_dpk_), allocatable :: tmp(:)
+  complex(psb_dpk_), allocatable, accelerated :: tmp(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1413,7 +1413,7 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  complex(psb_dpk_), allocatable  :: acc(:)
+  complex(psb_dpk_), allocatable, accelerated  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1639,7 +1639,7 @@ function psb_z_coo_csnmi(a) result(res)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  real(psb_dpk_), allocatable, accelerated :: vt(:)
   logical            :: tra, is_unit
   integer(psb_ipk_)  :: err_act
   integer(psb_ipk_)  :: ierr(5)
@@ -1700,7 +1700,7 @@ function psb_z_coo_csnm1(a) result(res)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
   real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  real(psb_dpk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1738,7 +1738,7 @@ subroutine psb_z_coo_rowsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_dpk_) :: acc
-  complex(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1786,7 +1786,7 @@ subroutine psb_z_coo_arwsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  real(psb_dpk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1833,7 +1833,7 @@ subroutine psb_z_coo_colsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_dpk_) :: acc
-  complex(psb_dpk_), allocatable :: vt(:)
+  complex(psb_dpk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1881,7 +1881,7 @@ subroutine psb_z_coo_aclsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: vt(:)
+  real(psb_dpk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -3242,7 +3242,6 @@ subroutine psb_z_fix_coo(a,info,idir)
   class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_), intent(in), optional :: idir
-  integer(psb_ipk_), allocatable :: iaux(:)
   !locals
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_, nra, nca
   integer(psb_ipk_) :: i,j, irw, icl, err_act
@@ -3305,8 +3304,8 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   integer(psb_ipk_), intent(out)          :: nzout, info
   integer(psb_ipk_), intent(in), optional :: idir
   !locals
-  integer(psb_ipk_), allocatable :: iaux(:), ias(:),jas(:), ix2(:)
-  complex(psb_dpk_),  allocatable :: vs(:)
+  integer(psb_ipk_), allocatable, accelerated :: iaux(:), ias(:),jas(:), ix2(:)
+  complex(psb_dpk_),  allocatable, accelerated :: vs(:)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_
   integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
   integer(psb_ipk_) :: debug_level, debug_unit

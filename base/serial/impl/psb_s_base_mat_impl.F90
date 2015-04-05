@@ -1186,7 +1186,7 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   character, optional, intent(in) :: trans, scale
   real(psb_spk_), intent(in), optional :: d(:)
 
-  real(psb_spk_), allocatable :: tmp(:,:)
+  real(psb_spk_), allocatable, accelerated :: tmp(:,:)
   integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
   integer(psb_ipk_) :: ierr(5)
@@ -1322,7 +1322,7 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   character, optional, intent(in) :: trans, scale
   real(psb_spk_), intent(in), optional :: d(:)
 
-  real(psb_spk_), allocatable :: tmp(:)
+  real(psb_spk_), allocatable, accelerated :: tmp(:)
   integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_
   integer(psb_ipk_) :: ierr(5)
@@ -1558,7 +1558,7 @@ function psb_s_base_csnmi(a) result(res)
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csnmi'
-  real(psb_spk_), allocatable  :: vt(:) 
+  real(psb_spk_), allocatable, accelerated  :: vt(:) 
     
   logical, parameter :: debug=.false.
 
@@ -1597,7 +1597,7 @@ function psb_s_base_csnm1(a) result(res)
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csnm1'
-  real(psb_spk_), allocatable  :: vt(:) 
+  real(psb_spk_), allocatable, accelerated  :: vt(:) 
     
   logical, parameter :: debug=.false.
 
@@ -1791,7 +1791,7 @@ subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   character, optional, intent(in)  :: trans, scale
   class(psb_s_base_vect_type), intent(inout),optional  :: d
 
-  real(psb_spk_), allocatable :: tmp(:)
+  real(psb_spk_), allocatable, accelerated :: tmp(:)
   class(psb_s_base_vect_type), allocatable :: tmpv
   integer(psb_ipk_) :: err_act, nar,nac,nc, i
   character(len=1) :: scale_

@@ -400,7 +400,7 @@ subroutine psb_s_csr_csmm(alpha,a,x,beta,y,info,trans)
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_spk_), allocatable  :: acc(:)
+  real(psb_spk_), allocatable, accelerated  :: acc(:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -749,7 +749,7 @@ subroutine psb_s_csr_cssv(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: tmp(:)
+  real(psb_spk_), allocatable, accelerated :: tmp(:)
   logical   :: tra,ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1012,7 +1012,7 @@ subroutine psb_s_csr_cssm(alpha,a,x,beta,y,info,trans)
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: tmp(:,:)
+  real(psb_spk_), allocatable, accelerated :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
@@ -1107,7 +1107,7 @@ contains
     real(psb_spk_), intent(out)   :: y(ldy,*)
     integer(psb_ipk_), intent(out)             :: info
     integer(psb_ipk_) :: i,j,k,m, ir, jc
-    real(psb_spk_), allocatable  :: acc(:)
+    real(psb_spk_), allocatable, accelerated  :: acc(:)
 
     info = psb_success_
     allocate(acc(nc), stat=info)
@@ -1316,7 +1316,7 @@ subroutine psb_s_csr_rowsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
+  real(psb_spk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1365,7 +1365,7 @@ subroutine psb_s_csr_arwsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
+  real(psb_spk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1414,7 +1414,7 @@ subroutine psb_s_csr_colsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
+  real(psb_spk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -1466,7 +1466,7 @@ subroutine psb_s_csr_aclsum(d,a)
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_spk_) :: acc
-  real(psb_spk_), allocatable :: vt(:)
+  real(psb_spk_), allocatable, accelerated :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
   integer(psb_ipk_) :: ierr(5)
@@ -2661,7 +2661,7 @@ subroutine psb_s_cp_csr_from_coo(a,b,info)
   integer(psb_ipk_), intent(out)               :: info
 
   type(psb_s_coo_sparse_mat)   :: tmp
-  integer(psb_ipk_), allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable, accelerated :: itemp(:)
   !locals
   logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc, i,j,k,ip,irw, err_act, ncl
@@ -2736,7 +2736,7 @@ subroutine psb_s_cp_csr_to_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)                      :: info
 
-  integer(psb_ipk_), allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable, accelerated :: itemp(:)
   !locals
   logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
@@ -2778,7 +2778,7 @@ subroutine psb_s_mv_csr_to_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout)   :: b
   integer(psb_ipk_), intent(out)                        :: info
 
-  integer(psb_ipk_), allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable, accelerated :: itemp(:)
   !locals
   logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc,i,j,k,irw, err_act
@@ -2823,7 +2823,7 @@ subroutine psb_s_mv_csr_from_coo(a,b,info)
   class(psb_s_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)                        :: info
 
-  integer(psb_ipk_), allocatable :: itemp(:)
+  integer(psb_ipk_), allocatable, accelerated :: itemp(:)
   !locals
   logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc, i,j,k, ip,irw, err_act, ncl
@@ -3083,8 +3083,8 @@ contains
     type(psb_s_csr_sparse_mat), intent(inout) :: c
     integer(psb_ipk_), intent(out)          :: info
     integer(psb_ipk_)              :: ma,na,mb,nb
-    integer(psb_ipk_), allocatable :: irow(:), idxs(:)
-    real(psb_spk_), allocatable    :: row(:)
+    integer(psb_ipk_), allocatable, accelerated :: irow(:), idxs(:)
+    real(psb_spk_), allocatable, accelerated    :: row(:)
     type(psb_int_heap)             :: heap
     integer(psb_ipk_)              :: i,j,k,irw,icl,icf, iret, &
          & nzc,nnzre, isz, ipb, irwsz, nrc, nze

@@ -61,7 +61,7 @@ module psb_d_base_vect_mod
   !!
   type psb_d_base_vect_type
     !> Values. 
-    real(psb_dpk_), allocatable :: v(:)
+    real(psb_dpk_), allocatable, accelerated :: v(:)
   contains
     !
     !  Constructors/allocators
@@ -398,7 +398,7 @@ contains
     class(psb_d_base_vect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=dzero
-
+    call x%set_host()
   end subroutine d_base_zero
 
   
@@ -614,7 +614,7 @@ contains
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
-    call x%sync()
+    if (.not.x%is_host()) call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
@@ -637,8 +637,10 @@ contains
     real(psb_dpk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
+
     x%v = val
-    
+    call x%set_host()
+
   end subroutine d_base_set_scal
 
   !
@@ -675,6 +677,7 @@ contains
     else
       x%v = val
     end if
+    call x%set_host()
 
   end subroutine d_base_set_vect
 

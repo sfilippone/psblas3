@@ -127,11 +127,11 @@ module psb_d_base_mat_mod
     !> Number of nonzeros.
     integer(psb_ipk_) :: nnz
     !> Row indices.
-    integer(psb_ipk_), allocatable :: ia(:)
+    integer(psb_ipk_), allocatable, accelerated :: ia(:)
     !> Column indices.
-    integer(psb_ipk_), allocatable :: ja(:)
+    integer(psb_ipk_), allocatable, accelerated :: ja(:)
     !> Coefficient values. 
-    real(psb_dpk_), allocatable :: val(:)
+    real(psb_dpk_), allocatable, accelerated :: val(:)
 
     integer, private   :: sort_status=psb_unsorted_
     
