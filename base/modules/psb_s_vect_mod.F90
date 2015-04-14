@@ -63,7 +63,9 @@ module psb_s_vect_mod
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
     procedure, pass(x) :: scal     => s_vect_scal
-    procedure, pass(x) :: absval   => s_vect_absval
+    procedure, pass(x) :: absval1  => s_vect_absval1
+    procedure, pass(x) :: absval2  => s_vect_absval2
+    generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2     => s_vect_nrm2
     procedure, pass(x) :: amax     => s_vect_amax
     procedure, pass(x) :: asum     => s_vect_asum
@@ -458,14 +460,24 @@ contains
 
   end subroutine s_vect_scal
 
-  subroutine s_vect_absval(x)
+  subroutine s_vect_absval1(x)
     class(psb_s_vect_type), intent(inout)  :: x
     
     if (allocated(x%v)) &
          &  call x%v%absval()
 
-  end subroutine s_vect_absval
+  end subroutine s_vect_absval1
 
+  subroutine s_vect_absval2(x,y)
+    class(psb_s_vect_type), intent(inout)  :: x
+    class(psb_s_vect_type), intent(inout)  :: y
+    
+    if (allocated(x%v)) then 
+      if (.not.allocated(y%v))  call y%bld(size(x%v%v))
+      call x%v%absval(y%v)
+    end if
+  end subroutine s_vect_absval2
+  
   function s_vect_nrm2(n,x) result(res)
     implicit none 
     class(psb_s_vect_type), intent(inout) :: x

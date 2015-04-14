@@ -135,7 +135,9 @@ module psb_z_base_vect_mod
     ! Scaling and norms
     !
     procedure, pass(x) :: scal     => z_base_scal
-    procedure, pass(x) :: absval   => z_base_absval
+    procedure, pass(x) :: absval1  => z_base_absval1
+    procedure, pass(x) :: absval2  => z_base_absval2
+    generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2     => z_base_nrm2
     procedure, pass(x) :: amax     => z_base_amax
     procedure, pass(x) :: asum     => z_base_asum
@@ -398,7 +400,7 @@ contains
     class(psb_z_base_vect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=zzero
-
+    call x%set_host()
   end subroutine z_base_zero
 
   
@@ -614,7 +616,7 @@ contains
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
-    call x%sync()
+    if (.not.x%is_host()) call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
@@ -637,8 +639,10 @@ contains
     complex(psb_dpk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
+
     x%v = val
-    
+    call x%set_host()
+
   end subroutine z_base_set_scal
 
   !
@@ -649,13 +653,29 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief  Set all entries to their respective absolute values.
   !!
-  subroutine z_base_absval(x)
+  subroutine z_base_absval1(x)
     class(psb_z_base_vect_type), intent(inout)  :: x
 
-    if (allocated(x%v)) &
-         &  x%v =  abs(x%v)
+    if (allocated(x%v)) then
+      if (.not.x%is_host()) call x%sync()
+      x%v =  abs(x%v)
+      call x%set_host()
+    end if
 
-  end subroutine z_base_absval
+  end subroutine z_base_absval1
+
+  subroutine z_base_absval2(x,y)
+    class(psb_z_base_vect_type), intent(inout) :: x
+    class(psb_z_base_vect_type), intent(inout) :: y
+
+    if (.not.x%is_host()) call x%sync()
+    if (allocated(x%v)) then 
+      call y%bld(x%v)
+      call y%absval()
+      call y%set_host()
+    end if
+    
+  end subroutine z_base_absval2
 
   !
   !> Function  base_set_vect
@@ -675,6 +695,7 @@ contains
     else
       x%v = val
     end if
+    call x%set_host()
 
   end subroutine z_base_set_vect
 
