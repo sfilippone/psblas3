@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.3
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -89,10 +89,10 @@ module psb_const_mod
   ! 
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.3.3"
+  character(len=*), parameter    :: psb_version_string_ = "3.4.0"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
-  integer(psb_ipk_), parameter   :: psb_version_minor_  = 3
-  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 3
+  integer(psb_ipk_), parameter   :: psb_version_minor_  = 4
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
 
   !
   !     Handy & miscellaneous constants

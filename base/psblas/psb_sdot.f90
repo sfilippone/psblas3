@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -242,8 +242,8 @@ end function psb_sdot
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -366,8 +366,8 @@ end function psb_sdotv
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -489,8 +489,8 @@ end subroutine psb_sdotvs
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
