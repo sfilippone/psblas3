@@ -62,6 +62,8 @@ module psb_c_base_vect_mod
   type psb_c_base_vect_type
     !> Values. 
     complex(psb_spk_), allocatable :: v(:)
+    complex(psb_spk_), allocatable :: combuf(:) 
+    integer(psb_ipk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -96,6 +98,17 @@ module psb_c_base_vect_mod
     procedure, pass(x) :: set_host => c_base_set_host
     procedure, pass(x) :: set_dev  => c_base_set_dev
     procedure, pass(x) :: set_sync => c_base_set_sync
+
+    !
+    ! These are for handling gather/scatter in new
+    ! comm internals implementation.
+    !
+    procedure, nopass  :: use_buffer   => c_base_use_buffer
+    procedure, pass(x) :: new_buffer   => c_base_new_buffer
+    procedure, nopass  :: device_wait  => c_base_device_wait
+    procedure, pass(x) :: free_buffer  => c_base_free_buffer
+    procedure, pass(x) :: new_comid    => c_base_new_comid
+    procedure, pass(x) :: free_comid   => c_base_free_comid
 
     !
     ! Basic info
@@ -148,10 +161,12 @@ module psb_c_base_vect_mod
     procedure, pass(x) :: gthab    => c_base_gthab
     procedure, pass(x) :: gthzv    => c_base_gthzv
     procedure, pass(x) :: gthzv_x  => c_base_gthzv_x
-    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(x) :: gthzbuf  => c_base_gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
     procedure, pass(y) :: sctb     => c_base_sctb
     procedure, pass(y) :: sctb_x   => c_base_sctb_x
-    generic, public    :: sct      => sctb, sctb_x
+    procedure, pass(y) :: sctb_buf => c_base_sctb_buf
+    generic, public    :: sct      => sctb, sctb_x, sctb_buf
   end type psb_c_base_vect_type
 
   public  :: psb_c_base_vect
@@ -348,8 +363,8 @@ contains
 
       case default
         info = 321
-! !$      call psb_errpush(info,name)
-! !$      goto 9999
+        ! !$      call psb_errpush(info,name)
+        ! !$      goto 9999
       end select
     end if
     call x%set_host()
@@ -359,7 +374,6 @@ contains
     end if
 
   end subroutine c_base_ins_a
-
 
   subroutine c_base_ins_v(n,irl,val,dupl,x,info)
     use psi_serial_mod
@@ -452,6 +466,8 @@ contains
     
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
+    if (info == 0) call x%free_buffer(info)
+    if (info == 0) call x%free_comid(info)
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
         
@@ -778,12 +794,9 @@ contains
     complex(psb_spk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     
-    select type(xx => x)
-    type is (psb_c_base_vect_type)
-      call psb_geaxpby(m,alpha,x%v,beta,y%v,info)
-    class default
-      call y%axpby(m,alpha,x%v,beta,info)
-    end select
+    if (x%is_dev()) call x%sync()
+
+    call y%axpby(m,alpha,x%v,beta,info)
 
   end subroutine c_base_axpby_v
 
@@ -809,7 +822,9 @@ contains
     complex(psb_spk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     
+    if (y%is_dev()) call y%sync()
     call psb_geaxpby(m,alpha,x,beta,y%v,info)
+    call y%set_host()
     
   end subroutine c_base_axpby_a
 
@@ -838,15 +853,8 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    select type(xx => x)
-    type is (psb_c_base_vect_type)
-      n = min(size(y%v), size(xx%v))
-      do i=1, n 
-        y%v(i) = y%v(i)*xx%v(i)
-      end do
-    class default
-      call y%mlt(x%v,info)
-    end select
+    if (x%is_dev()) call x%sync()
+    call y%mlt(x%v,info)
 
   end subroutine c_base_mlt_v
 
@@ -866,11 +874,13 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
+    if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
     do i=1, n 
       y%v(i) = y%v(i)*x(i)
     end do
-    
+    call y%set_host()
+
   end subroutine c_base_mlt_a
 
 
@@ -896,6 +906,8 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0    
+    if (z%is_dev()) call z%sync()
+
     n = min(size(z%v), size(x), size(y))
 !!$    write(0,*) 'Mlt_a_2: ',n
     if (alpha == czero) then 
@@ -951,6 +963,8 @@ contains
         end if
       end if
     end if
+    call z%set_host()
+
   end subroutine c_base_mlt_a_2
 
   !
@@ -978,6 +992,8 @@ contains
     logical :: conjgx_, conjgy_
 
     info = 0
+    if (y%is_dev()) call y%sync()
+    if (x%is_dev()) call x%sync()
     if (.not.psb_c_is_complex_) then
       call z%mlt(alpha,x%v,y%v,beta,info)
     else 
@@ -1004,7 +1020,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    
+    if (y%is_dev()) call y%sync()
     call z%mlt(alpha,x,y%v,beta,info)
 
   end subroutine c_base_mlt_av
@@ -1020,7 +1036,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    
+    if (x%is_dev()) call x%sync()
     call z%mlt(alpha,y,x,beta,info)
 
   end subroutine c_base_mlt_va
@@ -1040,7 +1056,10 @@ contains
     class(psb_c_base_vect_type), intent(inout)  :: x
     complex(psb_spk_), intent (in)       :: alpha
     
-    if (allocated(x%v)) x%v = alpha*x%v
+    if (allocated(x%v)) then 
+      x%v = alpha*x%v
+      call x%set_host()
+    end if
 
   end subroutine c_base_scal
   
@@ -1058,6 +1077,7 @@ contains
     real(psb_spk_)                :: res
     real(psb_spk_), external      :: scnrm2
     
+    if (x%is_dev()) call x%sync()
     res =  scnrm2(n,x%v,1)
 
   end function c_base_nrm2
@@ -1073,6 +1093,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                :: res
     
+    if (x%is_dev()) call x%sync()
     res =  maxval(abs(x%v(1:n)))
 
   end function c_base_amax
@@ -1088,6 +1109,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_)                :: res
     
+    if (x%is_dev()) call x%sync()
     res =  sum(abs(x%v(1:n)))
 
   end function c_base_asum
@@ -1111,7 +1133,7 @@ contains
     complex(psb_spk_) :: alpha, beta, y(:)
     class(psb_c_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,alpha,x%v,beta,y)
 
   end subroutine c_base_gthab
@@ -1131,9 +1153,107 @@ contains
     complex(psb_spk_) ::  y(:)
     class(psb_c_base_vect_type) :: x
     
+    if (idx%is_dev()) call idx%sync()
     call x%gth(n,idx%v(i:),y)
 
   end subroutine c_base_gthzv_x
+
+  !
+  ! New comm internals impl. 
+  !
+  subroutine c_base_gthzbuf(i,n,idx,x)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_c_base_vect_type) :: x
+    
+    if (.not.allocated(x%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+      return
+    end if
+    if (idx%is_dev()) call idx%sync()
+    if (x%is_dev()) call x%sync()
+    call x%gth(n,idx%v(i:),x%combuf(i:))
+
+  end subroutine c_base_gthzbuf
+
+  subroutine c_base_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    complex(psb_spk_) :: beta
+    class(psb_c_base_vect_type) :: y
+    
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    call y%set_host()
+
+  end subroutine c_base_sctb_buf
+
+  !
+  !> Function  base_device_wait:
+  !! \memberof  psb_c_base_vect_type
+  !! \brief device_wait: base version is a no-op.
+  !!           
+  !
+  subroutine c_base_device_wait()
+    implicit none 
+    
+  end subroutine c_base_device_wait
+
+  function c_base_use_buffer() result(res)
+    logical :: res
+    
+    res = .true.
+  end function c_base_use_buffer
+
+  subroutine c_base_new_buffer(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,x%combuf,info)
+  end subroutine c_base_new_buffer
+
+  subroutine c_base_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2,x%comid,info)
+  end subroutine c_base_new_comid
+
+
+  subroutine c_base_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine c_base_free_buffer
+
+  subroutine c_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine c_base_free_comid
+
 
   !
   ! shortcut alpha=1 beta=0
@@ -1150,7 +1270,7 @@ contains
     complex(psb_spk_) ::  y(:)
     class(psb_c_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,x%v,y)
 
   end subroutine c_base_gthzv
@@ -1174,7 +1294,7 @@ contains
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_base_vect_type) :: y
     
-    call y%sync()
+    if (y%is_dev()) call y%sync()
     call psi_sct(n,idx,x,beta,y%v)
     call y%set_host()
 
@@ -1187,7 +1307,9 @@ contains
     complex(psb_spk_) :: beta, x(:)
     class(psb_c_base_vect_type) :: y
     
+    if (idx%is_dev()) call idx%sync()
     call y%sct(n,idx%v(i:),x,beta)
+    call y%set_host()
 
   end subroutine c_base_sctb_x
 
