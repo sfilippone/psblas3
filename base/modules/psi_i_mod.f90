@@ -258,7 +258,7 @@ module psi_i_mod
       class(psb_i_base_vect_type)             :: y
       integer(psb_ipk_)                       :: beta
       integer(psb_ipk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(in) :: idx
+      class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_iswap_vidx_vect
   end interface

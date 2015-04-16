@@ -61,6 +61,8 @@ module psb_i_base_vect_mod
   type psb_i_base_vect_type
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:)
+    integer(psb_ipk_), allocatable :: combuf(:) 
+    integer(psb_ipk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -95,6 +97,17 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: set_host => i_base_set_host
     procedure, pass(x) :: set_dev  => i_base_set_dev
     procedure, pass(x) :: set_sync => i_base_set_sync
+
+    !
+    ! These are for handling gather/scatter in new
+    ! comm internals implementation.
+    !
+    procedure, nopass  :: use_buffer   => i_base_use_buffer
+    procedure, pass(x) :: new_buffer   => i_base_new_buffer
+    procedure, nopass  :: device_wait  => i_base_device_wait
+    procedure, pass(x) :: free_buffer  => i_base_free_buffer
+    procedure, pass(x) :: new_comid    => i_base_new_comid
+    procedure, pass(x) :: free_comid   => i_base_free_comid
 
     !
     ! Basic info
@@ -134,6 +147,9 @@ module psb_i_base_vect_mod
     ! Scaling and norms
     !
     procedure, pass(x) :: scal     => i_base_scal
+    procedure, pass(x) :: absval1  => i_base_absval1
+    procedure, pass(x) :: absval2  => i_base_absval2
+    generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2     => i_base_nrm2
     procedure, pass(x) :: amax     => i_base_amax
     procedure, pass(x) :: asum     => i_base_asum
@@ -144,10 +160,12 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: gthab    => i_base_gthab
     procedure, pass(x) :: gthzv    => i_base_gthzv
     procedure, pass(x) :: gthzv_x  => i_base_gthzv_x
-    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(x) :: gthzbuf  => i_base_gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
     procedure, pass(y) :: sctb     => i_base_sctb
     procedure, pass(y) :: sctb_x   => i_base_sctb_x
-    generic, public    :: sct      => sctb, sctb_x
+    procedure, pass(y) :: sctb_buf => i_base_sctb_buf
+    generic, public    :: sct      => sctb, sctb_x, sctb_buf
   end type psb_i_base_vect_type
 
   public  :: psb_i_base_vect
@@ -344,8 +362,8 @@ contains
 
       case default
         info = 321
-! !$      call psb_errpush(info,name)
-! !$      goto 9999
+        ! !$      call psb_errpush(info,name)
+        ! !$      goto 9999
       end select
     end if
     call x%set_host()
@@ -355,7 +373,6 @@ contains
     end if
 
   end subroutine i_base_ins_a
-
 
   subroutine i_base_ins_v(n,irl,val,dupl,x,info)
     use psi_serial_mod
@@ -396,7 +413,7 @@ contains
     class(psb_i_base_vect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=izero
-
+    call x%set_host()
   end subroutine i_base_zero
 
   
@@ -422,11 +439,12 @@ contains
     class(psb_i_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-
+    call x%sync()
   end subroutine i_base_asb
 
 
@@ -447,6 +465,8 @@ contains
     
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
+    if (info == 0) call x%free_buffer(info)
+    if (info == 0) call x%free_comid(info)
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
         
@@ -611,7 +631,7 @@ contains
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
-    call x%sync()
+    if (.not.x%is_host()) call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
@@ -634,9 +654,43 @@ contains
     integer(psb_ipk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
+
     x%v = val
-    
+    call x%set_host()
+
   end subroutine i_base_set_scal
+
+  !
+  ! Overwrite with absolute value
+  !
+  !
+  !> Function  base_set_scal
+  !! \memberof  psb_i_base_vect_type
+  !! \brief  Set all entries to their respective absolute values.
+  !!
+  subroutine i_base_absval1(x)
+    class(psb_i_base_vect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) then
+      if (.not.x%is_host()) call x%sync()
+      x%v =  abs(x%v)
+      call x%set_host()
+    end if
+
+  end subroutine i_base_absval1
+
+  subroutine i_base_absval2(x,y)
+    class(psb_i_base_vect_type), intent(inout) :: x
+    class(psb_i_base_vect_type), intent(inout) :: y
+
+    if (.not.x%is_host()) call x%sync()
+    if (allocated(x%v)) then 
+      call y%bld(x%v)
+      call y%absval()
+      call y%set_host()
+    end if
+    
+  end subroutine i_base_absval2
 
   !
   !> Function  base_set_vect
@@ -656,6 +710,7 @@ contains
     else
       x%v = val
     end if
+    call x%set_host()
 
   end subroutine i_base_set_vect
 
@@ -738,12 +793,9 @@ contains
     integer(psb_ipk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     
-    select type(xx => x)
-    type is (psb_i_base_vect_type)
-      call psb_geaxpby(m,alpha,x%v,beta,y%v,info)
-    class default
-      call y%axpby(m,alpha,x%v,beta,info)
-    end select
+    if (x%is_dev()) call x%sync()
+
+    call y%axpby(m,alpha,x%v,beta,info)
 
   end subroutine i_base_axpby_v
 
@@ -769,7 +821,9 @@ contains
     integer(psb_ipk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
     
+    if (y%is_dev()) call y%sync()
     call psb_geaxpby(m,alpha,x,beta,y%v,info)
+    call y%set_host()
     
   end subroutine i_base_axpby_a
 
@@ -798,15 +852,8 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    select type(xx => x)
-    type is (psb_i_base_vect_type)
-      n = min(size(y%v), size(xx%v))
-      do i=1, n 
-        y%v(i) = y%v(i)*xx%v(i)
-      end do
-    class default
-      call y%mlt(x%v,info)
-    end select
+    if (x%is_dev()) call x%sync()
+    call y%mlt(x%v,info)
 
   end subroutine i_base_mlt_v
 
@@ -826,11 +873,13 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
+    if (y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
     do i=1, n 
       y%v(i) = y%v(i)*x(i)
     end do
-    
+    call y%set_host()
+
   end subroutine i_base_mlt_a
 
 
@@ -856,6 +905,8 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0    
+    if (z%is_dev()) call z%sync()
+
     n = min(size(z%v), size(x), size(y))
 !!$    write(0,*) 'Mlt_a_2: ',n
     if (alpha == izero) then 
@@ -911,6 +962,8 @@ contains
         end if
       end if
     end if
+    call z%set_host()
+
   end subroutine i_base_mlt_a_2
 
   !
@@ -938,6 +991,8 @@ contains
     logical :: conjgx_, conjgy_
 
     info = 0
+    if (y%is_dev()) call y%sync()
+    if (x%is_dev()) call x%sync()
     if (.not.psb_i_is_complex_) then
       call z%mlt(alpha,x%v,y%v,beta,info)
     else 
@@ -964,7 +1019,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    
+    if (y%is_dev()) call y%sync()
     call z%mlt(alpha,x,y%v,beta,info)
 
   end subroutine i_base_mlt_av
@@ -980,7 +1035,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    
+    if (x%is_dev()) call x%sync()
     call z%mlt(alpha,y,x,beta,info)
 
   end subroutine i_base_mlt_va
@@ -1000,7 +1055,10 @@ contains
     class(psb_i_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent (in)       :: alpha
     
-    if (allocated(x%v)) x%v = alpha*x%v
+    if (allocated(x%v)) then 
+      x%v = alpha*x%v
+      call x%set_host()
+    end if
 
   end subroutine i_base_scal
   
@@ -1018,6 +1076,7 @@ contains
     integer(psb_ipk_)                :: res
     integer(psb_ipk_), external      :: inrm2
     
+    if (x%is_dev()) call x%sync()
     res =  inrm2(n,x%v,1)
 
   end function i_base_nrm2
@@ -1033,6 +1092,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     integer(psb_ipk_)                :: res
     
+    if (x%is_dev()) call x%sync()
     res =  maxval(abs(x%v(1:n)))
 
   end function i_base_amax
@@ -1048,6 +1108,7 @@ contains
     integer(psb_ipk_), intent(in)           :: n
     integer(psb_ipk_)                :: res
     
+    if (x%is_dev()) call x%sync()
     res =  sum(abs(x%v(1:n)))
 
   end function i_base_asum
@@ -1071,7 +1132,7 @@ contains
     integer(psb_ipk_) :: alpha, beta, y(:)
     class(psb_i_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,alpha,x%v,beta,y)
 
   end subroutine i_base_gthab
@@ -1091,9 +1152,107 @@ contains
     integer(psb_ipk_) ::  y(:)
     class(psb_i_base_vect_type) :: x
     
+    if (idx%is_dev()) call idx%sync()
     call x%gth(n,idx%v(i:),y)
 
   end subroutine i_base_gthzv_x
+
+  !
+  ! New comm internals impl. 
+  !
+  subroutine i_base_gthzbuf(i,n,idx,x)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_i_base_vect_type) :: x
+    
+    if (.not.allocated(x%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+      return
+    end if
+    if (idx%is_dev()) call idx%sync()
+    if (x%is_dev()) call x%sync()
+    call x%gth(n,idx%v(i:),x%combuf(i:))
+
+  end subroutine i_base_gthzbuf
+
+  subroutine i_base_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) :: beta
+    class(psb_i_base_vect_type) :: y
+    
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    call y%set_host()
+
+  end subroutine i_base_sctb_buf
+
+  !
+  !> Function  base_device_wait:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief device_wait: base version is a no-op.
+  !!           
+  !
+  subroutine i_base_device_wait()
+    implicit none 
+    
+  end subroutine i_base_device_wait
+
+  function i_base_use_buffer() result(res)
+    logical :: res
+    
+    res = .true.
+  end function i_base_use_buffer
+
+  subroutine i_base_new_buffer(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,x%combuf,info)
+  end subroutine i_base_new_buffer
+
+  subroutine i_base_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2,x%comid,info)
+  end subroutine i_base_new_comid
+
+
+  subroutine i_base_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine i_base_free_buffer
+
+  subroutine i_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i_base_free_comid
+
 
   !
   ! shortcut alpha=1 beta=0
@@ -1110,7 +1269,7 @@ contains
     integer(psb_ipk_) ::  y(:)
     class(psb_i_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,x%v,y)
 
   end subroutine i_base_gthzv
@@ -1134,7 +1293,7 @@ contains
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_base_vect_type) :: y
     
-    call y%sync()
+    if (y%is_dev()) call y%sync()
     call psi_sct(n,idx,x,beta,y%v)
     call y%set_host()
 
@@ -1147,11 +1306,16 @@ contains
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_base_vect_type) :: y
     
+    if (idx%is_dev()) call idx%sync()
     call y%sct(n,idx%v(i:),x,beta)
+    call y%set_host()
 
   end subroutine i_base_sctb_x
 
 end module psb_i_base_vect_mod
+
+
+
 
 
 module psb_i_base_multivect_mod
@@ -1701,8 +1865,7 @@ contains
   function  i_base_mv_get_vect(x) result(res)
     class(psb_i_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), allocatable                 :: res(:,:)
-    integer(psb_ipk_) :: info, m, n
-
+    integer(psb_ipk_) :: info,m,n
     m = x%get_nrows()
     n = x%get_ncols()
     if (.not.allocated(x%v)) return 
@@ -1713,7 +1876,6 @@ contains
       return
     end if
     res(1:m,1:n) = x%v(1:m,1:n)
-
   end function i_base_mv_get_vect
     
   !
@@ -1772,7 +1934,7 @@ contains
 !!$    class(psb_i_base_multivect_type), intent(inout) :: x, y
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: idot
+!!$    integer(psb_ipk_), external      :: ddot
 !!$    
 !!$    res = izero
 !!$    !
@@ -1784,7 +1946,7 @@ contains
 !!$    !
 !!$    select type(yy => y)
 !!$    type is (psb_i_base_multivect_type)
-!!$      res = idot(n,x%v,1,y%v,1)
+!!$      res = ddot(n,x%v,1,y%v,1)
 !!$    class default
 !!$      res = y%dot(n,x%v)
 !!$    end select
@@ -1807,9 +1969,9 @@ contains
 !!$    integer(psb_ipk_), intent(in)    :: y(:)
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: idot
+!!$    integer(psb_ipk_), external      :: ddot
 !!$    
-!!$    res = idot(n,y,1,x%v,1)
+!!$    res = ddot(n,y,1,x%v,1)
 !!$
 !!$  end function i_base_mv_dot_a
     
@@ -2113,9 +2275,9 @@ contains
 !!$    class(psb_i_base_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
 !!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: inrm2
+!!$    integer(psb_ipk_), external      :: dnrm2
 !!$    
-!!$    res =  inrm2(n,x%v,1)
+!!$    res =  dnrm2(n,x%v,1)
 !!$
 !!$  end function i_base_mv_nrm2
 !!$  
@@ -2241,7 +2403,7 @@ contains
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: i, n
 !!$    class(psb_i_base_multivect_type) :: idx
-!!$    integer(psb_ipk_) :: beta, x(:)
+!!$    integer( psb_ipk_) :: beta, x(:)
 !!$    class(psb_i_base_multivect_type) :: y
 !!$    
 !!$    call y%sct(n,idx%v(i:),x,beta)
@@ -2249,3 +2411,4 @@ contains
 !!$  end subroutine i_base_mv_sctb_x
 
 end module psb_i_base_multivect_mod
+
