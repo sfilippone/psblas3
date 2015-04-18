@@ -815,6 +815,10 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
 !!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
 !!$    yp(nrow+1:ncol) = dzero
+    ! FIXME
+    info = psb_err_transpose_not_n_unsupported_
+    call psb_errpush(info,name)
+    goto 9999
 
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
