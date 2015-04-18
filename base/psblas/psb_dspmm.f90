@@ -813,8 +813,11 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psi_ovrl_save(x%v,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,psb_avg_,info)
 
-!!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
-!!$    yp(nrow+1:ncol) = dzero
+    if (beta /= dzero) then
+      call y%sync()
+      y%v%v(nrow+1:ncol) = dzero
+      call y%v%set_host()
+    end if
 
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
