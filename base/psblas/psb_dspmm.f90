@@ -813,13 +813,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psi_ovrl_save(x%v,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,psb_avg_,info)
 
-!!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
-!!$    yp(nrow+1:ncol) = dzero
-    ! FIXME
-    info = psb_err_transpose_not_n_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
-
+    if (beta /= dzero) call y%set(dzero,nrow+1,ncol)
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 

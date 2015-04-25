@@ -47,7 +47,7 @@ module psb_z_base_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_i_base_vect_mod
-
+  use psb_realloc_mod
 
   !> \namespace  psb_base_mod  \class psb_z_base_vect_type
   !! The psb_z_base_vect_type 
@@ -650,13 +650,20 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine z_base_set_scal(x,val)
+  subroutine z_base_set_scal(x,val,first,last)
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional :: first, last
         
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: info, first_, last_
 
-    x%v = val
+    first_=1
+    last_=size(x%v)
+    if (present(first)) first_ = max(1,first)
+    if (present(last))  last_  = min(last,last_)
+    
+    if (x%is_dev()) call x%sync()
+    x%v(first_:last_) = val
     call x%set_host()
 
   end subroutine z_base_set_scal
@@ -699,15 +706,20 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in 
   !!
-  subroutine z_base_set_vect(x,val)
+  subroutine z_base_set_vect(x,val,first,last)
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val(:)
-    integer(psb_ipk_) :: nr
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: first, last
+        
+    integer(psb_ipk_) :: info, first_, last_, nr
+
+    first_=1
+    last_=min(psb_size(x%v),size(val))
+    if (present(first)) first_ = max(1,first)
+    if (present(last))  last_  = min(last,last_)
 
     if (allocated(x%v)) then 
-      nr = min(size(x%v),size(val))
-      x%v(1:nr) = val(1:nr)
+      x%v(first_:last_) = val(1:last_-first_+1)
     else
       x%v = val
     end if

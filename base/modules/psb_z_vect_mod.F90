@@ -231,21 +231,23 @@ contains
     end if
   end function z_vect_get_vect
 
-  subroutine z_vect_set_scal(x,val)
+  subroutine z_vect_set_scal(x,val,first,last)
     class(psb_z_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional :: first, last
         
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    if (allocated(x%v)) call x%v%set(val,first,last)
     
   end subroutine z_vect_set_scal
 
-  subroutine z_vect_set_vect(x,val)
+  subroutine z_vect_set_vect(x,val,first,last)
     class(psb_z_vect_type), intent(inout) :: x
     complex(psb_dpk_), intent(in)         :: val(:)
+    integer(psb_ipk_), optional :: first, last
         
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    if (allocated(x%v)) call x%v%set(val,first,last)
     
   end subroutine z_vect_set_vect
 
