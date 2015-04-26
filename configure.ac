@@ -40,7 +40,7 @@ AC_INIT([PSBLAS],3.4, salvatore.filippone@uniroma2.it)
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="3.0"
+psblas_cv_version="3.4"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -180,7 +180,7 @@ fi
 dnl NOTE : no spaces before the comma, and no brackets before the second argument!
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
-PAC_ARG_WITH_FLAGS(f90copt,F90COPT)
+#PAC_ARG_WITH_FLAGS(f90copt,F90COPT)
 #PAC_ARG_WITH_FLAGS(ldflags,LDFLAGS)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
@@ -341,7 +341,7 @@ AC_MSG_RESULT([ $pac_f_c_names ])
 ###############################################################################
 # 			Make.inc generation logic
 ###############################################################################
-
+F90COPT="$FCOPT"
 
 if test "X$CCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
