@@ -42,7 +42,7 @@
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
 !   ik          -  integer(optional).        The number of columns to gather. 
-!   work        -  real(optional).           A work area.
+!   work        -  complex(optional).           A work area.
 !   update      -  integer(optional).        Type of update:
 !                                            psb_none_   do nothing
 !                                            psb_sum_    sum of overlaps

@@ -36,7 +36,7 @@
 !    distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x         -  real,dimension(:,:).          The local part of the dense matrix.
+!   x         -  complex,dimension(:,:).          The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
 !   alpha     -  complex(optional).            Scale factor.

@@ -36,14 +36,15 @@
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  integer(psb_ipk_),dimension(:,:).          The global matrix to scatter.
-!   locx      -  integer(psb_ipk_),dimension(:,:).          The local piece of the ditributed matrix.
+!   globx     -  integer,dimension(:,:).       The global matrix to scatter.
+!   locx      -  integer,dimension(:,:).       The local piece of the distributed matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
-!   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
-!                                              the processes have a copy.
-!
+!   iroot     -  integer(optional).            The process that owns the global matrix. 
+!                                              If -1 all the processes have a copy. 
+!                                              Default -1
 subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
+
   use psb_base_mod, psb_protect_name => psb_iscatterm
 #ifdef MPI_MOD
   use mpi
@@ -59,13 +60,14 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
   integer(psb_ipk_), intent(out)             :: info
   integer(psb_ipk_), intent(in), optional    :: iroot
 
+
   ! locals
   integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, ilx,&
        & jlx, c, pos
-  integer(psb_ipk_), allocatable :: scatterv(:)
-  integer(psb_ipk_), allocatable :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_),allocatable  :: scatterv(:)
+  integer(psb_ipk_), allocatable           :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -87,14 +89,14 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      ierr(1)=5; ierr(2)= root
+      ierr(1)=5; ierr(2)=root
       call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
   else
     root = -1
   end if
-  if (root  == -1) then
+  if (root == -1) then
     iiroot = psb_root_
   endif
 
@@ -178,13 +180,20 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
       ! root has to gather loc_glob from each process
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
-      if(info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        ch_err='Allocate'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
+    else
+      !
+      ! This is to keep debugging compilers from being upset by 
+      ! calling an external MPI function with an unallocated array;
+      ! the Fortran side would complain even if the MPI side does
+      ! not use the unallocated stuff. 
+      ! 
+      allocate(l_t_g_all(1),scatterv(1),stat=info)
+    end if
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call mpi_gatherv(ltg,nrow,&
@@ -211,7 +220,14 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
     end do
 
-    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    deallocate(all_dim, l_t_g_all, displ, ltg, scatterv,stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='deallocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
   end if
 
   call psb_erractionrestore(err_act)
@@ -263,10 +279,10 @@ end subroutine psb_iscatterm
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  integer(psb_ipk_),dimension(:).            The global vector to scatter.
-!   locx      -  integer(psb_ipk_),dimension(:).            The local piece of the ditributed vector.
+!   globx     -  integer,dimension(:).         The global vector to scatter.
+!   locx      -  integer,dimension(:).         The local piece of the ditributed vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
-!   info      -  integer.                      Error code.
+!   info      -  integer.                      Return code
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.
 !
@@ -292,8 +308,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_ipk_), allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable  :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
-  character(len=20)     :: name, ch_err
+  integer(psb_ipk_), allocatable            :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  character(len=20)        :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_scatterv'
@@ -314,17 +330,17 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   endif
 
   if (present(iroot)) then
-    root = iroot
-    if((root < -1).or.(root > np)) then
-      info=psb_err_input_value_invalid_i_
-      ierr(1) = 5; ierr(2) = root
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
-    end if
+     root = iroot
+     if((root < -1).or.(root > np)) then
+        info=psb_err_input_value_invalid_i_
+        ierr(1) = 5; ierr(2)=root
+        call psb_errpush(info,name,i_err=ierr)
+        goto 9999
+     end if
   else
-    root = -1
+     root = -1
   end if
-
+  
   call psb_get_mpicomm(ictxt,icomm)
   call psb_get_rank(myrank,ictxt,me)
 
@@ -345,16 +361,16 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   if (info == psb_success_) &
        & call psb_chkvect(m,n,lda_locx,ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chk(glob)vect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=psb_err_from_subroutine_
+     ch_err='psb_chk(glob)vect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
-    goto 9999
+     info=psb_err_ix_n1_iy_n1_unsupported_
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   nrow = desc_a%get_local_rows()
@@ -369,7 +385,14 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
     call psb_get_rank(rootrank,ictxt,root)
 
     ! root has to gather size information
-    allocate(displ(np),all_dim(np),ltg(nrow))
+    allocate(displ(np),all_dim(np),ltg(nrow),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
     do i=1, nrow
       ltg(i) = i
     end do
@@ -388,9 +411,24 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
         write(debug_unit,*) me,' ',trim(name),' displ:',displ(1:np), &
              &' dim',all_dim(1:np), sum(all_dim)
       endif
-
+      
       ! root has to gather loc_glob from each process
-      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
+      allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
+      
+    else
+      !
+      ! This is to keep debugging compilers from being upset by 
+      ! calling an external MPI function with an unallocated array;
+      ! the Fortran side would complain even if the MPI side does
+      ! not use the unallocated stuff. 
+      ! 
+      allocate(l_t_g_all(1),scatterv(1),stat=info)
+    end if
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='Allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call mpi_gatherv(ltg,nrow,&
@@ -413,7 +451,13 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
          & psb_mpi_ipk_integer,locx,nrow,&
          & psb_mpi_ipk_integer,rootrank,icomm,info)
 
-    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    deallocate(all_dim, l_t_g_all, displ, ltg, scatterv,stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='deallocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   call psb_erractionrestore(err_act)
