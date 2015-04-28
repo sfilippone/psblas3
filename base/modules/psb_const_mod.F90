@@ -115,6 +115,20 @@ module psb_const_mod
   logical, parameter             :: psb_c_is_complex_ = .true.
   logical, parameter             :: psb_z_is_complex_ = .true.
 
+  !
+  ! Sort routines constants
+  !
+  ! 
+  !  The up/down constant are defined in pairs having 
+  !  opposite values. We make use of this fact in the heapsort routine.
+  !
+  integer(psb_ipk_), parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
+  integer(psb_ipk_), parameter :: psb_lsort_up_     = 2, psb_lsort_down_    = -2
+  integer(psb_ipk_), parameter :: psb_asort_up_     = 3, psb_asort_down_    = -3
+  integer(psb_ipk_), parameter :: psb_alsort_up_    = 4, psb_alsort_down_   = -4
+  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_ = 0, psb_sort_keep_idx_ =  1
+  integer(psb_ipk_), parameter :: psb_heap_resize   = 200
+
 
   !
   ! Sparse matrix constants
