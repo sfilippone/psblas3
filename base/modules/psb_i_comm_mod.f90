@@ -30,27 +30,32 @@
 !!$ 
 !!$  
 module psb_i_comm_mod
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_
+
+  use psb_i_vect_mod, only : psb_i_vect_type, psb_i_base_vect_type
 
   interface psb_ovrl
-    subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
-      use psb_desc_mod
+    subroutine psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
+      import
+      implicit none
       integer(psb_ipk_), intent(inout), target   :: x(:,:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer(psb_ipk_), intent(out)                       :: info
       integer(psb_ipk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_iovrlm
-    subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
-      use psb_desc_mod
+    subroutine psb_iovrlv(x,desc_a,info,work,update,mode)
+      import
+      implicit none
       integer(psb_ipk_), intent(inout), target   :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer(psb_ipk_), intent(out)                       :: info
       integer(psb_ipk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional              :: update,mode
     end subroutine psb_iovrlv
-    subroutine  psb_iovrl_vect(x,desc_a,info,work,update,mode)
-      use psb_desc_mod
-      use psb_i_vect_mod
+    subroutine psb_iovrl_vect(x,desc_a,info,work,update,mode)
+      import
+      implicit none
       type(psb_i_vect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
@@ -60,33 +65,32 @@ module psb_i_comm_mod
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
-      use psb_desc_mod
+    subroutine psb_ihalom(x,desc_a,info,jx,ik,work,tran,mode,data)
+      import
+      implicit none
       integer(psb_ipk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)          :: desc_a
       integer(psb_ipk_), intent(out)                     :: info
-      integer(psb_ipk_), intent(in), optional  :: alpha
       integer(psb_ipk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_ihalom
-    subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
-      use psb_desc_mod
+    subroutine psb_ihalov(x,desc_a,info,work,tran,mode,data)
+      import
+      implicit none
       integer(psb_ipk_), intent(inout)        :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), intent(in), optional :: alpha
       integer(psb_ipk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_ihalov
-    subroutine  psb_ihalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
-      use psb_desc_mod
-      use psb_i_vect_mod
+    subroutine psb_ihalo_vect(x,desc_a,info,work,tran,mode,data)
+      import
+      implicit none
       type(psb_i_vect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), intent(in), optional    :: alpha
       integer(psb_ipk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
@@ -95,16 +99,18 @@ module psb_i_comm_mod
 
 
   interface psb_scatter
-    subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
-      use psb_desc_mod
+    subroutine psb_iscatterm(globx, locx, desc_a, info, root)
+      import
+      implicit none
       integer(psb_ipk_), intent(out) :: locx(:,:)
       integer(psb_ipk_), intent(in)  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_iscatterm
-    subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
-      use psb_desc_mod
+    subroutine psb_iscatterv(globx, locx, desc_a, info, root)
+      import
+      implicit none
       integer(psb_ipk_), intent(out) :: locx(:)
       integer(psb_ipk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
@@ -114,36 +120,27 @@ module psb_i_comm_mod
   end interface psb_scatter
 
   interface psb_gather
-!!$    subroutine  psb_isp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
-!!$      use psb_desc_mod
-!!$      use psb_mat_mod
-!!$      implicit none
-!!$      type(psb_ispmat_type), intent(inout) :: loca
-!!$      type(psb_ispmat_type), intent(out)   :: globa
-!!$      type(psb_desc_type), intent(in) :: desc_a
-!!$      integer(psb_ipk_), intent(out)            :: info
-!!$      integer(psb_ipk_), intent(in), optional   :: root,dupl
-!!$      logical, intent(in), optional   :: keepnum,keeploc
-!!$    end subroutine psb_isp_allgather
     subroutine psb_igatherm(globx, locx, desc_a, info, root)
-      use psb_desc_mod
+      import
+      implicit none
       integer(psb_ipk_), intent(in)  :: locx(:,:)
       integer(psb_ipk_), intent(out), allocatable  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_igatherm
-    subroutine  psb_igatherv(globx, locx, desc_a, info, root)
-      use psb_desc_mod
+    subroutine psb_igatherv(globx, locx, desc_a, info, root)
+      import
+      implicit none
       integer(psb_ipk_), intent(in)  :: locx(:)
       integer(psb_ipk_), intent(out), allocatable  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_igatherv
-    subroutine  psb_igather_vect(globx, locx, desc_a, info, root)
-      use psb_desc_mod
-      use psb_i_vect_mod
+    subroutine psb_igather_vect(globx, locx, desc_a, info, root)
+      import
+      implicit none
       type(psb_i_vect_type), intent(inout) :: locx
       integer(psb_ipk_), intent(out), allocatable :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a

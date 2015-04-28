@@ -31,7 +31,7 @@
 !!$  
 module psi_i_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpik_
-  use psb_i_vect_mod,  only : psb_i_base_vect_type
+  use psb_i_vect_mod, only : psb_i_base_vect_type 
 
   interface
     subroutine psi_compute_size(desc_data,&
@@ -196,63 +196,53 @@ module psi_i_mod
 
   interface psi_swapdata
     subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag, n
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_) :: y(:,:), beta
-      integer(psb_ipk_), target             :: work(:)
+      integer(psb_ipk_)           :: y(:,:), beta
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswapdatam
     subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_) :: y(:), beta
-      integer(psb_ipk_), target             :: work(:)
+      integer(psb_ipk_)           :: y(:), beta 
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswapdatav
     subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_,  psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_i_base_vect_type) :: y
-      integer(psb_ipk_)              :: beta 
-      integer(psb_ipk_),target       :: work(:)
+      integer(psb_ipk_)           :: beta 
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswapdata_vect
     subroutine psi_iswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(in)  :: ictxt,icomm,flag, n
-      integer(psb_ipk_), intent(out) :: info
-      integer(psb_ipk_) :: y(:,:), beta
-      integer(psb_ipk_),target       :: work(:)
-      integer(psb_ipk_), intent(in)  :: idx(:),totxch,totsnd,totrcv
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag, n
+      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_)        :: y(:,:), beta
+      integer(psb_ipk_),target :: work(:)
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxm
     subroutine psi_iswapidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(in)  :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out) :: info
-      integer(psb_ipk_) :: y(:), beta
-      integer(psb_ipk_),target       :: work(:)
-      integer(psb_ipk_), intent(in)  :: idx(:),totxch,totsnd,totrcv
-    end subroutine psi_iswapidxv
-    subroutine psi_iswapidx_vect(ictxt,icomm,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_,  psb_i_base_vect_type
-      integer(psb_ipk_), intent(in)   :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out)  :: info
-      class(psb_i_base_vect_type) :: y
-      integer(psb_ipk_)        :: beta
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_)        :: y(:), beta
       integer(psb_ipk_),target :: work(:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
-    end subroutine psi_iswapidx_vect
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_iswapidxv
     subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_i_base_vect_type)             :: y
@@ -266,80 +256,80 @@ module psi_i_mod
 
   interface psi_swaptran
     subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag, n
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_) :: y(:,:), beta
-      integer(psb_ipk_),target              :: work(:)
+      integer(psb_ipk_)           :: y(:,:), beta
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswaptranm
     subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_) :: y(:), beta
-      integer(psb_ipk_),target              :: work(:)
+      integer(psb_ipk_)           :: y(:), beta
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswaptranv
     subroutine psi_iswaptran_vect(flag,beta,y,desc_a,work,info,data)
-      import :: psb_desc_type, psb_ipk_,  psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_i_base_vect_type) :: y
-      integer(psb_ipk_)              :: beta
-      integer(psb_ipk_),target       :: work(:)
+      integer(psb_ipk_)           :: beta
+      integer(psb_ipk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswaptran_vect
     subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(in)  :: ictxt,icomm,flag, n
-      integer(psb_ipk_), intent(out) :: info
-      integer(psb_ipk_) :: y(:,:), beta
-      integer(psb_ipk_), target      :: work(:)
-      integer(psb_ipk_), intent(in)  :: idx(:),totxch,totsnd,totrcv
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag, n
+      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_)        :: y(:,:), beta
+      integer(psb_ipk_),target :: work(:)
+      integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxm
     subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(in)  :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out) :: info
-      integer(psb_ipk_) :: y(:), beta
-      integer(psb_ipk_), target      :: work(:)
-      integer(psb_ipk_), intent(in)  :: idx(:),totxch,totsnd,totrcv
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
+      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_)        :: y(:), beta
+      integer(psb_ipk_),target :: work(:)
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxv
     subroutine psi_itranidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import :: psb_desc_type, psb_ipk_,  psb_i_base_vect_type
-      integer(psb_ipk_), intent(in)   :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out)  :: info
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)         :: ictxt,icomm,flag
+      integer(psb_ipk_), intent(out)        :: info
       class(psb_i_base_vect_type) :: y
-      integer(psb_ipk_)        :: beta
-      integer(psb_ipk_),target :: work(:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
+      integer(psb_ipk_)           :: beta
+      integer(psb_ipk_),target    :: work(:)
+      integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidx_vect
   end interface
 
   interface psi_ovrl_upd
     subroutine  psi_iovrl_updr1(x,desc_a,update,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout), target     :: x(:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(in)                :: update
-      integer(psb_ipk_), intent(out)               :: info
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout), target :: x(:)
+      type(psb_desc_type), intent(in)          :: desc_a
+      integer(psb_ipk_), intent(in)                      :: update
+      integer(psb_ipk_), intent(out)                     :: info
     end subroutine psi_iovrl_updr1
     subroutine  psi_iovrl_updr2(x,desc_a,update,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout), target     :: x(:,:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(in)                :: update
-      integer(psb_ipk_), intent(out)               :: info
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout), target :: x(:,:)
+      type(psb_desc_type), intent(in)          :: desc_a
+      integer(psb_ipk_), intent(in)                      :: update
+      integer(psb_ipk_), intent(out)                     :: info
     end subroutine psi_iovrl_updr2
     subroutine  psi_iovrl_upd_vect(x,desc_a,update,info)
-      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       class(psb_i_base_vect_type)       :: x
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(in)               :: update
@@ -349,23 +339,23 @@ module psi_i_mod
 
   interface psi_ovrl_save
     subroutine  psi_iovrl_saver1(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout)  :: x(:)
-      integer(psb_ipk_), allocatable    :: xs(:)
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout) :: x(:)
+      integer(psb_ipk_), allocatable   :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_saver1
     subroutine  psi_iovrl_saver2(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout)  :: x(:,:)
-      integer(psb_ipk_), allocatable    :: xs(:,:)
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout) :: x(:,:)
+      integer(psb_ipk_), allocatable   :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_saver2
     subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       class(psb_i_base_vect_type)     :: x
-      integer(psb_ipk_), allocatable     :: xs(:)
+      integer(psb_ipk_), allocatable  :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_iovrl_save_vect
@@ -373,23 +363,23 @@ module psi_i_mod
 
   interface psi_ovrl_restore
     subroutine  psi_iovrl_restrr1(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout)           :: x(:)
-      integer(psb_ipk_) :: xs(:)
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout)  :: x(:)
+      integer(psb_ipk_)                 :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_restrr1
     subroutine  psi_iovrl_restrr2(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_
-      integer(psb_ipk_), intent(inout)           :: x(:,:)
-      integer(psb_ipk_) :: xs(:,:)
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(inout) :: x(:,:)
+      integer(psb_ipk_)                :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_iovrl_restrr2
     subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
-      import :: psb_desc_type, psb_ipk_, psb_i_base_vect_type
+      import :: psb_desc_type, psb_ipk_, psb_ipk_, psb_i_base_vect_type
       class(psb_i_base_vect_type)     :: x
-      integer(psb_ipk_)                  :: xs(:)
+      integer(psb_ipk_)               :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_iovrl_restr_vect

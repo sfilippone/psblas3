@@ -33,6 +33,7 @@ module psi_s_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_spk_, psb_i_base_vect_type
   use psb_s_vect_mod, only : psb_s_base_vect_type 
 
+
   interface psi_swapdata
     subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
       import :: psb_desc_type, psb_ipk_, psb_spk_, psb_s_base_vect_type

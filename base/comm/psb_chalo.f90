@@ -39,7 +39,6 @@
 !   x         -  complex,dimension(:,:).          The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   alpha     -  complex(optional).            Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
 !   work      -  complex(optional).            Work  area.
@@ -53,7 +52,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
+subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalom
   use psi_mod
   implicit none
@@ -61,7 +60,6 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   complex(psb_spk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_ipk_), intent(out)                      :: info
-  complex(psb_spk_), intent(in), optional    :: alpha
   complex(psb_spk_), optional, target, intent(inout) :: work(:)
   integer(psb_ipk_), intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
@@ -146,14 +144,6 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   err=info
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
-
-  if(present(alpha)) then
-    if(alpha /= cone) then
-      do i=0, k-1
-        call cscal(int(nrow,kind=psb_mpik_),alpha,x(:,jjx+i),1)
-      end do
-    end if
-  end if
 
   liwork=nrow
   if (present(work)) then
@@ -256,7 +246,6 @@ end subroutine psb_chalom
 !   x         -  real,dimension(:).            The local part of the dense vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   alpha     -  complex(optional).            Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
 !   work      -  complex(optional).            Work  area.
@@ -270,7 +259,7 @@ end subroutine psb_chalom
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
+subroutine  psb_chalov(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalov
   use psi_mod
   implicit none
@@ -278,7 +267,6 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
   complex(psb_spk_), intent(inout)          :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_ipk_), intent(out)                      :: info
-  complex(psb_spk_), intent(in), optional   :: alpha
   complex(psb_spk_), target, optional, intent(inout) :: work(:)
   integer(psb_ipk_), intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
@@ -347,12 +335,6 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
 
-  if(present(alpha)) then
-    if(alpha /= cone) then
-      call cscal(int(nrow,kind=psb_mpik_),alpha,x,ione)
-    end if
-  end if
-
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
@@ -410,7 +392,7 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
 end subroutine psb_chalov
 
 
-subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
+subroutine  psb_chalo_vect(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalo_vect
   use psi_mod
   implicit none
@@ -418,7 +400,6 @@ subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   type(psb_c_vect_type), intent(inout)    :: x
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
-  complex(psb_spk_), intent(in), optional :: alpha
   complex(psb_spk_), target, optional, intent(inout)  :: work(:)
   integer(psb_ipk_), intent(in), optional           :: mode,data
   character, intent(in), optional         :: tran
@@ -492,12 +473,6 @@ subroutine  psb_chalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   err=info
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
-
-  if(present(alpha)) then
-    if(alpha /= cone) then
-      call x%scal(alpha)
-    end if
-  end if
 
   liwork=nrow
   if (present(work)) then

@@ -46,8 +46,8 @@ module psb_s_base_vect_mod
   
   use psb_const_mod
   use psb_error_mod
-  use psb_i_base_vect_mod
   use psb_realloc_mod
+  use psb_i_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_s_base_vect_type
   !! The psb_s_base_vect_type 
@@ -123,6 +123,20 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: set_scal => s_base_set_scal
     procedure, pass(x) :: set_vect => s_base_set_vect
     generic, public    :: set      => set_vect, set_scal
+    !
+    ! Gather/scatter. These are needed for MPI interfacing.
+    ! May have to be reworked. 
+    !
+    procedure, pass(x) :: gthab    => s_base_gthab
+    procedure, pass(x) :: gthzv    => s_base_gthzv
+    procedure, pass(x) :: gthzv_x  => s_base_gthzv_x
+    procedure, pass(x) :: gthzbuf  => s_base_gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
+    procedure, pass(y) :: sctb     => s_base_sctb
+    procedure, pass(y) :: sctb_x   => s_base_sctb_x
+    procedure, pass(y) :: sctb_buf => s_base_sctb_buf
+    generic, public    :: sct      => sctb, sctb_x, sctb_buf
+
 
     !
     ! Dot product and AXPBY
@@ -154,19 +168,7 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: nrm2     => s_base_nrm2
     procedure, pass(x) :: amax     => s_base_amax
     procedure, pass(x) :: asum     => s_base_asum
-    !
-    ! Gather/scatter. These are needed for MPI interfacing.
-    ! May have to be reworked. 
-    !
-    procedure, pass(x) :: gthab    => s_base_gthab
-    procedure, pass(x) :: gthzv    => s_base_gthzv
-    procedure, pass(x) :: gthzv_x  => s_base_gthzv_x
-    procedure, pass(x) :: gthzbuf  => s_base_gthzbuf
-    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
-    procedure, pass(y) :: sctb     => s_base_sctb
-    procedure, pass(y) :: sctb_x   => s_base_sctb_x
-    procedure, pass(y) :: sctb_buf => s_base_sctb_buf
-    generic, public    :: sct      => sctb, sctb_x, sctb_buf
+
   end type psb_s_base_vect_type
 
   public  :: psb_s_base_vect
@@ -668,37 +670,6 @@ contains
 
   end subroutine s_base_set_scal
 
-  !
-  ! Overwrite with absolute value
-  !
-  !
-  !> Function  base_set_scal
-  !! \memberof  psb_s_base_vect_type
-  !! \brief  Set all entries to their respective absolute values.
-  !!
-  subroutine s_base_absval1(x)
-    class(psb_s_base_vect_type), intent(inout)  :: x
-
-    if (allocated(x%v)) then
-      if (.not.x%is_host()) call x%sync()
-      x%v =  abs(x%v)
-      call x%set_host()
-    end if
-
-  end subroutine s_base_absval1
-
-  subroutine s_base_absval2(x,y)
-    class(psb_s_base_vect_type), intent(inout) :: x
-    class(psb_s_base_vect_type), intent(inout) :: y
-
-    if (.not.x%is_host()) call x%sync()
-    if (allocated(x%v)) then 
-      call y%bld(x%v)
-      call y%absval()
-      call y%set_host()
-    end if
-    
-  end subroutine s_base_absval2
 
   !
   !> Function  base_set_vect
@@ -719,6 +690,7 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (allocated(x%v)) then 
+      if (x%is_dev()) call x%sync()
       x%v(first_:last_) = val(1:last_-first_+1)
     else
       x%v = val
@@ -726,6 +698,38 @@ contains
     call x%set_host()
 
   end subroutine s_base_set_vect
+
+
+  !
+  ! Overwrite with absolute value
+  !
+  !
+  !> Function  base_set_scal
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Set all entries to their respective absolute values.
+  !!
+  subroutine s_base_absval1(x)
+    class(psb_s_base_vect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v =  abs(x%v)
+      call x%set_host()
+    end if
+
+  end subroutine s_base_absval1
+
+  subroutine s_base_absval2(x,y)
+    class(psb_s_base_vect_type), intent(inout) :: x
+    class(psb_s_base_vect_type), intent(inout) :: y
+
+    if (.not.x%is_host()) call x%sync()
+    if (allocated(x%v)) then 
+      call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
+      call y%absval()
+    end if
+    
+  end subroutine s_base_absval2
 
   !
   ! Dot products 
@@ -2422,6 +2426,5 @@ contains
 !!$    call y%sct(n,idx%v(i:),x,beta)
 !!$
 !!$  end subroutine s_base_mv_sctb_x
-
 end module psb_s_base_multivect_mod
 
