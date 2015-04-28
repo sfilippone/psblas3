@@ -44,16 +44,6 @@
 module psb_sort_mod
   use psb_const_mod
 
-  ! 
-  !  The up/down constant are defined in pairs having 
-  !  opposite values. We make use of this fact in the heapsort routine.
-  !
-  integer(psb_ipk_), parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
-  integer(psb_ipk_), parameter :: psb_lsort_up_     = 2, psb_lsort_down_    = -2
-  integer(psb_ipk_), parameter :: psb_asort_up_     = 3, psb_asort_down_    = -3
-  integer(psb_ipk_), parameter :: psb_alsort_up_    = 4, psb_alsort_down_   = -4
-  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_ = 0, psb_sort_keep_idx_ =  1
-  integer(psb_ipk_), parameter :: psb_heap_resize   = 200
 
   type psb_int_heap
     integer(psb_ipk_) :: last, dir
@@ -198,7 +188,6 @@ module psb_sort_mod
   
 
   interface psb_hsort
-!!$    module procedure ihsort, shsort, chsort, dhsort, zhsort
     subroutine ihsort(x,ix,dir,flag)
       import :: psb_ipk_, psb_spk_, psb_dpk_
       integer(psb_ipk_), intent(inout)           :: x(:) 
