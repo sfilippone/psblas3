@@ -152,7 +152,8 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
     return
 end subroutine psi_iswapdatam
 
-subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
+     & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_iswapidxm
   use psb_error_mod
@@ -654,7 +655,8 @@ end subroutine psi_iswapdatav
 !   
 !   
 ! 
-subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx, &
+     & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_iswapidxv
   use psb_error_mod
@@ -1104,7 +1106,8 @@ end subroutine psi_iswapdata_vect
 !   
 !   
 ! 
-subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
+     & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_iswap_vidx_vect
   use psb_error_mod
@@ -1325,7 +1328,8 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrc
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
-      if (debug) write(0,*)me,' Received from: ',prcid(i),y%combuf(rcv_pt:rcv_pt+nerv-1)        
+      if (debug) write(0,*)me,' Received from: ',prcid(i),&
+           & y%combuf(rcv_pt:rcv_pt+nerv-1)        
       call y%sct(rcv_pt,nerv,idx,beta)
       pnti   = pnti + nerv + nesd + 3
     end do
