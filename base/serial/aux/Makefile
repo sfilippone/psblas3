@@ -3,7 +3,8 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS  = isr.o isrx.o iasr.o iasrx.o msort_up.o msort_dw.o\
+FOBJS  = psi_acx_mod.o psi_alcx_mod.o psi_lcx_mod.o psi_tscx.o\
+	isr.o isrx.o iasr.o iasrx.o msort_up.o msort_dw.o\
 	imsr.o imsrx.o imsru.o iamsort_up.o iamsort_dw.o idot.o inrm2.o\
 	dsr.o dsrx.o dasr.o dasrx.o dmsr.o dmsrx.o \
 	dmsort_up.o dmsort_dw.o   damsort_up.o damsort_dw.o \
