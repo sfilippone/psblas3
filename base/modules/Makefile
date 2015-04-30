@@ -6,7 +6,8 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
         psb_gen_block_map_mod.o psb_list_map_mod.o psb_repl_map_mod.o\
         psb_glist_map_mod.o psb_hash_map_mod.o \
 	psb_desc_mod.o psb_sort_mod.o \
-	psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o psb_serial_mod.o \
+	psb_s_serial_mod.o psb_d_serial_mod.o psb_c_serial_mod.o psb_z_serial_mod.o 
+	psb_serial_mod.o \
 	psb_cd_tools_mod.o psb_i_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
 	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
@@ -25,6 +26,8 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 	psi_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
 	psb_ip_reord_mod.o\
+	psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o \
+	psb_c_sort_mod.o psb_z_sort_mod.o 
 	psb_check_mod.o psb_hash_mod.o\
 	psb_base_mat_mod.o  psb_mat_mod.o\
 	psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_mat_mod.o \
@@ -57,6 +60,7 @@ psi_penv_mod.o: psi_comm_buffers_mod.o
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
 
 
+psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o psb_c_sort_mod.o psb_z_sort_mod.o \
 psb_ip_reord_mod.o psi_serial_mod.o psb_sort_mod.o: $(BASIC_MODS)
 psb_base_mat_mod.o: psi_serial_mod.o
 psb_s_base_mat_mod.o psb_d_base_mat_mod.o psb_c_base_mat_mod.o psb_z_base_mat_mod.o: psb_base_mat_mod.o
