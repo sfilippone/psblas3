@@ -108,83 +108,32 @@ module psb_d_sort_mod
   end interface psb_hsort
 
 
-  interface psb_howmany_heap
-    function  psb_d_howmany(heap) result(res)
-      import 
-      class(psb_d_heap), intent(in) :: heap
-      integer(psb_ipk_) :: res
-    end function psb_d_howmany
-    function  psb_d_idx_howmany(heap) result(res)
-      import 
-      class(psb_d_idx_heap), intent(in) :: heap
-      integer(psb_ipk_) :: res
-    end function psb_d_idx_howmany
-  end interface psb_howmany_heap
-
-
-  interface psb_init_heap
-    subroutine psb_d_init_heap(heap,info,dir)
-      import 
-      class(psb_d_heap), intent(inout) :: heap
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: dir
-    end subroutine psb_d_init_heap
-    subroutine psb_d_idx_init_heap(heap,info,dir)
-      import 
-      class(psb_d_idx_heap), intent(inout) :: heap
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: dir
-    end subroutine psb_d_idx_init_heap
-  end interface psb_init_heap
-
-
-  interface psb_dump_heap
-    subroutine psb_d_dump_heap(iout,heap,info)
-      import 
-      class(psb_d_heap), intent(in) :: heap
-      integer(psb_ipk_), intent(out)           :: info
-      integer(psb_ipk_), intent(in)            :: iout
-    end subroutine psb_d_dump_heap
-    subroutine psb_dump_d_idx_heap(iout,heap,info)
-      import
-      class(psb_d_idx_heap), intent(in) :: heap
-      integer(psb_ipk_), intent(out)           :: info
-      integer(psb_ipk_), intent(in)            :: iout
-    end subroutine psb_dump_d_idx_heap
-  end interface psb_dump_heap
-
-
-  interface psb_insert_heap
-    subroutine psb_d_insert_heap(key,heap,info)
-      import
-      real(psb_dpk_), intent(in)               :: key
-      class(psb_d_heap), intent(inout) :: heap
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_insert_heap
-    subroutine psb_d_idx_insert_heap(key,index,heap,info)
-      import
-      real(psb_dpk_), intent(in)               :: key
-      integer(psb_ipk_), intent(in)                   :: index
-      class(psb_d_idx_heap), intent(inout) :: heap
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_idx_insert_heap
-  end interface psb_insert_heap
-
-  interface psb_heap_get_first
-    subroutine psb_d_heap_get_first(key,heap,info)
-      import 
-      class(psb_d_heap), intent(inout) :: heap
-      real(psb_dpk_), intent(out)              :: key
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_heap_get_first
-    subroutine psb_d_idx_heap_get_first(key,index,heap,info)
-      import 
-      class(psb_d_idx_heap), intent(inout) :: heap
-      real(psb_dpk_), intent(out)              :: key
-      integer(psb_ipk_), intent(out)              :: index
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psb_d_idx_heap_get_first
-  end interface psb_heap_get_first
+!!$  interface !psb_howmany_heap
+!!$    module procedure psb_d_howmany,  psb_d_idx_howmany
+!!$  end interface 
+!!$
+!!$
+!!$  interface !psb_init_heap
+!!$    module procedure psb_d_init_heap, psb_d_idx_init_heap
+!!$  end interface 
+!!$
+!!$
+!!$  interface !psb_dump_heap
+!!$    module procedure psb_d_dump_heap, psb_dump_d_idx_heap
+!!$  end interface 
+!!$
+!!$
+!!$  interface !psb_insert_heap
+!!$    module procedure psb_d_insert_heap,  psb_d_idx_insert_heap
+!!$  end interface 
+!!$
+!!$  interface !psb_heap_get_first
+!!$    module procedure psb_d_heap_get_first, psb_d_idx_heap_get_first
+!!$  end interface 
+!!$  
+!!$  interface !psb_free_heap
+!!$    module procedure psb_free_d_heap, psb_free_d_idx_heap
+!!$  end interface 
 
   interface 
     subroutine psi_d_insert_heap(key,last,heap,dir,info)
@@ -348,11 +297,6 @@ module psb_d_sort_mod
     end subroutine psi_daqsr_dw
   end interface
 
-  
-  interface psb_free_heap
-    module procedure psb_free_d_heap, psb_free_d_idx_heap
-  end interface psb_free_heap
-
 contains
 
   subroutine psb_d_init_heap(heap,info,dir)
@@ -384,7 +328,7 @@ contains
 
   function psb_d_howmany(heap) result(res)
     implicit none 
-    class(psb_scomplex_heap), intent(in) :: heap
+    class(psb_d_heap), intent(in) :: heap
     integer(psb_ipk_) :: res
     res  = heap%last
   end function psb_d_howmany
@@ -393,7 +337,7 @@ contains
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
 
-    real(@FKIND), intent(in)              :: key
+    real(psb_dpk_), intent(in)              :: key
     class(psb_d_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)                       :: info
 
@@ -410,7 +354,7 @@ contains
       info = -5
       return
     end if
-    call psi_d_insert_heap(key,index,&
+    call psi_d_insert_heap(key,&
          & heap%last,heap%keys,heap%dir,info)
 
     return
@@ -420,13 +364,13 @@ contains
     implicit none 
 
     class(psb_d_heap), intent(inout) :: heap
-    integer(psb_ipk_), intent(out)       :: index,info
-    real(@FKIND), intent(out)           :: key
+    integer(psb_ipk_), intent(out)     :: info
+    real(psb_dpk_), intent(out)       :: key
 
 
     info = psb_success_
 
-    call psi_d_heap_get_first(key,index,&
+    call psi_d_heap_get_first(key,&
          & heap%last,heap%keys,heap%dir,info)
 
     return
@@ -456,7 +400,7 @@ contains
     end if
   end subroutine psb_d_dump_heap
 
-  subroutine psb_free_d_heap(heap,info)
+  subroutine psb_d_free_heap(heap,info)
     implicit none 
     class(psb_d_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
@@ -464,7 +408,7 @@ contains
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
 
-  end subroutine psb_free_d_heap
+  end subroutine psb_d_free_heap
 
   subroutine psb_d_idx_init_heap(heap,info,dir)
     use psb_realloc_mod, only : psb_ensure_size
@@ -496,7 +440,7 @@ contains
 
   function psb_d_idx_howmany(heap) result(res)
     implicit none 
-    class(psb_scomplex_idx_heap), intent(in) :: heap
+    class(psb_d_idx_heap), intent(in) :: heap
     integer(psb_ipk_) :: res
     res  = heap%last
   end function psb_d_idx_howmany
@@ -505,7 +449,7 @@ contains
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
 
-    real(@FKIND), intent(in)              :: key
+    real(psb_dpk_), intent(in)              :: key
     integer(psb_ipk_), intent(in)                        :: index
     class(psb_d_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)                       :: info
@@ -536,7 +480,7 @@ contains
 
     class(psb_d_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)       :: index,info
-    real(@FKIND), intent(out)           :: key
+    real(psb_dpk_), intent(out)           :: key
 
 
     info = psb_success_
@@ -575,7 +519,7 @@ contains
     end if
   end subroutine psb_d_idx_dump_heap
 
-  subroutine psb_free_d_idx_heap(heap,info)
+  subroutine psb_d_idx_free_heap(heap,info)
     implicit none 
     class(psb_d_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
@@ -584,6 +528,6 @@ contains
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
     if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
 
-  end subroutine psb_free_d_idx_heap
+  end subroutine psb_d_idx_free_heap
 
 end module psb_d_sort_mod
