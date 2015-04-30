@@ -7,6 +7,7 @@
 #ifdef LowerUnderscore
 #define mpi_wtime       mpi_wtime_
 #define mpi_send        mpi_send_
+#define mpi_isend       mpi_isend_
 #define mpi_irecv       mpi_irecv_
 #define mpi_wait        mpi_wait_
 #define mpi_alltoall    mpi_alltoall_
@@ -17,6 +18,7 @@
 #ifdef LowerDoubleUnderscore
 #define mpi_wtime       mpi_wtime__
 #define mpi_send        mpi_send__
+#define mpi_isend       mpi_isend__
 #define mpi_irecv       mpi_irecv__
 #define mpi_wait        mpi_wait__
 #define mpi_alltoall    mpi_alltoall__
@@ -27,6 +29,7 @@
 #ifdef LowerCase
 #define mpi_wtime       mpi_wtime
 #define mpi_send        mpi_send
+#define mpi_isend       mpi_isend
 #define mpi_irecv       mpi_irecv
 #define mpi_wait        mpi_wait
 #define mpi_alltoall    mpi_alltoall
@@ -37,6 +40,7 @@
 #ifdef UpperUnderscore
 #define mpi_wtime       MPI_WTIME_
 #define mpi_send        MPI_SEND_
+#define mpi_isend       MPI_ISEND_
 #define mpi_irecv       MPI_IRECV_
 #define mpi_wait        MPI_WAIT_
 #define mpi_alltoall    MPI_ALLTOALL_
@@ -47,6 +51,7 @@
 #ifdef UpperDoubleUnderscore 
 #define mpi_wtime       MPI_WTIME__
 #define mpi_send        MPI_SEND__
+#define mpi_isend       MPI_ISEND__
 #define mpi_irecv       MPI_IRECV__
 #define mpi_wait        MPI_WAIT__
 #define mpi_alltoall    MPI_ALLTOALL__
@@ -57,6 +62,7 @@
 #ifdef UpperCase
 #define mpi_wtime       MPI_WTIME
 #define mpi_send        MPI_SEND
+#define mpi_isend       MPI_ISEND
 #define mpi_irecv       MPI_IRECV
 #define mpi_wait        MPI_WAIT
 #define mpi_alltoall    MPI_ALLTOALL
@@ -92,6 +98,10 @@ void mpi_wait()
   return;
 }
 void mpi_send()
+{
+  return;
+}
+void mpi_isend()
 {
   return;
 }
