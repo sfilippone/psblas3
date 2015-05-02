@@ -29,17 +29,17 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-!  The merge-sort routines
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
+  !
+  !  The merge-sort routines
+  !  References:
+  !  D. Knuth
+  !  The Art of Computer Programming, vol. 3
+  !  Addison-Wesley
+  !  
+  !  Aho, Hopcroft, Ullman
+  !  Data Structures and Algorithms
+  !  Addison-Wesley
+  !
 
 
 
@@ -48,108 +48,109 @@
 
 
 
-subroutine psb_cmsort(x,ix,dir,flag)
-  use psb_c_sort_mod, psb_protect_name => psb_cmsort
-  use psb_error_mod
-  use psb_ip_reord_mod
-  implicit none 
-  complex(psb_spk_), intent(inout)           :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
-  integer(psb_ipk_), optional, intent(inout) :: ix(:)
+  subroutine psb_cmsort(x,ix,dir,flag)
+    use psb_c_sort_mod, psb_protect_name => psb_cmsort
+    use psb_error_mod
+    use psb_ip_reord_mod
+    implicit none 
+    complex(psb_spk_), intent(inout)           :: x(:) 
+    integer(psb_ipk_), optional, intent(in)    :: dir, flag
+    integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act
+    integer(psb_ipk_) :: dir_, flag_, n, err_act
 
-  integer(psb_ipk_), allocatable :: iaux(:)
-  integer(psb_ipk_) :: iret, info, i 
-  integer(psb_ipk_)  :: ierr(5)
-  character(len=20)  :: name
+    integer(psb_ipk_), allocatable :: iaux(:)
+    integer(psb_ipk_) :: iret, info, i 
+    integer(psb_ipk_)  :: ierr(5)
+    character(len=20)  :: name
 
-  name='psb_cmsort'
-  call psb_erractionsave(err_act)
+    name='psb_cmsort'
+    call psb_erractionsave(err_act)
 
-  if (present(dir)) then 
-    dir_ = dir
-  else
-    dir_= psb_asort_up_
-  end if
-  select case(dir_) 
-  case( psb_lsort_up_, psb_lsort_down_,  psb_alsort_up_, psb_alsort_down_,&
-       & psb_asort_up_, psb_asort_down_)
-    ! OK keep going
-  case default
-    ierr(1) = 3; ierr(2) = dir_; 
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-    goto 9999
-  end select
-
-  n = size(x)
-
-  if (present(ix)) then 
-    if (size(ix) < n) then 
-      ierr(1) = 2; ierr(2) = size(ix); 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
-      goto 9999
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_asort_up_
     end if
-    if (present(flag)) then 
-      flag_ = flag
-    else 
-      flag_ = psb_sort_ovw_idx_
-    end if
-    select case(flag_) 
-    case(psb_sort_ovw_idx_)
-      do i=1,n 
-        ix(i) = i
-      end do
-    case (psb_sort_keep_idx_)
+    select case(dir_) 
+    case( psb_lsort_up_, psb_lsort_down_,  psb_alsort_up_, psb_alsort_down_,&
+         & psb_asort_up_, psb_asort_down_)
       ! OK keep going
     case default
-      ierr(1) = 4; ierr(2) = flag_; 
+      ierr(1) = 3; ierr(2) = dir_; 
       call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
     end select
-  end if
 
-  allocate(iaux(0:n+1),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_alloc_dealloc_,r_name='psb_c_msort')
-    goto 9999
-  endif
+    n = size(x)
 
-  select case(idir)
-  case (psb_lsort_up_)
-    call in_lmsort_up(n,x,iaux,iret)
-  case (psb_lsort_down_)
-    call in_lmsort_dw(n,x,iaux,iret)
-  case (psb_asort_up_)
-    call in_amsort_up(n,x,iaux,iret)
-  case (psb_asort_down_)
-    call in_amsort_dw(n,x,iaux,iret)
-  case (psb_alsort_up_)
-    call in_almsort_up(n,x,iaux,iret)
-  case (psb_alsort_down_)
-    call in_almsort_dw(n,x,iaux,iret)
-  end select
-  !
-  ! Do the actual reordering, since the inner routines
-  ! only provide linked pointers. 
-  !
-  if (iret == 0 ) then 
-    if (present(ix)) then
-      call psb_ip_reord(n,x,indx,iaux)
-    else      
-      call psb_ip_reord(n,x,iaux)
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end if
+      if (present(flag)) then 
+        flag_ = flag
+      else 
+        flag_ = psb_sort_ovw_idx_
+      end if
+      select case(flag_) 
+      case(psb_sort_ovw_idx_)
+        do i=1,n 
+          ix(i) = i
+        end do
+      case (psb_sort_keep_idx_)
+        ! OK keep going
+      case default
+        ierr(1) = 4; ierr(2) = flag_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
     end if
-  end if
- 
-  return
+
+    allocate(iaux(0:n+1),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_dealloc_,r_name='psb_c_msort')
+      goto 9999
+    endif
+
+    select case(dir_)
+    case (psb_lsort_up_)
+      call psi_c_lmsort_up(n,x,iaux,iret)
+    case (psb_lsort_down_)
+      call psi_c_lmsort_dw(n,x,iaux,iret)
+    case (psb_alsort_up_)
+      call psi_c_almsort_up(n,x,iaux,iret)
+    case (psb_alsort_down_)
+      call psi_c_almsort_dw(n,x,iaux,iret)
+    case (psb_asort_up_)
+      call psi_c_amsort_up(n,x,iaux,iret)
+    case (psb_asort_down_)
+      call psi_c_amsort_dw(n,x,iaux,iret)
+    end select
+    !
+    ! Do the actual reordering, since the inner routines
+    ! only provide linked pointers. 
+    !
+    if (iret == 0 ) then 
+      if (present(ix)) then
+        call psb_ip_reord(n,x,ix,iaux)
+      else      
+        call psb_ip_reord(n,x,iaux)
+      end if
+    end if
+
+    return
 
 9999 call psb_error_handler(err_act)
 
-  return
+    return
 
-contains
 
-  subroutine in_lmsort_up(n,k,l,iret)
+  end subroutine psb_cmsort
+
+  subroutine psi_c_lmsort_up(n,k,l,iret)
     use psb_const_mod
     use psi_lcx_mod
     implicit none
@@ -252,9 +253,9 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_lmsort_up
+  end subroutine psi_c_lmsort_up
 
-  subroutine in_lmsort_dw(n,k,l,iret)
+  subroutine psi_c_lmsort_dw(n,k,l,iret)
     use psb_const_mod
     use psi_lcx_mod
     implicit none
@@ -357,9 +358,9 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_lmsort_dw
+  end subroutine psi_c_lmsort_dw
 
-  subroutine in_amsort_up(n,k,l,iret)
+  subroutine psi_c_amsort_up(n,k,l,iret)
     use psb_const_mod
     use psi_acx_mod
     implicit none
@@ -462,9 +463,9 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_amsort_up
+  end subroutine psi_c_amsort_up
 
-  subroutine in_amsort_dw(n,k,l,iret)
+  subroutine psi_c_amsort_dw(n,k,l,iret)
     use psb_const_mod
     use psi_acx_mod
     implicit none
@@ -567,9 +568,9 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_amsort_dw
+  end subroutine psi_c_amsort_dw
 
-  subroutine in_almsort_up(n,k,l,iret)
+  subroutine psi_c_almsort_up(n,k,l,iret)
     use psb_const_mod
     use psi_alcx_mod
     implicit none
@@ -672,9 +673,9 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_almsort_up
+  end subroutine psi_c_almsort_up
 
-  subroutine in_almsort_dw(n,k,l,iret)
+  subroutine psi_c_almsort_dw(n,k,l,iret)
     use psb_const_mod
     use psi_alcx_mod
     implicit none
@@ -777,6 +778,5 @@ contains
       end do outer
     end do mergepass
 
-  end subroutine in_almsort_dw
+  end subroutine psi_c_almsort_dw
 
-end subroutine psb_cmsort

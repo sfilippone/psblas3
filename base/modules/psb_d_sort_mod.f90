@@ -79,6 +79,40 @@ module psb_d_sort_mod
     end subroutine psb_dmsort
   end interface psb_msort
 
+  interface 
+    subroutine psi_d_msort_up(n,k,l,iret)
+      import
+      implicit none
+      integer(psb_ipk_) :: n, iret
+      real(psb_dpk_)  ::  k(n)
+      integer(psb_ipk_) :: l(0:n+1)
+    end subroutine psi_d_msort_up
+    subroutine psi_d_msort_dw(n,k,l,iret)
+      import
+      implicit none
+      integer(psb_ipk_) :: n, iret
+      real(psb_dpk_)  ::  k(n)
+      integer(psb_ipk_) :: l(0:n+1)
+    end subroutine psi_d_msort_dw
+  end interface
+  interface 
+    subroutine psi_d_amsort_up(n,k,l,iret)
+      import
+      implicit none
+      integer(psb_ipk_) :: n, iret
+      real(psb_dpk_)  ::  k(n)
+      integer(psb_ipk_) :: l(0:n+1)
+    end subroutine psi_d_amsort_up
+    subroutine psi_d_amsort_dw(n,k,l,iret)
+      import
+      implicit none
+      integer(psb_ipk_) :: n, iret
+      real(psb_dpk_)  ::  k(n)
+      integer(psb_ipk_) :: l(0:n+1)
+    end subroutine psi_d_amsort_dw
+  end interface
+  
+  
   interface psb_qsort
     subroutine psb_dqsort(x,ix,dir,flag)
       import 

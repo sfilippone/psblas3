@@ -48,7 +48,7 @@ subroutine psb_cqsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act
+  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
@@ -138,607 +138,14 @@ subroutine psb_cqsort(x,ix,dir,flag)
 end subroutine psb_cqsort
 
 
-
-subroutine psi_cqsrx_up(n,x,ix)
-  use psb_c_sort_mod, psb_protect_name => psi_cqsrx_up
-  use psb_error_mod
-  implicit none 
-
-  complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
-  integer(psb_ipk_), intent(in)   :: n
-  !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
-  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
-
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
-  integer(psb_ipk_) :: istack(nparms,maxstack)
-
-  if (n > ithrs) then          
-    !
-    !     Init stack pointer
-    !
-    istp = 1
-    istack(1,istp) = 1
-    istack(2,istp) = n
-
-    do 
-      if (istp <= 0) exit
-      ilx  = istack(1,istp)
-      iux  = istack(2,istp)
-      istp = istp - 1
-      !
-      !       Choose a pivot with median-of-three heuristics, leave it 
-      !       in the LPIV location
-      !            
-      i = ilx
-      j = iux 
-      lpiv = (i+j)/2
-      piv  = x(lpiv)
-      if (piv < x(i)) then
-        xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      if (piv > x(j)) then
-        xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      if (piv < x(i)) then
-        xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      !
-      !     now piv is correct;  place it into first location
-      xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
-
-      i = ilx - 1 
-      j = iux + 1 
-
-      outer_up: do
-        in_up1: do
-          i = i + 1
-          xk = x(i)
-          if (xk >= piv) exit in_up1
-        end do in_up1
-        !
-        !     Ensure finite termination for next loop
-        !
-        xt  = xk
-        x(i) = piv
-        in_up2:do 
-          j = j - 1
-          xk = x(j)
-          if (xk <= piv) exit in_up2
-        end do in_up2
-        x(i) = xt  
-
-        if (j > i) then
-          xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt 
-          indx(j) = ixt  
-        else
-          exit outer_up
-        end if
-      end do outer_up
-      if (i == ilx) then 
-        if (x(i) /= piv) then
-          call psb_errpush(psb_err_internal_error_,&
-               & r_name='psi_cqsrx',a_err='impossible pivot condition')
-          call psb_error()
-        endif
-        i = i + 1 
-      endif
-
-      n1 = (i-1)-ilx+1
-      n2 = iux-(i)+1
-      if (n1 > n2) then
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
-        endif
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisrx_up(n2,x(i:iux),indx(i:iux))
-        endif
-      else
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisrx_up(n2,x(i:iux),indx(i:iux))
-        endif
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
-        endif
-      endif
-    enddo
-  else
-    call psi_cisrx_up(n,x,indx)
-  endif
-end subroutine psi_cqsrx_up
-
-subroutine psi_cqsrx_dw(n,x,ix)
-  use psb_c_sort_mod, psb_protect_name => psi_cqsrx_dw
-  use psb_error_mod
-  implicit none 
-
-  complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
-  integer(psb_ipk_), intent(in)   :: n
-  !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
-  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
-
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
-  integer(psb_ipk_) :: istack(nparms,maxstack)
-
-  if (n > ithrs) then          
-    !
-    !     Init stack pointer
-    !
-    istp = 1
-    istack(1,istp) = 1
-    istack(2,istp) = n
-
-    do 
-      if (istp <= 0) exit
-      ilx  = istack(1,istp)
-      iux  = istack(2,istp)
-      istp = istp - 1
-      !
-      !       Choose a pivot with median-of-three heuristics, leave it 
-      !       in the LPIV location
-      !            
-      i = ilx
-      j = iux 
-      lpiv = (i+j)/2
-      piv  = x(lpiv)
-      if (piv > x(i)) then
-        xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      if (piv < x(j)) then
-        xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      if (piv > x(i)) then
-        xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
-      endif
-      !
-      !     now piv is correct;  place it into first location
-      xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
-
-      i = ilx - 1 
-      j = iux + 1 
-
-      outer_dw: do
-        in_dw1: do
-          i = i + 1
-          xk = x(i)
-          if (xk <= piv) exit in_dw1
-        end do in_dw1
-        !
-        !     Ensure finite termination for next loop
-        !
-        xt  = xk
-        x(i) = piv
-        in_dw2:do 
-          j = j - 1
-          xk = x(j)
-          if (xk >= piv) exit in_dw2
-        end do in_dw2
-        x(i) = xt  
-
-        if (j > i) then
-          xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt  
-          indx(j) = ixt  
-        else
-          exit outer_dw
-        end if
-      end do outer_dw
-      if (i == ilx) then 
-        if (x(i) /= piv) then
-          call psb_errpush(psb_err_internal_error_,& 
-               & r_name='psi_cqsrx',a_err='impossible pivot condition')
-          call psb_error()
-        endif
-        i = i + 1 
-      endif
-
-      n1 = (i-1)-ilx+1
-      n2 = iux-(i)+1
-      if (n1 > n2) then
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
-        endif
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisrx_dw(n2,x(i:iux),indx(i:iux))
-        endif
-      else
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisrx_dw(n2,x(i:iux),indx(i:iux))
-        endif
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
-        endif
-      endif
-    enddo
-  else
-    call psi_cisrx_dw(n,x,indx)
-  endif
-
-end subroutine psi_cqsrx_dw
-
-subroutine psi_cqsr_up(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_cqsr_up
-  use psb_error_mod
-  implicit none 
-
-  complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  !     ..
-  !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xt, xk
-  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: n1, n2
-
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
-  integer(psb_ipk_) :: istack(nparms,maxstack)
-
-
-  if (n > ithrs) then          
-    !
-    !     Init stack pointer
-    !
-    istp = 1
-    istack(1,istp) = 1
-    istack(2,istp) = n
-
-    do 
-      if (istp <= 0) exit
-      ilx  = istack(1,istp)
-      iux  = istack(2,istp)
-      istp = istp - 1
-      !
-      !       Choose a pivot with median-of-three heuristics, leave it 
-      !       in the LPIV location
-      !            
-      i = ilx
-      j = iux 
-      lpiv = (i+j)/2
-      piv  = x(lpiv)
-      if (piv < x(i)) then
-        xt = x(i)
-        x(i) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      if (piv > x(j)) then
-        xt = x(j)
-        x(j) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      if (piv < x(i)) then
-        xt = x(i)
-        x(i) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      !
-      !     now piv is correct;  place it into first location
-
-      xt = x(i)
-      x(i) = x(lpiv)
-      x(lpiv) = xt
-
-      i = ilx - 1 
-      j = iux + 1 
-
-      outer_up: do
-        in_up1: do
-          i = i + 1
-          xk = x(i)
-          if (xk >= piv) exit in_up1
-        end do in_up1
-        !
-        !     Ensure finite termination for next loop
-        !
-        xt  = xk
-        x(i) = piv
-        in_up2:do 
-          j = j - 1
-          xk = x(j)
-          if (xk <= piv) exit in_up2
-        end do in_up2
-        x(i) = xt  
-
-        if (j > i) then
-          xt  = x(i)
-          x(i) = x(j)
-          x(j) = xt 
-        else
-          exit outer_up
-        end if
-      end do outer_up
-      if (i == ilx) then 
-        if (x(i) /= piv) then
-          call psb_errpush(psb_err_internal_error_,&
-               & r_name='psi_cqsr',a_err='impossible pivot condition')
-          call psb_error()
-        endif
-        i = i + 1 
-      endif
-
-      n1 = (i-1)-ilx+1
-      n2 = iux-(i)+1
-      if (n1 > n2) then
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisr_up(n1,x(ilx:i-1))
-        endif
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisr_up(n2,x(i:iux))
-        endif
-      else
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisr_up(n2,x(i:iux))
-        endif
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisr_up(n1,x(ilx:i-1))
-        endif
-      endif
-    enddo
-  else
-    call psi_cisr_up(n,x)
-  endif
-
-end subroutine psi_cqsr_up
-
-subroutine psi_cqsr_dw(n,x)
-  use psb_c_sort_mod, psb_protect_name => psi_cqsr_dw
-  use psb_error_mod
-  implicit none 
-
-  complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  !     ..
-  !     .. Local Scalars ..
-  complex(@FKIND) :: piv, xt, xk
-  integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: n1, n2
-
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
-  integer(psb_ipk_) :: istack(nparms,maxstack)
-
-
-  if (n > ithrs) then          
-    !
-    !     Init stack pointer
-    !
-    istp = 1
-    istack(1,istp) = 1
-    istack(2,istp) = n
-
-    do 
-      if (istp <= 0) exit
-      ilx  = istack(1,istp)
-      iux  = istack(2,istp)
-      istp = istp - 1
-      !
-      !       Choose a pivot with median-of-three heuristics, leave it 
-      !       in the LPIV location
-      !            
-      i = ilx
-      j = iux 
-      lpiv = (i+j)/2
-      piv  = x(lpiv)
-      if (piv > x(i)) then
-        xt = x(i)
-        x(i) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      if (piv < x(j)) then
-        xt = x(j)
-        x(j) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      if (piv > x(i)) then
-        xt = x(i)
-        x(i) = x(lpiv)
-        x(lpiv) = xt
-        piv = x(lpiv)
-      endif
-      !
-      !     now piv is correct;  place it into first location
-
-      xt = x(i)
-      x(i) = x(lpiv)
-      x(lpiv) = xt
-
-      i = ilx - 1 
-      j = iux + 1 
-
-      outer_dw: do
-        in_dw1: do
-          i = i + 1
-          xk = x(i)
-          if (xk <= piv) exit in_dw1
-        end do in_dw1
-        !
-        !     Ensure finite termination for next loop
-        !
-        xt  = xk
-        x(i) = piv
-        in_dw2:do 
-          j = j - 1
-          xk = x(j)
-          if (xk >= piv) exit in_dw2
-        end do in_dw2
-        x(i) = xt  
-
-        if (j > i) then
-          xt  = x(i)
-          x(i) = x(j)
-          x(j) = xt  
-        else
-          exit outer_dw
-        end if
-      end do outer_dw
-      if (i == ilx) then 
-        if (x(i) /= piv) then
-          call psb_errpush(psb_err_internal_error_, &
-               & r_name='psi_cqsr',a_err='impossible pivot condition')
-          call psb_error()
-        endif
-        i = i + 1 
-      endif
-
-      n1 = (i-1)-ilx+1
-      n2 = iux-(i)+1
-      if (n1 > n2) then
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisr_dw(n1,x(ilx:i-1))
-        endif
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisr_dw(n2,x(i:iux))
-        endif
-      else
-        if (n2 > ithrs) then
-          istp = istp + 1
-          istack(1,istp) = i
-          istack(2,istp) = iux
-        else
-          call psi_cisr_dw(n2,x(i:iux))
-        endif
-        if (n1 > ithrs) then 
-          istp = istp + 1
-          istack(1,istp) = ilx
-          istack(2,istp) = i-1
-        else
-          call psi_cisr_dw(n1,x(ilx:i-1))
-        endif
-      endif
-    enddo
-  else
-    call psi_cisr_dw(n,x)
-  endif
-
-end subroutine psi_cqsr_dw
-
-@NOTCE@
-subroutine psi_clqsrx_up(n,x,ix)
+subroutine psi_clqsrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_clqsrx_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
   complex(psb_spk_) :: piv, xk, xt
@@ -771,40 +178,40 @@ subroutine psi_clqsrx_up(n,x,ix)
       piv  = x(lpiv)
       if (piv < x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv > x(j)) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv < x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
+      piv       = x(lpiv)
 
       i = ilx - 1 
       j = iux + 1 
@@ -829,11 +236,11 @@ subroutine psi_clqsrx_up(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt 
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt 
+          idx(j) = ixt  
         else
           exit outer_up
         end if
@@ -855,14 +262,14 @@ subroutine psi_clqsrx_up(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_clisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_clisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_clisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_clisrx_up(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -870,31 +277,31 @@ subroutine psi_clqsrx_up(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_clisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_clisrx_up(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_clisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_clisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_clisrx_up(n,x,indx)
+    call psi_clisrx_up(n,x,idx)
   endif
 
 end subroutine psi_clqsrx_up
 
-subroutine psi_clqsrx_dw(n,x,ix)
+subroutine psi_clqsrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_clqsrx_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
   complex(psb_spk_) :: piv, xk, xt
@@ -927,40 +334,40 @@ subroutine psi_clqsrx_dw(n,x,ix)
       piv  = x(lpiv)
       if (piv > x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv < x(j)) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv > x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
+      piv       = x(lpiv)
 
       i = ilx - 1 
       j = iux + 1 
@@ -985,11 +392,11 @@ subroutine psi_clqsrx_dw(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt  
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt  
+          idx(j) = ixt  
         else
           exit outer_dw
         end if
@@ -1011,14 +418,14 @@ subroutine psi_clqsrx_dw(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_clisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_clisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_clisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_clisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -1026,19 +433,19 @@ subroutine psi_clqsrx_dw(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_clisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_clisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_clisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_clisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_clisrx_dw(n,x,indx)
+    call psi_clisrx_dw(n,x,idx)
   endif
 end subroutine psi_clqsrx_dw
 
@@ -1193,7 +600,7 @@ subroutine psi_clqsr_dw(n,x)
   complex(psb_spk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(@FKIND) :: piv, xt, xk
+  complex(psb_spk_) :: piv, xt, xk
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
@@ -1325,14 +732,14 @@ subroutine psi_clqsr_dw(n,x)
 
 end subroutine psi_clqsr_dw
 
-subroutine psi_calqsrx_up(n,x,ix)
+subroutine psi_calqsrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_calqsrx_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
   complex(psb_spk_) :: piv, xk, xt
@@ -1365,40 +772,40 @@ subroutine psi_calqsrx_up(n,x,ix)
       piv  = x(lpiv)
       if (piv < x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv > x(j)) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv < x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
+      piv       = x(lpiv)
 
       i = ilx - 1 
       j = iux + 1 
@@ -1423,11 +830,11 @@ subroutine psi_calqsrx_up(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt 
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt 
+          idx(j) = ixt  
         else
           exit outer_up
         end if
@@ -1449,14 +856,14 @@ subroutine psi_calqsrx_up(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_calisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_calisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_calisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_calisrx_up(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -1464,30 +871,30 @@ subroutine psi_calqsrx_up(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_calisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_calisrx_up(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_calisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_calisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_calisrx_up(n,x,indx)
+    call psi_calisrx_up(n,x,idx)
   endif
 end subroutine psi_calqsrx_up
 
-subroutine psi_calqsrx_dw(n,x,ix)
+subroutine psi_calqsrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_calqsrx_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
   complex(psb_spk_) :: piv, xk, xt
@@ -1520,40 +927,40 @@ subroutine psi_calqsrx_dw(n,x,ix)
       piv  = x(lpiv)
       if (piv > x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv < x(j)) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       if (piv > x(i)) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
-        piv        = x(lpiv)
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
+        piv       = x(lpiv)
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
-      piv        = x(lpiv)
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
+      piv       = x(lpiv)
 
       i = ilx - 1 
       j = iux + 1 
@@ -1578,11 +985,11 @@ subroutine psi_calqsrx_dw(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt  
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt  
+          idx(j) = ixt  
         else
           exit outer_dw
         end if
@@ -1604,14 +1011,14 @@ subroutine psi_calqsrx_dw(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_calisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_calisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_calisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_calisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -1619,19 +1026,19 @@ subroutine psi_calqsrx_dw(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_calisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_calisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_calisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_calisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_calisrx_dw(n,x,indx)
+    call psi_calisrx_dw(n,x,idx)
   endif
 end subroutine psi_calqsrx_dw
 
@@ -1785,7 +1192,7 @@ subroutine psi_calqsr_dw(n,x)
   complex(psb_spk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(@FKIND) :: piv, xt, xk
+  complex(psb_spk_) :: piv, xt, xk
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
@@ -1916,16 +1323,17 @@ subroutine psi_calqsr_dw(n,x)
   endif
 end subroutine psi_calqsr_dw
 
-subroutine psi_caqsrx_up(n,x,ix)
+subroutine psi_caqsrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_caqsrx_up
   use psb_error_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
+  real(psb_spk_) :: piv, xk
+  complex(psb_spk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
@@ -1955,39 +1363,39 @@ subroutine psi_caqsrx_up(n,x,ix)
       piv  = abs(x(lpiv))
       if (piv < abs(x(i))) then
         xt   = x(i)
-        ixt  = indx(i)
+        ixt  = idx(i)
         x(i) = x(lpiv)
-        indx(i) = indx(lpiv)
+        idx(i) = idx(lpiv)
         x(lpiv) = xt
-        indx(lpiv) = ixt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       if (piv > abs(x(j))) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       if (piv < abs(x(i))) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
 
       i = ilx - 1 
       j = iux + 1 
@@ -2012,11 +1420,11 @@ subroutine psi_caqsrx_up(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt 
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt 
+          idx(j) = ixt  
         else
           exit outer_up
         end if
@@ -2038,14 +1446,14 @@ subroutine psi_caqsrx_up(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_caisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_caisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_caisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_caisrx_up(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -2053,34 +1461,35 @@ subroutine psi_caqsrx_up(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_caisrx_up(n2,x(i:iux),indx(i:iux))
+          call psi_caisrx_up(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_caisrx_up(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_caisrx_up(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_caisrx_up(n,x,indx)
+    call psi_caisrx_up(n,x,idx)
   endif
 
 
 end subroutine psi_caqsrx_up
 
-subroutine psi_caqsrx_dw(n,x,ix)
+subroutine psi_caqsrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_caqsrx_dw
   use psb_error_mod
   implicit none 
 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
+  real(psb_spk_) :: piv, xk
+  complex(psb_spk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
@@ -2109,39 +1518,39 @@ subroutine psi_caqsrx_dw(n,x,ix)
       piv  = abs(x(lpiv))
       if (piv > abs(x(i))) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       if (piv < abs(x(j))) then
         xt        = x(j)
-        ixt        = indx(j)
-        x(j)       = x(lpiv)
-        indx(j)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
+        ixt       = idx(j)
+        x(j)      = x(lpiv)
+        idx(j)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       if (piv > abs(x(i))) then
         xt        = x(i)
-        ixt        = indx(i)
-        x(i)       = x(lpiv)
-        indx(i)    = indx(lpiv)
-        x(lpiv)    = xt
-        indx(lpiv) = ixt
+        ixt       = idx(i)
+        x(i)      = x(lpiv)
+        idx(i)    = idx(lpiv)
+        x(lpiv)   = xt
+        idx(lpiv) = ixt
         piv = abs(x(lpiv))
       endif
       !
       !     now piv is correct;  place it into first location
       xt        = x(i)
-      ixt        = indx(i)
-      x(i)       = x(lpiv)
-      indx(i)    = indx(lpiv)
-      x(lpiv)    = xt
-      indx(lpiv) = ixt
+      ixt       = idx(i)
+      x(i)      = x(lpiv)
+      idx(i)    = idx(lpiv)
+      x(lpiv)   = xt
+      idx(lpiv) = ixt
 
       i = ilx - 1 
       j = iux + 1 
@@ -2166,11 +1575,11 @@ subroutine psi_caqsrx_dw(n,x,ix)
 
         if (j > i) then
           xt     = x(i)
-          ixt     = indx(i)
-          x(i)    = x(j)
-          indx(i) = indx(j)
-          x(j)    = xt  
-          indx(j) = ixt  
+          ixt    = idx(i)
+          x(i)   = x(j)
+          idx(i) = idx(j)
+          x(j)   = xt  
+          idx(j) = ixt  
         else
           exit outer_dw
         end if
@@ -2192,14 +1601,14 @@ subroutine psi_caqsrx_dw(n,x,ix)
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_caisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_caisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
         if (n2 > ithrs) then
           istp = istp + 1
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_caisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_caisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
       else
         if (n2 > ithrs) then
@@ -2207,19 +1616,19 @@ subroutine psi_caqsrx_dw(n,x,ix)
           istack(1,istp) = i
           istack(2,istp) = iux
         else
-          call psi_caisrx_dw(n2,x(i:iux),indx(i:iux))
+          call psi_caisrx_dw(n2,x(i:iux),idx(i:iux))
         endif
         if (n1 > ithrs) then 
           istp = istp + 1
           istack(1,istp) = ilx
           istack(2,istp) = i-1
         else
-          call psi_caisrx_dw(n1,x(ilx:i-1),indx(ilx:i-1))
+          call psi_caisrx_dw(n1,x(ilx:i-1),idx(ilx:i-1))
         endif
       endif
     enddo
   else
-    call psi_caisrx_dw(n,x,indx)
+    call psi_caisrx_dw(n,x,idx)
   endif
 
 end subroutine psi_caqsrx_dw
@@ -2232,7 +1641,8 @@ subroutine psi_caqsr_up(n,x)
   complex(psb_spk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
+  real(psb_spk_) :: piv, xk
+  complex(psb_spk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
@@ -2371,7 +1781,8 @@ subroutine psi_caqsr_dw(n,x)
   complex(psb_spk_), intent(inout)  :: x(:) 
   integer(psb_ipk_), intent(in)   :: n
   !     .. Local Scalars ..
-  complex(psb_spk_) :: piv, xk, xt
+  real(psb_spk_) :: piv, xk
+  complex(psb_spk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 

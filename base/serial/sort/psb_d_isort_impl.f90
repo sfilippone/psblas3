@@ -129,12 +129,12 @@ subroutine psb_disort(x,ix,dir,flag)
   return
 end subroutine psb_disort
 
-subroutine psi_disrx_up(n,x,ix)
+subroutine psi_disrx_up(n,x,idx)
   use psb_d_sort_mod, psb_protect_name => psi_disrx_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   real(psb_dpk_) :: xx
@@ -157,12 +157,12 @@ subroutine psi_disrx_up(n,x,ix)
   enddo
 end subroutine psi_disrx_up
 
-subroutine psi_disrx_dw(n,x,ix)
+subroutine psi_disrx_dw(n,x,idx)
   use psb_d_sort_mod, psb_protect_name => psi_disrx_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   real(psb_dpk_) :: xx
@@ -234,12 +234,12 @@ subroutine psi_disr_dw(n,x)
   enddo
 end subroutine psi_disr_dw
 
-subroutine psi_daisrx_up(n,x,ix)
+subroutine psi_daisrx_up(n,x,idx)
   use psb_d_sort_mod, psb_protect_name => psi_daisrx_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   real(psb_dpk_) :: xx
@@ -262,12 +262,12 @@ subroutine psi_daisrx_up(n,x,ix)
   enddo
 end subroutine psi_daisrx_up
 
-subroutine psi_daisrx_dw(n,x,ix)
+subroutine psi_daisrx_dw(n,x,idx)
   use psb_d_sort_mod, psb_protect_name => psi_daisrx_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   real(psb_dpk_) :: xx

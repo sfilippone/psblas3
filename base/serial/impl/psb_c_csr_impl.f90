@@ -3085,7 +3085,6 @@ contains
     integer(psb_ipk_)              :: ma,na,mb,nb
     integer(psb_ipk_), allocatable :: irow(:), idxs(:)
     complex(psb_spk_), allocatable    :: row(:)
-    type(psb_int_heap)             :: heap
     integer(psb_ipk_)              :: i,j,k,irw,icl,icf, iret, &
          & nzc,nnzre, isz, ipb, irwsz, nrc, nze
     complex(psb_spk_)                 :: cfb

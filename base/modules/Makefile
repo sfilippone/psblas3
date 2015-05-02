@@ -138,6 +138,8 @@ psb_s_comm_mod.o: psb_s_vect_mod.o psb_desc_mod.o psb_mat_mod.o
 psb_d_comm_mod.o: psb_d_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
 psb_c_comm_mod.o: psb_c_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
 psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
+psb_sort_mod.o: psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o \
+	psb_c_sort_mod.o psb_z_sort_mod.o psb_ip_reord_mod.o psi_serial_mod.o
 
 psb_base_mod.o: $(MODULES)
 

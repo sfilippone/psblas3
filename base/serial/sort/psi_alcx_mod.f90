@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-module psi_lcx_mod
+module psi_alcx_mod
   use psb_const_mod
   interface operator(<)
     module procedure psi_callt, psi_zallt
@@ -126,5 +126,5 @@ contains
          & (abs(aimag(a))>=abs(aimag(b))))
   end function psi_zalge
 
-end module psi_lcx_mod
+end module psi_alcx_mod
   

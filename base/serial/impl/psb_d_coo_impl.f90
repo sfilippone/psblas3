@@ -3382,7 +3382,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ja(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ja(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,val(i:imx),&
                  & ia(i:imx),ja(i:imx),ix2)
@@ -3493,7 +3493,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,jas(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,jas(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
@@ -3586,7 +3586,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
       ! If we did not have enough memory for buffers,
       ! let's try in place. 
       ! 
-      call msort_up(nzin,ia(1:),iaux(1:),iret)
+      call psi_i_msort_up(nzin,ia(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
       i    = 1
@@ -3598,7 +3598,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           if (j > nzin) exit
         enddo
         nzl = j - i
-        call msort_up(nzl,ja(i:),iaux(1:),iret)
+        call psi_i_msort_up(nzl,ja(i:),iaux(1:),iret)
         if (iret == 0) &
              & call psb_ip_reord(nzl,val(i:i+nzl-1),&
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
@@ -3704,7 +3704,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ia(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ia(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,val(i:imx),&
                  & ia(i:imx),ja(i:imx),ix2)
@@ -3813,7 +3813,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ias(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ias(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
@@ -3900,7 +3900,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
     else if (.not.use_buffers) then 
 
-      call msort_up(nzin,ja(1:),iaux(1:),iret)
+      call psi_i_msort_up(nzin,ja(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
       i    = 1
@@ -3911,7 +3911,7 @@ subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           if (j > nzin) exit
         enddo
         nzl = j - i
-        call msort_up(nzl,ia(i:),iaux(1:),iret)
+        call psi_i_msort_up(nzl,ia(i:),iaux(1:),iret)
         if (iret == 0) &
              & call psb_ip_reord(nzl,val(i:i+nzl-1),&
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)

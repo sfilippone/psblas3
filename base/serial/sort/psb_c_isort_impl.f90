@@ -137,13 +137,13 @@ subroutine psb_cisort(x,ix,dir,flag)
   return
 end subroutine psb_cisort
 
-subroutine psi_clisrx_up(n,x,ix)
+subroutine psi_clisrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_clisrx_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx
@@ -167,13 +167,13 @@ subroutine psi_clisrx_up(n,x,ix)
 
 end subroutine psi_clisrx_up
 
-subroutine psi_clisrx_dw(n,x,ix)
+subroutine psi_clisrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_clisrx_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx
@@ -246,13 +246,13 @@ subroutine psi_clisr_dw(n,x)
   enddo
 end subroutine psi_clisr_dw
 
-subroutine psi_calisrx_up(n,x,ix)
+subroutine psi_calisrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_calisrx_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx
@@ -275,13 +275,13 @@ subroutine psi_calisrx_up(n,x,ix)
   enddo
 end subroutine psi_calisrx_up
 
-subroutine psi_calisrx_dw(n,x,ix)
+subroutine psi_calisrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_calisrx_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx
@@ -354,12 +354,12 @@ subroutine psi_calisr_dw(n,x)
   enddo
 end subroutine psi_calisr_dw
 
-subroutine psi_caisrx_up(n,x,ix)
+subroutine psi_caisrx_up(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_caisrx_up
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx
@@ -382,12 +382,12 @@ subroutine psi_caisrx_up(n,x,ix)
   enddo
 end subroutine psi_caisrx_up
 
-subroutine psi_caisrx_dw(n,x,ix)
+subroutine psi_caisrx_dw(n,x,idx)
   use psb_c_sort_mod, psb_protect_name => psi_caisrx_dw
   use psb_error_mod
   implicit none 
   complex(psb_spk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_spk_) :: xx

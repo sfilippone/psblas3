@@ -137,13 +137,13 @@ subroutine psb_zisort(x,ix,dir,flag)
   return
 end subroutine psb_zisort
 
-subroutine psi_zlisrx_up(n,x,ix)
+subroutine psi_zlisrx_up(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zlisrx_up
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx
@@ -167,13 +167,13 @@ subroutine psi_zlisrx_up(n,x,ix)
 
 end subroutine psi_zlisrx_up
 
-subroutine psi_zlisrx_dw(n,x,ix)
+subroutine psi_zlisrx_dw(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zlisrx_dw
   use psb_error_mod
   use psi_lcx_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx
@@ -246,13 +246,13 @@ subroutine psi_zlisr_dw(n,x)
   enddo
 end subroutine psi_zlisr_dw
 
-subroutine psi_zalisrx_up(n,x,ix)
+subroutine psi_zalisrx_up(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zalisrx_up
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx
@@ -275,13 +275,13 @@ subroutine psi_zalisrx_up(n,x,ix)
   enddo
 end subroutine psi_zalisrx_up
 
-subroutine psi_zalisrx_dw(n,x,ix)
+subroutine psi_zalisrx_dw(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zalisrx_dw
   use psb_error_mod
   use psi_alcx_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx
@@ -354,12 +354,12 @@ subroutine psi_zalisr_dw(n,x)
   enddo
 end subroutine psi_zalisr_dw
 
-subroutine psi_zaisrx_up(n,x,ix)
+subroutine psi_zaisrx_up(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zaisrx_up
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx
@@ -382,12 +382,12 @@ subroutine psi_zaisrx_up(n,x,ix)
   enddo
 end subroutine psi_zaisrx_up
 
-subroutine psi_zaisrx_dw(n,x,ix)
+subroutine psi_zaisrx_dw(n,x,idx)
   use psb_z_sort_mod, psb_protect_name => psi_zaisrx_dw
   use psb_error_mod
   implicit none 
   complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: ix(:)
+  integer(psb_ipk_), intent(inout) :: idx(:)
   integer(psb_ipk_), intent(in)   :: n
   integer(psb_ipk_) :: i,j,ix
   complex(psb_dpk_) :: xx

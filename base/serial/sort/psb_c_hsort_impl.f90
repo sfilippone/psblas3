@@ -50,7 +50,7 @@ subroutine psb_chsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
   integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
-  real(psb_spk_) :: key
+  complex(psb_spk_) :: key
   integer(psb_ipk_) :: index
 
   integer(psb_ipk_)  :: ierr(5)
@@ -391,7 +391,7 @@ contains
 end subroutine psi_c_insert_heap
 
 subroutine psi_c_heap_get_first(key,last,heap,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_insert_heap
+  use psb_c_sort_mod, psb_protect_name => psi_c_heap_get_first
   implicit none 
 
   !  
@@ -633,7 +633,7 @@ contains
 end subroutine psi_c_heap_get_first
 
 subroutine psi_c_idx_insert_heap(key,index,last,heap,idxs,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_idx_insert_idx_heap
+  use psb_c_sort_mod, psb_protect_name => psi_c_idx_insert_heap
 
   implicit none 
   !  
@@ -869,7 +869,7 @@ end subroutine psi_c_idx_insert_heap
 
 
 subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_insert_heap
+  use psb_c_sort_mod, psb_protect_name => psi_c_idx_heap_get_first
   implicit none 
 
   !  
@@ -905,22 +905,22 @@ subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     info = -4
 
   case (psb_asort_up_)
-    call fix_aup(last,heap)
+    call fix_aup(last,heap,idxs)
 
   case (psb_asort_down_)
-    call fix_adw(last,heap)
+    call fix_adw(last,heap,idxs)
 
   case (psb_alsort_up_)
-    call fix_alup(last,heap)
+    call fix_alup(last,heap,idxs)
 
   case (psb_alsort_down_)
-    call fix_aldw(last,heap)
+    call fix_aldw(last,heap,idxs)
 
   case (psb_lsort_up_)
-    call fix_lup(last,heap)
+    call fix_lup(last,heap,idxs)
 
   case (psb_lsort_down_)
-    call fix_ldw(last,heap)
+    call fix_ldw(last,heap,idxs)
 
   case default
     write(psb_err_unit,*) 'Invalid direction in heap ',dir
@@ -933,7 +933,7 @@ contains
     use psi_acx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
     
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -968,7 +968,7 @@ contains
     use psi_acx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
     
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -1002,7 +1002,7 @@ contains
     use psi_lcx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
 
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -1036,7 +1036,7 @@ contains
     use psi_lcx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
     
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -1070,7 +1070,7 @@ contains
     use psi_alcx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
     
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -1104,7 +1104,7 @@ contains
     use psi_alcx_mod
     integer(psb_ipk_), intent(in)    :: last
     complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk) :: idxs(:)
+    integer(psb_ipk_) :: idxs(:)
     
     integer(psb_ipk_) :: i,j, itemp
     complex(psb_spk_) :: temp 
@@ -1134,7 +1134,7 @@ contains
 
   end subroutine fix_aldw
 
-end subroutine psi_c_heap_get_first
+end subroutine psi_c_idx_heap_get_first
 
 
 

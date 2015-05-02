@@ -50,7 +50,7 @@ subroutine psb_dhsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
   integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
-  real(psb_spk_) :: key
+  real(psb_dpk_) :: key
   integer(psb_ipk_) :: index
 
   integer(psb_ipk_)  :: ierr(5)
