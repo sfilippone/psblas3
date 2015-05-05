@@ -1045,7 +1045,6 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
-  integer(psb_ipk_), pointer :: d_idx(:)
   class(psb_i_base_vect_type), pointer :: d_vidx
   character(len=20)  :: name
 
@@ -1054,6 +1053,8 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%get_context()
+  icomm = desc_a%get_mpic()
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -1066,8 +1067,6 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
     call psb_errpush(info,name)
     goto 9999
   endif
-
-  icomm = desc_a%get_mpic()
 
   if(present(data)) then
     data_ = data
@@ -1095,13 +1094,13 @@ end subroutine psi_iswapdata_vect
 
 !
 !
-! Subroutine: psi_iswapidx_vect
+! Subroutine: psi_iswap_vidx_vect
 !   Data exchange among processes.
 !
 !   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
 !   of vectors. 
 !   
-!   The real workhorse: the outer routines will only choose the index list
+!   The real workhorse: the outer routine will only choose the index list
 !   this one takes the index list and does the actual exchange. 
 !   
 !   
@@ -1134,8 +1133,7 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   ! locals
   integer(psb_mpik_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
-       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer(psb_mpik_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -1143,11 +1141,6 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false., debug=.false.
-
-  integer(psb_ipk_), pointer, dimension(:) :: sndbuf, rcvbuf
-#ifdef HAVE_VOLATILE
-  volatile :: sndbuf, rcvbuf
-#endif
   character(len=20)  :: name
 
   info=psb_success_
@@ -1155,6 +1148,7 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -1213,13 +1207,13 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     ! Then gather for sending.
     !    
     pnti   = 1
-    snd_pt = 1
     do i=1, totxch
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      idx_pt = 1+pnti+nerv+psb_n_elem_send_
+      snd_pt = 1+pnti+nerv+psb_n_elem_send_
+      rcv_pt = 1+pnti+psb_n_elem_recv_
+      idx_pt = snd_pt
       call y%gth(idx_pt,nesd,idx)
-      snd_pt = snd_pt + nesd 
       pnti   = pnti + nerv + nesd + 3
     end do
 
@@ -1236,14 +1230,13 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
+    p2ptag = psb_int_swap_tag
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
-
-      p2ptag = psb_int_swap_tag
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         call mpi_isend(y%combuf(snd_pt),nesd,&
@@ -1277,14 +1270,13 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
     if (debug) write(*,*) me,' wait'
     pnti   = 1
+    p2ptag = psb_int_swap_tag
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
-
-      p2ptag = psb_int_swap_tag
 
       if (proc_to_comm /= me)then 
         if (nesd>0) then 

@@ -81,7 +81,8 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxv
-    subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+    subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+         & totxch,totsnd,totrcv,work,info)
       import 
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
@@ -141,16 +142,17 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxv
-    subroutine psi_dtranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_dtran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)         :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_vect_type) :: y
-      real(psb_dpk_)           :: beta
-      real(psb_dpk_),target    :: work(:)
-      integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd,totrcv
-    end subroutine psi_dtranidx_vect
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_d_base_vect_type)             :: y
+      real(psb_dpk_)                       :: beta
+      real(psb_dpk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(inout) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_dtran_vidx_vect
   end interface
 
   interface psi_ovrl_upd

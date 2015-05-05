@@ -81,7 +81,8 @@ module psi_z_mod
       complex(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_zswapidxv
-    subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+    subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+         & totxch,totsnd,totrcv,work,info)
       import 
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
@@ -141,16 +142,17 @@ module psi_z_mod
       complex(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ztranidxv
-    subroutine psi_ztranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_ztran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)         :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_vect_type) :: y
-      complex(psb_dpk_)           :: beta
-      complex(psb_dpk_),target    :: work(:)
-      integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd,totrcv
-    end subroutine psi_ztranidx_vect
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_z_base_vect_type)             :: y
+      complex(psb_dpk_)                       :: beta
+      complex(psb_dpk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(inout) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_ztran_vidx_vect
   end interface
 
   interface psi_ovrl_upd

@@ -241,7 +241,8 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxv
-    subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+    subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+         & totxch,totsnd,totrcv,work,info)
       import 
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
@@ -301,16 +302,17 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxv
-    subroutine psi_itranidx_vect(ictxt,icomm,flag,beta,y,idx,&
+    subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
-      integer(psb_ipk_), intent(in)         :: ictxt,icomm,flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_i_base_vect_type) :: y
-      integer(psb_ipk_)           :: beta
-      integer(psb_ipk_),target    :: work(:)
-      integer(psb_ipk_), intent(in)         :: idx(:),totxch,totsnd,totrcv
-    end subroutine psi_itranidx_vect
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_i_base_vect_type)             :: y
+      integer(psb_ipk_)                       :: beta
+      integer(psb_ipk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(inout) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_itran_vidx_vect
   end interface
 
   interface psi_ovrl_upd
