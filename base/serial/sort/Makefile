@@ -40,5 +40,5 @@ clean: cleanobjs
 veryclean: cleanobjs
 
 cleanobjs:
-	/bin/rm -f $(OBJS) 
+	/bin/rm -f $(OBJS) *$(.mod)
 
