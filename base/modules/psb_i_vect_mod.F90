@@ -51,7 +51,6 @@ module psb_i_vect_mod
     procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
     procedure, pass(x) :: asb      => i_vect_asb
-    procedure, pass(x) :: sync     => i_vect_sync
     procedure, pass(x) :: gthab    => i_vect_gthab
     procedure, pass(x) :: gthzv    => i_vect_gthzv
     generic, public    :: gth      => gthab, gthzv
@@ -70,6 +69,15 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_vect => i_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => i_vect_clone
+
+    procedure, pass(x) :: sync     => i_vect_sync
+    procedure, pass(x) :: is_host  => i_vect_is_host
+    procedure, pass(x) :: is_dev   => i_vect_is_dev
+    procedure, pass(x) :: is_sync  => i_vect_is_sync
+    procedure, pass(x) :: set_host => i_vect_set_host
+    procedure, pass(x) :: set_dev  => i_vect_set_dev
+    procedure, pass(x) :: set_sync => i_vect_set_sync
+
   end type psb_i_vect_type
 
   public  :: psb_i_vect
@@ -77,7 +85,18 @@ module psb_i_vect_mod
   interface psb_i_vect
     module procedure constructor, size_const
   end interface psb_i_vect
- 
+
+  private :: i_vect_get_nrows, i_vect_sizeof, i_vect_get_fmt, &
+       & i_vect_all, i_vect_reall, i_vect_zero,  i_vect_asb, &
+       & i_vect_gthab, i_vect_gthzv, i_vect_sctb, &
+       & i_vect_free, i_vect_ins_a, i_vect_ins_v, i_vect_bld_x, &
+       & i_vect_bld_n, i_vect_get_vect, i_vect_cnv, i_vect_set_scal, &
+       & i_vect_set_vect, i_vect_clone, i_vect_sync, i_vect_is_host, &
+       & i_vect_is_dev, i_vect_is_sync, i_vect_set_host, &
+       & i_vect_set_dev, i_vect_set_sync
+
+
+
   class(psb_i_base_vect_type), allocatable, target,&
        & save, private :: psb_i_base_vect_default
 
@@ -339,15 +358,6 @@ contains
     
   end subroutine i_vect_asb
 
-  subroutine i_vect_sync(x)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    
-    if (allocated(x%v)) &
-         & call x%v%sync()
-    
-  end subroutine i_vect_sync
-
   subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -459,6 +469,77 @@ contains
       call move_alloc(tmp,x%v)
     end if
   end subroutine i_vect_cnv
+
+
+  subroutine i_vect_sync(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%sync()
+    
+  end subroutine i_vect_sync
+
+  subroutine i_vect_set_sync(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_sync()
+    
+  end subroutine i_vect_set_sync
+
+  subroutine i_vect_set_host(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_host()
+    
+  end subroutine i_vect_set_host
+
+  subroutine i_vect_set_dev(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_dev()
+    
+  end subroutine i_vect_set_dev
+
+  function i_vect_is_sync(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_sync()
+    
+  end function i_vect_is_sync
+
+  function i_vect_is_host(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_host()
+    
+  end function i_vect_is_host
+
+  function i_vect_is_dev(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .false. 
+    if (allocated(x%v)) &
+         & res =  x%v%is_dev()
+    
+  end function i_vect_is_dev
+
 
 end module psb_i_vect_mod
 

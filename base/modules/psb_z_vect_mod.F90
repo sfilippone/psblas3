@@ -52,7 +52,6 @@ module psb_z_vect_mod
     procedure, pass(x) :: reall    => z_vect_reall
     procedure, pass(x) :: zero     => z_vect_zero
     procedure, pass(x) :: asb      => z_vect_asb
-    procedure, pass(x) :: sync     => z_vect_sync
     procedure, pass(x) :: gthab    => z_vect_gthab
     procedure, pass(x) :: gthzv    => z_vect_gthzv
     generic, public    :: gth      => gthab, gthzv
@@ -71,6 +70,15 @@ module psb_z_vect_mod
     procedure, pass(x) :: set_vect => z_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => z_vect_clone
+
+    procedure, pass(x) :: sync     => z_vect_sync
+    procedure, pass(x) :: is_host  => z_vect_is_host
+    procedure, pass(x) :: is_dev   => z_vect_is_dev
+    procedure, pass(x) :: is_sync  => z_vect_is_sync
+    procedure, pass(x) :: set_host => z_vect_set_host
+    procedure, pass(x) :: set_dev  => z_vect_set_dev
+    procedure, pass(x) :: set_sync => z_vect_set_sync
+
     procedure, pass(x) :: dot_v    => z_vect_dot_v
     procedure, pass(x) :: dot_a    => z_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
@@ -91,7 +99,7 @@ module psb_z_vect_mod
     generic, public    :: absval   => absval1, absval2
     procedure, pass(x) :: nrm2     => z_vect_nrm2
     procedure, pass(x) :: amax     => z_vect_amax
-    procedure, pass(x) :: asum     => z_vect_asum
+    procedure, pass(x) :: asum     => z_vect_asum                  
   end type psb_z_vect_type
 
   public  :: psb_z_vect
@@ -99,7 +107,23 @@ module psb_z_vect_mod
   interface psb_z_vect
     module procedure constructor, size_const
   end interface psb_z_vect
- 
+
+  private :: z_vect_get_nrows, z_vect_sizeof, z_vect_get_fmt, &
+       & z_vect_all, z_vect_reall, z_vect_zero,  z_vect_asb, &
+       & z_vect_gthab, z_vect_gthzv, z_vect_sctb, &
+       & z_vect_free, z_vect_ins_a, z_vect_ins_v, z_vect_bld_x, &
+       & z_vect_bld_n, z_vect_get_vect, z_vect_cnv, z_vect_set_scal, &
+       & z_vect_set_vect, z_vect_clone, z_vect_sync, z_vect_is_host, &
+       & z_vect_is_dev, z_vect_is_sync, z_vect_set_host, &
+       & z_vect_set_dev, z_vect_set_sync
+
+  private ::  z_vect_dot_v, z_vect_dot_a, z_vect_axpby_v, z_vect_axpby_a, &
+       & z_vect_mlt_v, z_vect_mlt_a, z_vect_mlt_a_2, z_vect_mlt_v_2, &
+       & z_vect_mlt_va, z_vect_mlt_av, z_vect_scal, z_vect_absval1, &
+       & z_vect_absval2, z_vect_nrm2, z_vect_amax, z_vect_asum                  
+
+
+
   class(psb_z_base_vect_type), allocatable, target,&
        & save, private :: psb_z_base_vect_default
 
@@ -361,15 +385,6 @@ contains
     
   end subroutine z_vect_asb
 
-  subroutine z_vect_sync(x)
-    implicit none 
-    class(psb_z_vect_type), intent(inout) :: x
-    
-    if (allocated(x%v)) &
-         & call x%v%sync()
-    
-  end subroutine z_vect_sync
-
   subroutine z_vect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: n, idx(:)
@@ -481,6 +496,77 @@ contains
       call move_alloc(tmp,x%v)
     end if
   end subroutine z_vect_cnv
+
+
+  subroutine z_vect_sync(x)
+    implicit none 
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%sync()
+    
+  end subroutine z_vect_sync
+
+  subroutine z_vect_set_sync(x)
+    implicit none 
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_sync()
+    
+  end subroutine z_vect_set_sync
+
+  subroutine z_vect_set_host(x)
+    implicit none 
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_host()
+    
+  end subroutine z_vect_set_host
+
+  subroutine z_vect_set_dev(x)
+    implicit none 
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_dev()
+    
+  end subroutine z_vect_set_dev
+
+  function z_vect_is_sync(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_sync()
+    
+  end function z_vect_is_sync
+
+  function z_vect_is_host(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_host()
+    
+  end function z_vect_is_host
+
+  function z_vect_is_dev(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_z_vect_type), intent(inout) :: x
+    
+    res = .false. 
+    if (allocated(x%v)) &
+         & res =  x%v%is_dev()
+    
+  end function z_vect_is_dev
+
   
   function z_vect_dot_v(n,x,y) result(res)
     implicit none 

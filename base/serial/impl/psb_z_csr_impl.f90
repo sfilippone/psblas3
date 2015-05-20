@@ -65,6 +65,7 @@ subroutine psb_z_csr_csmv(alpha,a,x,beta,y,info,trans)
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  if (a%is_dev())   call a%sync()
 
   if (present(trans)) then
     trans_ = trans
@@ -409,6 +410,7 @@ subroutine psb_z_csr_csmm(alpha,a,x,beta,y,info,trans)
 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (present(trans)) then
     trans_ = trans
@@ -758,6 +760,7 @@ subroutine psb_z_csr_cssv(alpha,a,x,beta,y,info,trans)
 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   if (present(trans)) then
     trans_ = trans
   else
@@ -1022,6 +1025,7 @@ subroutine psb_z_csr_cssm(alpha,a,x,beta,y,info,trans)
   info = psb_success_
   call psb_erractionsave(err_act)
 
+  if (a%is_dev())   call a%sync()
   if (present(trans)) then
     trans_ = trans
   else
@@ -1270,6 +1274,7 @@ function psb_z_csr_maxval(a) result(res)
   character(len=20)  :: name='z_csr_maxval'
   logical, parameter :: debug=.false.
 
+  if (a%is_dev())   call a%sync()
 
   res = dzero
   nnz = a%get_nzeros()
@@ -1296,7 +1301,8 @@ function psb_z_csr_csnmi(a) result(res)
 
 
   res = dzero
- 
+  if (a%is_dev())   call a%sync()
+
   do i = 1, a%get_nrows()
     acc = dzero
     do j=a%irp(i),a%irp(i+1)-1  
@@ -1324,6 +1330,7 @@ subroutine psb_z_csr_rowsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   if (size(d) < m) then 
@@ -1373,6 +1380,7 @@ subroutine psb_z_csr_arwsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   if (size(d) < m) then 
@@ -1422,6 +1430,7 @@ subroutine psb_z_csr_colsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   n = a%get_ncols()
@@ -1474,6 +1483,7 @@ subroutine psb_z_csr_aclsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   n = a%get_ncols()
@@ -1525,6 +1535,7 @@ subroutine psb_z_csr_get_diag(a,d,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
@@ -1586,6 +1597,7 @@ subroutine psb_z_csr_scal(d,a,info,side)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     call a%make_nonunit()
@@ -1627,7 +1639,7 @@ subroutine psb_z_csr_scal(d,a,info,side)
     enddo
   end if
 
-
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -1659,6 +1671,7 @@ subroutine psb_z_csr_scals(d,a,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     call a%make_nonunit()
@@ -1667,6 +1680,7 @@ subroutine psb_z_csr_scals(d,a,info)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -1814,6 +1828,7 @@ subroutine  psb_z_csr_allocate_mnnz(m,n,a,nz)
     call a%set_triangle(.false.)
     call a%set_unit(.false.)
     call a%set_dupl(psb_dupl_def_)
+    call a%set_host()
   end if
 
   call psb_erractionrestore(err_act)
@@ -1853,6 +1868,7 @@ subroutine psb_z_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
 
@@ -2027,6 +2043,7 @@ subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
   
@@ -2287,6 +2304,7 @@ subroutine psb_z_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   end if
 
   if (nz == 0) return
+  if (a%is_dev())   call a%sync()
 
   nza  = a%get_nzeros()
 
@@ -2306,6 +2324,7 @@ subroutine psb_z_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
            & ': Discarded entries not  belonging to us.'                    
       info = psb_success_
     end if
+    call a%set_host()
 
   else 
     ! State is wrong.
@@ -2516,6 +2535,7 @@ subroutine psb_z_csr_reinit(a,clear)
   call psb_erractionsave(err_act)
   info = psb_success_
 
+  if (a%is_dev())   call a%sync()
 
   if (present(clear)) then 
     clear_ = clear
@@ -2529,6 +2549,7 @@ subroutine psb_z_csr_reinit(a,clear)
   else if (a%is_asb()) then 
     if (clear_) a%val(:) = zzero
     call a%set_upd()
+    call a%set_host()
   else
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2599,6 +2620,7 @@ subroutine psb_z_csr_print(iout,a,iv,head,ivr,ivc)
     write(iout,'(a)') '%'    
     write(iout,'(a,a)') '% COO'
   endif
+  if (a%is_dev())   call a%sync()
 
   nr = a%get_nrows()
   nc = a%get_ncols()
@@ -2672,7 +2694,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-
+  
   if (.not.b%is_by_rows()) then 
     ! This is to have fix_coo called behind the scenes
     call tmp%cp_from_coo(b,info)
@@ -2690,9 +2712,11 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%val,a%val)
     call psb_realloc(max(nr+1,nc+1),a%irp,info)
     call tmp%free()
+
   else
     
     if (info /= psb_success_) return
+    if (b%is_dev())   call b%sync()
     
     nr  = b%get_nrows()
     nc  = b%get_ncols()
@@ -2720,6 +2744,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     ip = ip + ncl
   end do
   a%irp(nr+1) = ip
+  call a%set_host()
   
 
 end subroutine psb_z_cp_csr_from_coo
@@ -2746,6 +2771,7 @@ subroutine psb_z_cp_csr_to_coo(a,b,info)
 
   info = psb_success_
 
+  if (a%is_dev())   call a%sync()
   nr  = a%get_nrows()
   nc  = a%get_ncols()
   nza = a%get_nzeros()
@@ -2763,6 +2789,7 @@ subroutine psb_z_cp_csr_to_coo(a,b,info)
   call b%set_nzeros(a%get_nzeros())
   call b%set_sort_status(psb_row_major_)
   call b%set_asb()
+  call b%set_host()
 
 end subroutine psb_z_cp_csr_to_coo
 
@@ -2788,6 +2815,7 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
 
   info = psb_success_
 
+  if (a%is_dev())   call a%sync()
   nr  = a%get_nrows()
   nc  = a%get_ncols()
   nza = a%get_nzeros()
@@ -2806,6 +2834,7 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
   call a%free()
   call b%set_sort_status(psb_row_major_)
   call b%set_asb()
+  call b%set_host()
 
 end subroutine psb_z_mv_csr_to_coo
 
@@ -2835,6 +2864,7 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
+  if (b%is_dev())   call b%sync()
 
   if (.not.b%is_by_rows()) call b%fix(info)
   if (info /= psb_success_) return
@@ -2865,8 +2895,8 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
     ip = ip + ncl
   end do
   a%irp(nr+1) = ip
+  call a%set_host()
   
-
 end subroutine psb_z_mv_csr_from_coo
 
 
@@ -2894,13 +2924,15 @@ subroutine psb_z_mv_csr_to_fmt(a,b,info)
   type is (psb_z_coo_sparse_mat) 
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
-  type is (psb_z_csr_sparse_mat) 
+  type is (psb_z_csr_sparse_mat)
+    if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     call move_alloc(a%irp, b%irp)
     call move_alloc(a%ja,  b%ja)
     call move_alloc(a%val, b%val)
     call a%free()
-    
+    call b%set_host()
+
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -2936,12 +2968,14 @@ subroutine psb_z_cp_csr_to_fmt(a,b,info)
     call a%cp_to_coo(b,info)
 
   type is (psb_z_csr_sparse_mat) 
+    if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     nr = a%get_nrows()
     nz = a%get_nzeros()
     if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
     if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
     if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    call b%set_host()
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2976,11 +3010,14 @@ subroutine psb_z_mv_csr_from_fmt(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_z_csr_sparse_mat) 
+    if (b%is_dev())   call b%sync()
+
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     call move_alloc(b%irp, a%irp)
     call move_alloc(b%ja,  a%ja)
     call move_alloc(b%val, a%val)
     call b%free()
+    call a%set_host()
 
   class default
     call b%mv_to_coo(tmp,info)
@@ -3017,12 +3054,14 @@ subroutine psb_z_cp_csr_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_z_csr_sparse_mat) 
+    if (b%is_dev())   call b%sync()
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     nr = b%get_nrows()
     nz = b%get_nzeros()
     if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
     if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
     if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    call a%set_host()
 
   class default
     call b%cp_to_coo(tmp,info)
@@ -3045,6 +3084,9 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   name='psb_csrspspmm'
   call psb_erractionsave(err_act)
   info = psb_success_
+  
+  if (a%is_dev())   call a%sync()
+  if (b%is_dev())   call b%sync()
 
   ma = a%get_nrows()
   na = a%get_ncols()
@@ -3067,6 +3109,7 @@ subroutine psb_zcsrspspmm(a,b,c,info)
   call csr_spspmm(a,b,c,info)
 
   call c%set_asb()
+  call c%set_host()
 
   call psb_erractionrestore(err_act)
   return

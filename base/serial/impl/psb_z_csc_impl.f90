@@ -89,6 +89,7 @@ subroutine psb_z_csc_csmv(alpha,a,x,beta,y,info,trans)
     m = a%get_nrows()
   end if
 
+  if (a%is_dev())   call a%sync()
 
   if (size(x,1)<n) then 
     info = psb_err_input_asize_small_i_
@@ -377,6 +378,7 @@ subroutine psb_z_csc_csmm(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
+  if (a%is_dev())   call a%sync()
 
   nc = min(size(x,2) , size(y,2) )
 
@@ -636,6 +638,7 @@ subroutine psb_z_csc_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
+  if (a%is_dev())   call a%sync()
   tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
@@ -854,7 +857,7 @@ subroutine psb_z_csc_cssm(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  if (a%is_dev())   call a%sync()
 
   tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   m   = a%get_nrows()
@@ -1068,6 +1071,7 @@ function psb_z_csc_maxval(a) result(res)
   else
     res = dzero
   end if
+  if (a%is_dev())   call a%sync()
 
   nnz = a%get_nzeros()
   if (allocated(a%val)) then 
@@ -1096,6 +1100,7 @@ function psb_z_csc_csnm1(a) result(res)
 
 
   res = dzero 
+  if (a%is_dev())   call a%sync()
   m = a%get_nrows()
   n = a%get_ncols()
   is_unit = a%is_unit()
@@ -1132,6 +1137,7 @@ subroutine psb_z_csc_colsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_ncols()
   if (size(d) < m) then 
@@ -1179,6 +1185,7 @@ subroutine psb_z_csc_aclsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_ncols()
   if (size(d) < m) then 
@@ -1233,6 +1240,7 @@ subroutine psb_z_csc_rowsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_ncols()
   n = a%get_nrows()
@@ -1282,6 +1290,7 @@ subroutine psb_z_csc_arwsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_ncols()
   n = a%get_nrows()
@@ -1331,6 +1340,7 @@ subroutine psb_z_csc_get_diag(a,d,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
@@ -1388,6 +1398,7 @@ subroutine psb_z_csc_scal(d,a,info,side)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   side_ = 'L'
   if (present(side)) then 
@@ -1427,6 +1438,7 @@ subroutine psb_z_csc_scal(d,a,info,side)
       end do
     enddo
   end if
+  call a%set_host()
   call psb_erractionrestore(err_act)
   return
 
@@ -1453,6 +1465,7 @@ subroutine psb_z_csc_scals(d,a,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     call a%make_nonunit()
@@ -1461,6 +1474,7 @@ subroutine psb_z_csc_scals(d,a,info)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -1511,6 +1525,7 @@ subroutine psb_z_csc_csgetptn(imin,imax,a,nz,ia,ja,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
 
@@ -1698,6 +1713,7 @@ subroutine psb_z_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
     
@@ -1884,6 +1900,7 @@ subroutine psb_z_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info = psb_success_
@@ -1934,6 +1951,7 @@ subroutine psb_z_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
            & ': Discarded entries not  belonging to us.'                    
       info = psb_success_
     end if
+    call a%set_host()
 
   else 
     ! State is wrong.
@@ -2176,6 +2194,7 @@ subroutine psb_z_cp_csc_to_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
+  if (a%is_dev())   call a%sync()
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
@@ -2218,6 +2237,7 @@ subroutine psb_z_mv_csc_to_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
+  if (a%is_dev())   call a%sync()
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
@@ -2293,6 +2313,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
     ip = ip + nrl
   end do
   a%icp(nc+1) = ip
+  call a%set_host()
   
 
 end subroutine psb_z_mv_csc_from_coo
@@ -2323,12 +2344,14 @@ subroutine psb_z_mv_csc_to_fmt(a,b,info)
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
   type is (psb_z_csc_sparse_mat) 
+    if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     call move_alloc(a%icp, b%icp)
     call move_alloc(a%ia,  b%ia)
     call move_alloc(a%val, b%val)
     call a%free()
-    
+    call b%set_host()
+
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -2357,18 +2380,19 @@ subroutine psb_z_cp_csc_to_fmt(a,b,info)
 
   info = psb_success_
 
-
   select type (b)
   type is (psb_z_coo_sparse_mat) 
     call a%cp_to_coo(b,info)
 
   type is (psb_z_csc_sparse_mat) 
+    if (a%is_dev())   call a%sync()
     b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
     nc = a%get_ncols()
     nz = a%get_nzeros()
     if (info == 0) call psb_safe_cpy( a%icp(1:nc+1), b%icp , info)
     if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
     if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    call b%set_host()
 
   class default
     call a%cp_to_coo(tmp,info)
@@ -2403,16 +2427,20 @@ subroutine psb_z_mv_csc_from_fmt(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_z_csc_sparse_mat) 
+    if (b%is_dev())   call b%sync()
+
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     call move_alloc(b%icp, a%icp)
     call move_alloc(b%ia,  a%ia)
     call move_alloc(b%val, a%val)
     call b%free()
+    call a%set_host()
 
   class default
     call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
+  call a%set_host()
 
 end subroutine psb_z_mv_csc_from_fmt
 
@@ -2443,17 +2471,20 @@ subroutine psb_z_cp_csc_from_fmt(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_z_csc_sparse_mat) 
+    if (b%is_dev())   call b%sync()
     a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
     nc = b%get_ncols()
     nz = b%get_nzeros()
     if (info == 0) call psb_safe_cpy( b%icp(1:nc+1), a%icp , info)
     if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
     if (info == 0) call psb_safe_cpy( b%val(1:nz),   a%val , info)
+    call a%set_host()
 
   class default
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
+  call a%set_host()
   
 end subroutine psb_z_cp_csc_from_fmt
 
@@ -2597,6 +2628,7 @@ subroutine psb_z_csc_reinit(a,clear)
   call psb_erractionsave(err_act)
   info = psb_success_
 
+  if (a%is_dev())   call a%sync()
 
   if (present(clear)) then 
     clear_ = clear
@@ -2610,6 +2642,7 @@ subroutine psb_z_csc_reinit(a,clear)
   else if (a%is_asb()) then 
     if (clear_) a%val(:) = zzero
     call a%set_upd()
+    call a%set_host()
   else
     info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
@@ -2704,6 +2737,7 @@ subroutine  psb_z_csc_allocate_mnnz(m,n,a,nz)
     call a%set_triangle(.false.)
     call a%set_unit(.false.)
     call a%set_dupl(psb_dupl_def_)
+    call a%set_host()
   end if
 
   call psb_erractionrestore(err_act)
@@ -2741,6 +2775,7 @@ subroutine psb_z_csc_print(iout,a,iv,head,ivr,ivc)
     write(iout,'(a)') '%'    
     write(iout,'(a,a)') '% COO'
   endif
+  if (a%is_dev())   call a%sync()
 
   nr = a%get_nrows()
   nc = a%get_ncols()
@@ -2806,6 +2841,8 @@ subroutine psb_zcscspspmm(a,b,c,info)
   call psb_erractionsave(err_act)
   info = psb_success_
 
+  if (a%is_dev())   call a%sync()
+  if (b%is_dev())   call b%sync()
   ma = a%get_nrows()
   na = a%get_ncols()
   mb = b%get_nrows()
@@ -2828,6 +2865,7 @@ subroutine psb_zcscspspmm(a,b,c,info)
   call csc_spspmm(a,b,c,info)
 
   call c%set_asb()
+  call c%set_host()
 
   call psb_erractionrestore(err_act)
   return

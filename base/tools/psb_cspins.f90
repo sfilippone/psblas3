@@ -129,7 +129,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       end if
 
       call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
-      if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
+      if (info == 0) call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
+           & mask=(ila(1:nz)>0))
 
       if (info /= psb_success_) then
         ierr(1) = info
@@ -274,7 +275,8 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
     end if
 
     call desc_ar%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)
-    if (info == 0) call desc_ac%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info, mask=(ila(1:nz)>0))
+    if (info == 0) call desc_ac%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,&
+         & mask=(ila(1:nz)>0))
 
     if (psb_errstatus_fatal()) then
       ierr(1) = info 
@@ -385,44 +387,47 @@ subroutine psb_cspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
 
   if (desc_a%is_bld()) then 
 
-!!$    if (local_) then
-    info = psb_err_invalid_a_and_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-!!$    else      
-!!$      allocate(ila(nz),jla(nz),stat=info)
-!!$      if (info /= psb_success_) then
-!!$        ierr(1) = info
-!!$        call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$             & a_err='allocate',i_err=ierr)
-!!$        goto 9999
-!!$      end if
-!!$
-!!$      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info,owned=.true.)    
-!!$      call desc_a%indxmap%g2l_ins(ja(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
-!!$
-!!$      if (info /= psb_success_) then
-!!$        ierr(1) = info
-!!$        call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$             & a_err='psb_cdins',i_err=ierr)
-!!$        goto 9999
-!!$      end if
-!!$      nrow = desc_a%get_local_rows()
-!!$      ncol = desc_a%get_local_cols()
-!!$
-!!$      if (a%is_bld()) then 
-!!$        call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
-!!$        if (info /= psb_success_) then
-!!$          info=psb_err_from_subroutine_
-!!$          call psb_errpush(info,name,a_err='a%csput')
-!!$          goto 9999
-!!$        end if
-!!$      else
-!!$        info = psb_err_invalid_a_and_cd_state_
-!!$        call psb_errpush(info,name)
-!!$        goto 9999
-!!$      end if
-!!$    endif
+    if (local_) then
+      info = psb_err_invalid_a_and_cd_state_
+      call psb_errpush(info,name)
+      goto 9999
+    else      
+      allocate(ila(nz),jla(nz),stat=info)
+      if (info /= psb_success_) then
+        ierr(1) = info
+        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+             & a_err='allocate',i_err=ierr)
+        goto 9999
+      end if
+      if (ia%is_dev()) call ia%sync()
+      if (ja%is_dev()) call ja%sync()
+      if (val%is_dev()) call val%sync()
+
+      call desc_a%indxmap%g2l(ia%v%v(1:nz),ila(1:nz),info,owned=.true.)    
+      call desc_a%indxmap%g2l_ins(ja%v%v(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
+
+      if (info /= psb_success_) then
+        ierr(1) = info
+        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+             & a_err='psb_cdins',i_err=ierr)
+        goto 9999
+      end if
+      nrow = desc_a%get_local_rows()
+      ncol = desc_a%get_local_cols()
+
+      if (a%is_bld()) then 
+        call a%csput(nz,ila,jla,val%v%v,ione,nrow,ione,ncol,info)
+        if (info /= psb_success_) then
+          info=psb_err_from_subroutine_
+          call psb_errpush(info,name,a_err='a%csput')
+          goto 9999
+        end if
+      else
+        info = psb_err_invalid_a_and_cd_state_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    endif
 
   else if (desc_a%is_asb()) then 
 
@@ -436,24 +441,25 @@ subroutine psb_cspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
         goto 9999
       end if
     else
-      info = psb_err_invalid_cd_state_
+      allocate(ila(nz),jla(nz),stat=info)
+      if (info /= psb_success_) then
+        ierr(1) = info
+        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+             & a_err='allocate',i_err=ierr)
+        goto 9999
+      end if
+      if (ia%is_dev()) call ia%sync()
+      if (ja%is_dev()) call ja%sync()
+      if (val%is_dev()) call val%sync()
 
-!!$      allocate(ila(nz),jla(nz),stat=info)
-!!$      if (info /= psb_success_) then
-!!$        ierr(1) = info
-!!$        call psb_errpush(psb_err_from_subroutine_ai_,name,&
-!!$             & a_err='allocate',i_err=ierr)
-!!$        goto 9999
-!!$      end if
-!!$
-!!$      call desc_a%indxmap%g2l(ia(1:nz),ila(1:nz),info)
-!!$      if (info == 0) call desc_a%indxmap%g2l(ja(1:nz),jla(1:nz),info)
-!!$      if (info == 0) call a%csput(nz,ila,jla,val,ione,nrow,ione,ncol,info)
-!!$      if (info /= psb_success_) then
-!!$        info=psb_err_from_subroutine_
-!!$        call psb_errpush(info,name,a_err='a%csput')
-!!$        goto 9999
-!!$      end if
+      call desc_a%indxmap%g2l(ia%v%v(1:nz),ila(1:nz),info)
+      if (info == 0) call desc_a%indxmap%g2l(ja%v%v(1:nz),jla(1:nz),info)
+      if (info == 0) call a%csput(nz,ila,jla,val%v%v,ione,nrow,ione,ncol,info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='a%csput')
+        goto 9999
+      end if
     end if
   else
     info = psb_err_invalid_cd_state_

@@ -367,9 +367,10 @@ subroutine psb_d_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   info = psb_success_
   
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if (a%is_dev())   call a%sync()
     if (val%is_dev()) call val%sync()
-    if (ia%is_dev()) call ia%sync()
-    if (ja%is_dev()) call ja%sync()
+    if (ia%is_dev())  call ia%sync()
+    if (ja%is_dev())  call ja%sync()
     call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
   else
     info = psb_err_invalid_mat_state_
