@@ -1844,7 +1844,7 @@ if test "x$psblas_cv_metislibdir" != "x"; then
 fi
 
 AC_MSG_NOTICE([metis dir $psblas_cv_metisdir])
-AC_CHECK_HEADER([metis.h],
+AC_CHECK_HEADERS([limits.h metis.h],
  [pac_metis_header_ok=yes],
  [pac_metis_header_ok=no; METIS_INCLUDES=""])
 if test "x$pac_metis_header_ok" == "xno" ; then
@@ -1854,7 +1854,7 @@ dnl Maybe Include or include subdirs?
   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
 
  AC_MSG_CHECKING([for metis_h in $METIS_INCLUDES])
- AC_CHECK_HEADER([metis.h],
+ AC_CHECK_HEADERS([limits.h metis.h],
     [pac_metis_header_ok=yes],
     [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
@@ -1863,7 +1863,7 @@ dnl Maybe new structure with METIS UFconfig METIS?
    unset ac_cv_header_metis_h
    METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
    CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
-   AC_CHECK_HEADER([metis.h],
+   AC_CHECK_HEADERS([limits.h metis.h],
      [pac_metis_header_ok=yes],
      [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
