@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -47,29 +47,10 @@ module psb_i_vect_mod
     procedure, pass(x) :: get_nrows => i_vect_get_nrows
     procedure, pass(x) :: sizeof   => i_vect_sizeof
     procedure, pass(x) :: get_fmt  => i_vect_get_fmt
-    procedure, pass(x) :: dot_v    => i_vect_dot_v
-    procedure, pass(x) :: dot_a    => i_vect_dot_a
-    generic, public    :: dot      => dot_v, dot_a
-    procedure, pass(y) :: axpby_v  => i_vect_axpby_v
-    procedure, pass(y) :: axpby_a  => i_vect_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
-    procedure, pass(y) :: mlt_v    => i_vect_mlt_v
-    procedure, pass(y) :: mlt_a    => i_vect_mlt_a
-    procedure, pass(z) :: mlt_a_2  => i_vect_mlt_a_2
-    procedure, pass(z) :: mlt_v_2  => i_vect_mlt_v_2
-    procedure, pass(z) :: mlt_va   => i_vect_mlt_va
-    procedure, pass(z) :: mlt_av   => i_vect_mlt_av
-    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
-         & mlt_v_2, mlt_av, mlt_va
-    procedure, pass(x) :: scal     => i_vect_scal
-    procedure, pass(x) :: nrm2     => i_vect_nrm2
-    procedure, pass(x) :: amax     => i_vect_amax
-    procedure, pass(x) :: asum     => i_vect_asum
     procedure, pass(x) :: all      => i_vect_all
     procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
     procedure, pass(x) :: asb      => i_vect_asb
-    procedure, pass(x) :: sync     => i_vect_sync
     procedure, pass(x) :: gthab    => i_vect_gthab
     procedure, pass(x) :: gthzv    => i_vect_gthzv
     generic, public    :: gth      => gthab, gthzv
@@ -88,6 +69,15 @@ module psb_i_vect_mod
     procedure, pass(x) :: set_vect => i_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => i_vect_clone
+
+    procedure, pass(x) :: sync     => i_vect_sync
+    procedure, pass(x) :: is_host  => i_vect_is_host
+    procedure, pass(x) :: is_dev   => i_vect_is_dev
+    procedure, pass(x) :: is_sync  => i_vect_is_sync
+    procedure, pass(x) :: set_host => i_vect_set_host
+    procedure, pass(x) :: set_dev  => i_vect_set_dev
+    procedure, pass(x) :: set_sync => i_vect_set_sync
+
   end type psb_i_vect_type
 
   public  :: psb_i_vect
@@ -95,7 +85,18 @@ module psb_i_vect_mod
   interface psb_i_vect
     module procedure constructor, size_const
   end interface psb_i_vect
- 
+
+  private :: i_vect_get_nrows, i_vect_sizeof, i_vect_get_fmt, &
+       & i_vect_all, i_vect_reall, i_vect_zero,  i_vect_asb, &
+       & i_vect_gthab, i_vect_gthzv, i_vect_sctb, &
+       & i_vect_free, i_vect_ins_a, i_vect_ins_v, i_vect_bld_x, &
+       & i_vect_bld_n, i_vect_get_vect, i_vect_cnv, i_vect_set_scal, &
+       & i_vect_set_vect, i_vect_clone, i_vect_sync, i_vect_is_host, &
+       & i_vect_is_dev, i_vect_is_sync, i_vect_set_host, &
+       & i_vect_set_dev, i_vect_set_sync
+
+
+
   class(psb_i_base_vect_type), allocatable, target,&
        & save, private :: psb_i_base_vect_default
 
@@ -160,10 +161,13 @@ contains
   
   subroutine i_vect_bld_x(x,invect,mold)
     integer(psb_ipk_), intent(in)          :: invect(:)
-    class(psb_i_vect_type), intent(out) :: x
+    class(psb_i_vect_type), intent(inout) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
     class(psb_i_base_vect_type), pointer :: mld
+
+    if (allocated(x%v)) &
+         & call x%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -187,10 +191,14 @@ contains
 
   subroutine i_vect_bld_n(x,n,mold)
     integer(psb_ipk_), intent(in) :: n
-    class(psb_i_vect_type), intent(out) :: x
+    class(psb_i_vect_type), intent(inout) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
     class(psb_i_base_vect_type), pointer :: mld
+
+
+    if (allocated(x%v)) &
+         & call x%free(info)
 
     if (present(mold)) then 
 #ifdef HAVE_MOLD
@@ -220,21 +228,23 @@ contains
     end if
   end function i_vect_get_vect
 
-  subroutine i_vect_set_scal(x,val)
+  subroutine i_vect_set_scal(x,val,first,last)
     class(psb_i_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
+    integer(psb_ipk_), optional :: first, last
         
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    if (allocated(x%v)) call x%v%set(val,first,last)
     
   end subroutine i_vect_set_scal
 
-  subroutine i_vect_set_vect(x,val)
+  subroutine i_vect_set_vect(x,val,first,last)
     class(psb_i_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)         :: val(:)
+    integer(psb_ipk_), optional :: first, last
         
     integer(psb_ipk_) :: info
-    if (allocated(x%v)) call x%v%set(val)
+    if (allocated(x%v)) call x%v%set(val,first,last)
     
   end subroutine i_vect_set_vect
 
@@ -283,223 +293,17 @@ contains
     res = 'NULL'
     if (allocated(x%v)) res = x%v%get_fmt()
   end function i_vect_get_fmt
-  
-  function i_vect_dot_v(n,x,y) result(res)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-
-    res = izero
-    if (allocated(x%v).and.allocated(y%v)) &
-         & res = x%v%dot(n,y%v)
-
-  end function i_vect_dot_v
-
-  function i_vect_dot_a(n,x,y) result(res)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    
-    res = izero
-    if (allocated(x%v)) &
-         & res = x%v%dot(n,y)
-    
-  end function i_vect_dot_a
-    
-  subroutine i_vect_axpby_v(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_i_vect_type), intent(inout)  :: x
-    class(psb_i_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    
-    if (allocated(x%v).and.allocated(y%v)) then 
-      call y%v%axpby(m,alpha,x%v,beta,info)
-    else
-      info = psb_err_invalid_vect_state_
-    end if
-
-  end subroutine i_vect_axpby_v
-
-  subroutine i_vect_axpby_a(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)               :: m
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    
-    if (allocated(y%v)) &
-         & call y%v%axpby(m,alpha,x,beta,info)
-    
-  end subroutine i_vect_axpby_a
-
-    
-  subroutine i_vect_mlt_v(x, y, info)
-    use psi_serial_mod
-    implicit none 
-    class(psb_i_vect_type), intent(inout)  :: x
-    class(psb_i_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (allocated(x%v).and.allocated(y%v)) &
-         & call y%v%mlt(x%v,info)
-
-  end subroutine i_vect_mlt_v
-
-  subroutine i_vect_mlt_a(x, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-
-    info = 0
-    if (allocated(y%v)) &
-         & call y%v%mlt(x,info)
-    
-  end subroutine i_vect_mlt_a
-
-
-  subroutine i_vect_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)         :: alpha,beta
-    integer(psb_ipk_), intent(in)         :: y(:)
-    integer(psb_ipk_), intent(in)         :: x(:)
-    class(psb_i_vect_type), intent(inout) :: z
-    integer(psb_ipk_), intent(out)                  :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0    
-    if (allocated(z%v)) &
-         & call z%v%mlt(alpha,x,y,beta,info)
-    
-  end subroutine i_vect_mlt_a_2
-
-  subroutine i_vect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)          :: alpha,beta
-    class(psb_i_vect_type), intent(inout)  :: x
-    class(psb_i_vect_type), intent(inout)  :: y
-    class(psb_i_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                   :: info    
-    character(len=1), intent(in), optional :: conjgx, conjgy
-
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (allocated(x%v).and.allocated(y%v).and.&
-         & allocated(z%v)) &
-         & call z%v%mlt(alpha,x%v,y%v,beta,info,conjgx,conjgy)
-
-  end subroutine i_vect_mlt_v_2
-
-  subroutine i_vect_mlt_av(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_vect_type), intent(inout)  :: y
-    class(psb_i_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (allocated(z%v).and.allocated(y%v)) &
-         & call z%v%mlt(alpha,x,y%v,beta,info)
-
-  end subroutine i_vect_mlt_av
-
-  subroutine i_vect_mlt_va(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    integer(psb_ipk_), intent(in)        :: y(:)
-    class(psb_i_vect_type), intent(inout)  :: x
-    class(psb_i_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    
-    if (allocated(z%v).and.allocated(x%v)) &
-         & call z%v%mlt(alpha,x%v,y,beta,info)
-
-  end subroutine i_vect_mlt_va
-
-  subroutine i_vect_scal(alpha, x)
-    use psi_serial_mod
-    implicit none 
-    class(psb_i_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent (in)       :: alpha
-    
-    if (allocated(x%v)) call x%v%scal(alpha)
-
-  end subroutine i_vect_scal
-
-
-  function i_vect_nrm2(n,x) result(res)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    
-    if (allocated(x%v)) then 
-      res = x%v%nrm2(n)
-    else
-      res = izero
-    end if
-
-  end function i_vect_nrm2
-  
-  function i_vect_amax(n,x) result(res)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-
-    if (allocated(x%v)) then 
-      res = x%v%amax(n)
-    else
-      res = izero
-    end if
-
-  end function i_vect_amax
-
-  function i_vect_asum(n,x) result(res)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-
-    if (allocated(x%v)) then 
-      res = x%v%asum(n)
-    else
-      res = izero
-    end if
-
-  end function i_vect_asum
-  
   subroutine i_vect_all(n, x, info, mold)
 
     implicit none 
-    integer(psb_ipk_), intent(in)       :: n
-    class(psb_i_vect_type), intent(out) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    class(psb_i_vect_type), intent(inout) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
     
+    if (allocated(x%v)) &
+         & call x%free(info)
+
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
@@ -553,15 +357,6 @@ contains
          & call x%v%asb(n,info)
     
   end subroutine i_vect_asb
-
-  subroutine i_vect_sync(x)
-    implicit none 
-    class(psb_i_vect_type), intent(inout) :: x
-    
-    if (allocated(x%v)) &
-         & call x%v%sync()
-    
-  end subroutine i_vect_sync
 
   subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
@@ -653,6 +448,7 @@ contains
 
   end subroutine i_vect_ins_v
 
+
   subroutine i_vect_cnv(x,mold)
     class(psb_i_vect_type), intent(inout) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
@@ -674,6 +470,77 @@ contains
     end if
   end subroutine i_vect_cnv
 
+
+  subroutine i_vect_sync(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%sync()
+    
+  end subroutine i_vect_sync
+
+  subroutine i_vect_set_sync(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_sync()
+    
+  end subroutine i_vect_set_sync
+
+  subroutine i_vect_set_host(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_host()
+    
+  end subroutine i_vect_set_host
+
+  subroutine i_vect_set_dev(x)
+    implicit none 
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    if (allocated(x%v)) &
+         & call x%v%set_dev()
+    
+  end subroutine i_vect_set_dev
+
+  function i_vect_is_sync(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_sync()
+    
+  end function i_vect_is_sync
+
+  function i_vect_is_host(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .true.
+    if (allocated(x%v)) &
+         & res = x%v%is_host()
+    
+  end function i_vect_is_host
+
+  function i_vect_is_dev(x) result(res)
+    implicit none 
+    logical :: res
+    class(psb_i_vect_type), intent(inout) :: x
+    
+    res = .false. 
+    if (allocated(x%v)) &
+         & res =  x%v%is_dev()
+    
+  end function i_vect_is_dev
+
+
 end module psb_i_vect_mod
 
 
@@ -683,7 +550,7 @@ module psb_i_multivect_mod
   use psb_i_base_multivect_mod
   use psb_const_mod
 
-  private
+  !private
 
   type psb_i_multivect_type
     class(psb_i_base_multivect_type), allocatable :: v 
@@ -692,34 +559,12 @@ module psb_i_multivect_mod
     procedure, pass(x) :: get_ncols => i_vect_get_ncols
     procedure, pass(x) :: sizeof   => i_vect_sizeof
     procedure, pass(x) :: get_fmt  => i_vect_get_fmt
-!!$    procedure, pass(x) :: dot_v    => i_vect_dot_v
-!!$    procedure, pass(x) :: dot_a    => i_vect_dot_a
-!!$    generic, public    :: dot      => dot_v, dot_a
-!!$    procedure, pass(y) :: axpby_v  => i_vect_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => i_vect_axpby_a
-!!$    generic, public    :: axpby    => axpby_v, axpby_a
-!!$    procedure, pass(y) :: mlt_v    => i_vect_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => i_vect_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => i_vect_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => i_vect_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => i_vect_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => i_vect_mlt_av
-!!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
-!!$         & mlt_v_2, mlt_av, mlt_va
-!!$    procedure, pass(x) :: scal     => i_vect_scal
-!!$    procedure, pass(x) :: nrm2     => i_vect_nrm2
-!!$    procedure, pass(x) :: amax     => i_vect_amax
-!!$    procedure, pass(x) :: asum     => i_vect_asum
+
     procedure, pass(x) :: all      => i_vect_all
     procedure, pass(x) :: reall    => i_vect_reall
     procedure, pass(x) :: zero     => i_vect_zero
     procedure, pass(x) :: asb      => i_vect_asb
     procedure, pass(x) :: sync     => i_vect_sync
-!!$    procedure, pass(x) :: gthab    => i_vect_gthab
-!!$    procedure, pass(x) :: gthzv    => i_vect_gthzv
-!!$    generic, public    :: gth      => gthab, gthzv
-!!$    procedure, pass(y) :: sctb     => i_vect_sctb
-!!$    generic, public    :: sct      => sctb
     procedure, pass(x) :: free     => i_vect_free
     procedure, pass(x) :: ins      => i_vect_ins
     procedure, pass(x) :: bld_x    => i_vect_bld_x
@@ -731,11 +576,17 @@ module psb_i_multivect_mod
     procedure, pass(x) :: set_vect => i_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => i_vect_clone
+!!$    procedure, pass(x) :: gthab    => i_vect_gthab
+!!$    procedure, pass(x) :: gthzv    => i_vect_gthzv
+!!$    generic, public    :: gth      => gthab, gthzv
+!!$    procedure, pass(y) :: sctb     => i_vect_sctb
+!!$    generic, public    :: sct      => sctb
   end type psb_i_multivect_type
 
   public  :: psb_i_multivect, psb_i_multivect_type,&
        & psb_set_multivect_default, psb_get_multivect_default
 
+  private
   interface psb_i_multivect
     module procedure constructor, size_const
   end interface
@@ -907,7 +758,7 @@ contains
   function i_vect_get_nrows(x) result(res)
     implicit none 
     class(psb_i_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
+    integer(psb_ipk_)  :: res
     res = 0
     if (allocated(x%v)) res = x%v%get_nrows()
   end function i_vect_get_nrows
@@ -935,214 +786,6 @@ contains
     res = 'NULL'
     if (allocated(x%v)) res = x%v%get_fmt()
   end function i_vect_get_fmt
-  
-!!$  function i_vect_dot_v(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout) :: x, y
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$
-!!$    res = izero
-!!$    if (allocated(x%v).and.allocated(y%v)) &
-!!$         & res = x%v%dot(n,y%v)
-!!$
-!!$  end function i_vect_dot_v
-!!$
-!!$  function i_vect_dot_a(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)    :: y(:)
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    
-!!$    res = izero
-!!$    if (allocated(x%v)) &
-!!$         & res = x%v%dot(n,y)
-!!$    
-!!$  end function i_vect_dot_a
-!!$    
-!!$  subroutine i_vect_axpby_v(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    class(psb_i_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    if (allocated(x%v).and.allocated(y%v)) then 
-!!$      call y%v%axpby(m,alpha,x%v,beta,info)
-!!$    else
-!!$      info = psb_err_invalid_vect_state_
-!!$    end if
-!!$
-!!$  end subroutine i_vect_axpby_v
-!!$
-!!$  subroutine i_vect_axpby_a(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    if (allocated(y%v)) &
-!!$         & call y%v%axpby(m,alpha,x,beta,info)
-!!$    
-!!$  end subroutine i_vect_axpby_a
-!!$
-!!$    
-!!$  subroutine i_vect_mlt_v(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    if (allocated(x%v).and.allocated(y%v)) &
-!!$         & call y%v%mlt(x%v,info)
-!!$
-!!$  end subroutine i_vect_mlt_v
-!!$
-!!$  subroutine i_vect_mlt_a(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$
-!!$    info = 0
-!!$    if (allocated(y%v)) &
-!!$         & call y%v%mlt(x,info)
-!!$    
-!!$  end subroutine i_vect_mlt_a
-!!$
-!!$
-!!$  subroutine i_vect_mlt_a_2(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)         :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)         :: y(:)
-!!$    integer(psb_ipk_), intent(in)         :: x(:)
-!!$    class(psb_i_multivect_type), intent(inout) :: z
-!!$    integer(psb_ipk_), intent(out)                  :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0    
-!!$    if (allocated(z%v)) &
-!!$         & call z%v%mlt(alpha,x,y,beta,info)
-!!$    
-!!$  end subroutine i_vect_mlt_a_2
-!!$
-!!$  subroutine i_vect_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)          :: alpha,beta
-!!$    class(psb_i_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    class(psb_i_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)                   :: info    
-!!$    character(len=1), intent(in), optional :: conjgx, conjgy
-!!$
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    if (allocated(x%v).and.allocated(y%v).and.&
-!!$         & allocated(z%v)) &
-!!$         & call z%v%mlt(alpha,x%v,y%v,beta,info,conjgx,conjgy)
-!!$
-!!$  end subroutine i_vect_mlt_v_2
-!!$
-!!$  subroutine i_vect_mlt_av(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_multivect_type), intent(inout)  :: y
-!!$    class(psb_i_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    if (allocated(z%v).and.allocated(y%v)) &
-!!$         & call z%v%mlt(alpha,x,y%v,beta,info)
-!!$
-!!$  end subroutine i_vect_mlt_av
-!!$
-!!$  subroutine i_vect_mlt_va(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)        :: y(:)
-!!$    class(psb_i_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    
-!!$    if (allocated(z%v).and.allocated(x%v)) &
-!!$         & call z%v%mlt(alpha,x%v,y,beta,info)
-!!$
-!!$  end subroutine i_vect_mlt_va
-!!$
-!!$  subroutine i_vect_scal(alpha, x)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout)  :: x
-!!$    integer(psb_ipk_), intent (in)       :: alpha
-!!$    
-!!$    if (allocated(x%v)) call x%v%scal(alpha)
-!!$
-!!$  end subroutine i_vect_scal
-!!$
-!!$
-!!$  function i_vect_nrm2(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    
-!!$    if (allocated(x%v)) then 
-!!$      res = x%v%nrm2(n)
-!!$    else
-!!$      res = izero
-!!$    end if
-!!$
-!!$  end function i_vect_nrm2
-!!$  
-!!$  function i_vect_amax(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$
-!!$    if (allocated(x%v)) then 
-!!$      res = x%v%amax(n)
-!!$    else
-!!$      res = izero
-!!$    end if
-!!$
-!!$  end function i_vect_amax
-!!$
-!!$  function i_vect_asum(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$
-!!$    if (allocated(x%v)) then 
-!!$      res = x%v%asum(n)
-!!$    else
-!!$      res = izero
-!!$    end if
-!!$
-!!$  end function i_vect_asum
   
   subroutine i_vect_all(m,n, x, info, mold)
 
@@ -1305,5 +948,6 @@ contains
       call move_alloc(tmp,x%v)
     end if
   end subroutine i_vect_cnv
+
 
 end module psb_i_multivect_mod

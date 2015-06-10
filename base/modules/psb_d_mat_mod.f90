@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -44,7 +44,7 @@
 ! the functionalities to have the encapsulated class change its
 ! type dynamically, and to extract/input an inner object.
 !
-! A sparse matric has a state corresponding to its progression
+! A sparse matrix has a state corresponding to its progression
 ! through the application life.
 ! In particular, computational methods can only be invoked when
 ! the matrix is in the ASSEMBLED state, whereas the other states are
@@ -147,6 +147,23 @@ module psb_d_mat_mod
     procedure, pass(a) :: transc_1mat => psb_d_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_d_transc_2mat
     generic, public    :: transc      => transc_1mat, transc_2mat
+
+    !
+    ! Sync: centerpiece of handling of external storage.
+    ! Any derived class having extra storage upon sync
+    ! will guarantee that both fortran/host side and
+    ! external side contain the same data. The base
+    ! version is only a placeholder. 
+    !
+    procedure, pass(a) :: sync        => d_mat_sync
+    procedure, pass(a) :: is_host     => d_mat_is_host
+    procedure, pass(a) :: is_dev      => d_mat_is_dev
+    procedure, pass(a) :: is_sync     => d_mat_is_sync
+    procedure, pass(a) :: set_host    => d_mat_set_host
+    procedure, pass(a) :: set_dev     => d_mat_set_dev
+    procedure, pass(a) :: set_sync    => d_mat_set_sync
+
+
     ! These are specific to this level of encapsulation.
     procedure, pass(a) :: mv_from_b   => psb_d_mv_from
     generic, public    :: mv_from     => mv_from_b
@@ -188,11 +205,17 @@ module psb_d_mat_mod
 
   end type psb_dspmat_type
 
-  private :: psb_d_get_nrows, psb_d_get_ncols, psb_d_get_nzeros, psb_d_get_size, &
+  private :: psb_d_get_nrows, psb_d_get_ncols, &
+       & psb_d_get_nzeros, psb_d_get_size, &
        & psb_d_get_dupl, psb_d_is_null, psb_d_is_bld, &
        & psb_d_is_upd, psb_d_is_asb, psb_d_is_sorted, &
        & psb_d_is_by_rows, psb_d_is_by_cols, psb_d_is_upper, &
-       & psb_d_is_lower, psb_d_is_triangle, psb_d_get_nz_row
+       & psb_d_is_lower, psb_d_is_triangle, psb_d_get_nz_row, &
+       & d_mat_sync, d_mat_is_host, d_mat_is_dev, &
+       & d_mat_is_sync, d_mat_set_host, d_mat_set_dev,&
+       & d_mat_set_sync
+
+
 
   class(psb_d_base_sparse_mat), allocatable, target, &
        & save, private :: psb_d_base_mat_default
@@ -1112,6 +1135,85 @@ contains
   end function psb_d_is_by_cols
 
 
+  !
+  subroutine d_mat_sync(a)
+    implicit none 
+    class(psb_dspmat_type), target, intent(in) :: a
+    
+    if (allocated(a%a))  call a%a%sync()
+
+  end subroutine d_mat_sync
+
+  !
+  subroutine d_mat_set_host(a)
+    implicit none 
+    class(psb_dspmat_type), intent(inout) :: a
+
+    if (allocated(a%a))  call a%a%set_host()
+    
+  end subroutine d_mat_set_host
+
+
+  !
+  subroutine d_mat_set_dev(a)
+    implicit none 
+    class(psb_dspmat_type), intent(inout) :: a
+
+    if (allocated(a%a))  call a%a%set_dev()
+    
+  end subroutine d_mat_set_dev
+
+  !
+  subroutine d_mat_set_sync(a)
+    implicit none 
+    class(psb_dspmat_type), intent(inout) :: a
+
+    if (allocated(a%a))  call a%a%set_sync()
+    
+  end subroutine d_mat_set_sync
+
+  !
+  function d_mat_is_dev(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical  :: res
+  
+    if (allocated(a%a)) then
+      res = a%a%is_dev()
+    else
+      res = .false.
+    end if
+  end function d_mat_is_dev
+  
+  !
+  function d_mat_is_host(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical  :: res
+
+  
+    if (allocated(a%a)) then
+      res = a%a%is_host()
+    else
+      res = .true.
+    end if
+  end function d_mat_is_host
+
+  !
+  function d_mat_is_sync(a) result(res)
+    implicit none 
+    class(psb_dspmat_type), intent(in) :: a
+    logical  :: res
+
+  
+    if (allocated(a%a)) then
+      res = a%a%is_sync()
+    else
+      res = .true.
+    end if
+
+  end function d_mat_is_sync
+
 
   function psb_d_is_repeatable_updates(a) result(res)
     implicit none 
@@ -1176,6 +1278,8 @@ contains
     if (allocated(a%a)) res = a%a%get_nz_row(idx)
 
   end function psb_d_get_nz_row
+
+
 
 
 end module psb_d_mat_mod

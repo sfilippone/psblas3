@@ -1,5 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
-history.
+	history.
+2015/04/25: New optional args in V%set. 	
+2015/04/14: New absval method for vectors.
+	
+2015/03/20: Optimizations of  TO/FROM routines, use of is_by_rows in COO.
+	
 2015/01/05: Fix silly bug in format conversion csr_from_coo.
 	
 2014/12/21: Change error handling routines to make them more flexible for

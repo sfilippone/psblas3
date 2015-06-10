@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -114,6 +114,10 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: aclsum      => psb_d_base_aclsum
   end type psb_d_base_sparse_mat
   
+  private :: d_base_mat_sync, d_base_mat_is_host, d_base_mat_is_dev, &
+       & d_base_mat_is_sync, d_base_mat_set_host, d_base_mat_set_dev,&
+       & d_base_mat_set_sync
+  
   !> \namespace  psb_base_mod  \class  psb_d_coo_sparse_mat
   !! \extends psb_d_base_mat_mod::psb_d_base_sparse_mat
   !! 
@@ -133,7 +137,7 @@ module psb_d_base_mat_mod
     !> Coefficient values. 
     real(psb_dpk_), allocatable :: val(:)
 
-    integer, private     :: sort_status=psb_unsorted_
+    integer, private   :: sort_status=psb_unsorted_
     
   contains
     !
@@ -170,6 +174,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: set_by_rows  => d_coo_set_by_rows
     procedure, pass(a) :: set_by_cols  => d_coo_set_by_cols
     procedure, pass(a) :: set_sort_status => d_coo_set_sort_status
+    procedure, pass(a) :: get_sort_status => d_coo_get_sort_status
 
     !
     ! This is COO specific
@@ -428,8 +433,8 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_tril(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
-      class(psb_d_base_sparse_mat), intent(in)   :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: b
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
@@ -469,8 +474,8 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_triu(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
-      class(psb_d_base_sparse_mat), intent(in)   :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: b
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
@@ -586,7 +591,7 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_cp_from_coo(a,b,info) 
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(in) :: b
+      class(psb_d_coo_sparse_mat), intent(in)     :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_d_base_cp_from_coo
   end interface
@@ -656,7 +661,7 @@ module psb_d_base_mat_mod
     subroutine psb_d_base_mv_from_coo(a,b,info) 
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_d_base_mv_from_coo
   end interface
@@ -1367,7 +1372,7 @@ module psb_d_base_mat_mod
       import :: psb_ipk_, psb_d_coo_sparse_mat
       class(psb_d_coo_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine psb_d_cp_coo_from_coo
   end interface
   
@@ -1812,6 +1817,14 @@ contains
     
   end subroutine d_coo_set_nzeros
   
+  function d_coo_get_sort_status(a) result(res)
+    implicit none 
+    integer(psb_ipk_)   :: res
+    class(psb_d_coo_sparse_mat), intent(in) :: a
+    
+    res = a%sort_status
+  end function d_coo_get_sort_status
+  
   subroutine  d_coo_set_sort_status(ist,a)
     implicit none 
     integer(psb_ipk_), intent(in)   :: ist
@@ -1864,6 +1877,7 @@ contains
     call a%set_nrows(izero)
     call a%set_ncols(izero)
     call a%set_nzeros(izero)
+    call a%set_sort_status(psb_unsorted_)
     
     return
     
@@ -1895,8 +1909,9 @@ contains
     call move_alloc(a%ia,itemp)
     call move_alloc(a%ja,a%ia)
     call move_alloc(itemp,a%ja)
-    
+        
     call a%set_sorted(.false.)
+    call a%set_sort_status(psb_unsorted_)
     
     return
     

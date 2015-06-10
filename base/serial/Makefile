@@ -1,7 +1,7 @@
 include ../../Make.inc
 
 
-FOBJS = psb_lsame.o psi_serial_impl.o psb_sort_impl.o \
+FOBJS = psb_lsame.o psi_serial_impl.o \
 	psb_srwextd.o psb_drwextd.o psb_crwextd.o psb_zrwextd.o \
 	psb_sspspmm.o psb_dspspmm.o psb_cspspmm.o psb_zspspmm.o \
 	psb_ssymbmm.o psb_dsymbmm.o psb_csymbmm.o psb_zsymbmm.o \
@@ -11,13 +11,14 @@ FOBJS = psb_lsame.o psi_serial_impl.o psb_sort_impl.o \
 	psb_sgelp.o psb_dgelp.o psb_cgelp.o psb_zgelp.o \
 	psb_samax_s.o psb_damax_s.o psb_camax_s.o psb_zamax_s.o \
 	psb_sasum_s.o psb_dasum_s.o psb_casum_s.o psb_zasum_s.o 
+# psb_sort_impl.o
 
 LIBDIR=..
 INCDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
-lib: auxd  f77d impld lib1 $(FOBJS)
+lib:   f77d impld sortd lib1 $(FOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
@@ -26,18 +27,18 @@ lib: auxd  f77d impld lib1 $(FOBJS)
 lib1:	$(FOBJS)
 
 
-auxd: 
-	cd aux && $(MAKE) lib
-
 f77d:
 	cd f77 && $(MAKE) lib
 impld:
 	cd impl && $(MAKE) lib
 
+sortd:
+	cd sort && $(MAKE) lib
+
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
-	(cd aux; $(MAKE) clean)
 	(cd f77; $(MAKE) clean)
 	(cd impl; $(MAKE) clean)
+	(cd sort; $(MAKE) clean)
 
 veryclean: clean 

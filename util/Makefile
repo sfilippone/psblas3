@@ -12,7 +12,7 @@ BASEOBJS= psb_blockpart_mod.o psb_metispart_mod.o \
 IMPLOBJS= psb_s_hbio_impl.o psb_d_hbio_impl.o \
 	psb_c_hbio_impl.o psb_z_hbio_impl.o \
 	psb_s_mmio_impl.o psb_d_mmio_impl.o \
-	psb_c_mmio_impl.o psb_z_mmio_impl.o \
+	psb_c_mmio_impl.o psb_z_mmio_impl.o psb_i_mmio_impl.o\
 	psb_s_mat_dist_impl.o psb_d_mat_dist_impl.o \
 	psb_c_mat_dist_impl.o psb_z_mat_dist_impl.o \
 	psb_s_renum_impl.o psb_d_renum_impl.o \

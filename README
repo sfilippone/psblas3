@@ -1,7 +1,7 @@
-This directory contains  the PSBLAS library, version 3.3.
+This directory contains  the PSBLAS library, version 3.4.
 
 
-Existing codes will work untouched with version 3.3, but they will
+Existing codes will work untouched with version 3.4, but they will
 have to be recompiled; new methods have been added for the sake of GPU
 computations, plus the usual bunch of bug fixes.
 
@@ -41,7 +41,7 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 
-See docs/psblas-3.2.pdf; an HTML version of the same document is
+See docs/psblas-3.4.pdf; an HTML version of the same document is
 available in docs/html. 
 Please consult the sample programs, especially 
 test/pargen/ppde[23]d.f90

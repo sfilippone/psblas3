@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -357,8 +357,8 @@ end subroutine psb_sspmm
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -813,9 +813,7 @@ subroutine  psb_sspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     call psi_ovrl_save(x%v,xvsave,desc_a,info)
     if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,psb_avg_,info)
 
-!!! THIS SHOULD BE FIXED !!! But beta is almost never /= 0
-!!$    yp(nrow+1:ncol) = szero
-
+    if (beta /= szero) call y%set(szero,nrow+1,ncol)
     !  local Matrix-vector product
     if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 

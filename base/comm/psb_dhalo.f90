@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -39,7 +39,6 @@
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   alpha     -  real(optional).            Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
 !   work      -  real(optional).            Work  area.
@@ -53,7 +52,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
+subroutine  psb_dhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalom
   use psi_mod
   implicit none
@@ -61,7 +60,6 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   real(psb_dpk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_ipk_), intent(out)                      :: info
-  real(psb_dpk_), intent(in), optional    :: alpha
   real(psb_dpk_), optional, target, intent(inout) :: work(:)
   integer(psb_ipk_), intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
@@ -147,14 +145,6 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
 
-  if(present(alpha)) then
-    if(alpha /= done) then
-      do i=0, k-1
-        call dscal(int(nrow,kind=psb_mpik_),alpha,x(:,jjx+i),1)
-      end do
-    end if
-  end if
-
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
@@ -217,8 +207,8 @@ end subroutine psb_dhalom
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -256,7 +246,6 @@ end subroutine psb_dhalom
 !   x         -  real,dimension(:).            The local part of the dense vector.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
-!   alpha     -  real(optional).            Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
 !   work      -  real(optional).            Work  area.
@@ -270,7 +259,7 @@ end subroutine psb_dhalom
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
+subroutine  psb_dhalov(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalov
   use psi_mod
   implicit none
@@ -278,7 +267,6 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   real(psb_dpk_), intent(inout)          :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_ipk_), intent(out)                      :: info
-  real(psb_dpk_), intent(in), optional   :: alpha
   real(psb_dpk_), target, optional, intent(inout) :: work(:)
   integer(psb_ipk_), intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
@@ -347,12 +335,6 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
 
-  if(present(alpha)) then
-    if(alpha /= done) then
-      call dscal(int(nrow,kind=psb_mpik_),alpha,x,ione)
-    end if
-  end if
-
   liwork=nrow
   if (present(work)) then
     if(size(work) >= liwork) then
@@ -410,7 +392,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
 end subroutine psb_dhalov
 
 
-subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
+subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_vect
   use psi_mod
   implicit none
@@ -418,7 +400,6 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   type(psb_d_vect_type), intent(inout)    :: x
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
-  real(psb_dpk_), intent(in), optional :: alpha
   real(psb_dpk_), target, optional, intent(inout)  :: work(:)
   integer(psb_ipk_), intent(in), optional           :: mode,data
   character, intent(in), optional         :: tran
@@ -492,12 +473,6 @@ subroutine  psb_dhalo_vect(x,desc_a,info,alpha,work,tran,mode,data)
   err=info
   call psb_errcomm(ictxt,err)
   if(err /= 0) goto 9999
-
-  if(present(alpha)) then
-    if(alpha /= done) then
-      call x%scal(alpha)
-    end if
-  end if
 
   liwork=nrow
   if (present(work)) then

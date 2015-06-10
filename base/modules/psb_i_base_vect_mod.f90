@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -46,7 +46,7 @@ module psb_i_base_vect_mod
   
   use psb_const_mod
   use psb_error_mod
-
+  use psb_realloc_mod
 
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type 
@@ -61,6 +61,8 @@ module psb_i_base_vect_mod
   type psb_i_base_vect_type
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:)
+    integer(psb_ipk_), allocatable :: combuf(:) 
+    integer(psb_ipk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -97,6 +99,17 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: set_sync => i_base_set_sync
 
     !
+    ! These are for handling gather/scatter in new
+    ! comm internals implementation.
+    !
+    procedure, nopass  :: use_buffer   => i_base_use_buffer
+    procedure, pass(x) :: new_buffer   => i_base_new_buffer
+    procedure, nopass  :: device_wait  => i_base_device_wait
+    procedure, pass(x) :: free_buffer  => i_base_free_buffer
+    procedure, pass(x) :: new_comid    => i_base_new_comid
+    procedure, pass(x) :: free_comid   => i_base_free_comid
+
+    !
     ! Basic info
     procedure, pass(x) :: get_nrows => i_base_get_nrows
     procedure, pass(x) :: sizeof    => i_base_sizeof
@@ -109,34 +122,6 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: set_scal => i_base_set_scal
     procedure, pass(x) :: set_vect => i_base_set_vect
     generic, public    :: set      => set_vect, set_scal
-
-    !
-    ! Dot product and AXPBY
-    !
-    procedure, pass(x) :: dot_v    => i_base_dot_v
-    procedure, pass(x) :: dot_a    => i_base_dot_a
-    generic, public    :: dot      => dot_v, dot_a
-    procedure, pass(y) :: axpby_v  => i_base_axpby_v
-    procedure, pass(y) :: axpby_a  => i_base_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
-    !
-    ! Vector by vector multiplication. Need all variants
-    ! to handle multiple requirements from preconditioners
-    !
-    procedure, pass(y) :: mlt_v    => i_base_mlt_v
-    procedure, pass(y) :: mlt_a    => i_base_mlt_a
-    procedure, pass(z) :: mlt_a_2  => i_base_mlt_a_2
-    procedure, pass(z) :: mlt_v_2  => i_base_mlt_v_2
-    procedure, pass(z) :: mlt_va   => i_base_mlt_va
-    procedure, pass(z) :: mlt_av   => i_base_mlt_av
-    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, mlt_va
-    !
-    ! Scaling and norms
-    !
-    procedure, pass(x) :: scal     => i_base_scal
-    procedure, pass(x) :: nrm2     => i_base_nrm2
-    procedure, pass(x) :: amax     => i_base_amax
-    procedure, pass(x) :: asum     => i_base_asum
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked. 
@@ -144,10 +129,15 @@ module psb_i_base_vect_mod
     procedure, pass(x) :: gthab    => i_base_gthab
     procedure, pass(x) :: gthzv    => i_base_gthzv
     procedure, pass(x) :: gthzv_x  => i_base_gthzv_x
-    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(x) :: gthzbuf  => i_base_gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
     procedure, pass(y) :: sctb     => i_base_sctb
     procedure, pass(y) :: sctb_x   => i_base_sctb_x
-    generic, public    :: sct      => sctb, sctb_x
+    procedure, pass(y) :: sctb_buf => i_base_sctb_buf
+    generic, public    :: sct      => sctb, sctb_x, sctb_buf
+
+
+
   end type psb_i_base_vect_type
 
   public  :: psb_i_base_vect
@@ -344,8 +334,8 @@ contains
 
       case default
         info = 321
-! !$      call psb_errpush(info,name)
-! !$      goto 9999
+        ! !$      call psb_errpush(info,name)
+        ! !$      goto 9999
       end select
     end if
     call x%set_host()
@@ -355,7 +345,6 @@ contains
     end if
 
   end subroutine i_base_ins_a
-
 
   subroutine i_base_ins_v(n,irl,val,dupl,x,info)
     use psi_serial_mod
@@ -396,7 +385,7 @@ contains
     class(psb_i_base_vect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=izero
-
+    call x%set_host()
   end subroutine i_base_zero
 
   
@@ -422,11 +411,12 @@ contains
     class(psb_i_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    info = 0
     if (x%get_nrows() < n) &
          & call psb_realloc(n,x%v,info)
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-
+    call x%sync()
   end subroutine i_base_asb
 
 
@@ -447,6 +437,8 @@ contains
     
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
+    if (info == 0) call x%free_buffer(info)
+    if (info == 0) call x%free_comid(info)
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
         
@@ -611,7 +603,7 @@ contains
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
-    call x%sync()
+    if (.not.x%is_host()) call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
@@ -629,14 +621,24 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine i_base_set_scal(x,val)
+  subroutine i_base_set_scal(x,val,first,last)
     class(psb_i_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
+    integer(psb_ipk_), optional :: first, last
         
-    integer(psb_ipk_) :: info
-    x%v = val
+    integer(psb_ipk_) :: info, first_, last_
+
+    first_=1
+    last_=size(x%v)
+    if (present(first)) first_ = max(1,first)
+    if (present(last))  last_  = min(last,last_)
     
+    if (x%is_dev()) call x%sync()
+    x%v(first_:last_) = val
+    call x%set_host()
+
   end subroutine i_base_set_scal
+
 
   !
   !> Function  base_set_vect
@@ -644,413 +646,29 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in 
   !!
-  subroutine i_base_set_vect(x,val)
+  subroutine i_base_set_vect(x,val,first,last)
     class(psb_i_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val(:)
-    integer(psb_ipk_) :: nr
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: first, last
+        
+    integer(psb_ipk_) :: info, first_, last_, nr
+
+    first_=1
+    last_=min(psb_size(x%v),size(val))
+    if (present(first)) first_ = max(1,first)
+    if (present(last))  last_  = min(last,last_)
 
     if (allocated(x%v)) then 
-      nr = min(size(x%v),size(val))
-      x%v(1:nr) = val(1:nr)
+      if (x%is_dev()) call x%sync()
+      x%v(first_:last_) = val(1:last_-first_+1)
     else
       x%v = val
     end if
+    call x%set_host()
 
   end subroutine i_base_set_vect
 
-  !
-  ! Dot products 
-  ! 
-  !
-  !> Function  base_dot_v
-  !! \memberof  psb_i_base_vect_type
-  !! \brief  Dot product by another base_vector
-  !! \param n    Number of entries to be considere
-  !! \param y    The other (base_vect) to be multiplied by
-  !!
-  function i_base_dot_v(n,x,y) result(res)
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    integer(psb_ipk_), external      :: idot
-    
-    res = izero
-    !
-    ! Note: this is the base implementation.
-    !  When we get here, we are sure that X is of
-    !  TYPE psb_i_base_vect.
-    !  If Y is not, throw the burden on it, implicitly
-    !  calling dot_a
-    !
-    select type(yy => y)
-    type is (psb_i_base_vect_type)
-      res = idot(n,x%v,1,y%v,1)
-    class default
-      res = y%dot(n,x%v)
-    end select
 
-  end function i_base_dot_v
-
-  !
-  ! Base workhorse is good old BLAS1
-  !
-  !
-  !> Function  base_dot_a
-  !! \memberof  psb_i_base_vect_type
-  !! \brief  Dot product by a normal array
-  !! \param n    Number of entries to be considere
-  !! \param y(:) The array to be multiplied by
-  !!
-  function i_base_dot_a(n,x,y) result(res)
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    integer(psb_ipk_), external      :: idot
-    
-    res = idot(n,y,1,x%v,1)
-
-  end function i_base_dot_a
-    
-  !
-  ! AXPBY is invoked via Y, hence the structure below. 
-  !
-  !
-  !
-  !> Function  base_axpby_v
-  !! \memberof  psb_i_base_vect_type
-  !! \brief AXPBY  by a (base_vect) y=alpha*x+beta*y
-  !! \param m    Number of entries to be considere
-  !! \param alpha scalar alpha
-  !! \param x     The class(base_vect) to be added
-  !! \param beta scalar alpha
-  !! \param info   return code
-  !!
-  subroutine i_base_axpby_v(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    
-    select type(xx => x)
-    type is (psb_i_base_vect_type)
-      call psb_geaxpby(m,alpha,x%v,beta,y%v,info)
-    class default
-      call y%axpby(m,alpha,x%v,beta,info)
-    end select
-
-  end subroutine i_base_axpby_v
-
-  !
-  ! AXPBY is invoked via Y, hence the structure below. 
-  !
-  !
-  !> Function  base_axpby_a
-  !! \memberof  psb_i_base_vect_type
-  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
-  !! \param m    Number of entries to be considere
-  !! \param alpha scalar alpha
-  !! \param x(:) The array to be added
-  !! \param beta scalar alpha
-  !! \param info   return code
-  !!
-  subroutine i_base_axpby_a(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)               :: m
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    
-    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-    
-  end subroutine i_base_axpby_a
-
-  
-  !
-  !  Multiple variants of two operations:
-  !  Simple multiplication  Y(:) = X(:)*Y(:)
-  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
-  !
-  !  Variants expanded according to the dynamic type
-  !  of the involved entities
-  !
-  !
-  !> Function  base_mlt_a
-  !! \memberof  psb_i_base_vect_type
-  !! \brief Vector entry-by-entry multiply  by a base_vect array y=x*y
-  !! \param x   The class(base_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine i_base_mlt_v(x, y, info)
-    use psi_serial_mod
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    select type(xx => x)
-    type is (psb_i_base_vect_type)
-      n = min(size(y%v), size(xx%v))
-      do i=1, n 
-        y%v(i) = y%v(i)*xx%v(i)
-      end do
-    class default
-      call y%mlt(x%v,info)
-    end select
-
-  end subroutine i_base_mlt_v
-
-  !
-  !> Function  base_mlt_a
-  !! \memberof  psb_i_base_vect_type
-  !! \brief Vector entry-by-entry multiply  by a normal array y=x*y
-  !! \param x(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine i_base_mlt_a(x, y, info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    n = min(size(y%v), size(x))
-    do i=1, n 
-      y%v(i) = y%v(i)*x(i)
-    end do
-    
-  end subroutine i_base_mlt_a
-
-
-  !
-  !> Function  base_mlt_a_2
-  !! \memberof  psb_i_base_vect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x(:) The array to be multiplied b
-  !! \param y(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine i_base_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    integer(psb_ipk_), intent(in)        :: y(:)
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0    
-    n = min(size(z%v), size(x), size(y))
-!!$    write(0,*) 'Mlt_a_2: ',n
-    if (alpha == izero) then 
-      if (beta == ione) then 
-        return 
-      else
-        do i=1, n
-          z%v(i) = beta*z%v(i)
-        end do
-      end if
-    else
-      if (alpha == ione) then 
-        if (beta == izero) then 
-          do i=1, n 
-            z%v(i) = y(i)*x(i)
-          end do
-        else if (beta == ione) then 
-          do i=1, n 
-            z%v(i) = z%v(i) + y(i)*x(i)
-          end do
-        else 
-          do i=1, n 
-            z%v(i) = beta*z%v(i) + y(i)*x(i)
-          end do
-        end if
-      else if (alpha == -ione) then 
-        if (beta == izero) then 
-          do i=1, n 
-            z%v(i) = -y(i)*x(i)
-          end do
-        else if (beta == ione) then 
-          do i=1, n 
-            z%v(i) = z%v(i) - y(i)*x(i)
-          end do
-        else 
-          do i=1, n 
-            z%v(i) = beta*z%v(i) - y(i)*x(i)
-          end do
-        end if
-      else
-        if (beta == izero) then 
-          do i=1, n 
-            z%v(i) = alpha*y(i)*x(i)
-          end do
-        else if (beta == ione) then 
-          do i=1, n 
-            z%v(i) = z%v(i) + alpha*y(i)*x(i)
-          end do
-        else 
-          do i=1, n 
-            z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
-          end do
-        end if
-      end if
-    end if
-  end subroutine i_base_mlt_a_2
-
-  !
-  !> Function  base_mlt_v_2
-  !! \memberof  psb_i_base_vect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_vect)
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x  The class(base_vect) to be multiplied b
-  !! \param y  The class(base_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine i_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    use psb_string_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    class(psb_i_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
-    character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer(psb_ipk_) :: i, n
-    logical :: conjgx_, conjgy_
-
-    info = 0
-    if (.not.psb_i_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
-    else 
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-    end if
-  end subroutine i_base_mlt_v_2
-
-  subroutine i_base_mlt_av(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    integer(psb_ipk_), intent(in)        :: x(:)
-    class(psb_i_base_vect_type), intent(inout)  :: y
-    class(psb_i_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    
-    call z%mlt(alpha,x,y%v,beta,info)
-
-  end subroutine i_base_mlt_av
-
-  subroutine i_base_mlt_va(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: alpha,beta
-    integer(psb_ipk_), intent(in)        :: y(:)
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    class(psb_i_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info    
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    
-    call z%mlt(alpha,y,x,beta,info)
-
-  end subroutine i_base_mlt_va
-
-
-  !
-  ! Simple scaling 
-  !
-  !> Function  base_scal
-  !! \memberof  psb_i_base_vect_type
-  !! \brief Scale all entries  x = alpha*x
-  !! \param alpha   The multiplier
-  !!
-  subroutine i_base_scal(alpha, x)
-    use psi_serial_mod
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent (in)       :: alpha
-    
-    if (allocated(x%v)) x%v = alpha*x%v
-
-  end subroutine i_base_scal
-  
-  !
-  ! Norms 1, 2 and infinity
-  !
-  !> Function  base_nrm2
-  !! \memberof  psb_i_base_vect_type
-  !! \brief 2-norm |x(1:n)|_2
-  !! \param n  how many entries to consider
-  function i_base_nrm2(n,x) result(res)
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    integer(psb_ipk_), external      :: inrm2
-    
-    res =  inrm2(n,x%v,1)
-
-  end function i_base_nrm2
-  
-  !
-  !> Function  base_amax
-  !! \memberof  psb_i_base_vect_type
-  !! \brief infinity-norm |x(1:n)|_\infty
-  !! \param n  how many entries to consider
-  function i_base_amax(n,x) result(res)
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    
-    res =  maxval(abs(x%v(1:n)))
-
-  end function i_base_amax
-
-  !
-  !> Function  base_asum
-  !! \memberof  psb_i_base_vect_type
-  !! \brief 1-norm |x(1:n)|_1
-  !! \param n  how many entries to consider
-  function i_base_asum(n,x) result(res)
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    integer(psb_ipk_)                :: res
-    
-    res =  sum(abs(x%v(1:n)))
-
-  end function i_base_asum
   
   
   !
@@ -1071,7 +689,7 @@ contains
     integer(psb_ipk_) :: alpha, beta, y(:)
     class(psb_i_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,alpha,x%v,beta,y)
 
   end subroutine i_base_gthab
@@ -1091,9 +709,107 @@ contains
     integer(psb_ipk_) ::  y(:)
     class(psb_i_base_vect_type) :: x
     
+    if (idx%is_dev()) call idx%sync()
     call x%gth(n,idx%v(i:),y)
 
   end subroutine i_base_gthzv_x
+
+  !
+  ! New comm internals impl. 
+  !
+  subroutine i_base_gthzbuf(i,n,idx,x)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_i_base_vect_type) :: x
+    
+    if (.not.allocated(x%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+      return
+    end if
+    if (idx%is_dev()) call idx%sync()
+    if (x%is_dev()) call x%sync()
+    call x%gth(n,idx%v(i:),x%combuf(i:))
+
+  end subroutine i_base_gthzbuf
+
+  subroutine i_base_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) :: beta
+    class(psb_i_base_vect_type) :: y
+    
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    call y%set_host()
+
+  end subroutine i_base_sctb_buf
+
+  !
+  !> Function  base_device_wait:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief device_wait: base version is a no-op.
+  !!           
+  !
+  subroutine i_base_device_wait()
+    implicit none 
+    
+  end subroutine i_base_device_wait
+
+  function i_base_use_buffer() result(res)
+    logical :: res
+    
+    res = .true.
+  end function i_base_use_buffer
+
+  subroutine i_base_new_buffer(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,x%combuf,info)
+  end subroutine i_base_new_buffer
+
+  subroutine i_base_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2,x%comid,info)
+  end subroutine i_base_new_comid
+
+
+  subroutine i_base_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine i_base_free_buffer
+
+  subroutine i_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i_base_free_comid
+
 
   !
   ! shortcut alpha=1 beta=0
@@ -1110,7 +826,7 @@ contains
     integer(psb_ipk_) ::  y(:)
     class(psb_i_base_vect_type) :: x
     
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call psi_gth(n,idx,x%v,y)
 
   end subroutine i_base_gthzv
@@ -1134,7 +850,7 @@ contains
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_base_vect_type) :: y
     
-    call y%sync()
+    if (y%is_dev()) call y%sync()
     call psi_sct(n,idx,x,beta,y%v)
     call y%set_host()
 
@@ -1147,11 +863,16 @@ contains
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_base_vect_type) :: y
     
+    if (idx%is_dev()) call idx%sync()
     call y%sct(n,idx%v(i:),x,beta)
+    call y%set_host()
 
   end subroutine i_base_sctb_x
 
 end module psb_i_base_vect_mod
+
+
+
 
 
 module psb_i_base_multivect_mod
@@ -1224,44 +945,6 @@ module psb_i_base_multivect_mod
     procedure, pass(x) :: set_vect => i_base_mv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
-    !
-    ! Dot product and AXPBY
-    !
-!!$    procedure, pass(x) :: dot_v    => i_base_mv_dot_v
-!!$    procedure, pass(x) :: dot_a    => i_base_mv_dot_a
-!!$    generic, public    :: dot      => dot_v, dot_a
-!!$    procedure, pass(y) :: axpby_v  => i_base_mv_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => i_base_mv_axpby_a
-!!$    generic, public    :: axpby    => axpby_v, axpby_a
-!!$    !
-!!$    ! Vector by vector multiplication. Need all variants
-!!$    ! to handle multiple requirements from preconditioners
-!!$    !
-!!$    procedure, pass(y) :: mlt_v    => i_base_mv_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => i_base_mv_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => i_base_mv_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => i_base_mv_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => i_base_mv_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => i_base_mv_mlt_av
-!!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, mlt_va
-!!$    !
-!!$    ! Scaling and norms
-!!$    !
-!!$    procedure, pass(x) :: scal     => i_base_mv_scal
-!!$    procedure, pass(x) :: nrm2     => i_base_mv_nrm2
-!!$    procedure, pass(x) :: amax     => i_base_mv_amax
-!!$    procedure, pass(x) :: asum     => i_base_mv_asum
-!!$    !
-!!$    ! Gather/scatter. These are needed for MPI interfacing.
-!!$    ! May have to be reworked. 
-!!$    !
-!!$    procedure, pass(x) :: gthab    => i_base_mv_gthab
-!!$    procedure, pass(x) :: gthzv    => i_base_mv_gthzv
-!!$    procedure, pass(x) :: gthzv_x  => i_base_mv_gthzv_x
-!!$    generic, public    :: gth      => gthab, gthzv, gthzv_x
-!!$    procedure, pass(y) :: sctb     => i_base_mv_sctb
-!!$    procedure, pass(y) :: sctb_x   => i_base_mv_sctb_x
-!!$    generic, public    :: sct      => sctb, sctb_x
   end type psb_i_base_multivect_type
 
   interface psb_i_base_multivect
@@ -1701,8 +1384,7 @@ contains
   function  i_base_mv_get_vect(x) result(res)
     class(psb_i_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), allocatable                 :: res(:,:)
-    integer(psb_ipk_) :: info, m, n
-
+    integer(psb_ipk_) :: info,m,n
     m = x%get_nrows()
     n = x%get_ncols()
     if (.not.allocated(x%v)) return 
@@ -1713,7 +1395,6 @@ contains
       return
     end if
     res(1:m,1:n) = x%v(1:m,1:n)
-
   end function i_base_mv_get_vect
     
   !
@@ -1757,495 +1438,5 @@ contains
 
   end subroutine i_base_mv_set_vect
 
-!!$  !
-!!$  ! Dot products 
-!!$  ! 
-!!$  !
-!!$  !> Function  base_mv_dot_v
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief  Dot product by another base_mv_vector
-!!$  !! \param n    Number of entries to be considere
-!!$  !! \param y    The other (base_mv_vect) to be multiplied by
-!!$  !!
-!!$  function i_base_mv_dot_v(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout) :: x, y
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: idot
-!!$    
-!!$    res = izero
-!!$    !
-!!$    ! Note: this is the base implementation.
-!!$    !  When we get here, we are sure that X is of
-!!$    !  TYPE psb_i_base_mv_vect.
-!!$    !  If Y is not, throw the burden on it, implicitly
-!!$    !  calling dot_a
-!!$    !
-!!$    select type(yy => y)
-!!$    type is (psb_i_base_multivect_type)
-!!$      res = idot(n,x%v,1,y%v,1)
-!!$    class default
-!!$      res = y%dot(n,x%v)
-!!$    end select
-!!$
-!!$  end function i_base_mv_dot_v
-!!$
-!!$  !
-!!$  ! Base workhorse is good old BLAS1
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_dot_a
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief  Dot product by a normal array
-!!$  !! \param n    Number of entries to be considere
-!!$  !! \param y(:) The array to be multiplied by
-!!$  !!
-!!$  function i_base_mv_dot_a(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)    :: y(:)
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: idot
-!!$    
-!!$    res = idot(n,y,1,x%v,1)
-!!$
-!!$  end function i_base_mv_dot_a
-    
-!!$  !
-!!$  ! AXPBY is invoked via Y, hence the structure below. 
-!!$  !
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_axpby_v
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief AXPBY  by a (base_mv_vect) y=alpha*x+beta*y
-!!$  !! \param m    Number of entries to be considere
-!!$  !! \param alpha scalar alpha
-!!$  !! \param x     The class(base_mv_vect) to be added
-!!$  !! \param beta scalar alpha
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_axpby_v(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    select type(xx => x)
-!!$    type is (psb_i_base_multivect_type)
-!!$      call psb_geaxpby(m,alpha,x%v,beta,y%v,info)
-!!$    class default
-!!$      call y%axpby(m,alpha,x%v,beta,info)
-!!$    end select
-!!$
-!!$  end subroutine i_base_mv_axpby_v
-!!$
-!!$  !
-!!$  ! AXPBY is invoked via Y, hence the structure below. 
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_axpby_a
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
-!!$  !! \param m    Number of entries to be considere
-!!$  !! \param alpha scalar alpha
-!!$  !! \param x(:) The array to be added
-!!$  !! \param beta scalar alpha
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_axpby_a(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-!!$    
-!!$  end subroutine i_base_mv_axpby_a
-
-  
-!!$  !
-!!$  !  Multiple variants of two operations:
-!!$  !  Simple multiplication  Y(:) = X(:)*Y(:)
-!!$  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
-!!$  !
-!!$  !  Variants expanded according to the dynamic type
-!!$  !  of the involved entities
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_mlt_a
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief Vector entry-by-entry multiply  by a base_mv_vect array y=x*y
-!!$  !! \param x   The class(base_mv_vect) to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_mlt_v(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    select type(xx => x)
-!!$    type is (psb_i_base_multivect_type)
-!!$      n = min(size(y%v), size(xx%v))
-!!$      do i=1, n 
-!!$        y%v(i) = y%v(i)*xx%v(i)
-!!$      end do
-!!$    class default
-!!$      call y%mlt(x%v,info)
-!!$    end select
-!!$
-!!$  end subroutine i_base_mv_mlt_v
-!!$
-!!$  !
-!!$  !> Function  base_mv_mlt_a
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief Vector entry-by-entry multiply  by a normal array y=x*y
-!!$  !! \param x(:) The array to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_mlt_a(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    n = min(size(y%v), size(x))
-!!$    do i=1, n 
-!!$      y%v(i) = y%v(i)*x(i)
-!!$    end do
-!!$    
-!!$  end subroutine i_base_mv_mlt_a
-!!$
-!!$
-!!$  !
-!!$  !> Function  base_mv_mlt_a_2
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
-!!$  !!        z=beta*z+alpha*x*y
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  !! \param x(:) The array to be multiplied b
-!!$  !! \param y(:) The array to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_mlt_a_2(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)        :: y(:)
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0    
-!!$    n = min(size(z%v), size(x), size(y))
-!!$    if (alpha == izero) then 
-!!$      if (beta == ione) then 
-!!$        return 
-!!$      else
-!!$        do i=1, n
-!!$          z%v(i) = beta*z%v(i)
-!!$        end do
-!!$      end if
-!!$    else
-!!$      if (alpha == ione) then 
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) + y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) + y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      else if (alpha == -ione) then 
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = -y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) - y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) - y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      else
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = alpha*y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) + alpha*y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      end if
-!!$    end if
-!!$  end subroutine i_base_mv_mlt_a_2
-!!$
-!!$  !
-!!$  !> Function  base_mv_mlt_v_2
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mv_vect)
-!!$  !!        z=beta*z+alpha*x*y
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  !! \param x  The class(base_mv_vect) to be multiplied b
-!!$  !! \param y  The class(base_mv_vect) to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine i_base_mv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-!!$    use psi_serial_mod
-!!$    use psb_string_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    character(len=1), intent(in), optional     :: conjgx, conjgy
-!!$    integer(psb_ipk_) :: i, n
-!!$    logical :: conjgx_, conjgy_
-!!$
-!!$    info = 0
-!!$    if (.not.psb_i_is_complex_) then
-!!$      call z%mlt(alpha,x%v,y%v,beta,info)
-!!$    else 
-!!$      conjgx_=.false.
-!!$      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-!!$      conjgy_=.false.
-!!$      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-!!$      if (conjgx_) x%v=(x%v)
-!!$      if (conjgy_) y%v=(y%v)
-!!$      call z%mlt(alpha,x%v,y%v,beta,info)
-!!$      if (conjgx_) x%v=(x%v)
-!!$      if (conjgy_) y%v=(y%v)
-!!$    end if
-!!$  end subroutine i_base_mv_mlt_v_2
-!!$
-!!$  subroutine i_base_mv_mlt_av(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)        :: x(:)
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: y
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    
-!!$    call z%mlt(alpha,x,y%v,beta,info)
-!!$
-!!$  end subroutine i_base_mv_mlt_av
-!!$
-!!$  subroutine i_base_mv_mlt_va(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: alpha,beta
-!!$    integer(psb_ipk_), intent(in)        :: y(:)
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    
-!!$    call z%mlt(alpha,y,x,beta,info)
-!!$
-!!$  end subroutine i_base_mv_mlt_va
-!!$
-!!$
-!!$  !
-!!$  ! Simple scaling 
-!!$  !
-!!$  !> Function  base_mv_scal
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief Scale all entries  x = alpha*x
-!!$  !! \param alpha   The multiplier
-!!$  !!
-!!$  subroutine i_base_mv_scal(alpha, x)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout)  :: x
-!!$    integer(psb_ipk_), intent (in)       :: alpha
-!!$    
-!!$    if (allocated(x%v)) x%v = alpha*x%v
-!!$
-!!$  end subroutine i_base_mv_scal
-!!$  
-!!$  !
-!!$  ! Norms 1, 2 and infinity
-!!$  !
-!!$  !> Function  base_mv_nrm2
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief 2-norm |x(1:n)|_2
-!!$  !! \param n  how many entries to consider
-!!$  function i_base_mv_nrm2(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    integer(psb_ipk_), external      :: inrm2
-!!$    
-!!$    res =  inrm2(n,x%v,1)
-!!$
-!!$  end function i_base_mv_nrm2
-!!$  
-!!$  !
-!!$  !> Function  base_mv_amax
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief infinity-norm |x(1:n)|_\infty
-!!$  !! \param n  how many entries to consider
-!!$  function i_base_mv_amax(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    
-!!$    res =  maxval(abs(x%v(1:n)))
-!!$
-!!$  end function i_base_mv_amax
-!!$
-!!$  !
-!!$  !> Function  base_mv_asum
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief 1-norm |x(1:n)|_1
-!!$  !! \param n  how many entries to consider
-!!$  function i_base_mv_asum(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_i_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    integer(psb_ipk_)                :: res
-!!$    
-!!$    res =  sum(abs(x%v(1:n)))
-!!$
-!!$  end function i_base_mv_asum
-!!$  
-!!$  
-!!$  !
-!!$  ! Gather: Y = beta * Y + alpha * X(IDX(:))
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_gthab
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief gather into an array
-!!$  !!    Y = beta * Y + alpha * X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  subroutine i_base_mv_gthab(n,idx,alpha,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) :: alpha, beta, y(:)
-!!$    class(psb_i_base_multivect_type) :: x
-!!$    
-!!$    call x%sync()
-!!$    call psi_gth(n,idx,alpha,x%v,beta,y)
-!!$
-!!$  end subroutine i_base_mv_gthab
-!!$  !
-!!$  ! shortcut alpha=1 beta=0
-!!$  ! 
-!!$  !> Function  base_mv_gthzv
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief gather into an array special alpha=1 beta=0
-!!$  !!    Y = X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  subroutine i_base_mv_gthzv_x(i,n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i,n
-!!$    class(psb_i_base_multivect_type) :: idx
-!!$    integer(psb_ipk_) ::  y(:)
-!!$    class(psb_i_base_multivect_type) :: x
-!!$    
-!!$    call x%gth(n,idx%v(i:),y)
-!!$
-!!$  end subroutine i_base_mv_gthzv_x
-!!$
-!!$  !
-!!$  ! shortcut alpha=1 beta=0
-!!$  ! 
-!!$  !> Function  base_mv_gthzv
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief gather into an array special alpha=1 beta=0
-!!$  !!    Y = X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  subroutine i_base_mv_gthzv(n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) ::  y(:)
-!!$    class(psb_i_base_multivect_type) :: x
-!!$    
-!!$    call x%sync()
-!!$    call psi_gth(n,idx,x%v,y)
-!!$
-!!$  end subroutine i_base_mv_gthzv
-!!$
-!!$  !
-!!$  ! Scatter: 
-!!$  ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
-!!$  ! 
-!!$  !
-!!$  !> Function  base_mv_sctb
-!!$  !! \memberof  psb_i_base_multivect_type
-!!$  !! \brief scatter into a class(base_mv_vect)
-!!$  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  !! \param beta
-!!$  !! \param x(:) 
-!!$  subroutine i_base_mv_sctb(n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) :: beta, x(:)
-!!$    class(psb_i_base_multivect_type) :: y
-!!$    
-!!$    call y%sync()
-!!$    call psi_sct(n,idx,x,beta,y%v)
-!!$    call y%set_host()
-!!$
-!!$  end subroutine i_base_mv_sctb
-!!$
-!!$  subroutine i_base_mv_sctb_x(i,n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i, n
-!!$    class(psb_i_base_multivect_type) :: idx
-!!$    integer(psb_ipk_) :: beta, x(:)
-!!$    class(psb_i_base_multivect_type) :: y
-!!$    
-!!$    call y%sct(n,idx%v(i:),x,beta)
-!!$
-!!$  end subroutine i_base_mv_sctb_x
-
 end module psb_i_base_multivect_mod
+

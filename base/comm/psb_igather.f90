@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -35,23 +35,22 @@
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
 ! Arguments:
-!   globx     -  integer(psb_ipk_),dimension(:,:).          The local matrix into which gather 
-!                                                the distributed pieces.
-!   locx      -  integer(psb_ipk_),dimension(:,:).          The local piece of the distributed 
-!                                                matrix to be gathered.
+!   globx     -  integer,dimension(:,:).          The local matrix into which gather 
+!                                                  the distributed pieces.
+!   locx      -  integer,dimension(:,:).          The local piece of the distributed 
+!                                                  matrix to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
-!                                              Default: -1. 
 !
 subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_igatherm
   implicit none
 
   integer(psb_ipk_), intent(in)    :: locx(:,:)
-  integer(psb_ipk_), intent(out), allocatable  :: globx(:,:)
+  integer(psb_ipk_), intent(out), allocatable :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iroot
@@ -61,6 +60,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
+
   character(len=20)        :: name, ch_err
 
   name='psb_igatherm'
@@ -82,7 +82,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
     root = iroot
     if((root < -1).or.(root > np)) then
       info=psb_err_input_value_invalid_i_
-      ierr(1)=5; ierr(2)=root
+      ierr(1) = 5; ierr(2)=root
       call psb_errpush(info,name,i_err=ierr)
       goto 9999
     end if
@@ -127,7 +127,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   call psb_realloc(m,k,globx,info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
@@ -162,7 +162,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
 
 9999 call psb_error_handler(ictxt,err_act)
 
-    return
+  return
 
 end subroutine psb_igatherm
 
@@ -172,8 +172,8 @@ end subroutine psb_igatherm
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -206,15 +206,16 @@ end subroutine psb_igatherm
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
 ! Arguments:
-!   globx     -  integer(psb_ipk_),dimension(:).            The local vector into which gather the 
-!                                                  distributed pieces.
-!   locx      -  integer(psb_ipk_),dimension(:).            The local piece of the ditributed
+!   globx     -  integer,dimension(:).            The local vector into which gather 
+!                                                  the distributed pieces.
+!   locx      -  integer,dimension(:).            The local piece of the distributed 
 !                                                  vector to be gathered.
 !   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
+!                                              default: -1
 !
 subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   use psb_base_mod, psb_protect_name => psb_igatherv
@@ -266,12 +267,12 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   jlocx=1
   ilocx = 1
 
-  lda_globx = size(globx)
-  lda_locx  = size(locx)
-
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
-  
+
+  lda_globx = m
+  lda_locx  = size(locx)
+
   k = 1
 
 
@@ -292,14 +293,21 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
+  call psb_realloc(m,globx,info)
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
   globx(:)=izero
 
   do i=1,desc_a%get_local_rows()
     call psb_loc_to_glob(i,idx,desc_a,info)
     globx(idx) = locx(i)
   end do
-  
+
   ! adjust overlapped elements
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
@@ -308,7 +316,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
       globx(idx) = izero
     end if
   end do
-  
+
   call psb_sum(ictxt,globx(1:m),root=root)
 
   call psb_erractionrestore(err_act)
@@ -316,9 +324,10 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
 
 9999 call psb_error_handler(ictxt,err_act)
 
-    return
+  return
 
 end subroutine psb_igatherv
+
 
 
 subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
@@ -339,7 +348,7 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
   integer(psb_ipk_), allocatable :: llocx(:)
   character(len=20)        :: name, ch_err
 
-  name='psb_igatherv'
+  name='psb_cgatherv'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -429,6 +438,6 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
 
 9999 call psb_error_handler(ictxt,err_act)
 
-    return
+  return
 
 end subroutine psb_igather_vect

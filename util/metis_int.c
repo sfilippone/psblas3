@@ -2,10 +2,10 @@
 #if defined(HAVE_METIS_)
 #include "metis.h"
 
-/* extern int METIS_PartGraphRecursive(int *, int *, int *, int *, int *, int *, int *, int *, float *, float, int *, int *, int *); */
+/* extern int METIS_PartGraphKway(int *, int *, int *, int *, int *, int *, int *, int *, float *, float, int *, int *, int *); */
 
 
-int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg, 
+int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
 				int *iajw, int *nparts, float *weights, 
 				int *graphpart)
 {
@@ -19,14 +19,14 @@ int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg,
   //printf("n:%p ncon:%p ixadj:%p iadj:%p npart:%p weights:%p options:%p objval:%p graphpart: %p\n",n,&ncon,ixadj,iadj,nparts,NULL,options,&objval,graphpart);
   /* fprintf(stderr,"From metis_int: %f\n",weights[0]); */
   if (weights[0] == -1.0) {
-    res = METIS_PartGraphRecursive((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj,
+    res = METIS_PartGraphKway((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj,
 				   NULL,NULL,NULL,(idx_t *)nparts,NULL,NULL,options,
 				   &objval,(idx_t *)graphpart);
   } else {
-    /* res = METIS_PartGraphRecursive((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj, */
+    /* res = METIS_PartGraphKway((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj, */
     /* 				   NULL,NULL,NULL,(idx_t *)nparts,NULL,NULL,NULL, */
     /* 				   &objval,(idx_t *)graphpart); */
-    res = METIS_PartGraphRecursive((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj,
+    res = METIS_PartGraphKway((idx_t*)n,(idx_t *)&ncon,(idx_t *)ixadj,(idx_t *)iadj,
     				   NULL,NULL,NULL,(idx_t *)nparts,weights,NULL,options,
     				   &objval,(idx_t *)graphpart);
   }
@@ -40,7 +40,7 @@ int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg,
 
 #else 
 
-int metis_PartGraphRecursive_C(int *n, int *ixadj, int *iadj, int *ivwg, 
+int metis_PartGraphKway_C(int *n, int *ixadj, int *iadj, int *ivwg, 
 				int *iajw, int *nparts, float *weights, 
 				int *graphpart)
 {

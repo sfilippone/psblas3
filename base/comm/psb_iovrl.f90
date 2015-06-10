@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -29,11 +29,12 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! File:  psb_iovrl.f90
 !
 ! Subroutine: psb_iovrlm
 !   This subroutine performs the exchange of the overlap elements in a 
-!   distributed dense matrix between all the processes.
+!    distributed dense matrix between all the processes.
 !
 ! Arguments:
 !   x(:,:)      -  integer                   The local part of the dense matrix.
@@ -41,7 +42,7 @@
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
 !   ik          -  integer(optional).        The number of columns to gather. 
-!   work        -  real(optional).           A work area.
+!   work        -  integer(optional).           A work area.
 !   update      -  integer(optional).        Type of update:
 !                                            psb_none_   do nothing
 !                                            psb_sum_    sum of overlaps
@@ -69,19 +70,19 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   implicit none
 
   integer(psb_ipk_), intent(inout), target  :: x(:,:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), optional, target, intent(inout) :: work(:)
-  integer(psb_ipk_), intent(in), optional   :: update,jx,ik,mode
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)                      :: info
+  integer(psb_ipk_), optional, target, intent(inout)  :: work(:)
+  integer(psb_ipk_), intent(in), optional             :: update,jx,ik,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
+  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork, ldx
-  integer(psb_ipk_),  pointer  :: iwork(:), xp(:,:)
-  logical            :: do_swap
-  character(len=20)  :: name, ch_err
-  logical            :: aliw
+  integer(psb_ipk_),pointer :: iwork(:), xp(:,:)
+  logical                  :: do_swap
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_iovrlm'
   if(psb_get_errstatus() /= 0) return 
@@ -163,6 +164,7 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   else
     aliw=.true.
   end if
+
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
     if(info /= psb_success_) then
@@ -175,7 +177,7 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   end if
   ! exchange overlap elements
   if(do_swap) then
-    xp => x(iix:size(x,1),jjx:jjx+k-1)
+    xp => x(iix:ldx,jjx:jjx+k-1)
     call psi_swapdata(mode_,k,ione,xp,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
@@ -195,10 +197,9 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
     return
 end subroutine psb_iovrlm
-
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -230,18 +231,18 @@ end subroutine psb_iovrlm
 !
 ! Subroutine: psb_iovrlv
 !   This subroutine performs the exchange of the overlap elements in a 
-!   distributed dense vector between all the processes.
+!    distributed dense vector between all the processes.
 !
 ! Arguments:
-!   x(:)        -  integer                 The local part of the dense vector.
+!   x(:)        -  integer                   The local part of the dense vector.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
-!   info        -  integer.                Return code.
-!   work        -  real(optional).         A work area.
-!   update      -  integer(optional).      Type of update:
-!                                          psb_none_   do nothing
-!                                          psb_sum_    sum of overlaps
-!                                          psb_avg_    average of overlaps
-!   mode        -  integer(optional).      Choose the algorithm for data exchange: 
+!   info        -  integer.                  Return code.
+!   work        -  integer(optional).           A work area.
+!   update      -  integer(optional).        Type of update:
+!                                            psb_none_   do nothing
+!                                            psb_sum_    sum of overlaps
+!                                            psb_avg_    average of overlaps
+!   mode        -  integer(optional).        Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
 !                                       - swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
 !                                       - swap_sync = iand(flag,psb_swap_sync_) /= 0
@@ -258,23 +259,22 @@ end subroutine psb_iovrlm
 !                                                       previous call with swap_send)
 !
 !
-!
 subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
   use psb_base_mod, psb_protect_name => psb_iovrlv
   use psi_mod
   implicit none
 
   integer(psb_ipk_), intent(inout), target  :: x(:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)                      :: info
   integer(psb_ipk_), optional, target, intent(inout) :: work(:)
-  integer(psb_ipk_), intent(in), optional   :: update,mode
+  integer(psb_ipk_), intent(in), optional             :: update,mode
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork, ldx
-  integer(psb_ipk_),pointer          :: iwork(:)
+  integer(psb_ipk_),pointer :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -316,8 +316,7 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
     mode_ = IOR(psb_swap_send_,psb_swap_recv_)
   endif
   do_swap = (mode_ /= 0)
-  
-  ldx = size(x,1)
+  ldx = size(x,1) 
   ! check vector correctness
   call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
@@ -359,7 +358,7 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,ione,x(:),&
+    call psi_swapdata(mode_,ione,x,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x,desc_a,update_,info)
@@ -378,6 +377,7 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
 
     return
 end subroutine psb_iovrlv
+
 
 subroutine  psb_iovrl_vect(x,desc_a,info,work,update,mode)
   use psb_base_mod, psb_protect_name => psb_iovrl_vect

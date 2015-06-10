@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -107,6 +107,22 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet2_read
+    subroutine mm_ivet_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      integer(psb_ipk_), allocatable, intent(out)  :: b(:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivet_read
+    subroutine mm_ivet2_read(b, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      integer(psb_ipk_), allocatable, intent(out)  :: b(:,:)
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivet2_read
   end interface
 
 
@@ -192,13 +208,32 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_zvet1_write
+    subroutine mm_ivet2_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      integer(psb_ipk_), intent(in)  :: b(:,:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivet2_write
+    subroutine mm_ivet1_write(b, header, info, iunit, filename)   
+      import :: psb_dpk_, psb_ipk_
+      implicit none
+      integer(psb_ipk_), intent(in)  :: b(:)
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivet1_write
   end interface
 
 #if ! defined(HAVE_BUGGY_GENERICS)
   interface mm_vet_write
     procedure mm_svet1_write, mm_dvet1_write, mm_cvet1_write,&
          & mm_zvet1_write, mm_svet2_write, mm_dvet2_write, &
-         & mm_cvet2_write, mm_zvet2_write
+         & mm_cvet2_write, mm_zvet2_write, &
+         & mm_ivet1_write, mm_ivet2_write
   end interface
 #endif
 

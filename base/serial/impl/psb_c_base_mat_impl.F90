@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -113,9 +113,13 @@ subroutine psb_c_base_cp_to_fmt(a,b,info)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  call a%cp_to_coo(tmp,info)
-  if (info == psb_success_) call b%mv_from_coo(tmp,info)
-
+  select type(b)
+  type is (psb_c_coo_sparse_mat)
+    call a%cp_to_coo(b,info)
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='to/from coo')
@@ -151,9 +155,14 @@ subroutine psb_c_base_cp_from_fmt(a,b,info)
   ! 
   info  = psb_success_
   call psb_erractionsave(err_act)
-
-  call b%cp_to_coo(tmp,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  
+  select type(b)
+  type is (psb_c_coo_sparse_mat)
+    call a%cp_from_coo(b,info)
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
@@ -267,8 +276,13 @@ subroutine psb_c_base_mv_to_fmt(a,b,info)
   ! Default implementation
   ! 
   info = psb_success_
-  call a%mv_to_coo(tmp,info)
-  if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  select type(b)
+  type is (psb_c_coo_sparse_mat)
+    call a%mv_to_coo(b,info)
+  class default
+    call a%mv_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
 
   return
 
@@ -293,9 +307,13 @@ subroutine psb_c_base_mv_from_fmt(a,b,info)
   ! Default implementation
   ! 
   info = psb_success_
-  call b%mv_to_coo(tmp,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
-
+  select type(b)
+  type is (psb_c_coo_sparse_mat)
+    call a%mv_from_coo(b,info)
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
   return
 
 end subroutine psb_c_base_mv_from_fmt
@@ -349,9 +367,10 @@ subroutine psb_c_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   info = psb_success_
   
   if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if (a%is_dev())   call a%sync()
     if (val%is_dev()) call val%sync()
-    if (ia%is_dev()) call ia%sync()
-    if (ja%is_dev()) call ja%sync()
+    if (ia%is_dev())  call ia%sync()
+    if (ja%is_dev())  call ja%sync()
     call a%csput(nz,ia%v,ja%v,val%v,imin,imax,jmin,jmax,info,gtl) 
   else
     info = psb_err_invalid_mat_state_

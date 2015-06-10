@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -69,7 +69,7 @@ module psb_error_mod
   interface psb_error_handler
     subroutine psb_ser_error_handler(err_act)
       import :: psb_ipk_
-      integer(psb_ipk_), intent(in) ::  err_act
+      integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
     subroutine psb_par_error_handler(ictxt,err_act)
       import :: psb_ipk_,psb_mpik_

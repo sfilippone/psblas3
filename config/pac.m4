@@ -1256,6 +1256,19 @@ if test $pac_blas_ok = no; then
 			[], [-latlas])])
 
 fi
+if test $pac_blas_ok = no; then
+	AC_LANG([C])
+	AC_CHECK_LIB(atlas, ATL_xerbla,
+		[AC_LANG([Fortran])
+		 AC_CHECK_LIB(satlas, sgemm,
+		[AC_LANG([C])
+		 AC_CHECK_LIB(satlas, cblas_dgemm,
+			[pac_blas_ok=yes
+			 BLAS_LIBS="-lsatlas"],
+			[], [-lsatlas])],
+			[], [-lsatlas])])
+
+fi
 
 # BLAS in PhiPACK libraries? (requires generic BLAS lib, too)
 if test $pac_blas_ok = no; then
@@ -1877,7 +1890,7 @@ if test "x$psblas_cv_metislibdir" != "x"; then
 fi
 
 AC_MSG_NOTICE([metis dir $psblas_cv_metisdir])
-AC_CHECK_HEADER([metis.h],
+AC_CHECK_HEADERS([limits.h metis.h],
  [pac_metis_header_ok=yes],
  [pac_metis_header_ok=no; METIS_INCLUDES=""])
 if test "x$pac_metis_header_ok" == "xno" ; then
@@ -1887,7 +1900,7 @@ dnl Maybe Include or include subdirs?
   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
 
  AC_MSG_CHECKING([for metis_h in $METIS_INCLUDES])
- AC_CHECK_HEADER([metis.h],
+ AC_CHECK_HEADERS([limits.h metis.h],
     [pac_metis_header_ok=yes],
     [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
@@ -1896,7 +1909,7 @@ dnl Maybe new structure with METIS UFconfig METIS?
    unset ac_cv_header_metis_h
    METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
    CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
-   AC_CHECK_HEADER([metis.h],
+   AC_CHECK_HEADERS([limits.h metis.h],
      [pac_metis_header_ok=yes],
      [pac_metis_header_ok=no; METIS_INCLUDES=""])
 fi
@@ -1906,8 +1919,8 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
       psblas_cv_metis_includes="$METIS_INCLUDES"
       METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
       LIBS="$METIS_LIBS -lm $LIBS";
-      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
-      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
        [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)
@@ -1917,8 +1930,8 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
         
-      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
-      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
        [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)
@@ -1928,8 +1941,8 @@ if test "x$pac_metis_header_ok" == "xyes" ; then
         METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
         METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
         LIBS="$METIS_LIBS -lm $SAVE_LIBS"
-      AC_MSG_CHECKING([for METIS_PartGraphRecursive in $METIS_LIBS])
-      AC_TRY_LINK_FUNC(METIS_PartGraphRecursive, 
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
        [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
       AC_MSG_RESULT($pac_metis_lib_ok)

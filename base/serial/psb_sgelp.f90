@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
@@ -126,8 +126,8 @@ end subroutine psb_sgelp
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 

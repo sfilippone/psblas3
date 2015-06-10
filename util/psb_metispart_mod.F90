@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -45,7 +45,7 @@
 !        integer(psb_ipk_) :: NPARTS  How many parts we are requiring to the 
 !                                 partition utility
 ! 
-!  DISTR_MTPART(RROOT,CROOT,ICTXT): This subroutine will be called by
+!  DISTR_MTPART(ROOT,ICTXT): This subroutine will be called by
 !      all processes to distribute the information computed by the root
 !      process, to be used subsequently.
 !
@@ -55,14 +55,21 @@
 !
 module psb_metispart_mod
   use psb_base_mod, only : psb_ipk_, psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, psb_mpik_
+       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, psb_mpik_,&
+       & psb_s_csr_sparse_mat, psb_d_csr_sparse_mat, &
+       & psb_c_csr_sparse_mat, psb_z_csr_sparse_mat
   public part_graph, build_mtpart, distr_mtpart,&
        & getv_mtpart, free_part
   private 
   integer(psb_ipk_), allocatable, save :: graph_vect(:)
 
   interface build_mtpart
-    module procedure build_mtpart, d_mat_build_mtpart, s_mat_build_mtpart, z_mat_build_mtpart, c_mat_build_mtpart
+    module procedure build_mtpart,&
+         & d_mat_build_mtpart, s_mat_build_mtpart,&
+         & z_mat_build_mtpart, c_mat_build_mtpart, &
+         & d_csr_build_mtpart, s_csr_build_mtpart,&
+         & z_csr_build_mtpart, c_csr_build_mtpart
+
   end interface
 
 contains
@@ -154,11 +161,10 @@ contains
       if (allocated(wgh_)) then 
         call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
       else
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
       end if
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-      call psb_abort(ictxt)
     end select
 
   end subroutine d_mat_build_mtpart
@@ -173,7 +179,7 @@ contains
     
 
     select type (aa=>a%a) 
-    type is (psb_z_csr_sparse_mat)
+    type is (psb_z_csr_sparse_mat) 
       if (present(weights)) then 
         if (size(weights)==nparts) then 
           wgh_ = weights
@@ -182,11 +188,10 @@ contains
       if (allocated(wgh_)) then 
         call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
       else
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
       end if
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-      call psb_abort(ictxt)
     end select
 
   end subroutine z_mat_build_mtpart
@@ -204,7 +209,6 @@ contains
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-      call psb_abort(ictxt)
     end select
 
   end subroutine s_mat_build_mtpart
@@ -222,10 +226,78 @@ contains
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,weights)
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
-      call psb_abort(ictxt)
     end select
 
   end subroutine c_mat_build_mtpart
+
+  
+  subroutine d_csr_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    type(psb_d_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_dpk_), optional :: weights(:)
+    real(psb_spk_), allocatable :: wgh_(:)
+
+
+    if (present(weights)) then 
+      if (size(weights)==nparts) then 
+        wgh_ = weights
+      end if
+    end if
+    if (allocated(wgh_)) then 
+      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,wgh_)
+    else
+      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts)
+    end if
+
+  end subroutine d_csr_build_mtpart
+
+  subroutine z_csr_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    type(psb_z_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_dpk_), optional :: weights(:)
+    real(psb_spk_), allocatable :: wgh_(:)
+    
+
+    if (present(weights)) then 
+      if (size(weights)==nparts) then 
+        wgh_ = weights
+      end if
+    end if
+    if (allocated(wgh_)) then 
+      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,wgh_)
+    else
+      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts)
+    end if
+
+  end subroutine z_csr_build_mtpart
+
+  
+  subroutine s_csr_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    type(psb_s_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
+    
+
+    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
+
+  end subroutine s_csr_build_mtpart
+
+  
+  subroutine c_csr_build_mtpart(a,nparts,weights)
+    use psb_base_mod
+    type(psb_c_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: nparts
+    real(psb_spk_), optional :: weights(:)
+    
+    
+    call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,weights)
+
+  end subroutine c_csr_build_mtpart
+
+
 
   subroutine build_mtpart(n,fida,ja,irp,nparts,weights)
     use psb_base_mod
@@ -244,7 +316,7 @@ contains
 
 #if defined(HAVE_METIS)
     interface 
-      ! subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
+      ! subroutine METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
       !     & wgflag,numflag,nparts,weights,iopt,nedc,part) bind(c)
       !   use iso_c_binding
       !   integer(c_int) :: n,wgflag,numflag,nparts,nedc
@@ -252,10 +324,10 @@ contains
       !   real(c_float)  :: weights(*)
       !   !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
       !   !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      ! end subroutine METIS_PartGraphRecursive
+      ! end subroutine METIS_PartGraphKway
 
-      function METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
-           & nparts,weights,part) bind(c,name="metis_PartGraphRecursive_C") result(res)
+      function METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
+           & nparts,weights,part) bind(c,name="metis_PartGraphKway_C") result(res)
         use iso_c_binding
         integer(c_int) :: res
         integer(c_int) :: n,nparts
@@ -263,7 +335,7 @@ contains
         real(c_float)  :: weights(*)
         !integer(psb_ipk_) :: n,wgflag,numflag,nparts,nedc
         !integer(psb_ipk_) :: ixadj(*),iadj(*),ivwg(*),iajw(*),iopt(*),part(*)
-      end function METIS_PartGraphRecursive
+      end function METIS_PartGraphKway
     end interface
 
     call psb_realloc(n,graph_vect,info)
@@ -280,7 +352,7 @@ contains
         numflag  = 1
         wgflag   = 0
 
-        write(*,*) 'Before allocation',nparts
+!!$        write(*,*) 'Before allocation',nparts
 
         irpl=irp
         jal = ja
@@ -289,23 +361,23 @@ contains
         wgh_ = -1.0
         if(present(weights)) then
           if (size(weights) == nptl) then 
-            write(*,*) 'weights present',weights
-            ! call METIS_PartGraphRecursive(n,irp,ja,idummy,jdummy,&
+!!$            write(*,*) 'weights present',weights
+            ! call METIS_PartGraphKway(n,irp,ja,idummy,jdummy,&
             !      & wgflag,numflag,nparts,weights,iopt,nedc,graph_vect)
-            info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+            info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
                  & nptl,weights,gvl)
 
           else
-            write(*,*) 'weights absent',wgh_
-            info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+!!$            write(*,*) 'weights absent',wgh_
+            info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
                  & nptl,wgh_,gvl)
           end if
         else
-          write(*,*) 'weights absent',wgh_
-          info = METIS_PartGraphRecursive(nl,irpl,jal,idummy,jdummy,&
+!!$          write(*,*) 'weights absent',wgh_
+          info = METIS_PartGraphKway(nl,irpl,jal,idummy,jdummy,&
                & nptl,wgh_,gvl)
         endif
-        write(*,*) 'after allocation',info
+!!$        write(*,*) 'after allocation',info
 
         do i=1, n
           graph_vect(i) = gvl(i) - 1 

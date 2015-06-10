@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -46,6 +46,7 @@ subroutine psb_z_coo_get_diag(a,d,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
@@ -96,6 +97,7 @@ subroutine psb_z_coo_scal(d,a,info,side)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     call a%make_nonunit()
@@ -135,6 +137,7 @@ subroutine psb_z_coo_scal(d,a,info,side)
       a%val(i) = a%val(i) * d(j)
     enddo
   end if
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -162,6 +165,7 @@ subroutine psb_z_coo_scals(d,a,info)
 
   info  = psb_success_
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     call a%make_nonunit()
@@ -170,6 +174,7 @@ subroutine psb_z_coo_scals(d,a,info)
   do i=1,a%get_nzeros()
     a%val(i) = a%val(i) * d
   enddo
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -269,11 +274,13 @@ subroutine psb_z_coo_reinit(a,clear)
     clear_ = .true.
   end if
 
+  if (a%is_dev())   call a%sync()
   if (a%is_bld() .or. a%is_upd()) then 
     ! do nothing
     return
   else if (a%is_asb()) then 
     if (clear_) a%val(:) = zzero
+    call a%set_host()
     call a%set_upd()
   else
     info = psb_err_invalid_mat_state_
@@ -305,6 +312,7 @@ subroutine  psb_z_coo_trim(a)
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  if (a%is_dev())   call a%sync()
   nz  = a%get_nzeros()
   if (info == psb_success_) call psb_realloc(nz,a%ia,info)
   if (info == psb_success_) call psb_realloc(nz,a%ja,info)
@@ -372,6 +380,7 @@ subroutine  psb_z_coo_allocate_mnnz(m,n,a,nz)
     call a%set_dupl(psb_dupl_def_)
     ! An empty matrix is sorted!
     call a%set_sorted(.true.)
+    call a%set_host()
   end if
   if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
@@ -411,6 +420,7 @@ subroutine psb_z_coo_print(iout,a,iv,head,ivr,ivc)
     write(iout,'(a)') '%'    
     write(iout,'(a,a)') '% COO'
   endif
+  if (a%is_dev())   call a%sync()
 
   nr = a%get_nrows()
   nc = a%get_ncols()
@@ -464,9 +474,10 @@ function  psb_z_coo_get_nz_row(idx,a) result(res)
   integer(psb_ipk_) :: res
   integer(psb_ipk_) :: nzin_, nza,ip,jp,i,k
 
+  if (a%is_dev())   call a%sync()
   res = 0 
   nza = a%get_nzeros()
-  if (a%is_sorted()) then 
+  if (a%is_by_rows()) then 
     ! In this case we can do a binary search. 
     ip = psb_ibsrch(idx,nza,a%ia)
     if (ip /= -1) return
@@ -534,7 +545,7 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  if (a%is_dev())   call a%sync()
 
   if (.not. (a%is_triangle())) then 
     info = psb_err_invalid_mat_state_
@@ -580,7 +591,7 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == zzero) then 
-    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1,kind=psb_ipk_),y,size(y,1,kind=psb_ipk_),info)
     do  i = 1, m
@@ -594,7 +605,7 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1,kind=psb_ipk_),tmp,size(tmp,1,kind=psb_ipk_),info)
     do  i = 1, m
@@ -895,7 +906,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  if (a%is_dev())   call a%sync()
 
   tra  = (psb_toupper(trans_) == 'T')
   ctra = (psb_toupper(trans_) == 'C')
@@ -933,7 +944,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == zzero) then 
-    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,y,info)
     if (info /= psb_success_) then 
@@ -951,7 +962,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_by_rows(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,tmp,info)
     if (info /= psb_success_) then 
@@ -1235,6 +1246,7 @@ subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
+  if (a%is_dev())   call a%sync()
 
   if (present(trans)) then
     trans_ = trans
@@ -1430,6 +1442,7 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
+  if (a%is_dev())   call a%sync()
 
   if (present(trans)) then
     trans_ = trans
@@ -1616,6 +1629,7 @@ function psb_z_coo_maxval(a) result(res)
   character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
 
+  if (a%is_dev())   call a%sync()
 
   if (a%is_unit()) then 
     res = done
@@ -1646,11 +1660,12 @@ function psb_z_coo_csnmi(a) result(res)
   character(len=20)  :: name='z_coo_csnmi'
   logical, parameter :: debug=.false.
 
+  if (a%is_dev())   call a%sync()
 
   res = dzero
   nnz = a%get_nzeros()
   is_unit = a%is_unit()
-  if (a%is_sorted()) then 
+  if (a%is_by_rows()) then 
     i   = 1
     j   = i
     res = dzero 
@@ -1707,6 +1722,7 @@ function psb_z_coo_csnm1(a) result(res)
   character(len=20)  :: name='z_coo_csnm1'
   logical, parameter :: debug=.false.
 
+  if (a%is_dev())   call a%sync()
 
   res = dzero
   nnz = a%get_nzeros()
@@ -1746,6 +1762,7 @@ subroutine psb_z_coo_rowsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   if (size(d) < m) then 
@@ -1794,6 +1811,7 @@ subroutine psb_z_coo_arwsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
   if (size(d) < m) then 
@@ -1841,6 +1859,7 @@ subroutine psb_z_coo_colsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   n = a%get_ncols()
   if (size(d) < n) then 
@@ -1889,6 +1908,7 @@ subroutine psb_z_coo_aclsum(d,a)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   n = a%get_ncols()
   if (size(d) < n) then 
@@ -1962,6 +1982,7 @@ subroutine psb_z_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
 
@@ -2067,7 +2088,7 @@ contains
       nzin_ = 0
     endif
 
-    if (a%is_sorted()) then 
+    if (a%is_by_rows()) then 
       ! In this case we can do a binary search. 
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
@@ -2236,6 +2257,7 @@ subroutine psb_z_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
   info = psb_success_
   nz = 0
   if (present(jmin)) then
@@ -2344,7 +2366,7 @@ contains
       nzin_ = 0
     endif
 
-    if (a%is_sorted()) then 
+    if (a%is_by_rows()) then 
       ! In this case we can do a binary search. 
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
@@ -2480,7 +2502,7 @@ contains
             ja(nzin_+k)  = (a%ja(i))
           endif
         enddo
-      end if      
+      end if
       call psb_z_fix_coo_inner(nra,nca,nzin_+k,psb_dupl_add_,ia,ja,val,nz,info)
       nz = nz - nzin_
     end if
@@ -2514,6 +2536,7 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
 
   if (nz < 0) then 
     info = psb_err_iarg_neg_
@@ -2565,6 +2588,8 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   else  if (a%is_upd()) then 
 
+    if (a%is_dev())   call a%sync()
+
     call  z_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
 
@@ -2584,6 +2609,7 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     call psb_errpush(info,name)
     goto 9999
   end if
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -2883,8 +2909,10 @@ subroutine psb_z_cp_coo_to_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
+  if (a%is_dev())   call a%sync()
 
+  b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
+  call b%set_sort_status(a%get_sort_status())
   nz = a%get_nzeros()
   call b%set_nzeros(nz)
   call b%reallocate(nz)
@@ -2893,8 +2921,9 @@ subroutine psb_z_cp_coo_to_coo(a,b,info)
   b%ja(1:nz)  = a%ja(1:nz)
   b%val(1:nz) = a%val(1:nz)
 
+  call b%set_host()
 
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -2912,7 +2941,7 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
   use psb_z_base_mat_mod, psb_protect_name => psb_z_cp_coo_from_coo
   implicit none 
   class(psb_z_coo_sparse_mat), intent(inout) :: a
-  class(psb_z_coo_sparse_mat), intent(in) :: b
+  class(psb_z_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act
@@ -2924,8 +2953,9 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  if (b%is_dev())   call b%sync()
   a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
-
+  call a%set_sort_status(b%get_sort_status())
   nz = b%get_nzeros()
   call a%set_nzeros(nz)
   call a%reallocate(nz)
@@ -2934,7 +2964,9 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
   a%ja(1:nz)  = b%ja(1:nz)
   a%val(1:nz) = b%val(1:nz)
 
-  if (.not.a%is_sorted()) call a%fix(info)
+  call a%set_host()
+
+  if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3035,15 +3067,18 @@ subroutine psb_z_mv_coo_to_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  if (a%is_dev())   call a%sync()
   b%psb_z_base_sparse_mat = a%psb_z_base_sparse_mat
+  call b%set_sort_status(a%get_sort_status())
   call b%set_nzeros(a%get_nzeros())
 
   call move_alloc(a%ia, b%ia)
   call move_alloc(a%ja, b%ja)
   call move_alloc(a%val, b%val)
+  call b%set_host()
   call a%free()
 
-  if (.not.b%is_sorted()) call b%fix(info)
+  if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3076,14 +3111,18 @@ subroutine psb_z_mv_coo_from_coo(a,b,info)
 
   call psb_erractionsave(err_act)
   info = psb_success_
+  if (b%is_dev())   call b%sync()
   a%psb_z_base_sparse_mat = b%psb_z_base_sparse_mat
+  call a%set_sort_status(b%get_sort_status())
   call a%set_nzeros(b%get_nzeros())
 
   call move_alloc(b%ia , a%ia   )
   call move_alloc(b%ja , a%ja   )
   call move_alloc(b%val, a%val )
   call b%free()
-  if (.not.a%is_sorted()) call a%fix(info)
+  call a%set_host()
+
+  if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
 
@@ -3262,6 +3301,7 @@ subroutine psb_z_fix_coo(a,info,idir)
   else
     idir_ = psb_row_major_
   endif
+  if (a%is_dev())   call a%sync()
   
   nra = a%get_nrows()
   nca = a%get_ncols()
@@ -3276,7 +3316,7 @@ subroutine psb_z_fix_coo(a,info,idir)
   call a%set_sort_status(idir_)
   call a%set_nzeros(i)
   call a%set_asb()
-
+  call a%set_host()
 
   call psb_erractionrestore(err_act)
   return
@@ -3380,7 +3420,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ja(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ja(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,val(i:imx),&
                  & ia(i:imx),ja(i:imx),ix2)
@@ -3491,7 +3531,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,jas(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,jas(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
@@ -3584,7 +3624,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
       ! If we did not have enough memory for buffers,
       ! let's try in place. 
       ! 
-      call msort_up(nzin,ia(1:),iaux(1:),iret)
+      call psi_i_msort_up(nzin,ia(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
       i    = 1
@@ -3596,7 +3636,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           if (j > nzin) exit
         enddo
         nzl = j - i
-        call msort_up(nzl,ja(i:),iaux(1:),iret)
+        call psi_i_msort_up(nzl,ja(i:),iaux(1:),iret)
         if (iret == 0) &
              & call psb_ip_reord(nzl,val(i:i+nzl-1),&
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
@@ -3702,7 +3742,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ia(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ia(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,val(i:imx),&
                  & ia(i:imx),ja(i:imx),ix2)
@@ -3811,7 +3851,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           imx = i+nzl-1
 
           if (nzl > 0) then 
-            call msort_up(nzl,ias(i:imx),ix2,iret)
+            call psi_i_msort_up(nzl,ias(i:imx),ix2,iret)
             if (iret == 0) &
                  & call psb_ip_reord(nzl,vs(i:imx),&
                  & ias(i:imx),jas(i:imx),ix2)
@@ -3898,7 +3938,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
     else if (.not.use_buffers) then 
 
-      call msort_up(nzin,ja(1:),iaux(1:),iret)
+      call psi_i_msort_up(nzin,ja(1:),iaux(1:),iret)
       if (iret == 0) &
            & call psb_ip_reord(nzin,val,ia,ja,iaux)
       i    = 1
@@ -3909,7 +3949,7 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
           if (j > nzin) exit
         enddo
         nzl = j - i
-        call msort_up(nzl,ia(i:),iaux(1:),iret)
+        call psi_i_msort_up(nzl,ia(i:),iaux(1:),iret)
         if (iret == 0) &
              & call psb_ip_reord(nzl,val(i:i+nzl-1),&
              & ia(i:i+nzl-1),ja(i:i+nzl-1),iaux)
