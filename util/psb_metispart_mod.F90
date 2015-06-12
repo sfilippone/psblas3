@@ -159,9 +159,11 @@ contains
         end if
       end if
       if (allocated(wgh_)) then 
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts,wgh_)
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),&
+             & aa%get_jap(),aa%get_irpp(),nparts,wgh_)
       else
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),&
+             & aa%get_jap(),aa%get_irpp(),nparts)
       end if
     class default
       write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
@@ -245,9 +247,11 @@ contains
       end if
     end if
     if (allocated(wgh_)) then 
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts,wgh_)
+      call build_mtpart(a%get_nrows(),a%get_fmt(),&
+           & a%get_jap(),a%get_irpp(),nparts,wgh_)
     else
-      call build_mtpart(a%get_nrows(),a%get_fmt(),a%ja,a%irp,nparts)
+      call build_mtpart(a%get_nrows(),a%get_fmt(),&
+           & a%get_jap(),a%get_irpp(),nparts)
     end if
 
   end subroutine d_csr_build_mtpart

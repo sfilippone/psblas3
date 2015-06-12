@@ -69,7 +69,8 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   endif
 
   call psb_dilu_fctint(m,a%get_nrows(),a,blck_%get_nrows(),blck_,&
-       & d,l%val,l%ja,l%irp,u%val,u%ja,u%irp,l1,l2,info)
+       & d,l%get_valp(),l%get_jap(),l%get_irpp(),&
+       & u%get_valp(),u%get_jap(),u%get_irpp(),l1,l2,info)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_dilu_fctint'
@@ -129,6 +130,8 @@ contains
     real(psb_dpk_) :: dia,temp
     integer(psb_ipk_), parameter :: nrb=60
     type(psb_d_coo_sparse_mat) :: trw
+    real(psb_dpk_), pointer    :: aval(:), bval(:)
+    integer(psb_ipk_), pointer :: airp(:), aja(:), birp(:), bja(:)
     integer(psb_ipk_) :: int_err(5) 
     character(len=20)   :: name, ch_err
 
@@ -150,6 +153,27 @@ contains
     l1=0
     l2=0
     m = ma+mb
+    select type(aa => a%a) 
+    type is (psb_d_csr_sparse_mat)
+      aval => aa%get_valp()
+      airp => aa%get_irpp()
+      aja  => aa%get_jap()
+    class default
+      aval => null()
+      airp => null()
+      aja  => null()
+    end select
+    select type(bb => b%a) 
+    type is (psb_d_csr_sparse_mat)
+      bval => bb%get_valp()
+      birp => bb%get_irpp()
+      bja  => bb%get_jap()
+    class default
+      bval => null()
+      birp => null()
+      bja  => null()
+    end select
+      
 
     do i = 1, ma
       d(i) = dzero
@@ -157,18 +181,18 @@ contains
       !
       select type(aa => a%a) 
       type is (psb_d_csr_sparse_mat)
-        do j = aa%irp(i), aa%irp(i+1) - 1
-          k = aa%ja(j)
+        do j = airp(i), airp(i+1) - 1
+          k = aja(j)
           !           write(psb_err_unit,*)'KKKKK',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
-            laspk(l1) = aa%val(j)
+            laspk(l1) = aval(j)
             lia1(l1) = k
           else if (k == i) then
-            d(i) = aa%val(j)
+            d(i) = aval(j)
           else if ((k > i).and.(k <= m)) then
             l2 = l2 + 1
-            uaspk(l2) = aa%val(j)
+            uaspk(l2) = aval(j)
             uia1(l2) = k
           end if
         enddo
@@ -295,18 +319,18 @@ contains
 
       select type(aa => b%a) 
       type is (psb_d_csr_sparse_mat)
-        do j = aa%irp(i-ma), aa%irp(i-ma+1) - 1
-          k = aa%ja(j)
+        do j = birp(i-ma), birp(i-ma+1) - 1
+          k = bja(j)
           !           write(psb_err_unit,*)'KKKKK',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
-            laspk(l1) = aa%val(j)
+            laspk(l1) = bval(j)
             lia1(l1) = k
           else if (k == i) then
-            d(i) = aa%val(j)
+            d(i) = bval(j)
           else if ((k > i).and.(k <= m)) then
             l2 = l2 + 1
-            uaspk(l2) = aa%val(j)
+            uaspk(l2) = bval(j)
             uia1(l2) = k
           end if
         enddo

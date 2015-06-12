@@ -71,7 +71,7 @@ module psb_d_sort_mod
 
 
   interface psb_msort
-    subroutine psb_dmsort(x,ix,dir,flag)
+    module subroutine psb_dmsort(x,ix,dir,flag)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
@@ -80,14 +80,14 @@ module psb_d_sort_mod
   end interface psb_msort
 
   interface 
-    subroutine psi_d_msort_up(n,k,l,iret)
+    module subroutine psi_d_msort_up(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
       real(psb_dpk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_d_msort_up
-    subroutine psi_d_msort_dw(n,k,l,iret)
+    module subroutine psi_d_msort_dw(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
@@ -96,14 +96,14 @@ module psb_d_sort_mod
     end subroutine psi_d_msort_dw
   end interface
   interface 
-    subroutine psi_d_amsort_up(n,k,l,iret)
+    module subroutine psi_d_amsort_up(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
       real(psb_dpk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_d_amsort_up
-    subroutine psi_d_amsort_dw(n,k,l,iret)
+    module subroutine psi_d_amsort_dw(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
@@ -114,7 +114,7 @@ module psb_d_sort_mod
   
   
   interface psb_qsort
-    subroutine psb_dqsort(x,ix,dir,flag)
+    module subroutine psb_dqsort(x,ix,dir,flag)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
@@ -123,7 +123,7 @@ module psb_d_sort_mod
   end interface psb_qsort
   
   interface psb_isort
-    subroutine psb_disort(x,ix,dir,flag)
+    module subroutine psb_disort(x,ix,dir,flag)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
@@ -133,7 +133,7 @@ module psb_d_sort_mod
 
 
   interface psb_hsort
-    subroutine psb_dhsort(x,ix,dir,flag)
+    module subroutine psb_dhsort(x,ix,dir,flag)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
@@ -142,35 +142,8 @@ module psb_d_sort_mod
   end interface psb_hsort
 
 
-!!$  interface !psb_howmany_heap
-!!$    module procedure psb_d_howmany,  psb_d_idx_howmany
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_init_heap
-!!$    module procedure psb_d_init_heap, psb_d_idx_init_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_dump_heap
-!!$    module procedure psb_d_dump_heap, psb_dump_d_idx_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_insert_heap
-!!$    module procedure psb_d_insert_heap,  psb_d_idx_insert_heap
-!!$  end interface 
-!!$
-!!$  interface !psb_heap_get_first
-!!$    module procedure psb_d_heap_get_first, psb_d_idx_heap_get_first
-!!$  end interface 
-!!$  
-!!$  interface !psb_free_heap
-!!$    module procedure psb_free_d_heap, psb_free_d_idx_heap
-!!$  end interface 
-
   interface 
-    subroutine psi_d_insert_heap(key,last,heap,dir,info)
+    module subroutine psi_d_insert_heap(key,last,heap,dir,info)
       import 
       implicit none 
 
@@ -190,7 +163,7 @@ module psb_d_sort_mod
   end interface
 
   interface 
-    subroutine psi_d_idx_insert_heap(key,index,last,heap,idxs,dir,info)
+    module subroutine psi_d_idx_insert_heap(key,index,last,heap,idxs,dir,info)
       import 
       implicit none 
 
@@ -213,7 +186,7 @@ module psb_d_sort_mod
 
 
   interface 
-    subroutine psi_d_heap_get_first(key,last,heap,dir,info)
+    module subroutine psi_d_heap_get_first(key,last,heap,dir,info)
       import 
       implicit none 
       real(psb_dpk_), intent(inout)  :: key
@@ -225,7 +198,7 @@ module psb_d_sort_mod
   end interface
 
   interface 
-    subroutine psi_d_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    module subroutine psi_d_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
       import
       real(psb_dpk_), intent(inout)    :: key
       integer(psb_ipk_), intent(out)    :: index
@@ -238,46 +211,46 @@ module psb_d_sort_mod
   end interface
 
   interface 
-    subroutine psi_disrx_up(n,x,ix)
+    module subroutine psi_disrx_up(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_disrx_up
-    subroutine psi_disrx_dw(n,x,ix)
+    module subroutine psi_disrx_dw(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_disrx_dw
-    subroutine psi_disr_up(n,x)
+    module subroutine psi_disr_up(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_disr_up
-    subroutine psi_disr_dw(n,x)
+    module subroutine psi_disr_dw(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_disr_dw
-    subroutine psi_daisrx_up(n,x,ix)
+    module subroutine psi_daisrx_up(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daisrx_up
-    subroutine psi_daisrx_dw(n,x,ix)
+    module subroutine psi_daisrx_dw(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daisrx_dw
-    subroutine psi_daisr_up(n,x)
+    module subroutine psi_daisr_up(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daisr_up
-    subroutine psi_daisr_dw(n,x)
+    module subroutine psi_daisr_dw(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
@@ -285,50 +258,50 @@ module psb_d_sort_mod
   end interface
 
   interface 
-    subroutine psi_dqsrx_up(n,x,ix)
+    module subroutine psi_dqsrx_up(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_dqsrx_up
-    subroutine psi_dqsrx_dw(n,x,ix)
+    module subroutine psi_dqsrx_dw(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_dqsrx_dw
-    subroutine psi_dqsr_up(n,x)
+    module subroutine psi_dqsr_up(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_dqsr_up
-    subroutine psi_dqsr_dw(n,x)
+    module subroutine psi_dqsr_dw(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_dqsr_dw
-    subroutine psi_daqsrx_up(n,x,ix)
+    module subroutine psi_daqsrx_up(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daqsrx_up
-    subroutine psi_daqsrx_dw(n,x,ix)
+    module subroutine psi_daqsrx_dw(n,x,ix)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daqsrx_dw
-    subroutine psi_daqsr_up(n,x)
+    module subroutine psi_daqsr_up(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_daqsr_up
-    subroutine psi_daqsr_dw(n,x)
+    module subroutine psi_daqsr_dw(n,x)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsr_dw
+    end subroutine psi_daqsr_dw    
   end interface
 
 contains

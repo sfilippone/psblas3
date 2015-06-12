@@ -248,7 +248,7 @@ module psb_d_mat_mod
 
 
   interface 
-    subroutine  psb_d_set_nrows(m,a) 
+    module subroutine  psb_d_set_nrows(m,a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: m
@@ -256,7 +256,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_ncols(n,a) 
+    module subroutine psb_d_set_ncols(n,a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
@@ -264,7 +264,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine  psb_d_set_dupl(n,a) 
+    module subroutine  psb_d_set_dupl(n,a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in) :: n
@@ -272,35 +272,35 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_null(a) 
+    module subroutine psb_d_set_null(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_null
   end interface
   
   interface 
-    subroutine psb_d_set_bld(a) 
+    module subroutine psb_d_set_bld(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_bld
   end interface
   
   interface 
-    subroutine psb_d_set_upd(a) 
+    module subroutine psb_d_set_upd(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_upd
   end interface
   
   interface 
-    subroutine psb_d_set_asb(a) 
+    module subroutine psb_d_set_asb(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_set_asb
   end interface
   
   interface 
-    subroutine psb_d_set_sorted(a,val) 
+    module subroutine psb_d_set_sorted(a,val) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
@@ -308,7 +308,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_triangle(a,val) 
+    module subroutine psb_d_set_triangle(a,val) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
@@ -316,7 +316,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_unit(a,val) 
+    module subroutine psb_d_set_unit(a,val) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
@@ -324,7 +324,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_lower(a,val) 
+    module subroutine psb_d_set_lower(a,val) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
@@ -332,7 +332,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_set_upper(a,val) 
+    module subroutine psb_d_set_upper(a,val) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       logical, intent(in), optional :: val
@@ -340,7 +340,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_sparse_print(iout,a,iv,head,ivr,ivc)
+    module subroutine psb_d_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_dspmat_type
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_dspmat_type), intent(in) :: a   
@@ -351,7 +351,7 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    subroutine psb_d_n_sparse_print(fname,a,iv,head,ivr,ivc)
+    module subroutine psb_d_n_sparse_print(fname,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_dspmat_type
       character(len=*), intent(in)      :: fname
       class(psb_dspmat_type), intent(in) :: a   
@@ -362,7 +362,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_get_neigh(a,idx,neigh,n,info,lev)
+    module subroutine psb_d_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(in) :: a   
       integer(psb_ipk_), intent(in)                :: idx 
@@ -374,7 +374,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_csall(nr,nc,a,info,nz) 
+    module subroutine psb_d_csall(nr,nc,a,info,nz) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(in)             :: nr,nc
@@ -384,7 +384,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_reallocate_nz(nz,a) 
+    module subroutine psb_d_reallocate_nz(nz,a) 
       import :: psb_ipk_, psb_dspmat_type
       integer(psb_ipk_), intent(in) :: nz
       class(psb_dspmat_type), intent(inout) :: a
@@ -392,21 +392,21 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_free(a) 
+    module subroutine psb_d_free(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_free
   end interface
   
   interface 
-    subroutine psb_d_trim(a) 
+    module subroutine psb_d_trim(a) 
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_trim
   end interface
   
   interface 
-    subroutine psb_d_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    module subroutine psb_d_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
@@ -418,7 +418,7 @@ module psb_d_mat_mod
 
   
   interface 
-    subroutine psb_d_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    module subroutine psb_d_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_d_vect_mod, only : psb_d_vect_type
       use psb_i_vect_mod, only : psb_i_vect_type
       import :: psb_ipk_, psb_dspmat_type
@@ -432,7 +432,7 @@ module psb_d_mat_mod
   end interface
  
   interface 
-    subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
+    module subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
@@ -448,7 +448,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+    module subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
@@ -465,7 +465,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_csgetblk(imin,imax,a,b,info,&
+    module subroutine psb_d_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)    :: a
@@ -480,7 +480,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_tril(a,b,info,diag,imin,imax,&
+    module subroutine psb_d_tril(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)      :: a
@@ -492,7 +492,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_triu(a,b,info,diag,imin,imax,&
+    module subroutine psb_d_triu(a,b,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)      :: a
@@ -505,7 +505,7 @@ module psb_d_mat_mod
 
 
   interface 
-    subroutine psb_d_csclip(a,b,info,&
+    module subroutine psb_d_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
@@ -517,7 +517,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_b_csclip(a,b,info,&
+    module subroutine psb_d_b_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_coo_sparse_mat
       class(psb_dspmat_type), intent(in) :: a
@@ -529,7 +529,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_mold(a,b)
+    module subroutine psb_d_mold(a,b)
       import :: psb_ipk_, psb_dspmat_type, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout)     :: a
       class(psb_d_base_sparse_mat), allocatable, intent(out) :: b
@@ -537,7 +537,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_asb(a,mold) 
+    module subroutine psb_d_asb(a,mold) 
       import :: psb_ipk_, psb_dspmat_type, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
       class(psb_d_base_sparse_mat), optional, intent(in) :: mold
@@ -545,14 +545,14 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_transp_1mat(a)
+    module subroutine psb_d_transp_1mat(a)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_transp_1mat
   end interface
   
   interface 
-    subroutine psb_d_transp_2mat(a,b)
+    module subroutine psb_d_transp_2mat(a,b)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(in)  :: a
       class(psb_dspmat_type), intent(inout) :: b
@@ -560,14 +560,14 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_transc_1mat(a)
+    module subroutine psb_d_transc_1mat(a)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
     end subroutine psb_d_transc_1mat
   end interface
   
   interface 
-    subroutine psb_d_transc_2mat(a,b)
+    module subroutine psb_d_transc_2mat(a,b)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(in)  :: a
       class(psb_dspmat_type), intent(inout) :: b
@@ -575,7 +575,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_reinit(a,clear)
+    module subroutine psb_d_reinit(a,clear)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a   
       logical, intent(in), optional :: clear
@@ -598,7 +598,7 @@ module psb_d_mat_mod
   !                 
   !
   interface 
-    subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
+    module subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(in)      :: a
       class(psb_dspmat_type), intent(inout)   :: b
@@ -611,7 +611,7 @@ module psb_d_mat_mod
   
 
   interface 
-    subroutine psb_d_cscnv_ip(a,iinfo,type,mold,dupl)
+    module subroutine psb_d_cscnv_ip(a,iinfo,type,mold,dupl)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_), intent(out)                   :: iinfo
@@ -623,7 +623,7 @@ module psb_d_mat_mod
   
 
   interface 
-    subroutine psb_d_cscnv_base(a,b,info,dupl)
+    module subroutine psb_d_cscnv_base(a,b,info,dupl)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(in)       :: a
       class(psb_d_base_sparse_mat), intent(out) :: b
@@ -637,7 +637,7 @@ module psb_d_mat_mod
   ! out; passes through a COO buffer. 
   !
   interface 
-    subroutine psb_d_clip_d(a,b,info)
+    module subroutine psb_d_clip_d(a,b,info)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(in)    :: a
       class(psb_dspmat_type), intent(inout) :: b
@@ -646,7 +646,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_clip_d_ip(a,info)
+    module subroutine psb_d_clip_d_ip(a,info)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       integer(psb_ipk_),intent(out)                  :: info
@@ -658,7 +658,7 @@ module psb_d_mat_mod
   ! encapsulation between spmat_type and base_sparse_mat.
   !
   interface 
-    subroutine psb_d_mv_from(a,b)
+    module subroutine psb_d_mv_from(a,b)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -666,7 +666,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_cp_from(a,b)
+    module subroutine psb_d_cp_from(a,b)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(out) :: a
       class(psb_d_base_sparse_mat), intent(in) :: b
@@ -674,7 +674,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_mv_to(a,b)
+    module subroutine psb_d_mv_to(a,b)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -682,7 +682,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_cp_to(a,b)
+    module subroutine psb_d_cp_to(a,b)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat    
       class(psb_dspmat_type), intent(in) :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -693,7 +693,7 @@ module psb_d_mat_mod
   ! Transfer the internal allocation to the target.
   !  
   interface psb_move_alloc 
-    subroutine psb_dspmat_type_move(a,b,info)
+    module subroutine psb_dspmat_type_move(a,b,info)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       class(psb_dspmat_type), intent(inout)   :: b
@@ -702,7 +702,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    subroutine psb_dspmat_clone(a,b,info)
+    module subroutine psb_dspmat_clone(a,b,info)
       import :: psb_ipk_, psb_dspmat_type
       class(psb_dspmat_type), intent(inout) :: a
       class(psb_dspmat_type), intent(inout) :: b
@@ -727,7 +727,7 @@ module psb_d_mat_mod
   ! == ===================================
 
   interface psb_csmm
-    subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
@@ -735,7 +735,7 @@ module psb_d_mat_mod
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_csmm
-    subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
@@ -743,7 +743,7 @@ module psb_d_mat_mod
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_csmv
-    subroutine psb_d_csmv_vect(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csmv_vect(alpha,a,x,beta,y,info,trans) 
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)   :: a
@@ -756,7 +756,7 @@ module psb_d_mat_mod
   end interface
   
   interface psb_cssm
-    subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
+    module subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
@@ -765,7 +765,7 @@ module psb_d_mat_mod
       character, optional, intent(in) :: trans, scale
       real(psb_dpk_), intent(in), optional :: d(:)
     end subroutine psb_d_cssm
-    subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
+    module subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
@@ -774,7 +774,7 @@ module psb_d_mat_mod
       character, optional, intent(in) :: trans, scale
       real(psb_dpk_), intent(in), optional :: d(:)
     end subroutine psb_d_cssv
-    subroutine psb_d_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
+    module subroutine psb_d_cssv_vect(alpha,a,x,beta,y,info,trans,scale,d) 
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in)   :: a
@@ -788,7 +788,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    function psb_d_maxval(a) result(res)
+    module function psb_d_maxval(a) result(res)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
@@ -796,7 +796,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    function psb_d_csnmi(a) result(res)
+    module function psb_d_csnmi(a) result(res)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
@@ -804,7 +804,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    function psb_d_csnm1(a) result(res)
+    module function psb_d_csnm1(a) result(res)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_)         :: res
@@ -812,7 +812,7 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    function psb_d_rowsum(a,info) result(d)
+    module function psb_d_rowsum(a,info) result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), allocatable      :: d(:)
@@ -821,7 +821,7 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    function psb_d_arwsum(a,info) result(d)
+    module function psb_d_arwsum(a,info) result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), allocatable        :: d(:)
@@ -830,7 +830,7 @@ module psb_d_mat_mod
   end interface
   
   interface 
-    function psb_d_colsum(a,info) result(d)
+    module function psb_d_colsum(a,info) result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), allocatable      :: d(:)
@@ -839,7 +839,7 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    function psb_d_aclsum(a,info)  result(d)
+    module function psb_d_aclsum(a,info)  result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), allocatable        :: d(:)
@@ -848,7 +848,7 @@ module psb_d_mat_mod
   end interface
 
   interface 
-    function psb_d_get_diag(a,info) result(d)
+    module function psb_d_get_diag(a,info) result(d)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(in) :: a
       real(psb_dpk_), allocatable         :: d(:)
@@ -857,14 +857,14 @@ module psb_d_mat_mod
   end interface
   
   interface psb_scal
-    subroutine psb_d_scal(d,a,info,side)
+    module subroutine psb_d_scal(d,a,info,side)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)             :: d(:)
       integer(psb_ipk_), intent(out)                    :: info
       character, intent(in), optional :: side
     end subroutine psb_d_scal
-    subroutine psb_d_scals(d,a,info)
+    module subroutine psb_d_scals(d,a,info)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_
       class(psb_dspmat_type), intent(inout) :: a
       real(psb_dpk_), intent(in)             :: d

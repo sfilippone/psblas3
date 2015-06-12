@@ -40,9 +40,9 @@
   !  Data Structures and Algorithms
   !  Addison-Wesley
   !
-
+submodule (psb_d_sort_mod) psb_d_msort_impl_mod
+contains
   subroutine psb_dmsort(x,ix,dir,flag)
-    use psb_d_sort_mod, psb_protect_name => psb_dmsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 
@@ -556,10 +556,4 @@
 
   end subroutine psi_d_amsort_dw
 
-
-
-
-
-
-
-
+end submodule psb_d_msort_impl_mod

@@ -106,7 +106,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
   interface
-    subroutine  psb_d_csc_reallocate_nz(nz,a) 
+    module subroutine  psb_d_csc_reallocate_nz(nz,a) 
       import :: psb_ipk_, psb_d_csc_sparse_mat
       integer(psb_ipk_), intent(in) :: nz
       class(psb_d_csc_sparse_mat), intent(inout) :: a
@@ -116,7 +116,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reinit
   interface 
-    subroutine psb_d_csc_reinit(a,clear)
+    module subroutine psb_d_csc_reinit(a,clear)
       import :: psb_ipk_, psb_d_csc_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
@@ -126,7 +126,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_trim
   interface
-    subroutine  psb_d_csc_trim(a)
+    module subroutine  psb_d_csc_trim(a)
       import :: psb_ipk_, psb_d_csc_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
     end subroutine psb_d_csc_trim
@@ -135,7 +135,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_mold
   interface 
-    subroutine psb_d_csc_mold(a,b,info) 
+    module subroutine psb_d_csc_mold(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
       class(psb_d_csc_sparse_mat), intent(in)                  :: a
       class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
@@ -146,7 +146,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface
-    subroutine  psb_d_csc_allocate_mnnz(m,n,a,nz) 
+    module subroutine  psb_d_csc_allocate_mnnz(m,n,a,nz) 
       import :: psb_ipk_, psb_d_csc_sparse_mat
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_d_csc_sparse_mat), intent(inout) :: a
@@ -158,7 +158,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_print
   interface
-    subroutine psb_d_csc_print(iout,a,iv,head,ivr,ivc)
+    module subroutine psb_d_csc_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_d_csc_sparse_mat
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_d_csc_sparse_mat), intent(in) :: a   
@@ -171,7 +171,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_coo
   interface 
-    subroutine psb_d_cp_csc_to_coo(a,b,info) 
+    module subroutine psb_d_cp_csc_to_coo(a,b,info) 
       import :: psb_ipk_, psb_d_coo_sparse_mat, psb_d_csc_sparse_mat
       class(psb_d_csc_sparse_mat), intent(in) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
@@ -182,7 +182,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
   interface 
-    subroutine psb_d_cp_csc_from_coo(a,b,info) 
+    module subroutine psb_d_cp_csc_from_coo(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
@@ -193,7 +193,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_fmt
   interface 
-    subroutine psb_d_cp_csc_to_fmt(a,b,info) 
+    module subroutine psb_d_cp_csc_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csc_sparse_mat), intent(in)   :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -204,7 +204,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_fmt
   interface 
-    subroutine psb_d_cp_csc_from_fmt(a,b,info) 
+    module subroutine psb_d_cp_csc_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(in)   :: b
@@ -215,7 +215,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_coo
   interface 
-    subroutine psb_d_mv_csc_to_coo(a,b,info) 
+    module subroutine psb_d_mv_csc_to_coo(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout)   :: b
@@ -226,7 +226,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_coo
   interface 
-    subroutine psb_d_mv_csc_from_coo(a,b,info) 
+    module subroutine psb_d_mv_csc_from_coo(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
@@ -237,7 +237,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_fmt
   interface 
-    subroutine psb_d_mv_csc_to_fmt(a,b,info) 
+    module subroutine psb_d_mv_csc_to_fmt(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(inout)  :: b
@@ -248,7 +248,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_fmt
   interface 
-    subroutine psb_d_mv_csc_from_fmt(a,b,info) 
+    module subroutine psb_d_mv_csc_from_fmt(a,b,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csc_sparse_mat), intent(inout)  :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
@@ -259,7 +259,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from
   interface 
-    subroutine psb_d_csc_cp_from(a,b)
+    module subroutine psb_d_csc_cp_from(a,b)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       type(psb_d_csc_sparse_mat), intent(in)   :: b
@@ -269,7 +269,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from
   interface 
-    subroutine psb_d_csc_mv_from(a,b)
+    module subroutine psb_d_csc_mv_from(a,b)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(inout)  :: a
       type(psb_d_csc_sparse_mat), intent(inout) :: b
@@ -280,7 +280,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csput_a
   interface 
-    subroutine psb_d_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+    module subroutine psb_d_csc_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
@@ -294,7 +294,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_base_mat_mod::psb_base_csgetptn
   interface 
-    subroutine psb_d_csc_csgetptn(imin,imax,a,nz,ia,ja,info,&
+    module subroutine psb_d_csc_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -312,7 +312,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csgetrow
   interface 
-    subroutine psb_d_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+    module subroutine psb_d_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -331,7 +331,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csgetblk
   interface 
-    subroutine psb_d_csc_csgetblk(imin,imax,a,b,info,&
+    module subroutine psb_d_csc_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_, psb_d_coo_sparse_mat
       class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -348,7 +348,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cssv
   interface 
-    subroutine psb_d_csc_cssv(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csc_cssv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
@@ -360,7 +360,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cssm
   interface 
-    subroutine psb_d_csc_cssm(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csc_cssm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
@@ -373,7 +373,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csmv
   interface 
-    subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
@@ -386,7 +386,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csmm
   interface 
-    subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans) 
+    module subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
@@ -400,7 +400,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_maxval
   interface 
-    function psb_d_csc_maxval(a) result(res)
+    module function psb_d_csc_maxval(a) result(res)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
@@ -410,7 +410,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csnm1
   interface 
-    function psb_d_csc_csnm1(a) result(res)
+    module function psb_d_csc_csnm1(a) result(res)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
@@ -420,7 +420,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_rowsum
   interface 
-    subroutine psb_d_csc_rowsum(d,a) 
+    module subroutine psb_d_csc_rowsum(d,a) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
@@ -430,7 +430,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_arwsum
   interface 
-    subroutine psb_d_csc_arwsum(d,a) 
+    module subroutine psb_d_csc_arwsum(d,a) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
@@ -440,7 +440,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_colsum
   interface 
-    subroutine psb_d_csc_colsum(d,a) 
+    module subroutine psb_d_csc_colsum(d,a) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
@@ -450,7 +450,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_aclsum
   interface 
-    subroutine psb_d_csc_aclsum(d,a) 
+    module subroutine psb_d_csc_aclsum(d,a) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
@@ -460,7 +460,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_get_diag
   interface 
-    subroutine psb_d_csc_get_diag(a,d,info) 
+    module subroutine psb_d_csc_get_diag(a,d,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)     :: d(:)
@@ -471,7 +471,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_scal
   interface 
-    subroutine psb_d_csc_scal(d,a,info,side) 
+    module subroutine psb_d_csc_scal(d,a,info,side) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: d(:)
@@ -483,7 +483,7 @@ module psb_d_csc_mat_mod
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_scals
   interface
-    subroutine psb_d_csc_scals(d,a,info) 
+    module subroutine psb_d_csc_scals(d,a,info) 
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: d

@@ -155,6 +155,8 @@ contains
     type(psb_d_csr_sparse_mat)  :: acsr
     type(psb_d_coo_sparse_mat)  :: acoo
     
+    integer(psb_ipk_), pointer :: airp(:), aja(:)
+    real(psb_dpk_), pointer    :: aval(:)
     integer(psb_ipk_) :: err_act
     character(len=20)           :: name
     integer(psb_ipk_), allocatable :: ndstk(:,:), iold(:), ndeg(:), perm(:) 
@@ -171,9 +173,12 @@ contains
     call aa%mv_to_fmt(acsr,info)
     ! Insert call to gps_reduce
     nr   = acsr%get_nrows()
+    airp => acsr%get_irpp()
+    aja  => acsr%get_jap()
+    aval => acsr%get_valp()
     ideg = 0
     do i=1, nr
-      ideg = max(ideg,acsr%irp(i+1)-acsr%irp(i))
+      ideg = max(ideg,airp(i+1)-airp(i))
     end do
     allocate(ndstk(nr,ideg), iold(nr), perm(nr+1), ndeg(nr),stat=info)
     if (info /= 0) then
@@ -185,9 +190,9 @@ contains
       iold(i) = i 
       ndstk(i,:) = 0
       k  = 0
-      do j=acsr%irp(i),acsr%irp(i+1)-1
+      do j=airp(i),airp(i+1)-1
         k = k + 1
-        ndstk(i,k) = acsr%ja(j)
+        ndstk(i,k) = aja(j)
       end do
     end do
     perm = 0
@@ -347,6 +352,8 @@ subroutine psb_d_cmp_bwpf(mat,bwl,bwu,prf,info)
   !
   integer(psb_ipk_), allocatable :: irow(:), icol(:)
   real(psb_dpk_), allocatable :: val(:)
+  integer(psb_ipk_), pointer :: airp(:), aja(:)
+  real(psb_dpk_), pointer    :: aval(:)
   integer(psb_ipk_) :: nz
   integer(psb_ipk_) :: i, j, lrbu, lrbl
   
@@ -356,12 +363,15 @@ subroutine psb_d_cmp_bwpf(mat,bwl,bwu,prf,info)
   prf = 0
   select type (aa=>mat%a)
   class is (psb_d_csr_sparse_mat)
+    airp => aa%get_irpp()
+    aja  => aa%get_jap()
+    aval => aa%get_valp()
     do i=1, aa%get_nrows()
       lrbl = 0
       lrbu = 0
-      do j = aa%irp(i), aa%irp(i+1) - 1
-        lrbl = max(lrbl,i-aa%ja(j))
-        lrbu = max(lrbu,aa%ja(j)-i)
+      do j = airp(i), airp(i+1) - 1
+        lrbl = max(lrbl,i-aja(j))
+        lrbu = max(lrbu,aja(j)-i)
       end do
       prf = prf + lrbl+lrbu
       bwu  = max(bwu,lrbu)

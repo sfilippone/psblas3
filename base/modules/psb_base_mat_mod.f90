@@ -229,7 +229,7 @@ module psb_base_mat_mod
   !!    \param idx   The line we are interested in.
   !
   interface 
-    function psb_base_get_nz_row(idx,a) result(res)
+    module function psb_base_get_nz_row(idx,a) result(res)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in)                    :: idx
       class(psb_base_sparse_mat), intent(in) :: a
@@ -244,7 +244,7 @@ module psb_base_mat_mod
   !!    count(A(:,:)/=0) 
   !
   interface 
-    function psb_base_get_nzeros(a) result(res)
+    module function psb_base_get_nzeros(a) result(res)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
       integer(psb_ipk_) :: res
@@ -259,7 +259,7 @@ module psb_base_mat_mod
   !!            currently occupied) 
   !    
   interface 
-    function psb_base_get_size(a) result(res)
+    module function psb_base_get_size(a) result(res)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
       integer(psb_ipk_) :: res
@@ -272,7 +272,7 @@ module psb_base_mat_mod
   !!  \param clear [true] explicitly zero out coefficients.
   !    
   interface 
-    subroutine psb_base_reinit(a,clear)
+    module subroutine psb_base_reinit(a,clear)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
@@ -291,7 +291,7 @@ module psb_base_mat_mod
   !!  \param ivc(:) [none] renumbering for the cols
   !    
   interface 
-    subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
+    module subroutine psb_base_sparse_print(iout,a,iv,head,ivr,ivc)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_base_sparse_mat), intent(in) :: a   
@@ -330,7 +330,7 @@ module psb_base_mat_mod
   !           
 
   interface 
-    subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
+    module subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a
@@ -361,7 +361,7 @@ module psb_base_mat_mod
   !!               i.e. when lev=2 find neighours of neighbours, etc. 
   !           
   interface 
-    subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
+    module subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(in) :: a   
       integer(psb_ipk_), intent(in)                :: idx 
@@ -383,7 +383,7 @@ module psb_base_mat_mod
   !!  \param nz [estimated internally] number of nonzeros to allocate for
   !
   interface 
-    subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
+    module subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_base_sparse_mat), intent(inout) :: a
@@ -401,7 +401,7 @@ module psb_base_mat_mod
   !!  \param nz  number of nonzeros to allocate for
   !
   interface 
-    subroutine psb_base_reallocate_nz(nz,a) 
+    module subroutine psb_base_reallocate_nz(nz,a) 
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       integer(psb_ipk_), intent(in) :: nz
       class(psb_base_sparse_mat), intent(inout) :: a
@@ -414,7 +414,7 @@ module psb_base_mat_mod
   !! \brief destructor
   !
   interface 
-    subroutine psb_base_free(a) 
+    module subroutine psb_base_free(a) 
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_free
@@ -428,7 +428,7 @@ module psb_base_mat_mod
   !! possible given the actual number of nonzeros it contains. 
   !
   interface 
-    subroutine psb_base_trim(a) 
+    module subroutine psb_base_trim(a) 
       import :: psb_ipk_, psb_long_int_k_, psb_base_sparse_mat
       class(psb_base_sparse_mat), intent(inout) :: a
     end subroutine psb_base_trim
