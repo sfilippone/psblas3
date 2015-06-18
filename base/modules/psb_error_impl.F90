@@ -61,7 +61,6 @@ contains
   ! handles the occurence of an error in a serial routine
   subroutine psb_serror()
     use psb_const_mod
-    use psb_error_mod
     implicit none 
     integer(psb_ipk_) ::  err_c
     character(len=20)       ::  r_name
@@ -98,7 +97,6 @@ contains
   ! handles the occurence of an error in a parallel routine
   subroutine psb_perror(ictxt,abrt)
     use psb_const_mod
-    use psb_error_mod
     use psb_penv_mod
     implicit none 
     integer(psb_mpik_), intent(in) :: ictxt

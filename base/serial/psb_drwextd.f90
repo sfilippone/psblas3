@@ -104,12 +104,14 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
   integer(psb_ipk_), intent(in)                                :: nr
-  class(psb_d_base_sparse_mat), intent(inout)        :: a
+  class(psb_d_base_sparse_mat), intent(inout), target         :: a
   integer(psb_ipk_),intent(out)                                :: info
   class(psb_d_base_sparse_mat), intent(in), optional :: b
   logical,intent(in), optional                       :: rowscale
 
   integer(psb_ipk_) :: i,j,ja,jb,err_act,nza,nzb, ma, mb, na, nb
+  integer(psb_ipk_), pointer :: irpp(:), jap(:)
+  real(psb_dpk_), pointer    :: valp(:)
   character(len=20)                 :: name, ch_err
   logical  rowscale_ 
 
@@ -123,12 +125,16 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
     rowscale_ = .true.
   end if
 
-  ma = a%get_nrows()
-  na = a%get_ncols()
+  ma  = a%get_nrows()
+  na  = a%get_ncols()
+  nza = a%get_nzeros()
 
 
   select type(a) 
   type is (psb_d_csr_sparse_mat)
+
+    call a%set_nrows(nr)
+        
 
     call psb_ensure_size(nr+1,a%irp,info)
 
@@ -166,8 +172,6 @@ subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
       end do
 
     end if
-
-    call a%set_nrows(nr)
 
 
   type is (psb_d_coo_sparse_mat) 

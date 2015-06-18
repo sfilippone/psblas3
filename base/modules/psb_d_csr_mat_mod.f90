@@ -52,7 +52,7 @@ module psb_d_csr_mat_mod
   !! This is a very common storage type, and is the default for assembled
   !! matrices in our library
   type, extends(psb_d_base_sparse_mat) :: psb_d_csr_sparse_mat
-    private
+    !private
     !> Pointers to beginning of rows in JA and VAL. 
     integer(psb_ipk_), allocatable :: irp(:)
     !> Column indices.

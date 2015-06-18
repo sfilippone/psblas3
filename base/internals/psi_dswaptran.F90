@@ -159,7 +159,7 @@ contains
     return
   end subroutine psi_dswaptranm
 
-  subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+  subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
     use psi_serial_mod
     use psb_error_mod
     use psb_desc_mod
@@ -172,14 +172,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag,n
+    integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag,n
     integer(psb_ipk_), intent(out)     :: info
     real(psb_dpk_)         :: y(:,:), beta
     real(psb_dpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
     ! locals
-    integer(psb_mpik_) :: ictxt, icomm, np, me,&
+    integer(psb_mpik_) :: iictxt, iicomm, np, me,&
          & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
          & sdsz, rvsz, prcid, rvhd, sdhd
@@ -200,10 +200,10 @@ contains
     info=psb_success_
     name='psi_swap_tran'
     call psb_erractionsave(err_act)
-    ictxt = iictxt
-    icomm = iicomm
+    iictxt = ictxt
+    iicomm = icomm
 
-    call psb_info(ictxt,me,np) 
+    call psb_info(iictxt,me,np) 
     if (np == -1) then
       info=psb_err_context_error_
       call psb_errpush(info,name)
@@ -244,7 +244,7 @@ contains
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-        call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+        call psb_get_rank(prcid(proc_to_comm),iictxt,proc_to_comm)
 
 
         brvidx(proc_to_comm) = rcv_pt
@@ -312,7 +312,7 @@ contains
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
            & psb_mpi_r_dpk_,&
-           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
+           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,iicomm,iret)
       if(iret /= mpi_success) then
         ierr(1) = iret
         info=psb_err_mpi_error_
@@ -331,14 +331,14 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
         if (proc_to_comm  <  me) then
-          if (nerv>0) call psb_snd(ictxt,&
+          if (nerv>0) call psb_snd(iictxt,&
                & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
-          if (nesd>0) call psb_rcv(ictxt,&
+          if (nesd>0) call psb_rcv(iictxt,&
                & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
         else if (proc_to_comm  >  me) then
-          if (nesd>0) call psb_rcv(ictxt,&
+          if (nesd>0) call psb_rcv(iictxt,&
                & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-          if (nerv>0) call psb_snd(ictxt,&
+          if (nerv>0) call psb_snd(iictxt,&
                & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
         else if (proc_to_comm == me) then 
           if (nesd /= nerv) then 
@@ -365,12 +365,12 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+        call psb_get_rank(prcid(i),iictxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),n*nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag,icomm,rvhd(i),iret)
+               & p2ptag,iicomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
@@ -379,7 +379,7 @@ contains
 
 
       ! Then I post all the blocking sends
-      if (usersend)  call mpi_barrier(icomm,iret)
+      if (usersend)  call mpi_barrier(iicomm,iret)
 
       pnti   = 1
       snd_pt = 1
@@ -394,11 +394,11 @@ contains
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
                  & psb_mpi_r_dpk_,prcid(i),&
-                 & p2ptag,icomm,iret)
+                 & p2ptag,iicomm,iret)
           else
             call mpi_send(rcvbuf(rcv_pt),n*nerv,&
                  & psb_mpi_r_dpk_,prcid(i),&
-                 & p2ptag,icomm,iret)
+                 & p2ptag,iicomm,iret)
           end if
 
           if(iret /= mpi_success) then
@@ -452,7 +452,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(iictxt,&
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
@@ -469,7 +469,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(iictxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
@@ -517,7 +517,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
     return
   end subroutine psi_dtranidxm
@@ -659,7 +659,7 @@ contains
   ! 
 
 
-  subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+  subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
     use psi_serial_mod
     use psb_error_mod
@@ -673,14 +673,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
+    integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
     integer(psb_ipk_), intent(out)     :: info
     real(psb_dpk_)         :: y(:), beta
     real(psb_dpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
     ! locals
-    integer(psb_mpik_) :: ictxt, icomm, np, me,&
+    integer(psb_mpik_) :: iictxt, iicomm, np, me,&
          & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
          & sdsz, rvsz, prcid, rvhd, sdhd
@@ -707,10 +707,10 @@ contains
     info=psb_success_
     name='psi_swap_tran'
     call psb_erractionsave(err_act)
-    ictxt = iictxt
-    icomm = iicomm
+    iictxt = ictxt
+    iicomm = icomm
 
-    call psb_info(ictxt,me,np) 
+    call psb_info(iictxt,me,np) 
     if (np == -1) then
       info=psb_err_context_error_
       call psb_errpush(info,name)
@@ -751,7 +751,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
+        call psb_get_rank(prcid(proc_to_comm),iictxt,proc_to_comm)
 
         brvidx(proc_to_comm) = rcv_pt
         rvsz(proc_to_comm)   = nerv
@@ -818,7 +818,7 @@ contains
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
            & psb_mpi_r_dpk_,&
-           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
+           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,iicomm,iret)
       if(iret /= mpi_success) then
         ierr(1) = iret
         info=psb_err_mpi_error_
@@ -837,14 +837,14 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
         if (proc_to_comm  <  me) then
-          if (nerv>0) call psb_snd(ictxt,&
+          if (nerv>0) call psb_snd(iictxt,&
                & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-          if (nesd>0) call psb_rcv(ictxt,&
+          if (nesd>0) call psb_rcv(iictxt,&
                & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
         else if (proc_to_comm  >  me) then
-          if (nesd>0) call psb_rcv(ictxt,&
+          if (nesd>0) call psb_rcv(iictxt,&
                & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-          if (nerv>0) call psb_snd(ictxt,&
+          if (nerv>0) call psb_snd(iictxt,&
                & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
         else if (proc_to_comm ==  me) then
           if (nesd /= nerv) then 
@@ -871,12 +871,12 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+        call psb_get_rank(prcid(i),iictxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag,icomm,rvhd(i),iret)
+               & p2ptag,iicomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + nerv
         snd_pt = snd_pt + nesd
@@ -885,7 +885,7 @@ contains
 
 
       ! Then I post all the blocking sends
-      if (usersend)  call mpi_barrier(icomm,iret)
+      if (usersend)  call mpi_barrier(iicomm,iret)
 
       pnti   = 1
       snd_pt = 1
@@ -900,11 +900,11 @@ contains
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),nerv,&
                  & psb_mpi_r_dpk_,prcid(i),&
-                 & p2ptag, icomm,iret)
+                 & p2ptag, iicomm,iret)
           else
             call mpi_send(rcvbuf(rcv_pt),nerv,&
                  & psb_mpi_r_dpk_,prcid(i),&
-                 & p2ptag, icomm,iret)
+                 & p2ptag, iicomm,iret)
           end if
 
           if(iret /= mpi_success) then
@@ -957,7 +957,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nerv>0) call psb_snd(ictxt,&
+        if (nerv>0) call psb_snd(iictxt,&
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
         rcv_pt = rcv_pt + nerv
         snd_pt = snd_pt + nesd
@@ -974,7 +974,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        if (nesd>0) call psb_rcv(ictxt,&
+        if (nesd>0) call psb_rcv(iictxt,&
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
         rcv_pt = rcv_pt + nerv
         snd_pt = snd_pt + nesd
@@ -1024,7 +1024,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
     return
   end subroutine psi_dtranidxv
@@ -1125,7 +1125,7 @@ contains
   !   
   !   
   ! 
-  subroutine psi_dtran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+  subroutine psi_dtran_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
        & totxch,totsnd,totrcv,work,info)
     use psi_serial_mod
     use psb_error_mod
@@ -1140,7 +1140,7 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: iictxt,iicomm,flag
+    integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
     integer(psb_ipk_), intent(out)     :: info
     class(psb_d_base_vect_type) :: y
     real(psb_dpk_)         :: beta
@@ -1149,7 +1149,7 @@ contains
     integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
     ! locals
-    integer(psb_mpik_) :: ictxt, icomm, np, me,&
+    integer(psb_mpik_) :: iictxt, iicomm, np, me,&
          & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpik_), allocatable :: prcid(:)
     integer(psb_ipk_) :: nesd, nerv,&
@@ -1164,10 +1164,10 @@ contains
     info=psb_success_
     name='psi_swap_tran'
     call psb_erractionsave(err_act)
-    ictxt = iictxt
-    icomm = iicomm
+    iictxt = ictxt         
+    iicomm = icomm
 
-    call psb_info(ictxt,me,np) 
+    call psb_info(iictxt,me,np) 
     if (np == -1) then
       info=psb_err_context_error_
       call psb_errpush(info,name)
@@ -1212,12 +1212,12 @@ contains
 
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+        call psb_get_rank(prcid(i),iictxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
           call mpi_irecv(y%combuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
+               & p2ptag, iicomm,y%comid(i,2),iret)
         end if
         pnti   = pnti + nerv + nesd + 3
       end do
@@ -1265,7 +1265,7 @@ contains
         if ((nerv>0).and.(proc_to_comm /= me)) then 
           call mpi_isend(y%combuf(rcv_pt),nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
+               & p2ptag,iicomm,y%comid(i,1),iret)
         end if
 
         if(iret /= mpi_success) then
@@ -1370,7 +1370,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
     return
 

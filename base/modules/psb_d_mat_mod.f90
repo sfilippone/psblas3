@@ -611,10 +611,10 @@ module psb_d_mat_mod
   
 
   interface 
-    module subroutine psb_d_cscnv_ip(a,iinfo,type,mold,dupl)
+    module subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
       import :: psb_ipk_, psb_dspmat_type, psb_dpk_, psb_d_base_sparse_mat
       class(psb_dspmat_type), intent(inout) :: a
-      integer(psb_ipk_), intent(out)                   :: iinfo
+      integer(psb_ipk_), intent(out)                   :: info
       integer(psb_ipk_),optional, intent(in)           :: dupl
       character(len=*), optional, intent(in) :: type
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
