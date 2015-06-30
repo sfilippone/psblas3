@@ -225,7 +225,7 @@ module psb_i_sort_mod
 
   interface 
     module subroutine psi_i_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      integer(psb_ipk_), intent(inout)    :: key
+      integer(psb_ipk_), intent(out)      :: key
       integer(psb_ipk_), intent(out)    :: index
       integer(psb_ipk_), intent(inout)    :: heap(:)
       integer(psb_ipk_), intent(in)     :: dir
