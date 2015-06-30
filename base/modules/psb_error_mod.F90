@@ -68,11 +68,9 @@ module psb_error_mod
 
   interface psb_error_handler
     module subroutine psb_ser_error_handler(err_act)
-      import :: psb_ipk_
       integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
     module subroutine psb_par_error_handler(ictxt,err_act)
-      import :: psb_ipk_,psb_mpik_
       integer(psb_mpik_), intent(in) ::  ictxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
@@ -82,7 +80,6 @@ module psb_error_mod
     module subroutine psb_serror()
     end subroutine psb_serror
     module subroutine psb_perror(ictxt,abrt)
-      import :: psb_mpik_
       integer(psb_mpik_), intent(in) ::  ictxt
       logical, intent(in), optional  :: abrt
     end subroutine psb_perror
@@ -91,7 +88,6 @@ module psb_error_mod
 
   interface psb_error_print_stack
     module subroutine psb_par_error_print_stack(ictxt)
-      import :: psb_ipk_,psb_mpik_
       integer(psb_mpik_), intent(in) ::  ictxt
     end subroutine psb_par_error_print_stack
     module subroutine psb_ser_error_print_stack()
@@ -100,7 +96,6 @@ module psb_error_mod
 
   interface psb_errcomm
     module subroutine psb_errcomm(ictxt, err)
-      import :: psb_mpik_, psb_ipk_
       integer(psb_mpik_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
