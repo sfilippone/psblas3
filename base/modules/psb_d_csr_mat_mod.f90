@@ -52,7 +52,7 @@ module psb_d_csr_mat_mod
   !! This is a very common storage type, and is the default for assembled
   !! matrices in our library
   type, extends(psb_d_base_sparse_mat) :: psb_d_csr_sparse_mat
-    !private
+
     !> Pointers to beginning of rows in JA and VAL. 
     integer(psb_ipk_), allocatable :: irp(:)
     !> Column indices.
@@ -99,10 +99,6 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: free        => d_csr_free
     procedure, pass(a) :: mold        => psb_d_csr_mold
 
-    procedure, pass(a) :: get_irpp    => d_csr_get_irpp
-    procedure, pass(a) :: get_jap     => d_csr_get_jap
-    procedure, pass(a) :: get_valp    => d_csr_get_valp
-    
   end type psb_d_csr_sparse_mat
 
   private :: d_csr_get_nzeros, d_csr_free,  d_csr_get_fmt, &
@@ -113,7 +109,6 @@ module psb_d_csr_mat_mod
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
   interface
     module subroutine  psb_d_csr_reallocate_nz(nz,a) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat
       integer(psb_ipk_), intent(in) :: nz
       class(psb_d_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_d_csr_reallocate_nz
@@ -123,7 +118,6 @@ module psb_d_csr_mat_mod
   !| \see psb_base_mat_mod::psb_base_reinit
   interface 
     module subroutine psb_d_csr_reinit(a,clear)
-      import :: psb_ipk_, psb_d_csr_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a   
       logical, intent(in), optional :: clear
     end subroutine psb_d_csr_reinit
@@ -133,7 +127,6 @@ module psb_d_csr_mat_mod
   !| \see psb_base_mat_mod::psb_base_trim
   interface
     module subroutine  psb_d_csr_trim(a)
-      import :: psb_ipk_, psb_d_csr_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
     end subroutine psb_d_csr_trim
   end interface
@@ -143,7 +136,6 @@ module psb_d_csr_mat_mod
   !| \see psb_base_mat_mod::psb_base_mold
   interface 
     module subroutine psb_d_csr_mold(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
       class(psb_d_csr_sparse_mat), intent(in)                  :: a
       class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
@@ -154,7 +146,6 @@ module psb_d_csr_mat_mod
   !| \see psb_base_mat_mod::psb_base_allocate_mnnz
   interface
     module subroutine  psb_d_csr_allocate_mnnz(m,n,a,nz) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(in), optional :: nz
@@ -166,7 +157,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_print
   interface
     module subroutine psb_d_csr_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_ipk_, psb_d_csr_sparse_mat
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_d_csr_sparse_mat), intent(in) :: a   
       integer(psb_ipk_), intent(in), optional     :: iv(:)
@@ -179,7 +169,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_coo
   interface 
     module subroutine psb_d_cp_csr_to_coo(a,b,info) 
-      import :: psb_ipk_, psb_d_coo_sparse_mat, psb_d_csr_sparse_mat
       class(psb_d_csr_sparse_mat), intent(in) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -190,7 +179,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
   interface 
     module subroutine psb_d_cp_csr_from_coo(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
       integer(psb_ipk_), intent(out)               :: info
@@ -201,7 +189,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_fmt
   interface 
     module subroutine psb_d_cp_csr_to_fmt(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csr_sparse_mat), intent(in)   :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                       :: info
@@ -212,7 +199,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_fmt
   interface 
     module subroutine psb_d_cp_csr_from_fmt(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(in)   :: b
       integer(psb_ipk_), intent(out)                        :: info
@@ -223,7 +209,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_coo
   interface 
     module subroutine psb_d_mv_csr_to_coo(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout)   :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -234,7 +219,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_coo
   interface 
     module subroutine psb_d_mv_csr_from_coo(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_coo_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                        :: info
@@ -245,7 +229,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_fmt
   interface 
     module subroutine psb_d_mv_csr_to_fmt(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       class(psb_d_base_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)                        :: info
@@ -256,7 +239,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_fmt
   interface 
     module subroutine psb_d_mv_csr_from_fmt(a,b,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_d_base_sparse_mat
       class(psb_d_csr_sparse_mat), intent(inout)  :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)                         :: info
@@ -267,7 +249,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from
   interface 
     module subroutine psb_d_csr_cp_from(a,b)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       type(psb_d_csr_sparse_mat), intent(in)   :: b
     end subroutine psb_d_csr_cp_from
@@ -277,7 +258,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from
   interface 
     module subroutine psb_d_csr_mv_from(a,b)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(inout)  :: a
       type(psb_d_csr_sparse_mat), intent(inout) :: b
     end subroutine psb_d_csr_mv_from
@@ -288,7 +268,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csput_a
   interface 
     module subroutine psb_d_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
@@ -303,7 +282,6 @@ module psb_d_csr_mat_mod
   interface 
     module subroutine psb_d_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_), intent(out)                 :: nz
@@ -321,7 +299,6 @@ module psb_d_csr_mat_mod
   interface 
     module subroutine psb_d_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_), intent(out)                 :: nz
@@ -340,7 +317,6 @@ module psb_d_csr_mat_mod
   interface 
     module subroutine psb_d_csr_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_, psb_d_coo_sparse_mat
       class(psb_d_csr_sparse_mat), intent(in) :: a
       class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -356,7 +332,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cssv
   interface 
     module subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
@@ -368,7 +343,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cssm
   interface 
     module subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -381,7 +355,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csmv
   interface 
     module subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
@@ -394,7 +367,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csmm
   interface 
     module subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
       real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -408,7 +380,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_maxval
   interface 
     module function psb_d_csr_maxval(a) result(res)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_d_csr_maxval
@@ -418,7 +389,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csnmi
   interface 
     module function psb_d_csr_csnmi(a) result(res)
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_)         :: res
     end function psb_d_csr_csnmi
@@ -428,7 +398,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_rowsum
   interface 
     module subroutine psb_d_csr_rowsum(d,a) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_csr_rowsum
@@ -438,7 +407,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_arwsum
   interface 
     module subroutine psb_d_csr_arwsum(d,a) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_csr_arwsum
@@ -448,7 +416,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_colsum
   interface 
     module subroutine psb_d_csr_colsum(d,a) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_csr_colsum
@@ -458,7 +425,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_aclsum
   interface 
     module subroutine psb_d_csr_aclsum(d,a) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_csr_aclsum
@@ -468,7 +434,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_get_diag
   interface 
     module subroutine psb_d_csr_get_diag(a,d,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(in) :: a
       real(psb_dpk_), intent(out)     :: d(:)
       integer(psb_ipk_), intent(out)            :: info
@@ -479,7 +444,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_scal
   interface 
     module subroutine psb_d_csr_scal(d,a,info,side) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: d(:)
       integer(psb_ipk_), intent(out)            :: info
@@ -491,7 +455,6 @@ module psb_d_csr_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_scals
   interface
     module subroutine psb_d_csr_scals(d,a,info) 
-      import :: psb_ipk_, psb_d_csr_sparse_mat, psb_dpk_
       class(psb_d_csr_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: d
       integer(psb_ipk_), intent(out)            :: info
@@ -618,48 +581,4 @@ contains
   end subroutine d_csr_free
 
 
-  function d_csr_get_irpp(a) result(res)
-    implicit none 
-    class(psb_d_csr_sparse_mat), intent(in), target  :: a
-    integer(psb_ipk_), pointer  :: res(:)
-
-    
-    if (allocated(a%irp)) then 
-      res => a%irp
-    else
-      res => null()
-    end if
-    
-  end function d_csr_get_irpp
-
-  function d_csr_get_jap(a) result(res)
-    implicit none 
-    class(psb_d_csr_sparse_mat), intent(in), target  :: a
-    integer(psb_ipk_), pointer  :: res(:)
-
-    
-    if (allocated(a%ja)) then 
-      res => a%ja
-    else
-      res => null()
-    end if
-    
-  end function d_csr_get_jap
-
-  function d_csr_get_valp(a) result(res)
-    implicit none 
-    class(psb_d_csr_sparse_mat), intent(in), target  :: a
-    real(psb_dpk_), pointer  :: res(:)
-
-    
-    if (allocated(a%val)) then 
-      res => a%val
-    else
-      res => null()
-    end if
-    
-  end function d_csr_get_valp
-
-
-  
 end module psb_d_csr_mat_mod

@@ -29,8 +29,10 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-submodule (psb_d_base_mat_mod) psb_d_coo_impl_mod
+submodule (psb_d_base_mat_mod) psb_d_coo_mat_impl_mod
+
 contains
+
 
   subroutine psb_d_coo_get_diag(a,d,info) 
     use psb_error_mod
@@ -4006,4 +4008,4 @@ contains
 
   end subroutine psb_d_fix_coo_inner
 
-end submodule psb_d_coo_impl_mod
+end submodule psb_d_coo_mat_impl_mod

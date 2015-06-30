@@ -35,8 +35,7 @@ module psi_c_mod
 
 
   interface psi_swapdata
-    subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag, n
       integer(psb_ipk_), intent(out)        :: info
       complex(psb_spk_)           :: y(:,:), beta
@@ -44,8 +43,7 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswapdatam
-    subroutine psi_cswapdatav(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswapdatav(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       complex(psb_spk_)           :: y(:), beta 
@@ -53,8 +51,7 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswapdatav
-    subroutine psi_cswapdata_vect(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswapdata_vect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_c_base_vect_type) :: y
@@ -63,27 +60,24 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswapdata_vect
-    subroutine psi_cswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_cswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag, n
       integer(psb_ipk_), intent(out)     :: info
       complex(psb_spk_)        :: y(:,:), beta
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_cswapidxm
-    subroutine psi_cswapidxv(ictxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_cswapidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)     :: info
       complex(psb_spk_)        :: y(:), beta
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_cswapidxv
-    subroutine psi_cswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_cswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_c_base_vect_type)             :: y
@@ -96,8 +90,7 @@ module psi_c_mod
 
 
   interface psi_swaptran
-    subroutine psi_cswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswaptranm(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag, n
       integer(psb_ipk_), intent(out)        :: info
       complex(psb_spk_)           :: y(:,:), beta
@@ -105,8 +98,7 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswaptranm
-    subroutine psi_cswaptranv(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswaptranv(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       complex(psb_spk_)           :: y(:), beta
@@ -114,8 +106,7 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswaptranv
-    subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       class(psb_c_base_vect_type) :: y
@@ -124,27 +115,24 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswaptran_vect
-    subroutine psi_ctranidxm(ictxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_ctranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag, n
       integer(psb_ipk_), intent(out)     :: info
       complex(psb_spk_)        :: y(:,:), beta
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ctranidxm
-    subroutine psi_ctranidxv(ictxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_ctranidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)     :: info
       complex(psb_spk_)        :: y(:), beta
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ctranidxv
-    subroutine psi_ctran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_ctran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_c_base_vect_type)             :: y
@@ -156,22 +144,19 @@ module psi_c_mod
   end interface
 
   interface psi_ovrl_upd
-    subroutine  psi_covrl_updr1(x,desc_a,update,info)
-      import 
+    module subroutine  psi_covrl_updr1(x,desc_a,update,info)
       complex(psb_spk_), intent(inout), target :: x(:)
       type(psb_desc_type), intent(in)          :: desc_a
       integer(psb_ipk_), intent(in)                      :: update
       integer(psb_ipk_), intent(out)                     :: info
     end subroutine psi_covrl_updr1
-    subroutine  psi_covrl_updr2(x,desc_a,update,info)
-      import 
+    module subroutine  psi_covrl_updr2(x,desc_a,update,info)
       complex(psb_spk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)          :: desc_a
       integer(psb_ipk_), intent(in)                      :: update
       integer(psb_ipk_), intent(out)                     :: info
     end subroutine psi_covrl_updr2
-    subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
-      import 
+    module subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
       class(psb_c_base_vect_type)       :: x
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(in)               :: update
@@ -180,22 +165,19 @@ module psi_c_mod
   end interface
 
   interface psi_ovrl_save
-    subroutine  psi_covrl_saver1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_saver1(x,xs,desc_a,info)
       complex(psb_spk_), intent(inout) :: x(:)
       complex(psb_spk_), allocatable   :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_saver1
-    subroutine  psi_covrl_saver2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_saver2(x,xs,desc_a,info)
       complex(psb_spk_), intent(inout) :: x(:,:)
       complex(psb_spk_), allocatable   :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_saver2
-    subroutine  psi_covrl_save_vect(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_save_vect(x,xs,desc_a,info)
       class(psb_c_base_vect_type)     :: x
       complex(psb_spk_), allocatable  :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
@@ -204,22 +186,19 @@ module psi_c_mod
   end interface
 
   interface psi_ovrl_restore
-    subroutine  psi_covrl_restrr1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_restrr1(x,xs,desc_a,info)
       complex(psb_spk_), intent(inout)  :: x(:)
       complex(psb_spk_)                 :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_restrr1
-    subroutine  psi_covrl_restrr2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_restrr2(x,xs,desc_a,info)
       complex(psb_spk_), intent(inout) :: x(:,:)
       complex(psb_spk_)                :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_restrr2
-    subroutine  psi_covrl_restr_vect(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_covrl_restr_vect(x,xs,desc_a,info)
       class(psb_c_base_vect_type)     :: x
       complex(psb_spk_)               :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a

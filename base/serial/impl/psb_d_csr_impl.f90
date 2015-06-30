@@ -29,10 +29,11 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-
-submodule (psb_d_csr_mat_mod)  psb_d_csr_mat_impl
+submodule (psb_d_csr_mat_mod) psb_d_csr_mat_impl_mod
 
 contains
+
+
   ! == ===================================
   !
   !
@@ -46,7 +47,7 @@ contains
   !
   ! == ===================================
 
-  module subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans) 
+  subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
     use psb_string_mod
     implicit none 
@@ -388,8 +389,7 @@ contains
     end subroutine psb_d_csr_csmv_inner
 
 
-  end subroutine psb_d_csr_csmv 
-
+  end subroutine psb_d_csr_csmv
 
   subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
@@ -1261,6 +1261,56 @@ contains
     end subroutine inner_csrsm
 
   end subroutine psb_d_csr_cssm
+
+  function psb_d_csr_maxval(a) result(res)
+    use psb_error_mod
+    implicit none 
+    class(psb_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_)         :: res
+
+    integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+    integer(psb_ipk_) :: ierr(5)
+    character(len=20)  :: name='d_csr_maxval'
+    logical, parameter :: debug=.false.
+
+    if (a%is_dev())   call a%sync()
+
+    res = dzero
+    nnz = a%get_nzeros()
+    if (allocated(a%val)) then 
+      nnz = min(nnz,size(a%val))
+      res = maxval(abs(a%val(1:nnz)))
+    end if
+  end function psb_d_csr_maxval
+
+  function psb_d_csr_csnmi(a) result(res)
+    use psb_error_mod
+    implicit none 
+    class(psb_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_)         :: res
+
+    integer(psb_ipk_) :: i,j,k,m,n, nr, ir, jc, nc
+    real(psb_dpk_) :: acc
+    logical   :: tra
+    integer(psb_ipk_) :: err_act
+    integer(psb_ipk_) :: ierr(5)
+    character(len=20)  :: name='d_csnmi'
+    logical, parameter :: debug=.false.
+
+
+    res = dzero
+    if (a%is_dev())   call a%sync()
+
+    do i = 1, a%get_nrows()
+      acc = dzero
+      do j=a%irp(i),a%irp(i+1)-1  
+        acc = acc + abs(a%val(j))
+      end do
+      res = max(res,acc)
+    end do
+
+  end function psb_d_csr_csnmi
+
   subroutine psb_d_csr_rowsum(d,a) 
     use psb_error_mod
     use psb_const_mod
@@ -2993,7 +3043,8 @@ contains
   end subroutine psb_d_cp_csr_from_fmt
 
   subroutine psb_dcsrspspmm(a,b,c,info)
-    use psb_error_mod
+    use psb_serial_mod, psb_protect_name => psb_dcsrspspmm
+
     implicit none 
 
     class(psb_d_csr_sparse_mat), intent(in) :: a,b
@@ -3112,56 +3163,4 @@ contains
 
   end subroutine psb_dcsrspspmm
 
-  function psb_d_csr_maxval(a) result(res)
-    use psb_error_mod
-    implicit none 
-    class(psb_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_)         :: res
-
-    integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
-    integer(psb_ipk_) :: ierr(5)
-    character(len=20)  :: name='d_csr_maxval'
-    logical, parameter :: debug=.false.
-
-    if (a%is_dev())   call a%sync()
-
-    res = dzero
-    nnz = a%get_nzeros()
-    if (allocated(a%val)) then 
-      nnz = min(nnz,size(a%val))
-      res = maxval(abs(a%val(1:nnz)))
-    end if
-  end function psb_d_csr_maxval
-
-  function psb_d_csr_csnmi(a) result(res)
-    use psb_error_mod
-    implicit none 
-    class(psb_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_)         :: res
-
-    integer(psb_ipk_) :: i,j,k,m,n, nr, ir, jc, nc
-    real(psb_dpk_) :: acc
-    logical   :: tra
-    integer(psb_ipk_) :: err_act
-    integer(psb_ipk_) :: ierr(5)
-    character(len=20)  :: name='d_csnmi'
-    logical, parameter :: debug=.false.
-
-
-    res = dzero
-    if (a%is_dev())   call a%sync()
-
-    do i = 1, a%get_nrows()
-      acc = dzero
-      do j=a%irp(i),a%irp(i+1)-1  
-        acc = acc + abs(a%val(j))
-      end do
-      res = max(res,acc)
-    end do
-
-  end function psb_d_csr_csnmi
-
-
-end submodule psb_d_csr_mat_impl
-
-
+end submodule psb_d_csr_mat_impl_mod

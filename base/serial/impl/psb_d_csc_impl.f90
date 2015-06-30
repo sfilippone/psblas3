@@ -29,10 +29,11 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-
-submodule (psb_d_csc_mat_mod) psb_d_csc_impl_mod
+submodule (psb_d_csc_mat_mod) psb_d_csc_mat_impl_mod
 
 contains
+
+
   ! == ===================================
   !
   !
@@ -1494,7 +1495,6 @@ contains
     use psb_error_mod
     use psb_const_mod
     use psb_error_mod
-    use psb_d_base_mat_mod
     implicit none
 
     class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -2798,7 +2798,6 @@ contains
   end subroutine psb_d_csc_print
 
   subroutine psb_dcscspspmm(a,b,c,info)
-    use psb_d_mat_mod
     use psb_serial_mod, psb_protect_name => psb_dcscspspmm
 
     implicit none 
@@ -2916,5 +2915,5 @@ contains
     end subroutine csc_spspmm
 
   end subroutine psb_dcscspspmm
-
-end submodule psb_d_csc_impl_mod
+  
+end submodule psb_d_csc_mat_impl_mod
