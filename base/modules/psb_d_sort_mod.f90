@@ -106,7 +106,6 @@ module psb_d_sort_mod
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_d_amsort_dw
   end interface
-  module 
   
   interface psb_qsort
     module subroutine psb_dqsort(x,ix,dir,flag)
