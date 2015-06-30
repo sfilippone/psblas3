@@ -156,33 +156,6 @@ module psb_c_sort_mod
   end interface psb_hsort
 
 
-!!$  interface !psb_howmany_heap
-!!$    module procedure psb_c_howmany,  psb_c_idx_howmany
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_init_heap
-!!$    module procedure psb_c_init_heap, psb_c_idx_init_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_dump_heap
-!!$    module procedure psb_c_dump_heap, psb_dump_c_idx_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_insert_heap
-!!$    module procedure psb_c_insert_heap,  psb_c_idx_insert_heap
-!!$  end interface 
-!!$
-!!$  interface !psb_heap_get_first
-!!$    module procedure psb_c_heap_get_first, psb_c_idx_heap_get_first
-!!$  end interface 
-!!$  
-!!$  interface !psb_free_heap
-!!$    module procedure psb_free_c_heap, psb_free_c_idx_heap
-!!$  end interface 
-
   interface 
     subroutine psi_c_insert_heap(key,last,heap,dir,info)
       import 

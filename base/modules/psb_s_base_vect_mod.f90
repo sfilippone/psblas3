@@ -704,7 +704,7 @@ contains
   ! Overwrite with absolute value
   !
   !
-  !> Function  base_set_scal
+  !> Function  base_absval1
   !! \memberof  psb_s_base_vect_type
   !! \brief  Set all entries to their respective absolute values.
   !!
@@ -1428,10 +1428,13 @@ module psb_s_base_multivect_mod
 !!$    !
 !!$    ! Scaling and norms
 !!$    !
-!!$    procedure, pass(x) :: scal     => s_base_mlv_scal
-!!$    procedure, pass(x) :: nrm2     => s_base_mlv_nrm2
-!!$    procedure, pass(x) :: amax     => s_base_mlv_amax
-!!$    procedure, pass(x) :: asum     => s_base_mlv_asum
+    procedure, pass(x) :: scal     => s_base_mlv_scal
+    procedure, pass(x) :: nrm2     => s_base_mlv_nrm2
+    procedure, pass(x) :: amax     => s_base_mlv_amax
+    procedure, pass(x) :: asum     => s_base_mlv_asum
+    procedure, pass(x) :: absval1  => s_base_mlv_absval1
+    procedure, pass(x) :: absval2  => s_base_mlv_absval2
+    generic, public    :: absval   => absval1, absval2
 !!$    !
 !!$    ! Gather/scatter. These are needed for MPI interfacing.
 !!$    ! May have to be reworked. 
@@ -2289,71 +2292,120 @@ contains
 !!$  end subroutine s_base_mlv_mlt_va
 !!$
 !!$
-!!$  !
-!!$  ! Simple scaling 
-!!$  !
-!!$  !> Function  base_mlv_scal
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief Scale all entries  x = alpha*x
-!!$  !! \param alpha   The multiplier
-!!$  !!
-!!$  subroutine s_base_mlv_scal(alpha, x)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: x
-!!$    real(psb_spk_), intent (in)       :: alpha
-!!$    
-!!$    if (allocated(x%v)) x%v = alpha*x%v
-!!$
-!!$  end subroutine s_base_mlv_scal
-!!$  
-!!$  !
-!!$  ! Norms 1, 2 and infinity
-!!$  !
-!!$  !> Function  base_mlv_nrm2
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief 2-norm |x(1:n)|_2
-!!$  !! \param n  how many entries to consider
-!!$  function s_base_mlv_nrm2(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_s_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_spk_)                :: res
-!!$    integer(psb_ipk_), external      :: dnrm2
-!!$    
-!!$    res =  dnrm2(n,x%v,1)
-!!$
-!!$  end function s_base_mlv_nrm2
-!!$  
-!!$  !
-!!$  !> Function  base_mlv_amax
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief infinity-norm |x(1:n)|_\infty
-!!$  !! \param n  how many entries to consider
-!!$  function s_base_mlv_amax(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_s_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_spk_)                :: res
-!!$    
-!!$    res =  maxval(abs(x%v(1:n)))
-!!$
-!!$  end function s_base_mlv_amax
-!!$
-!!$  !
-!!$  !> Function  base_mlv_asum
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief 1-norm |x(1:n)|_1
-!!$  !! \param n  how many entries to consider
-!!$  function s_base_mlv_asum(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_s_base_multivect_type), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_spk_)                :: res
-!!$    
-!!$    res =  sum(abs(x%v(1:n)))
-!!$
-!!$  end function s_base_mlv_asum
+  !
+  ! Simple scaling 
+  !
+  !> Function  base_mlv_scal
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief Scale all entries  x = alpha*x
+  !! \param alpha   The multiplier
+  !!
+  subroutine s_base_mlv_scal(alpha, x)
+    use psi_serial_mod
+    implicit none 
+    class(psb_s_base_multivect_type), intent(inout)  :: x
+    real(psb_spk_), intent (in)       :: alpha
+
+    if (x%is_dev()) call x%sync()
+    if (allocated(x%v)) x%v = alpha*x%v
+
+  end subroutine s_base_mlv_scal
+  
+  !
+  ! Norms 1, 2 and infinity
+  !
+  !> Function  base_mlv_nrm2
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief 2-norm |x(1:n)|_2
+  !! \param n  how many entries to consider
+  function s_base_mlv_nrm2(n,x) result(res)
+    implicit none 
+    class(psb_s_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_), allocatable    :: res(:)
+    integer(psb_ipk_), external      :: snrm2
+    integer(psb_ipk_) :: j, nc
+
+    if (x%is_dev()) call x%sync()
+    nc = psb_size(x%v,2)
+    allocate(res(nc))
+    do j=1,nc
+      res(j) =  snrm2(n,x%v(:,j),1)
+    end do
+
+  end function s_base_mlv_nrm2
+  
+  !
+  !> Function  base_mlv_amax
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief infinity-norm |x(1:n)|_\infty
+  !! \param n  how many entries to consider
+  function s_base_mlv_amax(n,x) result(res)
+    implicit none 
+    class(psb_s_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_), allocatable    :: res(:)
+    integer(psb_ipk_) :: j, nc
+
+    if (x%is_dev()) call x%sync()
+    nc = psb_size(x%v,2)
+    allocate(res(nc))
+    do j=1,nc
+      res(j) =  maxval(abs(x%v(1:n,j)))
+    end do 
+
+  end function s_base_mlv_amax
+
+  !
+  !> Function  base_mlv_asum
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief 1-norm |x(1:n)|_1
+  !! \param n  how many entries to consider
+  function s_base_mlv_asum(n,x) result(res)
+    implicit none 
+    class(psb_s_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_), allocatable    :: res(:)
+    integer(psb_ipk_) :: j, nc
+
+    if (x%is_dev()) call x%sync()
+    nc = psb_size(x%v,2)
+    allocate(res(nc))
+    do j=1,nc
+      res(j) =  sum(abs(x%v(1:n,j)))
+    end do
+
+  end function s_base_mlv_asum
+  !
+  ! Overwrite with absolute value
+  !
+  !
+  !> Function  base_absval1
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Set all entries to their respective absolute values.
+  !!
+  subroutine s_base_mlv_absval1(x)
+    class(psb_s_base_multivect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v =  abs(x%v)
+      call x%set_host()
+    end if
+    
+  end subroutine s_base_mlv_absval1
+
+  subroutine s_base_mlv_absval2(x,y)
+    class(psb_s_base_multivect_type), intent(inout) :: x
+    class(psb_s_base_multivect_type), intent(inout) :: y
+
+    if (.not.x%is_host()) call x%sync()
+    if (allocated(x%v)) then 
+      call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
+      call y%absval()
+    end if
+    
+  end subroutine s_base_mlv_absval2
 !!$  
 !!$  
 !!$  !
