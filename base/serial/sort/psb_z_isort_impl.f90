@@ -29,432 +29,423 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-!  The insertion sort routines 
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
-subroutine psb_zisort(x,ix,dir,flag)
-  use psb_z_sort_mod, psb_protect_name => psb_zisort
-  use psb_error_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
-  integer(psb_ipk_), optional, intent(inout) :: ix(:)
+  !
+  !  The insertion sort routines 
+  !  References:
+  !  D. Knuth
+  !  The Art of Computer Programming, vol. 3
+  !  Addison-Wesley
+  !  
+  !  Aho, Hopcroft, Ullman
+  !  Data Structures and Algorithms
+  !  Addison-Wesley
+  !
+submodule (psb_z_sort_mod) psb_z_isort_impl_mod
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
+contains
+  subroutine psb_zisort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), optional, intent(in)    :: dir, flag
+    integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_)  :: ierr(5)
-  character(len=20)  :: name
+    integer(psb_ipk_) :: dir_, flag_, n, err_act, i
 
-  name='psb_zisort'
-  call psb_erractionsave(err_act)
+    integer(psb_ipk_)  :: ierr(5)
+    character(len=20)  :: name
 
-  if (present(flag)) then 
-    flag_ = flag
-  else 
-    flag_ = psb_sort_ovw_idx_
-  end if
-  select case(flag_) 
-  case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
-    ! OK keep going
-  case default
-    ierr(1) = 4; ierr(2) = flag_; 
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-    goto 9999
-  end select
+    name='psb_zisort'
+    call psb_erractionsave(err_act)
 
-  if (present(dir)) then 
-    dir_ = dir
-  else
-    dir_= psb_asort_up_
-  end if
-
-  n = size(x)
-
-  if (present(ix)) then
-    if (size(ix) < n) then 
-      ierr(1) = 2; ierr(2) = size(ix); 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
       goto 9999
-    end if
-    if (flag_==psb_sort_ovw_idx_) then
-      do i=1,n
-        ix(i) = i
-      end do
+    end select
+
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_asort_up_
     end if
 
-    select case(dir_) 
-    case (psb_lsort_up_)
+    n = size(x)
+
+    if (present(ix)) then
+      if (size(ix) < n) then 
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end if
+      if (flag_==psb_sort_ovw_idx_) then
+        do i=1,n
+          ix(i) = i
+        end do
+      end if
+
+      select case(dir_) 
+      case (psb_lsort_up_)
         call psi_zlisrx_up(n,x,ix)
-    case (psb_lsort_down_)
+      case (psb_lsort_down_)
         call psi_zlisrx_dw(n,x,ix)
-    case (psb_alsort_up_)
+      case (psb_alsort_up_)
         call psi_zalisrx_up(n,x,ix)
-    case (psb_alsort_down_)
+      case (psb_alsort_down_)
         call psi_zalisrx_dw(n,x,ix)
-    case (psb_asort_up_)
+      case (psb_asort_up_)
         call psi_zaisrx_up(n,x,ix)
-    case (psb_asort_down_)
+      case (psb_asort_down_)
         call psi_zaisrx_dw(n,x,ix)
-    case default
-      ierr(1) = 3; ierr(2) = dir_; 
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-      goto 9999
-    end select
-  else 
-    select case(dir_) 
-    case (psb_lsort_up_)
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
+    else 
+      select case(dir_) 
+      case (psb_lsort_up_)
         call psi_zlisr_up(n,x)
-    case (psb_lsort_down_)
+      case (psb_lsort_down_)
         call psi_zlisr_dw(n,x)
-    case (psb_alsort_up_)
+      case (psb_alsort_up_)
         call psi_zalisr_up(n,x)
-    case (psb_alsort_down_)
+      case (psb_alsort_down_)
         call psi_zalisr_dw(n,x)
-    case (psb_asort_up_)
+      case (psb_asort_up_)
         call psi_zaisr_up(n,x)
-    case (psb_asort_down_)
+      case (psb_asort_down_)
         call psi_zaisr_dw(n,x)
-    case default
-      ierr(1) = 3; ierr(2) = dir_; 
-      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-      goto 9999
-    end select
+      case default
+        ierr(1) = 3; ierr(2) = dir_; 
+        call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end select
 
-  end if
+    end if
 
-  return
+    return
 
 9999 call psb_error_handler(err_act)
 
-  return
-end subroutine psb_zisort
+    return
+  end subroutine psb_zisort
 
-subroutine psi_zlisrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zlisrx_up
-  use psb_error_mod
-  use psi_lcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zlisrx_up(n,x,idx)
+    use psb_error_mod
+    use psi_lcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (x(j+1) < x(j)) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) >= xx) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
+    do j=n-1,1,-1
+      if (x(j+1) < x(j)) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) >= xx) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
 
-end subroutine psi_zlisrx_up
+  end subroutine psi_zlisrx_up
 
-subroutine psi_zlisrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zlisrx_dw
-  use psb_error_mod
-  use psi_lcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zlisrx_dw(n,x,idx)
+    use psb_error_mod
+    use psi_lcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (x(j+1) > x(j)) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) <= xx) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
-end subroutine psi_zlisrx_dw
+    do j=n-1,1,-1
+      if (x(j+1) > x(j)) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) <= xx) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
+  end subroutine psi_zlisrx_dw
 
-subroutine psi_zlisr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zlisr_up
-  use psb_error_mod
-  use psi_lcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (x(j+1) < x(j)) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) >= xx) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zlisr_up
+  subroutine psi_zlisr_up(n,x)
+    use psb_error_mod
+    use psi_lcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
 
-subroutine psi_zlisr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zlisr_dw
-  use psb_error_mod
-  use psi_lcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (x(j+1) > x(j)) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) <= xx) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zlisr_dw
+    do j=n-1,1,-1
+      if (x(j+1) < x(j)) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) >= xx) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zlisr_up
 
-subroutine psi_zalisrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zalisrx_up
-  use psb_error_mod
-  use psi_alcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zlisr_dw(n,x)
+    use psb_error_mod
+    use psi_lcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (x(j+1) < x(j)) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) >= xx) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
-end subroutine psi_zalisrx_up
+    do j=n-1,1,-1
+      if (x(j+1) > x(j)) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) <= xx) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zlisr_dw
 
-subroutine psi_zalisrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zalisrx_dw
-  use psb_error_mod
-  use psi_alcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zalisrx_up(n,x,idx)
+    use psb_error_mod
+    use psi_alcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (x(j+1) > x(j)) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) <= xx) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
-end subroutine psi_zalisrx_dw
+    do j=n-1,1,-1
+      if (x(j+1) < x(j)) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) >= xx) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
+  end subroutine psi_zalisrx_up
 
-subroutine psi_zalisr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zalisr_up
-  use psb_error_mod
-  use psi_alcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (x(j+1) < x(j)) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) >= xx) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zalisr_up
+  subroutine psi_zalisrx_dw(n,x,idx)
+    use psb_error_mod
+    use psi_alcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
 
-subroutine psi_zalisr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zalisr_dw
-  use psb_error_mod
-  use psi_alcx_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (x(j+1) > x(j)) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (x(i) <= xx) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zalisr_dw
+    do j=n-1,1,-1
+      if (x(j+1) > x(j)) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) <= xx) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
+  end subroutine psi_zalisrx_dw
 
-subroutine psi_zaisrx_up(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zaisrx_up
-  use psb_error_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zalisr_up(n,x)
+    use psb_error_mod
+    use psi_alcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (abs(x(j+1)) < abs(x(j))) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (abs(x(i)) >= abs(xx)) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
-end subroutine psi_zaisrx_up
+    do j=n-1,1,-1
+      if (x(j+1) < x(j)) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) >= xx) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zalisr_up
 
-subroutine psi_zaisrx_dw(n,x,idx)
-  use psb_z_sort_mod, psb_protect_name => psi_zaisrx_dw
-  use psb_error_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(inout) :: idx(:)
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j,ix
-  complex(psb_dpk_) :: xx
+  subroutine psi_zalisr_dw(n,x)
+    use psb_error_mod
+    use psi_alcx_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
 
-  do j=n-1,1,-1
-    if (abs(x(j+1)) > abs(x(j))) then
-      xx = x(j)
-      ix = idx(j) 
-      i=j+1
-      do 
-        x(i-1)    = x(i)
-        idx(i-1) = idx(i)
-        i = i+1
-        if (i>n) exit          
-        if (abs(x(i)) <= abs(xx)) exit
-      end do
-      x(i-1)    = xx
-      idx(i-1) = ix
-    endif
-  enddo
-end subroutine psi_zaisrx_dw
+    do j=n-1,1,-1
+      if (x(j+1) > x(j)) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (x(i) <= xx) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zalisr_dw
 
-subroutine psi_zaisr_up(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zaisr_up
-  use psb_error_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (abs(x(j+1)) < abs(x(j))) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (abs(x(i)) >= abs(xx)) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zaisr_up
+  subroutine psi_zaisrx_up(n,x,idx)
+    use psb_error_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
 
-subroutine psi_zaisr_dw(n,x)
-  use psb_z_sort_mod, psb_protect_name => psi_zaisr_dw
-  use psb_error_mod
-  implicit none 
-  complex(psb_dpk_), intent(inout)  :: x(:) 
-  integer(psb_ipk_), intent(in)   :: n
-  integer(psb_ipk_) :: i,j
-  complex(psb_dpk_) :: xx
-  
-  do j=n-1,1,-1
-    if (abs(x(j+1)) > abs(x(j))) then
-      xx = x(j)
-      i=j+1
-      do 
-        x(i-1) = x(i)
-        i = i+1
-        if (i>n) exit          
-        if (abs(x(i)) <= abs(xx)) exit
-      end do
-      x(i-1) = xx
-    endif
-  enddo
-end subroutine psi_zaisr_dw
+    do j=n-1,1,-1
+      if (abs(x(j+1)) < abs(x(j))) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (abs(x(i)) >= abs(xx)) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
+  end subroutine psi_zaisrx_up
 
+  subroutine psi_zaisrx_dw(n,x,idx)
+    use psb_error_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j,ix
+    complex(psb_dpk_) :: xx
+
+    do j=n-1,1,-1
+      if (abs(x(j+1)) > abs(x(j))) then
+        xx = x(j)
+        ix = idx(j) 
+        i=j+1
+        do 
+          x(i-1)    = x(i)
+          idx(i-1) = idx(i)
+          i = i+1
+          if (i>n) exit          
+          if (abs(x(i)) <= abs(xx)) exit
+        end do
+        x(i-1)    = xx
+        idx(i-1) = ix
+      endif
+    enddo
+  end subroutine psi_zaisrx_dw
+
+  subroutine psi_zaisr_up(n,x)
+    use psb_error_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
+
+    do j=n-1,1,-1
+      if (abs(x(j+1)) < abs(x(j))) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (abs(x(i)) >= abs(xx)) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zaisr_up
+
+  subroutine psi_zaisr_dw(n,x)
+    use psb_error_mod
+    implicit none 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
+    integer(psb_ipk_), intent(in)   :: n
+    integer(psb_ipk_) :: i,j
+    complex(psb_dpk_) :: xx
+
+    do j=n-1,1,-1
+      if (abs(x(j+1)) > abs(x(j))) then
+        xx = x(j)
+        i=j+1
+        do 
+          x(i-1) = x(i)
+          i = i+1
+          if (i>n) exit          
+          if (abs(x(i)) <= abs(xx)) exit
+        end do
+        x(i-1) = xx
+      endif
+    enddo
+  end subroutine psi_zaisr_dw
+
+end submodule  psb_z_isort_impl_mod

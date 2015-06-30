@@ -40,8 +40,10 @@
   !  Data Structures and Algorithms
   !  Addison-Wesley
   !
+submodule (psb_i_sort_mod) psb_i_msort_impl_mod
+
+contains
   logical function psb_isaperm(n,eip)               
-    use psb_i_sort_mod, psb_protect_name => psb_isaperm
     implicit none
 
     integer(psb_ipk_), intent(in) :: n                              
@@ -96,7 +98,6 @@
   end function psb_isaperm
 
   function  psb_iblsrch(key,n,v) result(ipos)
-    use psb_i_sort_mod, psb_protect_name => psb_iblsrch
     implicit none
     integer(psb_ipk_) :: ipos, key, n
     integer(psb_ipk_) :: v(:)
@@ -138,7 +139,6 @@
   end function psb_iblsrch
 
   function  psb_ibsrch(key,n,v) result(ipos)
-    use psb_i_sort_mod, psb_protect_name => psb_ibsrch
     implicit none
     integer(psb_ipk_) :: ipos, key, n
     integer(psb_ipk_) :: v(:)
@@ -164,7 +164,6 @@
   end function psb_ibsrch
 
   function psb_issrch(key,n,v) result(ipos)
-    use psb_i_sort_mod, psb_protect_name => psb_issrch
     implicit none
     integer(psb_ipk_) :: ipos, key, n
     integer(psb_ipk_) :: v(:)
@@ -184,7 +183,6 @@
 
 
   subroutine psb_imsort_u(x,nout,dir)
-    use psb_i_sort_mod, psb_protect_name => psb_imsort_u
     use psb_error_mod
     implicit none 
     integer(psb_ipk_), intent(inout)           :: x(:) 
@@ -233,7 +231,6 @@
 
 
   subroutine psb_imsort(x,ix,dir,flag)
-    use psb_i_sort_mod, psb_protect_name => psb_imsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 
@@ -754,3 +751,4 @@
 
 
 
+end submodule  psb_i_msort_impl_mod

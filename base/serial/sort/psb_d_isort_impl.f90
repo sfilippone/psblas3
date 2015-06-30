@@ -29,18 +29,19 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-!  The insertion sort routines 
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
+  !
+  !  The insertion sort routines 
+  !  References:
+  !  D. Knuth
+  !  The Art of Computer Programming, vol. 3
+  !  Addison-Wesley
+  !  
+  !  Aho, Hopcroft, Ullman
+  !  Data Structures and Algorithms
+  !  Addison-Wesley
+  !
 submodule (psb_d_sort_mod) psb_d_isort_impl_mod
+
 contains
   subroutine psb_disort(x,ix,dir,flag)
     use psb_error_mod
@@ -130,56 +131,56 @@ contains
     return
   end subroutine psb_disort
 
-  subroutine psi_disrx_up(n,x,ix)
+  subroutine psi_disrx_up(n,x,idx)
     use psb_error_mod
     implicit none 
     real(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: ix(:)
+    integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,lx
+    integer(psb_ipk_) :: i,j,ix
     real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
         xx = x(j)
-        lx = ix(j) 
+        ix = idx(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          ix(i-1) = ix(i)
+          idx(i-1) = idx(i)
           i = i+1
           if (i>n) exit          
           if (x(i) >= xx) exit
         end do
         x(i-1)    = xx
-        ix(i-1) = lx
+        idx(i-1) = ix
       endif
     enddo
   end subroutine psi_disrx_up
 
-  subroutine psi_disrx_dw(n,x,ix)
+  subroutine psi_disrx_dw(n,x,idx)
     use psb_error_mod
     implicit none 
     real(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: ix(:)
+    integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,lx
+    integer(psb_ipk_) :: i,j,ix
     real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then
         xx = x(j)
-        lx = ix(j) 
+        ix = idx(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          ix(i-1) = ix(i)
+          idx(i-1) = idx(i)
           i = i+1
           if (i>n) exit          
           if (x(i) <= xx) exit
         end do
         x(i-1)    = xx
-        ix(i-1) = lx
+        idx(i-1) = ix
       endif
     enddo
   end subroutine psi_disrx_dw
@@ -231,56 +232,56 @@ contains
     enddo
   end subroutine psi_disr_dw
 
-  subroutine psi_daisrx_up(n,x,ix)
+  subroutine psi_daisrx_up(n,x,idx)
     use psb_error_mod
     implicit none 
     real(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: ix(:)
+    integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,lx
+    integer(psb_ipk_) :: i,j,ix
     real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (abs(x(j+1)) < abs(x(j))) then
         xx = x(j)
-        lx = ix(j) 
+        ix = idx(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          ix(i-1) = ix(i)
+          idx(i-1) = idx(i)
           i = i+1
           if (i>n) exit          
           if (abs(x(i)) >= abs(xx)) exit
         end do
         x(i-1)    = xx
-        ix(i-1) = lx
+        idx(i-1) = ix
       endif
     enddo
   end subroutine psi_daisrx_up
 
-  subroutine psi_daisrx_dw(n,x,ix)
+  subroutine psi_daisrx_dw(n,x,idx)
     use psb_error_mod
     implicit none 
     real(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: ix(:)
+    integer(psb_ipk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,lx
+    integer(psb_ipk_) :: i,j,ix
     real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (abs(x(j+1)) > abs(x(j))) then
         xx = x(j)
-        lx = ix(j) 
+        ix = idx(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          ix(i-1) = ix(i)
+          idx(i-1) = idx(i)
           i = i+1
           if (i>n) exit          
           if (abs(x(i)) <= abs(xx)) exit
         end do
         x(i-1)    = xx
-        ix(i-1) = lx
+        idx(i-1) = ix
       endif
     enddo
   end subroutine psi_daisrx_dw
@@ -331,4 +332,4 @@ contains
     enddo
   end subroutine psi_daisr_dw
 
-end submodule psb_d_isort_impl_mod
+end submodule  psb_d_isort_impl_mod

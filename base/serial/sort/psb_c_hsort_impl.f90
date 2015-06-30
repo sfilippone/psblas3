@@ -29,1112 +29,1112 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-!  The merge-sort and quicksort routines are implemented in the
-!  serial/aux directory
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
-subroutine psb_chsort(x,ix,dir,flag)
-  use psb_c_sort_mod, psb_protect_name => psb_chsort
-  use psb_error_mod
-  implicit none 
-  complex(psb_spk_), intent(inout)           :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
-  integer(psb_ipk_), optional, intent(inout) :: ix(:)
-
-  integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
-  complex(psb_spk_) :: key
-  integer(psb_ipk_) :: index
-
-  integer(psb_ipk_)  :: ierr(5)
-  character(len=20)  :: name
-
-  name='psb_hsort'
-  call psb_erractionsave(err_act)
-
-  if (present(flag)) then 
-    flag_ = flag
-  else 
-    flag_ = psb_sort_ovw_idx_
-  end if
-  select case(flag_) 
-  case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
-    ! OK keep going
-  case default
-    ierr(1) = 4; ierr(2) = flag_; 
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-    goto 9999
-  end select
-
-  if (present(dir)) then 
-    dir_ = dir
-  else
-    dir_= psb_sort_up_
-  end if
-
-  select case(dir_)
-  case(psb_lsort_up_,psb_lsort_down_,psb_alsort_up_,psb_alsort_down_)
-    ! OK
-  case (psb_asort_up_,psb_asort_down_) 
-    ! OK    
-  case default
-    ierr(1) = 3; ierr(2) = dir_; 
-    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
-    goto 9999
-  end select
-
-  n = size(x)
-
   !
-  ! Dirty trick to sort with heaps: if we want 
-  ! to sort in place upwards, first we set up a heap so that
-  ! we can easily get the LARGEST element, then we take it out 
-  ! and put it in the last entry, and so on. 
-  ! So,  we invert dir_
+  !  The merge-sort and quicksort routines are implemented in the
+  !  serial/aux directory
+  !  References:
+  !  D. Knuth
+  !  The Art of Computer Programming, vol. 3
+  !  Addison-Wesley
+  !  
+  !  Aho, Hopcroft, Ullman
+  !  Data Structures and Algorithms
+  !  Addison-Wesley
   !
-  dir_ = -dir_ 
+submodule (psb_c_sort_mod) psb_c_hsort_impl_mod
 
-  if (present(ix)) then 
-    if (size(ix) < n) then 
-      ierr(1) = 2; ierr(2) = size(ix); 
-      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
-      goto 9999
+contains
+
+  subroutine psb_chsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    complex(psb_spk_), intent(inout)           :: x(:) 
+    integer(psb_ipk_), optional, intent(in)    :: dir, flag
+    integer(psb_ipk_), optional, intent(inout) :: ix(:)
+
+    integer(psb_ipk_) :: dir_, flag_, n, i, l, err_act,info
+    complex(psb_spk_) :: key
+    integer(psb_ipk_) :: index
+
+    integer(psb_ipk_)  :: ierr(5)
+    character(len=20)  :: name
+
+    name='psb_hsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
     end if
-    if (flag_ == psb_sort_ovw_idx_) then 
-      do i=1, n
-        ix(i) = i
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      ierr(1) = 4; ierr(2) = flag_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+      goto 9999
+    end select
+
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_sort_up_
+    end if
+
+    select case(dir_)
+    case(psb_lsort_up_,psb_lsort_down_,psb_alsort_up_,psb_alsort_down_)
+      ! OK
+    case (psb_asort_up_,psb_asort_down_) 
+      ! OK    
+    case default
+      ierr(1) = 3; ierr(2) = dir_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+      goto 9999
+    end select
+
+    n = size(x)
+
+    !
+    ! Dirty trick to sort with heaps: if we want 
+    ! to sort in place upwards, first we set up a heap so that
+    ! we can easily get the LARGEST element, then we take it out 
+    ! and put it in the last entry, and so on. 
+    ! So,  we invert dir_
+    !
+    dir_ = -dir_ 
+
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        ierr(1) = 2; ierr(2) = size(ix); 
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=ierr)
+        goto 9999
+      end if
+      if (flag_ == psb_sort_ovw_idx_) then 
+        do i=1, n
+          ix(i) = i
+        end do
+      end if
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        index = ix(i)
+        call psi_c_idx_insert_heap(key,index,l,x,ix,dir_,info)
+        if (l /= i) then 
+          write(psb_err_unit,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_c_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+        if (l /= i-1) then 
+          write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+        ix(i) = index
+      end do
+    else if (.not.present(ix)) then 
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        call psi_c_insert_heap(key,l,x,dir_,info)
+        if (l /= i) then 
+          write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_c_heap_get_first(key,l,x,dir_,info)
+        if (l /= i-1) then 
+          write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
       end do
     end if
-    l = 0
-    do i=1, n 
-      key   = x(i)
-      index = ix(i)
-      call psi_c_idx_insert_heap(key,index,l,x,ix,dir_,info)
-      if (l /= i) then 
-        write(psb_err_unit,*) 'Mismatch while heapifying ! '
-      end if
-    end do
-    do i=n, 2, -1 
-      call psi_c_idx_heap_get_first(key,index,l,x,ix,dir_,info)
-      if (l /= i-1) then 
-        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
-      end if
-      x(i)  = key
-      ix(i) = index
-    end do
-  else if (.not.present(ix)) then 
-    l = 0
-    do i=1, n 
-      key   = x(i)
-      call psi_c_insert_heap(key,l,x,dir_,info)
-      if (l /= i) then 
-        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
-      end if
-    end do
-    do i=n, 2, -1 
-      call psi_c_heap_get_first(key,l,x,dir_,info)
-      if (l /= i-1) then 
-        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
-      end if
-      x(i)  = key
-    end do
-  end if
 
 
-  return
+    return
 
 9999 call psb_error_handler(err_act)
 
-  return
-end subroutine psb_chsort
-
-
-
-!
-! These are packaged so that they can be used to implement 
-! a heapsort, should the need arise
-!
-!
-!   Programming note:
-!   In the implementation of the heap_get_first function
-!   we have code like this
-!
-!      if ( ( heap(2*i) < heap(2*i+1) ) .or.&
-!           & (2*i == last)) then 
-!        j = 2*i
-!      else
-!        j = 2*i + 1
-!      end if
-!
-!   It looks like the 2*i+1 could overflow the array, but this
-!   is not true because there is a guard statement
-!       if (i>last/2) exit
-!   and because last has just been reduced by 1 when defining the return value,
-!   therefore 2*i+1 may be greater than the current value of last,
-!   but cannot be greater than the value of last when the routine was entered
-!   hence it is safe.
-!
-!
-!
-
-subroutine psi_c_insert_heap(key,last,heap,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_insert_heap
-  implicit none 
-
-  !  
-  ! Input: 
-  !   key:  the new value
-  !   last: pointer to the last occupied element in heap
-  !   heap: the heap
-  !   dir:  sorting direction
-
-  complex(psb_spk_), intent(in)    :: key
-  integer(psb_ipk_), intent(in)                :: dir
-  complex(psb_spk_), intent(inout) :: heap(:)
-  integer(psb_ipk_), intent(inout)             :: last
-  integer(psb_ipk_), intent(out)               :: info
-  integer(psb_ipk_) :: i, i2
-  complex(psb_spk_)                :: temp
-
-  info = psb_success_
-  if (last < 0) then 
-    write(psb_err_unit,*) 'Invalid last in heap ',last
-    info = last
     return
-  endif
-  last    = last + 1
-  if (last > size(heap)) then 
-    write(psb_err_unit,*) 'out of bounds '
-    info = -1
+  end subroutine psb_chsort
+
+
+
+  !
+  ! These are packaged so that they can be used to implement 
+  ! a heapsort, should the need arise
+  !
+  !
+  !   Programming note:
+  !   In the implementation of the heap_get_first function
+  !   we have code like this
+  !
+  !      if ( ( heap(2*i) < heap(2*i+1) ) .or.&
+  !           & (2*i == last)) then 
+  !        j = 2*i
+  !      else
+  !        j = 2*i + 1
+  !      end if
+  !
+  !   It looks like the 2*i+1 could overflow the array, but this
+  !   is not true because there is a guard statement
+  !       if (i>last/2) exit
+  !   and because last has just been reduced by 1 when defining the return value,
+  !   therefore 2*i+1 may be greater than the current value of last,
+  !   but cannot be greater than the value of last when the routine was entered
+  !   hence it is safe.
+  !
+  !
+  !
+
+  subroutine psi_c_insert_heap(key,last,heap,dir,info)
+    implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    complex(psb_spk_), intent(in)    :: key
+    integer(psb_ipk_), intent(in)                :: dir
+    complex(psb_spk_), intent(inout) :: heap(:)
+    integer(psb_ipk_), intent(inout)             :: last
+    integer(psb_ipk_), intent(out)               :: info
+    integer(psb_ipk_) :: i, i2
+    complex(psb_spk_)                :: temp
+
+    info = psb_success_
+    if (last < 0) then 
+      write(psb_err_unit,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(psb_err_unit,*) 'out of bounds '
+      info = -1
+      return
+    end if
+
+    i       = last
+    heap(i) = key
+
+    select case(dir)
+    case (psb_sort_up_, psb_sort_down_)
+      info = -4
+
+    case (psb_asort_up_)
+      call fix_aup(last,heap)
+
+    case (psb_asort_down_)
+      call fix_adw(last,heap)
+
+    case (psb_alsort_up_)
+      call fix_alup(last,heap)
+
+    case (psb_alsort_down_)
+      call fix_aldw(last,heap)
+
+    case (psb_lsort_up_)
+      call fix_lup(last,heap)
+
+    case (psb_lsort_down_)
+      call fix_ldw(last,heap)
+
+    case default
+      write(psb_err_unit,*) 'Invalid direction in heap ',dir
+    end select
+
     return
-  end if
 
-  i       = last
-  heap(i) = key
+  contains
 
-  select case(dir)
-  case (psb_sort_up_, psb_sort_down_)
-    info = -4
+    subroutine fix_aup(last,heap)
+      use psi_acx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
 
-  case (psb_asort_up_)
-    call fix_aup(last,heap)
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_aup
 
-  case (psb_asort_down_)
-    call fix_adw(last,heap)
+    subroutine fix_adw(last,heap)
+      use psi_acx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
 
-  case (psb_alsort_up_)
-    call fix_alup(last,heap)
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_adw
 
-  case (psb_alsort_down_)
-    call fix_aldw(last,heap)
 
-  case (psb_lsort_up_)
-    call fix_lup(last,heap)
+    subroutine fix_lup(last,heap)
+      use psi_lcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
 
-  case (psb_lsort_down_)
-    call fix_ldw(last,heap)
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_lup
 
-  case default
-    write(psb_err_unit,*) 'Invalid direction in heap ',dir
-  end select
+    subroutine fix_ldw(last,heap)
+      use psi_lcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
 
-  return
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_ldw
 
-contains
+    subroutine fix_alup(last,heap)
+      use psi_alcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
 
-  subroutine fix_aup(last,heap)
-    use psi_acx_mod
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_alup
+
+    subroutine fix_aldw(last,heap)
+      use psi_alcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_aldw
+
+  end subroutine psi_c_insert_heap
+
+  subroutine psi_c_heap_get_first(key,last,heap,dir,info)
     implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    complex(psb_spk_), intent(inout)     :: key
+    integer(psb_ipk_), intent(in)      :: dir
     complex(psb_spk_), intent(inout)  :: heap(:)
     integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    integer(psb_ipk_), intent(out)    :: info
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_aup
+    integer(psb_ipk_) :: i
 
-  subroutine fix_adw(last,heap)
-    use psi_acx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    info = psb_success_
+    if (last <= 0) then 
+      key  = 0
+      info = -1
+      return
+    endif
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_adw
+    key     = heap(1)
+    heap(1) = heap(last)
+    last    = last - 1
 
+    select case(dir)
+    case (psb_sort_up_, psb_sort_down_)
+      info = -4
 
-  subroutine fix_lup(last,heap)
-    use psi_lcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    case (psb_asort_up_)
+      call fix_aup(last,heap)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_lup
+    case (psb_asort_down_)
+      call fix_adw(last,heap)
 
-  subroutine fix_ldw(last,heap)
-    use psi_lcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    case (psb_alsort_up_)
+      call fix_alup(last,heap)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_ldw
+    case (psb_alsort_down_)
+      call fix_aldw(last,heap)
 
-  subroutine fix_alup(last,heap)
-    use psi_alcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    case (psb_lsort_up_)
+      call fix_lup(last,heap)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_alup
+    case (psb_lsort_down_)
+      call fix_ldw(last,heap)
 
-  subroutine fix_aldw(last,heap)
-    use psi_alcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2
-    complex(psb_spk_) :: temp 
+    case default
+      write(psb_err_unit,*) 'Invalid direction in heap ',dir
+    end select
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_aldw
-
-end subroutine psi_c_insert_heap
-
-subroutine psi_c_heap_get_first(key,last,heap,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_heap_get_first
-  implicit none 
-
-  !  
-  ! Input: 
-  !   key:  the new value
-  !   last: pointer to the last occupied element in heap
-  !   heap: the heap
-  !   dir:  sorting direction
-
-  complex(psb_spk_), intent(inout)     :: key
-  integer(psb_ipk_), intent(in)      :: dir
-  complex(psb_spk_), intent(inout)  :: heap(:)
-  integer(psb_ipk_), intent(inout)  :: last
-  integer(psb_ipk_), intent(out)    :: info
-
-  integer(psb_ipk_) :: i
-
-  info = psb_success_
-  if (last <= 0) then 
-    key  = 0
-    info = -1
     return
-  endif
+  contains
 
-  key     = heap(1)
-  heap(1) = heap(last)
-  last    = last - 1
+    subroutine fix_aup(last,heap)
+      use psi_acx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-  select case(dir)
-  case (psb_sort_up_, psb_sort_down_)
-    info = -4
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-  case (psb_asort_up_)
-    call fix_aup(last,heap)
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  case (psb_asort_down_)
-    call fix_adw(last,heap)
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  case (psb_alsort_up_)
-    call fix_alup(last,heap)
-
-  case (psb_alsort_down_)
-    call fix_aldw(last,heap)
-
-  case (psb_lsort_up_)
-    call fix_lup(last,heap)
-
-  case (psb_lsort_down_)
-    call fix_ldw(last,heap)
-
-  case default
-    write(psb_err_unit,*) 'Invalid direction in heap ',dir
-  end select
-
-  return
-contains
-
-  subroutine fix_aup(last,heap)
-    use psi_acx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
-
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
-
-  end subroutine fix_aup
+    end subroutine fix_aup
 
 
-  subroutine fix_adw(last,heap)
-    use psi_acx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+    subroutine fix_adw(last,heap)
+      use psi_acx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-  end subroutine fix_adw
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  subroutine fix_lup(last,heap)
-    use psi_lcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+    end subroutine fix_adw
 
-  end subroutine fix_lup
+    subroutine fix_lup(last,heap)
+      use psi_lcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-  subroutine fix_ldw(last,heap)
-    use psi_lcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  end subroutine fix_ldw
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  subroutine fix_alup(last,heap)
-    use psi_alcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+    end subroutine fix_lup
 
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+    subroutine fix_ldw(last,heap)
+      use psi_lcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-  end subroutine fix_alup
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-  subroutine fix_aldw(last,heap)
-    use psi_alcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    
-    integer(psb_ipk_) :: i,j
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  end subroutine fix_aldw
+    end subroutine fix_ldw
 
-end subroutine psi_c_heap_get_first
+    subroutine fix_alup(last,heap)
+      use psi_alcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-subroutine psi_c_idx_insert_heap(key,index,last,heap,idxs,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_idx_insert_heap
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-  implicit none 
-  !  
-  ! Input: 
-  !   key:  the new value
-  !   index: the new index
-  !   last: pointer to the last occupied element in heap
-  !   heap: the heap
-  !   idxs: the indices
-  !   dir:  sorting direction
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  complex(psb_spk_), intent(in)    :: key
-  integer(psb_ipk_), intent(in)              :: index,dir
-  complex(psb_spk_), intent(inout) :: heap(:)
-  integer(psb_ipk_), intent(inout)           :: idxs(:)
-  integer(psb_ipk_), intent(inout)           :: last
-  integer(psb_ipk_), intent(out)             :: info
-  integer(psb_ipk_) :: i, i2, itemp
-  complex(psb_spk_)  :: temp 
-  info = psb_success_
-  if (last < 0) then 
-    write(psb_err_unit,*) 'Invalid last in heap ',last
-    info = last
-    return
-  endif
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  last    = last + 1
-  if (last > size(heap)) then 
-    write(psb_err_unit,*) 'out of bounds '
-    info = -1
-    return
-  end if
+    end subroutine fix_alup
 
-  i       = last
-  heap(i) = key
-  idxs(i) = index
+    subroutine fix_aldw(last,heap)
+      use psi_alcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
 
-  select case(dir)
-  case (psb_sort_up_, psb_sort_down_)
-    info = -4
+      integer(psb_ipk_) :: i,j
+      complex(psb_spk_) :: temp 
 
-  case (psb_asort_up_)
-    call fix_aup(last,heap,idxs)
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  case (psb_asort_down_)
-    call fix_adw(last,heap,idxs)
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  case (psb_alsort_up_)
-    call fix_alup(last,heap,idxs)
+    end subroutine fix_aldw
 
-  case (psb_alsort_down_)
-    call fix_aldw(last,heap,idxs)
+  end subroutine psi_c_heap_get_first
 
-  case (psb_lsort_up_)
-    call fix_lup(last,heap,idxs)
+  subroutine psi_c_idx_insert_heap(key,index,last,heap,idxs,dir,info)
 
-  case (psb_lsort_down_)
-    call fix_ldw(last,heap,idxs)
-
-  case default
-    write(psb_err_unit,*) 'Invalid direction in heap ',dir
-  end select
-
-  return
-
-contains
-
-  subroutine fix_aup(last,heap,idxs)
-    use psi_acx_mod
     implicit none 
-    complex(psb_spk_), intent(inout)   :: heap(:)
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   index: the new index
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   idxs: the indices
+    !   dir:  sorting direction
+
+    complex(psb_spk_), intent(in)    :: key
+    integer(psb_ipk_), intent(in)              :: index,dir
+    complex(psb_spk_), intent(inout) :: heap(:)
+    integer(psb_ipk_), intent(inout)           :: idxs(:)
+    integer(psb_ipk_), intent(inout)           :: last
+    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_) :: i, i2, itemp
+    complex(psb_spk_)  :: temp 
+    info = psb_success_
+    if (last < 0) then 
+      write(psb_err_unit,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(psb_err_unit,*) 'out of bounds '
+      info = -1
+      return
+    end if
+
+    i       = last
+    heap(i) = key
+    idxs(i) = index
+
+    select case(dir)
+    case (psb_sort_up_, psb_sort_down_)
+      info = -4
+
+    case (psb_asort_up_)
+      call fix_aup(last,heap,idxs)
+
+    case (psb_asort_down_)
+      call fix_adw(last,heap,idxs)
+
+    case (psb_alsort_up_)
+      call fix_alup(last,heap,idxs)
+
+    case (psb_alsort_down_)
+      call fix_aldw(last,heap,idxs)
+
+    case (psb_lsort_up_)
+      call fix_lup(last,heap,idxs)
+
+    case (psb_lsort_down_)
+      call fix_ldw(last,heap,idxs)
+
+    case default
+      write(psb_err_unit,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+
+  contains
+
+    subroutine fix_aup(last,heap,idxs)
+      use psi_acx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)   :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_aup
+
+    subroutine fix_adw(last,heap,idxs)
+      use psi_acx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_adw
+
+
+    subroutine fix_lup(last,heap,idxs)
+      use psi_lcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_lup
+
+    subroutine fix_ldw(last,heap,idxs)
+      use psi_lcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_ldw
+
+    subroutine fix_alup(last,heap,idxs)
+      use psi_alcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i)  < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_alup
+
+    subroutine fix_aldw(last,heap,idxs)
+      use psi_alcx_mod
+      implicit none 
+      complex(psb_spk_), intent(inout)  :: heap(:)
+      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_ipk_), intent(inout)  :: last
+      integer(psb_ipk_) :: i, i2, itemp
+      complex(psb_spk_) :: temp 
+
+      i=last
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+    end subroutine fix_aldw
+
+  end subroutine psi_c_idx_insert_heap
+
+
+
+  subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    complex(psb_spk_), intent(inout)     :: key
+    integer(psb_ipk_), intent(out)     :: index
+    integer(psb_ipk_), intent(in)      :: dir
+    complex(psb_spk_), intent(inout)    :: heap(:)
     integer(psb_ipk_), intent(inout)  :: idxs(:)
     integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    integer(psb_ipk_), intent(out)    :: info
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_aup
+    integer(psb_ipk_) :: i
 
-  subroutine fix_adw(last,heap,idxs)
-    use psi_acx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: idxs(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    info = psb_success_
+    if (last <= 0) then 
+      key  = 0
+      info = -1
+      return
+    endif
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_adw
+    key     = heap(1)
+    heap(1) = heap(last)
+    last    = last - 1
 
+    select case(dir)
+    case (psb_sort_up_, psb_sort_down_)
+      info = -4
 
-  subroutine fix_lup(last,heap,idxs)
-    use psi_lcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: idxs(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    case (psb_asort_up_)
+      call fix_aup(last,heap,idxs)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_lup
+    case (psb_asort_down_)
+      call fix_adw(last,heap,idxs)
 
-  subroutine fix_ldw(last,heap,idxs)
-    use psi_lcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: idxs(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    case (psb_alsort_up_)
+      call fix_alup(last,heap,idxs)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_ldw
+    case (psb_alsort_down_)
+      call fix_aldw(last,heap,idxs)
 
-  subroutine fix_alup(last,heap,idxs)
-    use psi_alcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: idxs(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    case (psb_lsort_up_)
+      call fix_lup(last,heap,idxs)
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i)  < heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_alup
+    case (psb_lsort_down_)
+      call fix_ldw(last,heap,idxs)
 
-  subroutine fix_aldw(last,heap,idxs)
-    use psi_alcx_mod
-    implicit none 
-    complex(psb_spk_), intent(inout)  :: heap(:)
-    integer(psb_ipk_), intent(inout)  :: idxs(:)
-    integer(psb_ipk_), intent(inout)  :: last
-    integer(psb_ipk_) :: i, i2, itemp
-    complex(psb_spk_) :: temp 
+    case default
+      write(psb_err_unit,*) 'Invalid direction in heap ',dir
+    end select
 
-    i=last
-    do 
-      if (i<=1) exit
-      i2 = i/2
-      if (heap(i) > heap(i2)) then 
-        temp     = heap(i)
-        heap(i)  = heap(i2)
-        heap(i2) = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(i2)
-        idxs(i2) = itemp
-        i        = i2
-      else
-        exit
-      end if
-    end do
-  end subroutine fix_aldw
-
-end subroutine psi_c_idx_insert_heap
-
-
-
-subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-  use psb_c_sort_mod, psb_protect_name => psi_c_idx_heap_get_first
-  implicit none 
-
-  !  
-  ! Input: 
-  !   key:  the new value
-  !   last: pointer to the last occupied element in heap
-  !   heap: the heap
-  !   dir:  sorting direction
-
-  complex(psb_spk_), intent(inout)     :: key
-  integer(psb_ipk_), intent(out)     :: index
-  integer(psb_ipk_), intent(in)      :: dir
-  complex(psb_spk_), intent(inout)    :: heap(:)
-  integer(psb_ipk_), intent(inout)  :: idxs(:)
-  integer(psb_ipk_), intent(inout)  :: last
-  integer(psb_ipk_), intent(out)    :: info
-
-  integer(psb_ipk_) :: i
-
-  info = psb_success_
-  if (last <= 0) then 
-    key  = 0
-    info = -1
     return
-  endif
+  contains
 
-  key     = heap(1)
-  heap(1) = heap(last)
-  last    = last - 1
+    subroutine fix_aup(last,heap,idxs)
+      use psi_acx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
 
-  select case(dir)
-  case (psb_sort_up_, psb_sort_down_)
-    info = -4
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
 
-  case (psb_asort_up_)
-    call fix_aup(last,heap,idxs)
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  case (psb_asort_down_)
-    call fix_adw(last,heap,idxs)
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  case (psb_alsort_up_)
-    call fix_alup(last,heap,idxs)
-
-  case (psb_alsort_down_)
-    call fix_aldw(last,heap,idxs)
-
-  case (psb_lsort_up_)
-    call fix_lup(last,heap,idxs)
-
-  case (psb_lsort_down_)
-    call fix_ldw(last,heap,idxs)
-
-  case default
-    write(psb_err_unit,*) 'Invalid direction in heap ',dir
-  end select
-
-  return
-contains
-
-  subroutine fix_aup(last,heap,idxs)
-    use psi_acx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
-    
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
-
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
-
-  end subroutine fix_aup
+    end subroutine fix_aup
 
 
-  subroutine fix_adw(last,heap,idxs)
-    use psi_acx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
-    
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+    subroutine fix_adw(last,heap,idxs)
+      use psi_acx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
 
-  end subroutine fix_adw
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  subroutine fix_lup(last,heap,idxs)
-    use psi_lcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+    end subroutine fix_adw
 
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+    subroutine fix_lup(last,heap,idxs)
+      use psi_lcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
 
-  end subroutine fix_lup
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
 
-  subroutine fix_ldw(last,heap,idxs)
-    use psi_lcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
-    
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-  end subroutine fix_ldw
+    end subroutine fix_lup
 
-  subroutine fix_alup(last,heap,idxs)
-    use psi_alcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
-    
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) < heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+    subroutine fix_ldw(last,heap,idxs)
+      use psi_lcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
 
-      if (heap(i) > heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
 
-  end subroutine fix_alup
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
 
-  subroutine fix_aldw(last,heap,idxs)
-    use psi_alcx_mod
-    integer(psb_ipk_), intent(in)    :: last
-    complex(psb_spk_), intent(inout) :: heap(:)
-    integer(psb_ipk_) :: idxs(:)
-    
-    integer(psb_ipk_) :: i,j, itemp
-    complex(psb_spk_) :: temp 
-    
-    i = 1
-    do 
-      if (i > (last/2)) exit
-      if ( (heap(2*i) > heap(2*i+1)) .or.&
-           & (2*i == last)) then 
-        j = 2*i
-      else
-        j = 2*i + 1
-      end if
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
 
-      if (heap(i) < heap(j)) then 
-        temp     = heap(i)
-        heap(i)  = heap(j)
-        heap(j)  = temp
-        itemp    = idxs(i)
-        idxs(i)  = idxs(j)
-        idxs(j) = itemp
-        i        = j 
-      else
-        exit
-      end if
-    end do
+    end subroutine fix_ldw
 
-  end subroutine fix_aldw
+    subroutine fix_alup(last,heap,idxs)
+      use psi_alcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
 
-end subroutine psi_c_idx_heap_get_first
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    end subroutine fix_alup
+
+    subroutine fix_aldw(last,heap,idxs)
+      use psi_alcx_mod
+      integer(psb_ipk_), intent(in)    :: last
+      complex(psb_spk_), intent(inout) :: heap(:)
+      integer(psb_ipk_) :: idxs(:)
+
+      integer(psb_ipk_) :: i,j, itemp
+      complex(psb_spk_) :: temp 
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j) = itemp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    end subroutine fix_aldw
+
+  end subroutine psi_c_idx_heap_get_first
 
 
+end submodule psb_c_hsort_impl_mod
 

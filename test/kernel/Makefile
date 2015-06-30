@@ -27,10 +27,6 @@ pdgenspmv: $(DPGOBJS)
 	$(F90LINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv pdgenspmv $(EXEDIR) 
 
-tt: tt.o
-	$(F90LINK) $(LOPT) tt.o -o tt $(PSBLAS_LIB) $(LDLIBS) 
-	/bin/mv tt $(EXEDIR) 
-
 s_file_spmv: $(STOBJS)
 	$(F90LINK) $(LOPT) $(STOBJS) -o s_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv s_file_spmv $(EXEDIR) 

@@ -71,8 +71,7 @@ module psb_c_sort_mod
 
 
   interface psb_msort
-    subroutine psb_cmsort(x,ix,dir,flag)
-      import 
+    module subroutine psb_cmsort(x,ix,dir,flag)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
@@ -80,29 +79,25 @@ module psb_c_sort_mod
   end interface psb_msort
 
   interface 
-    subroutine psi_c_lmsort_up(n,k,l,iret)
-      import
+    module subroutine psi_c_lmsort_up(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_lmsort_up
-    subroutine psi_c_lmsort_dw(n,k,l,iret)
-      import
+    module subroutine psi_c_lmsort_dw(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_lmsort_dw
-    subroutine psi_c_almsort_up(n,k,l,iret)
-      import
+    module subroutine psi_c_almsort_up(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_almsort_up
-    subroutine psi_c_almsort_dw(n,k,l,iret)
-      import
+    module subroutine psi_c_almsort_dw(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
@@ -110,26 +105,23 @@ module psb_c_sort_mod
     end subroutine psi_c_almsort_dw
   end interface
   interface 
-    subroutine psi_c_amsort_up(n,k,l,iret)
-      import
+    module subroutine psi_c_amsort_up(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_amsort_up
-    subroutine psi_c_amsort_dw(n,k,l,iret)
-      import
+    module subroutine psi_c_amsort_dw(n,k,l,iret)
       implicit none
       integer(psb_ipk_) :: n, iret
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_amsort_dw
   end interface
-  
+  module 
   
   interface psb_qsort
-    subroutine psb_cqsort(x,ix,dir,flag)
-      import 
+    module subroutine psb_cqsort(x,ix,dir,flag)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
@@ -137,8 +129,7 @@ module psb_c_sort_mod
   end interface psb_qsort
   
   interface psb_isort
-    subroutine psb_cisort(x,ix,dir,flag)
-      import 
+    module subroutine psb_cisort(x,ix,dir,flag)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
@@ -147,8 +138,7 @@ module psb_c_sort_mod
 
 
   interface psb_hsort
-    subroutine psb_chsort(x,ix,dir,flag)
-      import 
+    module subroutine psb_chsort(x,ix,dir,flag)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
@@ -156,36 +146,9 @@ module psb_c_sort_mod
   end interface psb_hsort
 
 
-!!$  interface !psb_howmany_heap
-!!$    module procedure psb_c_howmany,  psb_c_idx_howmany
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_init_heap
-!!$    module procedure psb_c_init_heap, psb_c_idx_init_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_dump_heap
-!!$    module procedure psb_c_dump_heap, psb_dump_c_idx_heap
-!!$  end interface 
-!!$
-!!$
-!!$  interface !psb_insert_heap
-!!$    module procedure psb_c_insert_heap,  psb_c_idx_insert_heap
-!!$  end interface 
-!!$
-!!$  interface !psb_heap_get_first
-!!$    module procedure psb_c_heap_get_first, psb_c_idx_heap_get_first
-!!$  end interface 
-!!$  
-!!$  interface !psb_free_heap
-!!$    module procedure psb_free_c_heap, psb_free_c_idx_heap
-!!$  end interface 
 
   interface 
-    subroutine psi_c_insert_heap(key,last,heap,dir,info)
-      import 
+    module subroutine psi_c_insert_heap(key,last,heap,dir,info)
       implicit none 
 
       !  
@@ -204,8 +167,7 @@ module psb_c_sort_mod
   end interface
 
   interface 
-    subroutine psi_c_idx_insert_heap(key,index,last,heap,idxs,dir,info)
-      import 
+    module subroutine psi_c_idx_insert_heap(key,index,last,heap,idxs,dir,info)
       implicit none 
 
       !  
@@ -227,8 +189,7 @@ module psb_c_sort_mod
 
 
   interface 
-    subroutine psi_c_heap_get_first(key,last,heap,dir,info)
-      import 
+    module subroutine psi_c_heap_get_first(key,last,heap,dir,info)
       implicit none 
       complex(psb_spk_), intent(inout)  :: key
       integer(psb_ipk_), intent(inout)  :: last
@@ -239,8 +200,7 @@ module psb_c_sort_mod
   end interface
 
   interface 
-    subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      import
+    module subroutine psi_c_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
       complex(psb_spk_), intent(inout)    :: key
       integer(psb_ipk_), intent(out)    :: index
       complex(psb_spk_), intent(inout)    :: heap(:)
@@ -252,138 +212,114 @@ module psb_c_sort_mod
   end interface
 
   interface 
-    subroutine psi_clisrx_up(n,x,ix)
-      import 
+    module subroutine psi_clisrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clisrx_up
-    subroutine psi_clisrx_dw(n,x,ix)
-      import 
+    module subroutine psi_clisrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clisrx_dw
-    subroutine psi_clisr_up(n,x)
-      import 
+    module subroutine psi_clisr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clisr_up
-    subroutine psi_clisr_dw(n,x)
-      import 
+    module subroutine psi_clisr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clisr_dw
-    subroutine psi_calisrx_up(n,x,ix)
-      import 
+    module subroutine psi_calisrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calisrx_up
-    subroutine psi_calisrx_dw(n,x,ix)
-      import 
+    module subroutine psi_calisrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calisrx_dw
-    subroutine psi_calisr_up(n,x)
-      import 
+    module subroutine psi_calisr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calisr_up
-    subroutine psi_calisr_dw(n,x)
-      import 
+    module subroutine psi_calisr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calisr_dw
-    subroutine psi_caisrx_up(n,x,ix)
-      import 
+    module subroutine psi_caisrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caisrx_up
-    subroutine psi_caisrx_dw(n,x,ix)
-      import 
+    module subroutine psi_caisrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caisrx_dw
-    subroutine psi_caisr_up(n,x)
-      import 
+    module subroutine psi_caisr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caisr_up
-    subroutine psi_caisr_dw(n,x)
-      import 
+    module subroutine psi_caisr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caisr_dw
   end interface
 
   interface 
-    subroutine psi_clqsrx_up(n,x,ix)
-      import 
+    module subroutine psi_clqsrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clqsrx_up
-    subroutine psi_clqsrx_dw(n,x,ix)
-      import 
+    module subroutine psi_clqsrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clqsrx_dw
-    subroutine psi_clqsr_up(n,x)
-      import 
+    module subroutine psi_clqsr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clqsr_up
-    subroutine psi_clqsr_dw(n,x)
-      import 
+    module subroutine psi_clqsr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_clqsr_dw
-    subroutine psi_calqsrx_up(n,x,ix)
-      import 
+    module subroutine psi_calqsrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calqsrx_up
-    subroutine psi_calqsrx_dw(n,x,ix)
-      import 
+    module subroutine psi_calqsrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calqsrx_dw
-    subroutine psi_calqsr_up(n,x)
-      import 
+    module subroutine psi_calqsr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calqsr_up
-    subroutine psi_calqsr_dw(n,x)
-      import 
+    module subroutine psi_calqsr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_calqsr_dw
-    subroutine psi_caqsrx_up(n,x,ix)
-      import 
+    module subroutine psi_caqsrx_up(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caqsrx_up
-    subroutine psi_caqsrx_dw(n,x,ix)
-      import 
+    module subroutine psi_caqsrx_dw(n,x,ix)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(inout) :: ix(:)
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caqsrx_dw
-    subroutine psi_caqsr_up(n,x)
-      import 
+    module subroutine psi_caqsr_up(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caqsr_up
-    subroutine psi_caqsr_dw(n,x)
-      import 
+    module subroutine psi_caqsr_dw(n,x)
       complex(psb_spk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
     end subroutine psi_caqsr_dw

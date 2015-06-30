@@ -29,16 +29,18 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
+  !
+  !  The merge-sort and quicksort routines are implemented in the
+  !  serial/aux directory
+  !  References:
+  !  D. Knuth
+  !  The Art of Computer Programming, vol. 3
+  !  Addison-Wesley
+  !  
+  !  Aho, Hopcroft, Ullman
+  !  Data Structures and Algorithms
+  !  Addison-Wesley
+  !
 submodule (psb_d_sort_mod) psb_d_hsort_impl_mod
 
 contains
@@ -670,6 +672,7 @@ contains
     return
   end subroutine psi_d_idx_heap_get_first
 
-end submodule psb_d_hsort_impl_mod
 
+
+end submodule psb_d_hsort_impl_mod
 

@@ -106,7 +106,7 @@ module psb_d_sort_mod
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_d_amsort_dw
   end interface
-  
+  module 
   
   interface psb_qsort
     module subroutine psb_dqsort(x,ix,dir,flag)
@@ -132,6 +132,7 @@ module psb_d_sort_mod
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_dhsort
   end interface psb_hsort
+
 
 
   interface 
@@ -188,9 +189,9 @@ module psb_d_sort_mod
 
   interface 
     module subroutine psi_d_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-      real(psb_dpk_), intent(out)       :: key
+      real(psb_dpk_), intent(inout)    :: key
       integer(psb_ipk_), intent(out)    :: index
-      real(psb_dpk_), intent(inout)     :: heap(:)
+      real(psb_dpk_), intent(inout)    :: heap(:)
       integer(psb_ipk_), intent(in)     :: dir
       integer(psb_ipk_), intent(inout)  :: last
       integer(psb_ipk_), intent(inout)  :: idxs(:)
@@ -273,7 +274,7 @@ module psb_d_sort_mod
     module subroutine psi_daqsr_dw(n,x)
       real(psb_dpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsr_dw    
+    end subroutine psi_daqsr_dw
   end interface
 
 contains
