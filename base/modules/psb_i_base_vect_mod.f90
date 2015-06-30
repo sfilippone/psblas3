@@ -879,7 +879,7 @@ module psb_i_base_multivect_mod
   
   use psb_const_mod
   use psb_error_mod
-
+  use psb_realloc_mod
 
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type 
@@ -901,20 +901,20 @@ module psb_i_base_multivect_mod
     !
     !  Constructors/allocators
     !
-    procedure, pass(x) :: bld_x    => i_base_mv_bld_x
-    procedure, pass(x) :: bld_n    => i_base_mv_bld_n
+    procedure, pass(x) :: bld_x    => i_base_mlv_bld_x
+    procedure, pass(x) :: bld_n    => i_base_mlv_bld_n
     generic, public    :: bld      => bld_x, bld_n
-    procedure, pass(x) :: all      => i_base_mv_all
-    procedure, pass(x) :: mold     => i_base_mv_mold
+    procedure, pass(x) :: all      => i_base_mlv_all
+    procedure, pass(x) :: mold     => i_base_mlv_mold
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
     ! in derived classes. 
     !
-    procedure, pass(x) :: ins      => i_base_mv_ins
-    procedure, pass(x) :: zero     => i_base_mv_zero
-    procedure, pass(x) :: asb      => i_base_mv_asb
-    procedure, pass(x) :: free     => i_base_mv_free
+    procedure, pass(x) :: ins      => i_base_mlv_ins
+    procedure, pass(x) :: zero     => i_base_mlv_zero
+    procedure, pass(x) :: asb      => i_base_mlv_asb
+    procedure, pass(x) :: free     => i_base_mlv_free
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -922,27 +922,27 @@ module psb_i_base_multivect_mod
     ! external side contain the same data. The base
     ! version is only a placeholder. 
     !
-    procedure, pass(x) :: sync     => i_base_mv_sync
-    procedure, pass(x) :: is_host  => i_base_mv_is_host
-    procedure, pass(x) :: is_dev   => i_base_mv_is_dev
-    procedure, pass(x) :: is_sync  => i_base_mv_is_sync
-    procedure, pass(x) :: set_host => i_base_mv_set_host
-    procedure, pass(x) :: set_dev  => i_base_mv_set_dev
-    procedure, pass(x) :: set_sync => i_base_mv_set_sync
+    procedure, pass(x) :: sync     => i_base_mlv_sync
+    procedure, pass(x) :: is_host  => i_base_mlv_is_host
+    procedure, pass(x) :: is_dev   => i_base_mlv_is_dev
+    procedure, pass(x) :: is_sync  => i_base_mlv_is_sync
+    procedure, pass(x) :: set_host => i_base_mlv_set_host
+    procedure, pass(x) :: set_dev  => i_base_mlv_set_dev
+    procedure, pass(x) :: set_sync => i_base_mlv_set_sync
 
     !
     ! Basic info
-    procedure, pass(x) :: get_nrows => i_base_mv_get_nrows
-    procedure, pass(x) :: get_ncols => i_base_mv_get_ncols
-    procedure, pass(x) :: sizeof    => i_base_mv_sizeof
-    procedure, nopass  :: get_fmt   => i_base_mv_get_fmt
+    procedure, pass(x) :: get_nrows => i_base_mlv_get_nrows
+    procedure, pass(x) :: get_ncols => i_base_mlv_get_ncols
+    procedure, pass(x) :: sizeof    => i_base_mlv_sizeof
+    procedure, nopass  :: get_fmt   => i_base_mlv_get_fmt
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
     !
-    procedure, pass(x) :: get_vect => i_base_mv_get_vect
-    procedure, pass(x) :: set_scal => i_base_mv_set_scal
-    procedure, pass(x) :: set_vect => i_base_mv_set_vect
+    procedure, pass(x) :: get_vect => i_base_mlv_get_vect
+    procedure, pass(x) :: set_scal => i_base_mlv_set_scal
+    procedure, pass(x) :: set_vect => i_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
   end type psb_i_base_multivect_type
@@ -993,7 +993,7 @@ contains
   !! \brief     Build method from an array
   !!  \param   x(:)  input array to be copied
   !!
-  subroutine i_base_mv_bld_x(x,this)
+  subroutine i_base_mlv_bld_x(x,this)
     use psb_realloc_mod
     integer(psb_ipk_), intent(in) :: this(:,:)
     class(psb_i_base_multivect_type), intent(inout) :: x
@@ -1001,12 +1001,12 @@ contains
 
     call psb_realloc(size(this,1),size(this,2),x%v,info)
     if (info /= 0) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mv_vect_bld')
+      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
       return
     end if
     x%v(:,:)  = this(:,:)
 
-  end subroutine i_base_mv_bld_x
+  end subroutine i_base_mlv_bld_x
     
   !
   ! Create with size, but no initialization
@@ -1017,7 +1017,7 @@ contains
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated. 
   !!
-  subroutine i_base_mv_bld_n(x,m,n)
+  subroutine i_base_mlv_bld_n(x,m,n)
     use psb_realloc_mod
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_i_base_multivect_type), intent(inout) :: x
@@ -1026,16 +1026,16 @@ contains
     call psb_realloc(m,n,x%v,info)
     call x%asb(m,n,info)
 
-  end subroutine i_base_mv_bld_n
+  end subroutine i_base_mlv_bld_n
   
-  !> Function  base_mv_all:
+  !> Function  base_mlv_all:
   !! \memberof  psb_i_base_multivect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
   !!  \param    n    size to be allocated. 
   !!  \param info  return code
   !!
-  subroutine i_base_mv_all(m,n, x, info)
+  subroutine i_base_mlv_all(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1045,15 +1045,15 @@ contains
     
     call psb_realloc(m,n,x%v,info)
     
-  end subroutine i_base_mv_all
+  end subroutine i_base_mlv_all
 
-  !> Function  base_mv_mold:
+  !> Function  base_mlv_mold:
   !! \memberof  psb_i_base_multivect_type
   !! \brief     Mold method: return a variable with the same dynamic type
   !!  \param    y returned variable
   !!  \param info  return code
   !!
-  subroutine i_base_mv_mold(x, y, info)
+  subroutine i_base_mlv_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1063,12 +1063,12 @@ contains
     
     allocate(psb_i_base_multivect_type :: y, stat=info)
 
-  end subroutine i_base_mv_mold
+  end subroutine i_base_mlv_mold
 
   !
   ! Insert a bunch of values at specified positions.
   !
-  !> Function  base_mv_ins:
+  !> Function  base_mlv_ins:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Insert coefficients. 
   !!
@@ -1092,7 +1092,7 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine i_base_mv_ins(n,irl,val,dupl,x,info)
+  subroutine i_base_mlv_ins(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
     class(psb_i_base_multivect_type), intent(inout)  :: x
@@ -1144,26 +1144,26 @@ contains
       end select
     end if
     if (info /= 0) then 
-      call psb_errpush(info,'base_mv_vect_ins')
+      call psb_errpush(info,'base_mlv_vect_ins')
       return
     end if
 
-  end subroutine i_base_mv_ins
+  end subroutine i_base_mlv_ins
 
   !
-  !> Function  base_mv_zero
+  !> Function  base_mlv_zero
   !! \memberof  psb_i_base_multivect_type
   !! \brief Zero out contents
   !!
   !
-  subroutine i_base_mv_zero(x)
+  subroutine i_base_mlv_zero(x)
     use psi_serial_mod
     implicit none 
     class(psb_i_base_multivect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=izero
 
-  end subroutine i_base_mv_zero
+  end subroutine i_base_mlv_zero
 
   
   !
@@ -1171,7 +1171,7 @@ contains
   ! For derived classes: after this the vector
   ! storage is supposed to be in sync.
   !
-  !> Function  base_mv_asb:
+  !> Function  base_mlv_asb:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Assemble vector: reallocate as necessary.
   !!           
@@ -1180,7 +1180,7 @@ contains
   !!
   !
  
-  subroutine i_base_mv_asb(m,n, x, info)
+  subroutine i_base_mlv_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1193,18 +1193,18 @@ contains
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
 
-  end subroutine i_base_mv_asb
+  end subroutine i_base_mlv_asb
 
 
   !
-  !> Function  base_mv_free:
+  !> Function  base_mlv_free:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Free vector
   !!           
   !!  \param info  return code
   !!
   !
-  subroutine i_base_mv_free(x, info)
+  subroutine i_base_mlv_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1216,7 +1216,7 @@ contains
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
         
-  end subroutine i_base_mv_free
+  end subroutine i_base_mlv_free
 
   
 
@@ -1225,106 +1225,106 @@ contains
   ! a placeholder.
   ! 
   !
-  !> Function  base_mv_sync:
+  !> Function  base_mlv_sync:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Sync: base version is a no-op.
   !!           
   !
-  subroutine i_base_mv_sync(x)
+  subroutine i_base_mlv_sync(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
     
-  end subroutine i_base_mv_sync
+  end subroutine i_base_mlv_sync
 
   !
-  !> Function  base_mv_set_host:
+  !> Function  base_mlv_set_host:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Set_host: base version is a no-op.
   !!           
   !
-  subroutine i_base_mv_set_host(x)
+  subroutine i_base_mlv_set_host(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
     
-  end subroutine i_base_mv_set_host
+  end subroutine i_base_mlv_set_host
 
   !
-  !> Function  base_mv_set_dev:
+  !> Function  base_mlv_set_dev:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Set_dev: base version is a no-op.
   !!           
   !
-  subroutine i_base_mv_set_dev(x)
+  subroutine i_base_mlv_set_dev(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
     
-  end subroutine i_base_mv_set_dev
+  end subroutine i_base_mlv_set_dev
 
   !
-  !> Function  base_mv_set_sync:
+  !> Function  base_mlv_set_sync:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Set_sync: base version is a no-op.
   !!           
   !
-  subroutine i_base_mv_set_sync(x)
+  subroutine i_base_mlv_set_sync(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
     
-  end subroutine i_base_mv_set_sync
+  end subroutine i_base_mlv_set_sync
 
   !
-  !> Function  base_mv_is_dev:
+  !> Function  base_mlv_is_dev:
   !! \memberof  psb_i_base_multivect_type
   !! \brief Is  vector on external device    .
   !!           
   !
-  function i_base_mv_is_dev(x) result(res)
+  function i_base_mlv_is_dev(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     logical  :: res
   
     res = .false.
-  end function i_base_mv_is_dev
+  end function i_base_mlv_is_dev
   
   !
-  !> Function  base_mv_is_host
+  !> Function  base_mlv_is_host
   !! \memberof  psb_i_base_multivect_type
   !! \brief Is  vector on standard memory    .
   !!           
   !
-  function i_base_mv_is_host(x) result(res)
+  function i_base_mlv_is_host(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     logical  :: res
 
     res = .true.
-  end function i_base_mv_is_host
+  end function i_base_mlv_is_host
 
   !
-  !> Function  base_mv_is_sync
+  !> Function  base_mlv_is_sync
   !! \memberof  psb_i_base_multivect_type
   !! \brief Is  vector on sync               .
   !!           
   !
-  function i_base_mv_is_sync(x) result(res)
+  function i_base_mlv_is_sync(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     logical  :: res
 
     res = .true.
-  end function i_base_mv_is_sync
+  end function i_base_mlv_is_sync
 
 
   !
   ! Size info. 
   !
   !
-  !> Function  base_mv_get_nrows
+  !> Function  base_mlv_get_nrows
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Number of entries
   !!           
   !
-  function i_base_mv_get_nrows(x) result(res)
+  function i_base_mlv_get_nrows(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
@@ -1332,9 +1332,9 @@ contains
     res = 0
     if (allocated(x%v)) res = size(x%v,1)
 
-  end function i_base_mv_get_nrows
+  end function i_base_mlv_get_nrows
 
-  function i_base_mv_get_ncols(x) result(res)
+  function i_base_mlv_get_ncols(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
@@ -1342,15 +1342,15 @@ contains
     res = 0
     if (allocated(x%v)) res = size(x%v,2)
 
-  end function i_base_mv_get_ncols
+  end function i_base_mlv_get_ncols
   
   !
-  !> Function  base_mv_get_sizeof
+  !> Function  base_mlv_get_sizeof
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Size in bytesa
   !!           
   !
-  function i_base_mv_sizeof(x) result(res)
+  function i_base_mlv_sizeof(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     integer(psb_long_int_k_) :: res
@@ -1358,30 +1358,30 @@ contains
     ! Force 8-byte integers.
     res = (1_psb_long_int_k_ * psb_sizeof_int) * x%get_nrows() * x%get_ncols()
 
-  end function i_base_mv_sizeof
+  end function i_base_mlv_sizeof
 
   !
-  !> Function  base_mv_get_fmt
+  !> Function  base_mlv_get_fmt
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Format
   !!           
   !
-  function i_base_mv_get_fmt() result(res)
+  function i_base_mlv_get_fmt() result(res)
     implicit none 
     character(len=5) :: res
     res = 'BASE'
-  end function i_base_mv_get_fmt
+  end function i_base_mlv_get_fmt
   
 
   !
   !
   !
-  !> Function  base_mv_get_vect
+  !> Function  base_mlv_get_vect
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Extract a copy of the contents
   !!
   !    
-  function  i_base_mv_get_vect(x) result(res)
+  function  i_base_mlv_get_vect(x) result(res)
     class(psb_i_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), allocatable                 :: res(:,:)
     integer(psb_ipk_) :: info,m,n
@@ -1391,37 +1391,37 @@ contains
     call x%sync()
     allocate(res(m,n),stat=info) 
     if (info /= 0) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mv_get_vect')
+      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_get_vect')
       return
     end if
     res(1:m,1:n) = x%v(1:m,1:n)
-  end function i_base_mv_get_vect
+  end function i_base_mlv_get_vect
     
   !
   ! Reset all values 
   !
   !
-  !> Function  base_mv_set_scal
+  !> Function  base_mlv_set_scal
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine i_base_mv_set_scal(x,val)
+  subroutine i_base_mlv_set_scal(x,val)
     class(psb_i_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
     x%v = val
     
-  end subroutine i_base_mv_set_scal
+  end subroutine i_base_mlv_set_scal
 
   !
-  !> Function  base_mv_set_vect
+  !> Function  base_mlv_set_vect
   !! \memberof  psb_i_base_multivect_type
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in 
   !!
-  subroutine i_base_mv_set_vect(x,val)
+  subroutine i_base_mlv_set_vect(x,val)
     class(psb_i_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val(:,:)
     integer(psb_ipk_) :: nr
@@ -1436,7 +1436,7 @@ contains
       x%v = val
     end if
 
-  end subroutine i_base_mv_set_vect
+  end subroutine i_base_mlv_set_vect
 
 end module psb_i_base_multivect_mod
 

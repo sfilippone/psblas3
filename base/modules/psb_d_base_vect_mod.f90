@@ -738,7 +738,7 @@ contains
   !> Function  base_dot_v
   !! \memberof  psb_d_base_vect_type
   !! \brief  Dot product by another base_vector
-  !! \param n    Number of entries to be considere
+  !! \param n    Number of entries to be considered
   !! \param y    The other (base_vect) to be multiplied by
   !!
   function d_base_dot_v(n,x,y) result(res)
@@ -772,7 +772,7 @@ contains
   !> Function  base_dot_a
   !! \memberof  psb_d_base_vect_type
   !! \brief  Dot product by a normal array
-  !! \param n    Number of entries to be considere
+  !! \param n    Number of entries to be considered
   !! \param y(:) The array to be multiplied by
   !!
   function d_base_dot_a(n,x,y) result(res)
@@ -795,7 +795,7 @@ contains
   !> Function  base_axpby_v
   !! \memberof  psb_d_base_vect_type
   !! \brief AXPBY  by a (base_vect) y=alpha*x+beta*y
-  !! \param m    Number of entries to be considere
+  !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x     The class(base_vect) to be added
   !! \param beta scalar alpha
@@ -823,7 +823,7 @@ contains
   !> Function  base_axpby_a
   !! \memberof  psb_d_base_vect_type
   !! \brief AXPBY  by a normal array y=alpha*x+beta*y
-  !! \param m    Number of entries to be considere
+  !! \param m    Number of entries to be considered
   !! \param alpha scalar alpha
   !! \param x(:) The array to be added
   !! \param beta scalar alpha
@@ -1339,7 +1339,7 @@ module psb_d_base_multivect_mod
   
   use psb_const_mod
   use psb_error_mod
-
+  use psb_realloc_mod
 
   !> \namespace  psb_base_mod  \class psb_d_base_vect_type
   !! The psb_d_base_vect_type 
@@ -1361,20 +1361,20 @@ module psb_d_base_multivect_mod
     !
     !  Constructors/allocators
     !
-    procedure, pass(x) :: bld_x    => d_base_mv_bld_x
-    procedure, pass(x) :: bld_n    => d_base_mv_bld_n
+    procedure, pass(x) :: bld_x    => d_base_mlv_bld_x
+    procedure, pass(x) :: bld_n    => d_base_mlv_bld_n
     generic, public    :: bld      => bld_x, bld_n
-    procedure, pass(x) :: all      => d_base_mv_all
-    procedure, pass(x) :: mold     => d_base_mv_mold
+    procedure, pass(x) :: all      => d_base_mlv_all
+    procedure, pass(x) :: mold     => d_base_mlv_mold
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
     ! in derived classes. 
     !
-    procedure, pass(x) :: ins      => d_base_mv_ins
-    procedure, pass(x) :: zero     => d_base_mv_zero
-    procedure, pass(x) :: asb      => d_base_mv_asb
-    procedure, pass(x) :: free     => d_base_mv_free
+    procedure, pass(x) :: ins      => d_base_mlv_ins
+    procedure, pass(x) :: zero     => d_base_mlv_zero
+    procedure, pass(x) :: asb      => d_base_mlv_asb
+    procedure, pass(x) :: free     => d_base_mlv_free
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -1382,66 +1382,66 @@ module psb_d_base_multivect_mod
     ! external side contain the same data. The base
     ! version is only a placeholder. 
     !
-    procedure, pass(x) :: sync     => d_base_mv_sync
-    procedure, pass(x) :: is_host  => d_base_mv_is_host
-    procedure, pass(x) :: is_dev   => d_base_mv_is_dev
-    procedure, pass(x) :: is_sync  => d_base_mv_is_sync
-    procedure, pass(x) :: set_host => d_base_mv_set_host
-    procedure, pass(x) :: set_dev  => d_base_mv_set_dev
-    procedure, pass(x) :: set_sync => d_base_mv_set_sync
+    procedure, pass(x) :: sync     => d_base_mlv_sync
+    procedure, pass(x) :: is_host  => d_base_mlv_is_host
+    procedure, pass(x) :: is_dev   => d_base_mlv_is_dev
+    procedure, pass(x) :: is_sync  => d_base_mlv_is_sync
+    procedure, pass(x) :: set_host => d_base_mlv_set_host
+    procedure, pass(x) :: set_dev  => d_base_mlv_set_dev
+    procedure, pass(x) :: set_sync => d_base_mlv_set_sync
 
     !
     ! Basic info
-    procedure, pass(x) :: get_nrows => d_base_mv_get_nrows
-    procedure, pass(x) :: get_ncols => d_base_mv_get_ncols
-    procedure, pass(x) :: sizeof    => d_base_mv_sizeof
-    procedure, nopass  :: get_fmt   => d_base_mv_get_fmt
+    procedure, pass(x) :: get_nrows => d_base_mlv_get_nrows
+    procedure, pass(x) :: get_ncols => d_base_mlv_get_ncols
+    procedure, pass(x) :: sizeof    => d_base_mlv_sizeof
+    procedure, nopass  :: get_fmt   => d_base_mlv_get_fmt
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
     !
-    procedure, pass(x) :: get_vect => d_base_mv_get_vect
-    procedure, pass(x) :: set_scal => d_base_mv_set_scal
-    procedure, pass(x) :: set_vect => d_base_mv_set_vect
+    procedure, pass(x) :: get_vect => d_base_mlv_get_vect
+    procedure, pass(x) :: set_scal => d_base_mlv_set_scal
+    procedure, pass(x) :: set_vect => d_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
     !
     ! Dot product and AXPBY
     !
-!!$    procedure, pass(x) :: dot_v    => d_base_mv_dot_v
-!!$    procedure, pass(x) :: dot_a    => d_base_mv_dot_a
-!!$    generic, public    :: dot      => dot_v, dot_a
-!!$    procedure, pass(y) :: axpby_v  => d_base_mv_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => d_base_mv_axpby_a
-!!$    generic, public    :: axpby    => axpby_v, axpby_a
+    procedure, pass(x) :: dot_v    => d_base_mlv_dot_v
+    procedure, pass(x) :: dot_a    => d_base_mlv_dot_a
+    generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(y) :: axpby_v  => d_base_mlv_axpby_v
+    procedure, pass(y) :: axpby_a  => d_base_mlv_axpby_a
+    generic, public    :: axpby    => axpby_v, axpby_a
 !!$    !
 !!$    ! Vector by vector multiplication. Need all variants
 !!$    ! to handle multiple requirements from preconditioners
 !!$    !
-!!$    procedure, pass(y) :: mlt_v    => d_base_mv_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => d_base_mv_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => d_base_mv_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => d_base_mv_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => d_base_mv_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => d_base_mv_mlt_av
+!!$    procedure, pass(y) :: mlt_v    => d_base_mlv_mlt_v
+!!$    procedure, pass(y) :: mlt_a    => d_base_mlv_mlt_a
+!!$    procedure, pass(z) :: mlt_a_2  => d_base_mlv_mlt_a_2
+!!$    procedure, pass(z) :: mlt_v_2  => d_base_mlv_mlt_v_2
+!!$    procedure, pass(z) :: mlt_va   => d_base_mlv_mlt_va
+!!$    procedure, pass(z) :: mlt_av   => d_base_mlv_mlt_av
 !!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, mlt_va
 !!$    !
 !!$    ! Scaling and norms
 !!$    !
-!!$    procedure, pass(x) :: scal     => d_base_mv_scal
-!!$    procedure, pass(x) :: nrm2     => d_base_mv_nrm2
-!!$    procedure, pass(x) :: amax     => d_base_mv_amax
-!!$    procedure, pass(x) :: asum     => d_base_mv_asum
+!!$    procedure, pass(x) :: scal     => d_base_mlv_scal
+!!$    procedure, pass(x) :: nrm2     => d_base_mlv_nrm2
+!!$    procedure, pass(x) :: amax     => d_base_mlv_amax
+!!$    procedure, pass(x) :: asum     => d_base_mlv_asum
 !!$    !
 !!$    ! Gather/scatter. These are needed for MPI interfacing.
 !!$    ! May have to be reworked. 
 !!$    !
-!!$    procedure, pass(x) :: gthab    => d_base_mv_gthab
-!!$    procedure, pass(x) :: gthzv    => d_base_mv_gthzv
-!!$    procedure, pass(x) :: gthzv_x  => d_base_mv_gthzv_x
+!!$    procedure, pass(x) :: gthab    => d_base_mlv_gthab
+!!$    procedure, pass(x) :: gthzv    => d_base_mlv_gthzv
+!!$    procedure, pass(x) :: gthzv_x  => d_base_mlv_gthzv_x
 !!$    generic, public    :: gth      => gthab, gthzv, gthzv_x
-!!$    procedure, pass(y) :: sctb     => d_base_mv_sctb
-!!$    procedure, pass(y) :: sctb_x   => d_base_mv_sctb_x
+!!$    procedure, pass(y) :: sctb     => d_base_mlv_sctb
+!!$    procedure, pass(y) :: sctb_x   => d_base_mlv_sctb_x
 !!$    generic, public    :: sct      => sctb, sctb_x
   end type psb_d_base_multivect_type
 
@@ -1491,7 +1491,7 @@ contains
   !! \brief     Build method from an array
   !!  \param   x(:)  input array to be copied
   !!
-  subroutine d_base_mv_bld_x(x,this)
+  subroutine d_base_mlv_bld_x(x,this)
     use psb_realloc_mod
     real(psb_dpk_), intent(in) :: this(:,:)
     class(psb_d_base_multivect_type), intent(inout) :: x
@@ -1499,12 +1499,12 @@ contains
 
     call psb_realloc(size(this,1),size(this,2),x%v,info)
     if (info /= 0) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mv_vect_bld')
+      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
       return
     end if
     x%v(:,:)  = this(:,:)
 
-  end subroutine d_base_mv_bld_x
+  end subroutine d_base_mlv_bld_x
     
   !
   ! Create with size, but no initialization
@@ -1515,7 +1515,7 @@ contains
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated. 
   !!
-  subroutine d_base_mv_bld_n(x,m,n)
+  subroutine d_base_mlv_bld_n(x,m,n)
     use psb_realloc_mod
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_d_base_multivect_type), intent(inout) :: x
@@ -1524,16 +1524,16 @@ contains
     call psb_realloc(m,n,x%v,info)
     call x%asb(m,n,info)
 
-  end subroutine d_base_mv_bld_n
+  end subroutine d_base_mlv_bld_n
   
-  !> Function  base_mv_all:
+  !> Function  base_mlv_all:
   !! \memberof  psb_d_base_multivect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
   !!  \param    n    size to be allocated. 
   !!  \param info  return code
   !!
-  subroutine d_base_mv_all(m,n, x, info)
+  subroutine d_base_mlv_all(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1543,15 +1543,15 @@ contains
     
     call psb_realloc(m,n,x%v,info)
     
-  end subroutine d_base_mv_all
+  end subroutine d_base_mlv_all
 
-  !> Function  base_mv_mold:
+  !> Function  base_mlv_mold:
   !! \memberof  psb_d_base_multivect_type
   !! \brief     Mold method: return a variable with the same dynamic type
   !!  \param    y returned variable
   !!  \param info  return code
   !!
-  subroutine d_base_mv_mold(x, y, info)
+  subroutine d_base_mlv_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1561,12 +1561,12 @@ contains
     
     allocate(psb_d_base_multivect_type :: y, stat=info)
 
-  end subroutine d_base_mv_mold
+  end subroutine d_base_mlv_mold
 
   !
   ! Insert a bunch of values at specified positions.
   !
-  !> Function  base_mv_ins:
+  !> Function  base_mlv_ins:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Insert coefficients. 
   !!
@@ -1590,7 +1590,7 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine d_base_mv_ins(n,irl,val,dupl,x,info)
+  subroutine d_base_mlv_ins(n,irl,val,dupl,x,info)
     use psi_serial_mod
     implicit none 
     class(psb_d_base_multivect_type), intent(inout)  :: x
@@ -1642,26 +1642,26 @@ contains
       end select
     end if
     if (info /= 0) then 
-      call psb_errpush(info,'base_mv_vect_ins')
+      call psb_errpush(info,'base_mlv_vect_ins')
       return
     end if
 
-  end subroutine d_base_mv_ins
+  end subroutine d_base_mlv_ins
 
   !
-  !> Function  base_mv_zero
+  !> Function  base_mlv_zero
   !! \memberof  psb_d_base_multivect_type
   !! \brief Zero out contents
   !!
   !
-  subroutine d_base_mv_zero(x)
+  subroutine d_base_mlv_zero(x)
     use psi_serial_mod
     implicit none 
     class(psb_d_base_multivect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=dzero
 
-  end subroutine d_base_mv_zero
+  end subroutine d_base_mlv_zero
 
   
   !
@@ -1669,7 +1669,7 @@ contains
   ! For derived classes: after this the vector
   ! storage is supposed to be in sync.
   !
-  !> Function  base_mv_asb:
+  !> Function  base_mlv_asb:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Assemble vector: reallocate as necessary.
   !!           
@@ -1678,7 +1678,7 @@ contains
   !!
   !
  
-  subroutine d_base_mv_asb(m,n, x, info)
+  subroutine d_base_mlv_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1691,18 +1691,18 @@ contains
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
 
-  end subroutine d_base_mv_asb
+  end subroutine d_base_mlv_asb
 
 
   !
-  !> Function  base_mv_free:
+  !> Function  base_mlv_free:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Free vector
   !!           
   !!  \param info  return code
   !!
   !
-  subroutine d_base_mv_free(x, info)
+  subroutine d_base_mlv_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1714,7 +1714,7 @@ contains
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
         
-  end subroutine d_base_mv_free
+  end subroutine d_base_mlv_free
 
   
 
@@ -1723,106 +1723,106 @@ contains
   ! a placeholder.
   ! 
   !
-  !> Function  base_mv_sync:
+  !> Function  base_mlv_sync:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Sync: base version is a no-op.
   !!           
   !
-  subroutine d_base_mv_sync(x)
+  subroutine d_base_mlv_sync(x)
     implicit none 
     class(psb_d_base_multivect_type), intent(inout) :: x
     
-  end subroutine d_base_mv_sync
+  end subroutine d_base_mlv_sync
 
   !
-  !> Function  base_mv_set_host:
+  !> Function  base_mlv_set_host:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Set_host: base version is a no-op.
   !!           
   !
-  subroutine d_base_mv_set_host(x)
+  subroutine d_base_mlv_set_host(x)
     implicit none 
     class(psb_d_base_multivect_type), intent(inout) :: x
     
-  end subroutine d_base_mv_set_host
+  end subroutine d_base_mlv_set_host
 
   !
-  !> Function  base_mv_set_dev:
+  !> Function  base_mlv_set_dev:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Set_dev: base version is a no-op.
   !!           
   !
-  subroutine d_base_mv_set_dev(x)
+  subroutine d_base_mlv_set_dev(x)
     implicit none 
     class(psb_d_base_multivect_type), intent(inout) :: x
     
-  end subroutine d_base_mv_set_dev
+  end subroutine d_base_mlv_set_dev
 
   !
-  !> Function  base_mv_set_sync:
+  !> Function  base_mlv_set_sync:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Set_sync: base version is a no-op.
   !!           
   !
-  subroutine d_base_mv_set_sync(x)
+  subroutine d_base_mlv_set_sync(x)
     implicit none 
     class(psb_d_base_multivect_type), intent(inout) :: x
     
-  end subroutine d_base_mv_set_sync
+  end subroutine d_base_mlv_set_sync
 
   !
-  !> Function  base_mv_is_dev:
+  !> Function  base_mlv_is_dev:
   !! \memberof  psb_d_base_multivect_type
   !! \brief Is  vector on external device    .
   !!           
   !
-  function d_base_mv_is_dev(x) result(res)
+  function d_base_mlv_is_dev(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     logical  :: res
   
     res = .false.
-  end function d_base_mv_is_dev
+  end function d_base_mlv_is_dev
   
   !
-  !> Function  base_mv_is_host
+  !> Function  base_mlv_is_host
   !! \memberof  psb_d_base_multivect_type
   !! \brief Is  vector on standard memory    .
   !!           
   !
-  function d_base_mv_is_host(x) result(res)
+  function d_base_mlv_is_host(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     logical  :: res
 
     res = .true.
-  end function d_base_mv_is_host
+  end function d_base_mlv_is_host
 
   !
-  !> Function  base_mv_is_sync
+  !> Function  base_mlv_is_sync
   !! \memberof  psb_d_base_multivect_type
   !! \brief Is  vector on sync               .
   !!           
   !
-  function d_base_mv_is_sync(x) result(res)
+  function d_base_mlv_is_sync(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     logical  :: res
 
     res = .true.
-  end function d_base_mv_is_sync
+  end function d_base_mlv_is_sync
 
 
   !
   ! Size info. 
   !
   !
-  !> Function  base_mv_get_nrows
+  !> Function  base_mlv_get_nrows
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Number of entries
   !!           
   !
-  function d_base_mv_get_nrows(x) result(res)
+  function d_base_mlv_get_nrows(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
@@ -1830,9 +1830,9 @@ contains
     res = 0
     if (allocated(x%v)) res = size(x%v,1)
 
-  end function d_base_mv_get_nrows
+  end function d_base_mlv_get_nrows
 
-  function d_base_mv_get_ncols(x) result(res)
+  function d_base_mlv_get_ncols(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     integer(psb_ipk_) :: res
@@ -1840,15 +1840,15 @@ contains
     res = 0
     if (allocated(x%v)) res = size(x%v,2)
 
-  end function d_base_mv_get_ncols
+  end function d_base_mlv_get_ncols
   
   !
-  !> Function  base_mv_get_sizeof
+  !> Function  base_mlv_get_sizeof
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Size in bytesa
   !!           
   !
-  function d_base_mv_sizeof(x) result(res)
+  function d_base_mlv_sizeof(x) result(res)
     implicit none 
     class(psb_d_base_multivect_type), intent(in) :: x
     integer(psb_long_int_k_) :: res
@@ -1856,30 +1856,30 @@ contains
     ! Force 8-byte integers.
     res = (1_psb_long_int_k_ * psb_sizeof_int) * x%get_nrows() * x%get_ncols()
 
-  end function d_base_mv_sizeof
+  end function d_base_mlv_sizeof
 
   !
-  !> Function  base_mv_get_fmt
+  !> Function  base_mlv_get_fmt
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Format
   !!           
   !
-  function d_base_mv_get_fmt() result(res)
+  function d_base_mlv_get_fmt() result(res)
     implicit none 
     character(len=5) :: res
     res = 'BASE'
-  end function d_base_mv_get_fmt
+  end function d_base_mlv_get_fmt
   
 
   !
   !
   !
-  !> Function  base_mv_get_vect
+  !> Function  base_mlv_get_vect
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Extract a copy of the contents
   !!
   !    
-  function  d_base_mv_get_vect(x) result(res)
+  function  d_base_mlv_get_vect(x) result(res)
     class(psb_d_base_multivect_type), intent(inout) :: x
     real(psb_dpk_), allocatable                 :: res(:,:)
     integer(psb_ipk_) :: info,m,n
@@ -1889,37 +1889,37 @@ contains
     call x%sync()
     allocate(res(m,n),stat=info) 
     if (info /= 0) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mv_get_vect')
+      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_get_vect')
       return
     end if
     res(1:m,1:n) = x%v(1:m,1:n)
-  end function d_base_mv_get_vect
+  end function d_base_mlv_get_vect
     
   !
   ! Reset all values 
   !
   !
-  !> Function  base_mv_set_scal
+  !> Function  base_mlv_set_scal
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine d_base_mv_set_scal(x,val)
+  subroutine d_base_mlv_set_scal(x,val)
     class(psb_d_base_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
     x%v = val
     
-  end subroutine d_base_mv_set_scal
+  end subroutine d_base_mlv_set_scal
 
   !
-  !> Function  base_mv_set_vect
+  !> Function  base_mlv_set_vect
   !! \memberof  psb_d_base_multivect_type
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in 
   !!
-  subroutine d_base_mv_set_vect(x,val)
+  subroutine d_base_mlv_set_vect(x,val)
     class(psb_d_base_multivect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in) :: val(:,:)
     integer(psb_ipk_) :: nr
@@ -1934,121 +1934,148 @@ contains
       x%v = val
     end if
 
-  end subroutine d_base_mv_set_vect
+  end subroutine d_base_mlv_set_vect
 
-!!$  !
-!!$  ! Dot products 
-!!$  ! 
-!!$  !
-!!$  !> Function  base_mv_dot_v
-!!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief  Dot product by another base_mv_vector
-!!$  !! \param n    Number of entries to be considere
-!!$  !! \param y    The other (base_mv_vect) to be multiplied by
-!!$  !!
-!!$  function d_base_mv_dot_v(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_d_base_multivect_type), intent(inout) :: x, y
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_dpk_)                :: res
-!!$    real(psb_dpk_), external      :: ddot
-!!$    
-!!$    res = izero
-!!$    !
-!!$    ! Note: this is the base implementation.
-!!$    !  When we get here, we are sure that X is of
-!!$    !  TYPE psb_d_base_mv_vect.
-!!$    !  If Y is not, throw the burden on it, implicitly
-!!$    !  calling dot_a
-!!$    !
-!!$    select type(yy => y)
-!!$    type is (psb_d_base_multivect_type)
-!!$      res = ddot(n,x%v,1,y%v,1)
-!!$    class default
-!!$      res = y%dot(n,x%v)
-!!$    end select
-!!$
-!!$  end function d_base_mv_dot_v
-!!$
-!!$  !
-!!$  ! Base workhorse is good old BLAS1
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_dot_a
-!!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief  Dot product by a normal array
-!!$  !! \param n    Number of entries to be considere
-!!$  !! \param y(:) The array to be multiplied by
-!!$  !!
-!!$  function d_base_mv_dot_a(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_d_base_multivect_type), intent(inout) :: x
-!!$    real(psb_dpk_), intent(in)    :: y(:)
-!!$    integer(psb_ipk_), intent(in)           :: n
-!!$    real(psb_dpk_)                :: res
-!!$    integer(psb_ipk_), external      :: ddot
-!!$    
-!!$    res = ddot(n,y,1,x%v,1)
-!!$
-!!$  end function d_base_mv_dot_a
+  !
+  ! Dot products 
+  ! 
+  !
+  !> Function  base_mlv_dot_v
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief  Dot product by another base_mlv_vector
+  !! \param n    Number of entries to be considered
+  !! \param y    The other (base_mlv_vect) to be multiplied by
+  !!
+  function d_base_mlv_dot_v(n,x,y) result(res)
+    implicit none 
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), allocatable   :: res(:)
+    real(psb_dpk_), external      :: ddot
+    integer(psb_ipk_) :: j,nc
+
+    if (x%is_dev()) call x%sync()
+    res = dzero
+    !
+    ! Note: this is the base implementation.
+    !  When we get here, we are sure that X is of
+    !  TYPE psb_d_base_mlv_vect (or its class does not care). 
+    !  If Y is not, throw the burden on it, implicitly
+    !  calling dot_a
+    !
+    select type(yy => y)
+    type is (psb_d_base_multivect_type)
+      if (y%is_dev()) call y%sync()
+      nc = min(psb_size(x%v,2),psb_size(y%v,2))
+      allocate(res(nc))
+      do j=1,nc
+        res(j) = ddot(n,x%v(:,j),1,y%v(:,j),1)
+      end do
+    class default
+      res = y%dot(n,x%v)
+    end select
+
+  end function d_base_mlv_dot_v
+
+  !
+  ! Base workhorse is good old BLAS1
+  !
+  !
+  !> Function  base_mlv_dot_a
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief  Dot product by a normal array
+  !! \param n    Number of entries to be considered
+  !! \param y(:) The array to be multiplied by
+  !!
+  function d_base_mlv_dot_a(n,x,y) result(res)
+    implicit none 
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    real(psb_dpk_), intent(in)    :: y(:,:)
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_dpk_), allocatable     :: res(:)
+    integer(psb_ipk_), external      :: ddot
+    integer(psb_ipk_) :: j,nc
+
+    if (x%is_dev()) call x%sync()
+    nc = min(psb_size(x%v,2),size(y,2))
+    allocate(res(nc))
+    do j=1,nc
+      res(j) = ddot(n,x%v(:,j),1,y(:,j),1)
+    end do
+
+  end function d_base_mlv_dot_a
     
-!!$  !
-!!$  ! AXPBY is invoked via Y, hence the structure below. 
-!!$  !
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_axpby_v
-!!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief AXPBY  by a (base_mv_vect) y=alpha*x+beta*y
-!!$  !! \param m    Number of entries to be considere
-!!$  !! \param alpha scalar alpha
-!!$  !! \param x     The class(base_mv_vect) to be added
-!!$  !! \param beta scalar alpha
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine d_base_mv_axpby_v(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: y
-!!$    real(psb_dpk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    select type(xx => x)
-!!$    type is (psb_d_base_multivect_type)
-!!$      call psb_geaxpby(m,alpha,x%v,beta,y%v,info)
-!!$    class default
-!!$      call y%axpby(m,alpha,x%v,beta,info)
-!!$    end select
-!!$
-!!$  end subroutine d_base_mv_axpby_v
-!!$
-!!$  !
-!!$  ! AXPBY is invoked via Y, hence the structure below. 
-!!$  !
-!!$  !
-!!$  !> Function  base_mv_axpby_a
-!!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
-!!$  !! \param m    Number of entries to be considere
-!!$  !! \param alpha scalar alpha
-!!$  !! \param x(:) The array to be added
-!!$  !! \param beta scalar alpha
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine d_base_mv_axpby_a(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)               :: m
-!!$    real(psb_dpk_), intent(in)        :: x(:)
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: y
-!!$    real(psb_dpk_), intent (in)       :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    
-!!$    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-!!$    
-!!$  end subroutine d_base_mv_axpby_a
+  !
+  ! AXPBY is invoked via Y, hence the structure below. 
+  !
+  !
+  !
+  !> Function  base_mlv_axpby_v
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief AXPBY  by a (base_mlv_vect) y=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x     The class(base_mlv_vect) to be added
+  !! \param beta scalar alpha
+  !! \param info   return code
+  !!
+  subroutine d_base_mlv_axpby_v(m,alpha, x, beta, y, info, n)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_base_multivect_type), intent(inout)  :: x
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in), optional     :: n
+    integer(psb_ipk_)  :: nc
+
+    if (present(n)) then
+      nc = n
+    else
+      nc = min(psb_size(x%v,2),psb_size(y%v,2))
+    end if
+    select type(xx => x)
+    type is (psb_d_base_multivect_type)
+      call psb_geaxpby(m,nc,alpha,x%v,beta,y%v,info)
+    class default
+      call y%axpby(m,alpha,x%v,beta,info,n=n)
+    end select
+
+  end subroutine d_base_mlv_axpby_v
+
+  !
+  ! AXPBY is invoked via Y, hence the structure below. 
+  !
+  !
+  !> Function  base_mlv_axpby_a
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
+  !! \param m    Number of entries to be considered
+  !! \param alpha scalar alpha
+  !! \param x(:) The array to be added
+  !! \param beta scalar alpha
+  !! \param info   return code
+  !!
+  subroutine d_base_mlv_axpby_a(m,alpha, x, beta, y, info,n)
+    use psi_serial_mod
+    implicit none 
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)        :: x(:,:)
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in), optional     :: n
+    integer(psb_ipk_)  :: nc
+    if (present(n)) then
+      nc = n
+    else
+      nc = min(size(x,2),psb_size(y%v,2))
+    end if
+    
+    call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
+    
+  end subroutine d_base_mlv_axpby_a
 
   
 !!$  !
@@ -2060,13 +2087,13 @@ contains
 !!$  !  of the involved entities
 !!$  !
 !!$  !
-!!$  !> Function  base_mv_mlt_a
+!!$  !> Function  base_mlv_mlt_a
 !!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief Vector entry-by-entry multiply  by a base_mv_vect array y=x*y
-!!$  !! \param x   The class(base_mv_vect) to be multiplied by
+!!$  !! \brief Vector entry-by-entry multiply  by a base_mlv_vect array y=x*y
+!!$  !! \param x   The class(base_mlv_vect) to be multiplied by
 !!$  !! \param info   return code
 !!$  !!
-!!$  subroutine d_base_mv_mlt_v(x, y, info)
+!!$  subroutine d_base_mlv_mlt_v(x, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    class(psb_d_base_multivect_type), intent(inout)  :: x
@@ -2085,16 +2112,16 @@ contains
 !!$      call y%mlt(x%v,info)
 !!$    end select
 !!$
-!!$  end subroutine d_base_mv_mlt_v
+!!$  end subroutine d_base_mlv_mlt_v
 !!$
 !!$  !
-!!$  !> Function  base_mv_mlt_a
+!!$  !> Function  base_mlv_mlt_a
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief Vector entry-by-entry multiply  by a normal array y=x*y
 !!$  !! \param x(:) The array to be multiplied by
 !!$  !! \param info   return code
 !!$  !!
-!!$  subroutine d_base_mv_mlt_a(x, y, info)
+!!$  subroutine d_base_mlv_mlt_a(x, y, info)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    real(psb_dpk_), intent(in)        :: x(:)
@@ -2108,11 +2135,11 @@ contains
 !!$      y%v(i) = y%v(i)*x(i)
 !!$    end do
 !!$    
-!!$  end subroutine d_base_mv_mlt_a
+!!$  end subroutine d_base_mlv_mlt_a
 !!$
 !!$
 !!$  !
-!!$  !> Function  base_mv_mlt_a_2
+!!$  !> Function  base_mlv_mlt_a_2
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
 !!$  !!        z=beta*z+alpha*x*y
@@ -2122,7 +2149,7 @@ contains
 !!$  !! \param y(:) The array to be multiplied by
 !!$  !! \param info   return code
 !!$  !!
-!!$  subroutine d_base_mv_mlt_a_2(alpha,x,y,beta,z,info)
+!!$  subroutine d_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    real(psb_dpk_), intent(in)        :: alpha,beta
@@ -2187,20 +2214,20 @@ contains
 !!$        end if
 !!$      end if
 !!$    end if
-!!$  end subroutine d_base_mv_mlt_a_2
+!!$  end subroutine d_base_mlv_mlt_a_2
 !!$
 !!$  !
-!!$  !> Function  base_mv_mlt_v_2
+!!$  !> Function  base_mlv_mlt_v_2
 !!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mv_vect)
+!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
 !!$  !!        z=beta*z+alpha*x*y
 !!$  !! \param alpha
 !!$  !! \param beta
-!!$  !! \param x  The class(base_mv_vect) to be multiplied b
-!!$  !! \param y  The class(base_mv_vect) to be multiplied by
+!!$  !! \param x  The class(base_mlv_vect) to be multiplied b
+!!$  !! \param y  The class(base_mlv_vect) to be multiplied by
 !!$  !! \param info   return code
 !!$  !!
-!!$  subroutine d_base_mv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+!!$  subroutine d_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
 !!$    use psi_serial_mod
 !!$    use psb_string_mod
 !!$    implicit none 
@@ -2227,9 +2254,9 @@ contains
 !!$      if (conjgx_) x%v=(x%v)
 !!$      if (conjgy_) y%v=(y%v)
 !!$    end if
-!!$  end subroutine d_base_mv_mlt_v_2
+!!$  end subroutine d_base_mlv_mlt_v_2
 !!$
-!!$  subroutine d_base_mv_mlt_av(alpha,x,y,beta,z,info)
+!!$  subroutine d_base_mlv_mlt_av(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    real(psb_dpk_), intent(in)        :: alpha,beta
@@ -2243,9 +2270,9 @@ contains
 !!$    
 !!$    call z%mlt(alpha,x,y%v,beta,info)
 !!$
-!!$  end subroutine d_base_mv_mlt_av
+!!$  end subroutine d_base_mlv_mlt_av
 !!$
-!!$  subroutine d_base_mv_mlt_va(alpha,x,y,beta,z,info)
+!!$  subroutine d_base_mlv_mlt_va(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    real(psb_dpk_), intent(in)        :: alpha,beta
@@ -2259,18 +2286,18 @@ contains
 !!$    
 !!$    call z%mlt(alpha,y,x,beta,info)
 !!$
-!!$  end subroutine d_base_mv_mlt_va
+!!$  end subroutine d_base_mlv_mlt_va
 !!$
 !!$
 !!$  !
 !!$  ! Simple scaling 
 !!$  !
-!!$  !> Function  base_mv_scal
+!!$  !> Function  base_mlv_scal
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief Scale all entries  x = alpha*x
 !!$  !! \param alpha   The multiplier
 !!$  !!
-!!$  subroutine d_base_mv_scal(alpha, x)
+!!$  subroutine d_base_mlv_scal(alpha, x)
 !!$    use psi_serial_mod
 !!$    implicit none 
 !!$    class(psb_d_base_multivect_type), intent(inout)  :: x
@@ -2278,16 +2305,16 @@ contains
 !!$    
 !!$    if (allocated(x%v)) x%v = alpha*x%v
 !!$
-!!$  end subroutine d_base_mv_scal
+!!$  end subroutine d_base_mlv_scal
 !!$  
 !!$  !
 !!$  ! Norms 1, 2 and infinity
 !!$  !
-!!$  !> Function  base_mv_nrm2
+!!$  !> Function  base_mlv_nrm2
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief 2-norm |x(1:n)|_2
 !!$  !! \param n  how many entries to consider
-!!$  function d_base_mv_nrm2(n,x) result(res)
+!!$  function d_base_mlv_nrm2(n,x) result(res)
 !!$    implicit none 
 !!$    class(psb_d_base_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -2296,14 +2323,14 @@ contains
 !!$    
 !!$    res =  dnrm2(n,x%v,1)
 !!$
-!!$  end function d_base_mv_nrm2
+!!$  end function d_base_mlv_nrm2
 !!$  
 !!$  !
-!!$  !> Function  base_mv_amax
+!!$  !> Function  base_mlv_amax
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief infinity-norm |x(1:n)|_\infty
 !!$  !! \param n  how many entries to consider
-!!$  function d_base_mv_amax(n,x) result(res)
+!!$  function d_base_mlv_amax(n,x) result(res)
 !!$    implicit none 
 !!$    class(psb_d_base_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -2311,14 +2338,14 @@ contains
 !!$    
 !!$    res =  maxval(abs(x%v(1:n)))
 !!$
-!!$  end function d_base_mv_amax
+!!$  end function d_base_mlv_amax
 !!$
 !!$  !
-!!$  !> Function  base_mv_asum
+!!$  !> Function  base_mlv_asum
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief 1-norm |x(1:n)|_1
 !!$  !! \param n  how many entries to consider
-!!$  function d_base_mv_asum(n,x) result(res)
+!!$  function d_base_mlv_asum(n,x) result(res)
 !!$    implicit none 
 !!$    class(psb_d_base_multivect_type), intent(inout) :: x
 !!$    integer(psb_ipk_), intent(in)           :: n
@@ -2326,14 +2353,14 @@ contains
 !!$    
 !!$    res =  sum(abs(x%v(1:n)))
 !!$
-!!$  end function d_base_mv_asum
+!!$  end function d_base_mlv_asum
 !!$  
 !!$  
 !!$  !
 !!$  ! Gather: Y = beta * Y + alpha * X(IDX(:))
 !!$  !
 !!$  !
-!!$  !> Function  base_mv_gthab
+!!$  !> Function  base_mlv_gthab
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief gather into an array
 !!$  !!    Y = beta * Y + alpha * X(IDX(:))
@@ -2341,7 +2368,7 @@ contains
 !!$  !! \param idx(:) indices
 !!$  !! \param alpha
 !!$  !! \param beta
-!!$  subroutine d_base_mv_gthab(n,idx,alpha,x,beta,y)
+!!$  subroutine d_base_mlv_gthab(n,idx,alpha,x,beta,y)
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: n, idx(:)
 !!$    real(psb_dpk_) :: alpha, beta, y(:)
@@ -2350,17 +2377,17 @@ contains
 !!$    call x%sync()
 !!$    call psi_gth(n,idx,alpha,x%v,beta,y)
 !!$
-!!$  end subroutine d_base_mv_gthab
+!!$  end subroutine d_base_mlv_gthab
 !!$  !
 !!$  ! shortcut alpha=1 beta=0
 !!$  ! 
-!!$  !> Function  base_mv_gthzv
+!!$  !> Function  base_mlv_gthzv
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief gather into an array special alpha=1 beta=0
 !!$  !!    Y = X(IDX(:))
 !!$  !! \param n  how many entries to consider
 !!$  !! \param idx(:) indices
-!!$  subroutine d_base_mv_gthzv_x(i,n,idx,x,y)
+!!$  subroutine d_base_mlv_gthzv_x(i,n,idx,x,y)
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: i,n
 !!$    class(psb_d_base_multivect_type) :: idx
@@ -2369,18 +2396,18 @@ contains
 !!$    
 !!$    call x%gth(n,idx%v(i:),y)
 !!$
-!!$  end subroutine d_base_mv_gthzv_x
+!!$  end subroutine d_base_mlv_gthzv_x
 !!$
 !!$  !
 !!$  ! shortcut alpha=1 beta=0
 !!$  ! 
-!!$  !> Function  base_mv_gthzv
+!!$  !> Function  base_mlv_gthzv
 !!$  !! \memberof  psb_d_base_multivect_type
 !!$  !! \brief gather into an array special alpha=1 beta=0
 !!$  !!    Y = X(IDX(:))
 !!$  !! \param n  how many entries to consider
 !!$  !! \param idx(:) indices
-!!$  subroutine d_base_mv_gthzv(n,idx,x,y)
+!!$  subroutine d_base_mlv_gthzv(n,idx,x,y)
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: n, idx(:)
 !!$    real(psb_dpk_) ::  y(:)
@@ -2389,22 +2416,22 @@ contains
 !!$    call x%sync()
 !!$    call psi_gth(n,idx,x%v,y)
 !!$
-!!$  end subroutine d_base_mv_gthzv
+!!$  end subroutine d_base_mlv_gthzv
 !!$
 !!$  !
 !!$  ! Scatter: 
 !!$  ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
 !!$  ! 
 !!$  !
-!!$  !> Function  base_mv_sctb
+!!$  !> Function  base_mlv_sctb
 !!$  !! \memberof  psb_d_base_multivect_type
-!!$  !! \brief scatter into a class(base_mv_vect)
+!!$  !! \brief scatter into a class(base_mlv_vect)
 !!$  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
 !!$  !! \param n  how many entries to consider
 !!$  !! \param idx(:) indices
 !!$  !! \param beta
 !!$  !! \param x(:) 
-!!$  subroutine d_base_mv_sctb(n,idx,x,beta,y)
+!!$  subroutine d_base_mlv_sctb(n,idx,x,beta,y)
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: n, idx(:)
 !!$    real(psb_dpk_) :: beta, x(:)
@@ -2414,9 +2441,9 @@ contains
 !!$    call psi_sct(n,idx,x,beta,y%v)
 !!$    call y%set_host()
 !!$
-!!$  end subroutine d_base_mv_sctb
+!!$  end subroutine d_base_mlv_sctb
 !!$
-!!$  subroutine d_base_mv_sctb_x(i,n,idx,x,beta,y)
+!!$  subroutine d_base_mlv_sctb_x(i,n,idx,x,beta,y)
 !!$    use psi_serial_mod
 !!$    integer(psb_ipk_) :: i, n
 !!$    class(psb_d_base_multivect_type) :: idx
@@ -2425,6 +2452,6 @@ contains
 !!$    
 !!$    call y%sct(n,idx%v(i:),x,beta)
 !!$
-!!$  end subroutine d_base_mv_sctb_x
+!!$  end subroutine d_base_mlv_sctb_x
 end module psb_d_base_multivect_mod
 
