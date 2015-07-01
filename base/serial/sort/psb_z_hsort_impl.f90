@@ -42,7 +42,7 @@
   !  Addison-Wesley
   !
 submodule (psb_z_sort_mod) psb_z_hsort_impl_mod
-
+  
 contains
 
   subroutine psb_zhsort(x,ix,dir,flag)
@@ -402,9 +402,9 @@ contains
     !   heap: the heap
     !   dir:  sorting direction
 
-    complex(psb_dpk_), intent(inout)     :: key
-    integer(psb_ipk_), intent(in)      :: dir
-    complex(psb_dpk_), intent(inout)  :: heap(:)
+    complex(psb_dpk_), intent(out)      :: key
+    integer(psb_ipk_), intent(in)     :: dir
+    complex(psb_dpk_), intent(inout)    :: heap(:)
     integer(psb_ipk_), intent(inout)  :: last
     integer(psb_ipk_), intent(out)    :: info
 
@@ -878,9 +878,9 @@ contains
     !   heap: the heap
     !   dir:  sorting direction
 
-    complex(psb_dpk_), intent(inout)     :: key
-    integer(psb_ipk_), intent(out)     :: index
-    integer(psb_ipk_), intent(in)      :: dir
+    complex(psb_dpk_), intent(out)      :: key
+    integer(psb_ipk_), intent(out)    :: index
+    integer(psb_ipk_), intent(in)     :: dir
     complex(psb_dpk_), intent(inout)    :: heap(:)
     integer(psb_ipk_), intent(inout)  :: idxs(:)
     integer(psb_ipk_), intent(inout)  :: last

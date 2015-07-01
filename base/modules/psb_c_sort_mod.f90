@@ -190,7 +190,7 @@ module psb_c_sort_mod
   interface 
     module subroutine psi_c_heap_get_first(key,last,heap,dir,info)
       implicit none 
-      complex(psb_spk_), intent(inout)  :: key
+      complex(psb_spk_), intent(out)  :: key
       integer(psb_ipk_), intent(inout)  :: last
       integer(psb_ipk_), intent(in)     :: dir
       complex(psb_spk_), intent(inout)  :: heap(:)

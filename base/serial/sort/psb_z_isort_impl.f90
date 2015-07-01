@@ -139,59 +139,59 @@ contains
     return
   end subroutine psb_zisort
 
-  subroutine psi_zlisrx_up(n,x,idx)
+  subroutine psi_zlisrx_up(n,x,ix)
     use psb_error_mod
     use psi_lcx_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (x(i) >= xx) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
 
   end subroutine psi_zlisrx_up
 
-  subroutine psi_zlisrx_dw(n,x,idx)
+  subroutine psi_zlisrx_dw(n,x,ix)
     use psb_error_mod
     use psi_lcx_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (x(i) <= xx) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
   end subroutine psi_zlisrx_dw
@@ -244,58 +244,58 @@ contains
     enddo
   end subroutine psi_zlisr_dw
 
-  subroutine psi_zalisrx_up(n,x,idx)
+  subroutine psi_zalisrx_up(n,x,ix)
     use psb_error_mod
     use psi_alcx_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (x(i) >= xx) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
   end subroutine psi_zalisrx_up
 
-  subroutine psi_zalisrx_dw(n,x,idx)
+  subroutine psi_zalisrx_dw(n,x,ix)
     use psb_error_mod
     use psi_alcx_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (x(i) <= xx) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
   end subroutine psi_zalisrx_dw
@@ -348,56 +348,56 @@ contains
     enddo
   end subroutine psi_zalisr_dw
 
-  subroutine psi_zaisrx_up(n,x,idx)
+  subroutine psi_zaisrx_up(n,x,ix)
     use psb_error_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (abs(x(j+1)) < abs(x(j))) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (abs(x(i)) >= abs(xx)) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
   end subroutine psi_zaisrx_up
 
-  subroutine psi_zaisrx_dw(n,x,idx)
+  subroutine psi_zaisrx_dw(n,x,ix)
     use psb_error_mod
     implicit none 
     complex(psb_dpk_), intent(inout)  :: x(:) 
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_ipk_), intent(inout) :: ix(:)
     integer(psb_ipk_), intent(in)   :: n
-    integer(psb_ipk_) :: i,j,ix
+    integer(psb_ipk_) :: i,j,itx
     complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (abs(x(j+1)) > abs(x(j))) then
         xx = x(j)
-        ix = idx(j) 
+        itx = ix(j) 
         i=j+1
         do 
           x(i-1)    = x(i)
-          idx(i-1) = idx(i)
+          ix(i-1) = ix(i)
           i = i+1
           if (i>n) exit          
           if (abs(x(i)) <= abs(xx)) exit
         end do
         x(i-1)    = xx
-        idx(i-1) = ix
+        ix(i-1) = itx
       endif
     enddo
   end subroutine psi_zaisrx_dw

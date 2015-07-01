@@ -42,7 +42,7 @@
   !  Addison-Wesley
   !
 submodule (psb_d_sort_mod) psb_d_hsort_impl_mod
-
+  
 contains
 
   subroutine psb_dhsort(x,ix,dir,flag)
@@ -295,7 +295,7 @@ contains
   subroutine psi_d_heap_get_first(key,last,heap,dir,info)
     implicit none 
 
-    real(psb_dpk_), intent(inout)     :: key
+    real(psb_dpk_), intent(out)     :: key
     integer(psb_ipk_), intent(inout)  :: last
     integer(psb_ipk_), intent(in)     :: dir
     real(psb_dpk_), intent(inout)     :: heap(:)
