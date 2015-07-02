@@ -113,7 +113,7 @@ subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   real(psb_dpk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals

@@ -113,7 +113,7 @@ subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
 
-  integer(psb_ipk_) :: n, idx(:)
+  integer(psb_ipk_) :: n, k, idx(:)
   integer(psb_ipk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals
