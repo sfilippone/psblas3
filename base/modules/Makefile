@@ -23,7 +23,8 @@ UTIL_MODS = psb_string_mod.o psb_desc_const_mod.o psb_indx_map_mod.o\
 	psb_vect_mod.o\
 	psb_s_psblas_mod.o psb_c_psblas_mod.o \
 	psb_d_psblas_mod.o psb_z_psblas_mod.o psb_psblas_mod.o \
-	psi_serial_mod.o \
+	psi_serial_mod.o psi_i_serial_mod.o \
+	psi_s_serial_mod.o psi_d_serial_mod.o psi_c_serial_mod.o psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
 	psb_ip_reord_mod.o\
 	psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o \
@@ -140,6 +141,8 @@ psb_c_comm_mod.o: psb_c_vect_mod.o psb_desc_mod.o psb_mat_mod.o
 psb_z_comm_mod.o: psb_z_vect_mod.o psb_desc_mod.o psb_mat_mod.o 
 psb_sort_mod.o: psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o \
 	psb_c_sort_mod.o psb_z_sort_mod.o psb_ip_reord_mod.o psi_serial_mod.o
+psi_serial_mod.o:  psi_i_serial_mod.o \
+	psi_s_serial_mod.o psi_d_serial_mod.o psi_c_serial_mod.o psi_z_serial_mod.o 
 
 psb_base_mod.o: $(MODULES)
 

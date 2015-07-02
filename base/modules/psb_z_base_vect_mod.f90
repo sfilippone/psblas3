@@ -1439,7 +1439,7 @@ module psb_z_base_multivect_mod
 !!$    ! Gather/scatter. These are needed for MPI interfacing.
 !!$    ! May have to be reworked. 
 !!$    !
-!!$    procedure, pass(x) :: gthab    => z_base_mlv_gthab
+    procedure, pass(x) :: gthab    => z_base_mlv_gthab
 !!$    procedure, pass(x) :: gthzv    => z_base_mlv_gthzv
 !!$    procedure, pass(x) :: gthzv_x  => z_base_mlv_gthzv_x
 !!$    generic, public    :: gth      => gthab, gthzv, gthzv_x
@@ -2406,30 +2406,35 @@ contains
     end if
     
   end subroutine z_base_mlv_absval2
-!!$  
-!!$  
-!!$  !
-!!$  ! Gather: Y = beta * Y + alpha * X(IDX(:))
-!!$  !
-!!$  !
-!!$  !> Function  base_mlv_gthab
-!!$  !! \memberof  psb_z_base_multivect_type
-!!$  !! \brief gather into an array
-!!$  !!    Y = beta * Y + alpha * X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  subroutine z_base_mlv_gthab(n,idx,alpha,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    complex(psb_dpk_) :: alpha, beta, y(:)
-!!$    class(psb_z_base_multivect_type) :: x
-!!$    
-!!$    call x%sync()
-!!$    call psi_gth(n,idx,alpha,x%v,beta,y)
-!!$
-!!$  end subroutine z_base_mlv_gthab
+  
+  
+  !
+  ! Gather: Y = beta * Y + alpha * X(IDX(:))
+  !
+  !
+  !> Function  base_mlv_gthab
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief gather into an array
+  !!    Y = beta * Y + alpha * X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param alpha
+  !! \param beta
+  subroutine z_base_mlv_gthab(n,idx,alpha,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    complex(psb_dpk_) :: alpha, beta, y(:)
+    class(psb_z_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+
+    call x%sync()
+    if (.not.allocated(x%v)) then
+      return
+    end if
+    nc = psb_size(x%v,2)
+    call psi_gth(n,nc,idx,alpha,x%v,beta,y)
+    
+  end subroutine z_base_mlv_gthab
 !!$  !
 !!$  ! shortcut alpha=1 beta=0
 !!$  ! 

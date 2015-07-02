@@ -1,7 +1,9 @@
 include ../../Make.inc
 
 
-FOBJS = psb_lsame.o psi_serial_impl.o \
+FOBJS = psb_lsame.o psi_i_serial_impl.o \
+	psi_s_serial_impl.o psi_d_serial_impl.o \
+	psi_c_serial_impl.o psi_z_serial_impl.o \
 	psb_srwextd.o psb_drwextd.o psb_crwextd.o psb_zrwextd.o \
 	psb_sspspmm.o psb_dspspmm.o psb_cspspmm.o psb_zspspmm.o \
 	psb_ssymbmm.o psb_dsymbmm.o psb_csymbmm.o psb_zsymbmm.o \
