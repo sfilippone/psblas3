@@ -98,12 +98,17 @@ module psb_z_csr_mat_mod
     procedure, pass(a) :: print       => psb_z_csr_print
     procedure, pass(a) :: free        => z_csr_free
     procedure, pass(a) :: mold        => psb_z_csr_mold
-
+    procedure, pass(a) :: get_irpp    => z_csr_get_irpp
+    procedure, pass(a) :: get_jap     => z_csr_get_jap
+    procedure, pass(a) :: get_valp    => z_csr_get_valp
   end type psb_z_csr_sparse_mat
 
   private :: z_csr_get_nzeros, z_csr_free,  z_csr_get_fmt, &
        & z_csr_get_size, z_csr_sizeof, z_csr_get_nz_row, &
-       & z_csr_is_by_rows
+       & z_csr_is_by_rows, z_csr_get_irpp, z_csr_get_jap, &
+       & z_csr_get_valp
+
+  
 
   !> \memberof psb_z_csr_sparse_mat
   !| \see psb_base_mat_mod::psb_base_reallocate_nz
@@ -579,6 +584,45 @@ contains
     return
 
   end subroutine z_csr_free
+  
+  function z_csr_get_irpp(a) result(res)
+    implicit none 
+    class(psb_z_csr_sparse_mat), intent(in), target  :: a
+    integer(psb_ipk_), pointer  :: res(:)
+    
+    if (allocated(a%irp)) then 
+      res => a%irp
+    else
+      res => null()
+    end if
+    
+  end function z_csr_get_irpp
 
+  function z_csr_get_jap(a) result(res)
+    implicit none 
+    class(psb_z_csr_sparse_mat), intent(in), target  :: a
+    integer(psb_ipk_), pointer  :: res(:)
+
+    
+    if (allocated(a%ja)) then 
+      res => a%ja
+    else
+      res => null()
+    end if
+    
+  end function z_csr_get_jap
+
+  function z_csr_get_valp(a) result(res)
+    implicit none 
+    class(psb_z_csr_sparse_mat), intent(in), target  :: a
+    complex(psb_dpk_), pointer  :: res(:)
+    
+    if (allocated(a%val)) then 
+      res => a%val
+    else
+      res => null()
+    end if
+    
+  end function z_csr_get_valp
 
 end module psb_z_csr_mat_mod

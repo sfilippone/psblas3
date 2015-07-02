@@ -86,8 +86,9 @@
 submodule (psi_d_mod) psi_dswapdata_mod
 
 contains
+
   subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
-    
+
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -156,7 +157,7 @@ contains
 
   subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
-    use psi_serial_mod
+
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -657,7 +658,7 @@ contains
   ! 
   subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
-    use psi_serial_mod
+
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -1111,7 +1112,6 @@ contains
     use psb_desc_mod
     use psb_penv_mod
     use psb_d_base_vect_mod
-    use psi_serial_mod
 #ifdef MPI_MOD
     use mpi
 #endif

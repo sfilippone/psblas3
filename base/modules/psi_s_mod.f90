@@ -76,9 +76,9 @@ module psi_s_mod
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_sswapidxv
-    module subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_sswap_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_s_base_vect_type)             :: y
       real(psb_spk_)                       :: beta
@@ -131,9 +131,9 @@ module psi_s_mod
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxv
-    module subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_stran_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_s_base_vect_type)             :: y
       real(psb_spk_)                       :: beta

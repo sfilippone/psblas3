@@ -160,7 +160,7 @@ contains
   end subroutine psi_dswaptranm
 
   subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
-    use psi_serial_mod
+
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -661,7 +661,6 @@ contains
 
   subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
 
-    use psi_serial_mod
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -1127,7 +1126,7 @@ contains
   ! 
   subroutine psi_dtran_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
        & totxch,totsnd,totrcv,work,info)
-    use psi_serial_mod
+
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
@@ -1164,7 +1163,7 @@ contains
     info=psb_success_
     name='psi_swap_tran'
     call psb_erractionsave(err_act)
-    iictxt = ictxt         
+    iictxt = ictxt
     iicomm = icomm
 
     call psb_info(iictxt,me,np) 

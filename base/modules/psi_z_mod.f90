@@ -76,9 +76,9 @@ module psi_z_mod
       complex(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_zswapidxv
-    module subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_zswap_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_z_base_vect_type)             :: y
       complex(psb_dpk_)                       :: beta
@@ -131,9 +131,9 @@ module psi_z_mod
       complex(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ztranidxv
-    module subroutine psi_ztran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_ztran_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_z_base_vect_type)             :: y
       complex(psb_dpk_)                       :: beta

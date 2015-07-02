@@ -218,9 +218,9 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxv
-    module subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_iswap_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_i_base_vect_type)             :: y
       integer(psb_ipk_)                       :: beta
@@ -273,9 +273,9 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxv
-    module subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
+    module subroutine psi_itran_vidx_vect(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(in)           :: ictxt,icomm,flag
       integer(psb_ipk_), intent(out)          :: info
       class(psb_i_base_vect_type)             :: y
       integer(psb_ipk_)                       :: beta
