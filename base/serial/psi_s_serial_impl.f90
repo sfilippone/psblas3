@@ -54,6 +54,7 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
 
   return
 end subroutine psi_saxpby
+
 subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   
   use psb_const_mod
@@ -105,8 +106,94 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   return
 
 end subroutine psi_saxpbyv
+
+
+subroutine psi_sgthmv(n,k,idx,alpha,x,beta,y)
+
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, idx(:)
+  real(psb_spk_) :: x(:,:), y(:),alpha,beta
+
+  ! Locals
+  integer(psb_ipk_) :: i, j, pt
+
+  if (beta == szero) then 
+    if (alpha == szero) then 
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = szero
+        end do
+      end do
+    else if (alpha == sone) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = x(idx(i),j)
+        end do
+      end do
+    else if (alpha == -sone) then 
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1                
+          y(pt) = -x(idx(i),j)
+        end do
+      end do
+    else
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = alpha*x(idx(i),j)
+        end do
+      end do
+    end if
+  else 
+    if (beta == sone) then 
+      ! Do nothing
+    else if (beta == -sone) then 
+      y(1:n*k) = -y(1:n*k) 
+    else
+      y(1:n*k) = beta*y(1:n*k) 
+    end if
+
+    if (alpha == szero) then 
+      ! do nothing
+    else if (alpha == sone) then 
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = y(pt) + x(idx(i),j)
+        end do
+      end do
+    else if (alpha == -sone) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = y(pt) - x(idx(i),j)
+        end do
+      end do
+    else  
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(pt) = y(pt) + alpha*x(idx(i),j)
+        end do
+      end do
+    end if
+  end if
+
+end subroutine psi_sgthmv
+
 subroutine psi_sgthv(n,idx,alpha,x,beta,y)
-  
 
   use psb_const_mod
   implicit none
@@ -161,8 +248,8 @@ subroutine psi_sgthv(n,idx,alpha,x,beta,y)
   end if
 
 end subroutine psi_sgthv
+
 subroutine psi_sgthzmv(n,k,idx,x,y)
-  
 
   use psb_const_mod
   implicit none
@@ -182,8 +269,8 @@ subroutine psi_sgthzmv(n,k,idx,x,y)
   end do
 
 end subroutine psi_sgthzmv
+
 subroutine psi_sgthzv(n,idx,x,y)
-  
 
   use psb_const_mod
   implicit none
@@ -199,9 +286,9 @@ subroutine psi_sgthzv(n,idx,x,y)
   end do
 
 end subroutine psi_sgthzv
+
 subroutine psi_ssctmv(n,k,idx,x,beta,y)
   
-
   use psb_const_mod
   implicit none
 
@@ -237,8 +324,8 @@ subroutine psi_ssctmv(n,k,idx,x,beta,y)
     end do
   end if
 end subroutine psi_ssctmv
+
 subroutine psi_ssctv(n,idx,x,beta,y)
-  
 
   use psb_const_mod
   implicit none
