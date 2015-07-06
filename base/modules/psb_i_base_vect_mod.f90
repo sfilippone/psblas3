@@ -880,6 +880,7 @@ module psb_i_base_multivect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
+  use psb_i_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type 

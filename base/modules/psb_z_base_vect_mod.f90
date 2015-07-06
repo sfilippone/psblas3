@@ -1340,6 +1340,7 @@ module psb_z_base_multivect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
+  use psb_z_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_z_base_vect_type
   !! The psb_z_base_vect_type 
@@ -1440,9 +1441,9 @@ module psb_z_base_multivect_mod
 !!$    ! May have to be reworked. 
 !!$    !
     procedure, pass(x) :: gthab    => z_base_mlv_gthab
-!!$    procedure, pass(x) :: gthzv    => z_base_mlv_gthzv
-!!$    procedure, pass(x) :: gthzv_x  => z_base_mlv_gthzv_x
-!!$    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(x) :: gthzv    => z_base_mlv_gthzv
+    procedure, pass(x) :: gthzv_x  => z_base_mlv_gthzv_x
+    generic, public    :: gth      => gthab, gthzv, gthzv_x
 !!$    procedure, pass(y) :: sctb     => z_base_mlv_sctb
 !!$    procedure, pass(y) :: sctb_x   => z_base_mlv_sctb_x
 !!$    generic, public    :: sct      => sctb, sctb_x
@@ -2435,46 +2436,53 @@ contains
     call psi_gth(n,nc,idx,alpha,x%v,beta,y)
     
   end subroutine z_base_mlv_gthab
-!!$  !
-!!$  ! shortcut alpha=1 beta=0
-!!$  ! 
-!!$  !> Function  base_mlv_gthzv
-!!$  !! \memberof  psb_z_base_multivect_type
-!!$  !! \brief gather into an array special alpha=1 beta=0
-!!$  !!    Y = X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  subroutine z_base_mlv_gthzv_x(i,n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i,n
-!!$    class(psb_z_base_multivect_type) :: idx
-!!$    complex(psb_dpk_) ::  y(:)
-!!$    class(psb_z_base_multivect_type) :: x
-!!$    
-!!$    call x%gth(n,idx%v(i:),y)
-!!$
-!!$  end subroutine z_base_mlv_gthzv_x
-!!$
-!!$  !
-!!$  ! shortcut alpha=1 beta=0
-!!$  ! 
-!!$  !> Function  base_mlv_gthzv
-!!$  !! \memberof  psb_z_base_multivect_type
-!!$  !! \brief gather into an array special alpha=1 beta=0
-!!$  !!    Y = X(IDX(:))
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  subroutine z_base_mlv_gthzv(n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    complex(psb_dpk_) ::  y(:)
-!!$    class(psb_z_base_multivect_type) :: x
-!!$    
-!!$    call x%sync()
-!!$    call psi_gth(n,idx,x%v,y)
-!!$
-!!$  end subroutine z_base_mlv_gthzv
-!!$
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_mlv_gthzv
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  subroutine z_base_mlv_gthzv_x(i,n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    complex(psb_dpk_) ::  y(:)
+    class(psb_z_base_multivect_type) :: x
+
+    call x%sync()
+    call x%gth(n,idx%v(i:),y)
+
+  end subroutine z_base_mlv_gthzv_x
+
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_mlv_gthzv
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  subroutine z_base_mlv_gthzv(n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    complex(psb_dpk_) ::  y(:)
+    class(psb_z_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+
+    call x%sync()
+    if (.not.allocated(x%v)) then
+      return
+    end if
+    nc = psb_size(x%v,2)
+    
+    call psi_gth(n,nc,idx,x%v,y)
+
+  end subroutine z_base_mlv_gthzv
+
 !!$  !
 !!$  ! Scatter: 
 !!$  ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
