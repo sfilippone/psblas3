@@ -732,26 +732,6 @@ contains
     call x%gth(n,idx%v(i:),x%combuf(i:))
 
   end subroutine i_base_gthzbuf
-
-  subroutine i_base_sctb_buf(i,n,idx,beta,y)
-    use psi_serial_mod
-    integer(psb_ipk_) :: i, n
-    class(psb_i_base_vect_type) :: idx
-    integer(psb_ipk_) :: beta
-    class(psb_i_base_vect_type) :: y
-    
-    
-    if (.not.allocated(y%combuf)) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
-      return
-    end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
-    call y%set_host()
-
-  end subroutine i_base_sctb_buf
-
   !
   !> Function  base_device_wait:
   !! \memberof  psb_i_base_vect_type
@@ -868,6 +848,26 @@ contains
     call y%set_host()
 
   end subroutine i_base_sctb_x
+
+
+  subroutine i_base_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) :: beta
+    class(psb_i_base_vect_type) :: y
+    
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    call y%set_host()
+
+  end subroutine i_base_sctb_buf
 
 end module psb_i_base_vect_mod
 

@@ -925,7 +925,6 @@ contains
     if (z%is_dev()) call z%sync()
 
     n = min(size(z%v), size(x), size(y))
-!!$    write(0,*) 'Mlt_a_2: ',n
     if (alpha == szero) then 
       if (beta == sone) then 
         return 
@@ -1192,26 +1191,6 @@ contains
     call x%gth(n,idx%v(i:),x%combuf(i:))
 
   end subroutine s_base_gthzbuf
-
-  subroutine s_base_sctb_buf(i,n,idx,beta,y)
-    use psi_serial_mod
-    integer(psb_ipk_) :: i, n
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) :: beta
-    class(psb_s_base_vect_type) :: y
-    
-    
-    if (.not.allocated(y%combuf)) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
-      return
-    end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
-    call y%set_host()
-
-  end subroutine s_base_sctb_buf
-
   !
   !> Function  base_device_wait:
   !! \memberof  psb_s_base_vect_type
@@ -1329,6 +1308,26 @@ contains
 
   end subroutine s_base_sctb_x
 
+
+  subroutine s_base_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    real(psb_spk_) :: beta
+    class(psb_s_base_vect_type) :: y
+    
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    call y%set_host()
+
+  end subroutine s_base_sctb_buf
+
 end module psb_s_base_vect_mod
 
 
@@ -1415,20 +1414,23 @@ module psb_s_base_multivect_mod
     procedure, pass(y) :: axpby_v  => s_base_mlv_axpby_v
     procedure, pass(y) :: axpby_a  => s_base_mlv_axpby_a
     generic, public    :: axpby    => axpby_v, axpby_a
-!!$    !
-!!$    ! Vector by vector multiplication. Need all variants
-!!$    ! to handle multiple requirements from preconditioners
-!!$    !
-!!$    procedure, pass(y) :: mlt_v    => s_base_mlv_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => s_base_mlv_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => s_base_mlv_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => s_base_mlv_mlt_v_2
+    !
+    ! MultiVector by vector/multivector multiplication. Need all variants
+    ! to handle multiple requirements from preconditioners
+    !
+    procedure, pass(y) :: mlt_mv   => s_base_mlv_mlt_mv
+    procedure, pass(y) :: mlt_mv_v => s_base_mlv_mlt_mv_v
+    procedure, pass(y) :: mlt_ar1  => s_base_mlv_mlt_ar1
+    procedure, pass(y) :: mlt_ar2  => s_base_mlv_mlt_ar2
+    procedure, pass(z) :: mlt_a_2  => s_base_mlv_mlt_a_2
+    procedure, pass(z) :: mlt_v_2  => s_base_mlv_mlt_v_2
 !!$    procedure, pass(z) :: mlt_va   => s_base_mlv_mlt_va
 !!$    procedure, pass(z) :: mlt_av   => s_base_mlv_mlt_av
-!!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2, mlt_v_2, mlt_av, mlt_va
-!!$    !
-!!$    ! Scaling and norms
-!!$    !
+    generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
+         & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+    !
+    ! Scaling and norms
+    !
     procedure, pass(x) :: scal     => s_base_mlv_scal
     procedure, pass(x) :: nrm2     => s_base_mlv_nrm2
     procedure, pass(x) :: amax     => s_base_mlv_amax
@@ -1444,9 +1446,9 @@ module psb_s_base_multivect_mod
     procedure, pass(x) :: gthzv    => s_base_mlv_gthzv
     procedure, pass(x) :: gthzv_x  => s_base_mlv_gthzv_x
     generic, public    :: gth      => gthab, gthzv, gthzv_x
-!!$    procedure, pass(y) :: sctb     => s_base_mlv_sctb
-!!$    procedure, pass(y) :: sctb_x   => s_base_mlv_sctb_x
-!!$    generic, public    :: sct      => sctb, sctb_x
+    procedure, pass(y) :: sctb     => s_base_mlv_sctb
+    procedure, pass(y) :: sctb_x   => s_base_mlv_sctb_x
+    generic, public    :: sct      => sctb, sctb_x
   end type psb_s_base_multivect_type
 
   interface psb_s_base_multivect
@@ -2082,183 +2084,194 @@ contains
   end subroutine s_base_mlv_axpby_a
 
   
-!!$  !
-!!$  !  Multiple variants of two operations:
-!!$  !  Simple multiplication  Y(:) = X(:)*Y(:)
-!!$  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
-!!$  !
-!!$  !  Variants expanded according to the dynamic type
-!!$  !  of the involved entities
-!!$  !
-!!$  !
-!!$  !> Function  base_mlv_mlt_a
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief Vector entry-by-entry multiply  by a base_mlv_vect array y=x*y
-!!$  !! \param x   The class(base_mlv_vect) to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine s_base_mlv_mlt_v(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    select type(xx => x)
-!!$    type is (psb_s_base_multivect_type)
-!!$      n = min(size(y%v), size(xx%v))
-!!$      do i=1, n 
-!!$        y%v(i) = y%v(i)*xx%v(i)
-!!$      end do
-!!$    class default
-!!$      call y%mlt(x%v,info)
-!!$    end select
-!!$
-!!$  end subroutine s_base_mlv_mlt_v
-!!$
-!!$  !
-!!$  !> Function  base_mlv_mlt_a
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief Vector entry-by-entry multiply  by a normal array y=x*y
-!!$  !! \param x(:) The array to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine s_base_mlv_mlt_a(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    real(psb_spk_), intent(in)        :: x(:)
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: y
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$    n = min(size(y%v), size(x))
-!!$    do i=1, n 
-!!$      y%v(i) = y%v(i)*x(i)
-!!$    end do
-!!$    
-!!$  end subroutine s_base_mlv_mlt_a
-!!$
-!!$
-!!$  !
-!!$  !> Function  base_mlv_mlt_a_2
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
-!!$  !!        z=beta*z+alpha*x*y
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  !! \param x(:) The array to be multiplied b
-!!$  !! \param y(:) The array to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine s_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    real(psb_spk_), intent(in)        :: alpha,beta
-!!$    real(psb_spk_), intent(in)        :: y(:)
-!!$    real(psb_spk_), intent(in)        :: x(:)
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0    
-!!$    n = min(size(z%v), size(x), size(y))
-!!$    if (alpha == izero) then 
-!!$      if (beta == ione) then 
-!!$        return 
-!!$      else
-!!$        do i=1, n
-!!$          z%v(i) = beta*z%v(i)
-!!$        end do
-!!$      end if
-!!$    else
-!!$      if (alpha == ione) then 
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) + y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) + y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      else if (alpha == -ione) then 
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = -y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) - y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) - y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      else
-!!$        if (beta == izero) then 
-!!$          do i=1, n 
-!!$            z%v(i) = alpha*y(i)*x(i)
-!!$          end do
-!!$        else if (beta == ione) then 
-!!$          do i=1, n 
-!!$            z%v(i) = z%v(i) + alpha*y(i)*x(i)
-!!$          end do
-!!$        else 
-!!$          do i=1, n 
-!!$            z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
-!!$          end do
-!!$        end if
-!!$      end if
-!!$    end if
-!!$  end subroutine s_base_mlv_mlt_a_2
-!!$
-!!$  !
-!!$  !> Function  base_mlv_mlt_v_2
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
-!!$  !!        z=beta*z+alpha*x*y
-!!$  !! \param alpha
-!!$  !! \param beta
-!!$  !! \param x  The class(base_mlv_vect) to be multiplied b
-!!$  !! \param y  The class(base_mlv_vect) to be multiplied by
-!!$  !! \param info   return code
-!!$  !!
-!!$  subroutine s_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-!!$    use psi_serial_mod
-!!$    use psb_string_mod
-!!$    implicit none 
-!!$    real(psb_spk_), intent(in)        :: alpha,beta
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: y
-!!$    class(psb_s_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info    
-!!$    character(len=1), intent(in), optional     :: conjgx, conjgy
-!!$    integer(psb_ipk_) :: i, n
-!!$    logical :: conjgx_, conjgy_
-!!$
-!!$    info = 0
-!!$    if (.not.psb_i_is_complex_) then
-!!$      call z%mlt(alpha,x%v,y%v,beta,info)
-!!$    else 
-!!$      conjgx_=.false.
-!!$      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-!!$      conjgy_=.false.
-!!$      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-!!$      if (conjgx_) x%v=(x%v)
-!!$      if (conjgy_) y%v=(y%v)
-!!$      call z%mlt(alpha,x%v,y%v,beta,info)
-!!$      if (conjgx_) x%v=(x%v)
-!!$      if (conjgy_) y%v=(y%v)
-!!$    end if
-!!$  end subroutine s_base_mlv_mlt_v_2
+  !
+  !  Multiple variants of two operations:
+  !  Simple multiplication  Y(:.:) = X(:,:)*Y(:,:)
+  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
+  !
+  !  Variants expanded according to the dynamic type
+  !  of the involved entities
+  !
+  !
+  !> Function  base_mlv_mlt_mv
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief Multivector entry-by-entry multiply  by a base_mlv_multivect  y=x*y
+  !! \param x   The class(base_mlv_vect) to be multiplied by
+  !! \param info   return code
+  !!
+  subroutine s_base_mlv_mlt_mv(x, y, info)
+    use psi_serial_mod
+    implicit none 
+    class(psb_s_base_multivect_type), intent(inout)  :: x
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info    
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call y%mlt(x%v,info)
+      
+  end subroutine s_base_mlv_mlt_mv
+
+  subroutine s_base_mlv_mlt_mv_v(x, y, info)
+    use psi_serial_mod
+    implicit none 
+    class(psb_s_base_vect_type), intent(inout)  :: x
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info    
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    call y%mlt(x%v,info)
+      
+  end subroutine s_base_mlv_mlt_mv_v
+
+  !
+  !> Function  base_mlv_mlt_ar1
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief MultiVector entry-by-entry multiply  by a rank 1 array y=x*y
+  !! \param x(:) The array to be multiplied by
+  !! \param info   return code
+  !!
+  subroutine s_base_mlv_mlt_ar1(x, y, info)
+    use psi_serial_mod
+    implicit none 
+    real(psb_spk_), intent(in)        :: x(:)
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    n = min(psb_size(y%v,1), size(x))
+    do i=1, n 
+      y%v(i,:) = y%v(i,:)*x(i)
+    end do
+    
+  end subroutine s_base_mlv_mlt_ar1
+
+  !
+  !> Function  base_mlv_mlt_ar2
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief MultiVector entry-by-entry multiply  by a rank 2 array y=x*y
+  !! \param x(:,:) The array to be multiplied by
+  !! \param info   return code
+  !!
+  subroutine s_base_mlv_mlt_ar2(x, y, info)
+    use psi_serial_mod
+    implicit none 
+    real(psb_spk_), intent(in)        :: x(:,:)
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, nr,nc
+
+    info = 0
+    nr   = min(psb_size(y%v,1), size(x,1))
+    nc   = min(psb_size(y%v,2), size(x,2))
+    y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
+    
+  end subroutine s_base_mlv_mlt_ar2
+
+
+  !
+  !> Function  base_mlv_mlt_a_2
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
+  !!        z=beta*z+alpha*x*y
+  !! \param alpha
+  !! \param beta
+  !! \param x(:) The array to be multiplied b
+  !! \param y(:) The array to be multiplied by
+  !! \param info   return code
+  !!
+  subroutine s_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
+    use psi_serial_mod
+    implicit none 
+    real(psb_spk_), intent(in)        :: alpha,beta
+    real(psb_spk_), intent(in)        :: y(:,:)
+    real(psb_spk_), intent(in)        :: x(:,:)
+    class(psb_s_base_multivect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, nr, nc
+
+    info = 0    
+    nr = min(psb_size(z%v,1), size(x,1), size(y,1))
+    nc = min(psb_size(z%v,2), size(x,2), size(y,2))    
+    if (alpha == szero) then 
+      if (beta == sone) then 
+        return 
+      else
+        z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc)
+      end if
+    else
+      if (alpha == sone) then 
+        if (beta == szero) then 
+          z%v(1:nr,1:nc) = y(1:nr,1:nc)*x(1:nr,1:nc)
+        else if (beta == sone) then 
+          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
+        else 
+          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
+        end if
+      else if (alpha == -sone) then 
+        if (beta == szero) then 
+          z%v(1:nr,1:nc) = -y(1:nr,1:nc)*x(1:nr,1:nc)
+        else if (beta == sone) then 
+          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
+        else 
+          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
+        end if
+      else
+        if (beta == szero) then 
+          z%v(1:nr,1:nc) = alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+        else if (beta == sone) then 
+          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+        else 
+          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+        end if
+      end if
+    end if
+  end subroutine s_base_mlv_mlt_a_2
+
+  !
+  !> Function  base_mlv_mlt_v_2
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
+  !!        z=beta*z+alpha*x*y
+  !! \param alpha
+  !! \param beta
+  !! \param x  The class(base_mlv_vect) to be multiplied b
+  !! \param y  The class(base_mlv_vect) to be multiplied by
+  !! \param info   return code
+  !!
+  subroutine s_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+    use psi_serial_mod
+    use psb_string_mod
+    implicit none 
+    real(psb_spk_), intent(in)        :: alpha,beta
+    class(psb_s_base_multivect_type), intent(inout)  :: x
+    class(psb_s_base_multivect_type), intent(inout)  :: y
+    class(psb_s_base_multivect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info    
+    character(len=1), intent(in), optional     :: conjgx, conjgy
+    integer(psb_ipk_) :: i, n
+    logical :: conjgx_, conjgy_
+
+    info = 0
+    if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
+    if (z%is_dev()) call z%sync()
+    if (.not.psb_s_is_complex_) then
+      call z%mlt(alpha,x%v,y%v,beta,info)
+    else 
+      conjgx_=.false.
+      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
+      conjgy_=.false.
+      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+      if (conjgx_) x%v=(x%v)
+      if (conjgy_) y%v=(y%v)
+      call z%mlt(alpha,x%v,y%v,beta,info)
+      if (conjgx_) x%v=(x%v)
+      if (conjgy_) y%v=(y%v)
+    end if
+  end subroutine s_base_mlv_mlt_v_2
 !!$
 !!$  subroutine s_base_mlv_mlt_av(alpha,x,y,beta,z,info)
 !!$    use psi_serial_mod
@@ -2400,7 +2413,7 @@ contains
     class(psb_s_base_multivect_type), intent(inout) :: x
     class(psb_s_base_multivect_type), intent(inout) :: y
 
-    if (.not.x%is_host()) call x%sync()
+    if (x%is_dev()) call x%sync()
     if (allocated(x%v)) then 
       call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
       call y%absval()
@@ -2428,7 +2441,7 @@ contains
     class(psb_s_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
 
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
       return
     end if
@@ -2452,7 +2465,7 @@ contains
     real(psb_spk_) ::  y(:)
     class(psb_s_base_multivect_type) :: x
 
-    call x%sync()
+    if (x%is_dev()) call x%sync()
     call x%gth(n,idx%v(i:),y)
 
   end subroutine s_base_mlv_gthzv_x
@@ -2472,8 +2485,8 @@ contains
     real(psb_spk_) ::  y(:)
     class(psb_s_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
-
-    call x%sync()
+    
+    if (x%is_dev()) call x%sync()
     if (.not.allocated(x%v)) then
       return
     end if
@@ -2483,40 +2496,42 @@ contains
 
   end subroutine s_base_mlv_gthzv
 
-!!$  !
-!!$  ! Scatter: 
-!!$  ! Y(IDX(:)) = beta*Y(IDX(:)) + X(:)
-!!$  ! 
-!!$  !
-!!$  !> Function  base_mlv_sctb
-!!$  !! \memberof  psb_s_base_multivect_type
-!!$  !! \brief scatter into a class(base_mlv_vect)
-!!$  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
-!!$  !! \param n  how many entries to consider
-!!$  !! \param idx(:) indices
-!!$  !! \param beta
-!!$  !! \param x(:) 
-!!$  subroutine s_base_mlv_sctb(n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    real(psb_spk_) :: beta, x(:)
-!!$    class(psb_s_base_multivect_type) :: y
-!!$    
-!!$    call y%sync()
-!!$    call psi_sct(n,idx,x,beta,y%v)
-!!$    call y%set_host()
-!!$
-!!$  end subroutine s_base_mlv_sctb
-!!$
-!!$  subroutine s_base_mlv_sctb_x(i,n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i, n
-!!$    class(psb_s_base_multivect_type) :: idx
-!!$    real( psb_spk_) :: beta, x(:)
-!!$    class(psb_s_base_multivect_type) :: y
-!!$    
-!!$    call y%sct(n,idx%v(i:),x,beta)
-!!$
-!!$  end subroutine s_base_mlv_sctb_x
+  !
+  ! Scatter: 
+  ! Y(IDX(:),:) = beta*Y(IDX(:),:) + X(:)
+  ! 
+  !
+  !> Function  base_mlv_sctb
+  !! \memberof  psb_s_base_multivect_type
+  !! \brief scatter into a class(base_mlv_vect)
+  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param beta
+  !! \param x(:) 
+  subroutine s_base_mlv_sctb(n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    real(psb_spk_) :: beta, x(:)
+    class(psb_s_base_multivect_type) :: y
+    integer(psb_ipk_) :: nc
+    
+    if (y%is_dev()) call y%sync()
+    nc = psb_size(y%v,2)
+    call psi_sct(n,nc,idx,x,beta,y%v)
+    call y%set_host()
+
+  end subroutine s_base_mlv_sctb
+
+  subroutine s_base_mlv_sctb_x(i,n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    real( psb_spk_) :: beta, x(:)
+    class(psb_s_base_multivect_type) :: y
+    
+    call y%sct(n,idx%v(i:),x,beta)
+
+  end subroutine s_base_mlv_sctb_x
 end module psb_s_base_multivect_mod
 
