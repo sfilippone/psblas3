@@ -144,6 +144,8 @@ psb_sort_mod.o: psb_i_sort_mod.o psb_s_sort_mod.o psb_d_sort_mod.o \
 psi_serial_mod.o:  psi_i_serial_mod.o \
 	psi_s_serial_mod.o psi_d_serial_mod.o psi_c_serial_mod.o psi_z_serial_mod.o 
 
+psi_i_serial_mod.o psi_s_serial_mod.o psi_d_serial_mod.o psi_c_serial_mod.o psi_z_serial_mod.o: psb_const_mod.o
+
 psb_base_mod.o: $(MODULES)
 
 psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 

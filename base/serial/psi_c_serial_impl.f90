@@ -45,7 +45,7 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call zaxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  if ((m>0).and.(n>0)) call caxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -96,7 +96,7 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if (m>0) call zaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  if (m>0) call caxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
