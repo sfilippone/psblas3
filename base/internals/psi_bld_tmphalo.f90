@@ -44,105 +44,110 @@
 !    desc     - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !
-subroutine psi_bld_tmphalo(desc,info)
-  use psb_desc_mod
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_bld_tmphalo
-  implicit none
-  type(psb_desc_type), intent(inout) :: desc
-  integer(psb_ipk_), intent(out) :: info
+submodule (psi_i_mod) psi_bld_tmphalo_impl_mod
 
-  integer(psb_ipk_),allocatable :: helem(:),hproc(:)
-  integer(psb_ipk_),allocatable :: tmphl(:)
+contains
 
-  integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&
-       & n_col, err_act,  key, ih, nh, idx, nk,icomm
-  integer(psb_ipk_) :: ictxt,n_row
-  character(len=20)   :: name,ch_err
+  subroutine psi_bld_tmphalo(desc,info)
+    use psb_desc_mod
+    use psb_serial_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    implicit none
+    type(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(out) :: info
 
-  info = psb_success_
-  name = 'psi_bld_tmphalo'
-  call psb_erractionsave(err_act)
+    integer(psb_ipk_),allocatable :: helem(:),hproc(:)
+    integer(psb_ipk_),allocatable :: tmphl(:)
 
-  ictxt = desc%get_context()
-  icomm = desc%get_mpic()
-  n_row = desc%get_local_rows()
-  n_col = desc%get_local_cols()
+    integer(psb_ipk_) ::  i,j,np,me,lhalo,nhalo,&
+         & n_col, err_act,  key, ih, nh, idx, nk,icomm
+    integer(psb_ipk_) :: ictxt,n_row
+    character(len=20)   :: name,ch_err
 
-  ! check on blacs grid 
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    info = psb_success_
+    name = 'psi_bld_tmphalo'
+    call psb_erractionsave(err_act)
 
-  if (.not.(desc%is_bld())) then 
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+    ictxt = desc%get_context()
+    icomm = desc%get_mpic()
+    n_row = desc%get_local_rows()
+    n_col = desc%get_local_cols()
 
-  ! Here we do not know yet who owns what, so we have 
-  ! to call fnd_owner.
-  nh = (n_col-n_row)
-  Allocate(helem(max(1,nh)),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
+    ! check on blacs grid 
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  do i=1, nh
-    helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
-  end do
-
-  call desc%indxmap%l2gip(helem(1:nh),info)
-  call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
-      
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='fnd_owner')
-    goto 9999      
-  endif
-  if (nh > size(hproc)) then 
-    info=psb_err_from_subroutine_
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='nh > size(hproc)')
-    goto 9999      
-  end if
-
-  allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
-  j  = 1
-  do i=1,nh
-    tmphl(j+0) = hproc(i)
-    if (tmphl(j+0)<0) then 
-      write(psb_err_unit,*) me,'Unrecoverable error: missing proc from asb',&
-           & i, nh, n_row+i,helem(i),hproc(i)      
+    if (.not.(desc%is_bld())) then 
       info = psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
     end if
-    tmphl(j+1) = 1
-    tmphl(j+2) = n_row+i
-    j          = j + 3
-  end do
-  tmphl(j) = -1
-  lhalo = j
-  nhalo = (lhalo-1)/3
 
-  call psb_move_alloc(tmphl,desc%halo_index,info)
+    ! Here we do not know yet who owns what, so we have 
+    ! to call fnd_owner.
+    nh = (n_col-n_row)
+    Allocate(helem(max(1,nh)),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
 
-  call psb_erractionrestore(err_act)
-  return
+    do i=1, nh
+      helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
+    end do
+
+    call desc%indxmap%l2gip(helem(1:nh),info)
+    call desc%indxmap%fnd_owner(helem(1:nh),hproc,info)
+
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='fnd_owner')
+      goto 9999      
+    endif
+    if (nh > size(hproc)) then 
+      info=psb_err_from_subroutine_
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='nh > size(hproc)')
+      goto 9999      
+    end if
+
+    allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
+    j  = 1
+    do i=1,nh
+      tmphl(j+0) = hproc(i)
+      if (tmphl(j+0)<0) then 
+        write(psb_err_unit,*) me,'Unrecoverable error: missing proc from asb',&
+             & i, nh, n_row+i,helem(i),hproc(i)      
+        info = psb_err_invalid_cd_state_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+      tmphl(j+1) = 1
+      tmphl(j+2) = n_row+i
+      j          = j + 3
+    end do
+    tmphl(j) = -1
+    lhalo = j
+    nhalo = (lhalo-1)/3
+
+    call psb_move_alloc(tmphl,desc%halo_index,info)
+
+    call psb_erractionrestore(err_act)
+    return
 
 9999 call psb_error_handler(ictxt,err_act)
 
     return
 
-end subroutine psi_bld_tmphalo
+  end subroutine psi_bld_tmphalo
+
+end submodule psi_bld_tmphalo_impl_mod

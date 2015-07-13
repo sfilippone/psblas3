@@ -43,77 +43,80 @@
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
-subroutine psi_crea_bnd_elem(bndel,desc_a,info)
-  use psi_mod, psb_protect_name => psi_crea_bnd_elem
-  use psb_realloc_mod
-  use psb_desc_mod
-  use psb_error_mod
-  use psb_serial_mod
-  implicit none
-  
-  integer(psb_ipk_), allocatable :: bndel(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out) :: info
+submodule (psi_i_mod) psi_crea_bnd_elem_impl_mod
 
-  integer(psb_ipk_), allocatable :: work(:)
-  integer(psb_ipk_) :: i, j, nr, ns, k, err_act
-  character(len=20)    :: name
+contains
+  subroutine psi_crea_bnd_elem(bndel,desc_a,info)
+    use psb_realloc_mod
+    use psb_desc_mod
+    use psb_error_mod
+    use psb_serial_mod
+    implicit none
 
-  info = psb_success_
-  name='psi_crea_bnd_elem'
-  call psb_erractionsave(err_act)
+    integer(psb_ipk_), allocatable :: bndel(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer(psb_ipk_), intent(out) :: info
 
-  allocate(work(size(desc_a%halo_index)),stat=info)
-  if (info /= psb_success_ ) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+    integer(psb_ipk_), allocatable :: work(:)
+    integer(psb_ipk_) :: i, j, nr, ns, k, err_act
+    character(len=20)    :: name
 
-  i=0
-  j=1
-  do while(desc_a%halo_index(j) /= -1) 
+    info = psb_success_
+    name='psi_crea_bnd_elem'
+    call psb_erractionsave(err_act)
 
-    nr = desc_a%halo_index(j+1)
-    ns = desc_a%halo_index(j+1+nr+1)
-    do k=1, ns
-      i = i + 1
-      work(i) = desc_a%halo_index(j+1+nr+1+k)
+    allocate(work(size(desc_a%halo_index)),stat=info)
+    if (info /= psb_success_ ) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    i=0
+    j=1
+    do while(desc_a%halo_index(j) /= -1) 
+
+      nr = desc_a%halo_index(j+1)
+      ns = desc_a%halo_index(j+1+nr+1)
+      do k=1, ns
+        i = i + 1
+        work(i) = desc_a%halo_index(j+1+nr+1+k)
+      enddo
+      j  = j + 1 + ns + 1 + nr + 1
     enddo
-    j  = j + 1 + ns + 1 + nr + 1
-  enddo
 
-  call psb_msort_unique(work(1:i),j)
+    call psb_msort_unique(work(1:i),j)
 
-  if (.true.) then 
-    if (j>=0) then 
-      call psb_realloc(j,bndel,info)
+    if (.true.) then 
+      if (j>=0) then 
+        call psb_realloc(j,bndel,info)
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+          goto 9999      
+        end if
+        bndel(1:j) = work(1:j)
+      else
+        if (allocated(bndel)) then 
+          deallocate(bndel)
+        end if
+      end if
+    else
+      call psb_realloc(j+1,bndel,info)
       if (info /= psb_success_) then 
         call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
       bndel(1:j) = work(1:j)
-    else
-      if (allocated(bndel)) then 
-        deallocate(bndel)
-      end if
-    end if
-  else
-    call psb_realloc(j+1,bndel,info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-      goto 9999      
-    end if
-    bndel(1:j) = work(1:j)
-    bndel(j+1) = -1
-  endif
+      bndel(j+1) = -1
+    endif
 
-  deallocate(work)
-  call psb_erractionrestore(err_act)
-  return
+    deallocate(work)
+    call psb_erractionrestore(err_act)
+    return
 
 9999 call psb_error_handler(err_act)
 
-  return
+    return
 
-end subroutine psi_crea_bnd_elem
+  end subroutine psi_crea_bnd_elem
+end submodule psi_crea_bnd_elem_impl_mod
