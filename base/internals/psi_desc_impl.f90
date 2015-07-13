@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 submodule (psi_i_mod) psi_desc_impl_mod
-
+  use psb_error_mod
 contains
 
   subroutine psi_renum_index(iperm,idx,info)
