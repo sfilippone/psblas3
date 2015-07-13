@@ -52,107 +52,109 @@
 ! nrcv         - integer               Total receive buffer size    on the calling process
 !
 !  
-subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
+submodule (psi_i_mod) psi_crea_index_impl_mod
+contains
+  subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
 
-  use psb_realloc_mod
-  use psb_desc_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_crea_index
-  implicit none
+    use psb_realloc_mod
+    use psb_desc_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
 
-  type(psb_desc_type), intent(in)     :: desc_a
-  integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
-  integer(psb_ipk_), intent(in)                 :: index_in(:)
-  integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
-  logical                             :: glob_idx
+    type(psb_desc_type), intent(in)     :: desc_a
+    integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
+    integer(psb_ipk_), intent(in)                 :: index_in(:)
+    integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
+    logical                             :: glob_idx
 
-  !         ....local scalars...      
-  integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda
-  !         ...parameters...
-  integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:)
-  integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name
+    !         ....local scalars...      
+    integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda
+    !         ...parameters...
+    integer(psb_ipk_), allocatable :: dep_list(:,:), length_dl(:)
+    integer(psb_ipk_),parameter    :: root=psb_root_,no_comm=-1
+    integer(psb_ipk_) :: debug_level, debug_unit
+    character(len=20)    :: name
 
-  info = psb_success_
-  name='psi_crea_index'
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
+    info = psb_success_
+    name='psi_crea_index'
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_ctxt()
+    ictxt = desc_a%get_ctxt()
 
-  call psb_info(ictxt,me,np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    call psb_info(ictxt,me,np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  ! allocate dependency list
-  ! This should be computed more efficiently to save space when
-  ! the number of processors becomes very high
-  dl_lda=np+1
+    ! allocate dependency list
+    ! This should be computed more efficiently to save space when
+    ! the number of processors becomes very high
+    dl_lda=np+1
 
-  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
-    goto 9999      
-  end if
+    allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
 
-  ! ...extract dependence list (ordered list of identifer process
-  !    which every process must communcate with...
-  if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
-  mode = 1
+    ! ...extract dependence list (ordered list of identifer process
+    !    which every process must communcate with...
+    if (debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
+    mode = 1
 
-  call psi_extract_dep_list(ictxt,&
-       & desc_a%is_bld(), desc_a%is_upd(),&
-       & index_in, dep_list,length_dl,np,max(1,dl_lda),mode,info)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
-    goto 9999
-  end if
+    call psi_extract_dep_list(ictxt,&
+         & desc_a%is_bld(), desc_a%is_upd(),&
+         & index_in, dep_list,length_dl,np,max(1,dl_lda),mode,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
+      goto 9999
+    end if
 
-  if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
-       &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
-  ! ...now process root contains dependence list of all processes...
-  if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
+    if (debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
+         &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
+    ! ...now process root contains dependence list of all processes...
+    if (debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
 
-  call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
+    call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
 
-  ! ....now i can sort dependency lists.
-  call psi_sort_dl(dep_list,length_dl,np,info)
-  if(info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
-    goto 9999
-  end if
-  
-  if(debug_level >= psb_debug_inner_)&
-       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
-  ! Do the actual format conversion. 
-  call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
-       & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
-  if(debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
-       & size(index_out)
-  nxch = length_dl(me)
-  if(info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_desc_index')
-    goto 9999
-  end if
+    ! ....now i can sort dependency lists.
+    call psi_sort_dl(dep_list,length_dl,np,info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
+      goto 9999
+    end if
 
-  deallocate(dep_list,length_dl)
-  if(debug_level >= psb_debug_inner_) &
-       & write(debug_unit,*) me,' ',trim(name),': done'
+    if(debug_level >= psb_debug_inner_)&
+         & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
+    ! Do the actual format conversion. 
+    call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
+         & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
+    if(debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
+         & size(index_out)
+    nxch = length_dl(me)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_desc_index')
+      goto 9999
+    end if
 
-  call psb_erractionrestore(err_act)
-  return
+    deallocate(dep_list,length_dl)
+    if(debug_level >= psb_debug_inner_) &
+         & write(debug_unit,*) me,' ',trim(name),': done'
+
+    call psb_erractionrestore(err_act)
+    return
 
 9999 call psb_error_handler(ictxt,err_act)
 
-  return
-end subroutine psi_crea_index
+    return
+  end subroutine psi_crea_index
+end submodule psi_crea_index_impl_mod
