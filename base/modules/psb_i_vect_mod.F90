@@ -549,6 +549,8 @@ module psb_i_multivect_mod
 
   use psb_i_base_multivect_mod
   use psb_const_mod
+  use psb_i_vect_mod
+
 
   !private
 
@@ -576,11 +578,13 @@ module psb_i_multivect_mod
     procedure, pass(x) :: set_vect => i_vect_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: clone    => i_vect_clone
-!!$    procedure, pass(x) :: gthab    => i_vect_gthab
-!!$    procedure, pass(x) :: gthzv    => i_vect_gthzv
-!!$    generic, public    :: gth      => gthab, gthzv
-!!$    procedure, pass(y) :: sctb     => i_vect_sctb
-!!$    generic, public    :: sct      => sctb
+    procedure, pass(x) :: gthab    => i_vect_gthab
+    procedure, pass(x) :: gthzv    => i_vect_gthzv
+    procedure, pass(x) :: gthzv_x  => i_vect_gthzv_x
+    generic, public    :: gth      => gthab, gthzv
+    procedure, pass(y) :: sctb     => i_vect_sctb
+    procedure, pass(y) :: sctb_x   => i_vect_sctb_x
+    generic, public    :: sct      => sctb, sctb_x
   end type psb_i_multivect_type
 
   public  :: psb_i_multivect, psb_i_multivect_type,&
@@ -858,38 +862,62 @@ contains
     
   end subroutine i_vect_sync
 
-!!$  subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) :: alpha, beta, y(:)
-!!$    class(psb_i_multivect_type) :: x
-!!$    
-!!$    if (allocated(x%v)) &
-!!$         &  call x%v%gth(n,idx,alpha,beta,y)
-!!$    
-!!$  end subroutine i_vect_gthab
-!!$
-!!$  subroutine i_vect_gthzv(n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) ::  y(:)
-!!$    class(psb_i_multivect_type) :: x
-!!$
-!!$    if (allocated(x%v)) &
-!!$         &  call x%v%gth(n,idx,y)
-!!$    
-!!$  end subroutine i_vect_gthzv
-!!$
-!!$  subroutine i_vect_sctb(n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: n, idx(:)
-!!$    integer(psb_ipk_) :: beta, x(:)
-!!$    class(psb_i_multivect_type) :: y
-!!$    
-!!$    if (allocated(y%v)) &
-!!$         &  call y%v%sct(n,idx,x,beta)
-!!$
-!!$  end subroutine i_vect_sctb
+  subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) :: alpha, beta, y(:)
+    class(psb_i_multivect_type) :: x
+    
+    if (allocated(x%v)) &
+         &  call x%v%gth(n,idx,alpha,beta,y)
+    
+  end subroutine i_vect_gthab
+
+  subroutine i_vect_gthzv(n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) ::  y(:)
+    class(psb_i_multivect_type) :: x
+
+    if (allocated(x%v)) &
+         &  call x%v%gth(n,idx,y)
+    
+  end subroutine i_vect_gthzv
+
+  subroutine i_vect_gthzv_x(i,n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) ::  y(:)
+    class(psb_i_multivect_type) :: x
+
+    if (allocated(x%v)) &
+         &  call x%v%gth(i,n,idx,y)
+    
+  end subroutine i_vect_gthzv_x
+
+  subroutine i_vect_sctb(n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) :: beta, x(:)
+    class(psb_i_multivect_type) :: y
+    
+    if (allocated(y%v)) &
+         &  call y%v%sct(n,idx,x,beta)
+
+  end subroutine i_vect_sctb
+
+  subroutine i_vect_sctb_x(i,n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) :: beta, x(:)
+    class(psb_i_multivect_type) :: y
+    
+    if (allocated(y%v)) &
+         &  call y%v%sct(i,n,idx,x,beta)
+
+  end subroutine i_vect_sctb_x
 
   subroutine i_vect_free(x, info)
     use psi_serial_mod

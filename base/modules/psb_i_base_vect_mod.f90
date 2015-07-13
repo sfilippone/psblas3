@@ -876,7 +876,7 @@ end module psb_i_base_vect_mod
 
 
 module psb_i_base_multivect_mod
-  
+
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
@@ -946,18 +946,29 @@ module psb_i_base_multivect_mod
     procedure, pass(x) :: set_vect => i_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
+!!$    !
+!!$    ! Gather/scatter. These are needed for MPI interfacing.
+!!$    ! May have to be reworked. 
+!!$    !
+    procedure, pass(x) :: gthab    => i_base_mlv_gthab
+    procedure, pass(x) :: gthzv    => i_base_mlv_gthzv
+    procedure, pass(x) :: gthzv_x  => i_base_mlv_gthzv_x
+    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(y) :: sctb     => i_base_mlv_sctb
+    procedure, pass(y) :: sctb_x   => i_base_mlv_sctb_x
+    generic, public    :: sct      => sctb, sctb_x
   end type psb_i_base_multivect_type
 
   interface psb_i_base_multivect
     module procedure constructor, size_const
-  end interface
+  end interface psb_i_base_multivect
 
 contains
-  
+
   !
   ! Constructors. 
   !
-  
+
   !> Function  constructor:
   !! \brief     Constructor from an array
   !!  \param   x(:)  input array to be copied
@@ -970,8 +981,8 @@ contains
     this%v = x
     call this%asb(size(x,dim=1,kind=psb_ipk_),size(x,dim=2,kind=psb_ipk_),info)
   end function constructor
-    
-  
+
+
   !> Function  constructor:
   !! \brief     Constructor from size
   !!  \param    n   Size of vector to be built. 
@@ -984,7 +995,7 @@ contains
     call this%asb(m,n,info)
 
   end function size_const
-  
+
   !
   ! Build from a sample
   !
@@ -1008,7 +1019,7 @@ contains
     x%v(:,:)  = this(:,:)
 
   end subroutine i_base_mlv_bld_x
-    
+
   !
   ! Create with size, but no initialization
   !
@@ -1028,7 +1039,7 @@ contains
     call x%asb(m,n,info)
 
   end subroutine i_base_mlv_bld_n
-  
+
   !> Function  base_mlv_all:
   !! \memberof  psb_i_base_multivect_type
   !! \brief     Build method with size (uninitialized data) and
@@ -1043,9 +1054,9 @@ contains
     integer(psb_ipk_), intent(in)               :: m,n
     class(psb_i_base_multivect_type), intent(out) :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     call psb_realloc(m,n,x%v,info)
-    
+
   end subroutine i_base_mlv_all
 
   !> Function  base_mlv_mold:
@@ -1061,7 +1072,7 @@ contains
     class(psb_i_base_multivect_type), intent(in)   :: x
     class(psb_i_base_multivect_type), intent(out), allocatable :: y
     integer(psb_ipk_), intent(out)              :: info
-    
+
     allocate(psb_i_base_multivect_type :: y, stat=info)
 
   end subroutine i_base_mlv_mold
@@ -1140,8 +1151,8 @@ contains
 
       case default
         info = 321
-! !$      call psb_errpush(info,name)
-! !$      goto 9999
+        ! !$      call psb_errpush(info,name)
+        ! !$      goto 9999
       end select
     end if
     if (info /= 0) then 
@@ -1161,12 +1172,12 @@ contains
     use psi_serial_mod
     implicit none 
     class(psb_i_base_multivect_type), intent(inout)    :: x
-    
+
     if (allocated(x%v)) x%v=izero
 
   end subroutine i_base_mlv_zero
 
-  
+
   !
   ! Assembly.
   ! For derived classes: after this the vector
@@ -1180,7 +1191,7 @@ contains
   !!  \param info  return code
   !!
   !
- 
+
   subroutine i_base_mlv_asb(m,n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -1188,7 +1199,7 @@ contains
     integer(psb_ipk_), intent(in)              :: m,n
     class(psb_i_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
-    
+
     if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
          & call psb_realloc(m,n,x%v,info)
     if (info /= 0) &
@@ -1211,15 +1222,15 @@ contains
     implicit none 
     class(psb_i_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if (info /= 0) call & 
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
-        
+
   end subroutine i_base_mlv_free
 
-  
+
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -1234,7 +1245,7 @@ contains
   subroutine i_base_mlv_sync(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
-    
+
   end subroutine i_base_mlv_sync
 
   !
@@ -1246,7 +1257,7 @@ contains
   subroutine i_base_mlv_set_host(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
-    
+
   end subroutine i_base_mlv_set_host
 
   !
@@ -1258,7 +1269,7 @@ contains
   subroutine i_base_mlv_set_dev(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
-    
+
   end subroutine i_base_mlv_set_dev
 
   !
@@ -1270,7 +1281,7 @@ contains
   subroutine i_base_mlv_set_sync(x)
     implicit none 
     class(psb_i_base_multivect_type), intent(inout) :: x
-    
+
   end subroutine i_base_mlv_set_sync
 
   !
@@ -1283,10 +1294,10 @@ contains
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     logical  :: res
-  
+
     res = .false.
   end function i_base_mlv_is_dev
-  
+
   !
   !> Function  base_mlv_is_host
   !! \memberof  psb_i_base_multivect_type
@@ -1344,7 +1355,7 @@ contains
     if (allocated(x%v)) res = size(x%v,2)
 
   end function i_base_mlv_get_ncols
-  
+
   !
   !> Function  base_mlv_get_sizeof
   !! \memberof  psb_i_base_multivect_type
@@ -1355,7 +1366,7 @@ contains
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
     integer(psb_long_int_k_) :: res
-    
+
     ! Force 8-byte integers.
     res = (1_psb_long_int_k_ * psb_sizeof_int) * x%get_nrows() * x%get_ncols()
 
@@ -1372,7 +1383,7 @@ contains
     character(len=5) :: res
     res = 'BASE'
   end function i_base_mlv_get_fmt
-  
+
 
   !
   !
@@ -1397,7 +1408,7 @@ contains
     end if
     res(1:m,1:n) = x%v(1:m,1:n)
   end function i_base_mlv_get_vect
-    
+
   !
   ! Reset all values 
   !
@@ -1410,10 +1421,10 @@ contains
   subroutine i_base_mlv_set_scal(x,val)
     class(psb_i_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
-        
+
     integer(psb_ipk_) :: info
     x%v = val
-    
+
   end subroutine i_base_mlv_set_scal
 
   !
@@ -1431,13 +1442,125 @@ contains
     if (allocated(x%v)) then 
       nr = min(size(x%v,1),size(val,1))
       nc = min(size(x%v,2),size(val,2))
-      
+
       x%v(1:nr,1:nc) = val(1:nr,1:nc)
     else
       x%v = val
     end if
 
   end subroutine i_base_mlv_set_vect
+
+  !
+  ! Gather: Y = beta * Y + alpha * X(IDX(:))
+  !
+  !
+  !> Function  base_mlv_gthab
+  !! \memberof  psb_i_base_multivect_type
+  !! \brief gather into an array
+  !!    Y = beta * Y + alpha * X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param alpha
+  !! \param beta
+  subroutine i_base_mlv_gthab(n,idx,alpha,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) :: alpha, beta, y(:)
+    class(psb_i_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+
+    if (x%is_dev()) call x%sync()
+    if (.not.allocated(x%v)) then
+      return
+    end if
+    nc = psb_size(x%v,2)
+    call psi_gth(n,nc,idx,alpha,x%v,beta,y)
+
+  end subroutine i_base_mlv_gthab
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_mlv_gthzv
+  !! \memberof  psb_i_base_multivect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  subroutine i_base_mlv_gthzv_x(i,n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) ::  y(:)
+    class(psb_i_base_multivect_type) :: x
+
+    if (x%is_dev()) call x%sync()
+    call x%gth(n,idx%v(i:),y)
+
+  end subroutine i_base_mlv_gthzv_x
+
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_mlv_gthzv
+  !! \memberof  psb_i_base_multivect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  subroutine i_base_mlv_gthzv(n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) ::  y(:)
+    class(psb_i_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+
+    if (x%is_dev()) call x%sync()
+    if (.not.allocated(x%v)) then
+      return
+    end if
+    nc = psb_size(x%v,2)
+
+    call psi_gth(n,nc,idx,x%v,y)
+
+  end subroutine i_base_mlv_gthzv
+
+  !
+  ! Scatter: 
+  ! Y(IDX(:),:) = beta*Y(IDX(:),:) + X(:)
+  ! 
+  !
+  !> Function  base_mlv_sctb
+  !! \memberof  psb_i_base_multivect_type
+  !! \brief scatter into a class(base_mlv_vect)
+  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  !! \param beta
+  !! \param x(:) 
+  subroutine i_base_mlv_sctb(n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    integer(psb_ipk_) :: beta, x(:)
+    class(psb_i_base_multivect_type) :: y
+    integer(psb_ipk_) :: nc
+
+    if (y%is_dev()) call y%sync()
+    nc = psb_size(y%v,2)
+    call psi_sct(n,nc,idx,x,beta,y%v)
+    call y%set_host()
+
+  end subroutine i_base_mlv_sctb
+
+  subroutine i_base_mlv_sctb_x(i,n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer( psb_ipk_) :: beta, x(:)
+    class(psb_i_base_multivect_type) :: y
+
+    call y%sct(n,idx%v(i:),x,beta)
+
+  end subroutine i_base_mlv_sctb_x
 
 end module psb_i_base_multivect_mod
 

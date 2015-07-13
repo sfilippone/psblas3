@@ -31,7 +31,8 @@
 !!$  
 module psi_d_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type
-  use psb_d_vect_mod, only : psb_d_base_vect_type 
+  use psb_d_base_vect_mod, only : psb_d_base_vect_type 
+  use psb_d_base_multivect_mod, only : psb_d_base_multivect_type 
 
 
   interface psi_swapdata
@@ -63,6 +64,16 @@ module psi_d_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswapdata_vect
+    subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+      import 
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_ipk_), intent(out)        :: info
+      class(psb_d_base_multivect_type)    :: y
+      real(psb_dpk_)           :: beta 
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
+      integer(psb_ipk_), optional           :: data
+    end subroutine psi_dswapdata_multivect
     subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -92,6 +103,17 @@ module psi_d_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_dswap_vidx_vect
+    subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
+         & totxch,totsnd,totrcv,work,info)
+      import 
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_d_base_multivect_type)      :: y
+      real(psb_dpk_)                       :: beta
+      real(psb_dpk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(inout) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_dswap_vidx_multivect
   end interface
 
 
@@ -124,6 +146,16 @@ module psi_d_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswaptran_vect
+    subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,work,info,data)
+      import 
+      integer(psb_ipk_), intent(in)         :: flag
+      integer(psb_ipk_), intent(out)        :: info
+      class(psb_d_base_multivect_type) :: y
+      real(psb_dpk_)           :: beta
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
+      integer(psb_ipk_), optional           :: data
+    end subroutine psi_dswaptran_multivect
     subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -153,6 +185,17 @@ module psi_d_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_dtran_vidx_vect
+    subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
+         & totxch,totsnd,totrcv,work,info)
+      import 
+      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)          :: info
+      class(psb_d_base_multivect_type)      :: y
+      real(psb_dpk_)                       :: beta
+      real(psb_dpk_), target               :: work(:)
+      class(psb_i_base_vect_type), intent(inout) :: idx
+      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+    end subroutine psi_dtran_vidx_multivect
   end interface
 
   interface psi_ovrl_upd
