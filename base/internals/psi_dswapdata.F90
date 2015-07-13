@@ -161,6 +161,7 @@ contains
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
+    use psi_serial_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -662,6 +663,7 @@ contains
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
+    use psi_serial_mod
 #ifdef MPI_MOD
     use mpi
 #endif
