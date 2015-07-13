@@ -30,11 +30,13 @@
 !!$ 
 !!$  
 submodule (psi_i_mod) psi_desc_impl_mod
+  use psb_const_mod
   use psb_error_mod
+  use psb_realloc_mod
+  use psb_serial_mod
 contains
 
   subroutine psi_renum_index(iperm,idx,info)
-    use psb_serial_mod 
     implicit none 
 
     integer(psb_ipk_), intent(out)   :: info
@@ -63,7 +65,6 @@ contains
   end subroutine psi_renum_index
 
   subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
-    use psb_realloc_mod
     implicit none
 
     !     ....scalars parameters....
@@ -446,7 +447,6 @@ contains
 
   subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
 
-    use psb_realloc_mod
     implicit none
 
     !     ....scalars parameters....
