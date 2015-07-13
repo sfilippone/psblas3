@@ -98,247 +98,249 @@
 !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
 !
 !
-subroutine psi_desc_index(desc,index_in,dep_list,&
-     & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
-  use psb_desc_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_const_mod
+submodule (psi_i_mod) psi_desc_index_impl_mod
+contains
+  subroutine psi_desc_index(desc,index_in,dep_list,&
+       & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+    use psb_desc_mod
+    use psb_realloc_mod
+    use psb_error_mod
+    use psb_const_mod
 #ifdef MPI_MOD
-  use mpi
+    use mpi
 #endif
-  use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_desc_index
-  implicit none
+    use psb_penv_mod
+    implicit none
 #ifdef MPI_H
-  include 'mpif.h'
+    include 'mpif.h'
 #endif
 
-  !    ...array parameters.....
-  type(psb_desc_type) :: desc
-  integer(psb_ipk_) :: index_in(:),dep_list(:)
-  integer(psb_ipk_),allocatable  :: desc_index(:)
-  integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
-  logical         :: isglob_in
-  !    ....local scalars...        
-  integer(psb_ipk_) :: j,me,np,i,proc
-  !    ...parameters...
-  integer(psb_ipk_) :: ictxt
-  integer(psb_ipk_), parameter  :: no_comm=-1
-  !     ...local arrays..
-  integer(psb_ipk_),allocatable  :: sndbuf(:), rcvbuf(:)
+    !    ...array parameters.....
+    type(psb_desc_type) :: desc
+    integer(psb_ipk_) :: index_in(:),dep_list(:)
+    integer(psb_ipk_),allocatable  :: desc_index(:)
+    integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
+    logical         :: isglob_in
+    !    ....local scalars...        
+    integer(psb_ipk_) :: j,me,np,i,proc
+    !    ...parameters...
+    integer(psb_ipk_) :: ictxt
+    integer(psb_ipk_), parameter  :: no_comm=-1
+    !     ...local arrays..
+    integer(psb_ipk_),allocatable  :: sndbuf(:), rcvbuf(:)
 
-  integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:),&
-       & bsdindx(:),sdsz(:)
+    integer(psb_mpik_),allocatable  :: brvindx(:),rvsz(:),&
+         & bsdindx(:),sdsz(:)
 
-  integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
-       & idxr, idxs, iszs, iszr, nesd, nerv
-  integer(psb_mpik_) :: icomm, minfo
+    integer(psb_ipk_) :: ihinsz,ntot,k,err_act,nidx,&
+         & idxr, idxs, iszs, iszr, nesd, nerv
+    integer(psb_mpik_) :: icomm, minfo
 
-  logical,parameter :: usempi=.true.
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20) :: name
+    logical,parameter :: usempi=.true.
+    integer(psb_ipk_) :: debug_level, debug_unit
+    character(len=20) :: name
 
-  info = psb_success_
-  name='psi_desc_index'
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level() 
+    info = psb_success_
+    name='psi_desc_index'
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level() 
 
-  ictxt = desc%get_context()
-  icomm = desc%get_mpic()
-  call psb_info(ictxt,me,np) 
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    ictxt = desc%get_context()
+    icomm = desc%get_mpic()
+    call psb_info(ictxt,me,np) 
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  if (debug_level >= psb_debug_inner_) then 
-    write(debug_unit,*) me,' ',trim(name),': start'
-    call psb_barrier(ictxt)
-  endif
+    if (debug_level >= psb_debug_inner_) then 
+      write(debug_unit,*) me,' ',trim(name),': start'
+      call psb_barrier(ictxt)
+    endif
 
-  ! 
-  !     first, find out the sizes to be exchanged.
-  !     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
-  !     to be received/sent (in the final psblas descriptor).
-  !     be careful of the inversion
-  !   
-  allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
-  if(info /= psb_success_) then
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+    ! 
+    !     first, find out the sizes to be exchanged.
+    !     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
+    !     to be received/sent (in the final psblas descriptor).
+    !     be careful of the inversion
+    !   
+    allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-  sdsz(:)    = 0
-  rvsz(:)    = 0
-  bsdindx(:) = 0
-  brvindx(:) = 0
-  i = 1
-  do 
-    if (index_in(i) == -1) exit
-    proc = index_in(i)
-    i = i + 1 
-    nerv = index_in(i)
-    sdsz(proc+1) = sdsz(proc+1) + nerv
-    i = i + nerv + 1 
-  end do
-  ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
-  if (minfo /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
-    goto 9999
-  end if
+    sdsz(:)    = 0
+    rvsz(:)    = 0
+    bsdindx(:) = 0
+    brvindx(:) = 0
+    i = 1
+    do 
+      if (index_in(i) == -1) exit
+      proc = index_in(i)
+      i = i + 1 
+      nerv = index_in(i)
+      sdsz(proc+1) = sdsz(proc+1) + nerv
+      i = i + nerv + 1 
+    end do
+    ihinsz=i
+    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+    if (minfo /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
+      goto 9999
+    end if
 
-  i    = 1
-  idxs = 0
-  idxr = 0
-  do i=1, length_dl
-    proc = dep_list(i)
-    bsdindx(proc+1) = idxs
-    idxs = idxs + sdsz(proc+1)
-    brvindx(proc+1) = idxr
-    idxr = idxr + rvsz(proc+1)
-  end do
-  iszs = sum(sdsz)
-  iszr = sum(rvsz)
-  nsnd = iszr
-  nrcv = iszs  
+    i    = 1
+    idxs = 0
+    idxr = 0
+    do i=1, length_dl
+      proc = dep_list(i)
+      bsdindx(proc+1) = idxs
+      idxs = idxs + sdsz(proc+1)
+      brvindx(proc+1) = idxr
+      idxr = idxr + rvsz(proc+1)
+    end do
+    iszs = sum(sdsz)
+    iszr = sum(rvsz)
+    nsnd = iszr
+    nrcv = iszs  
 
-  if ((iszs /= idxs).or.(iszr /= idxr)) then 
-    write(psb_err_unit,*) me, trim(name),': Warning: strange results?', &
-         & iszs,idxs,iszr,idxr
-  end if
-  if (debug_level >= psb_debug_inner_) then 
-    write(debug_unit,*) me,' ',trim(name),': computed sizes ',iszr,iszs
-    call psb_barrier(ictxt)
-  endif
+    if ((iszs /= idxs).or.(iszr /= idxr)) then 
+      write(psb_err_unit,*) me, trim(name),': Warning: strange results?', &
+           & iszs,idxs,iszr,idxr
+    end if
+    if (debug_level >= psb_debug_inner_) then 
+      write(debug_unit,*) me,' ',trim(name),': computed sizes ',iszr,iszs
+      call psb_barrier(ictxt)
+    endif
 
-  ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
+    ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
 
-  if (ntot > psb_size(desc_index)) then 
-    call psb_realloc(ntot,desc_index,info) 
-  endif
+    if (ntot > psb_size(desc_index)) then 
+      call psb_realloc(ntot,desc_index,info) 
+    endif
 !!$  call psb_ensure_size(ntot,desc_index,info)
 
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
-    goto 9999
-  end if
-
-  if (debug_level >= psb_debug_inner_) then 
-    write(debug_unit,*) me,' ',trim(name),': computed allocated workspace ',iszr,iszs
-    call psb_barrier(ictxt)
-  endif
-  allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
-  if(info /= psb_success_) then
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  ! 
-  !     Second build the lists of requests
-  !   
-  i = 1
-  do 
-    if (i > ihinsz) then 
-!!$      write(psb_err_unit,*) me,' did not find index_in end??? ',i,ihinsz
-      exit
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
+      goto 9999
     end if
-    if (index_in(i) == -1) exit
-    proc = index_in(i)
-    i = i + 1 
-    nerv = index_in(i)
-    !  
-    !   note that here bsdinx is zero-based, hence the following loop
-    !          
-    if (isglob_in) then 
-      do j=1, nerv
-        sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
-      end do
-    else
-      
-      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
-           & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-           & info) 
 
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
-        goto 9999
-      end if
-
+    if (debug_level >= psb_debug_inner_) then 
+      write(debug_unit,*) me,' ',trim(name),': computed allocated workspace ',iszr,iszs
+      call psb_barrier(ictxt)
     endif
-    bsdindx(proc+1) = bsdindx(proc+1) + nerv
-    i = i + nerv + 1 
-  end do
+    allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-  if (debug_level >= psb_debug_inner_) then 
-    write(debug_unit,*) me,' ',trim(name),': prepared send buffer '
-    call psb_barrier(ictxt)
-  endif
-  !
-  !   now have to regenerate bsdindx
-  !  
-  idxs = 0
-  idxr = 0
-  do i=1, length_dl
-    proc = dep_list(i)
-    bsdindx(proc+1) = idxs
-    idxs = idxs + sdsz(proc+1)
-    brvindx(proc+1) = idxr
-    idxr = idxr + rvsz(proc+1)
-  end do
+    ! 
+    !     Second build the lists of requests
+    !   
+    i = 1
+    do 
+      if (i > ihinsz) then 
+!!$      write(psb_err_unit,*) me,' did not find index_in end??? ',i,ihinsz
+        exit
+      end if
+      if (index_in(i) == -1) exit
+      proc = index_in(i)
+      i = i + 1 
+      nerv = index_in(i)
+      !  
+      !   note that here bsdinx is zero-based, hence the following loop
+      !          
+      if (isglob_in) then 
+        do j=1, nerv
+          sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
+        end do
+      else
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
-  if (minfo /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
-    goto 9999
-  end if
+        call desc%indxmap%l2g(index_in(i+1:i+nerv),&
+             & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+             & info) 
 
-  !
-  !  at this point we can finally build the output desc_index. beware
-  !  of snd/rcv inversion. 
-  !      
-  i = 1
-  do k = 1, length_dl
-    proc = dep_list(k)
-    desc_index(i) = proc
-    i = i + 1 
-    nerv = sdsz(proc+1) 
-    desc_index(i) = nerv
-    call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-         &  desc_index(i+1:i+nerv),info)
-      
-    i = i + nerv + 1 
-    nesd = rvsz(proc+1) 
-    desc_index(i) = nesd
-    call desc%indxmap%g2l(rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
-         &  desc_index(i+1:i+nesd),info)
-    i = i + nesd + 1 
-  end do
-  desc_index(i) = - 1 
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
+          goto 9999
+        end if
 
-  deallocate(sdsz,rvsz,bsdindx,brvindx,sndbuf,rcvbuf,stat=info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+      endif
+      bsdindx(proc+1) = bsdindx(proc+1) + nerv
+      i = i + nerv + 1 
+    end do
 
-  if (debug_level >= psb_debug_inner_) then 
-    write(debug_unit,*) me,' ',trim(name),': done'
-    call psb_barrier(ictxt)
-  endif
+    if (debug_level >= psb_debug_inner_) then 
+      write(debug_unit,*) me,' ',trim(name),': prepared send buffer '
+      call psb_barrier(ictxt)
+    endif
+    !
+    !   now have to regenerate bsdindx
+    !  
+    idxs = 0
+    idxr = 0
+    do i=1, length_dl
+      proc = dep_list(i)
+      bsdindx(proc+1) = idxs
+      idxs = idxs + sdsz(proc+1)
+      brvindx(proc+1) = idxr
+      idxr = idxr + rvsz(proc+1)
+    end do
 
-  call psb_erractionrestore(err_act)
-  return
+    call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
+         & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+    if (minfo /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
+      goto 9999
+    end if
+
+    !
+    !  at this point we can finally build the output desc_index. beware
+    !  of snd/rcv inversion. 
+    !      
+    i = 1
+    do k = 1, length_dl
+      proc = dep_list(k)
+      desc_index(i) = proc
+      i = i + 1 
+      nerv = sdsz(proc+1) 
+      desc_index(i) = nerv
+      call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+           &  desc_index(i+1:i+nerv),info)
+
+      i = i + nerv + 1 
+      nesd = rvsz(proc+1) 
+      desc_index(i) = nesd
+      call desc%indxmap%g2l(rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
+           &  desc_index(i+1:i+nesd),info)
+      i = i + nesd + 1 
+    end do
+    desc_index(i) = - 1 
+
+    deallocate(sdsz,rvsz,bsdindx,brvindx,sndbuf,rcvbuf,stat=info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (debug_level >= psb_debug_inner_) then 
+      write(debug_unit,*) me,' ',trim(name),': done'
+      call psb_barrier(ictxt)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
 
 9999 call psb_error_handler(ictxt,err_act)
-  
-  return
 
-end subroutine psi_desc_index
+    return
+
+  end subroutine psi_desc_index
+end submodule psi_desc_index_impl_mod

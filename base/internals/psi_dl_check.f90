@@ -44,52 +44,54 @@
 !    length_dl(:)  - integer             Items in dependency lists; updated on 
 !                                        exit
 ! 
-subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+submodule (psi_i_mod) psi_dl_check_impl_mod
+contains
+  subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
 
-  use psi_mod, psb_protect_name => psi_dl_check
-  use psb_const_mod
-  use psb_desc_mod
-  implicit none
+    use psb_const_mod
+    use psb_desc_mod
+    implicit none
 
-  integer(psb_ipk_) :: np,dl_lda,length_dl(0:np)
-  integer(psb_ipk_) :: dep_list(dl_lda,0:np)
-  ! locals
-  integer(psb_ipk_) :: proc, proc2, i, j
+    integer(psb_ipk_) :: np,dl_lda,length_dl(0:np)
+    integer(psb_ipk_) :: dep_list(dl_lda,0:np)
+    ! locals
+    integer(psb_ipk_) :: proc, proc2, i, j
 
 
-  ! ...if j is in  dep_list of process i 
-  !     and i is not in dep_list of process j 
-  !     fix it.
+    ! ...if j is in  dep_list of process i 
+    !     and i is not in dep_list of process j 
+    !     fix it.
 
-  do proc=0,np-1
-    i=1
-    outer: do 
-      if (i >length_dl(proc)) exit outer
-      proc2=dep_list(i,proc)
-      if ((proc2 /= -1).and.(proc2 /= proc)) then
-        ! ...search proc in proc2's dep_list....
-        j=1
-        p2loop:do 
-          if (j > length_dl(proc2)) exit p2loop
-          if (dep_list(j,proc2) == proc) exit p2loop
-          j=j+1
-        enddo p2loop
+    do proc=0,np-1
+      i=1
+      outer: do 
+        if (i >length_dl(proc)) exit outer
+        proc2=dep_list(i,proc)
+        if ((proc2 /= -1).and.(proc2 /= proc)) then
+          ! ...search proc in proc2's dep_list....
+          j=1
+          p2loop:do 
+            if (j > length_dl(proc2)) exit p2loop
+            if (dep_list(j,proc2) == proc) exit p2loop
+            j=j+1
+          enddo p2loop
 
-        if (j > length_dl(proc2)) then
-          ! ...add proc to proc2 s dep_list.....',proc,proc2
-          length_dl(proc2)     = length_dl(proc2)+1
-          if (length_dl(proc2) > size(dep_list,1)) then
-            write(psb_err_unit,*)'error in crea_halo', proc2,proc,&
-                 & length_dl(proc2),'>',size(dep_list,1)
+          if (j > length_dl(proc2)) then
+            ! ...add proc to proc2 s dep_list.....',proc,proc2
+            length_dl(proc2)     = length_dl(proc2)+1
+            if (length_dl(proc2) > size(dep_list,1)) then
+              write(psb_err_unit,*)'error in crea_halo', proc2,proc,&
+                   & length_dl(proc2),'>',size(dep_list,1)
+            endif
+            dep_list(length_dl(proc2),proc2) = proc
+          else if (dep_list(j,proc2) /= proc) then 
+            write(psb_err_unit,*) 'PSI_DL_CHECK This should not happen!!! ',&
+                 & j,proc2,dep_list(j,proc2),proc
           endif
-          dep_list(length_dl(proc2),proc2) = proc
-        else if (dep_list(j,proc2) /= proc) then 
-          write(psb_err_unit,*) 'PSI_DL_CHECK This should not happen!!! ',&
-               & j,proc2,dep_list(j,proc2),proc
         endif
-      endif
-      i=i+1
-    enddo outer
-  enddo
+        i=i+1
+      enddo outer
+    enddo
 
-end subroutine psi_dl_check
+  end subroutine psi_dl_check
+end submodule psi_dl_check_impl_mod
