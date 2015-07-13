@@ -3302,7 +3302,7 @@ contains
     use psb_const_mod
     use psb_error_mod
     use psb_string_mod
-    use psb_ip_reord_mod
+    use psb_sort_mod
     implicit none 
 
     integer(psb_ipk_), intent(in)           :: nr, nc, nzin, dupl
