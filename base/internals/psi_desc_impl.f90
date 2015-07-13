@@ -34,6 +34,7 @@ submodule (psi_i_mod) psi_desc_impl_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_serial_mod
+  use psb_penv_mod
 contains
 
   subroutine psi_renum_index(iperm,idx,info)
