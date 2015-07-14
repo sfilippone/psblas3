@@ -32,8 +32,9 @@
 module psb_s_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_spk_
   use psb_mat_mod, only  : psb_sspmat_type
-
+  
   use psb_s_vect_mod, only : psb_s_vect_type, psb_s_base_vect_type
+  use psb_s_multivect_mod, only : psb_s_multivect_type, psb_s_base_multivect_type
 
   interface psb_ovrl
     subroutine psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -96,6 +97,16 @@ module psb_s_comm_mod
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_shalo_vect
+    subroutine psb_shalo_multivect(x,desc_a,info,work,tran,mode,data)
+      import
+      implicit none
+      type(psb_s_multivect_type), intent(inout)   :: x
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      real(psb_spk_), target, optional, intent(inout) :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_shalo_multivect
   end interface psb_halo
 
 

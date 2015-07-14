@@ -849,7 +849,6 @@ contains
 
   end subroutine i_base_sctb_x
 
-
   subroutine i_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
     integer(psb_ipk_) :: i, n
@@ -898,6 +897,8 @@ module psb_i_base_multivect_mod
   type psb_i_base_multivect_type
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:,:)
+    integer(psb_ipk_), allocatable :: combuf(:) 
+    integer(psb_ipk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -946,17 +947,31 @@ module psb_i_base_multivect_mod
     procedure, pass(x) :: set_vect => i_base_mlv_set_vect
     generic, public    :: set      => set_vect, set_scal
 
-!!$    !
-!!$    ! Gather/scatter. These are needed for MPI interfacing.
-!!$    ! May have to be reworked. 
-!!$    !
+
+    !
+    ! These are for handling gather/scatter in new
+    ! comm internals implementation.
+    !
+    procedure, nopass  :: use_buffer   => i_base_mlv_use_buffer
+    procedure, pass(x) :: new_buffer   => i_base_mlv_new_buffer
+    procedure, nopass  :: device_wait  => i_base_mlv_device_wait
+    procedure, pass(x) :: free_buffer  => i_base_mlv_free_buffer
+    procedure, pass(x) :: new_comid    => i_base_mlv_new_comid
+    procedure, pass(x) :: free_comid   => i_base_mlv_free_comid
+
+    !
+    ! Gather/scatter. These are needed for MPI interfacing.
+    ! May have to be reworked. 
+    !
     procedure, pass(x) :: gthab    => i_base_mlv_gthab
     procedure, pass(x) :: gthzv    => i_base_mlv_gthzv
     procedure, pass(x) :: gthzv_x  => i_base_mlv_gthzv_x
-    generic, public    :: gth      => gthab, gthzv, gthzv_x
+    procedure, pass(x) :: gthzbuf  => i_base_mlv_gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
     procedure, pass(y) :: sctb     => i_base_mlv_sctb
     procedure, pass(y) :: sctb_x   => i_base_mlv_sctb_x
-    generic, public    :: sct      => sctb, sctb_x
+    procedure, pass(y) :: sctb_buf => i_base_mlv_sctb_buf
+    generic, public    :: sct      => sctb, sctb_x, sctb_buf
   end type psb_i_base_multivect_type
 
   interface psb_i_base_multivect
@@ -1450,6 +1465,57 @@ contains
 
   end subroutine i_base_mlv_set_vect
 
+
+  function i_base_mlv_use_buffer() result(res)
+    logical :: res
+    
+    res = .true.
+  end function i_base_mlv_use_buffer
+
+  subroutine i_base_mlv_new_buffer(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    integer(psb_ipk_)               :: nc
+    nc = x%get_ncols()
+    call psb_realloc(n*nc,x%combuf,info)
+  end subroutine i_base_mlv_new_buffer
+
+  subroutine i_base_mlv_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2,x%comid,info)
+  end subroutine i_base_mlv_new_comid
+
+
+  subroutine i_base_mlv_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine i_base_mlv_free_buffer
+
+  subroutine i_base_mlv_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i_base_mlv_free_comid
+
+
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
   !
@@ -1525,6 +1591,27 @@ contains
   end subroutine i_base_mlv_gthzv
 
   !
+  ! New comm internals impl. 
+  !
+  subroutine i_base_mlv_gthzbuf(i,n,idx,x)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i,n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_i_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+    
+    if (.not.allocated(x%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+      return
+    end if
+    if (idx%is_dev()) call idx%sync()
+    if (x%is_dev()) call x%sync()
+    nc = x%get_ncols()
+    call x%gth(n,idx%v(i:),x%combuf((i-1)*nc+1:))
+
+  end subroutine i_base_mlv_gthzbuf
+
+  !
   ! Scatter: 
   ! Y(IDX(:),:) = beta*Y(IDX(:),:) + X(:)
   ! 
@@ -1561,6 +1648,37 @@ contains
     call y%sct(n,idx%v(i:),x,beta)
 
   end subroutine i_base_mlv_sctb_x
+
+  subroutine i_base_mlv_sctb_buf(i,n,idx,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: i, n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_) :: beta
+    class(psb_i_base_multivect_type) :: y
+    integer(psb_ipk_) :: nc
+    
+    if (.not.allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+      return
+    end if
+    if (y%is_dev()) call y%sync()
+    if (idx%is_dev()) call idx%sync()
+    nc = y%get_ncols()
+    call y%sct(n,idx%v(i:),y%combuf((i-1)*nc+1:),beta)
+    call y%set_host()
+    
+  end subroutine i_base_mlv_sctb_buf
+
+  !
+  !> Function  base_device_wait:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief device_wait: base version is a no-op.
+  !!           
+  !
+  subroutine i_base_mlv_device_wait()
+    implicit none 
+    
+  end subroutine i_base_mlv_device_wait
 
 end module psb_i_base_multivect_mod
 

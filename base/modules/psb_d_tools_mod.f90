@@ -33,6 +33,7 @@ Module psb_d_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_dpk_, psb_ipk_
   use psb_d_vect_mod, only : psb_d_base_vect_type, psb_d_vect_type, psb_i_vect_type
   use psb_d_mat_mod, only : psb_dspmat_type, psb_d_base_sparse_mat
+  use psb_d_multivect_mod, only : psb_d_base_multivect_type, psb_d_multivect_type
 
   interface  psb_geall
     subroutine psb_dalloc(x, desc_a, info, n, lb)
@@ -67,6 +68,14 @@ Module psb_d_tools_mod
       integer(psb_ipk_),intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)   :: n, lb
     end subroutine psb_dalloc_vect_r2
+    subroutine psb_dalloc_multivect(x, desc_a,info,n)
+      import
+      implicit none
+      type(psb_d_multivect_type), intent(out)  :: x
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_),intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)   :: n
+    end subroutine psb_dalloc_multivect
   end interface
 
 
@@ -103,6 +112,16 @@ Module psb_d_tools_mod
       class(psb_d_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
     end subroutine psb_dasb_vect_r2
+    subroutine psb_dasb_multivect(x, desc_a, info,mold, scratch, n)
+      import
+      implicit none
+      type(psb_desc_type), intent(in)      ::  desc_a
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)                 ::  info
+      class(psb_d_base_multivect_type), intent(in), optional :: mold
+      logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in)   :: n
+    end subroutine psb_dasb_multivect
   end interface
 
   interface psb_gefree
@@ -134,6 +153,13 @@ Module psb_d_tools_mod
       type(psb_d_vect_type), allocatable, intent(inout) :: x(:)
       integer(psb_ipk_), intent(out)             ::  info
     end subroutine psb_dfree_vect_r2
+    subroutine psb_dfree_multivect(x, desc_a, info)
+      import
+      implicit none
+      type(psb_desc_type), intent(in)  ::  desc_a
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             ::  info
+    end subroutine psb_dfree_multivect
   end interface
 
 
@@ -198,6 +224,18 @@ Module psb_d_tools_mod
       integer(psb_ipk_), optional, intent(in)    :: dupl
       logical, intent(in), optional        :: local
     end subroutine psb_dins_vect_r2
+    subroutine psb_dins_multivect(m,irw,val,x,desc_a,info,dupl,local)
+      import
+      implicit none
+      integer(psb_ipk_), intent(in)              :: m
+      type(psb_desc_type), intent(in)  :: desc_a
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)              :: irw(:)
+      real(psb_dpk_), intent(in)    :: val(:,:)
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), optional, intent(in)    :: dupl
+      logical, intent(in), optional        :: local
+    end subroutine psb_dins_multivect
   end interface
 
   interface psb_cdbldext

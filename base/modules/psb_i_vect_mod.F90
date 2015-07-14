@@ -102,50 +102,50 @@ module psb_i_vect_mod
 
   interface psb_set_vect_default
     module procedure psb_i_set_vect_default
-  end interface
+  end interface psb_set_vect_default
 
   interface psb_get_vect_default
     module procedure psb_i_get_vect_default
-  end interface
+  end interface psb_get_vect_default
 
 
 contains
 
-  
+
   subroutine  psb_i_set_vect_default(v) 
     implicit none 
     class(psb_i_base_vect_type), intent(in) :: v
-    
+
     if (allocated(psb_i_base_vect_default)) then 
       deallocate(psb_i_base_vect_default)
     end if
     allocate(psb_i_base_vect_default, mold=v)
 
   end subroutine psb_i_set_vect_default
-  
+
   function psb_i_get_vect_default(v) result(res)
     implicit none 
     class(psb_i_vect_type), intent(in) :: v
     class(psb_i_base_vect_type), pointer :: res
-    
+
     res => psb_i_get_base_vect_default()
-    
+
   end function psb_i_get_vect_default
 
-  
+
   function psb_i_get_base_vect_default() result(res)
     implicit none 
     class(psb_i_base_vect_type), pointer :: res
-    
+
     if (.not.allocated(psb_i_base_vect_default)) then 
       allocate(psb_i_base_vect_type :: psb_i_base_vect_default)
     end if
 
     res => psb_i_base_vect_default
-    
+
   end function psb_i_get_base_vect_default
 
-  
+
   subroutine i_vect_clone(x,y,info)
     implicit none 
     class(psb_i_vect_type), intent(inout) :: x
@@ -158,7 +158,7 @@ contains
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine i_vect_clone
-  
+
   subroutine i_vect_bld_x(x,invect,mold)
     integer(psb_ipk_), intent(in)          :: invect(:)
     class(psb_i_vect_type), intent(inout) :: x
@@ -232,20 +232,20 @@ contains
     class(psb_i_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
-        
+
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val,first,last)
-    
+
   end subroutine i_vect_set_scal
 
   subroutine i_vect_set_vect(x,val,first,last)
     class(psb_i_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)         :: val(:)
     integer(psb_ipk_), optional :: first, last
-        
+
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val,first,last)
-    
+
   end subroutine i_vect_set_vect
 
 
@@ -300,7 +300,7 @@ contains
     class(psb_i_vect_type), intent(inout) :: x
     class(psb_i_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
-    
+
     if (allocated(x%v)) &
          & call x%free(info)
 
@@ -327,7 +327,7 @@ contains
     integer(psb_ipk_), intent(in)         :: n
     class(psb_i_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
-  
+
     info = 0 
     if (.not.allocated(x%v)) &
          & call x%all(n,info)
@@ -355,7 +355,7 @@ contains
 
     if (allocated(x%v)) &
          & call x%v%asb(n,info)
-    
+
   end subroutine i_vect_asb
 
   subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
@@ -363,10 +363,10 @@ contains
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_ipk_) :: alpha, beta, y(:)
     class(psb_i_vect_type) :: x
-    
+
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,alpha,beta,y)
-    
+
   end subroutine i_vect_gthab
 
   subroutine i_vect_gthzv(n,idx,x,y)
@@ -377,7 +377,7 @@ contains
 
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,y)
-    
+
   end subroutine i_vect_gthzv
 
   subroutine i_vect_sctb(n,idx,x,beta,y)
@@ -385,7 +385,7 @@ contains
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_vect_type) :: y
-    
+
     if (allocated(y%v)) &
          &  call y%v%sct(n,idx,x,beta)
 
@@ -397,13 +397,13 @@ contains
     implicit none 
     class(psb_i_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     info = 0
     if (allocated(x%v)) then 
       call x%v%free(info)
       if (info == 0) deallocate(x%v,stat=info)
     end if
-        
+
   end subroutine i_vect_free
 
   subroutine i_vect_ins_a(n,irl,val,dupl,x,info)
@@ -422,9 +422,9 @@ contains
       info = psb_err_invalid_vect_state_
       return
     end if
-    
+
     call  x%v%ins(n,irl,val,dupl,info)
-    
+
   end subroutine i_vect_ins_a
 
   subroutine i_vect_ins_v(n,irl,val,dupl,x,info)
@@ -474,70 +474,70 @@ contains
   subroutine i_vect_sync(x)
     implicit none 
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     if (allocated(x%v)) &
          & call x%v%sync()
-    
+
   end subroutine i_vect_sync
 
   subroutine i_vect_set_sync(x)
     implicit none 
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     if (allocated(x%v)) &
          & call x%v%set_sync()
-    
+
   end subroutine i_vect_set_sync
 
   subroutine i_vect_set_host(x)
     implicit none 
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     if (allocated(x%v)) &
          & call x%v%set_host()
-    
+
   end subroutine i_vect_set_host
 
   subroutine i_vect_set_dev(x)
     implicit none 
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     if (allocated(x%v)) &
          & call x%v%set_dev()
-    
+
   end subroutine i_vect_set_dev
 
   function i_vect_is_sync(x) result(res)
     implicit none 
     logical :: res
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     res = .true.
     if (allocated(x%v)) &
          & res = x%v%is_sync()
-    
+
   end function i_vect_is_sync
 
   function i_vect_is_host(x) result(res)
     implicit none 
     logical :: res
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     res = .true.
     if (allocated(x%v)) &
          & res = x%v%is_host()
-    
+
   end function i_vect_is_host
 
   function i_vect_is_dev(x) result(res)
     implicit none 
     logical :: res
     class(psb_i_vect_type), intent(inout) :: x
-    
+
     res = .false. 
     if (allocated(x%v)) &
          & res =  x%v%is_dev()
-    
+
   end function i_vect_is_dev
 
 
@@ -588,62 +588,63 @@ module psb_i_multivect_mod
   end type psb_i_multivect_type
 
   public  :: psb_i_multivect, psb_i_multivect_type,&
-       & psb_set_multivect_default, psb_get_multivect_default
+       & psb_set_multivect_default, psb_get_multivect_default, &
+       & psb_i_base_multivect_type
 
   private
   interface psb_i_multivect
     module procedure constructor, size_const
-  end interface
- 
+  end interface psb_i_multivect
+
   class(psb_i_base_multivect_type), allocatable, target,&
        & save, private :: psb_i_base_multivect_default
 
   interface psb_set_multivect_default
     module procedure psb_i_set_multivect_default
-  end interface
+  end interface psb_set_multivect_default
 
   interface psb_get_vect_default
     module procedure psb_i_get_multivect_default
-  end interface
+  end interface psb_get_vect_default
 
 
 contains
 
-  
+
   subroutine  psb_i_set_multivect_default(v) 
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: v
-    
+
     if (allocated(psb_i_base_multivect_default)) then 
       deallocate(psb_i_base_multivect_default)
     end if
     allocate(psb_i_base_multivect_default, mold=v)
 
   end subroutine psb_i_set_multivect_default
-  
+
   function psb_i_get_multivect_default(v) result(res)
     implicit none 
     class(psb_i_multivect_type), intent(in) :: v
     class(psb_i_base_multivect_type), pointer :: res
-    
+
     res => psb_i_get_base_multivect_default()
-    
+
   end function psb_i_get_multivect_default
 
-  
+
   function psb_i_get_base_multivect_default() result(res)
     implicit none 
     class(psb_i_base_multivect_type), pointer :: res
-    
+
     if (.not.allocated(psb_i_base_multivect_default)) then 
       allocate(psb_i_base_multivect_type :: psb_i_base_multivect_default)
     end if
 
     res => psb_i_base_multivect_default
-    
+
   end function psb_i_get_base_multivect_default
 
-  
+
   subroutine i_vect_clone(x,y,info)
     implicit none 
     class(psb_i_multivect_type), intent(inout) :: x
@@ -656,7 +657,7 @@ contains
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine i_vect_clone
-  
+
   subroutine i_vect_bld_x(x,invect,mold)
     integer(psb_ipk_), intent(in)          :: invect(:,:)
     class(psb_i_multivect_type), intent(out) :: x
@@ -722,19 +723,19 @@ contains
   subroutine i_vect_set_scal(x,val)
     class(psb_i_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in) :: val
-        
+
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
-    
+
   end subroutine i_vect_set_scal
 
   subroutine i_vect_set_vect(x,val)
     class(psb_i_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)         :: val(:,:)
-        
+
     integer(psb_ipk_) :: info
     if (allocated(x%v)) call x%v%set(val)
-    
+
   end subroutine i_vect_set_vect
 
 
@@ -790,7 +791,7 @@ contains
     res = 'NULL'
     if (allocated(x%v)) res = x%v%get_fmt()
   end function i_vect_get_fmt
-  
+
   subroutine i_vect_all(m,n, x, info, mold)
 
     implicit none 
@@ -798,7 +799,7 @@ contains
     class(psb_i_multivect_type), intent(out) :: x
     class(psb_i_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_), intent(out)      :: info
-    
+
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
@@ -822,7 +823,7 @@ contains
     integer(psb_ipk_), intent(in)         :: m,n
     class(psb_i_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
-  
+
     info = 0 
     if (.not.allocated(x%v)) &
          & call x%all(m,n,info)
@@ -850,16 +851,16 @@ contains
 
     if (allocated(x%v)) &
          & call x%v%asb(m,n,info)
-    
+
   end subroutine i_vect_asb
 
   subroutine i_vect_sync(x)
     implicit none 
     class(psb_i_multivect_type), intent(inout) :: x
-    
+
     if (allocated(x%v)) &
          & call x%v%sync()
-    
+
   end subroutine i_vect_sync
 
   subroutine i_vect_gthab(n,idx,alpha,x,beta,y)
@@ -867,10 +868,10 @@ contains
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_ipk_) :: alpha, beta, y(:)
     class(psb_i_multivect_type) :: x
-    
+
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,alpha,beta,y)
-    
+
   end subroutine i_vect_gthab
 
   subroutine i_vect_gthzv(n,idx,x,y)
@@ -881,7 +882,7 @@ contains
 
     if (allocated(x%v)) &
          &  call x%v%gth(n,idx,y)
-    
+
   end subroutine i_vect_gthzv
 
   subroutine i_vect_gthzv_x(i,n,idx,x,y)
@@ -893,7 +894,7 @@ contains
 
     if (allocated(x%v)) &
          &  call x%v%gth(i,n,idx,y)
-    
+
   end subroutine i_vect_gthzv_x
 
   subroutine i_vect_sctb(n,idx,x,beta,y)
@@ -901,7 +902,7 @@ contains
     integer(psb_ipk_) :: n, idx(:)
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_multivect_type) :: y
-    
+
     if (allocated(y%v)) &
          &  call y%v%sct(n,idx,x,beta)
 
@@ -913,7 +914,7 @@ contains
     class(psb_i_base_vect_type) :: idx
     integer(psb_ipk_) :: beta, x(:)
     class(psb_i_multivect_type) :: y
-    
+
     if (allocated(y%v)) &
          &  call y%v%sct(i,n,idx,x,beta)
 
@@ -925,13 +926,13 @@ contains
     implicit none 
     class(psb_i_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
-    
+
     info = 0
     if (allocated(x%v)) then 
       call x%v%free(info)
       if (info == 0) deallocate(x%v,stat=info)
     end if
-        
+
   end subroutine i_vect_free
 
   subroutine i_vect_ins(n,irl,val,dupl,x,info)
@@ -950,9 +951,9 @@ contains
       info = psb_err_invalid_vect_state_
       return
     end if
-    
+
     call  x%v%ins(n,irl,val,dupl,info)
-    
+
   end subroutine i_vect_ins
 
 

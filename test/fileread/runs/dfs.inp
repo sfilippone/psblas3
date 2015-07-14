@@ -1,11 +1,11 @@
 11                  Number of inputs
-matrix_0000_of_0001.mtx  !  kivap005.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+kivap005.mtx        This (and others) from: http://math.nist.gov/MatrixMarket/  or 
 NONE                  sherman3_b.mtx      http://www.cise.ufl.edu/research/sparse/matrices/index.html
 MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
-BiCG                Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
+BiCGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
 BJAC                Preconditioner NONE  DIAG  BJAC 
 CSR                 Storage format CSR COO JAD 
-3                   IPART: Partition method 0: BLK   2: graph (with Metis) 
+2                   IPART: Partition method 0: BLK   2: graph (with Metis) 
 2                   ISTOPC
 02100               ITMAX
 -1                  ITRACE

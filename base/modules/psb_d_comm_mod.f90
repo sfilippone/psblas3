@@ -32,8 +32,9 @@
 module psb_d_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_
   use psb_mat_mod, only  : psb_dspmat_type
-
+  
   use psb_d_vect_mod, only : psb_d_vect_type, psb_d_base_vect_type
+  use psb_d_multivect_mod, only : psb_d_multivect_type, psb_d_base_multivect_type
 
   interface psb_ovrl
     subroutine psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -96,6 +97,16 @@ module psb_d_comm_mod
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalo_vect
+    subroutine psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
+      import
+      implicit none
+      type(psb_d_multivect_type), intent(inout)   :: x
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      real(psb_dpk_), target, optional, intent(inout) :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_dhalo_multivect
   end interface psb_halo
 
 

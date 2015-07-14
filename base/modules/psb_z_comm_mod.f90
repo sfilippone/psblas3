@@ -32,8 +32,9 @@
 module psb_z_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_
   use psb_mat_mod, only  : psb_zspmat_type
-
+  
   use psb_z_vect_mod, only : psb_z_vect_type, psb_z_base_vect_type
+  use psb_z_multivect_mod, only : psb_z_multivect_type, psb_z_base_multivect_type
 
   interface psb_ovrl
     subroutine psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -96,6 +97,16 @@ module psb_z_comm_mod
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalo_vect
+    subroutine psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
+      import
+      implicit none
+      type(psb_z_multivect_type), intent(inout)   :: x
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      complex(psb_dpk_), target, optional, intent(inout) :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_zhalo_multivect
   end interface psb_halo
 
 

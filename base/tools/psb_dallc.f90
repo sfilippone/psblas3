@@ -420,3 +420,97 @@ subroutine psb_dalloc_vect_r2(x, desc_a,info,n,lb)
   return
 
 end subroutine psb_dalloc_vect_r2
+
+
+subroutine psb_dalloc_multivect(x, desc_a,info,n)
+  use psb_base_mod, psb_protect_name => psb_dalloc_multivect
+  use psi_mod
+  implicit none
+
+  !....parameters...
+  type(psb_d_multivect_type), allocatable, intent(out)  :: x
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_),intent(out)             :: info
+  integer(psb_ipk_), optional, intent(in)   :: n
+
+  !locals
+  integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
+  integer(psb_ipk_) :: ictxt, int_err(5), exch(1)
+  integer(psb_ipk_) :: debug_level, debug_unit
+  character(len=20)  :: name
+
+  info=psb_success_
+  if (psb_errstatus_fatal()) return 
+  name='psb_geall'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check m and n parameters....
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (present(n)) then 
+    n_ = n
+  else
+    n_ = 1
+  endif
+
+  !global check on n parameters
+  if (me == psb_root_) then
+    exch(1)=n_
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+  else
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    if (exch(1) /= n_) then
+      info=psb_err_parm_differs_among_procs_
+      int_err(1)=1
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
+  endif
+  ! As this is a rank-1 array, optional parameter N is actually ignored.
+
+  !....allocate x .....
+  if (desc_a%is_asb().or.desc_a%is_upd()) then
+    nr = max(1,desc_a%get_local_cols())
+  else if (desc_a%is_bld()) then
+    nr = max(1,desc_a%get_local_rows())
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
+  endif
+
+  allocate(psb_d_base_multivect_type :: x%v, stat=info) 
+  if (info == 0) call x%all(nr,n_,info)
+  if (info == 0) call x%zero()
+  
+  if (psb_errstatus_fatal()) then 
+    info=psb_err_alloc_request_
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    goto 9999
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_dalloc_multivect
