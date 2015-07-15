@@ -1593,9 +1593,9 @@ contains
   !
   ! New comm internals impl. 
   !
-  subroutine i_base_mlv_gthzbuf(i,n,idx,x)
+  subroutine i_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
-    integer(psb_ipk_) :: i,n
+    integer(psb_ipk_) :: i, ixb, n
     class(psb_i_base_vect_type) :: idx
     class(psb_i_base_multivect_type) :: x
     integer(psb_ipk_) :: nc
@@ -1607,7 +1607,7 @@ contains
     if (idx%is_dev()) call idx%sync()
     if (x%is_dev()) call x%sync()
     nc = x%get_ncols()
-    call x%gth(n,idx%v(i:),x%combuf((i-1)*nc+1:))
+    call x%gth(n,idx%v(i:),x%combuf(ixb:))
 
   end subroutine i_base_mlv_gthzbuf
 
@@ -1649,9 +1649,9 @@ contains
 
   end subroutine i_base_mlv_sctb_x
 
-  subroutine i_base_mlv_sctb_buf(i,n,idx,beta,y)
+  subroutine i_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
-    integer(psb_ipk_) :: i, n
+    integer(psb_ipk_) :: i, iyb, n
     class(psb_i_base_vect_type) :: idx
     integer(psb_ipk_) :: beta
     class(psb_i_base_multivect_type) :: y
@@ -1664,7 +1664,7 @@ contains
     if (y%is_dev()) call y%sync()
     if (idx%is_dev()) call idx%sync()
     nc = y%get_ncols()
-    call y%sct(n,idx%v(i:),y%combuf((i-1)*nc+1:),beta)
+    call y%sct(n,idx%v(i:),y%combuf(iyb:),beta)
     call y%set_host()
     
   end subroutine i_base_mlv_sctb_buf

@@ -1525,7 +1525,8 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     goto 9999
   endif
 
-  n=1
+  n = y%get_ncols()
+
   swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
@@ -1555,21 +1556,22 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
+    snd_pt = totrcv_+1
+    rcv_pt = 1
     p2ptag = psb_double_swap_tag
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
-        if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
-        call mpi_irecv(y%combuf(snd_pt),nesd,&
+        if (debug) write(*,*) me,'Posting receive from',prcid(i),snd_pt
+        call mpi_irecv(y%combuf(snd_pt),n*nesd,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag, icomm,y%comid(i,2),iret)
       end if
+      rcv_pt = rcv_pt + n*nerv
+      snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
@@ -1578,16 +1580,15 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     ! Then gather for sending.
     !    
     pnti   = 1
-    snd_pt = 1
+    snd_pt = totrcv_+1
+    rcv_pt = 1
     do i=1, totxch
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
-
-      idx_pt = rcv_pt
-      call y%gth(idx_pt,nerv,idx)
-
+      idx_pt = 1+pnti+psb_n_elem_recv_
+      call y%gth(idx_pt,rcv_pt,nerv,idx)
+      rcv_pt = rcv_pt + n*nerv
+      snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
@@ -1603,18 +1604,17 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     !
 
     pnti   = 1
-    snd_pt = 1
+    snd_pt = totrcv_+1
     rcv_pt = 1
     p2ptag = psb_double_swap_tag
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
+      idx_pt = 1+pnti+psb_n_elem_recv_
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        call mpi_isend(y%combuf(rcv_pt),nerv,&
+        call mpi_isend(y%combuf(rcv_pt),n*nerv,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
       end if
@@ -1625,7 +1625,8 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
         call psb_errpush(info,name,i_err=ierr)
         goto 9999
       end if
-
+      rcv_pt = rcv_pt + n*nerv
+      snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
   end if
@@ -1645,14 +1646,13 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
 
     if (debug) write(*,*) me,' wait'
     pnti   = 1
+    snd_pt = totrcv_+1
+    rcv_pt = 1
     p2ptag = psb_double_swap_tag
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
-
       if (proc_to_comm /= me)then 
         if (nerv>0) then 
           call mpi_wait(y%comid(i,1),p2pstat,iret)
@@ -1678,26 +1678,30 @@ subroutine psi_dtran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
                & 'Fatal error in swapdata: mismatch on self send',&
                & nerv,nesd
         end if
-        y%combuf(snd_pt:snd_pt+nesd-1) = y%combuf(rcv_pt:rcv_pt+nerv-1) 
+        y%combuf(snd_pt:snd_pt+n*nesd-1) = y%combuf(rcv_pt:rcv_pt+n*nerv-1) 
       end if
+      rcv_pt = rcv_pt + n*nerv
+      snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
     if (debug) write(*,*) me,' scatter'      
+
+
     pnti   = 1
-    snd_pt = 1
+    snd_pt = totrcv_+1
     rcv_pt = 1
     do i=1, totxch
       proc_to_comm = idx%v(pnti+psb_proc_id_)
       nerv = idx%v(pnti+psb_n_elem_recv_)
       nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      idx_pt = 1+pnti+psb_n_elem_recv_
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
+      idx_pt = 1+pnti+nerv+psb_n_elem_send_
 
       if (debug) write(0,*)me,' Received from: ',prcid(i),&
-           & y%combuf(snd_pt:snd_pt+nesd-1)        
-      call y%sct(snd_pt,nesd,idx,beta)
+           & y%combuf(snd_pt:snd_pt+n*nesd-1)        
+      call y%sct(idx_pt,snd_pt,nesd,idx,beta)
+      rcv_pt = rcv_pt + n*nerv
+      snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
