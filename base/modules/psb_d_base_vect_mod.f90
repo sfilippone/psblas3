@@ -1457,13 +1457,15 @@ module psb_d_base_multivect_mod
     !
     procedure, pass(x) :: gthab    => d_base_mlv_gthab
     procedure, pass(x) :: gthzv    => d_base_mlv_gthzv
+    procedure, pass(x) :: gthzm    => d_base_mlv_gthzm
     procedure, pass(x) :: gthzv_x  => d_base_mlv_gthzv_x
     procedure, pass(x) :: gthzbuf  => d_base_mlv_gthzbuf
-    generic, public    :: gth      => gthab, gthzv, gthzv_x, gthzbuf
+    generic, public    :: gth      => gthab, gthzv, gthzm, gthzv_x, gthzbuf
     procedure, pass(y) :: sctb     => d_base_mlv_sctb
+    procedure, pass(y) :: sctbr2   => d_base_mlv_sctbr2
     procedure, pass(y) :: sctb_x   => d_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => d_base_mlv_sctb_buf
-    generic, public    :: sct      => sctb, sctb_x, sctb_buf
+    generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
   end type psb_d_base_multivect_type
 
   interface psb_d_base_multivect
@@ -2560,6 +2562,31 @@ contains
     call psi_gth(n,nc,idx,x%v,y)
 
   end subroutine d_base_mlv_gthzv
+  !
+  ! shortcut alpha=1 beta=0
+  ! 
+  !> Function  base_mlv_gthzv
+  !! \memberof  psb_d_base_multivect_type
+  !! \brief gather into an array special alpha=1 beta=0
+  !!    Y = X(IDX(:))
+  !! \param n  how many entries to consider
+  !! \param idx(:) indices
+  subroutine d_base_mlv_gthzm(n,idx,x,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    real(psb_dpk_) ::  y(:,:)
+    class(psb_d_base_multivect_type) :: x
+    integer(psb_ipk_) :: nc
+
+    if (x%is_dev()) call x%sync()
+    if (.not.allocated(x%v)) then
+      return
+    end if
+    nc = psb_size(x%v,2)
+
+    call psi_gth(n,nc,idx,x%v,y)
+
+  end subroutine d_base_mlv_gthzm
 
   !
   ! New comm internals impl. 
@@ -2608,6 +2635,20 @@ contains
     call y%set_host()
 
   end subroutine d_base_mlv_sctb
+
+  subroutine d_base_mlv_sctbr2(n,idx,x,beta,y)
+    use psi_serial_mod
+    integer(psb_ipk_) :: n, idx(:)
+    real(psb_dpk_) :: beta, x(:,:)
+    class(psb_d_base_multivect_type) :: y
+    integer(psb_ipk_) :: nc
+
+    if (y%is_dev()) call y%sync()
+    nc = y%get_ncols()
+    call psi_sct(n,nc,idx,x,beta,y%v)
+    call y%set_host()
+
+  end subroutine d_base_mlv_sctbr2
 
   subroutine d_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod

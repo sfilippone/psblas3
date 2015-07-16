@@ -62,6 +62,13 @@ module psi_i_serial_mod
       integer(psb_ipk_) :: x(:,:), y(:)
       
     end subroutine psi_igthzmv
+    subroutine psi_igthzmm(n,k,idx,x,y)
+      import :: psb_ipk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_ipk_) :: x(:,:), y(:,:)
+      
+    end subroutine psi_igthzmm
     subroutine psi_igthzv(n,idx,x,y)
       import :: psb_ipk_
       implicit none 
@@ -71,6 +78,12 @@ module psi_i_serial_mod
   end interface psi_gth
 
   interface psi_sct
+    subroutine psi_isctmm(n,k,idx,x,beta,y)
+      import :: psb_ipk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      integer(psb_ipk_) :: beta, x(:,:), y(:,:)
+    end subroutine psi_isctmm
     subroutine psi_isctmv(n,k,idx,x,beta,y)
       import :: psb_ipk_
       implicit none

@@ -5,7 +5,12 @@ FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
 	psi_sort_dl.o \
 	psi_bld_tmphalo.o\
 	psi_sort_dl.o \
-        psi_desc_impl.o psi_ovrl_restr.o psi_ovrl_save.o psi_ovrl_upd.o
+        psi_desc_impl.o \
+	psi_iovrl_restr.o psi_iovrl_save.o psi_iovrl_upd.o \
+	psi_sovrl_restr.o psi_sovrl_save.o psi_sovrl_upd.o \
+	psi_dovrl_restr.o psi_dovrl_save.o psi_dovrl_upd.o \
+	psi_covrl_restr.o psi_covrl_save.o psi_covrl_upd.o \
+	psi_zovrl_restr.o psi_zovrl_save.o psi_zovrl_upd.o 
 
 FOBJS2 = psi_exist_ovr_elem.o psi_list_search.o srtlist.o 
 #COBJS = avltree.o srcht.o

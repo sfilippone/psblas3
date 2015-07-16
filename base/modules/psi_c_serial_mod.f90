@@ -62,6 +62,13 @@ module psi_c_serial_mod
       complex(psb_spk_) :: x(:,:), y(:)
       
     end subroutine psi_cgthzmv
+    subroutine psi_cgthzmm(n,k,idx,x,y)
+      import :: psb_ipk_, psb_spk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      complex(psb_spk_) :: x(:,:), y(:,:)
+      
+    end subroutine psi_cgthzmm
     subroutine psi_cgthzv(n,idx,x,y)
       import :: psb_ipk_, psb_spk_
       implicit none 
@@ -71,6 +78,12 @@ module psi_c_serial_mod
   end interface psi_gth
 
   interface psi_sct
+    subroutine psi_csctmm(n,k,idx,x,beta,y)
+      import :: psb_ipk_, psb_spk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      complex(psb_spk_) :: beta, x(:,:), y(:,:)
+    end subroutine psi_csctmm
     subroutine psi_csctmv(n,k,idx,x,beta,y)
       import :: psb_ipk_, psb_spk_
       implicit none

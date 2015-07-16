@@ -249,6 +249,24 @@ subroutine psi_sgthv(n,idx,alpha,x,beta,y)
 
 end subroutine psi_sgthv
 
+subroutine psi_sgthzmm(n,k,idx,x,y)
+
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  real(psb_spk_) :: x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i
+
+  
+  do i=1,n
+    y(i,1:k)=x(idx(i),1:k)
+  end do
+
+end subroutine psi_sgthzmm
+
 subroutine psi_sgthzmv(n,k,idx,x,y)
 
   use psb_const_mod
@@ -286,6 +304,32 @@ subroutine psi_sgthzv(n,idx,x,y)
   end do
 
 end subroutine psi_sgthzv
+
+subroutine psi_ssctmm(n,k,idx,x,beta,y)
+  
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  real(psb_spk_) :: beta, x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i, j
+
+  if (beta == szero) then
+    do i=1,n
+      y(idx(i),1:k) = x(i,1:k)
+    end do
+  else if (beta == sone) then
+    do i=1,n
+      y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
+    end do
+  else
+    do i=1,n
+      y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
+    end do
+  end if
+end subroutine psi_ssctmm
 
 subroutine psi_ssctmv(n,k,idx,x,beta,y)
   

@@ -249,6 +249,24 @@ subroutine psi_zgthv(n,idx,alpha,x,beta,y)
 
 end subroutine psi_zgthv
 
+subroutine psi_zgthzmm(n,k,idx,x,y)
+
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  complex(psb_dpk_) :: x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i
+
+  
+  do i=1,n
+    y(i,1:k)=x(idx(i),1:k)
+  end do
+
+end subroutine psi_zgthzmm
+
 subroutine psi_zgthzmv(n,k,idx,x,y)
 
   use psb_const_mod
@@ -286,6 +304,32 @@ subroutine psi_zgthzv(n,idx,x,y)
   end do
 
 end subroutine psi_zgthzv
+
+subroutine psi_zsctmm(n,k,idx,x,beta,y)
+  
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  complex(psb_dpk_) :: beta, x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i, j
+
+  if (beta == zzero) then
+    do i=1,n
+      y(idx(i),1:k) = x(i,1:k)
+    end do
+  else if (beta == zone) then
+    do i=1,n
+      y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
+    end do
+  else
+    do i=1,n
+      y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
+    end do
+  end if
+end subroutine psi_zsctmm
 
 subroutine psi_zsctmv(n,k,idx,x,beta,y)
   

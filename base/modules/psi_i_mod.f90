@@ -119,7 +119,7 @@ module psi_i_mod
       type(psb_desc_type), intent(in) :: desc
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_fnd_owner
-  end interface
+  end interface psi_fnd_owner
 
   interface psi_bld_tmphalo
     subroutine psi_bld_tmphalo(desc,info)
@@ -127,7 +127,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_bld_tmphalo
-  end interface
+  end interface psi_bld_tmphalo
 
 
   interface psi_bld_tmpovrl
@@ -137,7 +137,7 @@ module psi_i_mod
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_bld_tmpovrl
-  end interface
+  end interface psi_bld_tmpovrl
 
   interface psi_cnv_dsc
     subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
@@ -147,7 +147,7 @@ module psi_i_mod
       integer(psb_ipk_), intent(out)               :: info
       class(psb_i_base_vect_type), optional, intent(in) :: mold
     end subroutine psi_cnv_dsc
-  end interface
+  end interface psi_cnv_dsc
 
   interface psi_renum_index
     subroutine psi_renum_index(iperm,idx,info)
@@ -156,7 +156,7 @@ module psi_i_mod
       integer(psb_ipk_), intent(in)    :: iperm(:)
       integer(psb_ipk_), intent(inout) :: idx(:)
     end subroutine psi_renum_index
-  end interface
+  end interface psi_renum_index
 
   interface psi_inner_cnv
     subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)
@@ -183,7 +183,7 @@ module psi_i_mod
       integer(psb_ipk_), intent(in)  :: x(:)
       integer(psb_ipk_), intent(out) :: y(:)
     end subroutine psi_inner_cnv2
-  end interface
+  end interface psi_inner_cnv
 
   interface 
     subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
@@ -274,7 +274,7 @@ module psi_i_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_iswap_vidx_multivect
-  end interface
+  end interface psi_swapdata
 
 
   interface psi_swaptran
@@ -356,7 +356,7 @@ module psi_i_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_itran_vidx_multivect
-  end interface
+  end interface psi_swaptran
 
   interface psi_ovrl_upd
     subroutine  psi_iovrl_updr1(x,desc_a,update,info)
@@ -380,7 +380,14 @@ module psi_i_mod
       integer(psb_ipk_), intent(in)               :: update
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_iovrl_upd_vect
-  end interface
+    subroutine  psi_iovrl_upd_multivect(x,desc_a,update,info)
+      import 
+      class(psb_i_base_multivect_type)   :: x
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(in)        :: update
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psi_iovrl_upd_multivect
+  end interface psi_ovrl_upd
 
   interface psi_ovrl_save
     subroutine  psi_iovrl_saver1(x,xs,desc_a,info)
@@ -404,7 +411,14 @@ module psi_i_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_iovrl_save_vect
-  end interface
+    subroutine  psi_iovrl_save_multivect(x,xs,desc_a,info)
+      import 
+      class(psb_i_base_multivect_type)     :: x
+      integer(psb_ipk_), allocatable  :: xs(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_iovrl_save_multivect
+  end interface psi_ovrl_save
 
   interface psi_ovrl_restore
     subroutine  psi_iovrl_restrr1(x,xs,desc_a,info)
@@ -428,7 +442,14 @@ module psi_i_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_iovrl_restr_vect
-  end interface
+    subroutine  psi_iovrl_restr_multivect(x,xs,desc_a,info)
+      import 
+      class(psb_i_base_multivect_type)     :: x
+      integer(psb_ipk_)               :: xs(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_iovrl_restr_multivect
+  end interface psi_ovrl_restore
 
 end module psi_i_mod
 

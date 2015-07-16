@@ -249,6 +249,24 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
 
 end subroutine psi_cgthv
 
+subroutine psi_cgthzmm(n,k,idx,x,y)
+
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  complex(psb_spk_) :: x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i
+
+  
+  do i=1,n
+    y(i,1:k)=x(idx(i),1:k)
+  end do
+
+end subroutine psi_cgthzmm
+
 subroutine psi_cgthzmv(n,k,idx,x,y)
 
   use psb_const_mod
@@ -286,6 +304,32 @@ subroutine psi_cgthzv(n,idx,x,y)
   end do
 
 end subroutine psi_cgthzv
+
+subroutine psi_csctmm(n,k,idx,x,beta,y)
+  
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  complex(psb_spk_) :: beta, x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i, j
+
+  if (beta == czero) then
+    do i=1,n
+      y(idx(i),1:k) = x(i,1:k)
+    end do
+  else if (beta == cone) then
+    do i=1,n
+      y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
+    end do
+  else
+    do i=1,n
+      y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
+    end do
+  end if
+end subroutine psi_csctmm
 
 subroutine psi_csctmv(n,k,idx,x,beta,y)
   

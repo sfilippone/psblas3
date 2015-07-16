@@ -249,6 +249,24 @@ subroutine psi_dgthv(n,idx,alpha,x,beta,y)
 
 end subroutine psi_dgthv
 
+subroutine psi_dgthzmm(n,k,idx,x,y)
+
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  real(psb_dpk_) :: x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i
+
+  
+  do i=1,n
+    y(i,1:k)=x(idx(i),1:k)
+  end do
+
+end subroutine psi_dgthzmm
+
 subroutine psi_dgthzmv(n,k,idx,x,y)
 
   use psb_const_mod
@@ -286,6 +304,32 @@ subroutine psi_dgthzv(n,idx,x,y)
   end do
 
 end subroutine psi_dgthzv
+
+subroutine psi_dsctmm(n,k,idx,x,beta,y)
+  
+  use psb_const_mod
+  implicit none
+
+  integer(psb_ipk_) :: n, k, idx(:)
+  real(psb_dpk_) :: beta, x(:,:), y(:,:)
+
+  ! Locals
+  integer(psb_ipk_) :: i, j
+
+  if (beta == dzero) then
+    do i=1,n
+      y(idx(i),1:k) = x(i,1:k)
+    end do
+  else if (beta == done) then
+    do i=1,n
+      y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
+    end do
+  else
+    do i=1,n
+      y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
+    end do
+  end if
+end subroutine psi_dsctmm
 
 subroutine psi_dsctmv(n,k,idx,x,beta,y)
   

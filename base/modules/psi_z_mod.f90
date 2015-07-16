@@ -114,7 +114,7 @@ module psi_z_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_zswap_vidx_multivect
-  end interface
+  end interface psi_swapdata
 
 
   interface psi_swaptran
@@ -196,7 +196,7 @@ module psi_z_mod
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_ztran_vidx_multivect
-  end interface
+  end interface psi_swaptran
 
   interface psi_ovrl_upd
     subroutine  psi_zovrl_updr1(x,desc_a,update,info)
@@ -220,7 +220,14 @@ module psi_z_mod
       integer(psb_ipk_), intent(in)               :: update
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_zovrl_upd_vect
-  end interface
+    subroutine  psi_zovrl_upd_multivect(x,desc_a,update,info)
+      import 
+      class(psb_z_base_multivect_type)   :: x
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(in)        :: update
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psi_zovrl_upd_multivect
+  end interface psi_ovrl_upd
 
   interface psi_ovrl_save
     subroutine  psi_zovrl_saver1(x,xs,desc_a,info)
@@ -244,7 +251,14 @@ module psi_z_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_zovrl_save_vect
-  end interface
+    subroutine  psi_zovrl_save_multivect(x,xs,desc_a,info)
+      import 
+      class(psb_z_base_multivect_type)     :: x
+      complex(psb_dpk_), allocatable  :: xs(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_zovrl_save_multivect
+  end interface psi_ovrl_save
 
   interface psi_ovrl_restore
     subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
@@ -268,7 +282,14 @@ module psi_z_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_zovrl_restr_vect
-  end interface
+    subroutine  psi_zovrl_restr_multivect(x,xs,desc_a,info)
+      import 
+      class(psb_z_base_multivect_type)     :: x
+      complex(psb_dpk_)               :: xs(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psi_zovrl_restr_multivect
+  end interface psi_ovrl_restore
 
 end module psi_z_mod
 

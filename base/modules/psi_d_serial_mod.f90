@@ -62,6 +62,13 @@ module psi_d_serial_mod
       real(psb_dpk_) :: x(:,:), y(:)
       
     end subroutine psi_dgthzmv
+    subroutine psi_dgthzmm(n,k,idx,x,y)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      real(psb_dpk_) :: x(:,:), y(:,:)
+      
+    end subroutine psi_dgthzmm
     subroutine psi_dgthzv(n,idx,x,y)
       import :: psb_ipk_, psb_dpk_
       implicit none 
@@ -71,6 +78,12 @@ module psi_d_serial_mod
   end interface psi_gth
 
   interface psi_sct
+    subroutine psi_dsctmm(n,k,idx,x,beta,y)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_) :: n, k, idx(:)
+      real(psb_dpk_) :: beta, x(:,:), y(:,:)
+    end subroutine psi_dsctmm
     subroutine psi_dsctmv(n,k,idx,x,beta,y)
       import :: psb_ipk_, psb_dpk_
       implicit none
