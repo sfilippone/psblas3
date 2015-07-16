@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
-<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
+<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
+<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node91.html">
 <LINK REL="previous" HREF="node89.html">
-<LINK REL="up" HREF="node66.html">
+<LINK REL="up" HREF="node67.html">
 <LINK REL="next" HREF="node91.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1363"
+<A NAME="tex2html1366"
   HREF="node91.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1359"
-  HREF="node66.html">
+<A NAME="tex2html1362"
+  HREF="node67.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1353"
+<A NAME="tex2html1356"
   HREF="node89.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1361"
+<A NAME="tex2html1364"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1364"
-  HREF="node91.html">psb_sp_getrow   Extract</A>
-<B> Up:</B> <A NAME="tex2html1360"
-  HREF="node66.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1354"
-  HREF="node89.html">psb_get_boundary   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1362"
+<B> Next:</B> <A NAME="tex2html1367"
+  HREF="node91.html">psb_get_overlap   Extract</A>
+<B> Up:</B> <A NAME="tex2html1363"
+  HREF="node67.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1357"
+  HREF="node89.html">psb_local_index</A>
+ &nbsp; <B>  <A NAME="tex2html1365"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000724000000000000000">
-psb_get_overlap -- Extract list of overlap
+<H2><A NAME="SECTION000723000000000000000">
+psb_get_boundary -- Extract list of boundary
   elements</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_overlap(ovrel, desc, info)
+call psb_get_boundary(bndel, desc, info)
 </PRE>
 
 <P>
@@ -87,8 +87,8 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ovrel</STRONG></DT>
-<DD>The list of overlap elements on the calling process, in
+<DT><STRONG>bndel</STRONG></DT>
+<DD>The list of boundary elements on the calling process, in
   local numbering.
 <BR>
 Scope: <B>local</B> 
@@ -117,11 +117,12 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>If there are no overlap elements the output vector is set
-  to the ``not allocated'' state.  
+<LI>If there are no boundary elements (i.e., if the local part of
+  the connectivity graph is self-contained) the output vector is set
+  to the ``not allocated'' state. 
 </LI>
-<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
-  number of overlap elements. 
+<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
+  number of boundary elements. 
 </LI>
 </OL>
 

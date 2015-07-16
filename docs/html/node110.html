@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_rcv -- Receive data</TITLE>
-<META NAME="description" CONTENT="psb_rcv -- Receive data">
+<TITLE>psb_snd -- Send data</TITLE>
+<META NAME="description" CONTENT="psb_snd -- Send data">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,52 +18,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node111.html">
 <LINK REL="previous" HREF="node109.html">
-<LINK REL="up" HREF="node94.html">
+<LINK REL="up" HREF="node95.html">
 <LINK REL="next" HREF="node111.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1615"
+<A NAME="tex2html1620"
   HREF="node111.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1611"
-  HREF="node94.html">
+<A NAME="tex2html1616"
+  HREF="node95.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1607"
+<A NAME="tex2html1610"
   HREF="node109.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1613"
+<A NAME="tex2html1618"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1616"
-  HREF="node111.html">Error handling</A>
-<B> Up:</B> <A NAME="tex2html1612"
-  HREF="node94.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1608"
-  HREF="node109.html">psb_snd   Send</A>
- &nbsp; <B>  <A NAME="tex2html1614"
+<B> Next:</B> <A NAME="tex2html1621"
+  HREF="node111.html">psb_rcv   Receive</A>
+<B> Up:</B> <A NAME="tex2html1617"
+  HREF="node95.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1611"
+  HREF="node109.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1619"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000816000000000000000">
-psb_rcv -- Receive data</A>
+<H2><A NAME="SECTION000815000000000000000">
+psb_snd -- Send data</A>
 </H2>
 
 <P>
 <PRE>
-call psb_rcv(icontxt, dat, src, m)
+call psb_snd(icontxt, dat, dst, m)
 </PRE>
 
 <P>
-This subroutine receives a packet of data to a destination.
+This subroutine sends a packet of data to a destination.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous: see usage notes.
+<DD>Synchronous: see usage notes. 
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -80,8 +81,24 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>src</STRONG></DT>
-<DD>Source process.
+<DT><STRONG>dat</STRONG></DT>
+<DD>The data to be sent.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind and  rank must agree on sender and receiver process; if <IMG
+ WIDTH="18" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img133.png"
+ ALT="$m$"> is
+not specified, size must agree as well. 
+</DD>
+<DT><STRONG>dst</STRONG></DT>
+<DD>Destination process.
 <BR>
 Scope: <B>global</B>.
 <BR>
@@ -90,12 +107,12 @@ Type: <B>required</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer value <!-- MATH
- $0<= src <= np-1$
+ $0<= dst <= np-1$
  -->
 <IMG
- WIDTH="146" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img140.png"
- ALT="$0&lt;= src &lt;= np-1$">. 
+ WIDTH="145" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img134.png"
+ ALT="$0&lt;= dst &lt;= np-1$">. 
 <BR></DD>
 <DT><STRONG>m</STRONG></DT>
 <DD>Number of rows.
@@ -110,17 +127,17 @@ Specified as: an integer value <!-- MATH
  $0<= m <= size(dat,1)$
  -->
 <IMG
- WIDTH="171" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img136.png"
+ WIDTH="172" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img135.png"
  ALT="$0&lt;= m &lt;= size(dat,1)$">. 
 <BR>
 When <IMG
- WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img137.png"
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img136.png"
  ALT="$dat$"> is a rank 2 array, specifies the number of rows to be sent
 independently of the leading dimension <IMG
- WIDTH="82" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img138.png"
+ WIDTH="83" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img137.png"
  ALT="$size(dat,1)$">; must have the
 same value on sending and receiving processes.
 </DD>
@@ -131,22 +148,6 @@ same value on sending and receiving processes.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>The data to be received.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind and  rank must agree on sender and receiver process; if <IMG
- WIDTH="18" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img134.png"
- ALT="$m$"> is
-not specified, size must agree as well. 
-</DD>
 </DL>
 
 <P>
@@ -154,36 +155,36 @@ not specified, size must agree as well.
 
 <OL>
 <LI>This subroutine implies a synchronization, but only between the
-  calling process and the source  process <IMG
- WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img141.png"
- ALT="$src$">.
+  calling process and the destination  process <IMG
+ WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img138.png"
+ ALT="$dst$">.
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1615"
+<A NAME="tex2html1620"
   HREF="node111.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1611"
-  HREF="node94.html">
+<A NAME="tex2html1616"
+  HREF="node95.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1607"
+<A NAME="tex2html1610"
   HREF="node109.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1613"
+<A NAME="tex2html1618"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1616"
-  HREF="node111.html">Error handling</A>
-<B> Up:</B> <A NAME="tex2html1612"
-  HREF="node94.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1608"
-  HREF="node109.html">psb_snd   Send</A>
- &nbsp; <B>  <A NAME="tex2html1614"
+<B> Next:</B> <A NAME="tex2html1621"
+  HREF="node111.html">psb_rcv   Receive</A>
+<B> Up:</B> <A NAME="tex2html1617"
+  HREF="node95.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1611"
+  HREF="node109.html">psb_amn   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1619"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

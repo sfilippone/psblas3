@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_is_local -- </TITLE>
-<META NAME="description" CONTENT="psb_is_local -- ">
+<TITLE>psb_owned_index -- </TITLE>
+<META NAME="description" CONTENT="psb_owned_index -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node88.html">
 <LINK REL="previous" HREF="node86.html">
-<LINK REL="up" HREF="node66.html">
+<LINK REL="up" HREF="node67.html">
 <LINK REL="next" HREF="node88.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1327"
+<A NAME="tex2html1330"
   HREF="node88.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1323"
-  HREF="node66.html">
+<A NAME="tex2html1326"
+  HREF="node67.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1317"
+<A NAME="tex2html1320"
   HREF="node86.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1325"
+<A NAME="tex2html1328"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1328"
-  HREF="node88.html">psb_local_index</A>
-<B> Up:</B> <A NAME="tex2html1324"
-  HREF="node66.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1318"
-  HREF="node86.html">psb_owned_index</A>
- &nbsp; <B>  <A NAME="tex2html1326"
+<B> Next:</B> <A NAME="tex2html1331"
+  HREF="node88.html">psb_is_local</A>
+<B> Up:</B> <A NAME="tex2html1327"
+  HREF="node67.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1321"
+  HREF="node86.html">psb_is_owned</A>
+ &nbsp; <B>  <A NAME="tex2html1329"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000721000000000000000">
-psb_is_local  -- </A>
+<H2><A NAME="SECTION000720000000000000000">
+psb_owned_index  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_is_local(x, desc_a)
+call psb_owned_index(y, x, desc_a, info)
 </PRE>
 
 <P>
@@ -69,15 +69,15 @@ call psb_is_local(x, desc_a)
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>Integer index.
+<DD>Integer indices.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>in, inout</B>.
 <BR>
-Specified as: a scalar integer.
+Specified as: a scalar or a rank one integer array.
 <BR></DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -90,6 +90,17 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
+</DD>
 </DL>
 
 <P>
@@ -97,26 +108,39 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>A logical mask which is true if 
+<DT><STRONG>y</STRONG></DT>
+<DD>A logical mask which is true for all corresponding entries of
   <IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is  local to the current process
+ ALT="$x$"> that are owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
-<BR></DD>
+<BR>
+Specified as: a scalar or rank one logical array.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
 </DL>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This routine returns a <code>.true.</code> value for an index
-  that is local to the current process, including the halo
+<LI>This routine returns a <code>.true.</code> value for those indices
+  that are strictly owned by the current process, excluding the halo
   indices
 </LI>
 </OL>

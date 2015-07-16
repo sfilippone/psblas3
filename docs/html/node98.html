@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
-<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
+<TITLE>psb_exit -- Exit from PSBLAS parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_exit -- Exit from PSBLAS parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,51 +20,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node99.html">
 <LINK REL="previous" HREF="node97.html">
-<LINK REL="up" HREF="node94.html">
+<LINK REL="up" HREF="node95.html">
 <LINK REL="next" HREF="node99.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1473"
+<A NAME="tex2html1476"
   HREF="node99.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1469"
-  HREF="node94.html">
+<A NAME="tex2html1472"
+  HREF="node95.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1463"
+<A NAME="tex2html1466"
   HREF="node97.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1471"
+<A NAME="tex2html1474"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1474"
-  HREF="node99.html">psb_get_rank   Get</A>
-<B> Up:</B> <A NAME="tex2html1470"
-  HREF="node94.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1464"
-  HREF="node97.html">psb_exit   Exit</A>
- &nbsp; <B>  <A NAME="tex2html1472"
+<B> Next:</B> <A NAME="tex2html1477"
+  HREF="node99.html">psb_get_mpicomm   Get</A>
+<B> Up:</B> <A NAME="tex2html1473"
+  HREF="node95.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1467"
+  HREF="node97.html">psb_info   Return</A>
+ &nbsp; <B>  <A NAME="tex2html1475"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00084000000000000000">
-psb_get_mpicomm -- Get the MPI communicator</A>
+<H2><A NAME="SECTION00083000000000000000">
+psb_exit -- Exit from  PSBLAS parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_mpicomm(icontxt, icomm)
+call psb_exit(icontxt)
+call psb_exit(icontxt,close)
 </PRE>
 
 <P>
-This subroutine returns the MPI communicator associated with a PSBLAS context
+This subroutine exits from the  PSBLAS parallel virtual  machine.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -81,26 +83,69 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>icomm</STRONG></DT>
-<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<DT><STRONG>close</STRONG></DT>
+<DD>Whether to close all data structures related to the
+  virtual parallel machine, besides those associated with icontxt.
 <BR>
 Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>.
+Type: <B>optional</B>.
 <BR>
-Intent: <B>out</B>.
-<BR></DD>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical  variable, default value: true.
+</DD>
 </DL>
 
 <P>
-<BR><HR>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This routine may be called even if a previous call to
+  <code>psb_info</code> has returned with <IMG
+ WIDTH="73" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img128.png"
+ ALT="$iam=-1$">; indeed, it it is the only
+  routine that may be called with argument <code>icontxt</code> in this
+  situation.
+</LI>
+<LI>A call to this routine with <code>close=.true.</code> implies a call
+  to <code>MPI_Finalize</code>, after which no parallel routine may be called.
+</LI>
+<LI>If the user whishes to use multiple communication contexts in the
+  same program, or to enter and exit multiple times into the parallel
+  environment, this routine may be called to 
+  selectively close the contexts with <code>close=.false.</code>, while on
+  the last call it should be called with <code>close=.true.</code> to
+  shutdown in a clean way the entire parallel environment.
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1476"
+  HREF="node99.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1472"
+  HREF="node95.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1466"
+  HREF="node97.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1474"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1477"
+  HREF="node99.html">psb_get_mpicomm   Get</A>
+<B> Up:</B> <A NAME="tex2html1473"
+  HREF="node95.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1467"
+  HREF="node97.html">psb_info   Return</A>
+ &nbsp; <B>  <A NAME="tex2html1475"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

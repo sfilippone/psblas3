@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_set_large_threshold -- Set threshold for index mapping switch</TITLE>
-<META NAME="description" CONTENT="psb_cd_set_large_threshold -- Set threshold for index mapping switch">
+<TITLE>psb_cd_get_large_threshold -- Get threshold for index mapping switch</TITLE>
+<META NAME="description" CONTENT="psb_cd_get_large_threshold -- Get threshold for index mapping switch">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,66 +26,55 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html456"
+<A NAME="tex2html459"
   HREF="node20.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html452"
+<A NAME="tex2html455"
   HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html446"
+<A NAME="tex2html449"
   HREF="node18.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html454"
+<A NAME="tex2html457"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html457"
-  HREF="node20.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html453"
+<B> Next:</B> <A NAME="tex2html460"
+  HREF="node20.html">psb_cd_set_large_threshold   Set</A>
+<B> Up:</B> <A NAME="tex2html456"
   HREF="node10.html">Descriptor data structure</A>
-<B> Previous:</B> <A NAME="tex2html447"
-  HREF="node18.html">psb_cd_get_large_threshold   Get</A>
- &nbsp; <B>  <A NAME="tex2html455"
+<B> Previous:</B> <A NAME="tex2html450"
+  HREF="node18.html">Clone   clone</A>
+ &nbsp; <B>  <A NAME="tex2html458"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION00041900000000000000">
-psb_cd_set_large_threshold -- Set threshold for
+psb_cd_get_large_threshold -- Get threshold for
   index mapping switch</A>
 </H3>
 
 <P>
 <PRE>
-call psb_cd_set_large_threshold(ith)
+ith = psb_cd_get_large_threshold()
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ith</STRONG></DT>
-<DD>the new threshold for communication descriptors.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value greater than zero.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The current value for the size threshold. 
+
+<P>
 </DD>
 </DL>
-Note: the threshold value is only queried by the library at the time a
-call to <code>psb_cdall</code> is executed, therefore changing the threshold
-has no effect on communication descriptors that have already been
-initialized. Moreover the threshold must have the same value on all
-processes. 
 
 <P>
 <BR><HR>

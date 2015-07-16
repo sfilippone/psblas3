@@ -155,7 +155,7 @@ subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   ! define  rhs from boundary conditions; also build initial guess 
   if (info == psb_success_) call psb_geall(xv,desc_a,info)
   if (info == psb_success_) call psb_geall(bv,desc_a,info)
-  nlr = desc_a%get_local_rows()
+
   call psb_barrier(ictxt)
   talc = psb_wtime()-t0
 
@@ -171,19 +171,15 @@ subroutine psb_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   ! a bunch of rows per call. 
   ! 
   allocate(val(20*nb),irow(20*nb),&
-       &icol(20*nb),myidx(nlr),stat=info)
+       &icol(20*nb),stat=info)
   if (info /= psb_success_ ) then 
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  do i=1,nlr
-    myidx(i) = i
-  end do
-
-
-  call psb_loc_to_glob(myidx,desc_a,info)
+  myidx = desc_a%get_global_indices()
+  nlr = size(myidx)
 
   ! loop over rows belonging to current process in a block
   ! distribution.
@@ -481,7 +477,6 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   ! define  rhs from boundary conditions; also build initial guess 
   if (info == psb_success_) call psb_geall(xv,desc_a,info)
   if (info == psb_success_) call psb_geall(bv,desc_a,info)
-  nlr = desc_a%get_local_rows()
   call psb_barrier(ictxt)
   talc = psb_wtime()-t0
 
@@ -497,19 +492,16 @@ subroutine psb_d_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
   ! a bunch of rows per call. 
   ! 
   allocate(val(20*nb),irow(20*nb),&
-       &icol(20*nb),myidx(nlr),stat=info)
+       &icol(20*nb),stat=info)
   if (info /= psb_success_ ) then 
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  do i=1,nlr
-    myidx(i) = i
-  end do
-
-
-  call psb_loc_to_glob(myidx,desc_a,info)
+  
+  myidx = desc_a%get_global_indices()
+  nlr = size(myidx)
 
   ! loop over rows belonging to current process in a block
   ! distribution.

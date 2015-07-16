@@ -278,6 +278,35 @@ Scope: {\bf local}.\\
 \end{description}
 
 
+\subsubsection*{get\_global\_indices --- Get vector of global indices}
+\addcontentsline{toc}{paragraph}{get\_global\_rows}
+
+\begin{verbatim}
+myidx = desc%get_global_indices([owned])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+\item[owned] Choose if you only want owned indices
+  (\verb|owned=.true.|) or also halo indices (\verb|owned=.false.|). 
+Scope: {\bf local}.\\
+Type: {\bf optional}; default: \verb|.true.|.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The global indices, returned as an allocatable
+  integer array of rank 1. 
+\end{description}
+
+
+
 \subsubsection*{get\_context --- Get communication context}
 \addcontentsline{toc}{paragraph}{get\_context}
 

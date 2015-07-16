@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Preconditioner routines</TITLE>
-<META NAME="description" CONTENT="Preconditioner routines">
+<TITLE>mm_array_write -- Write a dense array from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_array_write -- Write a dense array from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,79 +18,100 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node125.html">
-<LINK REL="previous" HREF="node112.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node118.html">
+<LINK REL="up" HREF="node113.html">
 <LINK REL="next" HREF="node120.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1727"
+<A NAME="tex2html1730"
   HREF="node120.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1723"
-  HREF="userhtml.html">
+<A NAME="tex2html1726"
+  HREF="node113.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1717"
+<A NAME="tex2html1722"
   HREF="node118.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1725"
+<A NAME="tex2html1728"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1728"
-  HREF="node120.html">psb_precinit   Initialize</A>
-<B> Up:</B> <A NAME="tex2html1724"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1718"
-  HREF="node118.html">mm_array_write   Write</A>
- &nbsp; <B>  <A NAME="tex2html1726"
+<B> Next:</B> <A NAME="tex2html1731"
+  HREF="node120.html">Preconditioner routines</A>
+<B> Up:</B> <A NAME="tex2html1727"
+  HREF="node113.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1723"
+  HREF="node118.html">mm_mat_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1729"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000110000000000000000"></A>
-<A NAME="sec:precs"></A>
+<H2><A NAME="SECTION000106000000000000000">
+mm_array_write --  Write a dense array from a
+  file in the MatrixMarket format</A>
+</H2>
+
+<P>
 <BR>
-Preconditioner routines
-</H1>
+<IMG
+ WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img153.png"
+ ALT="\begin{lstlisting}
+call mm_array_write(b, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
 
 <P>
-<A NAME="sec:psprecs"></A>The base PSBLAS library  contains the implementation of two simple
-preconditioning techniques:
-
-<UL>
-<LI>Diagonal Scaling
-</LI>
-<LI>Block Jacobi with ILU(0) factorization
-</LI>
-</UL>
-The supporting data type and subroutine interfaces are defined in the
-module  <code>psb_prec_mod</code>.
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>required</B> 
+<BR>
+An  array of type real or complex, rank 1 or 2; will be written.. </DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be written.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
 
-<UL>
-<LI><A NAME="tex2html1729"
-  HREF="node120.html">psb_precinit -- Initialize a  preconditioner</A>
-<LI><A NAME="tex2html1730"
-  HREF="node121.html">psb_precbld -- Builds a preconditioner</A>
-<LI><A NAME="tex2html1731"
-  HREF="node122.html">psb_precaply -- Preconditioner application
-  routine</A>
-<LI><A NAME="tex2html1732"
-  HREF="node123.html">psb_precdescr -- Prints a description of current
-  preconditioner</A>
-<LI><A NAME="tex2html1733"
-  HREF="node124.html">clone -- clone  current
-  preconditioner</A>
-</UL>
-<!--End of Table of Child-Links-->
+<P>
 <BR><HR>
 
 </BODY>

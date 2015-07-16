@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Clone -- clone current object</TITLE>
-<META NAME="description" CONTENT="Clone -- clone current object">
+<TITLE>get_context -- Get communication context</TITLE>
+<META NAME="description" CONTENT="get_context -- Get communication context">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,38 +26,38 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html432"
+<A NAME="tex2html435"
   HREF="node18.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html428"
+<A NAME="tex2html431"
   HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html422"
+<A NAME="tex2html425"
   HREF="node16.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html430"
+<A NAME="tex2html433"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html433"
-  HREF="node18.html">psb_cd_get_large_threshold   Get</A>
-<B> Up:</B> <A NAME="tex2html429"
+<B> Next:</B> <A NAME="tex2html436"
+  HREF="node18.html">Clone   clone</A>
+<B> Up:</B> <A NAME="tex2html432"
   HREF="node10.html">Descriptor data structure</A>
-<B> Previous:</B> <A NAME="tex2html423"
-  HREF="node16.html">get_context   Get</A>
- &nbsp; <B>  <A NAME="tex2html431"
+<B> Previous:</B> <A NAME="tex2html426"
+  HREF="node16.html">get_global_indices   Get</A>
+ &nbsp; <B>  <A NAME="tex2html434"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION00041700000000000000">
-Clone -- clone current object</A>
+get_context -- Get communication context</A>
 </H3>
 
 <P>
 <PRE>
-call  desc%clone(descout,info)
+ictxt = desc%get_context()
 </PRE>
 
 <P>
@@ -80,11 +80,8 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>descout</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The communication context.
 </DD>
 </DL>
 

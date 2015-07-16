@@ -231,6 +231,7 @@ module psb_desc_mod
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
+    procedure, pass(desc) :: get_global_indices => psb_cd_get_global_indices
     procedure, pass(desc) :: a_get_list      => psb_cd_get_list
     procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
     generic, public       :: get_list => a_get_list, v_get_list
@@ -497,6 +498,40 @@ contains
 
   end function psb_cd_get_global_cols
 
+  function psb_cd_get_global_indices(desc,owned) result(val)
+    implicit none 
+    integer(psb_ipk_), allocatable   :: val(:)
+    class(psb_desc_type), intent(in) :: desc
+    logical, intent(in), optional    :: owned
+
+    logical :: owned_
+    integer(psb_ipk_) :: i, nr, info
+    
+    owned_=.true.
+    if (present(owned)) owned_=owned
+
+    
+    if (allocated(desc%indxmap)) then 
+      if (owned_) then
+        nr = desc%get_local_rows()
+      else
+        nr = desc%get_local_cols()
+      end if
+      nr = max(nr,0)
+      allocate(val(nr))
+      do i=1, nr
+        val(i) = i
+      end do
+      call desc%l2gip(val,info,owned=owned_)
+    else
+      allocate(val(0))
+    endif
+
+  end function psb_cd_get_global_indices
+
+
+
+  
   function cd_get_fmt(desc) result(val)
     implicit none 
     character(len=5) :: val 

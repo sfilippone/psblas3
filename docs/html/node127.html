@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Bibliography</TITLE>
-<META NAME="description" CONTENT="Bibliography">
+<TITLE>psb_krylov -- Krylov Methods Driver Routine</TITLE>
+<META NAME="description" CONTENT="psb_krylov -- Krylov Methods Driver Routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,166 +18,377 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node128.html">
-<LINK REL="previous" HREF="node125.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node126.html">
+<LINK REL="up" HREF="node126.html">
 <LINK REL="next" HREF="node128.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1825"
+<A NAME="tex2html1828"
   HREF="node128.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1821"
-  HREF="userhtml.html">
+<A NAME="tex2html1824"
+  HREF="node126.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1815"
+<A NAME="tex2html1820"
   HREF="node126.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1823"
+<A NAME="tex2html1826"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1826"
-  HREF="node128.html">About this document ...</A>
-<B> Up:</B> <A NAME="tex2html1822"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1816"
-  HREF="node126.html">psb_krylov   Krylov</A>
- &nbsp; <B>  <A NAME="tex2html1824"
+<B> Next:</B> <A NAME="tex2html1829"
+  HREF="node128.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1825"
+  HREF="node126.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1821"
+  HREF="node126.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1827"
   HREF="node1.html">Contents</A></B> 
-<BR><BR>
+<BR>
+<BR>
 <!--End of Navigation Panel-->
- 
-<H2><A NAME="SECTION000130000000000000000">
-Bibliography</A>
-</H2><DL COMPACT><DD><P></P><DT><A NAME="DesPat:11">1</A>
-<DD>
- D.&nbsp;Barbieri, V.&nbsp;Cardellini, S.&nbsp;Filippone and D.&nbsp;Rouson
-<EM>Design Patterns for Scientific Computations on Sparse Matrices</EM>,
- HPSS 2011, Algorithms and Programming Tools for Next-Generation High-Performance Scientific Software, Bordeaux, Sep. 2011
 
-<P>
-<P></P><DT><A NAME="PARA04FOREST">2</A>
-<DD>
-G.&nbsp;Bella, S.&nbsp;Filippone, A.&nbsp;De Maio and M.&nbsp;Testa,
-<EM>A Simulation Model for Forest Fires</EM>,
-in J.&nbsp;Dongarra, K.&nbsp;Madsen, J.&nbsp;Wasniewski, editors,
-Proceedings of PARA&nbsp;04 Workshop on State of the Art
-in Scientific Computing, pp.&nbsp;546-553, Lecture Notes in Computer Science,
-Springer, 2005.
-<P></P><DT><A NAME="2007d">3</A>
-<DD> A. Buttari, D. di Serafino, P. D'Ambra, S. Filippone,<BR>
-2LEV-D2P4: a package of high-performance preconditioners,<BR>
-Applicable Algebra in Engineering, Communications and Computing, 
-Volume 18, Number 3, May, 2007, pp.  223-239
-<P></P><DT><A NAME="2007c">4</A>
-<DD>  P. D'Ambra, S. Filippone,  D. Di Serafino<BR>
-On the Development of PSBLAS-based Parallel Two-level Schwarz Preconditioners
+<H2><A NAME="SECTION000121000000000000000"></A><A NAME="krylov"></A>
 <BR>
-Applied Numerical Mathematics, Elsevier Science, 
-Volume 57, Issues 11-12, November-December 2007, Pages 1181-1196.
+psb_krylov  -- Krylov Methods Driver
+      Routine
+</H2>
 
 <P>
-<P></P><DT><A NAME="BLAS2">5</A>
-<DD>
- Dongarra, J. J.,  DuCroz, J.,  Hammarling, S. and Hanson, R.,
-An Extended Set of Fortran Basic Linear Algebra Subprograms,
-ACM Trans. Math. Softw. vol.&nbsp;14, 1-17, 1988.
-<P></P><DT><A NAME="BLAS3">6</A>
-<DD>
-  Dongarra, J., DuCroz, J., Hammarling, S. and Duff, I.,
-A  Set of level 3 Basic Linear Algebra Subprograms,
-ACM Trans. Math. Softw. vol.&nbsp;16, 1-17, 1990.
-<P></P><DT><A NAME="BLACS">7</A>
-<DD>
-J.&nbsp;J.&nbsp;Dongarra and R.&nbsp;C.&nbsp;Whaley,
-<EM>A User's Guide to the BLACS v.&nbsp;1.1</EM>,
-Lapack Working Note 94, Tech. Rep. UT-CS-95-281, University of
-Tennessee, March 1995 (updated May 1997).
-<P></P><DT><A NAME="sblas97">8</A>
-<DD>
-I.&nbsp;Duff, M.&nbsp;Marrone, G.&nbsp;Radicati and C.&nbsp;Vittoli,
-<EM>Level 3 Basic Linear Algebra Subprograms for Sparse Matrices: 
-a User Level Interface</EM>,
-ACM Transactions on Mathematical Software, 23(3), pp.&nbsp;379-401, 1997.
-<P></P><DT><A NAME="sblas02">9</A>
-<DD>
-I.&nbsp;Duff, M.&nbsp;Heroux and R.&nbsp;Pozo,
-<EM>An Overview of the Sparse Basic Linear
-Algebra Subprograms: the New Standard from the BLAS Technical Forum</EM>,
-ACM Transactions on Mathematical Software, 28(2), pp.&nbsp;239-267, 2002.
-<P></P><DT><A NAME="PSBLAS">10</A>
-<DD>
-S.&nbsp;Filippone and M.&nbsp;Colajanni, 
-<EM>PSBLAS: A Library for Parallel Linear Algebra
-Computation on Sparse Matrices</EM>,
+This subroutine is a driver that provides a general interface for all
+the Krylov-Subspace family methods implemented in PSBLAS version 2. 
+
+<P>
+The stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="204" HEIGHT="44" BORDER="0"
+ SRC="img156.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+or the 2-norm residual reduction
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{\|b\|_2} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="121" HEIGHT="44" BORDER="0"
+ SRC="img157.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert b\Vert _2} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+according to the value passed through the  istop argument (see
+later). In the above formulae, <IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img158.png"
+ ALT="$x_i$"> is the tentative solution and
+<IMG
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img159.png"
+ ALT="$r_i=b-Ax_i$"> the corresponding residual at the <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">-th iteration. 
+
+<P>
 <BR>
-ACM Transactions on Mathematical Software, 26(4), pp.&nbsp;527-550, 2000.
-<P></P><DT><A NAME="Sparse03">11</A>
-<DD>
-S.&nbsp;Filippone and A.&nbsp;Buttari, 
-<EM>Object-Oriented Techniques for Sparse Matrix Computations in Fortran 2003</EM>,
+<IMG
+ WIDTH="482" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img160.png"
+ ALT="\begin{lstlisting}
+call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
+&amp; itmax,iter,err,itrace,irst,istop,cond)
+\end{lstlisting}">
 <BR>
-ACM Transactions on Mathematical Software, 38(4), 2012.
-<P></P><DT><A NAME="KIVA3PSBLAS">12</A>
-<DD>
-S.&nbsp;Filippone, P.&nbsp;D'Ambra, M.&nbsp;Colajanni,
-<EM>Using a Parallel Library of Sparse Linear Algebra in a Fluid Dynamics 
-Applications Code on Linux Clusters</EM>,
-in G.&nbsp;Joubert, A.&nbsp;Murli, F.&nbsp;Peters, M.&nbsp;Vanneschi, editors,
-Parallel Computing - Advances &amp; Current Issues,
-pp.&nbsp;441-448, Imperial College Press, 2002. 
-<P></P><DT><A NAME="DesignPatterns">13</A>
-<DD>
- Gamma, E.,  Helm, R.,  Johnson, R.,  and  Vlissides,
-  J. 1995.
- <EM>Design Patterns: Elements of Reusable Object-Oriented Software</EM>.
- Addison-Wesley.
 
 <P>
-<P></P><DT><A NAME="METIS">14</A>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-Karypis, G. and Kumar, V.,
-<EM>METIS: Unstructured Graph Partitioning and Sparse Matrix
-  Ordering System</EM>.
-Minneapolis, MN 55455: University of Minnesota, Department of
-  Computer Science, 1995. 
-Internet Address: <code>http://www.cs.umn.edu/~karypis</code>.
-<P></P><DT><A NAME="BLAS1">15</A>
-<DD>
-Lawson, C.,  Hanson, R., Kincaid, D. and Krogh, F.,
-   Basic Linear Algebra Subprograms for Fortran usage,
-ACM Trans. Math. Softw. vol.&nbsp;5, 38-329, 1979.
+</DD>
+<DT><STRONG>method</STRONG></DT>
+<DD>a string that defines the iterative method to be
+  used. Supported values are:
+  <DL>
+<DT><STRONG>CG:</STRONG></DT>
+<DD>the Conjugate Gradient method;
+  
+</DD>
+<DT><STRONG>CGS:</STRONG></DT>
+<DD>the Conjugate Gradient Stabilized method;
 
 <P>
-<P></P><DT><A NAME="machiels">16</A>
-<DD>
-Machiels, L. and Deville, M.
-<EM>Fortran 90: An entry to object-oriented programming for the solution
-  of partial differential equations.</EM>
-ACM Trans. Math. Softw. vol.&nbsp;23, 32-49.
-<P></P><DT><A NAME="metcalf">17</A>
-<DD>
-Metcalf, M., Reid, J. and Cohen, M.
-<EM>Fortran 95/2003 explained.</EM>
-Oxford University Press, 2004.
-<P></P><DT><A NAME="RouXiaXu:11">18</A>
-<DD>
-Rouson, D.W.I., Xia, J., Xu, X.: Scientific Software Design: The
-  Object-Oriented Way. Cambridge University Press (2011)
+</DD>
+<DT><STRONG>BICG:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient method;
+  
+</DD>
+<DT><STRONG>BICGSTAB:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method;
+  
+</DD>
+<DT><STRONG>BICGSTABL:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method with restarting;
+  
+</DD>
+<DT><STRONG>RGMRES:</STRONG></DT>
+<DD>the Generalized Minimal Residual method with restarting.
+  
+</DD>
+</DL>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the local portion of global sparse matrix
+<IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>The data structure containing the preconditioner.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>The RHS vector. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The initial guess. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>eps</STRONG></DT>
+<DD>The stopping tolerance. 
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a real number. 
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>itmax</STRONG></DT>
+<DD>The maximum number of iterations to perform.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Default: <IMG
+ WIDTH="100" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img161.png"
+ ALT="$itmax = 1000$">.
+<BR>
+Specified as: an integer variable <IMG
+ WIDTH="75" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img162.png"
+ ALT="$itmax \ge 1$">.
+</DD>
+<DT><STRONG>itrace</STRONG></DT>
+<DD>If <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img111.png"
+ ALT="$&gt;0$"> print out an informational message about
+  convergence  every <IMG
+ WIDTH="46" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img163.png"
+ ALT="$itrace$"> iterations.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR></DD>
+<DT><STRONG>irst</STRONG></DT>
+<DD>An integer specifying the restart parameter.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: <IMG
+ WIDTH="59" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img164.png"
+ ALT="$irst&gt;0$">. This is employed for the BiCGSTABL or RGMRES
+methods, otherwise it is ignored. 
 
 <P>
-<P></P><DT><A NAME="MPI1">19</A>
+</DD>
+<DT><STRONG>istop</STRONG></DT>
+<DD>An integer specifying the stopping criterion.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+of the residual. Default: 2. 
+</DD>
+<DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
-M.&nbsp;Snir, S.&nbsp;Otto, S.&nbsp;Huss-Lederman, D.&nbsp;Walker and J.&nbsp;Dongarra,
-<EM>MPI: The Complete Reference. Volume 1 - The MPI Core</EM>, second edition,
-MIT Press, 1998.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The computed solution. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>iter</STRONG></DT>
+<DD>The number of iterations performed.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: an integer variable.
+</DD>
+<DT><STRONG>err</STRONG></DT>
+<DD>The convergence estimate on exit.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number.
+</DD>
+<DT><STRONG>cond</STRONG></DT>
+<DD>An estimate of the condition number of matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">; only
+  available with the <IMG
+ WIDTH="29" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img165.png"
+ ALT="$CG$"> method.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
 </DL>
 
 <P>
-<BR><HR>
+
+<P>
+
+<P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1828"
+  HREF="node128.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1824"
+  HREF="node126.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1820"
+  HREF="node126.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1826"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1829"
+  HREF="node128.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1825"
+  HREF="node126.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1821"
+  HREF="node126.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1827"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

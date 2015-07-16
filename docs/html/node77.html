@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sprn -- Reinit sparse matrix structure for psblas routines.</TITLE>
-<META NAME="description" CONTENT="psb_sprn -- Reinit sparse matrix structure for psblas routines.">
+<TITLE>psb_spfree -- Frees a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spfree -- Frees a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node78.html">
 <LINK REL="previous" HREF="node76.html">
-<LINK REL="up" HREF="node66.html">
+<LINK REL="up" HREF="node67.html">
 <LINK REL="next" HREF="node78.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1207"
+<A NAME="tex2html1210"
   HREF="node78.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1203"
-  HREF="node66.html">
+<A NAME="tex2html1206"
+  HREF="node67.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1197"
+<A NAME="tex2html1200"
   HREF="node76.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1205"
+<A NAME="tex2html1208"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1208"
-  HREF="node78.html">psb_geall   Allocates</A>
-<B> Up:</B> <A NAME="tex2html1204"
-  HREF="node66.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1198"
-  HREF="node76.html">psb_spfree   Frees</A>
- &nbsp; <B>  <A NAME="tex2html1206"
+<B> Next:</B> <A NAME="tex2html1211"
+  HREF="node78.html">psb_sprn   Reinit</A>
+<B> Up:</B> <A NAME="tex2html1207"
+  HREF="node67.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1201"
+  HREF="node76.html">psb_spasb   Sparse</A>
+ &nbsp; <B>  <A NAME="tex2html1209"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000711000000000000000">
-psb_sprn -- Reinit sparse matrix structure for psblas
-  routines.</A>
+<H2><A NAME="SECTION000710000000000000000">
+psb_spfree -- Frees a sparse matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_sprn(a, decsc_a, info, clear)
+call psb_spfree(a, desc_a, info)
 </PRE>
 
 <P>
@@ -70,7 +69,7 @@ call psb_sprn(a, decsc_a, info, clear)
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the matrix to be reinitialized.
+<DD>the matrix to be freed.
 <BR>
 Scope:<B>local</B>
 <BR>
@@ -91,17 +90,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>clear</STRONG></DT>
-<DD>Choose whether to zero out matrix coefficients
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Default: true.
-</DD>
 </DL>
 
 <P>
@@ -121,13 +109,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>On exit from this routine the sparse matrix is in the update
-  state. 
-</LI>
-</OL>
 
 <P>
 <BR><HR>

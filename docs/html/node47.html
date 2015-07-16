@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Computational routines</TITLE>
-<META NAME="description" CONTENT="Computational routines">
+<TITLE>Preconditioner data structure</TITLE>
+<META NAME="description" CONTENT="Preconditioner data structure">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,78 +18,72 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node61.html">
-<LINK REL="previous" HREF="node9.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node48.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html807"
+<A NAME="tex2html810"
   HREF="node48.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html803"
-  HREF="userhtml.html">
+<A NAME="tex2html806"
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html797"
+<A NAME="tex2html802"
   HREF="node46.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html805"
+<A NAME="tex2html808"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html808"
-  HREF="node48.html">psb_geaxpby   General</A>
-<B> Up:</B> <A NAME="tex2html804"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html798"
-  HREF="node46.html">Preconditioner data structure</A>
- &nbsp; <B>  <A NAME="tex2html806"
+<B> Next:</B> <A NAME="tex2html811"
+  HREF="node48.html">Computational routines</A>
+<B> Up:</B> <A NAME="tex2html807"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Previous:</B> <A NAME="tex2html803"
+  HREF="node46.html">clone   Clone</A>
+ &nbsp; <B>  <A NAME="tex2html809"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00050000000000000000">
-Computational routines</A>
-</H1>
+<H2><A NAME="SECTION00044000000000000000"></A>
+<A NAME="sec:prec"></A>
+<BR>
+Preconditioner data structure
+</H2>
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
+figure&nbsp;<A HREF="#fig:prectype">6</A>. The <code>psb_prec_type</code> 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor.The internal preconditioner is allocated appropriately with the
+dynamic type corresponding to the desired preconditioner. 
 
-<UL>
-<LI><A NAME="tex2html809"
-  HREF="node48.html">psb_geaxpby -- General Dense Matrix Sum</A>
-<LI><A NAME="tex2html810"
-  HREF="node49.html">psb_gedot -- Dot Product</A>
-<LI><A NAME="tex2html811"
-  HREF="node50.html">psb_gedots -- Generalized Dot Product</A>
-<LI><A NAME="tex2html812"
-  HREF="node51.html">psb_normi -- Infinity-Norm of Vector</A>
-<LI><A NAME="tex2html813"
-  HREF="node52.html">psb_geamaxs -- Generalized Infinity Norm</A>
-<LI><A NAME="tex2html814"
-  HREF="node53.html">psb_norm1 -- 1-Norm of Vector</A>
-<LI><A NAME="tex2html815"
-  HREF="node54.html">psb_geasums -- Generalized 1-Norm of Vector</A>
-<LI><A NAME="tex2html816"
-  HREF="node55.html">psb_norm2 -- 2-Norm of Vector</A>
-<LI><A NAME="tex2html817"
-  HREF="node56.html">psb_genrm2s -- Generalized 2-Norm of Vector</A>
-<LI><A NAME="tex2html818"
-  HREF="node57.html">psb_norm1 -- 1-Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html819"
-  HREF="node58.html">psb_normi -- Infinity Norm of Sparse Matrix</A>
-<LI><A NAME="tex2html820"
-  HREF="node59.html">psb_spmm -- Sparse Matrix by Dense Matrix
-  Product</A>
-<LI><A NAME="tex2html821"
-  HREF="node60.html">psb_spsm -- Triangular System Solve</A>
-</UL>
-<!--End of Table of Child-Links-->
+<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="880"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
+The PSBLAS defined data type that contains a preconditioner.</CAPTION>
+<TR><TD><FONT SIZE="-1">  </FONT>
+<DIV ALIGN="CENTER"></DIV><TABLE  WIDTH="90%">
+<TR><TD>
+<PRE>
+  type psb_Tprec_type
+    class(psb_T_base_prec_type), allocatable :: prec
+  end type psb_Tprec_type
+</PRE></TD></TR>
+</TABLE>
+<DIV ALIGN="CENTER"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
 <BR><HR>
 
 </BODY>

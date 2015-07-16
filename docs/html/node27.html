@@ -7,10 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>sizeof -- Get memory occupation in bytes
-of a sparse matrix</TITLE>
-<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
-of a sparse matrix">
+<TITLE>get_size -- Get maximum number of nonzero elements in a sparse matrix</TITLE>
+<META NAME="description" CONTENT="get_size -- Get maximum number of nonzero elements in a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -22,45 +20,45 @@ of a sparse matrix">
 
 <LINK REL="next" HREF="node28.html">
 <LINK REL="previous" HREF="node26.html">
-<LINK REL="up" HREF="node21.html">
+<LINK REL="up" HREF="node22.html">
 <LINK REL="next" HREF="node28.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html568"
+<A NAME="tex2html571"
   HREF="node28.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html564"
-  HREF="node21.html">
+<A NAME="tex2html567"
+  HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html558"
+<A NAME="tex2html561"
   HREF="node26.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html566"
+<A NAME="tex2html569"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html569"
-  HREF="node28.html">get_fmt   Short</A>
-<B> Up:</B> <A NAME="tex2html565"
-  HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html559"
-  HREF="node26.html">get_size   Get</A>
- &nbsp; <B>  <A NAME="tex2html567"
+<B> Next:</B> <A NAME="tex2html572"
+  HREF="node28.html">sizeof   Get</A>
+<B> Up:</B> <A NAME="tex2html568"
+  HREF="node22.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html562"
+  HREF="node26.html">get_nnzeros   Get</A>
+ &nbsp; <B>  <A NAME="tex2html570"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042600000000000000">
-sizeof  -- Get memory occupation in bytes
-of  a sparse matrix</A>
+<H3><A NAME="SECTION00042500000000000000">
+get_size  -- Get maximum number of nonzero elements
+  in a sparse matrix</A>
 </H3>
 
 <P>
 <PRE>
-memory_size = a%sizeof()
+maxnz = a%get_size()
 </PRE>
 
 <P>
@@ -84,7 +82,8 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>The memory occupation in bytes.
+<DD>The maximum number of nonzero elements that can
+  be stored in sparse matrix <code>a</code> using its current memory allocation.
 </DD>
 </DL>
 

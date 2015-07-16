@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>clone -- clone current preconditioner</TITLE>
-<META NAME="description" CONTENT="clone -- clone current preconditioner">
+<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,45 +18,48 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node125.html">
 <LINK REL="previous" HREF="node123.html">
-<LINK REL="up" HREF="node119.html">
+<LINK REL="up" HREF="node120.html">
 <LINK REL="next" HREF="node125.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1790"
+<A NAME="tex2html1795"
   HREF="node125.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1786"
-  HREF="node119.html">
+<A NAME="tex2html1791"
+  HREF="node120.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1782"
+<A NAME="tex2html1785"
   HREF="node123.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1788"
+<A NAME="tex2html1793"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1791"
-  HREF="node125.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1787"
-  HREF="node119.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1783"
-  HREF="node123.html">psb_precdescr   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1789"
+<B> Next:</B> <A NAME="tex2html1796"
+  HREF="node125.html">clone   clone</A>
+<B> Up:</B> <A NAME="tex2html1792"
+  HREF="node120.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1786"
+  HREF="node123.html">psb_precaply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1794"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000115000000000000000">
-clone -- clone  current
+<H2><A NAME="SECTION000114000000000000000">
+psb_precdescr -- Prints a description of current
   preconditioner</A>
 </H2>
 
+<P>
 <PRE>
-call  prec%clone(precout,info)
+call psb_precdescr(prec)
+call psb_precdescr(prec, iout)
 </PRE>
 
 <P>
@@ -69,21 +72,23 @@ call  prec%clone(precout,info)
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>precout</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
+Scope: <B>local</B> 
+<BR>
+Type: <B>optiona</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number. 
 </DD>
 </DL>
 

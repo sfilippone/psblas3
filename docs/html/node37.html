@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
-<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
+<TITLE>triu -- Return the upper triangle</TITLE>
+<META NAME="description" CONTENT="triu -- Return the upper triangle">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,47 +20,50 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node38.html">
 <LINK REL="previous" HREF="node36.html">
-<LINK REL="up" HREF="node21.html">
+<LINK REL="up" HREF="node22.html">
 <LINK REL="next" HREF="node38.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html688"
+<A NAME="tex2html691"
   HREF="node38.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html684"
-  HREF="node21.html">
+<A NAME="tex2html687"
+  HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html678"
+<A NAME="tex2html681"
   HREF="node36.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html686"
+<A NAME="tex2html689"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html689"
-  HREF="node38.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html685"
-  HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html679"
-  HREF="node36.html">triu   Return</A>
- &nbsp; <B>  <A NAME="tex2html687"
+<B> Next:</B> <A NAME="tex2html692"
+  HREF="node38.html">psb_set_mat_default   Set</A>
+<B> Up:</B> <A NAME="tex2html688"
+  HREF="node22.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html682"
+  HREF="node36.html">tril   Return</A>
+ &nbsp; <B>  <A NAME="tex2html690"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421600000000000000">
-psb_set_mat_default -- Set default  storage format</A>
+<H3><A NAME="SECTION000421500000000000000">
+triu -- Return the upper triangle</A>
 </H3>
 
-<P>
 <PRE>
-call  psb_set_mat_default(a)
+    call a%triu(b,info[,&amp;
+       &amp; diag,imin,imax,jmin,jmax,rscale,cscale])
 </PRE>
 
 <P>
+Returns the upper triangular part of submatrix
+<code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
+the range <code>1:imax-imin+1,1:jmax-jmin+1</code>.   
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -69,10 +72,38 @@ call  psb_set_mat_default(a)
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
-  a new default storage format.
+<DD>the sparse matrix.
 <BR>
-Type: required.
+A variable of type <code>psb_Tspmat_type</code>.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+<DT><STRONG>diag</STRONG></DT>
+<DD>Include diagonals up to this one; <code>diag=1</code> means the
+  first superdiagonal, <code>diag=-1</code> means the first subdiagonal. 
+Default 0.
+</DD>
+<DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
+<DD>Minimum and maximum row and column indices.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>rscale,cscale</STRONG></DT>
+<DD>Whether to rescale row/column indices.
+Type: optional.
+</DD>
+</DL>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy  of a subtriangle of <code>a</code>.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

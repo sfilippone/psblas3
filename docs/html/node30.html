@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>is_lower, is_upper, is_triangle, is_unit -- Format check</TITLE>
-<META NAME="description" CONTENT="is_lower, is_upper, is_triangle, is_unit -- Format check">
+<TITLE>is_bld, is_upd, is_asb -- Status check</TITLE>
+<META NAME="description" CONTENT="is_bld, is_upd, is_asb -- Status check">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,48 +20,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node31.html">
 <LINK REL="previous" HREF="node29.html">
-<LINK REL="up" HREF="node21.html">
+<LINK REL="up" HREF="node22.html">
 <LINK REL="next" HREF="node31.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html604"
+<A NAME="tex2html607"
   HREF="node31.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html600"
-  HREF="node21.html">
+<A NAME="tex2html603"
+  HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html594"
+<A NAME="tex2html597"
   HREF="node29.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html602"
+<A NAME="tex2html605"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html605"
-  HREF="node31.html">cscnv   Convert</A>
-<B> Up:</B> <A NAME="tex2html601"
-  HREF="node21.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html595"
-  HREF="node29.html">is_bld, is_upd, is_asb </A>
- &nbsp; <B>  <A NAME="tex2html603"
+<B> Next:</B> <A NAME="tex2html608"
+  HREF="node31.html">is_lower, is_upper, is_triangle, is_unit</A>
+<B> Up:</B> <A NAME="tex2html604"
+  HREF="node22.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html598"
+  HREF="node29.html">get_fmt   Short</A>
+ &nbsp; <B>  <A NAME="tex2html606"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042900000000000000">
-is_lower, is_upper, is_triangle, is_unit  --
-  Format  check</A>
+<H3><A NAME="SECTION00042800000000000000">
+is_bld, is_upd, is_asb  -- Status check</A>
 </H3>
 
 <P>
 <PRE>
-if (a%is_triangle()) then 
-if (a%is_upper()) then 
-if (a%is_lower()) then 
-if (a%is_unit()) then 
+if (a%is_bld()) then 
+if (a%is_upd()) then 
+if (a%is_asb()) then 
 </PRE>
 
 <P>
@@ -86,9 +84,7 @@ Scope: <B>local</B>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
 <DD>A <code>logical</code> value indicating whether the
-  matrix is triangular; if <code>is_triangle()</code> returns <code>.true.</code>
-  check also if it is lower, upper and with a unit (i.e. assumed)
-  diagonal. 
+  matrix is in the Build, Update or Assembled state, respectively. 
 </DD>
 </DL>
 
