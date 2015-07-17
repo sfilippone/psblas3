@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2015/07/17: Fix bug in cdbldext. 	
 2015/04/18: Fix bug in spmv transpose case.	
 2015/03/28: Fix bug in transpose.
 2015/03/20: Introduce some optimizations for conversions to/from.	
