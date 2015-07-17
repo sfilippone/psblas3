@@ -503,3 +503,128 @@ subroutine  psb_covrl_vect(x,desc_a,info,work,update,mode)
     return
 end subroutine psb_covrl_vect
 
+
+subroutine  psb_covrl_multivect(x,desc_a,info,work,update,mode)
+  use psb_base_mod, psb_protect_name => psb_covrl_multivect
+  use psi_mod
+  implicit none
+
+  type(psb_c_multivect_type), intent(inout)   :: x
+  type(psb_desc_type), intent(in)        :: desc_a
+  integer(psb_ipk_), intent(out)                   :: info
+  complex(psb_spk_), optional, target, intent(inout) :: work(:)
+  integer(psb_ipk_), intent(in), optional          :: update,mode
+
+  ! locals
+  integer(psb_ipk_) :: ictxt, np, me, &
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
+       & mode_, err, liwork,ldx
+  complex(psb_spk_),pointer :: iwork(:)
+  logical                  :: do_swap
+  character(len=20)        :: name, ch_err
+  logical                  :: aliw
+
+  name='psb_covrlv'
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%get_context()
+
+  ! check on blacs grid 
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = 1
+  ijx = 1
+
+  m = desc_a%get_global_rows()
+  n = desc_a%get_global_cols()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+
+  k = 1
+
+  if (present(update)) then 
+    update_ = update
+  else
+    update_ = psb_avg_
+  endif
+
+  if (present(mode)) then 
+    mode_ = mode
+  else
+    mode_ = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+  do_swap = (mode_ /= 0)
+
+  ! check vector correctness
+  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+  end if
+
+  if (iix /= 1) then
+    info=psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  err=info
+  call psb_errcomm(ictxt,err)
+  if(err /= 0) goto 9999
+
+  ! check for presence/size of a work area
+  liwork=ncol
+  if (present(work)) then
+    if(size(work) >= liwork) then
+      aliw=.false.
+    else
+      aliw=.true.
+    end if
+  else
+    aliw=.true.
+  end if
+  if (aliw) then 
+    allocate(iwork(liwork),stat=info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='Allocate')
+      goto 9999
+    end if
+  else
+    iwork => work    
+  end if
+
+  ! exchange overlap elements
+  if (do_swap) then
+    call psi_swapdata(mode_,cone,x%v,&
+         & desc_a,iwork,info,data=psb_comm_ovr_)
+  end if
+  if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,update_,info)
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
+    goto 9999
+  end if
+  
+  if (aliw) deallocate(iwork)
+  nullify(iwork)
+  
+  call psb_erractionrestore(err_act)
+  return  
+  
+9999 call psb_error_handler(ictxt,err_act)
+  
+  return
+end subroutine psb_covrl_multivect
+

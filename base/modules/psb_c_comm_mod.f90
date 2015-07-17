@@ -64,6 +64,15 @@ module psb_c_comm_mod
       complex(psb_spk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional           :: update,mode
     end subroutine psb_covrl_vect
+    subroutine psb_covrl_multivect(x,desc_a,info,work,update,mode)
+      import
+      implicit none
+      type(psb_c_multivect_type), intent(inout)    :: x
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
+      integer(psb_ipk_), intent(in), optional           :: update,mode
+    end subroutine psb_covrl_multivect
   end interface psb_ovrl
 
   interface psb_halo
