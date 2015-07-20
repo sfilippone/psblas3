@@ -713,3 +713,119 @@ subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl,local)
 end subroutine psb_sinsi
 
 
+
+subroutine psb_sins_multivect(m, irw, val, x, desc_a, info, dupl,local)
+  use psb_base_mod, psb_protect_name => psb_sins_multivect
+  use psi_mod
+  implicit none
+
+  ! m rows number of submatrix belonging to val to be inserted
+  ! ix  x global-row corresponding to position at which val submatrix
+  !     must be inserted
+
+  !....parameters...
+  integer(psb_ipk_), intent(in)                  :: m
+  integer(psb_ipk_), intent(in)                  :: irw(:)
+  real(psb_spk_), intent(in)        :: val(:,:)
+  type(psb_s_multivect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)      :: desc_a
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), optional, intent(in)        :: dupl
+  logical, intent(in), optional        :: local
+
+  !locals.....
+  integer(psb_ipk_) :: ictxt,i,&
+       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_), allocatable   :: irl(:)
+  logical :: local_
+  character(len=20)      :: name
+
+  if (psb_errstatus_fatal()) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  name = 'psb_sinsvi'
+
+  if (.not.desc_a%is_ok()) then
+    info = psb_err_invalid_cd_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  ictxt = desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  !... check parameters....
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
+  else if (x%get_nrows() < desc_a%get_local_rows()) then
+    info = 310
+    int_err(1) = 5
+    int_err(2) = 4
+    call psb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if (m == 0) return  
+  loc_rows = desc_a%get_local_rows()
+  loc_cols = desc_a%get_local_cols()
+  mglob    = desc_a%get_global_rows()
+
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+
+  allocate(irl(m),stat=info) 
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (present(dupl)) then 
+    dupl_ = dupl
+  else
+    dupl_ = psb_dupl_ovwrt_
+  endif
+  if (present(local)) then 
+    local_ = local
+  else
+    local_ = .false.
+  endif
+
+  if (local_) then 
+    irl(1:m) = irw(1:m)
+  else
+    call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
+  end if
+  call x%ins(m,irl,val,dupl_,info) 
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  deallocate(irl)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_sins_multivect
+
+

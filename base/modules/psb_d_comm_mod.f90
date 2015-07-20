@@ -178,6 +178,15 @@ module psb_d_comm_mod
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root
     end subroutine psb_dgather_vect
+    subroutine psb_dgather_multivect(globx, locx, desc_a, info, root)
+      import
+      implicit none
+      type(psb_d_multivect_type), intent(inout) :: locx
+      real(psb_dpk_), intent(out), allocatable :: globx(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root
+    end subroutine psb_dgather_multivect
   end interface psb_gather
 
 end module psb_d_comm_mod
