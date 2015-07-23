@@ -1070,6 +1070,7 @@ contains
 
   end subroutine psb_cd_clone
 
+  
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
 
     use psb_error_mod

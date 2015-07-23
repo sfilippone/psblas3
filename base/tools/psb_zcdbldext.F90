@@ -177,7 +177,6 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     ! in a separate method. 
     call psb_cd_switch_ovl_indxmap(desc_ov,info) 
   end if
-  if (info == 0) call desc_ov%indxmap%reinit(info)
   if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
   if (info /= 0) goto 9999
 
