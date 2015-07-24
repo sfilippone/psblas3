@@ -69,7 +69,7 @@ Subroutine psb_cd_reinit(desc,info)
   call psb_move_alloc(tmp_halo,desc%halo_index,info)
   call psb_move_alloc(tmp_ext,desc%ext_index,info)
   call desc%indxmap%reinit(info)
-  call psb_cd_set_bld(desc,info)
+!  call psb_cd_set_bld(desc,info)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
