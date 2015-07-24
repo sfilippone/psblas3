@@ -60,16 +60,17 @@ Subroutine psb_cd_reinit(desc,info)
   Call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start'
-
-  call psb_cd_get_recv_idx(tmp_ovr,desc,psb_comm_ovr_,info,toglob=.true.)
-  call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
-  call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
-
-  call psb_move_alloc(tmp_ovr,desc%ovrlap_index,info)
-  call psb_move_alloc(tmp_halo,desc%halo_index,info)
-  call psb_move_alloc(tmp_ext,desc%ext_index,info)
-  call desc%indxmap%reinit(info)
-!  call psb_cd_set_bld(desc,info)
+  if (desc%is_asb()) then 
+    call psb_cd_get_recv_idx(tmp_ovr,desc,psb_comm_ovr_,info,toglob=.true.)
+    call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
+    call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
+    
+    call psb_move_alloc(tmp_ovr,desc%ovrlap_index,info)
+    call psb_move_alloc(tmp_halo,desc%halo_index,info)
+    call psb_move_alloc(tmp_ext,desc%ext_index,info)
+    call desc%indxmap%reinit(info)
+    !  call psb_cd_set_bld(desc,info)
+  end if
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
