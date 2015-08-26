@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -84,7 +84,7 @@ subroutine psb_d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_d_nullprec, psb_protect_name => psb_d_null_apply
   implicit none 
   type(psb_desc_type),intent(in)       :: desc_data
-  class(psb_d_null_prec_type), intent(in)  :: prec
+  class(psb_d_null_prec_type), intent(inout)  :: prec
   real(psb_dpk_),intent(inout)      :: x(:)
   real(psb_dpk_),intent(in)         :: alpha, beta
   real(psb_dpk_),intent(inout)      :: y(:)

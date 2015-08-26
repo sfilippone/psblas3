@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -30,8 +30,8 @@
 !!$ 
 !!$  
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -209,7 +209,7 @@ subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
   use psb_d_prec_type, psb_protect_name => psb_d_apply2v
   implicit none 
   type(psb_desc_type),intent(in)    :: desc_data
-  class(psb_dprec_type), intent(in) :: prec
+  class(psb_dprec_type), intent(inout) :: prec
   real(psb_dpk_),intent(inout)   :: x(:)
   real(psb_dpk_),intent(inout)   :: y(:)
   integer(psb_ipk_), intent(out)              :: info
@@ -276,7 +276,7 @@ subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
   use psb_d_prec_type, psb_protect_name => psb_d_apply1v
   implicit none 
   type(psb_desc_type),intent(in)    :: desc_data
-  class(psb_dprec_type), intent(in) :: prec
+  class(psb_dprec_type), intent(inout) :: prec
   real(psb_dpk_),intent(inout)   :: x(:)
   integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans

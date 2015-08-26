@@ -1,6 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010, 2012, 2013
+!!$              Parallel Sparse BLAS  version 3.4
+!!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -73,7 +73,7 @@ module psb_z_diagprec
     subroutine psb_z_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_ipk_, psb_desc_type, psb_z_diag_prec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_z_diag_prec_type), intent(in)  :: prec
+      class(psb_z_diag_prec_type), intent(inout)  :: prec
       complex(psb_dpk_),intent(inout)      :: x(:)
       complex(psb_dpk_),intent(in)         :: alpha, beta
       complex(psb_dpk_),intent(inout)      :: y(:)
