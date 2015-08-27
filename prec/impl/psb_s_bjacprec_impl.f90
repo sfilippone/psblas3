@@ -228,7 +228,7 @@ subroutine psb_s_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_s_bjacprec, psb_protect_name => psb_s_bjac_apply
   implicit none 
   type(psb_desc_type),intent(in)    :: desc_data
-  class(psb_s_bjac_prec_type), intent(in)  :: prec
+  class(psb_s_bjac_prec_type), intent(inout)  :: prec
   real(psb_spk_),intent(in)         :: alpha,beta
   real(psb_spk_),intent(inout)      :: x(:)
   real(psb_spk_),intent(inout)      :: y(:)

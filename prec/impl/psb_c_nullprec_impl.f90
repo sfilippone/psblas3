@@ -84,7 +84,7 @@ subroutine psb_c_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   use psb_c_nullprec, psb_protect_name => psb_c_null_apply
   implicit none 
   type(psb_desc_type),intent(in)       :: desc_data
-  class(psb_c_null_prec_type), intent(in)  :: prec
+  class(psb_c_null_prec_type), intent(inout)  :: prec
   complex(psb_spk_),intent(inout)      :: x(:)
   complex(psb_spk_),intent(in)         :: alpha, beta
   complex(psb_spk_),intent(inout)      :: y(:)

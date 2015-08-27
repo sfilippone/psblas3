@@ -98,7 +98,7 @@ module psb_z_prec_type
     subroutine psb_z_apply2v(prec,x,y,desc_data,info,trans,work)
       import :: psb_ipk_, psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_zprec_type), intent(in) :: prec
+      class(psb_zprec_type), intent(inout) :: prec
       complex(psb_dpk_),intent(inout)   :: x(:)
       complex(psb_dpk_),intent(inout)   :: y(:)
       integer(psb_ipk_), intent(out)              :: info
@@ -111,7 +111,7 @@ module psb_z_prec_type
     subroutine psb_z_apply1v(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_zprec_type, psb_z_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_zprec_type), intent(in) :: prec
+      class(psb_zprec_type), intent(inout) :: prec
       complex(psb_dpk_),intent(inout)   :: x(:)
       integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans

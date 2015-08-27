@@ -68,7 +68,7 @@ module psb_d_nullprec
     subroutine psb_d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       import :: psb_ipk_, psb_desc_type, psb_d_null_prec_type, psb_dpk_
       type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_d_null_prec_type), intent(in)  :: prec
+      class(psb_d_null_prec_type), intent(inout)  :: prec
       real(psb_dpk_),intent(inout)      :: x(:)
       real(psb_dpk_),intent(in)         :: alpha, beta
       real(psb_dpk_),intent(inout)      :: y(:)

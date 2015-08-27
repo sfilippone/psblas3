@@ -98,7 +98,7 @@ module psb_c_prec_type
     subroutine psb_c_apply2v(prec,x,y,desc_data,info,trans,work)
       import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_cprec_type), intent(in) :: prec
+      class(psb_cprec_type), intent(inout) :: prec
       complex(psb_spk_),intent(inout)   :: x(:)
       complex(psb_spk_),intent(inout)   :: y(:)
       integer(psb_ipk_), intent(out)              :: info
@@ -111,7 +111,7 @@ module psb_c_prec_type
     subroutine psb_c_apply1v(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_cprec_type), intent(in) :: prec
+      class(psb_cprec_type), intent(inout) :: prec
       complex(psb_spk_),intent(inout)   :: x(:)
       integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans

@@ -135,7 +135,7 @@ subroutine psb_z_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
   implicit none 
 
   type(psb_desc_type),intent(in)    :: desc_data
-  class(psb_z_diag_prec_type), intent(in)  :: prec
+  class(psb_z_diag_prec_type), intent(inout)  :: prec
   complex(psb_dpk_),intent(inout)      :: x(:)
   complex(psb_dpk_),intent(in)         :: alpha, beta
   complex(psb_dpk_),intent(inout)      :: y(:)

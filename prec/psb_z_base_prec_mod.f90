@@ -95,7 +95,7 @@ module psb_z_base_prec_mod
            & psb_z_base_sparse_mat
       implicit none 
       type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_z_base_prec_type), intent(in)  :: prec
+      class(psb_z_base_prec_type), intent(inout)  :: prec
       complex(psb_dpk_),intent(in)         :: alpha, beta
       complex(psb_dpk_),intent(inout)      :: x(:)
       complex(psb_dpk_),intent(inout)      :: y(:)
