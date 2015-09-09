@@ -152,7 +152,7 @@ program df_sample
       call psb_gelp('N',perm(1:m_problem),&
            & b_col_glob(1:m_problem),info)
       write(fnout,'(a,i3.3,a)') 'amat-',iam,'-gps.mtx'
-      call aux_a%print(fname=fnout)
+      call aux_a%print(fnout)
       write(fnout,'(a,i3.3,a)') 'rhs-',iam,'-gps.mtx'
       call mm_array_write(b_col_glob(1:m_problem),'GPS RHS',info,filename=fnout)
     else
