@@ -193,14 +193,15 @@ subroutine  psb_d_coo_reallocate_nz(nz,a)
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
   class(psb_d_coo_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: err_act, info, nz_
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_coo_reallocate_nz'
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
 
-  call psb_realloc(nz,a%ia,a%ja,a%val,info)
+  nz_ = max(nz,ione)
+  call psb_realloc(nz_,a%ia,a%ja,a%val,info)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
@@ -357,9 +358,9 @@ subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz)
     goto 9999
   endif
   if (present(nz)) then 
-    nz_ = nz
+    nz_ = max(nz,ione)
   else
-    nz_ = max(7*m,7*n,1)
+    nz_ = max(7*m,7*n,ione)
   end if
   if (nz_ < 0) then 
     info = psb_err_iarg_neg_

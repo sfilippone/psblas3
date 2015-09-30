@@ -1710,8 +1710,8 @@ subroutine  psb_c_csr_reallocate_nz(nz,a)
 
   call psb_erractionsave(err_act)
 
-  call psb_realloc(nz,a%ja,info)
-  if (info == psb_success_) call psb_realloc(nz,a%val,info)
+  call psb_realloc(max(nz,ione),a%ja,info)
+  if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
   if (info == psb_success_) call psb_realloc(&
        & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
   if (info /= psb_success_) then 
@@ -1789,9 +1789,9 @@ subroutine  psb_c_csr_allocate_mnnz(m,n,a,nz)
     goto 9999
   endif
   if (present(nz)) then 
-    nz_ = nz
+    nz_ = max(nz,ione)
   else
-    nz_ = max(7*m,7*n,1)
+    nz_ = max(7*m,7*n,ione)
   end if
   if (nz_ < 0) then 
     info = psb_err_iarg_neg_
