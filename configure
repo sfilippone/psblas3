@@ -3416,7 +3416,6 @@ fi
 # Note: Someday we will contemplate a fake MPI - configured version of PSBLAS
 ###############################################################################
 # First check whether the user required our serial (fake) mpi.
-
 { $as_echo "$as_me:$LINENO: checking whether we want serial  mpi stubs" >&5
 $as_echo_n "checking whether we want serial  mpi stubs... " >&6; }
 # Check whether --enable-serial was given.
@@ -5586,11 +5585,18 @@ fi
 psblas_cv_fc=""
 
 
-ac_exeext=''
-ac_ext='F'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking for GNU Fortran" >&5
+$as_echo_n "checking for GNU Fortran... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 
-cat > conftest.$ac_ext <<EOF
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program main
 #ifdef __GNUC__
               print *, "GCC!"
@@ -5598,26 +5604,60 @@ cat > conftest.$ac_ext <<EOF
         this program will fail
 #endif
            end
-
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  rm -rf conftest*
-  psblas_cv_fc="gcc"
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+		      psblas_cv_fc="gcc"
 else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
 fi
-rm -f conftest*
 
-ac_exeext=''
-ac_ext='F'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-cat > conftest.$ac_ext <<EOF
+
+
+{ $as_echo "$as_me:$LINENO: checking for Cray Fortran" >&5
+$as_echo_n "checking for Cray Fortran... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program main
 #ifdef _CRAYFTN
               print *, "Cray FTN!"
@@ -5625,20 +5665,47 @@ cat > conftest.$ac_ext <<EOF
         this program will fail
 #endif
            end
-
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  rm -rf conftest*
-  psblas_cv_fc="cray"
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+		      psblas_cv_fc="cray"
 else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
 fi
-rm -f conftest*
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
@@ -5677,12 +5744,18 @@ $as_echo "$as_me: Unknown Fortran compiler, proceeding with fingers crossed !" >
  fi
 fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
-ac_exeext=''
-ac_ext='F'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking GNU Fortran version at least 4.6" >&5
-$as_echo_n "checking GNU Fortran version at least 4.6... " >&6; }
-cat > conftest.$ac_ext <<EOF
+{ $as_echo "$as_me:$LINENO: checking for recent GNU Fortran" >&5
+$as_echo_n "checking for recent GNU Fortran... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program main
 #if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
               print *, "ok"
@@ -5690,28 +5763,50 @@ cat > conftest.$ac_ext <<EOF
         this program will fail
 #endif
            end
-
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result:  yes." >&5
-$as_echo " yes." >&6; }
-  :
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+		     :
 else
- { $as_echo "$as_me:$LINENO: result:  no." >&5
-$as_echo " no." >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
 $as_echo "$as_me: error: Sorry, we require GNU Fortran 4.6 or later." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-rm -f conftest*
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
 fi
 # TODO : SEE _AC_PROG_FC_V
 # TODO : AC_MSG_ERROR(see "$ac_cv_prog_FC_fc")
@@ -7365,64 +7460,123 @@ fi
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
 else
- ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking MPI Fortran 2008 interface" >&5
+ { $as_echo "$as_me:$LINENO: checking MPI Fortran 2008 interface" >&5
 $as_echo_n "checking MPI Fortran 2008 interface... " >&6; }
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program test
              use mpi_f08
            end program test
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  pac_cv_mpi_f08="yes";
-  { $as_echo "$as_me:$LINENO: result:  use mpi_f08. " >&5
-$as_echo " use mpi_f08. " >&6; }
-  :
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+		      pac_cv_mpi_f08="yes";
+		      :
 else
-  pac_cv_mpi_f08="no";
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  { $as_echo "$as_me:$LINENO: result:  no. " >&5
-$as_echo " no. " >&6; }
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+	              pac_cv_mpi_f08="no";
+		      echo "configure: failed program was:" >&5
+		      cat conftest.$ac_ext >&5
+
 fi
-rm -f conftest*
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
     FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
   else
-    ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking MPI Fortran interface" >&5
-$as_echo_n "checking MPI Fortran interface... " >&6; }
-cat > conftest.$ac_ext <<EOF
+    { $as_echo "$as_me:$LINENO: checking for Fortran MPI mod" >&5
+$as_echo_n "checking for Fortran MPI mod... " >&6; }
+  ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program test
              use mpi
            end program test
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result:  use mpi " >&5
-$as_echo " use mpi " >&6; }
-  rm -rf conftest*
-  FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+		      FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"
 else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  { $as_echo "$as_me:$LINENO: result:  include mpif.h " >&5
-$as_echo " include mpif.h " >&6; }
-  rm -rf conftest*
-  FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"
 fi
-rm -f conftest*
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
  fi
 fi
 
@@ -7459,18 +7613,18 @@ fi
 #
 # Critical features
 #
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 { $as_echo "$as_me:$LINENO: checking support for Fortran allocatables TR15581" >&5
 $as_echo_n "checking support for Fortran allocatables TR15581... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 module conftest
   type outer
     integer,  allocatable :: v(:)
@@ -7520,43 +7674,68 @@ program testtr15581
   write(*,*) db%v
 
 end program testtr15581
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  :
+		     :
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-cd ..
-rm -fr tmpdir_$i
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
 
 ac_exeext=''
 ac_ext='f90'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 { $as_echo "$as_me:$LINENO: checking support for Fortran EXTENDS" >&5
 $as_echo_n "checking support for Fortran EXTENDS... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program conftest
   type foo
     integer :: i
@@ -7566,43 +7745,65 @@ program conftest
   end type bar
   type(bar) :: barvar
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  :
+		     :
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-cd ..
-rm -fr tmpdir_$i
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran CLASS TBP" >&5
 $as_echo_n "checking support for Fortran CLASS TBP... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 module foo_mod
   type foo
     integer :: i
@@ -7631,43 +7832,65 @@ program conftest
   use foo_mod
   type(foo) :: foovar
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  :
+		     :
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
  Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
  Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-cd ..
-rm -fr tmpdir_$i
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran SOURCE= allocation" >&5
 $as_echo_n "checking support for Fortran SOURCE= allocation... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program xtt
   type foo
     integer :: i
@@ -7682,160 +7905,251 @@ program xtt
   allocate(fooab, source=nfv, stat=info)
 
 end program xtt
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  :
+		     :
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-cd ..
-rm -fr tmpdir_$i
 
-ac_exeext=''
-ac_ext='f'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking for Fortran MOVE_ALLOC intrinsic" >&5
-$as_echo_n "checking for Fortran MOVE_ALLOC intrinsic... " >&6; }
-cat > conftest.$ac_ext <<EOF
-           program test_move_alloc
-               integer, allocatable :: a(:), b(:)
-               allocate(a(3))
-               call move_alloc(a, b)
-               print *, allocated(a), allocated(b)
-               print *, b
-           end program test_move_alloc
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ $as_echo "$as_me:$LINENO: checking support for Fortran MOVE_ALLOC intrinsic" >&5
+$as_echo_n "checking support for Fortran MOVE_ALLOC intrinsic... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_ext='f90';
+ cat >conftest.$ac_ext <<_ACEOF
+ program test_move_alloc
+		       integer, allocatable :: a(:), b(:)
+		       allocate(a(3))
+		       call move_alloc(a, b)
+		       print *, allocated(a), allocated(b)
+		       print *, b
+		     end program test_move_alloc
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  rm -rf conftest*
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-rm -f conftest*
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran ISO_C_BINDING module" >&5
 $as_echo_n "checking support for Fortran ISO_C_BINDING module... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program conftest
   use iso_c_binding
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
-cd ..
-rm -fr tmpdir_$i
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
 
 #
 # Optional features
 #
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 { $as_echo "$as_me:$LINENO: checking support for Fortran VOLATILE" >&5
 $as_echo_n "checking support for Fortran VOLATILE... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program conftest
   integer, volatile :: i, j
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-cd ..
-rm -fr tmpdir_$i
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_objext='.o'
-ac_ext='f90'
-ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FCFLAGS conftest.$ac_ext  1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking test GENERIC interfaces" >&5
 $as_echo_n "checking test GENERIC interfaces... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 module iface
 
   interface foo
@@ -7849,39 +8163,61 @@ module iface
   end interface bar
 
 end module iface
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_objext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  :
+		     :
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"
 
 fi
-cd ..
-rm -fr tmpdir_$i
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran FLUSH statement" >&5
 $as_echo_n "checking support for Fortran FLUSH statement... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program conftest
    integer :: iunit=10
    open(10)
@@ -7889,64 +8225,117 @@ program conftest
    flush(10)
    close(10)
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-cd ..
-rm -fr tmpdir_$i
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for ISO_FORTRAN_ENV" >&5
 $as_echo_n "checking support for ISO_FORTRAN_ENV... " >&6; }
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
            program test
              use iso_fortran_env
            end program test
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-  rm -rf conftest*
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"
 else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f conftest*
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran FINAL" >&5
 $as_echo_n "checking support for Fortran FINAL... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 module foo_mod
   type foo
     integer :: i
@@ -7965,37 +8354,60 @@ program conftest
   use foo_mod
   type(foo) :: foovar
 end program conftest
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-cd ..
-rm -fr tmpdir_$i
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran SAME_TYPE_AS" >&5
 $as_echo_n "checking support for Fortran SAME_TYPE_AS... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program stt
   type foo
     integer :: i
@@ -8010,37 +8422,60 @@ program stt
   write(*,*) 'foov == nfv1? ', same_type_as(foov,nfv1)
   write(*,*) 'nfv2 == nfv1? ', same_type_as(nfv2,nfv1)
 end program stt
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-cd ..
-rm -fr tmpdir_$i
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran EXTENDS_TYPE_OF" >&5
 $as_echo_n "checking support for Fortran EXTENDS_TYPE_OF... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program xtt
   type foo
     integer :: i
@@ -8053,37 +8488,60 @@ program xtt
 
   write(*,*) 'nfv1 extends foov? ', extends_type_of(nfv1,foov)
 end program xtt
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-cd ..
-rm -fr tmpdir_$i
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:$LINENO: checking support for Fortran MOLD= allocation" >&5
 $as_echo_n "checking support for Fortran MOLD= allocation... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat >conftest.$ac_ext <<_ACEOF
+
 program xtt
   type foo
     integer :: i
@@ -8098,24 +8556,47 @@ program xtt
   allocate(fooab, mold=nfv, stat=info)
 
 end program xtt
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
   ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
-  FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"
+		      FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"
 else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	  { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+
 fi
-cd ..
-rm -fr tmpdir_$i
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
