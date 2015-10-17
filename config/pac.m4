@@ -1088,7 +1088,7 @@ if test $pac_blas_ok = no; then
 fi
 if test $pac_blas_ok = no; then
 	AC_LANG([C])
-	AC_CHECK_LIB(atlas, ATL_xerbla,
+	AC_CHECK_LIB(satlas, ATL_xerbla,
 		[AC_LANG([Fortran])
 		 AC_CHECK_LIB(satlas, sgemm,
 		[AC_LANG([C])
