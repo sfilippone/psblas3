@@ -26,6 +26,7 @@ while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
 done
 mkdir tmpdir_$i
 cd tmpdir_$i
+ac_ext='f90';
 AC_COMPILE_IFELSE([
       module conftest_module
        contains
@@ -34,7 +35,7 @@ AC_COMPILE_IFELSE([
        end subroutine conftest_routine
       end module conftest_module
   ],[],[])
-cd ..
+cd ..;
 ax_cv_f90_modflag="not found"
 for ax_flag in "-I " "-M" "-p"; do
   if test "$ax_cv_f90_modflag" = "not found" ; then
@@ -50,8 +51,8 @@ for ax_flag in "-I " "-M" "-p"; do
   fi
 done
 rm -fr tmpdir_$i
-if test "$ax_flag" = "not found" ; then
-  AC_MSG_ERROR([unable to find compiler flag for modules inclusion])
+if test "$ax_cv_f90_modflag" = "not found" ; then
+   AC_MSG_ERROR([unable to find compiler flag for modules inclusion])
 fi
 AC_LANG_POP(Fortran)
 ])])
