@@ -565,7 +565,7 @@ AC_LANG_PUSH([Fortran])
  dnl ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
  ac_fc=${MPIFC-$FC};
  AC_COMPILE_IFELSE([
-module iface
+module conftest
 
   interface foo 
     subroutine i_sub_foo(v)
@@ -577,7 +577,7 @@ module iface
     procedure i_sub_foo
   end interface bar
 
-end module iface],
+end module conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
@@ -653,7 +653,7 @@ AC_LANG_PUSH([Fortran])
  dnl ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
  ac_fc=${MPIFC-$FC};
  AC_COMPILE_IFELSE([
-module foo_mod
+module conftest_mod
   type foo
     integer :: i 
   contains
@@ -676,9 +676,9 @@ contains
     res = a%i
   end function getit
 
-end module foo_mod
+end module conftest_mod
 program conftest
-  use foo_mod
+  use conftest_mod
   type(foo) :: foovar
 end program conftest],
 		  [  AC_MSG_RESULT([yes])
@@ -712,7 +712,7 @@ dnl Warning : square brackets are EVIL!
  dnl ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
  ac_fc=${MPIFC-$FC};
  AC_COMPILE_IFELSE([
-module foo_mod
+module conftest_mod
   type foo
     integer :: i 
   contains
@@ -725,9 +725,9 @@ contains
     type(foo) :: a
      ! Just a test
   end subroutine destroy_foo
-end module foo_mod
+end module conftest_mod
 program conftest
-  use foo_mod
+  use conftest_mod
   type(foo) :: foovar
 end program conftest],
 		  [  AC_MSG_RESULT([yes])
