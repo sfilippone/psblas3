@@ -248,6 +248,10 @@ contains
           nze = max(c%irp(i+1), nint((dble(c%irp(i))*(dble(n)/i)))   )
         endif
         call psb_realloc(nze,c%ja,info)
+        if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          return
+        endif
       end if
       do j= c%irp(i),c%irp(i+1)-1
         c%ja(j)=istart
