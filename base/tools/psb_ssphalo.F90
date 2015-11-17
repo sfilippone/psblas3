@@ -172,7 +172,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
 
-  call acoo%allocate(izero,a%get_ncols(),info)
+  call acoo%allocate(izero,a%get_ncols())
 
 
   call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)

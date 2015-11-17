@@ -2143,7 +2143,6 @@ subroutine psb_z_cp_csc_from_coo(a,b,info)
   type(psb_z_coo_sparse_mat)   :: tmp
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
-  logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2171,7 +2170,6 @@ subroutine psb_z_cp_csc_to_coo(a,b,info)
 
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
-  logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2214,7 +2212,6 @@ subroutine psb_z_mv_csc_to_coo(a,b,info)
 
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
-  logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, nc,i,j,irw, err_act
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2258,8 +2255,7 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
 
   integer(psb_ipk_), allocatable :: itemp(:)
   !locals
-  logical             :: rwshr_
-  integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc, icl
+  integer(psb_ipk_) :: nza, nr, i,j,k,ip,irw, err_act, nc, nrl
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name='z_mv_csc_from_coo'
@@ -2285,55 +2281,19 @@ subroutine psb_z_mv_csc_from_coo(a,b,info)
   call psb_realloc(max(nr+1,nc+1),a%icp,info)
   call b%free()
 
-  if (nza <= 0) then 
-    a%icp(:) = 1
-  else
-    a%icp(1) = 1
-    if (nc < itemp(nza)) then 
-      write(debug_unit,*) trim(name),': CLSHR=.false. : ',&
-           &nc,itemp(nza),' Expect trouble!'
-      info = 12
-    end if
-
-    j = 1 
-    i = 1
-    icl = itemp(j) 
-
-    outer: do 
-      inner: do 
-        if (i >= icl) exit inner
-        if (i > nc) then 
-          write(debug_unit,*) trim(name),&
-               & 'Strange situation: i>nr ',i,nc,j,nza,icl
-          exit outer
-        end if
-        a%icp(i+1) = a%icp(i) 
-        i = i + 1
-      end do inner
-      j = j + 1
-      if (j > nza) exit
-      if (itemp(j) /= icl) then 
-        a%icp(i+1) = j
-        icl = itemp(j) 
-        i = i + 1
-      endif
-      if (i > nc) exit
-    enddo outer
-    !
-    ! Cleanup empty rows at the end
-    !
-    if (j /= (nza+1)) then 
-      write(debug_unit,*) trim(name),': Problem from loop :',j,nza
-      info = 13
-    endif
-    do 
-      if (i > nc) exit
-      a%icp(i+1) = j
-      i = i + 1
-    end do
-
-  endif
-
+  a%icp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%icp(i) = a%icp(i) + 1
+  end do
+  ip = 1
+  do i=1,nc
+    nrl = a%icp(i)
+    a%icp(i) = ip
+    ip = ip + nrl
+  end do
+  a%icp(nc+1) = ip
+  
 
 end subroutine psb_z_mv_csc_from_coo
 
@@ -2351,7 +2311,6 @@ subroutine psb_z_mv_csc_to_fmt(a,b,info)
 
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2391,7 +2350,6 @@ subroutine psb_z_cp_csc_to_fmt(a,b,info)
 
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
   integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2433,7 +2391,6 @@ subroutine psb_z_mv_csc_from_fmt(a,b,info)
 
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
   integer(psb_ipk_) :: nza, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2474,7 +2431,6 @@ subroutine psb_z_cp_csc_from_fmt(a,b,info)
 
   !locals
   type(psb_z_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
   integer(psb_ipk_) :: nz, nr, i,j,irw, err_act, nc
   integer(psb_ipk_), Parameter  :: maxtry=8
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -2866,7 +2822,8 @@ subroutine psb_zcscspspmm(a,b,c,info)
   nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
   ! Estimate number of nonzeros on output.
   ! Turns out this is often a large  overestimate.
-  call c%allocate(ma,nb,min(nzc,nze,nzeb))
+  !call c%allocate(ma,nb,min(nzc,nze,nzeb))
+  call c%allocate(ma,nb,nzc)
 
 
   call csc_spspmm(a,b,c,info)

@@ -101,6 +101,10 @@ c
             nze = max(ic(i+1), nint((dble(ic(i))*(dble(n)/i)))   )
           endif 
           call psb_realloc(nze,jc,info)
+          if (info /= 0) then
+            write(0,*) 'Failed realloc ',nze,info
+            return
+          end if
         end if 
 
         do 40 j= ic(i),ic(i+1)-1
