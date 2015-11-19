@@ -2592,13 +2592,11 @@ subroutine psb_z_csr_print(iout,a,iv,head,ivr,ivc)
   character(len=*), parameter  :: datatype='complex'
   character(len=80)                 :: frmtv 
   integer(psb_ipk_) :: irs,ics,i,j, nmx, ni, nr, nc, nz
-
-  if (present(head)) then 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
-    write(iout,'(a,a)') '% ',head 
-    write(iout,'(a)') '%'    
-    write(iout,'(a,a)') '% COO'
-  endif
+  
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
+  if (present(head)) write(iout,'(a,a)') '% ',head 
+  write(iout,'(a)') '%'    
+  write(iout,'(a,a)') '% COO'
 
   nr = a%get_nrows()
   nc = a%get_ncols()
