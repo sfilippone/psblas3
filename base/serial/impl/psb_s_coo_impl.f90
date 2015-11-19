@@ -415,12 +415,11 @@ subroutine psb_s_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=80)                 :: frmtv 
   integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
 
-  if (present(head)) then 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
-    write(iout,'(a,a)') '% ',head 
-    write(iout,'(a)') '%'    
-    write(iout,'(a,a)') '% COO'
-  endif
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+  if (present(head)) write(iout,'(a,a)') '% ',head 
+  write(iout,'(a)') '%'    
+  write(iout,'(a,a)') '% COO'
+
   if (a%is_dev())   call a%sync()
 
   nr = a%get_nrows()

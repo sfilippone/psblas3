@@ -2770,12 +2770,12 @@ subroutine psb_z_csc_print(iout,a,iv,head,ivr,ivc)
   character(len=80)                 :: frmtv 
   integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
 
-  if (present(head)) then 
-    write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
-    write(iout,'(a,a)') '% ',head 
-    write(iout,'(a)') '%'    
-    write(iout,'(a,a)') '% COO'
-  endif
+  
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
+  if (present(head)) write(iout,'(a,a)') '% ',head 
+  write(iout,'(a)') '%'    
+  write(iout,'(a,a)') '% COO'
+
   if (a%is_dev())   call a%sync()
 
   nr = a%get_nrows()
@@ -2860,7 +2860,7 @@ subroutine psb_zcscspspmm(a,b,c,info)
   nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
   ! Estimate number of nonzeros on output.
   ! Turns out this is often a large  overestimate.
-  call c%allocate(ma,nb,min(nzc,nze,nzeb))
+  call c%allocate(ma,nb,nzc)
 
 
   call csc_spspmm(a,b,c,info)
