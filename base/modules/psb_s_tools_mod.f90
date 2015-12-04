@@ -350,5 +350,5 @@ Module psb_s_tools_mod
       logical, intent(in), optional        :: clear
     end subroutine psb_ssprn
   end interface
-
+  
 end module psb_s_tools_mod

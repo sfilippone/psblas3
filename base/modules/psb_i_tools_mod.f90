@@ -237,7 +237,7 @@ Module psb_i_tools_mod
     end subroutine psb_iins_multivect
   end interface
 
-
+  
   interface psb_glob_to_loc
     subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
       import
