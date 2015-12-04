@@ -111,7 +111,7 @@ module psb_c_comm_mod
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_cscatterv
-    subroutine  psb_cscatter_vect(globx, locx, desc_a, info, root)
+    subroutine  psb_cscatter_vect(globx, locx, desc_a, info, root, mold)
       use psb_desc_mod
       use psb_c_vect_mod
       type(psb_c_vect_type), intent(inout) :: locx
@@ -119,6 +119,7 @@ module psb_c_comm_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
+      class(psb_c_base_vect_type), intent(in), optional :: mold  
     end subroutine psb_cscatter_vect
   end interface psb_scatter
 
