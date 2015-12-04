@@ -135,6 +135,7 @@ module psb_c_base_vect_mod
     ! Scaling and norms
     !
     procedure, pass(x) :: scal     => c_base_scal
+    procedure, pass(x) :: absval   => c_base_absval
     procedure, pass(x) :: nrm2     => c_base_nrm2
     procedure, pass(x) :: amax     => c_base_amax
     procedure, pass(x) :: asum     => c_base_asum
@@ -397,7 +398,7 @@ contains
     class(psb_c_base_vect_type), intent(inout)    :: x
     
     if (allocated(x%v)) x%v=czero
-
+    call x%set_host()
   end subroutine c_base_zero
 
   
@@ -613,7 +614,7 @@ contains
     integer(psb_ipk_) :: info
     
     if (.not.allocated(x%v)) return 
-    call x%sync()
+    if (.not.x%is_host()) call x%sync()
     allocate(res(x%get_nrows()),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
@@ -636,9 +637,27 @@ contains
     complex(psb_spk_), intent(in) :: val
         
     integer(psb_ipk_) :: info
+
     x%v = val
-    
+    call x%set_host()
+
   end subroutine c_base_set_scal
+
+  !
+  ! Overwrite with absolute value
+  !
+  !
+  !> Function  base_set_scal
+  !! \memberof  psb_c_base_vect_type
+  !! \brief  Set all entries to their respective absolute values.
+  !!
+  subroutine c_base_absval(x)
+    class(psb_c_base_vect_type), intent(inout)  :: x
+
+    if (allocated(x%v)) &
+         &  x%v =  abs(x%v)
+
+  end subroutine c_base_absval
 
   !
   !> Function  base_set_vect
@@ -658,6 +677,7 @@ contains
     else
       x%v = val
     end if
+    call x%set_host()
 
   end subroutine c_base_set_vect
 

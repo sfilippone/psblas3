@@ -495,8 +495,7 @@ Long Precision Complex & psb\_scatter \\
 \end{table}
 
 \begin{lstlisting}
-call psb_scatter(glob_x, loc_x, desc_a, info, root)
-call psb_scatter(glob_x, loc_x, desc_a, info, root)
+call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
 \end{lstlisting}
 
 \begin{description}
@@ -518,6 +517,12 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf in}.\\
 Specified as: an integer variable $-1\le root\le np-1$, default $-1$. 
+\item[mold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata; this is
+only allowed when loc\_x is of type \vdata.
 %% \item[iglobx]  Row index to define a submatrix in glob\_x that has to
 %%   be scattered into local pieces.\\
 %% Scope: {\bf global} \\
@@ -548,7 +553,7 @@ $glob\_x$. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf out}.\\
-Specified as: a rank one or two array containing numbers of the type
+Specified as: a rank one or two array  or an object of type \vdata\ containing numbers of the type
 indicated in Table~\ref{tab:scatter}.
 \item[info] Error code.\\
 Scope: {\bf local} \\

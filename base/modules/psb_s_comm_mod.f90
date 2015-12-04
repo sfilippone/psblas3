@@ -111,6 +111,15 @@ module psb_s_comm_mod
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_sscatterv
+    subroutine  psb_sscatter_vect(globx, locx, desc_a, info, root)
+      use psb_desc_mod
+      use psb_s_vect_mod
+      type(psb_s_vect_type), intent(inout) :: locx
+      real(psb_spk_), intent(in)  :: globx(:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in), optional    :: root
+    end subroutine psb_sscatter_vect
   end interface psb_scatter
 
   interface psb_gather
