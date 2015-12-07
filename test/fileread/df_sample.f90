@@ -194,7 +194,7 @@ program df_sample
       ivg(i) = ipv(1)
     enddo
     call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
@@ -208,12 +208,12 @@ program df_sample
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
 
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
     call psb_matdist(aux_a, a,  ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
+         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
   end if
 
   call psb_geall(x_col,desc_a,info)
