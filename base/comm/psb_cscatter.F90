@@ -547,8 +547,9 @@ subroutine  psb_cscatter_vect(globx, locx, desc_a, info, iroot, mold)
     call psb_errpush(info,name)
     goto 9999
   endif
+  call psb_geall(vlocx,desc_a,info)
   
-  call psb_scatter(globx, vlocx, desc_a, info, iroot)
+  if (info == psb_success_) call psb_scatter(globx, vlocx, desc_a, info, iroot)
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_scatterv')
