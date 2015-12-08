@@ -119,19 +119,19 @@ module psb_i_comm_mod
 
 
   interface psb_scatter
-    subroutine psb_iscatterm(globx, locx, desc_a, info, root)
+    subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_ipk_), intent(out) :: locx(:,:)
+      integer(psb_ipk_), intent(out), allocatable :: locx(:,:)
       integer(psb_ipk_), intent(in)  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
     end subroutine psb_iscatterm
-    subroutine psb_iscatterv(globx, locx, desc_a, info, root)
+    subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
       import
       implicit none
-      integer(psb_ipk_), intent(out) :: locx(:)
+      integer(psb_ipk_), intent(out), allocatable :: locx(:)
       integer(psb_ipk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
@@ -145,7 +145,7 @@ module psb_i_comm_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-      class(psb_i_base_vect_type), intent(in), optional :: mold
+      class(psb_i_base_vect_type), intent(in), optional :: mold  
     end subroutine psb_iscatter_vect
   end interface psb_scatter
 
