@@ -216,6 +216,7 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_no_optional_arg_=581
   integer(psb_ipk_), parameter, public :: psb_err_arg_m_required_=582
   integer(psb_ipk_), parameter, public :: psb_err_many_optional_arg_=583
+  integer(psb_ipk_), parameter, public :: psb_err_optional_arg_pair_=584
   integer(psb_ipk_), parameter, public :: psb_err_spmat_invalid_state_=600
   integer(psb_ipk_), parameter, public :: psb_err_missing_override_method_=700
   integer(psb_ipk_), parameter, public :: psb_err_invalid_dynamic_type_=701

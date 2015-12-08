@@ -744,6 +744,13 @@ contains
            &'("One of the optional arguments  ",a," must be present")')&
            & trim(a_e_d)
 
+    case(psb_err_optional_arg_pair_)
+      allocate(achmsg(2)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),&
+           &'("The optional arguments  ",a," must be present together")')&
+           & trim(a_e_d)
+
     case(psb_err_arg_m_required_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
