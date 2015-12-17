@@ -97,7 +97,7 @@ module psb_z_comm_mod
   interface psb_scatter
     subroutine  psb_zscatterm(globx, locx, desc_a, info, root)
       use psb_desc_mod
-      complex(psb_dpk_), intent(out) :: locx(:,:)
+      complex(psb_dpk_), intent(out), allocatable :: locx(:,:)
       complex(psb_dpk_), intent(in)  :: globx(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
@@ -105,7 +105,7 @@ module psb_z_comm_mod
     end subroutine psb_zscatterm
     subroutine  psb_zscatterv(globx, locx, desc_a, info, root)
       use psb_desc_mod
-      complex(psb_dpk_), intent(out) :: locx(:)
+      complex(psb_dpk_), intent(out), allocatable :: locx(:)
       complex(psb_dpk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info

@@ -318,6 +318,23 @@ subroutine psb_c_base_mv_from_fmt(a,b,info)
 
 end subroutine psb_c_base_mv_from_fmt
 
+subroutine  psb_c_base_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_base_clean_zeros
+  implicit none 
+  class(psb_c_base_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_), intent(out)              :: info
+  !
+  type(psb_c_coo_sparse_mat) :: tmpcoo
+
+  call a%mv_to_coo(tmpcoo,info)
+  if (info == 0) call tmpcoo%clean_zeros(info)  
+  if (info == 0) call a%mv_from_coo(tmpcoo,info)
+  
+end subroutine psb_c_base_clean_zeros
+
+
+
 subroutine psb_c_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_c_base_mat_mod, psb_protect_name => psb_c_base_csput_a

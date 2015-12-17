@@ -320,6 +320,31 @@ subroutine  psb_d_coo_trim(a)
 
 end subroutine psb_d_coo_trim
 
+subroutine  psb_d_coo_clean_zeros(a, info)
+  use psb_error_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_clean_zeros
+  implicit none 
+  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: info
+  !
+  integer(psb_ipk_) :: i,j,k, nzin
+
+  info = 0 
+  nzin = a%get_nzeros()
+  j = 0
+  do i=1, nzin
+    if (a%val(i) /= dzero) then
+      j = j + 1
+      a%val(j) = a%val(i)
+      a%ia(j)  = a%ia(i)
+      a%ja(j)  = a%ja(i)
+    end if
+  end do
+  call a%set_nzeros(j) 
+  call a%trim()
+end subroutine psb_d_coo_clean_zeros
+
+
 
 subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz) 
   use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_allocate_mnnz
