@@ -133,6 +133,7 @@ module psb_z_mat_mod
     procedure, pass(a) :: m_csclip    => psb_z_csclip
     procedure, pass(a) :: b_csclip    => psb_z_b_csclip
     generic, public    :: csclip      => b_csclip, m_csclip
+    procedure, pass(a) :: clean_zeros => psb_z_clean_zeros
     procedure, pass(a) :: reall       => psb_z_reallocate_nz
     procedure, pass(a) :: get_neigh   => psb_z_get_neigh
     procedure, pass(a) :: reinit      => psb_z_reinit
@@ -1279,7 +1280,15 @@ contains
 
   end function psb_z_get_nz_row
 
+  subroutine psb_z_clean_zeros(a,info)
+    implicit none 
+    integer(psb_ipk_), intent(out)        :: info
+    class(psb_zspmat_type), intent(inout) :: a
 
+    info = 0 
+    if (allocated(a%a)) call a%a%clean_zeros(info)
+
+  end subroutine psb_z_clean_zeros
 
 
 end module psb_z_mat_mod
