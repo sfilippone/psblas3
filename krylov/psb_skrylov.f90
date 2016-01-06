@@ -200,6 +200,9 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
   call psb_info(ictxt, me, np)
 
+  ! Default return for COND
+  if (present(cond)) cond = szero
+  
   select case(psb_toupper(method))
   case('CG') 
     call  psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
