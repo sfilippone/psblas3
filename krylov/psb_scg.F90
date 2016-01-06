@@ -96,7 +96,7 @@
 ! 
 !
 subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop)
+     & itmax,iter,err,itrace,istop,cond)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_krylov_conv_mod
@@ -111,9 +111,10 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
-  Real(psb_spk_), Optional, Intent(out) :: err
+  Real(psb_spk_), Optional, Intent(out) :: err,cond
 ! =   Local data
-  real(psb_spk_), allocatable, target   :: aux(:)
+  real(psb_spk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
+  integer(psb_mpik_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_s_vect_type), allocatable, target :: wwrk(:)
   type(psb_s_vect_type), pointer  :: q, p, r, z, w
   real(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
@@ -123,6 +124,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: np, me, ictxt
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
+  logical                     :: do_cond
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
 
@@ -196,7 +198,18 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
     itrace_ = 0
   end if
 
-
+  do_cond=present(cond)
+  if (do_cond) then 
+    istebz = 0
+    allocate(td(itmax_),tu(itmax_), eig(itmax_),&
+         & ibl(itmax_),ispl(itmax_),iwrk(3*itmax_),ewrk(4*itmax_),&
+         & stat=info)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
   itx=0
 
 
@@ -256,6 +269,17 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
       alpha_old = alpha
       alpha = rho/sigma
 
+      if (do_cond) then 
+        istebz = istebz + 1
+        if (istebz == 1) then 
+          td(istebz) = sone/alpha
+        else 
+          td(istebz) = sone/alpha + beta/alpha_old
+          tu(istebz-1) = sqrt(beta)/alpha_old
+        end if
+      end if
+
+
       call psb_geaxpby(alpha,p,sone,x,desc_a,info)
       call psb_geaxpby(-alpha,q,sone,r,desc_a,info)
 
@@ -267,6 +291,25 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
 
     end do iteration
   end do restart
+  if (do_cond) then 
+    if (me == 0) then 
+#if defined(HAVE_LAPACK) 
+      call sstebz('A','E',istebz,szero,szero,0,0,-sone,td,tu,&
+           & ieg,nspl,eig,ibl,ispl,ewrk,iwrk,info)
+      if (info < 0) then 
+        call psb_errpush(psb_err_from_subroutine_ai_,name,a_err='sstebz',i_err=(/info,0,0,0,0/))
+        info=psb_err_from_subroutine_ai_
+        goto 9999
+      end if
+      cond = eig(ieg)/eig(1)
+#else 
+      cond = szero
+#endif
+      info=psb_success_
+    end if
+    call psb_bcast(ictxt,cond,root=0)
+  end if
+
 
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
