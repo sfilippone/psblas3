@@ -96,7 +96,7 @@
 ! 
 !
 subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop)
+     & itmax,iter,err,itrace,istop,cond)
   use psb_base_mod
   use psb_prec_mod
   use psb_z_krylov_conv_mod
@@ -111,9 +111,10 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
-  Real(psb_dpk_), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err,cond
 ! =   Local data
-  complex(psb_dpk_), allocatable, target   :: aux(:)
+  complex(psb_dpk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
+  integer(psb_mpik_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_z_vect_type), allocatable, target :: wwrk(:)
   type(psb_z_vect_type), pointer  :: q, p, r, z, w
   complex(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
@@ -123,6 +124,7 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: np, me, ictxt
   real(psb_dpk_)     :: derr  
   type(psb_itconv_type)       :: stopdat
+  logical                     :: do_cond
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
 
@@ -196,7 +198,10 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
     itrace_ = 0
   end if
 
-
+  do_cond=present(cond)
+  if (do_cond) then 
+    istebz = 0
+  end if
   itx=0
 
 
@@ -256,6 +261,8 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
       alpha_old = alpha
       alpha = rho/sigma
 
+
+
       call psb_geaxpby(alpha,p,zone,x,desc_a,info)
       call psb_geaxpby(-alpha,q,zone,r,desc_a,info)
 
@@ -267,6 +274,10 @@ subroutine psb_zcg_vect(a,prec,b,x,eps,desc_a,info,&
 
     end do iteration
   end do restart
+  if (do_cond) then 
+    cond = dzero
+  end if
+
 
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
