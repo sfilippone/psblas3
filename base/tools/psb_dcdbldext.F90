@@ -190,15 +190,12 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
   ! LOVR= (NNZ/NROW)*N_HALO*NOVR  This assumes that the local average 
   ! nonzeros per row is the same as the global. 
   !
-  nztot = a%get_nzeros()
+  ! Allow for empty matrices.
+  nztot = max(ione,a%get_nzeros())
   if (nztot>0) then 
     lovr   = ((nztot+m-1)/m)*nhalo*novr
     lworks = ((nztot+m-1)/m)*nhalo
     lworkr = ((nztot+m-1)/m)*nhalo
-  else
-    info   = -1
-    call psb_errpush(info,name)
-    goto 9999
   endif
   If (debug_level >= psb_debug_outer_)&
        & Write(debug_unit,*) me,' ',trim(name),':ovr_est done',novr,lovr
