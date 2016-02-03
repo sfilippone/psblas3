@@ -177,9 +177,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     ! in a separate method. 
     call psb_cd_switch_ovl_indxmap(desc_ov,info) 
   end if
-  if (info == 0) call desc_ov%indxmap%reinit(info)
-  if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
-  if (info /= 0) goto 9999
+
+  call psb_cd_set_ovl_bld(desc_ov,info)
 
   If (debug_level >= psb_debug_outer_)then 
     Write(debug_unit,*) me,' ',trim(name),&
@@ -191,15 +190,12 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   ! LOVR= (NNZ/NROW)*N_HALO*NOVR  This assumes that the local average 
   ! nonzeros per row is the same as the global. 
   !
-  nztot = a%get_nzeros()
+  ! Allow for zero-szied matrices.
+  nztot = max(ione,a%get_nzeros())
   if (nztot>0) then 
     lovr   = ((nztot+m-1)/m)*nhalo*novr
     lworks = ((nztot+m-1)/m)*nhalo
     lworkr = ((nztot+m-1)/m)*nhalo
-  else
-    info   = -1
-    call psb_errpush(info,name)
-    goto 9999
   endif
   If (debug_level >= psb_debug_outer_)&
        & Write(debug_unit,*) me,' ',trim(name),':ovr_est done',novr,lovr
