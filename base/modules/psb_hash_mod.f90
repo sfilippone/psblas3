@@ -303,6 +303,10 @@ contains
       hd = hsize - hk 
       hd = ior(hd,1)
     end if
+    if (.not.allocated(hash%table)) then
+      info = HashOutOfMemory
+      return
+    end if
 
     hash%nsrch = hash%nsrch + 1
     do 
