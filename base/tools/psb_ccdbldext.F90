@@ -170,11 +170,11 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   endif
 
 
-  if ((extype_ == psb_ovt_asov_).and.&
-       & (.not.desc_ov%indxmap%row_extendable())) then 
+  if (extype_ == psb_ovt_asov_) then 
     ! Need to switch to a format that can support overlap,
-    ! so far: LIST or HASH. Encapsulate choice
-    ! in a separate method. 
+    ! so far: LIST or HASH. This will also reinitialize properly
+    ! the inex map contents. Encapsulate choice
+    ! in a separate method.
     call psb_cd_switch_ovl_indxmap(desc_ov,info) 
   end if
   if (info == 0) call psb_cd_set_ovl_bld(desc_ov,info)
