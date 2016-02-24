@@ -70,10 +70,9 @@ subroutine psb_cd_set_bld(desc,info)
   call psb_info(ictxt, me, np)
   if (debug) write(psb_err_unit,*) me,'Entered CDSETBLD'
 
-  if (psb_is_asb_desc(desc)) then 
-  end if
+
+  if (desc%is_asb())  call psb_cd_reinit(desc,info) 
   
-!!$  desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
   call desc%indxmap%set_state(psb_desc_bld_)
 
   if (debug) write(psb_err_unit,*) me,'SET_BLD: done'
