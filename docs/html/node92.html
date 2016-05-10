@@ -1,65 +1,64 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sp_getrow -- Extract row(s) from a sparse matrix</TITLE>
-<META NAME="description" CONTENT="psb_sp_getrow -- Extract row(s) from a sparse matrix">
+<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
+<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node93.html">
 <LINK REL="previous" HREF="node91.html">
-<LINK REL="up" HREF="node67.html">
+<LINK REL="up" HREF="node68.html">
 <LINK REL="next" HREF="node93.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1390"
+<A NAME="tex2html1393"
   HREF="node93.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1386"
-  HREF="node67.html">
+<A NAME="tex2html1389"
+  HREF="node68.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1380"
+<A NAME="tex2html1383"
   HREF="node91.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1388"
+<A NAME="tex2html1391"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1391"
-  HREF="node93.html">psb_sizeof   Memory</A>
-<B> Up:</B> <A NAME="tex2html1387"
-  HREF="node67.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1381"
-  HREF="node91.html">psb_get_overlap   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1389"
+<B> Next:</B> <A NAME="tex2html1394"
+  HREF="node93.html">psb_sp_getrow   Extract</A>
+<B> Up:</B> <A NAME="tex2html1390"
+  HREF="node68.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1384"
+  HREF="node91.html">psb_get_boundary   Extract</A>
+ &nbsp; <B>  <A NAME="tex2html1392"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000725000000000000000">
-psb_sp_getrow -- Extract row(s) from a sparse
-  matrix</A>
+<H2><A NAME="SECTION000724000000000000000">
+psb_get_overlap -- Extract list of overlap
+  elements</A>
 </H2>
 
 <P>
 <PRE>
-call psb_sp_getrow(row, a, nz, ia, ja, val, info, &amp;
-              &amp; append, nzin, lrw)
+call psb_get_overlap(ovrel, desc, info)
 </PRE>
 
 <P>
@@ -70,75 +69,16 @@ call psb_sp_getrow(row, a, nz, ia, ja, val, info, &amp;
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>row</STRONG></DT>
-<DD>The (first) row to be extracted.
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
-Scope:<B>local</B>
+Scope:<B>local</B>.
 <BR>
-Type:<B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer <IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img111.png"
- ALT="$&gt;0$">.
-</DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the matrix from  which to get rows.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>required</B>
+Type:<B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
-</DD>
-<DT><STRONG>append</STRONG></DT>
-<DD>Whether to append or overwrite existing output.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a logical value default: false (overwrite).
-</DD>
-<DT><STRONG>nzin</STRONG></DT>
-<DD>Input size to be appended to.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer <IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img111.png"
- ALT="$&gt;0$">. When append is true, specifies how many
-entries in the output vectors are already filled. 
-</DD>
-<DT><STRONG>lrw</STRONG></DT>
-<DD>The last  row to be extracted.
-<BR>
-Scope:<B>local</B>
-<BR>
-Type:<B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer <IMG
- WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img111.png"
- ALT="$&gt;0$">, default: <IMG
- WIDTH="31" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img112.png"
- ALT="$row$">.
-
-<P>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 </DL>
 
@@ -147,50 +87,19 @@ Specified as: an integer <IMG
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of elements returned by this call.
+<DT><STRONG>ovrel</STRONG></DT>
+<DD>The list of overlap elements on the calling process, in
+  local numbering.
 <BR>
-Scope:<B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type:<B>required</B>.
+Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Returned  as: an integer scalar.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the row indices.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the column indices of the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer array with the <code>ALLOCATABLE</code> attribute.
-</DD>
-<DT><STRONG>val</STRONG></DT>
-<DD>the elements to be inserted.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a real  array with the <code>ALLOCATABLE</code> attribute.
-</DD>
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.
+<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -208,51 +117,16 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>The output <IMG
- WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$"> is always the size of the output generated by
-  the current call; thus, if <code>append=.true.</code>, the total output
-  size will be <IMG
- WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="img113.png"
- ALT="$nzin+nz$">, with the newly extracted coefficients stored in
-  entries <code>nzin+1:nzin+nz</code> of the array arguments;
+<LI>If there are no overlap elements the output vector is set
+  to the ``not allocated'' state.  
 </LI>
-<LI>When <code>append=.true.</code>  the output arrays are reallocated as
-  necessary;
-</LI>
-<LI>The row and column indices are returned in the local numbering
-  scheme; if the global numbering is desired, the user may employ the
-  <code>psb_loc_to_glob</code> routine on the output.
+<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
+  number of overlap elements. 
 </LI>
 </OL>
 
 <P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1390"
-  HREF="node93.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1386"
-  HREF="node67.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1380"
-  HREF="node91.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1388"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1391"
-  HREF="node93.html">psb_sizeof   Memory</A>
-<B> Up:</B> <A NAME="tex2html1387"
-  HREF="node67.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1381"
-  HREF="node91.html">psb_get_overlap   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1389"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

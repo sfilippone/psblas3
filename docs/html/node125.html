@@ -1,62 +1,65 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>clone -- clone current preconditioner</TITLE>
-<META NAME="description" CONTENT="clone -- clone current preconditioner">
+<TITLE>psb_precdescr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="psb_precdescr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node126.html">
 <LINK REL="previous" HREF="node124.html">
-<LINK REL="up" HREF="node120.html">
+<LINK REL="up" HREF="node121.html">
 <LINK REL="next" HREF="node126.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1805"
+<A NAME="tex2html1810"
   HREF="node126.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1801"
-  HREF="node120.html">
+<A NAME="tex2html1806"
+  HREF="node121.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1797"
+<A NAME="tex2html1800"
   HREF="node124.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1803"
+<A NAME="tex2html1808"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1806"
-  HREF="node126.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1802"
-  HREF="node120.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1798"
-  HREF="node124.html">psb_precdescr   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1804"
+<B> Next:</B> <A NAME="tex2html1811"
+  HREF="node126.html">clone   clone</A>
+<B> Up:</B> <A NAME="tex2html1807"
+  HREF="node121.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1801"
+  HREF="node124.html">psb_precaply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1809"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000115000000000000000">
-clone -- clone  current
+<H2><A NAME="SECTION000114000000000000000">
+psb_precdescr -- Prints a description of current
   preconditioner</A>
 </H2>
 
+<P>
 <PRE>
-call  prec%clone(precout,info)
+call psb_precdescr(prec)
+call psb_precdescr(prec, iout)
 </PRE>
 
 <P>
@@ -69,21 +72,23 @@ call  prec%clone(precout,info)
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>precout</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
+Scope: <B>local</B> 
+<BR>
+Type: <B>optiona</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number. 
 </DD>
 </DL>
 

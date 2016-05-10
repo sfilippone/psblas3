@@ -1,71 +1,70 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_bcast -- Broadcast data</TITLE>
-<META NAME="description" CONTENT="psb_bcast -- Broadcast data">
+<TITLE>psb_abort -- Abort a computation</TITLE>
+<META NAME="description" CONTENT="psb_abort -- Abort a computation">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node105.html">
 <LINK REL="previous" HREF="node103.html">
-<LINK REL="up" HREF="node95.html">
+<LINK REL="up" HREF="node96.html">
 <LINK REL="next" HREF="node105.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1548"
+<A NAME="tex2html1551"
   HREF="node105.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1544"
-  HREF="node95.html">
+<A NAME="tex2html1547"
+  HREF="node96.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1538"
+<A NAME="tex2html1541"
   HREF="node103.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1546"
+<A NAME="tex2html1549"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1549"
-  HREF="node105.html">psb_sum   Global</A>
-<B> Up:</B> <A NAME="tex2html1545"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1539"
-  HREF="node103.html">psb_abort   Abort</A>
- &nbsp; <B>  <A NAME="tex2html1547"
+<B> Next:</B> <A NAME="tex2html1552"
+  HREF="node105.html">psb_bcast   Broadcast</A>
+<B> Up:</B> <A NAME="tex2html1548"
+  HREF="node96.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1542"
+  HREF="node103.html">psb_barrier   Sinchronization</A>
+ &nbsp; <B>  <A NAME="tex2html1550"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00089000000000000000">
-psb_bcast -- Broadcast data</A>
+<H2><A NAME="SECTION00088000000000000000">
+psb_abort -- Abort a computation</A>
 </H2>
 
 <P>
 <PRE>
-call psb_bcast(icontxt, dat, root)
+call psb_abort(icontxt)
 </PRE>
 
 <P>
-This subroutine implements a broadcast operation based on the
-underlying communication library. 
+This subroutine aborts computation on the parallel virtual machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,81 +81,10 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On the root process, the data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical variable,
-which may be a scalar or rank 1 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Root process holding data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $0<= root <= np-1$
- -->
-<IMG
- WIDTH="153" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img131.png"
- ALT="$0&lt;= root &lt;= np-1$">, default 0  </DD>
 </DL>
 
 <P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On processes other than  root, the data to be broadcast.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind, rank and size must agree on all processes.
-</DD>
-</DL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1548"
-  HREF="node105.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1544"
-  HREF="node95.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1538"
-  HREF="node103.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1546"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1549"
-  HREF="node105.html">psb_sum   Global</A>
-<B> Up:</B> <A NAME="tex2html1545"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1539"
-  HREF="node103.html">psb_abort   Abort</A>
- &nbsp; <B>  <A NAME="tex2html1547"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

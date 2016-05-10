@@ -1,5 +1,13 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2016/05/05: Fix fakempi
+2016/02/24: Fix init of hash inside cdbldext.
+2016/01/06: Default COND to 0.
+2015/12/17: Added clean_zeros method to spmat.	
+2015/12/14: Fixed mat_dist
+2015/12/08: Make LOCX allocatable
+2015/12/02: Reworked scatter interfaces.	
+2015/10/17: Fix configure for ATLAS packaging.
 2015/07/17: Fix cdbldext.
 2015/07/10: Begin integration of multivectors.	
 2015/04/25: New optional args in V%set. 	

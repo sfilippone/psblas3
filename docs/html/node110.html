@@ -1,70 +1,71 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_snd -- Send data</TITLE>
-<META NAME="description" CONTENT="psb_snd -- Send data">
+<TITLE>psb_amn -- Global minimum absolute value</TITLE>
+<META NAME="description" CONTENT="psb_amn -- Global minimum absolute value">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node111.html">
 <LINK REL="previous" HREF="node109.html">
-<LINK REL="up" HREF="node95.html">
+<LINK REL="up" HREF="node96.html">
 <LINK REL="next" HREF="node111.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1620"
+<A NAME="tex2html1623"
   HREF="node111.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1616"
-  HREF="node95.html">
+<A NAME="tex2html1619"
+  HREF="node96.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1610"
+<A NAME="tex2html1613"
   HREF="node109.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1618"
+<A NAME="tex2html1621"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1621"
-  HREF="node111.html">psb_rcv   Receive</A>
-<B> Up:</B> <A NAME="tex2html1617"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1611"
-  HREF="node109.html">psb_amn   Global</A>
- &nbsp; <B>  <A NAME="tex2html1619"
+<B> Next:</B> <A NAME="tex2html1624"
+  HREF="node111.html">psb_snd   Send</A>
+<B> Up:</B> <A NAME="tex2html1620"
+  HREF="node96.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1614"
+  HREF="node109.html">psb_amx   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1622"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000815000000000000000">
-psb_snd -- Send data</A>
+<H2><A NAME="SECTION000814000000000000000">
+psb_amn -- Global minimum absolute value</A>
 </H2>
 
 <P>
 <PRE>
-call psb_snd(icontxt, dat, dst, m)
+call psb_amn(icontxt, dat, root)
 </PRE>
 
 <P>
-This subroutine sends a packet of data to a destination.
+This subroutine implements a minimum absolute value reduction
+operation based on the underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous: see usage notes. 
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,65 +83,38 @@ Intent: <B>in</B>.
 Specified as: an integer variable.
 </DD>
 <DT><STRONG>dat</STRONG></DT>
-<DD>The data to be sent.
+<DD>The local contribution to the global minimum.
 <BR>
 Scope: <B>local</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
 Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind and  rank must agree on sender and receiver process; if <IMG
- WIDTH="18" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img133.png"
- ALT="$m$"> is
-not specified, size must agree as well. 
+scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
-<DT><STRONG>dst</STRONG></DT>
-<DD>Destination process.
+<DT><STRONG>root</STRONG></DT>
+<DD>Process to hold the final value, or <IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1$"> to make it available
+  on all processes.
 <BR>
 Scope: <B>global</B>.
 <BR>
-Type: <B>required</B>.
+Type: <B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer value <!-- MATH
- $0<= dst <= np-1$
+ $-1<= root <= np-1$
  -->
 <IMG
- WIDTH="145" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img134.png"
- ALT="$0&lt;= dst &lt;= np-1$">. 
+ WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img132.png"
+ ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
 <BR></DD>
-<DT><STRONG>m</STRONG></DT>
-<DD>Number of rows.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>Optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $0<= m <= size(dat,1)$
- -->
-<IMG
- WIDTH="172" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img135.png"
- ALT="$0&lt;= m &lt;= size(dat,1)$">. 
-<BR>
-When <IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img136.png"
- ALT="$dat$"> is a rank 2 array, specifies the number of rows to be sent
-independently of the leading dimension <IMG
- WIDTH="83" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img137.png"
- ALT="$size(dat,1)$">; must have the
-same value on sending and receiving processes.
-</DD>
 </DL>
 
 <P>
@@ -148,43 +122,57 @@ same value on sending and receiving processes.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>dat</STRONG></DT>
+<DD>On destination process(es), the result of the minimum operation.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. 
+<BR>
+Type, kind, rank and size must agree on all processes.
+</DD>
 </DL>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>This subroutine implies a synchronization, but only between the
-  calling process and the destination  process <IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img138.png"
- ALT="$dst$">.
+<LI>The <code>dat</code> argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+</LI>
+<LI>The <code>dat</code> argument may also be a long integer scalar.
 </LI>
 </OL>
 
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1620"
+<A NAME="tex2html1623"
   HREF="node111.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1616"
-  HREF="node95.html">
+<A NAME="tex2html1619"
+  HREF="node96.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1610"
+<A NAME="tex2html1613"
   HREF="node109.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1618"
+<A NAME="tex2html1621"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1621"
-  HREF="node111.html">psb_rcv   Receive</A>
-<B> Up:</B> <A NAME="tex2html1617"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1611"
-  HREF="node109.html">psb_amn   Global</A>
- &nbsp; <B>  <A NAME="tex2html1619"
+<B> Next:</B> <A NAME="tex2html1624"
+  HREF="node111.html">psb_snd   Send</A>
+<B> Up:</B> <A NAME="tex2html1620"
+  HREF="node96.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1614"
+  HREF="node109.html">psb_amx   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1622"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

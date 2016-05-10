@@ -1,151 +1,117 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_gedot -- Dot Product</TITLE>
-<META NAME="description" CONTENT="psb_gedot -- Dot Product">
+<TITLE>psb_geaxpby -- General Dense Matrix Sum</TITLE>
+<META NAME="description" CONTENT="psb_geaxpby -- General Dense Matrix Sum">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node51.html">
 <LINK REL="previous" HREF="node49.html">
-<LINK REL="up" HREF="node48.html">
+<LINK REL="up" HREF="node49.html">
 <LINK REL="next" HREF="node51.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html859"
+<A NAME="tex2html862"
   HREF="node51.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html855"
-  HREF="node48.html">
+<A NAME="tex2html858"
+  HREF="node49.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html849"
+<A NAME="tex2html852"
   HREF="node49.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html857"
+<A NAME="tex2html860"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html860"
-  HREF="node51.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html856"
-  HREF="node48.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html850"
-  HREF="node49.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html858"
+<B> Next:</B> <A NAME="tex2html863"
+  HREF="node51.html">psb_gedot   Dot</A>
+<B> Up:</B> <A NAME="tex2html859"
+  HREF="node49.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html853"
+  HREF="node49.html">Computational routines</A>
+ &nbsp; <B>  <A NAME="tex2html861"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00052000000000000000">
-psb_gedot -- Dot Product</A>
+<H2><A NAME="SECTION00051000000000000000">
+psb_geaxpby -- General Dense Matrix Sum</A>
 </H2>
 
 <P>
-This function computes dot product between two vectors <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> and
-<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$">.
-<BR>
-If <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> and <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> are real vectors
-it computes dot-product as:
+This subroutine is an interface to the computational kernel for
+dense matrix sum:
 <BR><P></P>
 <DIV ALIGN="CENTER">
 <!-- MATH
  \begin{displaymath}
-dot \leftarrow x^T y
+y \leftarrow  \alpha\> x+ \beta y
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="74" HEIGHT="27" BORDER="0"
- SRC="img24.png"
- ALT="\begin{displaymath}dot \leftarrow x^T y\end{displaymath}">
+ WIDTH="93" HEIGHT="27" BORDER="0"
+ SRC="img19.png"
+ ALT="\begin{displaymath}y \leftarrow \alpha\&gt; x+ \beta y \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
-<P></P>
-Else if <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> and <IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img21.png"
- ALT="$y$"> are complex vectors then it computes dot-product as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-dot \leftarrow x^H y
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="76" HEIGHT="27" BORDER="0"
- SRC="img25.png"
- ALT="\begin{displaymath}dot \leftarrow x^H y\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-
+<P></P> 
 <P>
 <PRE>
-psb_gedot(x, y, desc_a, info)
+call psb_geaxpby(alpha, x, beta, y, desc_a, info)
 </PRE>
+<P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1848"></A>
+<DIV ALIGN="CENTER"><A NAME="1861"></A>
 <TABLE>
-<CAPTION><STRONG>Table 2:</STRONG>
+<CAPTION><STRONG>Table 1:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$dot$">, <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
- ALT="$y$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+ ALT="$y$">, <IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img22.png"
+ ALT="$\alpha$">, <IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img23.png"
+ ALT="$\beta$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_geaxpby</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_geaxpby</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_geaxpby</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_gedot</TD>
+<TD ALIGN="LEFT">psb_geaxpby</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -162,10 +128,24 @@ Data types</CAPTION>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>alpha</STRONG></DT>
+<DD>the scalar <IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img22.png"
+ ALT="$\alpha$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
+</DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
@@ -175,18 +155,32 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+containing numbers of type 
+specified in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">. 
 </DD>
+<DT><STRONG>beta</STRONG></DT>
+<DD>the scalar <IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img23.png"
+ ALT="$\beta$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
+</DD>
 <DT><STRONG>y</STRONG></DT>
-<DD>the local portion of global dense matrix
+<DD>the local portion of the global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
@@ -196,15 +190,14 @@ Scope: <B>local</B>
 <BR>
 Type: <B>required</B> 
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <IMG
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>  containing numbers of the type 
+indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.  The rank of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"> must be the same of <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">. 
 </DD>
@@ -218,24 +211,29 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
-
 <P>
 </DD>
+</DL>
+
+<P>
+<DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>is the dot product of subvectors <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> and <IMG
+<DT><STRONG>y</STRONG></DT>
+<DD>the local portion of result submatrix <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$">.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>local</B> 
 <BR>
-Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90dot">2</A>.
+Type: <B>required</B> 
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> containing numbers of the type
+indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -253,26 +251,26 @@ An integer value; 0 means no error has been detected.
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html859"
+<A NAME="tex2html862"
   HREF="node51.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html855"
-  HREF="node48.html">
+<A NAME="tex2html858"
+  HREF="node49.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html849"
+<A NAME="tex2html852"
   HREF="node49.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html857"
+<A NAME="tex2html860"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html860"
-  HREF="node51.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html856"
-  HREF="node48.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html850"
-  HREF="node49.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html858"
+<B> Next:</B> <A NAME="tex2html863"
+  HREF="node51.html">psb_gedot   Dot</A>
+<B> Up:</B> <A NAME="tex2html859"
+  HREF="node49.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html853"
+  HREF="node49.html">Computational routines</A>
+ &nbsp; <B>  <A NAME="tex2html861"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

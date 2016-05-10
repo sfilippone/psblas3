@@ -1142,8 +1142,29 @@ dynamic type corresponding to the desired preconditioner.
 
 % \subsection{Data structure Methods}
 % \label{sec:dataquery}
+\subsection{Heap data structure}
 
-
+Among the tools routines of sec.~\ref{sec:toolsrout}, we have a number
+of sorting utilities; the heap sort is implemented in terms of heaps
+having the following signatures:
+\begin{description}
+\item[\tt psb\_T\_heap]: a heap containing elements of type T, where T
+  can be \verb|i,s,c,d,z| for integer, real and complex data;
+\item[\tt psb\_T\_idx\_heap]: a heap containing elements of type T, as
+  above, together with an integer index.
+\end{description}
+Given a heap object, the following methods are defined on it:
+\begin{description}
+\item[init] Initialize memory; also choose ascending or descending
+  order;
+\item[howmany] Current heap occupancy;
+\item[insert] Add an item (or an item and its index);
+\item[get\_first] Remove and return the first element;
+\item[dump] Print on file;
+\item[free] Release memory.
+\end{description}
+These objects are used in MLD2P4 to implement the factorization
+algorithms. 
 
 %%% Local Variables: 
 %%% mode: latex

@@ -1,68 +1,68 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_max -- Global maximum</TITLE>
-<META NAME="description" CONTENT="psb_max -- Global maximum">
+<TITLE>psb_sum -- Global sum</TITLE>
+<META NAME="description" CONTENT="psb_sum -- Global sum">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node107.html">
 <LINK REL="previous" HREF="node105.html">
-<LINK REL="up" HREF="node95.html">
+<LINK REL="up" HREF="node96.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1572"
+<A NAME="tex2html1575"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1568"
-  HREF="node95.html">
+<A NAME="tex2html1571"
+  HREF="node96.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1562"
+<A NAME="tex2html1565"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1570"
+<A NAME="tex2html1573"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1573"
-  HREF="node107.html">psb_min   Global</A>
-<B> Up:</B> <A NAME="tex2html1569"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1563"
-  HREF="node105.html">psb_sum   Global</A>
- &nbsp; <B>  <A NAME="tex2html1571"
+<B> Next:</B> <A NAME="tex2html1576"
+  HREF="node107.html">psb_max   Global</A>
+<B> Up:</B> <A NAME="tex2html1572"
+  HREF="node96.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1566"
+  HREF="node105.html">psb_bcast   Broadcast</A>
+ &nbsp; <B>  <A NAME="tex2html1574"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000811000000000000000">
-psb_max -- Global maximum</A>
+<H2><A NAME="SECTION000810000000000000000">
+psb_sum -- Global sum</A>
 </H2>
 
 <P>
 <PRE>
-call psb_max(icontxt, dat, root)
+call psb_sum(icontxt, dat, root)
 </PRE>
 
 <P>
-This subroutine implements a maximum valuereduction
-operation based on the underlying communication library. 
+This subroutine implements a sum reduction  operation based on the
+underlying communication library. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Synchronous.
@@ -83,19 +83,19 @@ Intent: <B>in</B>.
 Specified as: an integer variable.
 </DD>
 <DT><STRONG>dat</STRONG></DT>
-<DD>The local contribution to the global maximum.
+<DD>The local contribution to the global sum.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: an integer or  real variable, which may be a
+Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
 </DD>
 <DT><STRONG>root</STRONG></DT>
-<DD>Process to hold the final maximum, or <IMG
+<DD>Process to hold the final sum, or <IMG
  WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img78.png"
  ALT="$-1$"> to make it available
@@ -113,8 +113,7 @@ Specified as: an integer value <!-- MATH
 <IMG
  WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img132.png"
- ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
-<BR></DD>
+ ALT="$-1&lt;= root &lt;= np-1$">, default -1.  </DD>
 </DL>
 
 <P>
@@ -123,16 +122,18 @@ Specified as: an integer value <!-- MATH
 <DD>
 </DD>
 <DT><STRONG>dat</STRONG></DT>
-<DD>On destination process(es), the result of the maximum operation.
+<DD>On destination process(es), the result of the sum operation.
 <BR>
 Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer or  real variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. 
+<BR>
+Type, kind, rank and size must agree on all processes.
 </DD>
 </DL>
 
@@ -151,26 +152,26 @@ scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all pro
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1572"
+<A NAME="tex2html1575"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1568"
-  HREF="node95.html">
+<A NAME="tex2html1571"
+  HREF="node96.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1562"
+<A NAME="tex2html1565"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1570"
+<A NAME="tex2html1573"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1573"
-  HREF="node107.html">psb_min   Global</A>
-<B> Up:</B> <A NAME="tex2html1569"
-  HREF="node95.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1563"
-  HREF="node105.html">psb_sum   Global</A>
- &nbsp; <B>  <A NAME="tex2html1571"
+<B> Next:</B> <A NAME="tex2html1576"
+  HREF="node107.html">psb_max   Global</A>
+<B> Up:</B> <A NAME="tex2html1572"
+  HREF="node96.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1566"
+  HREF="node105.html">psb_bcast   Broadcast</A>
+ &nbsp; <B>  <A NAME="tex2html1574"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 
