@@ -178,7 +178,7 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
  ac_fc=${MPIFC-$FC};
  AC_COMPILE_IFELSE([
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
