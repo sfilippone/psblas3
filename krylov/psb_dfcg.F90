@@ -123,7 +123,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
 ! =   Local data
   type(psb_d_vect_type)  :: v, w
   type(psb_d_vect_type), dimension(0:1) ::  d
-  real(psb_dpk_) :: delta_old, alpha, tau, tau1, beta, delta
+  real(psb_dpk_) :: alpha, tau, tau1, beta, delta
   real(psb_dpk_) :: derr
   integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
   integer(psb_ipk_) :: n_col, mglob, naux, err_act
@@ -239,8 +239,6 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     !Compute w = -Ax + b
 
     call psb_geaxpby(-done, v, done, w, desc_a, info)   
-    delta = psb_gedot(w, w, desc_a, info)
-    !    rhs_norm = psb_gedot(b, b, desc_a, info)
 
     !Apply the preconditioner
 
@@ -248,7 +246,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
     call prec%apply(w,d(idx),desc_a,info,work=aux)  
 
-    delta_old = psb_gedot(d(idx), w, desc_a, info)
+    delta = psb_gedot(d(idx), w, desc_a, info)
 
 
     !Loop
@@ -271,7 +269,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
       tau = psb_gedot(d(idx), v, desc_a, info) 
 
 
-      alpha = delta_old/tau
+      alpha = delta/tau
       !Update solution x
       call psb_geaxpby(alpha, d(idx), done, x, desc_a, info)   
       !Update residual w
@@ -292,7 +290,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(-beta, d(idx + 1), done, d(idx), desc_a, info)         
       endif
     
-      delta_old=psb_gedot(w, d(idx), desc_a, info)
+      delta = psb_gedot(w, d(idx), desc_a, info)
 
       if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
       if (info /= psb_success_) Then 

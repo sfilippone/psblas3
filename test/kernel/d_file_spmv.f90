@@ -62,7 +62,7 @@ program d_file_spmv
   character(len=20)  :: name
   character(len=2)   :: filefmt
   integer(psb_ipk_), parameter :: iunit=12
-  integer(psb_ipk_), parameter :: times=10
+  integer(psb_ipk_), parameter :: times=20
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
