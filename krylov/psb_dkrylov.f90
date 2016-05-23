@@ -97,38 +97,9 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err,cond
 
-  interface 
-    subroutine psb_dcg_vect(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
-           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
-      type(psb_dspmat_type), intent(in)    :: a
-      type(psb_desc_type), intent(in)      :: desc_a
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type), Intent(inout) :: b
-      type(psb_d_vect_type), Intent(inout) :: x
-      real(psb_dpk_), intent(in)           :: eps
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)       :: iter
-      real(psb_dpk_), optional, intent(out) :: err,cond
-    end subroutine psb_dcg_vect
-    subroutine psb_dbicg_vect(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop)
-      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
-           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
-      type(psb_dspmat_type), intent(in)    :: a
-      type(psb_desc_type), intent(in)      :: desc_a
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type), Intent(inout) :: b
-      type(psb_d_vect_type), Intent(inout) :: x
-      real(psb_dpk_), intent(in)           :: eps
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)       :: iter
-      real(psb_dpk_), optional, intent(out) :: err
-    end subroutine psb_dbicg_vect
-    subroutine psb_dcgstab_vect(a,prec,b,x,eps,&
+
+  abstract interface
+    subroutine psb_dkryl_vect(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
@@ -142,8 +113,8 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
       integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
-    end subroutine psb_dcgstab_vect
-    Subroutine psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
+    end subroutine psb_dkryl_vect
+    Subroutine psb_dkryl_rest_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
@@ -157,9 +128,9 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
       integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
-    end subroutine psb_dcgstabl_vect
-    Subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
+    end subroutine psb_dkryl_rest_vect
+    Subroutine psb_dkryl_cond_vect(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err, itrace,istop,cond)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       Type(psb_dspmat_type), Intent(in)    :: a
@@ -169,26 +140,18 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       type(psb_d_vect_type), Intent(inout) :: x
       Real(psb_dpk_), Intent(in)           :: eps
       integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
+      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
       integer(psb_ipk_), Optional, Intent(out)       :: iter
-      Real(psb_dpk_), Optional, Intent(out) :: err
-    end subroutine psb_drgmres_vect
-    subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
-           & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
-      type(psb_dspmat_type), intent(in)    :: a
-      type(psb_desc_type), intent(in)      :: desc_a 
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type), Intent(inout) :: b
-      type(psb_d_vect_type), Intent(inout) :: x
-      real(psb_dpk_), intent(in)           :: eps
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)       :: iter
-      real(psb_dpk_), optional, intent(out) :: err
-    end subroutine psb_dcgs_vect
+      Real(psb_dpk_), Optional, Intent(out) :: err, cond
+    end subroutine psb_dkryl_cond_vect
   end interface
+
+  procedure(psb_dkryl_vect) :: psb_dbicg_vect, psb_dcgstab_vect,&
+       & psb_dcgs_vect
+  procedure(psb_dkryl_rest_vect) :: psb_drgmres_vect, psb_dcgstabl_vect, psb_dcgr_vect
+  procedure(psb_dkryl_cond_vect) :: psb_dcg_vect, psb_dfcg_vect
+
+  
   integer(psb_ipk_) :: ictxt,me,np,err_act
   character(len=20)             :: name
 
@@ -207,6 +170,12 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   case('CG') 
     call  psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop,cond)
+  case('FCG') 
+    call  psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,istop,cond)
+  case('CGR') 
+    call  psb_dcgr_vect(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,istop)
   case('CGS') 
     call  psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
