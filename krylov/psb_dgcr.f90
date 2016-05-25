@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_zcgr.f90
+! File:  psb_dgcr.f90
 !!
 !! Contributors: Ambra Abdullahi (UNITOV) and Pasqua D’Ambra (IAC-CNR)
 !!
@@ -63,16 +63,16 @@
 !!$ C                                                                      C
 !!$ C                                                                      C
 !!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-! File:  psb_zcgr.f90
+! File:  psb_dgcr.f90
 !
-! Subroutine: psb_zcgr
-!    This subroutine implements the CGR method.
+! Subroutine: psb_dgcr
+!    This subroutine implements the GCR method.
 !
 !
 ! Arguments:
 !
-!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
-!    prec   -  class(psb_zprec_type)       Input: preconditioner
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  class(psb_dprec_type)       Input: preconditioner
 !    b(:)   -  real                    Input: vector containing the
 !                                         right hand side B
 !    x(:)   -  real                    Input/Output: vector containing the
@@ -105,43 +105,43 @@
 !    irst   -  integer(optional)          Input: restart parameter 
 !
 
-subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
+subroutine psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace, irst, istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_krylov_conv_mod
+  use psb_d_krylov_conv_mod
   use psb_krylov_mod
   implicit none
   
   
-  type(psb_zspmat_type), intent(in)    :: a
+  type(psb_dspmat_type), intent(in)    :: a
   Type(psb_desc_type), Intent(in)      :: desc_a
-  class(psb_zprec_type), intent(inout) :: prec
-  type(psb_z_vect_type), Intent(inout) :: b
-  type(psb_z_vect_type), Intent(inout) :: x
+  class(psb_dprec_type), intent(inout) :: prec
+  type(psb_d_vect_type), Intent(inout) :: b
+  type(psb_d_vect_type), Intent(inout) :: x
   real(psb_dpk_), Intent(in)           :: eps
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   real(psb_dpk_), Optional, Intent(out) :: err
   ! =   local data
-  complex(psb_dpk_), allocatable   :: alpha(:), h(:,:)
-  type(psb_z_vect_type), allocatable :: z(:), c(:), c_scale(:)
-  type(psb_z_vect_type)   ::  r
+  real(psb_dpk_), allocatable   :: alpha(:), h(:,:)
+  type(psb_d_vect_type), allocatable :: z(:), c(:), c_scale(:)
+  type(psb_d_vect_type)   ::  r
   
   real(psb_dpk_) :: r_norm, b_norm, a_norm, derr
   integer(psb_ipk_) :: n_col, mglob, naux, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   integer(psb_ipk_) ::  i, j, it, itx, istop_, itmax_, itrace_, nl, m, nrst
-  complex(psb_dpk_) :: hjj
-  complex(psb_dpk_), allocatable, target   :: aux(:)
+  real(psb_dpk_) :: hjj
+  real(psb_dpk_), allocatable, target   :: aux(:)
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
-  character(len=*), parameter :: methdname='CGR'
+  character(len=*), parameter :: methdname='GCR'
   integer(psb_ipk_) ::int_err(5)
   info = psb_success_
-  name = 'psb_zcgr'
+  name = 'psb_dgcr'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -228,7 +228,7 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
   allocate(aux(naux),h(nl+1,nl+1),&
        &c_scale(nl+1),c(nl+1),z(nl+1), alpha(nl+1), stat=info)
   
-  h = zzero
+  h = dzero
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_ 
     call psb_errpush(info,name)
@@ -249,7 +249,7 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   restart: do 
     if (itx>= itmax_) exit restart 
-    h = zzero
+    h = dzero
     
     it = 0
     ! compute r0 = b-ax0
@@ -261,15 +261,15 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
     end if
     
     
-    call psb_geaxpby(zone, b, zzero, r, desc_a, info) 
-    call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
+    call psb_geaxpby(done, b, dzero, r, desc_a, info) 
+    call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
-
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    
+    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
     ! if (info /= psb_success_) Then 
     !   call psb_errpush(psb_err_from_subroutine_non_,name)
     !   goto 9999
@@ -285,24 +285,24 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
       !Apply preconditioner
       call prec%apply(r,z(j),desc_a,info,work=aux)  
       
-      call psb_spmm(zone,a,z(j),zzero,c(1),desc_a,info,work=aux)
+      call psb_spmm(done,a,z(j),dzero,c(1),desc_a,info,work=aux)
       do i =1, j - 1
         
         h(i,j) = psb_gedot(c_scale(i), c(i), desc_a, info)   
         
-        call psb_geaxpby(zone, c(i), zzero, c(i+1), desc_a, info)
-        call psb_geaxpby(-h(i,j), c_scale(i), zone, c(i+1), desc_a, info)   
+        call psb_geaxpby(done, c(i), dzero, c(i+1), desc_a, info)
+        call psb_geaxpby(-h(i,j), c_scale(i), done, c(i+1), desc_a, info)   
       end do
       
       h(j,j) = psb_norm2(c(j), desc_a, info)
-      hjj = zone/h(j,j)
-      call psb_geaxpby(hjj, c(j), zzero, c_scale(j), desc_a, info)   
+      hjj = done/h(j,j)
+      call psb_geaxpby(hjj, c(j), dzero, c_scale(j), desc_a, info)   
       
       alpha(j) = psb_gedot(c_scale(j), r, desc_a, info) 
       
       !Update residual
-      call psb_geaxpby(zone, r, zzero, r, desc_a, info)   
-      call psb_geaxpby(-alpha(j), c_scale(j), zone, r, desc_a, info)   
+      call psb_geaxpby(done, r, dzero, r, desc_a, info)   
+      call psb_geaxpby(-alpha(j), c_scale(j), done, r, desc_a, info)   
       
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
       
@@ -315,13 +315,13 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
     
     !Compute solution
     
-    call ztrsm('l','u','n','n',m,1,zone,h,size(h,1),alpha,size(alpha,1))
+    call dtrsm('l','u','n','n',m,1,done,h,size(h,1),alpha,size(alpha,1))
     
     if (nrst == 0 ) then    
-      call x%set(zzero)
+      call x%set(dzero)
     endif
     do i=1,m
-      call psb_geaxpby(alpha(i), z(i), zone, x, desc_a, info)   
+      call psb_geaxpby(alpha(i), z(i), done, x, desc_a, info)   
     enddo
     
     
@@ -330,10 +330,10 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
   end do restart
   m = j
   !Compute solution
-  call ztrsm('l','u','n','n',m,1,zone,h,size(h,1),alpha,size(alpha,1))
-  call x%set(zzero)
+  call dtrsm('l','u','n','n',m,1,done,h,size(h,1),alpha,size(alpha,1))
+  call x%set(dzero)
   do i=1,m
-    call psb_geaxpby(alpha(i), z(i), zone, x, desc_a, info)   
+    call psb_geaxpby(alpha(i), z(i), done, x, desc_a, info)   
   enddo
   
   iter = j
@@ -370,6 +370,6 @@ subroutine psb_zcgr_vect(a,prec,b,x,eps,desc_a,info,&
   end if
   
   return
-end subroutine psb_zcgr_vect
+end subroutine psb_dgcr_vect
 
 

@@ -148,7 +148,7 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
   procedure(psb_skryl_vect) :: psb_sbicg_vect, psb_scgstab_vect,&
        & psb_scgs_vect
-  procedure(psb_skryl_rest_vect) :: psb_srgmres_vect, psb_scgstabl_vect, psb_scgr_vect
+  procedure(psb_skryl_rest_vect) :: psb_srgmres_vect, psb_scgstabl_vect, psb_sgcr_vect
   procedure(psb_skryl_cond_vect) :: psb_scg_vect, psb_sfcg_vect
 
   
@@ -173,8 +173,8 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   case('FCG') 
     call  psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop,cond)
-  case('CGR') 
-    call  psb_scgr_vect(a,prec,b,x,eps,desc_a,info,&
+  case('GCR') 
+    call  psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
   case('CGS') 
     call  psb_scgs_vect(a,prec,b,x,eps,desc_a,info,&
