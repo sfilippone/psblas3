@@ -344,6 +344,7 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, root)
   ilocx = 1
   jlocx = 1
   lda_globx = size(globx, 1)
+  if (iroot /= -1) call psb_bcast(ictxt,lda_globx,root=iroot)
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
