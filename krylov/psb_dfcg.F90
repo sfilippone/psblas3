@@ -250,9 +250,9 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
 
     !Loop
-    itx = 0
 
-    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+    if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
+
     if (info /= psb_success_) Then 
       call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
