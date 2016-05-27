@@ -114,8 +114,6 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, root)
       k = size(globx,2)
       lda_globx = size(globx, 1)
     end if
-    call psb_bcast(ictxt,k,root=iroot)
-    call psb_bcast(ictxt,lda_globx,root=iroot)
   end if
       
   m = desc_a%get_global_rows()
@@ -123,7 +121,8 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, root)
 
 
   !  there should be a global check on k here!!!
-  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
+  if ((iroot==-1).or.(iam==iroot)) &
+       & call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
@@ -343,16 +342,18 @@ subroutine  psb_sscatterv(globx, locx, desc_a, info, root)
   jglobx = 1
   ilocx = 1
   jlocx = 1
-  lda_globx = size(globx, 1)
-  if (iroot /= -1) call psb_bcast(ictxt,lda_globx,root=iroot)
+  if ((iroot==-1).or.(iam==iroot))&
+       & lda_globx = size(globx, 1)
+
 
   m = desc_a%get_global_rows()
   n = desc_a%get_global_cols()
 
   k = 1
   !  there should be a global check on k here!!!
+  if ((iroot==-1).or.(iam==iroot)) &
+       & call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
 
-  call psb_chkglobvect(m,n,lda_globx,iglobx,jglobx,desc_a,info)
   if(info /= psb_success_) then
      info=psb_err_from_subroutine_
      ch_err='psb_chk(glob)vect'
