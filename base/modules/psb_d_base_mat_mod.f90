@@ -1752,9 +1752,9 @@ contains
     class(psb_d_coo_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 + 1
-    res = res + psb_sizeof_dp  * size(a%val)
-    res = res + psb_sizeof_int * size(a%ia)
-    res = res + psb_sizeof_int * size(a%ja)
+    res = res + psb_sizeof_dp  * psb_size(a%val)
+    res = res + psb_sizeof_int * psb_size(a%ia)
+    res = res + psb_sizeof_int * psb_size(a%ja)
     
   end function d_coo_sizeof
   

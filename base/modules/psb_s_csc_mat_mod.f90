@@ -521,9 +521,9 @@ contains
     class(psb_s_csc_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + psb_sizeof_sp  * size(a%val)
-    res = res + psb_sizeof_int * size(a%icp)
-    res = res + psb_sizeof_int * size(a%ia)
+    res = res + psb_sizeof_sp  * psb_size(a%val)
+    res = res + psb_sizeof_int * psb_size(a%icp)
+    res = res + psb_sizeof_int * psb_size(a%ia)
       
   end function s_csc_sizeof
 
