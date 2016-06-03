@@ -799,15 +799,15 @@ FDEFINES=$(PSBFDEFINES)
 
 # These should be portable rules, arent they?
 .c.o:
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $< -o $@
 .f.o:
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $< -o $@
 .f90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $< -o $@
 .F.o:
-	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
+	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@'
 
 
 AC_SUBST(PSBLASRULES)
