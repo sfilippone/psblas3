@@ -5757,7 +5757,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
  cat >conftest.$ac_ext <<_ACEOF
 
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 9 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -5791,10 +5791,12 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 	  { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
+		     { $as_echo "$as_me:$LINENO: Sorry, we require GNU Fortran version 4.9.1 or later." >&5
+$as_echo "$as_me: Sorry, we require GNU Fortran version 4.9.1 or later." >&6;}
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
-		      { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
-$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.6 or later." >&2;}
+		      { { $as_echo "$as_me:$LINENO: error: Bailing out." >&5
+$as_echo "$as_me: error: Bailing out." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
