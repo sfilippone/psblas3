@@ -14,16 +14,18 @@ INCDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) 
 
-lib: mpfobjs $(OBJS) 
+lib: interns mpfobjs $(OBJS) 
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
-
+interns:
+	cd internals && $(MAKE) lib
 mpfobjs: 
 	$(MAKE) $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)"
 
 
 clean:
+	cd internals && $(MAKE) clean
 	/bin/rm -f $(MPFOBJS) $(OBJS)
 
 veryclean: clean
