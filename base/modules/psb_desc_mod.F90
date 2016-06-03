@@ -199,6 +199,8 @@ module psb_desc_mod
 
 
   type psb_desc_type
+    class(psb_indx_map), allocatable :: indxmap
+
     integer(psb_ipk_), allocatable   :: halo_index(:)
     integer(psb_ipk_), allocatable   :: ext_index(:)
     integer(psb_ipk_), allocatable   :: ovrlap_index(:)
@@ -211,7 +213,6 @@ module psb_desc_mod
 
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
-    class(psb_indx_map), allocatable :: indxmap
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable   :: idx_space(:)
