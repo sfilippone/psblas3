@@ -260,7 +260,7 @@ fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
 PAC_HAVE_MODERN_GFORTRAN(
 	[],
-        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.6 or later.])]
+        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.8.4 or later.])]
 )
 fi
 # TODO : SEE _AC_PROG_FC_V

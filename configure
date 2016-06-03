@@ -5793,8 +5793,8 @@ sed 's/^/| /' conftest.$ac_ext >&5
 $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
-		      { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
-$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.6 or later." >&2;}
+		      { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.8.4 or later." >&5
+$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.8.4 or later." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
