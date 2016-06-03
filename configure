@@ -7708,9 +7708,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7779,9 +7779,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7866,9 +7866,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7939,9 +7939,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -8002,9 +8002,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -8064,9 +8064,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
