@@ -186,7 +186,8 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
            end],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
-		  [  AC_MSG_RESULT([no])	
+		  [  AC_MSG_RESULT([no])
+		     AC_MSG_NOTICE([Sorry, we require GNU Fortran version 4.8.4 or later.])
 		     echo "configure: failed program was:" >&AC_FD_CC
 		     cat conftest.$ac_ext >&AC_FD_CC
 		     ifelse([$2], , , [ $2])])
