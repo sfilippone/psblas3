@@ -34,7 +34,7 @@ lib: $(OBJS)
 
 # A bit excessive, but safe
 $(OBJS): $(MODDIR)/psb_base_mod.o
-
+$(IOBJS) $(SOBJS)  $(DOBJS)  $(COBJS)  $(ZOBJS): $(BOBJS) 
 clean: cleanobjs
 
 veryclean: cleanobjs

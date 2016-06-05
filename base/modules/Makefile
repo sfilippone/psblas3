@@ -2,7 +2,7 @@ include ../../Make.inc
 
 BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
 COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o
-UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
+UTIL_MODS=aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
         desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o \
 	desc/psb_desc_mod.o aux/psb_sort_mod.o \
@@ -54,7 +54,7 @@ $(LIBDIR)/$(LIBNAME): $(MODULES) $(OBJS) $(MPFOBJS)
 
 psb_error_mod.o: psb_const_mod.o
 psb_realloc_mod.o:  psb_error_mod.o
-$(UTILS_MODS): $(BASIC_MODS)
+$(UTIL_MODS): $(BASIC_MODS)
 
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
