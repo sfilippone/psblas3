@@ -62,7 +62,7 @@ module psb_indx_map_mod
   !!  -  Query the indx state.
   !!    
   !!  -  Does the dynamic class support extensions of the rows? I.e., can
-  !!     it have overlap? for instance, the BLOCK cannot, it would run afoul
+  !!     it have overlap? for instance, BLOCK cannot, it would run afoul
   !!     of the glob_to_loc translation. 
   !!  
   !!  Checking for the existence of overlap is very expensive, thus

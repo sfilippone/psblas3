@@ -576,7 +576,7 @@ PAC_FORTRAN_TEST_ISO_C_BIND(
 )
 PAC_FORTRAN_TEST_FINAL( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
-        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for FINAL. 
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.9.])]
 )
 
