@@ -3156,7 +3156,7 @@ contains
           if (info /= 0) return
         end if
           
-        call psb_msort(idxs(1:nrc))
+        call psb_qsort(idxs(1:nrc))
         do i=1, nrc
           irw        = idxs(i) 
           c%ja(nzc)  = irw 
