@@ -3424,6 +3424,7 @@ subroutine psb_s_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         do i=2,nzin
           if (  (ia(i) < 1).or.(ia(i)> nr)) then 
             use_buffers = .false.
+            srt_inp     = .false. 
             exit
           end if
           iaux(ia(i)) = iaux(ia(i)) + 1
@@ -3744,6 +3745,7 @@ subroutine psb_s_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
         do i=2,nzin
           if (  (ja(i) < 1).or.(ja(i)> nc)) then 
             use_buffers = .false.
+            srt_inp     = .false.
             exit
           end if
           iaux(ja(i)) = iaux(ja(i)) + 1
