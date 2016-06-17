@@ -141,8 +141,7 @@ subroutine psi_iqsrx_up(n,x,idx)
   integer(psb_ipk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
-
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -296,7 +295,7 @@ subroutine psi_iqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -451,7 +450,7 @@ subroutine psi_iqsr_up(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -592,7 +591,7 @@ subroutine psi_iqsr_dw(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -734,7 +733,7 @@ subroutine psi_iaqsrx_up(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -890,7 +889,7 @@ subroutine psi_iaqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
   if (n > ithrs) then          
     !
@@ -1043,7 +1042,7 @@ subroutine psi_iaqsr_up(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -1183,7 +1182,7 @@ subroutine psi_iaqsr_dw(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
