@@ -152,7 +152,7 @@ subroutine psi_clqsrx_up(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -308,7 +308,7 @@ subroutine psi_clqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -463,7 +463,7 @@ subroutine psi_clqsr_up(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -604,7 +604,7 @@ subroutine psi_clqsr_dw(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -746,7 +746,7 @@ subroutine psi_calqsrx_up(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -901,7 +901,7 @@ subroutine psi_calqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -1056,7 +1056,7 @@ subroutine psi_calqsr_up(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -1196,7 +1196,7 @@ subroutine psi_calqsr_dw(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
 
@@ -1337,7 +1337,7 @@ subroutine psi_caqsrx_up(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -1493,7 +1493,7 @@ subroutine psi_caqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
   if (n > ithrs) then          
     !
@@ -1646,7 +1646,7 @@ subroutine psi_caqsr_up(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
@@ -1786,7 +1786,7 @@ subroutine psi_caqsr_dw(n,x)
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
   integer(psb_ipk_) :: ixt, n1, n2
 
-  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=16
+  integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=32
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
   if (n > ithrs) then          
