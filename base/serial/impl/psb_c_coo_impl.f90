@@ -451,6 +451,8 @@ subroutine psb_c_coo_print(iout,a,iv,head,ivr,ivc)
   nc = a%get_ncols()
   nz = a%get_nzeros()
   nmx = max(nr,nc,1)
+  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
+  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
   ni  = floor(log10(1.0*nmx)) + 1
 
   if (datatype=='real') then 
