@@ -40,6 +40,7 @@ module psb_desc_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_i_vect_mod
+  use iso_fortran_env, only : event_type
 
   implicit none
 
@@ -214,8 +215,15 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
     integer(psb_ipk_), allocatable   :: lprm(:)
-    type(psb_desc_type), pointer     :: base_desc => null()
+    !type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable   :: idx_space(:)
+
+    !
+    ! Test a coarray implementation
+    !
+    !type(event_type), allocatable  :: up_for_grabs(:)[:]
+    real(psb_dpk_), allocatable    :: d_send_buf(:)[:]
+    integer(psb_ipk_), allocatable :: grab_idxes(:,:)
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -358,7 +366,7 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
-    nullify(desc%base_desc)
+    !nullify(desc%base_desc)
 
   end subroutine psb_nullify_desc
 
@@ -367,7 +375,7 @@ contains
     class(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
-    nullify(desc%base_desc)
+    !nullify(desc%base_desc)
 
   end subroutine nullify_desc
 
@@ -684,11 +692,11 @@ contains
     case(psb_comm_ext_) 
       ipnt   => desc%ext_index
       if (debug_level >= psb_debug_ext_) then
-        if (.not.associated(desc%base_desc)) then
-          write(debug_unit,*) trim(name),&
-               & ': Warning: trying to get ext_index on a descriptor ',&
-               & 'which does not have a base_desc!'
-        end if
+!!$        if (.not.associated(desc%base_desc)) then
+!!$          write(debug_unit,*) trim(name),&
+!!$               & ': Warning: trying to get ext_index on a descriptor ',&
+!!$               & 'which does not have a base_desc!'
+!!$        end if
         if (.not.psb_is_ovl_desc(desc)) then
           write(debug_unit,*) trim(name),&
                & ': Warning: trying to get ext_index on a descriptor ',&
@@ -754,11 +762,11 @@ contains
       if (.not.allocated(desc%v_ext_index%v)) &
            & info = psb_err_inconsistent_index_lists_
       if (debug_level >= psb_debug_ext_) then
-        if (.not.associated(desc%base_desc)) then
-          write(debug_unit,*) trim(name),&
-               & ': Warning: trying to get ext_index on a descriptor ',&
-               & 'which does not have a base_desc!'
-        end if
+!!$        if (.not.associated(desc%base_desc)) then
+!!$          write(debug_unit,*) trim(name),&
+!!$               & ': Warning: trying to get ext_index on a descriptor ',&
+!!$               & 'which does not have a base_desc!'
+!!$        end if
         if (.not.psb_is_ovl_desc(desc)) then
           write(debug_unit,*) trim(name),&
                & ': Warning: trying to get ext_index on a descriptor ',&
@@ -1015,7 +1023,7 @@ contains
         goto 9999
       endif
 
-      desc_out%base_desc  => desc%base_desc
+!!$      desc_out%base_desc  => desc%base_desc
       if (info == psb_success_)&
            & call psb_safe_ab_cpy(desc%halo_index,desc_out%halo_index,info)
       if (info == psb_success_)&
