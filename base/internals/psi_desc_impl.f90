@@ -60,7 +60,99 @@ subroutine psi_renum_index(iperm,idx,info)
 
 end subroutine psi_renum_index
 
-subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
+subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
+  use psi_mod, psi_protect_name =>  psi_cnv_v2xch
+  use psb_realloc_mod
+  implicit none
+  integer(psb_ipk_), intent(in)         :: ictxt, vidx_in(:)
+  type(psb_xch_idx_type), intent(inout) :: xch_idx
+  integer(psb_ipk_), intent(out)        :: info
+
+  !     ....local scalars....      
+  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: nxch, nsnd, nrcv, nesd,nerv, ip, j, k, ixch
+  !     ...parameters
+  integer(psb_ipk_) :: debug_level, debug_unit
+  logical, parameter :: debug=.false.
+  character(len=20)  :: name
+
+  name='psi_cnv_v2xch'
+  call psb_get_erraction(err_act)
+  debug_level = psb_get_debug_level()
+  debug_unit  = psb_get_debug_unit()
+
+  info = psb_success_
+  
+  call psb_info(ictxt,me,np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  call psb_get_xch_idx(vidx_in, nxch, nsnd, nrcv)
+  xch_idx%max_buffer_size = max(nsnd,nrcv)
+  call psb_amx(ictxt,xch_idx%max_buffer_size)
+  if (info == 0) call psb_realloc(nxch,xch_idx%prcs_xch,info)
+  if (info == 0) call psb_realloc(nxch,2,xch_idx%rmt_snd_bnd,info)
+  if (info == 0) call psb_realloc(nxch,2,xch_idx%rmt_rcv_bnd,info)
+  if (info == 0) call psb_realloc(nxch+1,xch_idx%loc_snd_bnd,info)
+  if (info == 0) call psb_realloc(nxch+1,xch_idx%loc_rcv_bnd,info)
+  if (info == 0) call psb_realloc(nsnd,xch_idx%loc_snd_idx,info)
+  if (info == 0) call psb_realloc(nrcv,xch_idx%loc_rcv_idx,info)
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+    goto 9999      
+  end if
+
+  
+  
+  ip     = 1
+  ixch   = 1
+  xch_idx%loc_snd_bnd(1) = 1
+  xch_idx%loc_rcv_bnd(1) = 1 
+  do 
+    if (ip > size(vidx_in)) then 
+      write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
+      exit
+    end if
+    if (vidx_in(ip) == -1) exit
+    xch_idx%prcs_xch(ixch) = vidx_in(ip)
+    nerv   = vidx_in(ip+psb_n_elem_recv_)
+!!$    write(*,*) 'Check on receive option ',ip,nerv,xch_idx%loc_rcv_bnd(ixch)
+    xch_idx%loc_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1) = &
+         & vidx_in(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv)
+    nesd   = vidx_in(ip+nerv+psb_n_elem_send_)
+!!$    write(*,*) 'Check on send option ',ip,nesd,xch_idx%loc_snd_bnd(ixch)
+    xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1) = &
+         & vidx_in(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd)
+    xch_idx%loc_rcv_bnd(ixch+1) =  xch_idx%loc_rcv_bnd(ixch) + nerv
+    xch_idx%loc_snd_bnd(ixch+1) =  xch_idx%loc_snd_bnd(ixch) + nesd
+    call psb_snd(ictxt,xch_idx%loc_rcv_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
+    call psb_snd(ictxt,xch_idx%loc_snd_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
+    call psb_rcv(ictxt,xch_idx%rmt_rcv_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
+    call psb_rcv(ictxt,xch_idx%rmt_snd_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
+    ip     = ip+nerv+nesd+3
+    ixch   = ixch + 1 
+  end do
+  xch_idx%rmt_rcv_bnd(:,2) = xch_idx%rmt_rcv_bnd(:,2) - 1
+  xch_idx%rmt_snd_bnd(:,2) = xch_idx%rmt_snd_bnd(:,2) - 1
+  
+  
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end subroutine psi_cnv_v2xch
+  
+  
+
+subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in, cdesc, info, mold)
 
   use psi_mod, psi_protect_name =>  psi_cnv_dsc
   use psb_realloc_mod
@@ -98,6 +190,7 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   endif
 
+  cdesc%max_buffer_size=0
 
   ! first the halo index
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo',&
@@ -108,7 +201,8 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%halo_index,info)
-
+  cdesc%max_buffer_size = max(cdesc%max_buffer_size, nsnd, nrcv)
+  call  psi_cnv_v2xch(ictxt, cdesc%halo_index, cdesc%halo_xch,info)
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
 
@@ -121,7 +215,9 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%ext_index,info)
-
+  cdesc%max_buffer_size = max(cdesc%max_buffer_size, nsnd, nrcv)
+  call  psi_cnv_v2xch(ictxt, cdesc%ext_index, cdesc%ext_xch,info)
+  
   if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
 
@@ -132,6 +228,8 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%ovrlap_index,info)
+  cdesc%max_buffer_size = max(cdesc%max_buffer_size, nsnd, nrcv)
+  call  psi_cnv_v2xch(ictxt, cdesc%ovrlap_index, cdesc%ovrlap_xch,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
     goto 9999
@@ -157,6 +255,8 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
     goto 9999
   end if
   call psb_move_alloc(idx_out,cdesc%ovr_mst_idx,info)
+  cdesc%max_buffer_size = max(cdesc%max_buffer_size, nsnd, nrcv)
+  call  psi_cnv_v2xch(ictxt, cdesc%ovr_mst_idx, cdesc%ovr_mst_xch,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
     goto 9999
@@ -171,7 +271,7 @@ subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   call cdesc%v_ovrlap_index%bld(cdesc%ovrlap_index,mold=mold)
   call cdesc%v_ovr_mst_idx%bld(cdesc%ovr_mst_idx,mold=mold)
 
-
+  call psb_amx(ictxt,cdesc%max_buffer_size)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_bnd_elem')
     goto 9999

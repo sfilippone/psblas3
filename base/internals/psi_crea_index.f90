@@ -124,7 +124,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
 
-  ! ....now i can sort dependency lists.
+  ! ....now I can sort dependency lists.
   call psi_sort_dl(dep_list,length_dl,np,info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')

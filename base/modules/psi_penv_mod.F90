@@ -410,7 +410,7 @@ contains
     if (present(close)) then 
       close_ = close
     else
-      close_ = .true.
+      close_ = .false.
     end if
 ! !$    if (close_) call psb_rsb_exit(info)
 ! !$    if (info.ne.psb_rsb_const_success) then 

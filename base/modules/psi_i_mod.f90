@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psi_i_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpik_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpik_, psb_xch_idx_type
   use psb_i_base_vect_mod, only : psb_i_base_vect_type 
   use psb_i_base_multivect_mod, only : psb_i_base_multivect_type 
 
@@ -51,6 +51,16 @@ module psi_i_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psi_crea_bnd_elem
   end interface
+
+  interface
+    subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
+      import
+      integer(psb_ipk_), intent(in)         :: ictxt, vidx_in(:)
+      type(psb_xch_idx_type), intent(inout) :: xch_idx
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine psi_cnv_v2xch
+  end interface
+  
 
   interface
     subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)

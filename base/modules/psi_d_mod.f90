@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 module psi_d_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type, psb_xch_idx_type
   use psb_d_base_vect_mod, only : psb_d_base_vect_type 
   use psb_d_base_multivect_mod, only : psb_d_base_multivect_type 
 
@@ -92,6 +92,14 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxv
+    subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      class(psb_d_base_vect_type)            :: y
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswap_xchg_vect
     subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 

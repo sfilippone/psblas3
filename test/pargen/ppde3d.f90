@@ -175,6 +175,7 @@ program ppde3d
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
+  !write(*,*) 'Check on image info:',iam,this_image()
   !
   !  get parameters
   !
@@ -197,6 +198,13 @@ program ppde3d
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  if (iam == psb_root_) write(psb_err_unit,'("Check on new descriptor entries")')
+!!$  do i = 0, np -1
+!!$    if (iam == i) call desc_a%halo_xch%print(psb_err_unit)
+!!$    if (iam == i) flush(psb_err_unit)
+!!$    call psb_barrier(ictxt)
+!!$  end do
+  
   !
   !  prepare the preconditioner.
   !  
