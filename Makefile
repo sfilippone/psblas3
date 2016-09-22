@@ -31,6 +31,8 @@ install: all
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   $(INSTALL_DATA) README LICENSE  $(INSTALL_DOCSDIR))
+	(./mkdir.sh  $(INSTALL_SAMPLESDIR) && \
+	     /bin/cp -fr test/pargen test/fileread test/kernel $(INSTALL_SAMPLESDIR))
 clean: 
 	cd base && $(MAKE) clean
 	cd prec && $(MAKE) clean 
