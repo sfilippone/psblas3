@@ -1,10 +1,10 @@
 #
 # Libraries used
 #
-BASEDIR=../..
-INCDIR=$(BASEDIR)/include/
+INSTALLDIR=../..
+INCDIR=$(INSTALLDIR)/include/
 include $(INCDIR)/Make.inc.psblas
-LIBDIR=$(BASEDIR)/lib/
+LIBDIR=$(INSTALLDIR)/lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 
