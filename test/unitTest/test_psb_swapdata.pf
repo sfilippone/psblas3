@@ -1,0 +1,128 @@
+module test_psb_swapdata
+use pfunit_mod
+use psb_base_mod
+use psi_mod
+implicit none
+include 'mpif.h'
+contains
+
+
+@test(nimgs=[std])
+subroutine test_psi_dswap_xchg_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, nrows=6, j, info
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	!Let's modify x, so we need to update halo indices
+
+	x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+
+	call psb_barrier(icontxt)
+
+
+        ! END OF SETUP
+        iictxt = desc_a%get_context()
+        icomm = desc_a%get_mpic()
+	call desc_a%get_list(psb_comm_halo_,xchg,info)
+	flag = IOR(psb_swap_send_, psb_swap_recv_)
+        call psi_dswap_xchg_vect(iictxt,icomm,flag,0.0d0,x%v,xchg,info)
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+
+        v = x%get_vect()
+
+
+	!Let's build the expected solution
+
+	allocate(check(mid+1))
+        if (me == 1 ) then
+		check(1:mid)=1.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1:mid)=2.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1:mid+1)=0.0d0
+	endif
+
+	!call psb_barrier(icontxt)
+
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(real(true*v(1:mid+1)),real(true*check(1:mid+1)))
+
+	deallocate(vg,ia,val,v,check)
+	call psb_exit(icontxt)
+
+end subroutine test_psi_dswap_xchg_vect
+
+
+end module test_psb_swapdata
+
