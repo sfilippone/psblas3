@@ -15,7 +15,7 @@ CCOPT= -g
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 
-all: test_psb_swapdata
+all: test_psb_halo
 
 %: %.x
 	mpirun -np 4 ./$^	

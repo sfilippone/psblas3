@@ -1,4 +1,4 @@
-module test_psb_swapdata
+module test_psb_halo
 use pfunit_mod
 use psb_base_mod
 implicit none
@@ -7,7 +7,7 @@ include 'mpif.h'
 contains
 
 @test(nimgs=[std])
-subroutine test_psb_swapdata_2imgs(this)
+subroutine test_psb_halo_2imgs(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: msg, me, i=0, np, j, info
@@ -16,7 +16,6 @@ subroutine test_psb_swapdata_2imgs(this)
 	integer, allocatable :: vg(:), ia(:)
         real(psb_dpk_), allocatable :: val(:)
         real(psb_dpk_), allocatable :: v(:), check(:)
-        class(psb_xch_idx_type), pointer :: xchg
 	integer(psb_ipk_) :: iictxt, icomm, flag
 	type(psb_desc_type):: desc_a
 	type(psb_d_vect_type) :: x
@@ -90,15 +89,7 @@ subroutine test_psb_swapdata_2imgs(this)
         ! END OF SETUP
 
 
-        iictxt = desc_a%get_context()
-
-        icomm = desc_a%get_mpic()
-
-	call desc_a%get_list(psb_comm_halo_,xchg,info)
-
-	flag = IOR(psb_swap_send_, psb_swap_recv_)
-
-        call psi_dswap_xchg_vect(iictxt,icomm,flag,0.0d0,x%v,xchg,info)
+	call psb_halo(x, desc_a, info)
         !GETTING BACK X
 	call psb_barrier(icontxt)
         v = x%get_vect()
@@ -134,11 +125,12 @@ subroutine test_psb_swapdata_2imgs(this)
 
 	call psb_exit(icontxt)
 
-end subroutine test_psb_swapdata_2imgs
+end subroutine test_psb_halo_2imgs
+
 
 
 @test(nimgs=[std])
-subroutine test_psb_swapdata_4imgs(this)
+subroutine test_psb_d_halo(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: msg, me, i=0, np, j, info, nz
@@ -148,7 +140,6 @@ subroutine test_psb_swapdata_4imgs(this)
         real(psb_dpk_), allocatable :: val(:)
         real(psb_dpk_), allocatable :: v(:), check(:)
 	integer(psb_ipk_) :: iictxt, icomm, flag
-        class(psb_xch_idx_type), pointer :: xchg
 	type(psb_desc_type):: desc_a
 	type(psb_d_vect_type) :: x
 
@@ -347,38 +338,33 @@ subroutine test_psb_swapdata_4imgs(this)
 
         ! END OF SETUP
 
-	call psb_barrier(icontxt)
-
 	!We can do something better here
         x%v%v = x%v%v*2*me
 
 	call psb_barrier(icontxt)
 
-        iictxt = desc_a%get_context()
 
-        icomm = desc_a%get_mpic()
-
-	call desc_a%get_list(psb_comm_halo_,xchg,info)
-
-	flag = IOR(psb_swap_send_, psb_swap_recv_)
-
-        call psi_dswap_xchg_vect(iictxt,icomm,flag,0.0d0,x%v,xchg,info)
+	call psb_halo(x, desc_a, info)
 
 
 
 	call psb_barrier(icontxt)
+
         v = x%get_vect()
 
 
 
-	!call psb_barrier(icontxt)
+	call psb_barrier(icontxt)
 
 	if ((me==1).or.(me==2)) then
 		true = 1
 	else
 		true=0
 	endif
+
+
 	@assertEqual(real(true*check),real(true*v))
+
 	deallocate(vg,ia,val,v,check)
 
 	call psb_gefree(x, desc_a, info)
@@ -386,7 +372,8 @@ subroutine test_psb_swapdata_4imgs(this)
 
 	call psb_exit(icontxt)
 
+end subroutine test_psb_d_halo
 
-end subroutine test_psb_swapdata_4imgs
-end module test_psb_swapdata
+
+end module test_psb_halo
 
