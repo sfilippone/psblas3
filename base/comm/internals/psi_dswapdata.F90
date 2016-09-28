@@ -1176,7 +1176,6 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
     if (last_clear_count>0) &
          & event wait(clear,until_count=last_clear_count)
   end if
-
   if (psb_size(buffer) < xchg%max_buffer_size) then
     !
     ! By construction, max_buffer_size was computed with a collective. 
@@ -1184,6 +1183,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
     if (allocated(buffer)) deallocate(buffer)
     !write(*,*) 'Allocating buffer',xchg%max_buffer_size
     allocate(buffer(xchg%max_buffer_size)[*],stat=info)
+    if (allocated(sndbuf)) deallocate(sndbuf)
     if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
     if (info /= 0) then
       info = psb_err_internal_error_
@@ -1191,7 +1191,6 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
       goto 9999
     end if
   end if
-
   if (.true.) then 
     !sync all
     nxch = size(xchg%prcs_xch)
@@ -1220,6 +1219,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
       !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
       call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta)
       event post(clear[img])
+
     end do
     last_clear_count = nxch
 
@@ -1883,4 +1883,3 @@ subroutine psi_dswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
 
   return
 end subroutine psi_dswap_vidx_multivect
-
