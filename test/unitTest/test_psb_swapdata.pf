@@ -104,6 +104,7 @@ subroutine test_psb_swapdata_2imgs(this)
         v = x%get_vect()
 
 	!Let's build the expected solution
+	if (allocated(check)) deallocate(check)
 	if ((me == 1).or.(me==2)) then
 		allocate(check(mid+1))
 	else
@@ -187,6 +188,7 @@ subroutine test_psb_swapdata_4imgs(this)
 	if (me == 2) nz = 7
 	if (me == 3) nz = 7
 	if (me == 4) nz = 5
+        if (me > 4)  nz = 0
 
 	allocate(ia(nz),ja(nz))
 
@@ -290,6 +292,20 @@ subroutine test_psb_swapdata_4imgs(this)
 		val(i)=4.
 	enddo
 
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+
+	call psb_cdasb(desc_a, info)
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
 
 	if (me==1) nz = 5
 	if (me==2) nz = 6
@@ -330,21 +346,6 @@ subroutine test_psb_swapdata_4imgs(this)
 		check(5)=18
 	endif
 
-	call psb_cdall(icontxt,desc_a,info, vg=vg)
-	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
-	call psb_cdasb(desc_a, info)
-
-	allocate(irw(nrows))
-	do i=1,nrows
-		irw(i)=i
-	enddo
-
-
-	call psb_geall(x,desc_a,info)
-	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
-	call psb_geasb(x,desc_a,info)
-
-
         ! END OF SETUP
 
 	call psb_barrier(icontxt)
@@ -378,6 +379,7 @@ subroutine test_psb_swapdata_4imgs(this)
 	else
 		true=0
 	endif
+
 	@assertEqual(real(true*check),real(true*v))
 	deallocate(vg,ia,val,v,check)
 
@@ -388,5 +390,452 @@ subroutine test_psb_swapdata_4imgs(this)
 
 
 end subroutine test_psb_swapdata_4imgs
+
+@test(nimgs=[std])
+subroutine test_psb_swapdata_8imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info, nz
+	integer, parameter :: nrows = 8
+	integer :: icontxt, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 1
+	if (me == 2) nz = 2
+	if (me == 3) nz = 3
+	if ((me >= 4).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 0
+	allocate(ia(nz),ja(nz))
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=6
+
+	endif
+
+	if (me == 2) then
+
+	  ia(1)=2
+	  ja(1)=1
+
+	  ia(2)=2
+	  ja(2)=7
+
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+
+	  ia(2)=3
+	  ja(2)=2
+
+	  ia(3)=3
+	  ja(3)=8
+
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=2
+
+	  ia(2)=4
+	  ja(2)=3
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=3
+
+	  ia(2)=5
+	  ja(2)=4
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=4
+
+	  ia(2)=6
+	  ja(2)=5
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=5
+
+	  ia(2)=7
+	  ja(2)=6
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=6
+
+	  ia(2)=8
+	  ja(2)=7
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 2
+	if (me == 2) nz = 3
+	if (me == 3) nz = 4
+	if ((me >= 4).and.(me <= 8)) nz = 3
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz))
+	if (me == 1) then
+		check(1)=2
+		check(2)=12
+	endif
+	if (me == 2) then
+		check(1)=4
+		check(2)=2
+		check(3)=14
+	endif
+	if (me == 3) then
+		check(1)=6
+		check(2)=2
+		check(3)=4
+		check(4)=16
+
+	endif
+	if (me == 4) then
+		check(1)=8
+		check(2)=4
+		check(3)=6
+	endif
+	if (me == 5) then
+		check(1)=10
+		check(2)=6
+		check(3)=8
+	endif
+	if (me == 6) then
+		check(1)=12
+		check(2)=8
+		check(3)=10
+	endif
+	if (me == 7) then
+		check(1)=14
+		check(2)=10
+		check(3)=12
+	endif
+	if (me == 8) then
+		check(1)=16
+		check(2)=12
+		check(3)=14
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+
+
+	call psb_barrier(icontxt)
+
+        iictxt = desc_a%get_context()
+
+        icomm = desc_a%get_mpic()
+
+	call desc_a%get_list(psb_comm_halo_,xchg,info)
+
+	flag = IOR(psb_swap_send_, psb_swap_recv_)
+
+        call psi_dswap_xchg_vect(iictxt,icomm,flag,0.0d0,x%v,xchg,info)
+
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+
+
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*v))
+
+	deallocate(vg,ia,val,v,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+
+end subroutine test_psb_swapdata_8imgs
+
+
+@test(nimgs=[std])
+subroutine test_psb_swapdata_8imgs_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info, nz
+	integer, parameter :: nrows = 8
+	integer :: icontxt, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 7
+	if ((me >= 2).and.(me <= 8)) nz = 1
+	if (me > 8) nz = 0
+	allocate(ia(nz),ja(nz))
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=2
+
+	  ia(2)=1
+	  ja(2)=3
+
+	  ia(3)=1
+	  ja(3)=4
+
+	  ia(4)=1
+	  ja(4)=5
+
+	  ia(5)=1
+	  ja(5)=6
+
+	  ia(6)=1
+	  ja(6)=7
+
+	  ia(7)=1
+	  ja(7)=8
+
+	endif
+
+	if (me == 2) then
+	  ia(1)=2
+	  ja(1)=1
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=1
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=1
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=1
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=1
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=1
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 8
+	if ((me >= 2).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz))
+	if (me == 1) then
+		check(1)=2
+		check(2)=4
+		check(3)=6
+		check(4)=8
+		check(5)=10
+		check(6)=12
+		check(7)=14
+		check(8)=16
+	endif
+	if (me == 2) then
+		check(1)=4
+		check(2)=2
+	endif
+	if (me == 3) then
+		check(1)=6
+		check(2)=2
+
+	endif
+	if (me == 4) then
+		check(1)=8
+		check(2)=2
+	endif
+	if (me == 5) then
+		check(1)=10
+		check(2)=2
+	endif
+	if (me == 6) then
+		check(1)=12
+		check(2)=2
+	endif
+	if (me == 7) then
+		check(1)=14
+		check(2)=2
+	endif
+	if (me == 8) then
+		check(1)=16
+		check(2)=2
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+
+
+	call psb_barrier(icontxt)
+
+        iictxt = desc_a%get_context()
+
+        icomm = desc_a%get_mpic()
+
+	call desc_a%get_list(psb_comm_halo_,xchg,info)
+
+	flag = IOR(psb_swap_send_, psb_swap_recv_)
+
+
+        call psi_dswap_xchg_vect(iictxt,icomm,flag,0.0d0,x%v,xchg,info)
+
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*v))
+
+	deallocate(vg,ia,val,v,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+
+end subroutine test_psb_swapdata_8imgs_b
+
 end module test_psb_swapdata
 

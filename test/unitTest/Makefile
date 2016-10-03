@@ -18,7 +18,7 @@ FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 all: test_psb_swapdata
 
 %: %.x
-	mpirun -np 4 ./$^	
+	mpirun -np 12 ./$^	
 %.x:%.o driver.o
 	$(FCFLAGS)$(F90LINK) -g $(LOPT) -o $@ $^ -L$(PFUNIT)/lib $(PSBLAS_LIB) $(LDLIBS) -DUSE_CAF -lpfunit -lmpi
 #Create .F90 file
