@@ -74,6 +74,14 @@ module psi_d_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswapdata_multivect
+    subroutine psi_dswap_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag,m
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_dpk_)            :: y(:,:)
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswap_xchg_m
     subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -83,6 +91,14 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxm
+    subroutine psi_dswap_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_dpk_)            :: y(:)
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswap_xchg_v
     subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -164,6 +180,14 @@ module psi_d_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswaptran_multivect
+    subroutine psi_dswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag,m
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_dpk_)            :: y(:,:)
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswaptran_xchg_m
     subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -173,6 +197,14 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxm
+    subroutine psi_dswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_dpk_)            :: y(:)
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswaptran_xchg_v
     subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -182,6 +214,14 @@ module psi_d_mod
       real(psb_dpk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxv
+    subroutine psi_dswaptran_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      class(psb_d_base_vect_type)            :: y
+      real(psb_dpk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_dswaptran_xchg_vect
     subroutine psi_dtran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 

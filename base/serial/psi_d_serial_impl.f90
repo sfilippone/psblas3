@@ -298,7 +298,6 @@ subroutine psi_dgthzv(n,idx,x,y)
 
   ! Locals
   integer(psb_ipk_) :: i
-
   do i=1,n
     y(i)=x(idx(i))
   end do
