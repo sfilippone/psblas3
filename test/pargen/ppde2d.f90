@@ -65,13 +65,13 @@ contains
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) :: b1
     real(psb_dpk_), intent(in) :: x,y
-    b1=1.d0/sqrt(2.d0)
+    b1=0.d0/sqrt(2.d0)
   end function b1
   function b2(x,y)
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  b2
     real(psb_dpk_), intent(in) :: x,y
-    b2=1.d0/sqrt(2.d0)
+    b2=0.d0/sqrt(2.d0)
   end function b2
   function c(x,y)
     use psb_base_mod, only : psb_dpk_
@@ -83,13 +83,13 @@ contains
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  a1   
     real(psb_dpk_), intent(in) :: x,y
-    a1=1.d0/80
+    a1=1.d0
   end function a1
   function a2(x,y)
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  a2
     real(psb_dpk_), intent(in) :: x,y
-    a2=1.d0/80
+    a2=1.d0
   end function a2
   function g(x,y)
     use psb_base_mod, only : psb_dpk_, done, dzero
@@ -151,7 +151,7 @@ program ppde2d
   if (iam < 0) then 
     ! This should not happen, but just in case
     call psb_exit(ictxt)
-    stop
+    !stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde2d90'
@@ -263,11 +263,11 @@ program ppde2d
   end if
 
   call psb_exit(ictxt)
-  stop
+  !stop
 
 9999 call psb_error(ictxt)
 
-  stop
+  !stop
 
 contains
   !
@@ -322,7 +322,7 @@ contains
         ! wrong number of parameter, print an error message and exit
         call pr_usage(izero)      
         call psb_abort(ictxt)
-        stop 1
+        !stop 1
       endif
     end if
 

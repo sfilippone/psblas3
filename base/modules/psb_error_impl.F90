@@ -19,7 +19,7 @@ subroutine psb_ser_error_handler(err_act)
   
   if (err_act /= psb_act_ret_)     &
        &  call psb_error()
-  if (err_act == psb_act_abort_) stop
+ ! if (err_act == psb_act_abort_) stop
 
   return 
 end subroutine psb_ser_error_handler

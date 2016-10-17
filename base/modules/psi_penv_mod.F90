@@ -300,7 +300,7 @@ contains
       if (info == mpi_success) call mpi_init(info) 
       if (info /= mpi_success) then
         write(psb_err_unit,*) 'Error in initalizing MPI, bailing out',info 
-        stop 
+      !  stop 
       end if
     end if
 
@@ -486,7 +486,7 @@ contains
     integer(psb_mpik_) :: code, info 
 
 #if defined(SERIAL_MPI) 
-    stop 
+    !stop 
 #else    
     if (present(errc)) then 
       code = errc

@@ -111,6 +111,7 @@ subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
+  class(psb_xch_idx_type), pointer     :: d_xchg
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
@@ -141,12 +142,17 @@ subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
   end if
 
   call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
+  if (.false.) then
+    call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  else
+    call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_xchg,info)
+  endif
 
-  call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -246,7 +252,7 @@ subroutine psi_sswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
     end if
   end if
 
-  if (.true.) then
+  if (.false.) then
     nxch = size(xchg%prcs_xch)
     myself = this_image()
     do ip = 1, nxch
@@ -277,7 +283,6 @@ subroutine psi_sswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
     end do
     last_clear_count = nxch
   else
-    !sync all
     nxch = size(xchg%prcs_xch)
     myself = this_image()
     do ip = 1, nxch
@@ -287,11 +292,19 @@ subroutine psi_sswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
       rp1 = xchg%rmt_snd_bnd(ip,1)
       rp2 = xchg%rmt_snd_bnd(ip,2)
       isz = p2-p1+1
-      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
       call psi_gth(isz,m,xchg%loc_rcv_idx(p1:p2),&
-           & y,buffer(p1:p2))
+           & y,sndbuf(p1:p2))
+      buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+    end do
+    !
+    ! Doing event post later should provide more opportunities for
+    ! overlap
+    ! 
+    do ip= 1, nxch
+      img = xchg%prcs_xch(ip) + 1
       event post(ufg(myself)[img])
     end do
+
     do ip = 1, nxch
       img = xchg%prcs_xch(ip) + 1
       event wait(ufg(img))
@@ -301,9 +314,9 @@ subroutine psi_sswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
       isz = p2-p1+1
       rp1 = xchg%rmt_rcv_bnd(ip,1)
       rp2 = xchg%rmt_rcv_bnd(ip,2)
-      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+      !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
       call psi_sct(isz,m,xchg%loc_snd_idx(p1:p2),&
-        & buffer(rp1:rp2)[img],beta,y)
+        & buffer(p1:p2),beta, y)
       event post(clear[img])
     end do
     last_clear_count = nxch
@@ -761,6 +774,7 @@ subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   integer(psb_ipk_), pointer :: d_idx(:)
+  class(psb_xch_idx_type), pointer     :: d_xchg
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
@@ -790,12 +804,17 @@ subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
   end if
   
   call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
+  if (.false.) then
+    call  psi_swaptran(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  else
+    call  psi_swaptran(ictxt,icomm,flag,beta,y,d_xchg,info)
+  endif
 
-  call  psi_swaptran(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -896,7 +915,7 @@ subroutine psi_sswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
     end if
   end if
 
-  if (.true.) then
+  if (.false.) then
     nxch = size(xchg%prcs_xch)
     myself = this_image()
     do ip = 1, nxch
@@ -927,7 +946,6 @@ subroutine psi_sswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
     end do
     last_clear_count = nxch
   else
-    !sync all
     nxch = size(xchg%prcs_xch)
     myself = this_image()
     do ip = 1, nxch
@@ -937,11 +955,19 @@ subroutine psi_sswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
       rp1 = xchg%rmt_snd_bnd(ip,1)
       rp2 = xchg%rmt_snd_bnd(ip,2)
       isz = p2-p1+1
-      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
       call psi_gth(isz,xchg%loc_rcv_idx(p1:p2),&
-           & y,buffer(p1:p2))
+           & y,sndbuf(p1:p2))
+      buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+    end do
+    !
+    ! Doing event post later should provide more opportunities for
+    ! overlap
+    ! 
+    do ip= 1, nxch
+      img = xchg%prcs_xch(ip) + 1
       event post(ufg(myself)[img])
     end do
+
     do ip = 1, nxch
       img = xchg%prcs_xch(ip) + 1
       event wait(ufg(img))
@@ -951,9 +977,9 @@ subroutine psi_sswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
       isz = p2-p1+1
       rp1 = xchg%rmt_rcv_bnd(ip,1)
       rp2 = xchg%rmt_rcv_bnd(ip,2)
-      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+      !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
       call psi_sct(isz,xchg%loc_snd_idx(p1:p2),&
-        & buffer(rp1:rp2)[img],beta,y)
+        & buffer(p1:p2),beta, y)
       event post(clear[img])
     end do
     last_clear_count = nxch
@@ -1386,6 +1412,7 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   class(psb_i_base_vect_type), pointer :: d_vidx
+  class(psb_xch_idx_type), pointer     :: d_xchg
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
@@ -1415,12 +1442,17 @@ subroutine psi_sswaptran_vect(flag,beta,y,desc_a,work,info,data)
   end if
   
   call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info) 
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
+  if (.false.) then
+    call  psi_swaptran(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+  else
+    call  psi_swaptran(ictxt,icomm,flag,beta,y,d_xchg,info)
+  endif
 
-  call  psi_swaptran(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)

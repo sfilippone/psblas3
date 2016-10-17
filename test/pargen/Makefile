@@ -4,7 +4,7 @@ include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
 LIBDIR=$(BASEDIR)/lib
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -L/opencoarrays6.2 -lcaf_mpi -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such
@@ -19,21 +19,21 @@ all: ppde3d spde3d ppde2d spde2d
 
 
 ppde3d: ppde3d.o 
-	$(F90LINK)  ppde3d.o -o ppde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) -fcoarray=lib  ppde3d.o -o ppde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde3d $(EXEDIR)
 
 
 spde3d: spde3d.o 
-	$(F90LINK) spde3d.o  -o spde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) -fcoarray=lib  spde3d.o  -o spde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv spde3d $(EXEDIR)
 
 ppde2d: ppde2d.o 
-	$(F90LINK)  ppde2d.o -o ppde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) -fcoarray=lib  ppde2d.o -o ppde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde2d $(EXEDIR)
 
 
 spde2d: spde2d.o 
-	$(F90LINK) spde2d.o  -o spde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) -fcoarray=lib  spde2d.o  -o spde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv spde2d $(EXEDIR)
 
 

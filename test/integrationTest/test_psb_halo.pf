@@ -3,11 +3,625 @@ use pfunit_mod
 use psb_base_mod
 implicit none
 include 'mpif.h'
-
 contains
 
 @test(nimgs=[std])
-subroutine test_psb_halo_2imgs(this)
+subroutine test_psb_halotran_m_2imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info
+	integer, parameter :: nrows=6
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), y(:,:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	!call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+	!Let's modify x, so we need to update halo indices
+
+	if ((me == 1).or.(me == 2)) then
+          call psb_geaxpby(dble(me),x,0.0d0,x,desc_a,info)
+	  !x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+	call psb_barrier(icontxt)
+
+        ! END OF SETUP
+
+        v = x%get_vect()
+        allocate(y(size(v,1),1))
+        y(:,1)=v
+	call psb_halo(y, desc_a, info, tran='T')
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+
+
+	!Let's build the expected solution
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1))
+	else
+		allocate(check(1))
+	endif
+        if (me == 1 ) then
+		check(1:mid-1)=1.0d0
+		check(mid)=2.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1)=6.0d0
+		check(mid-1:mid)=4.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*y(:,1)))
+	deallocate(vg,ia,val,v,y,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+end subroutine test_psb_halotran_m_2imgs
+
+@test(nimgs=[std])
+subroutine test_psb_halotran_v_2imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info
+	integer, parameter :: nrows=6
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	!call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+	!Let's modify x, so we need to update halo indices
+
+	if ((me == 1).or.(me == 2)) then
+          call psb_geaxpby(dble(me),x,0.0d0,x,desc_a,info)
+	  !x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+	call psb_barrier(icontxt)
+
+        ! END OF SETUP
+
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info, tran='T')
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+
+
+	!Let's build the expected solution
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1))
+	else
+		allocate(check(1))
+	endif
+        if (me == 1 ) then
+		check(1:mid-1)=1.0d0
+		check(mid)=2.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1)=6.0d0
+		check(mid-1:mid)=4.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*v))
+	deallocate(vg,ia,val,v,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+end subroutine test_psb_halotran_v_2imgs
+
+@test(nimgs=[std])
+subroutine test_psb_halotran_2imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info
+	integer, parameter :: nrows=6
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	!call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	!Let's modify x, so we need to update halo indices
+
+	if ((me == 1).or.(me == 2)) then
+          call psb_geaxpby(dble(me),x,0.0d0,x,desc_a,info)
+	  !x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+	call psb_barrier(icontxt)
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+        ! END OF SETUP
+
+	call psb_halo(x, desc_a, info, tran='T')
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+	!Let's build the expected solution
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1))
+	else
+		allocate(check(1))
+	endif
+        if (me == 1 ) then
+		check(1:mid-1)=1.0d0
+		check(mid)=2.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1)=6.0d0
+		check(mid-1:mid)=4.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*v))
+	deallocate(vg,ia,val,v,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+end subroutine test_psb_halotran_2imgs
+
+
+@test(nimgs=[std])
+subroutine test_psb_halom_2imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info
+	integer, parameter :: nrows=6
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: y(:,:),v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	!call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+	!Let's modify x, so we need to update halo indices
+
+	if ((me == 1).or.(me == 2)) then
+	  v(mid +1)=v(mid+1) + 2.0d0
+	endif
+	call psb_barrier(icontxt)
+
+        ! END OF SETUP
+        allocate(y(size(v,1),1))
+        y(:,1)=v
+	call psb_halo(y, desc_a, info)
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+
+
+	!Let's build the expected solution
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1))
+	else
+		allocate(check(1))
+	endif
+        if (me == 1 ) then
+		check(1:mid)=1.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1:mid)=2.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*y(:,1)))
+	deallocate(vg,ia,val,v,y,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+end subroutine test_psb_halom_2imgs
+
+@test(nimgs=[std])
+subroutine test_psb_halov_2imgs(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: msg, me, i=0, np, j, info
+	integer, parameter :: nrows=6
+	integer :: icontxt, mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	np = this%getNumImages()
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+	!call psb_info(icontxt, me, np)
+        me = this_image()
+	!Allocate vectors
+	allocate(vg(nrows))
+	allocate(ia(nrows))
+	allocate(val(nrows))
+	allocate(v(nrows))
+	i = 0 
+	do j=1,size(vg,1)
+		vg(j)= i
+		i = i+1
+		if (i==np) then
+			i=0
+		endif
+	enddo
+
+
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	call psb_barrier(icontxt)
+        v = x%get_vect()
+	!Let's modify x, so we need to update halo indices
+
+	if ((me == 1).or.(me == 2)) then
+	  x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+	call psb_barrier(icontxt)
+
+        ! END OF SETUP
+
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info)
+        !GETTING BACK X
+	call psb_barrier(icontxt)
+
+
+	!Let's build the expected solution
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1))
+	else
+		allocate(check(1))
+	endif
+        if (me == 1 ) then
+		check(1:mid)=1.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1:mid)=2.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+	!call psb_barrier(icontxt)
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+
+	@assertEqual(real(true*check),real(true*v))
+	deallocate(vg,ia,val,v,check)
+
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+
+	call psb_exit(icontxt)
+
+end subroutine test_psb_halov_2imgs
+
+@test(nimgs=[std])
+subroutine test_psb_halovect_2imgs(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: msg, me, i=0, np, j, info
@@ -125,7 +739,7 @@ subroutine test_psb_halo_2imgs(this)
 
 	call psb_exit(icontxt)
 
-end subroutine test_psb_halo_2imgs
+end subroutine test_psb_halovect_2imgs
 
 
 
