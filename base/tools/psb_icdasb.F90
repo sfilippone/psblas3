@@ -91,7 +91,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   endif
 
   if (.not.desc%is_ok()) then 
-    info = psb_err_spmat_invalid_state_
+    info = psb_err_invalid_cd_state_
     int_err(1) = dectype
     call psb_errpush(info,name)
     goto 9999
@@ -156,7 +156,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
     end if
 
   else
-    info = psb_err_spmat_invalid_state_
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif

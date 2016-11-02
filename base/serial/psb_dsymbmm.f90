@@ -105,6 +105,9 @@ subroutine psb_dbase_symbmm(a,b,c,info)
 
   if ( mb /= na ) then 
     write(psb_err_unit,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
+    info = psb_err_invalid_matrix_sizes_
+    call psb_errpush(info,name)
+    goto 9999
   endif
   allocate(itemp(max(ma,na,mb,nb)),stat=info)    
   if (info /= psb_success_) then 

@@ -83,7 +83,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = psb_err_spmat_invalid_state_
+    info = psb_err_invalid_cd_state_
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)
     goto 9999

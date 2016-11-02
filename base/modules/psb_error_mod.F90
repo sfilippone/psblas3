@@ -756,13 +756,6 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Argument M is required when argument PARTS is specified")')
 
-    case(psb_err_spmat_invalid_state_)
-      allocate(achmsg(2)) 
-      achmsg(1) = tmpmsg
-      write(achmsg(2),&
-           & '("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')&
-           &i_e_d(1)
-
     case(psb_err_missing_override_method_)
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
@@ -799,6 +792,11 @@ contains
       allocate(achmsg(2)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Invalid state for vector")')
+
+    case(psb_err_invalid_matrix_sizes_)
+      allocate(achmsg(2)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),'("Invalid combination of matrix sizes")')
 
     case(1125:1999)
       allocate(achmsg(2)) 

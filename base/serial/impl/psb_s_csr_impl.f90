@@ -3082,7 +3082,11 @@ subroutine psb_scsrspspmm(a,b,c,info)
 
   if ( mb /= na ) then 
     write(psb_err_unit,*) 'Mismatch in SPSPMM: ',ma,na,mb,nb
+    info = psb_err_invalid_matrix_sizes_
+    call psb_errpush(info,name)
+    goto 9999
   endif
+
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
   nzc = 2*(nza+nzb)
