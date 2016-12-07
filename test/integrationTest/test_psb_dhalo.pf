@@ -1,4 +1,4 @@
-module test_psb_halo
+module test_psb_dhalo
 use pfunit_mod
 use psb_base_mod
 implicit none
@@ -1649,7 +1649,7 @@ subroutine prepare_test8imgs_tran_b(desc_a,x,check,np,icontxt, info)
 end subroutine prepare_test8imgs_tran_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_2imgs_v(this)
+subroutine test_psb_dhalo_2imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1677,10 +1677,10 @@ subroutine test_psb_halo_2imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_2imgs_v
+end subroutine test_psb_dhalo_2imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_2imgs_v(this)
+subroutine test_psb_dhalo_tran_2imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1708,10 +1708,10 @@ subroutine test_psb_halo_tran_2imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_2imgs_v
+end subroutine test_psb_dhalo_tran_2imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_2imgs_vect(this)
+subroutine test_psb_dhalo_2imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1739,10 +1739,10 @@ subroutine test_psb_halo_2imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_2imgs_vect
+end subroutine test_psb_dhalo_2imgs_vect
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_2imgs_vect(this)
+subroutine test_psb_dhalo_tran_2imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1770,11 +1770,11 @@ subroutine test_psb_halo_tran_2imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_2imgs_vect
+end subroutine test_psb_dhalo_tran_2imgs_vect
 
 
 @test(nimgs=[std])
-subroutine test_psb_halo_2imgs_m(this)
+subroutine test_psb_dhalo_2imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1805,10 +1805,10 @@ subroutine test_psb_halo_2imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_2imgs_m
+end subroutine test_psb_dhalo_2imgs_m
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_2imgs_m(this)
+subroutine test_psb_dhalo_tran_2imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1840,10 +1840,10 @@ subroutine test_psb_halo_tran_2imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_2imgs_m
+end subroutine test_psb_dhalo_tran_2imgs_m
 
 @test(nimgs=[std])
-subroutine test_psb_halo_4imgs_v(this)
+subroutine test_psb_dhalo_4imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1872,10 +1872,10 @@ subroutine test_psb_halo_4imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_4imgs_v
+end subroutine test_psb_dhalo_4imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_4imgs_v(this)
+subroutine test_psb_dhalo_tran_4imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1904,10 +1904,10 @@ subroutine test_psb_halo_tran_4imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_4imgs_v
+end subroutine test_psb_dhalo_tran_4imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_4imgs_vect(this)
+subroutine test_psb_dhalo_4imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1935,10 +1935,10 @@ subroutine test_psb_halo_4imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_4imgs_vect
+end subroutine test_psb_dhalo_4imgs_vect
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_4imgs_vect(this)
+subroutine test_psb_dhalo_tran_4imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -1966,10 +1966,10 @@ subroutine test_psb_halo_tran_4imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_4imgs_vect
+end subroutine test_psb_dhalo_tran_4imgs_vect
 
 @test(nimgs=[std])
-subroutine test_psb_halo_4imgs_m(this)
+subroutine test_psb_dhalo_4imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2000,10 +2000,10 @@ subroutine test_psb_halo_4imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_4imgs_m
+end subroutine test_psb_dhalo_4imgs_m
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_4imgs_m(this)
+subroutine test_psb_dhalo_tran_4imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2035,11 +2035,11 @@ subroutine test_psb_halo_tran_4imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_4imgs_m
+end subroutine test_psb_dhalo_tran_4imgs_m
 
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_v(this)
+subroutine test_psb_dhalo_8imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2068,10 +2068,10 @@ subroutine test_psb_halo_8imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_v
+end subroutine test_psb_dhalo_8imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_v(this)
+subroutine test_psb_dhalo_tran_8imgs_v(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2100,10 +2100,10 @@ subroutine test_psb_halo_tran_8imgs_v(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_v
+end subroutine test_psb_dhalo_tran_8imgs_v
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_vect(this)
+subroutine test_psb_dhalo_8imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2132,10 +2132,10 @@ subroutine test_psb_halo_8imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_vect
+end subroutine test_psb_dhalo_8imgs_vect
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_vect(this)
+subroutine test_psb_dhalo_tran_8imgs_vect(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2164,10 +2164,10 @@ subroutine test_psb_halo_tran_8imgs_vect(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_vect
+end subroutine test_psb_dhalo_tran_8imgs_vect
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_m(this)
+subroutine test_psb_dhalo_8imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2198,10 +2198,10 @@ subroutine test_psb_halo_8imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_m
+end subroutine test_psb_dhalo_8imgs_m
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_m(this)
+subroutine test_psb_dhalo_tran_8imgs_m(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2233,10 +2233,10 @@ subroutine test_psb_halo_tran_8imgs_m(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_m
+end subroutine test_psb_dhalo_tran_8imgs_m
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_v_b(this)
+subroutine test_psb_dhalo_8imgs_v_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2265,10 +2265,10 @@ subroutine test_psb_halo_8imgs_v_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_v_b
+end subroutine test_psb_dhalo_8imgs_v_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_v_b(this)
+subroutine test_psb_dhalo_tran_8imgs_v_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2297,10 +2297,10 @@ subroutine test_psb_halo_tran_8imgs_v_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_v_b
+end subroutine test_psb_dhalo_tran_8imgs_v_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_vect_b(this)
+subroutine test_psb_dhalo_8imgs_vect_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2328,10 +2328,10 @@ subroutine test_psb_halo_8imgs_vect_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_vect_b
+end subroutine test_psb_dhalo_8imgs_vect_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_vect_b(this)
+subroutine test_psb_dhalo_tran_8imgs_vect_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2361,10 +2361,10 @@ subroutine test_psb_halo_tran_8imgs_vect_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_vect_b
+end subroutine test_psb_dhalo_tran_8imgs_vect_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_8imgs_m_b(this)
+subroutine test_psb_dhalo_8imgs_m_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2395,10 +2395,10 @@ subroutine test_psb_halo_8imgs_m_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_8imgs_m_b
+end subroutine test_psb_dhalo_8imgs_m_b
 
 @test(nimgs=[std])
-subroutine test_psb_halo_tran_8imgs_m_b(this)
+subroutine test_psb_dhalo_tran_8imgs_m_b(this)
 	implicit none
 	Class(CafTestMethod), intent(inout) :: this
 	integer :: me, np, info
@@ -2430,7 +2430,7 @@ subroutine test_psb_halo_tran_8imgs_m_b(this)
 	call psb_gefree(x, desc_a, info)
 	call psb_cdfree(desc_a, info)
 	call psb_exit(icontxt)
-end subroutine test_psb_halo_tran_8imgs_m_b
+end subroutine test_psb_dhalo_tran_8imgs_m_b
 
-end module test_psb_halo
+end module test_psb_dhalo
 

@@ -1,0 +1,80 @@
+module test_psb_dmatdist
+use pfunit_mod
+use psb_base_mod
+use psb_util_mod
+implicit none
+include 'mpif.h'
+contains
+
+@test(nimgs=[std])
+subroutine test_psb_dmatdist1(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt
+	type(psb_desc_type):: desc_a
+	type(psb_dspmat_type) :: a, a_out
+        integer :: iunit=12, m_problem = 10, nv, i, nz, last, j, irow
+        integer, allocatable :: ipv(:), ivg(:), ia(:), ja(:)
+        integer, allocatable :: ia_exp(:), ja_exp(:)
+        real(psb_dpk_), allocatable :: val(:), val_exp(:), a_exp(:,:), a_aux(:,:)
+        me = this_image()
+        np = num_images()
+        call psb_init(icontxt,np,MPI_COMM_WORLD)
+        call mm_mat_read(a,info,iunit=iunit,filename="matrix1.mtx")
+        allocate(ivg(m_problem),ipv(np))
+        do i=1,m_problem
+          call part_block(i,m_problem,np,ipv,nv)
+          ivg(i) = ipv(1)
+        enddo
+
+        !Getting the expected solution
+        call a%csgetrow(1,10,nz,ia,ja,val,info)
+        allocate(ia_exp(nz),ja_exp(nz), val_exp(nz))
+        last = 0
+        do i=1, m_problem
+           if (me == ivg(i) + 1) then
+             irow=i
+             do j=1, nz
+               if (ia(j)  == irow) then
+                 last = last + 1
+                 ia_exp(last)=ia(j)
+                 ja_exp(last)=ja(j)
+                 val_exp(last)=val(j)
+	       endif 
+             enddo  
+           endif           
+        enddo
+        if (allocated(a_exp)) deallocate(a_exp)
+        allocate(a_exp(m_problem,m_problem))
+        a_exp = 0.0d0
+        do i=1,last
+	  a_exp(ia_exp(i),ja_exp(i))=val_exp(i) 
+	enddo
+         
+        !Test subroutine
+        call psb_matdist(a, a_out, icontxt, &
+             & desc_a,info, v=ivg)
+        call a_out%csgetrow(1,10,nz,ia,ja,val,info)
+        !Convert to global indices
+        call psb_loc_to_glob(ia, desc_a, info)
+        call psb_loc_to_glob(ja, desc_a, info)
+        if (allocated(a_aux)) deallocate(a_aux)
+        allocate(a_aux(m_problem,m_problem))
+        a_aux = 0.0d0
+        do i=1,last
+	  a_aux(ia(i),ja(i))=val(i) 
+	enddo
+	@assertEqual(a_aux,a_exp)
+
+        !Free 
+        deallocate(a_aux, a_exp, ia, ja, val)
+        deallocate(ipv, ivg, ia_exp, ja_exp, val_exp)
+	call psb_spfree(a, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_dmatdist1
+
+
+end module test_psb_dmatdist
+

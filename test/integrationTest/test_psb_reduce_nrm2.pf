@@ -1,0 +1,369 @@
+module test_psb_reduce_nrm2
+use pfunit_mod
+use psb_base_mod
+use psi_reduce_mod
+implicit none
+include 'mpif.h'
+
+interface prepare_test
+   module procedure prepare_ctest2imgs
+   module procedure prepare_stest2imgs
+   module procedure prepare_dtest2imgs
+end interface prepare_test
+
+contains
+subroutine prepare_ctest2imgs(desc_a,x,result, np, icontxt, info)
+	use psb_base_mod
+	IMPLICIT NONE
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_c_vect_type), intent(out) :: x
+        real(psb_spk_), intent(out) :: result
+	integer, intent(out) :: icontxt, info
+	integer, intent(in) :: np
+	integer :: me, i=0, j
+	integer, parameter :: nrows=6
+	integer ::  mid, true
+	integer, allocatable :: vg(:), ia(:)
+        complex(psb_spk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	me = this_image()
+        info = 0
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+	allocate(vg(nrows),  STAT=info)
+	if (info == 0) allocate(ia(nrows),  STAT=info)
+	if (info == 0) allocate(val(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=(1.,1.)
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=(2.,2.)
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  	print*,'ERROR in desc allocation', info
+	  	stop
+	endif
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+        if (info /=0) then
+		print*,'ERROR in psb_cdins', info
+		stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  	print*,'an error in psb_cdasb', info
+	  	stop
+	endif
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	sync all
+
+	!Let's modify x, so we need to update halo indices
+	if ((me == 1).or.(me == 2)) then
+	  	x%v%v(mid +1)=x%v%v(mid+1) + (2.0,2.0)
+	endif
+
+	!Let's build the expected solution
+        result = 5.47722578E0
+	if (allocated(vg))  deallocate(vg)
+	if (allocated(ia))  deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_ctest2imgs
+
+subroutine prepare_stest2imgs(desc_a,x,result, np, icontxt, info)
+	use psb_base_mod
+	IMPLICIT NONE
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_s_vect_type), intent(out) :: x
+        real(psb_spk_), intent(out) :: result
+	integer, intent(out) :: icontxt, info
+	integer, intent(in) :: np
+	integer :: me, i=0, j
+	integer, parameter :: nrows=6
+	integer ::  mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_spk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	me = this_image()
+        info = 0
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+	allocate(vg(nrows),  STAT=info)
+	if (info == 0) allocate(ia(nrows),  STAT=info)
+	if (info == 0) allocate(val(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  	print*,'ERROR in desc allocation', info
+	  	stop
+	endif
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+        if (info /=0) then
+		print*,'ERROR in psb_cdins', info
+		stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  	print*,'an error in psb_cdasb', info
+	  	stop
+	endif
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	sync all
+
+	!Let's modify x, so we need to update halo indices
+	if ((me == 1).or.(me == 2)) then
+	  	x%v%v(mid +1)=x%v%v(mid+1) + 2.0E0
+	endif
+
+	!Let's build the expected solution
+        result = 3.87298322E0
+	if (allocated(vg))  deallocate(vg)
+	if (allocated(ia))  deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_stest2imgs
+subroutine prepare_dtest2imgs(desc_a,x,result, np, icontxt, info)
+	use psb_base_mod
+	IMPLICIT NONE
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), intent(out) :: result
+	integer, intent(out) :: icontxt, info
+	integer, intent(in) :: np
+	integer :: me, i=0, j
+	integer, parameter :: nrows=6
+	integer ::  mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	me = this_image()
+        info = 0
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+	allocate(vg(nrows),  STAT=info)
+	if (info == 0) allocate(ia(nrows),  STAT=info)
+	if (info == 0) allocate(val(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  	print*,'ERROR in desc allocation', info
+	  	stop
+	endif
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+        if (info /=0) then
+		print*,'ERROR in psb_cdins', info
+		stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  	print*,'an error in psb_cdasb', info
+	  	stop
+	endif
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	sync all
+
+	!Let's modify x, so we need to update halo indices
+	if ((me == 1).or.(me == 2)) then
+	  	x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+
+	!Let's build the expected solution
+	result = 3.8729833462074170d0
+	if (allocated(vg))  deallocate(vg)
+	if (allocated(ia))  deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_dtest2imgs
+
+!--------- REAL TESTS
+@test(nimgs=[std])
+subroutine test_psb_cnrm2_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	type(psb_desc_type):: desc_a
+	type(psb_c_vect_type) :: x
+        complex(psb_spk_), allocatable :: v(:)
+        integer :: info, np, icontxt
+        real(psb_spk_) :: expected, result 
+        np = num_images()
+	call prepare_test(desc_a,x,expected, np, icontxt, info)
+        v=x%get_vect()
+        call psb_genrm2s(result, v, desc_a,info)
+	@assertEqual(result,expected)
+        if (allocated(v)) deallocate(v)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_cnrm2_s
+
+@test(nimgs=[std])
+subroutine test_psb_snrm2_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	type(psb_desc_type):: desc_a
+	type(psb_s_vect_type) :: x
+        real(psb_spk_), allocatable :: v(:)
+        integer :: info, np, icontxt
+        real(psb_spk_) :: expected, result 
+        np = num_images()
+	call prepare_test(desc_a,x,expected, np, icontxt, info)
+        v=x%get_vect()
+        call psb_genrm2s(result, v, desc_a,info)
+	@assertEqual(result,expected)
+        if (allocated(v)) deallocate(v)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_snrm2_s
+
+@test(nimgs=[std])
+subroutine test_psb_dnrm2_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+        real(psb_dpk_), allocatable :: v(:)
+        integer :: info, np, icontxt
+        real(psb_dpk_) :: expected, result 
+        np = num_images()
+	call prepare_test(desc_a,x,expected, np, icontxt, info)
+        v=x%get_vect()
+        call psb_genrm2s(result, v, desc_a,info)
+	@assertEqual(result,expected)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_dnrm2_s
+
+end module test_psb_reduce_nrm2
+

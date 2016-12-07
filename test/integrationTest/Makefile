@@ -15,10 +15,12 @@ CCOPT= -g
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 
-all: test_psb_halo
+all: prova
 
+prova.x: test_psb_dmatdist.o test_psb_dhalo.o test_psb_shalo.o test_psb_chalo.o test_psb_zhalo.o test_psb_reduce_nrm2.o test_psb_sum.o test_psb_max.o test_psb_amx.o test_psb_min.o test_psb_amn.o test_psb_broadcast.o driver.o
+	$(FCFLAGS)$(F90LINK) -g $(LOPT) -o $@ $^ -L$(PFUNIT)/lib $(PSBLAS_LIB) $(LDLIBS) -DUSE_CAF -lpfunit -lmpi
 %: %.x
-	mpirun -np 4 ./$^	
+	mpirun -np 8 ./$^	
 %.x:%.o driver.o
 	$(FCFLAGS)$(F90LINK) -g $(LOPT) -o $@ $^ -L$(PFUNIT)/lib $(PSBLAS_LIB) $(LDLIBS) -DUSE_CAF -lpfunit -lmpi
 #Create .F90 file

@@ -1,0 +1,645 @@
+module test_psb_min
+use pfunit_mod
+use psb_base_mod
+implicit none
+include 'mpif.h'
+
+interface prepare_test
+   module procedure prepare_itest_s
+   module procedure prepare_stest_s
+   module procedure prepare_dtest_s
+
+   module procedure prepare_itest_v
+   module procedure prepare_stest_v
+   module procedure prepare_dtest_v
+
+   module procedure prepare_itest_m
+   module procedure prepare_stest_m
+   module procedure prepare_dtest_m
+end interface prepare_test
+
+interface prepare_test2
+   module procedure prepare_itest2_s
+   module procedure prepare_stest2_s
+   module procedure prepare_dtest2_s
+
+   module procedure prepare_itest2_v
+   module procedure prepare_stest2_v
+   module procedure prepare_dtest2_v
+
+   module procedure prepare_itest2_m
+   module procedure prepare_stest2_m
+   module procedure prepare_dtest2_m
+end interface prepare_test2
+
+contains
+
+   subroutine prepare_itest_s(dat,check,root,info, np, icontxt)
+     integer, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=0
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check = dat
+     if (me == root + 1) then
+	check= 1
+     endif
+   end subroutine prepare_itest_s
+
+   subroutine prepare_stest_s(dat,check,root,info, np, icontxt)
+     real, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=0
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check = dat
+     if (me == root + 1) then
+	check= real(1)/real(np)
+     endif
+   end subroutine prepare_stest_s
+
+   subroutine prepare_dtest_s(dat,check,root,info, np, icontxt)
+     double precision, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=0
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check = dat
+     if (me == root + 1) then
+	check= dble(1)/dble(np)
+     endif
+   end subroutine prepare_dtest_s
+
+
+   subroutine prepare_itest_v(dat,check,root,info, np, icontxt)
+     integer, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check = dat
+     if (me == root + 1) then
+	check= 1
+     endif
+   end subroutine prepare_itest_v
+
+   subroutine prepare_stest_v(dat,check,root,info, np, icontxt)
+     real, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check = dat
+     if (me == root + 1) then
+	check= real(1)/real(np)
+     endif
+   end subroutine prepare_stest_v
+
+   subroutine prepare_dtest_v(dat,check,root,info, np, icontxt)
+     double precision, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check = dat
+     if (me == root + 1) then
+	check= dble(1)/dble(np)
+     endif
+   end subroutine prepare_dtest_v
+
+
+   subroutine prepare_itest_m(dat,check,root,info, np, icontxt)
+     integer, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check = dat
+     if (me == root + 1) then
+	check= 1
+     endif
+   end subroutine prepare_itest_m
+
+   subroutine prepare_stest_m(dat,check,root,info, np, icontxt)
+     real, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check = dat
+     if (me == root + 1) then
+	check= real(1)/real(np)
+     endif
+   end subroutine prepare_stest_m
+
+   subroutine prepare_dtest_m(dat,check,root,info, np, icontxt)
+     double precision, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=0
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check = dat
+     if (me == root + 1) then
+	check= dble(1)/dble(np)
+     endif
+   end subroutine prepare_dtest_m
+
+   subroutine prepare_itest2_s(dat,check,root,info, np, icontxt)
+     integer, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=-1
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check= 1
+   end subroutine prepare_itest2_s
+
+   subroutine prepare_stest2_s(dat,check,root,info, np, icontxt)
+     real, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=-1
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check= real(1)/real(np)
+   end subroutine prepare_stest2_s
+
+   subroutine prepare_dtest2_s(dat,check,root,info, np, icontxt)
+     double precision, intent(out) :: dat, check
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     info = 0
+     root=-1
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check= dble(1)/dble(np)
+   end subroutine prepare_dtest2_s
+
+
+   subroutine prepare_itest2_v(dat,check,root,info, np, icontxt)
+     integer, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check= 1
+   end subroutine prepare_itest2_v
+
+   subroutine prepare_stest2_v(dat,check,root,info, np, icontxt)
+     real, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check= real(1)/real(np)
+   end subroutine prepare_stest2_v
+
+   subroutine prepare_dtest2_v(dat,check,root,info, np, icontxt)
+     double precision, allocatable, intent(out) :: dat(:), check(:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_),check(size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check= dble(1)/dble(np)
+   end subroutine prepare_dtest2_v
+
+
+   subroutine prepare_itest2_m(dat,check,root,info, np, icontxt)
+     integer, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = this_image()
+     check= 1
+   end subroutine prepare_itest2_m
+
+   subroutine prepare_stest2_m(dat,check,root,info, np, icontxt)
+     real, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = real(this_image())/real(np)
+     check= real(1)/real(np)
+   end subroutine prepare_stest2_m
+
+   subroutine prepare_dtest2_m(dat,check,root,info, np, icontxt)
+     double precision, allocatable, intent(out) :: dat(:,:), check(:,:)
+     integer, intent(out) :: root, info, np, icontxt
+     integer :: me
+     integer, parameter :: size_=23
+     info = 0
+     root=-1
+     if (allocated(dat)) deallocate(dat)
+     if (allocated(dat)) deallocate(check)
+     allocate(dat(size_,size_),check(size_,size_), STAT=info)
+     if (info /=0) then
+     	print*,'ERROR while allocating some vectors'
+     	info = -1
+	stop
+     endif
+     me=this_image()
+     np= num_images()
+     call psb_init(icontxt,np,MPI_COMM_WORLD)
+     dat = dble(this_image())/dble(np)
+     check= dble(1)/dble(np)
+   end subroutine prepare_dtest2_m
+
+
+!--------- REAL TESTS
+
+
+@test(nimgs=[std])
+subroutine test_psb_imin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer :: dat, check, root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test_psb_imin_s
+
+@test(nimgs=[std])
+subroutine test_psb_smin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real :: dat, check
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test_psb_smin_s
+
+@test(nimgs=[std])
+subroutine test_psb_dmin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision :: dat, check
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test_psb_dmin_s
+
+
+@test(nimgs=[std])
+subroutine test_psb_imin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_imin_v
+
+@test(nimgs=[std])
+subroutine test_psb_smin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_smin_v
+
+@test(nimgs=[std])
+subroutine test_psb_dmin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_dmin_v
+
+
+@test(nimgs=[std])
+subroutine test_psb_imin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_imin_m
+
+@test(nimgs=[std])
+subroutine test_psb_smin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_smin_m
+
+@test(nimgs=[std])
+subroutine test_psb_dmin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test_psb_dmin_m
+
+@test(nimgs=[std])
+subroutine test2_psb_imin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer :: dat, check, root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_imin_s
+
+@test(nimgs=[std])
+subroutine test2_psb_smin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real :: dat, check
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_smin_s
+
+@test(nimgs=[std])
+subroutine test2_psb_dmin_s(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision :: dat, check
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_dmin_s
+
+
+@test(nimgs=[std])
+subroutine test2_psb_imin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_imin_v
+
+@test(nimgs=[std])
+subroutine test2_psb_smin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_smin_v
+
+@test(nimgs=[std])
+subroutine test2_psb_dmin_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision, allocatable :: dat(:), check(:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_dmin_v
+
+
+@test(nimgs=[std])
+subroutine test2_psb_imin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        integer, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_imin_m
+
+@test(nimgs=[std])
+subroutine test2_psb_smin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        real, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_smin_m
+
+@test(nimgs=[std])
+subroutine test2_psb_dmin_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+        double precision, allocatable :: dat(:,:), check(:,:)
+        integer :: root, info, np, icontxt
+	call prepare_test2(dat,check,root,info, np, icontxt)
+        call psb_min(icontxt, dat, root)
+	@assertEqual(dat,check)
+        deallocate(dat, check)
+	call psb_exit(icontxt)
+end subroutine test2_psb_dmin_m
+
+
+end module test_psb_min
