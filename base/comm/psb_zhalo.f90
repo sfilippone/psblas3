@@ -198,7 +198,7 @@ subroutine  psb_zhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zhalom
@@ -386,7 +386,7 @@ subroutine  psb_zhalov(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zhalov
@@ -525,7 +525,7 @@ subroutine  psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zhalo_vect
@@ -664,7 +664,7 @@ subroutine  psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 end subroutine psb_zhalo_multivect

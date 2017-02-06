@@ -149,7 +149,7 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
 9999 continue
   call psb_errpush(info,name)
-  call psb_error_handler(ictxt,err_act)
+  call psb_error_handler(ione*ictxt,err_act)
 
   return
  

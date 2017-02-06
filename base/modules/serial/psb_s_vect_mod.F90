@@ -746,7 +746,7 @@ contains
     class(psb_s_vect_type), intent(inout)  :: y
 
     if (allocated(x%v)) then 
-      if (.not.allocated(y%v))  call y%bld(size(x%v%v))
+      if (.not.allocated(y%v))  call y%bld(psb_size(x%v%v))
       call x%v%absval(y%v)
     end if
   end subroutine s_vect_absval2

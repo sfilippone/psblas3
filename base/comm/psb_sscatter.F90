@@ -227,7 +227,7 @@ subroutine  psb_sscatterm(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 
@@ -456,7 +456,7 @@ subroutine  psb_sscatterv(globx, locx, desc_a, info, root)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 
@@ -540,7 +540,7 @@ subroutine  psb_sscatter_vect(globx, locx, desc_a, info, root, mold)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
   
   return
   

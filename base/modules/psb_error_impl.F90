@@ -28,15 +28,15 @@ subroutine psb_par_error_handler(ictxt,err_act)
   use psb_error_mod, psb_protect_name => psb_par_error_handler
   use psb_penv_mod
   implicit none 
-  integer(psb_mpik_), intent(in) ::  ictxt
+  integer(psb_ipk_), intent(in) ::  ictxt
   integer(psb_ipk_), intent(in) ::  err_act
-
+  integer(psb_mpik_) ::  iictxt
   call psb_erractionrestore(err_act)
-  
+  iictxt = ictxt 
   if (err_act == psb_act_print_)     &
-       &  call psb_error(ictxt, abrt=.false.)
+       &  call psb_error(iictxt, abrt=.false.)
   if (err_act == psb_act_abort_)      &
-       &  call psb_error(ictxt, abrt=.true.)
+       &  call psb_error(iictxt, abrt=.true.)
 
   return 
 

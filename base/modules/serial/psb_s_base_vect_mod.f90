@@ -63,7 +63,7 @@ module psb_s_base_vect_mod
     !> Values. 
     real(psb_spk_), allocatable :: v(:)
     real(psb_spk_), allocatable :: combuf(:) 
-    integer(psb_ipk_), allocatable :: comid(:,:)
+    integer(psb_mpik_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -722,10 +722,10 @@ contains
   subroutine s_base_absval2(x,y)
     class(psb_s_base_vect_type), intent(inout) :: x
     class(psb_s_base_vect_type), intent(inout) :: y
-
+    integer(psb_ipk_) :: info
     if (.not.x%is_host()) call x%sync()
     if (allocated(x%v)) then 
-      call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
+      call y%axpby(ione*min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
       call y%absval()
     end if
     
@@ -1225,7 +1225,7 @@ contains
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,2,x%comid,info)
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine s_base_new_comid
 
 
@@ -1357,7 +1357,7 @@ module psb_s_base_multivect_mod
     !> Values. 
     real(psb_spk_), allocatable :: v(:,:)
     real(psb_spk_), allocatable :: combuf(:) 
-    integer(psb_ipk_), allocatable :: comid(:,:)
+    integer(psb_mpik_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -1989,7 +1989,7 @@ contains
     select type(yy => y)
     type is (psb_s_base_multivect_type)
       if (y%is_dev()) call y%sync()
-      nc = min(psb_size(x%v,2),psb_size(y%v,2))
+      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
       allocate(res(nc))
       do j=1,nc
         res(j) = sdot(n,x%v(:,j),1,y%v(:,j),1)
@@ -2020,7 +2020,7 @@ contains
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
-    nc = min(psb_size(x%v,2),size(y,2))
+    nc = min(psb_size(x%v,2_psb_ipk_),size(y,2_psb_ipk_))
     allocate(res(nc))
     do j=1,nc
       res(j) = sdot(n,x%v(:,j),1,y(:,j),1)
@@ -2056,7 +2056,7 @@ contains
     if (present(n)) then
       nc = n
     else
-      nc = min(psb_size(x%v,2),psb_size(y%v,2))
+      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
     end if
     select type(xx => x)
     type is (psb_s_base_multivect_type)
@@ -2093,7 +2093,7 @@ contains
     if (present(n)) then
       nc = n
     else
-      nc = min(size(x,2),psb_size(y%v,2))
+      nc = min(size(x,2),psb_size(y%v,2_psb_ipk_))
     end if
 
     call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
@@ -2158,7 +2158,7 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    n = min(psb_size(y%v,1), size(x))
+    n = min(psb_size(y%v,1_psb_ipk_), size(x))
     do i=1, n 
       y%v(i,:) = y%v(i,:)*x(i)
     end do
@@ -2181,8 +2181,8 @@ contains
     integer(psb_ipk_) :: i, nr,nc
 
     info = 0
-    nr   = min(psb_size(y%v,1), size(x,1))
-    nc   = min(psb_size(y%v,2), size(x,2))
+    nr   = min(psb_size(y%v,1_psb_ipk_), size(x,1))
+    nc   = min(psb_size(y%v,2_psb_ipk_), size(x,2))
     y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
 
   end subroutine s_base_mlv_mlt_ar2
@@ -2210,8 +2210,8 @@ contains
     integer(psb_ipk_) :: i, nr, nc
 
     info = 0    
-    nr = min(psb_size(z%v,1), size(x,1), size(y,1))
-    nc = min(psb_size(z%v,2), size(x,2), size(y,2))    
+    nr = min(psb_size(z%v,1_psb_ipk_), size(x,1), size(y,1))
+    nc = min(psb_size(z%v,2_psb_ipk_), size(x,2), size(y,2))    
     if (alpha == szero) then 
       if (beta == sone) then 
         return 
@@ -2358,7 +2358,7 @@ contains
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
     allocate(res(nc))
     do j=1,nc
       res(j) =  snrm2(n,x%v(:,j),1)
@@ -2379,7 +2379,7 @@ contains
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
     allocate(res(nc))
     do j=1,nc
       res(j) =  maxval(abs(x%v(1:n,j)))
@@ -2400,7 +2400,7 @@ contains
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
     allocate(res(nc))
     do j=1,nc
       res(j) =  sum(abs(x%v(1:n,j)))
@@ -2429,7 +2429,8 @@ contains
   subroutine s_base_mlv_absval2(x,y)
     class(psb_s_base_multivect_type), intent(inout) :: x
     class(psb_s_base_multivect_type), intent(inout) :: y
-
+    integer(psb_ipk_) :: info
+    
     if (x%is_dev()) call x%sync()
     if (allocated(x%v)) then 
       call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
@@ -2464,7 +2465,7 @@ contains
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,2,x%comid,info)
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine s_base_mlv_new_comid
 
 
@@ -2512,7 +2513,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
     call psi_gth(n,nc,idx,alpha,x%v,beta,y)
 
   end subroutine s_base_mlv_gthab
@@ -2557,7 +2558,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
 
     call psi_gth(n,nc,idx,x%v,y)
 
@@ -2582,7 +2583,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
 
     call psi_gth(n,nc,idx,x%v,y)
 
@@ -2630,7 +2631,7 @@ contains
     integer(psb_ipk_) :: nc
 
     if (y%is_dev()) call y%sync()
-    nc = psb_size(y%v,2)
+    nc = psb_size(y%v,2_psb_ipk_)
     call psi_sct(n,nc,idx,x,beta,y%v)
     call y%set_host()
 

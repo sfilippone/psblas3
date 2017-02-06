@@ -498,7 +498,7 @@ contains
 
     integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, &
          & nxt, err_act
-    integer(psb_mpik_) :: ictxt, me, np
+    integer(psb_ipk_) :: ictxt, me, np
     character(len=20)  :: name,ch_err
 
     info = psb_success_

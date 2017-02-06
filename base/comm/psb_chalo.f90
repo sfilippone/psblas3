@@ -198,7 +198,7 @@ subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_chalom
@@ -386,7 +386,7 @@ subroutine  psb_chalov(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_chalov
@@ -525,7 +525,7 @@ subroutine  psb_chalo_vect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_chalo_vect
@@ -664,7 +664,7 @@ subroutine  psb_chalo_multivect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 end subroutine psb_chalo_multivect

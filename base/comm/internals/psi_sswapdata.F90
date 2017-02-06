@@ -516,7 +516,7 @@ subroutine psi_sswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
     return
 end subroutine psi_sswapidxm
@@ -1006,7 +1006,7 @@ subroutine psi_sswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
     return
 end subroutine psi_sswapidxv
@@ -1180,7 +1180,7 @@ subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       goto 9999
     end if
     if (debug) write(*,*) me,'do_send start'
-    call y%new_buffer(size(idx%v),info)
+    call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
@@ -1345,7 +1345,7 @@ subroutine psi_sswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
   return
 end subroutine psi_sswap_vidx_vect
@@ -1520,7 +1520,7 @@ subroutine psi_sswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       goto 9999
     end if
     if (debug) write(*,*) me,'do_send start'
-    call y%new_buffer(size(idx%v),info)
+    call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
@@ -1690,7 +1690,7 @@ subroutine psi_sswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(iictxt,err_act)
 
   return
 end subroutine psi_sswap_vidx_multivect

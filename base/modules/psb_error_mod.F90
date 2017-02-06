@@ -73,7 +73,7 @@ module psb_error_mod
     end subroutine psb_ser_error_handler
     subroutine psb_par_error_handler(ictxt,err_act)
       import :: psb_ipk_,psb_mpik_
-      integer(psb_mpik_), intent(in) ::  ictxt
+      integer(psb_ipk_), intent(in) ::  ictxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
   end interface

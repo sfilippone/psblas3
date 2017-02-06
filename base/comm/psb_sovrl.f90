@@ -193,7 +193,7 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_sovrlm
@@ -373,7 +373,7 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_sovrlv
@@ -498,7 +498,7 @@ subroutine  psb_sovrl_vect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_sovrl_vect
@@ -623,7 +623,7 @@ subroutine  psb_sovrl_multivect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
   
   return
 end subroutine psb_sovrl_multivect

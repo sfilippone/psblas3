@@ -59,7 +59,8 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   ! locals
   integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
+       & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, &
+       & ilx, i, j, idx
 
   character(len=20)        :: name, ch_err
 
@@ -69,7 +70,6 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%get_context()
-
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -160,7 +160,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 
@@ -322,7 +322,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 
@@ -436,7 +436,7 @@ subroutine  psb_igather_vect(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 
@@ -548,7 +548,7 @@ subroutine  psb_igather_multivect(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 

@@ -198,7 +198,7 @@ subroutine  psb_dhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_dhalom
@@ -386,7 +386,7 @@ subroutine  psb_dhalov(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_dhalov
@@ -525,7 +525,7 @@ subroutine  psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_dhalo_vect
@@ -664,7 +664,7 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 end subroutine psb_dhalo_multivect

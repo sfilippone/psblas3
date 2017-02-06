@@ -712,7 +712,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 

@@ -168,7 +168,7 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
   return
 

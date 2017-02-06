@@ -193,7 +193,7 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_iovrlm
@@ -373,7 +373,7 @@ subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_iovrlv
@@ -498,7 +498,7 @@ subroutine  psb_iovrl_vect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_iovrl_vect
@@ -623,7 +623,7 @@ subroutine  psb_iovrl_multivect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
   
   return
 end subroutine psb_iovrl_multivect

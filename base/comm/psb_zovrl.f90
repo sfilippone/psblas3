@@ -193,7 +193,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zovrlm
@@ -373,7 +373,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zovrlv
@@ -498,7 +498,7 @@ subroutine  psb_zovrl_vect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
 
     return
 end subroutine psb_zovrl_vect
@@ -623,7 +623,7 @@ subroutine  psb_zovrl_multivect(x,desc_a,info,work,update,mode)
   call psb_erractionrestore(err_act)
   return  
   
-9999 call psb_error_handler(ictxt,err_act)
+9999 call psb_error_handler(ione*ictxt,err_act)
   
   return
 end subroutine psb_zovrl_multivect

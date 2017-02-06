@@ -62,7 +62,7 @@ module psb_i_base_vect_mod
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:)
     integer(psb_ipk_), allocatable :: combuf(:) 
-    integer(psb_ipk_), allocatable :: comid(:,:)
+    integer(psb_mpik_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -766,7 +766,7 @@ contains
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,2,x%comid,info)
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine i_base_new_comid
 
 
@@ -898,7 +898,7 @@ module psb_i_base_multivect_mod
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:,:)
     integer(psb_ipk_), allocatable :: combuf(:) 
-    integer(psb_ipk_), allocatable :: comid(:,:)
+    integer(psb_mpik_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -1493,7 +1493,7 @@ contains
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,2,x%comid,info)
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine i_base_mlv_new_comid
 
 
@@ -1541,7 +1541,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
     call psi_gth(n,nc,idx,alpha,x%v,beta,y)
 
   end subroutine i_base_mlv_gthab
@@ -1586,7 +1586,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
 
     call psi_gth(n,nc,idx,x%v,y)
 
@@ -1611,7 +1611,7 @@ contains
     if (.not.allocated(x%v)) then
       return
     end if
-    nc = psb_size(x%v,2)
+    nc = psb_size(x%v,2_psb_ipk_)
 
     call psi_gth(n,nc,idx,x%v,y)
 
@@ -1659,7 +1659,7 @@ contains
     integer(psb_ipk_) :: nc
 
     if (y%is_dev()) call y%sync()
-    nc = psb_size(y%v,2)
+    nc = psb_size(y%v,2_psb_ipk_)
     call psi_sct(n,nc,idx,x,beta,y%v)
     call y%set_host()
 

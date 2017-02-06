@@ -292,12 +292,13 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
     end do iteration
   end do restart
   if (do_cond) then 
-    if (me == 0) then 
+    if (me == psb_root_) then 
 #if defined(HAVE_LAPACK) 
       call sstebz('A','E',istebz,szero,szero,0,0,-sone,td,tu,&
            & ieg,nspl,eig,ibl,ispl,ewrk,iwrk,info)
       if (info < 0) then 
-        call psb_errpush(psb_err_from_subroutine_ai_,name,a_err='sstebz',i_err=(/info,0,0,0,0/))
+        call psb_errpush(psb_err_from_subroutine_ai_,name,&
+             & a_err='sstebz',i_err=(/info,izero,izero,izero,izero/))
         info=psb_err_from_subroutine_ai_
         goto 9999
       end if
@@ -307,7 +308,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
 #endif
       info=psb_success_
     end if
-    call psb_bcast(ictxt,cond,root=0)
+    call psb_bcast(ictxt,cond)
   end if
 
 

@@ -59,7 +59,9 @@ module psb_realloc_mod
     module procedure psb_reallocatec2
 #if defined(LONG_INTEGERS)
     module procedure psb_reallocate1i4
-    module procedure psb_reallocatei4_2
+    module procedure psb_reallocate1i4_i8
+    module procedure psb_reallocate2i4
+    module procedure psb_reallocate2i4_i8
     module procedure psb_rp1i1
     module procedure psb_rp1i2i2
     module procedure psb_ri1p2i2
@@ -101,6 +103,8 @@ module psb_realloc_mod
 #else
     module procedure psb_i4move_alloc1d
     module procedure psb_i4move_alloc2d
+    module procedure psb_i4move_alloc1d_i8
+    module procedure psb_i4move_alloc2d_i8
 #endif
     module procedure psb_cmove_alloc1d
     module procedure psb_cmove_alloc2d
@@ -3035,6 +3039,29 @@ Contains
 #endif
   end Subroutine psb_i4move_alloc1d
 
+  Subroutine psb_i4move_alloc1d_i8(vin,vout,info)
+    use psb_error_mod
+    integer(psb_mpik_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer(psb_ipk_), intent(out) :: info 
+    !
+    ! 
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+
+    call move_alloc(vin,vout)
+
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
+  end Subroutine psb_i4move_alloc1d_i8
+ 
   Subroutine psb_i4move_alloc2d(vin,vout,info)
     use psb_error_mod
     integer(psb_mpik_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
@@ -3059,6 +3086,31 @@ Contains
     deallocate(vin,stat=info)
 #endif
   end Subroutine psb_i4move_alloc2d
+ 
+  Subroutine psb_i4move_alloc2d_i8(vin,vout,info)
+    use psb_error_mod
+    integer(psb_mpik_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer(psb_ipk_), intent(out) :: info 
+    !
+    ! 
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+
+    call move_alloc(vin,vout)
+
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if
+    if (.not.allocated(vin) ) return
+
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
+  end Subroutine psb_i4move_alloc2d_i8
 
 #endif
 
@@ -3141,7 +3193,85 @@ Contains
 
   End Subroutine psb_reallocate1i4
 
-  Subroutine psb_reallocatei4_2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocate1i4_i8(len,rrax,info,pad,lb)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    integer(psb_ipk_),Intent(in)                 :: len
+    Integer(psb_mpik_),allocatable, intent(inout) :: rrax(:)
+    integer(psb_ipk_) :: info
+    integer(psb_mpik_), optional, intent(in) :: pad
+    integer(psb_ipk_), optional, intent(in) :: lb
+    ! ...Local Variables
+    Integer(psb_mpik_),allocatable  :: tmp(:)
+    integer(psb_mpik_) :: dim, lb_, lbi, ub_, iinfo
+    integer(psb_ipk_)  :: err, err_act, ierr(5)
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+
+    name='psb_reallocate1i4' 
+    call psb_erractionsave(err_act)
+    info=psb_success_
+
+    if (debug) write(psb_err_unit,*) 'reallocate I',len
+    if (psb_get_errstatus() /= 0) then 
+      if (debug) write(psb_err_unit,*) 'reallocate errstatus /= 0'
+      info=psb_err_from_subroutine_
+      goto 9999
+    end if
+
+    if (present(lb)) then
+      lb_ = lb
+    else
+      lb_ = 1
+    endif
+    if ((len<0)) then 
+      err=4025; ierr(1) = len
+      call psb_errpush(err,name,i_err=ierr,a_err='integer')
+      goto 9999
+    end if
+    ub_ = lb_+len-1
+    if (debug) write(psb_err_unit,*) 'reallocate : lb ub ',lb_, ub_
+    if (allocated(rrax)) then 
+      dim = size(rrax)
+      lbi = lbound(rrax,1) 
+      If ((dim /= len).or.(lbi /= lb_))  Then
+        Allocate(tmp(lb_:ub_),stat=info)
+        if (info /= psb_success_) then
+          err=4025; ierr(1) = len
+          call psb_errpush(err,name,i_err=ierr,a_err='integer')
+          goto 9999
+        end if
+        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
+        if (debug) write(psb_err_unit,*) 'reallocate : calling move_alloc '
+        call psb_move_alloc(tmp,rrax,iinfo)
+        if (debug) write(psb_err_unit,*) 'reallocate : from move_alloc ',iinfo
+      end if
+    else
+      dim = 0
+      allocate(rrax(lb_:ub_),stat=info)
+      if (info /= psb_success_) then
+        err=4025; ierr(1) = len
+        call psb_errpush(err,name,i_err=ierr,a_err='integer')
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(lb_-1+dim+1:lb_-1+len) = pad
+    endif
+    if (debug) write(psb_err_unit,*) 'end reallocate : ',info
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    info = err
+    call psb_error_handler(err_act)
+    return
+
+
+  End Subroutine psb_reallocate1i4_i8
+
+  Subroutine psb_reallocate2i4(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     integer(psb_mpik_),Intent(in) :: len1,len2
@@ -3224,7 +3354,92 @@ Contains
     call psb_error_handler(err_act)
     return
 
-  End Subroutine psb_reallocatei4_2
+  End Subroutine psb_reallocate2i4
+
+  Subroutine psb_reallocate2i4_i8(len1,len2,rrax,info,pad,lb1,lb2)
+    use psb_error_mod
+    ! ...Subroutine Arguments  
+    integer(psb_ipk_),Intent(in) :: len1,len2
+    integer(psb_mpik_),allocatable :: rrax(:,:)
+    integer(psb_ipk_) :: info
+    integer(psb_mpik_), optional, intent(in) :: pad
+    integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
+
+    ! ...Local Variables
+    integer(psb_mpik_),allocatable  :: tmp(:,:)
+    integer(psb_mpik_) :: dim, dim2,lb1_, lb2_, ub1_, ub2_,&
+         & lbi1, lbi2
+    integer(psb_ipk_)  :: err,err_act, ierr(5)
+    character(len=20)  :: name
+
+    name='psb_reallocatei2'
+    call psb_erractionsave(err_act)
+    info=psb_success_ 
+    if (present(lb1)) then 
+      lb1_ = lb1
+    else
+      lb1_ = 1
+    endif
+    if (present(lb2)) then 
+      lb2_ = lb2
+    else
+      lb2_ = 1
+    endif
+    ub1_ = lb1_ + len1 -1
+    ub2_ = lb2_ + len2 -1
+
+    if (len1 < 0) then
+      err=4025; ierr(1) = len1
+      call psb_errpush(err,name,i_err=ierr,a_err='integer')
+      goto 9999
+    end if
+    if (len2 < 0) then
+      err=4025; ierr(1) = len2
+      call psb_errpush(err,name,i_err=ierr,a_err='integer')
+      goto 9999
+    end if
+
+    if (allocated(rrax)) then 
+      dim  = size(rrax,1)
+      lbi1 = lbound(rrax,1)
+      dim2 = size(rrax,2)
+      lbi2 = lbound(rrax,2)
+      If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
+           &  .or.(lbi2 /= lb2_)) Then
+        Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
+        if (info /= psb_success_) then
+          err=4025; ierr(1) = len1*len2
+          call psb_errpush(err,name,i_err=ierr,a_err='integer')
+          goto 9999
+        end if
+        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+        call psb_move_alloc(tmp,rrax,info)
+      End If
+    else
+      dim  = 0
+      dim2 = 0
+      Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
+      if (info /= psb_success_) then
+        err=4025; ierr(1) = len1*len2
+        call psb_errpush(err,name,i_err=ierr,a_err='integer')
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
+      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    info = err
+    call psb_error_handler(err_act)
+    return
+
+  End Subroutine psb_reallocate2i4_i8
 
 
   Subroutine psb_rp1i1(len,rrax,info,pad,lb)
