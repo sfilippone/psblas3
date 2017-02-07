@@ -149,7 +149,7 @@ contains
     type(psb_buffer_node), intent(inout) :: node
     integer(psb_ipk_), intent(out) :: info 
     integer(psb_mpik_) :: status(mpi_status_size),minfo
-
+    minfo = mpi_success
     call mpi_wait(node%request,status,minfo)
     info=minfo
   end subroutine psb_wait_buffer
@@ -166,8 +166,12 @@ contains
     logical, intent(out) :: flag
     integer(psb_ipk_), intent(out) :: info 
     integer(psb_mpik_) :: status(mpi_status_size), minfo
-
+    minfo = mpi_success
+#if defined(SERIAL_MPI)
+    flag  = .true.
+#else
     call mpi_test(node%request,flag,status,minfo)
+#endif
     info=minfo
   end subroutine psb_test_buffer
   
