@@ -1119,6 +1119,12 @@ if test $pac_blas_ok = no; then
 			[], [-lblas])])
 fi
 
+
+# BLAS in OpenBLAS? 
+if test $pac_blas_ok = no; then
+  AC_LANG([Fortran])
+  AC_CHECK_LIB(openblas, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"])
+fi
 # BLAS in Alpha CXML library? 
 if test $pac_blas_ok = no; then
 	AC_CHECK_LIB(cxml, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml $BLAS_LIBDIR"])
@@ -1158,7 +1164,13 @@ if test $pac_blas_ok = no; then
 		[AC_CHECK_LIB(essl, sgemm,
 			[pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas $BLAS_LIBDIR"],
 			[], [-lblas $FLIBS])])
+	fi
+# BLAS in generic BLAS library? 
+if test $pac_blas_ok = no; then
+  AC_LANG([Fortran])
+  AC_CHECK_LIB(blas, sgemm, , [pac_blas_ok=yes;BLAS_LIBS="-lblas $BLAS_LIBDIR"])
 fi
+	
 # BLAS linked to by default?  (happens on some supercomputers)
 if test $pac_blas_ok = no; then
 	save_LIBS="$LIBS"; LIBS=" $BLAS_LIBDIR $LIBS"

@@ -8024,6 +8024,42 @@ fi
 
 fi
 
+
+# BLAS in OpenBLAS?
+if test $pac_blas_ok = no; then
+  ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sgemm in -lopenblas" >&5
+$as_echo_n "checking for sgemm in -lopenblas... " >&6; }
+if ${ac_cv_lib_openblas_sgemm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopenblas  $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  ac_cv_lib_openblas_sgemm=yes
+else
+  ac_cv_lib_openblas_sgemm=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_openblas_sgemm" >&5
+$as_echo "$ac_cv_lib_openblas_sgemm" >&6; }
+if test "x$ac_cv_lib_openblas_sgemm" = xyes; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"
+fi
+
+fi
 # BLAS in Alpha CXML library?
 if test $pac_blas_ok = no; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sgemm in -lcxml" >&5
@@ -8269,7 +8305,50 @@ fi
 
 fi
 
+	fi
+# BLAS in generic BLAS library?
+if test $pac_blas_ok = no; then
+  ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sgemm in -lblas" >&5
+$as_echo_n "checking for sgemm in -lblas... " >&6; }
+if ${ac_cv_lib_blas_sgemm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lblas  $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  ac_cv_lib_blas_sgemm=yes
+else
+  ac_cv_lib_blas_sgemm=no
 fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_blas_sgemm" >&5
+$as_echo "$ac_cv_lib_blas_sgemm" >&6; }
+if test "x$ac_cv_lib_blas_sgemm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBLAS 1
+_ACEOF
+
+  LIBS="-lblas $LIBS"
+
+else
+  pac_blas_ok=yes;BLAS_LIBS="-lblas $BLAS_LIBDIR"
+fi
+
+fi
+
 # BLAS linked to by default?  (happens on some supercomputers)
 if test $pac_blas_ok = no; then
 	save_LIBS="$LIBS"; LIBS=" $BLAS_LIBDIR $LIBS"
