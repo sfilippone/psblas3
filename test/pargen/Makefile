@@ -15,31 +15,31 @@ FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: ppde3d spde3d ppde2d spde2d
+all: psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
 
 
-ppde3d: ppde3d.o 
-	$(F90LINK)  ppde3d.o -o ppde3d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv ppde3d $(EXEDIR)
+psb_d_pde3d: psb_d_pde3d.o 
+	$(F90LINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_pde3d $(EXEDIR)
 
 
-spde3d: spde3d.o 
-	$(F90LINK) spde3d.o  -o spde3d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spde3d $(EXEDIR)
+psb_s_pde3d: psb_s_pde3d.o 
+	$(F90LINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_s_pde3d $(EXEDIR)
 
-ppde2d: ppde2d.o 
-	$(F90LINK)  ppde2d.o -o ppde2d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv ppde2d $(EXEDIR)
+psb_d_pde2d: psb_d_pde2d.o 
+	$(F90LINK)  psb_d_pde2d.o -o psb_d_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_pde2d $(EXEDIR)
 
 
-spde2d: spde2d.o 
-	$(F90LINK) spde2d.o  -o spde2d $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spde2d $(EXEDIR)
+psb_s_pde2d: psb_s_pde2d.o 
+	$(F90LINK) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_s_pde2d $(EXEDIR)
 
 
 clean: 
-	/bin/rm -f ppde3d.o spde3d.o  ppde2d.o spde2d.o *$(.mod) \
-	$(EXEDIR)/ppde3d $(EXEDIR)/spde3d $(EXEDIR)/ppde2d $(EXEDIR)/spde2d 
+	/bin/rm -f psb_d_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o *$(.mod) \
+	$(EXEDIR)/psb_d_pde3d $(EXEDIR)/psb_s_pde3d $(EXEDIR)/psb_d_pde2d $(EXEDIR)/psb_s_pde2d 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

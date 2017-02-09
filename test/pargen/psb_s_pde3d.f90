@@ -29,9 +29,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: spde3d.f90
+! File: psb_s_pde3d.f90
 !
-! Program: spde3d
+! Program: psb_s_pde3d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. 
 ! 
@@ -56,7 +56,7 @@
 ! data distribution.
 !
 !
-module spde3d_mod
+module psb_s_pde3d_mod
 contains
   
   !
@@ -115,14 +115,14 @@ contains
       g = exp(y**2-z**2)
     end if
   end function g
-end module spde3d_mod
+end module psb_s_pde3d_mod
 
-program spde3d
+program psb_s_pde3d
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   use psb_util_mod
-  use spde3d_mod
+  use psb_s_pde3d_mod
   implicit none
 
   ! input parameters
@@ -374,6 +374,6 @@ contains
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
 
-end program spde3d
+end program psb_s_pde3d
 
 

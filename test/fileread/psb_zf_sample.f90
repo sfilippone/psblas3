@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-program df_sample
+program psb_zf_sample
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
@@ -38,20 +38,19 @@ program df_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file,renum
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
+  type(psb_zspmat_type) :: a, aux_a
 
   ! preconditioner data
-  type(psb_dprec_type)  :: prec
+  type(psb_zprec_type)  :: prec
 
   ! dense matrices
-  real(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  real(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
-  real(psb_dpk_), pointer  :: b_col_glob(:)
-  type(psb_d_vect_type)    :: b_col, x_col, r_col
-
+  complex(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
+  complex(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
+  complex(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_z_vect_type)    :: b_col, x_col, r_col
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -62,7 +61,7 @@ program df_sample
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
-  real(psb_dpk_)   :: err, eps,cond
+  real(psb_dpk_)   :: err, eps
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -91,11 +90,10 @@ program df_sample
   endif
 
 
-  name='df_sample'
+  name='psb_zf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(itwo)
-  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -142,7 +140,7 @@ program df_sample
     
     m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
-    call psb_mat_renum(psb_mat_renum_gps_,aux_a,info,perm) 
+    call psb_mat_renum(psb_mat_renum_identity_,aux_a,info,perm) 
 
     ! At this point aux_b may still be unallocated
     if (size(aux_b,dim=1) == m_problem) then
@@ -151,10 +149,6 @@ program df_sample
       b_col_glob =>aux_b(:,1)
       call psb_gelp('N',perm(1:m_problem),&
            & b_col_glob(1:m_problem),info)
-      write(fnout,'(a,i3.3,a)') 'amat-',iam,'-gps.mtx'
-      call aux_a%print(fnout)
-      write(fnout,'(a,i3.3,a)') 'rhs-',iam,'-gps.mtx'
-      call mm_array_write(b_col_glob(1:m_problem),'GPS RHS',info,filename=fnout)
     else
       write(psb_out_unit,'("Generating an rhs...")')
       write(psb_out_unit,'(" ")')
@@ -163,11 +157,11 @@ program df_sample
         call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
       endif
-      
+
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
-        b_col_glob(i) = 1.d0
-      enddo
+         b_col_glob(i) = (1.d0,1.d0)
+      enddo      
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
@@ -176,12 +170,11 @@ program df_sample
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,name)
-      goto 9999
+       call psb_errpush(psb_err_alloc_dealloc_,name)
+       goto 9999
     endif
     b_col_glob =>aux_b(:,1)
     call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
-
   end if
 
   ! switch over different partition types
@@ -215,23 +208,22 @@ program df_sample
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
   end if
-
+  
   call psb_geall(x_col,desc_a,info)
-  call x_col%set(dzero)
+  call x_col%set(zzero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  call r_col%set(dzero)
+  call r_col%set(zzero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
-
-!!$  write(fnout,'(a,i3.3,a)') 'amat-',iam,'.mtx'
-!!$  call a%print(fname=fnout)
+  
+  
   call psb_amx(ictxt, t2)
-
+  
   if (iam == psb_root_) then
-    write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-    write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+     write(psb_out_unit,'(" ")')
   end if
 
   ! 
@@ -243,30 +235,28 @@ program df_sample
   call psb_precbld(a,desc_a,prec,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-    goto 9999
+     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+     goto 9999
   end if
-
-
-  call psb_amx(ictxt, tprec)
-
+  
+  
+  call psb_amx(ictxt,tprec)
+  
   if(iam == psb_root_) then
-    write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
-    write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
+     write(psb_out_unit,'(" ")')
   end if
-  cond = dzero
+
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,&
-       & irst=irst,cond=cond)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
-
   call psb_amx(ictxt,t2)
-  call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
-  call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
+  call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
+  call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)
   resmx  = psb_genrm2(r_col,desc_a,info)
   resmxp = psb_geamax(r_col,desc_a,info)
 
@@ -288,14 +278,13 @@ program df_sample
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
     write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
-    write(psb_out_unit,*)"Condition number         : ",cond
+!!$    write(psb_out_unit,*)"Condition number         : ",cond
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
          &  desc_a%get_fmt()
   end if
-!!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
   call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
   if (info == psb_success_) &
@@ -316,23 +305,23 @@ program df_sample
       write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
     enddo
   end if
-998 format(i8,4(2x,g20.14))
+998 format(i8,6(1x,g11.5))
 993 format(i6,4(1x,e12.6))
 
-
+  
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
-
   call psb_exit(ictxt)
   stop
 
 9999 call psb_error(ictxt)
 
   stop
-end program df_sample
+  
+end program psb_zf_sample
   
 
 

@@ -29,9 +29,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: spde2d.f90
+! File: psb_d_pde2d.f90
 !
-! Program: spde2d
+! Program: psb_d_pde2d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. 
 ! 
@@ -55,61 +55,62 @@
 ! then the corresponding vector is distributed according to a BLOCK
 ! data distribution.
 !
-module spde2d_mod
+module psb_d_pde2d_mod
 contains
+
   !
   ! functions parametrizing the differential equation 
   !  
   function b1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) :: b1
-    real(psb_spk_), intent(in) :: x,y
-    b1=1.e0/sqrt(2.e0)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) :: b1
+    real(psb_dpk_), intent(in) :: x,y
+    b1=1.d0/sqrt(2.d0)
   end function b1
   function b2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  b2
-    real(psb_spk_), intent(in) :: x,y
-    b2=1.e0/sqrt(2.e0)
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  b2
+    real(psb_dpk_), intent(in) :: x,y
+    b2=1.d0/sqrt(2.d0)
   end function b2
   function c(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  c
-    real(psb_spk_), intent(in) :: x,y
-    c=0.e0
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  c
+    real(psb_dpk_), intent(in) :: x,y
+    c=0.d0
   end function c
   function a1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a1   
-    real(psb_spk_), intent(in) :: x,y
-    a1=1.e0/80
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a1   
+    real(psb_dpk_), intent(in) :: x,y
+    a1=1.d0/80
   end function a1
   function a2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a2
-    real(psb_spk_), intent(in) :: x,y
-    a2=1.e0/80
+    use psb_base_mod, only : psb_dpk_
+    real(psb_dpk_) ::  a2
+    real(psb_dpk_), intent(in) :: x,y
+    a2=1.d0/80
   end function a2
   function g(x,y)
-    use psb_base_mod, only : psb_spk_, sone, szero
-    real(psb_spk_) ::  g
-    real(psb_spk_), intent(in) :: x,y
-    g = szero
-    if (x == sone) then
-      g = sone
-    else if (x == szero) then 
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    real(psb_dpk_) ::  g
+    real(psb_dpk_), intent(in) :: x,y
+    g = dzero
+    if (x == done) then
+      g = done
+    else if (x == dzero) then 
       g = exp(-y**2)
     end if
   end function g
 
-end module spde2d_mod
+end module psb_d_pde2d_mod
 
-program spde2d
+program psb_d_pde2d
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
   use psb_util_mod
-  use spde2d_mod
+  use psb_d_pde2d_mod
   implicit none
 
   ! input parameters
@@ -118,23 +119,23 @@ program spde2d
   integer(psb_ipk_) :: idim
 
   ! miscellaneous 
-  real(psb_spk_), parameter :: one = 1.e0
+  real(psb_dpk_), parameter :: one = 1.d0
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_sspmat_type) :: a
-  type(psb_sprec_type)  :: prec
+  type(psb_dspmat_type) :: a
+  type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
-  type(psb_s_vect_type) :: xxv,bv
+  type(psb_d_vect_type) :: xxv,bv
   ! parallel environment
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
-  real(psb_spk_)   :: err, eps
+  real(psb_dpk_)   :: err, eps
 
   ! other variables
   integer(psb_ipk_) :: info, i
@@ -324,6 +325,7 @@ contains
         stop 1
       endif
     end if
+
     ! broadcast parameters to all processors
     call psb_bcast(ictxt,kmethd)
     call psb_bcast(ictxt,afmt)
@@ -358,7 +360,6 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
-
-end program spde2d
+end program psb_d_pde2d
 
 

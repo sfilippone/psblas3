@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-program zf_sample
+program psb_sf_sample
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
@@ -41,16 +41,17 @@ program zf_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_zspmat_type) :: a, aux_a
+  type(psb_sspmat_type) :: a, aux_a
 
   ! preconditioner data
-  type(psb_zprec_type)  :: prec
+  type(psb_sprec_type)  :: prec
 
   ! dense matrices
-  complex(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  complex(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
-  complex(psb_dpk_), pointer  :: b_col_glob(:)
-  type(psb_z_vect_type)    :: b_col, x_col, r_col
+  real(psb_spk_), allocatable, target ::  aux_b(:,:), d(:)
+  real(psb_spk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
+  real(psb_spk_), pointer  :: b_col_glob(:)
+  type(psb_s_vect_type)    :: b_col, x_col, r_col
+
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -61,7 +62,7 @@ program zf_sample
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
-  real(psb_dpk_)   :: err, eps
+  real(psb_spk_)   :: err, eps,cond
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -73,7 +74,7 @@ program zf_sample
   integer(psb_ipk_) :: i,info,j,m_problem
   integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec
-  real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
+  real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
   integer(psb_ipk_) :: nrhs, nrow, n_row, dim, ne, nv
   integer(psb_ipk_), allocatable :: ivg(:), perm(:)
   integer(psb_ipk_), allocatable :: ipv(:)
@@ -90,7 +91,7 @@ program zf_sample
   endif
 
 
-  name='zf_sample'
+  name='psb_sf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(itwo)
@@ -160,8 +161,8 @@ program zf_sample
 
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
-         b_col_glob(i) = (1.d0,1.d0)
-      enddo      
+        b_col_glob(i) = 1.d0
+      enddo
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
@@ -170,8 +171,8 @@ program zf_sample
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
-       call psb_errpush(psb_err_alloc_dealloc_,name)
-       goto 9999
+      call psb_errpush(psb_err_alloc_dealloc_,name)
+      goto 9999
     endif
     b_col_glob =>aux_b(:,1)
     call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
@@ -208,22 +209,22 @@ program zf_sample
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
   end if
-  
+
   call psb_geall(x_col,desc_a,info)
-  call x_col%set(zzero)
+  call x_col%set(szero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  call r_col%set(zzero)
+  call r_col%set(szero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
-  
-  
+
+
   call psb_amx(ictxt, t2)
-  
+
   if (iam == psb_root_) then
-     write(psb_out_unit,'(" ")')
-     write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-     write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+    write(psb_out_unit,'(" ")')
   end if
 
   ! 
@@ -235,28 +236,30 @@ program zf_sample
   call psb_precbld(a,desc_a,prec,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
-     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-     goto 9999
-  end if
-  
-  
-  call psb_amx(ictxt,tprec)
-  
-  if(iam == psb_root_) then
-     write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
-     write(psb_out_unit,'(" ")')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+    goto 9999
   end if
 
+
+  call psb_amx(ictxt, tprec)
+
+  if(iam == psb_root_) then
+    write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
+    write(psb_out_unit,'(" ")')
+  end if
+  cond = szero
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,&
+       & irst=irst,cond=cond)     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
+
   call psb_amx(ictxt,t2)
-  call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
-  call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)
+  call psb_geaxpby(sone,b_col,szero,r_col,desc_a,info)
+  call psb_spmm(-sone,a,x_col,sone,r_col,desc_a,info)
   resmx  = psb_genrm2(r_col,desc_a,info)
   resmxp = psb_geamax(r_col,desc_a,info)
 
@@ -278,13 +281,14 @@ program zf_sample
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
     write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
-!!$    write(psb_out_unit,*)"Condition number         : ",cond
+    write(psb_out_unit,*)"Condition number         : ",cond
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
          &  desc_a%get_fmt()
   end if
+!!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
   call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
   if (info == psb_success_) &
@@ -305,23 +309,23 @@ program zf_sample
       write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
     enddo
   end if
-998 format(i8,6(1x,g11.5))
+998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
-  
+
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
+
   call psb_exit(ictxt)
   stop
 
 9999 call psb_error(ictxt)
 
   stop
-  
-end program zf_sample
+end program psb_sf_sample
   
 
 
