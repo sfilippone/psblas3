@@ -42,8 +42,9 @@ Module psb_base_krylov_conv_mod
   end interface
 
   integer(psb_ipk_), parameter :: psb_ik_bni_=1, psb_ik_rni_=2, psb_ik_ani_=3
-  integer(psb_ipk_), parameter :: psb_ik_xni_=4, psb_ik_bn2_=5, psb_ik_xn2_=6
-  integer(psb_ipk_), parameter :: psb_ik_errnum_=7, psb_ik_errden_=8, psb_ik_eps_=9, psb_ik_rn2_=10
+  integer(psb_ipk_), parameter :: psb_ik_xni_=4, psb_ik_bn2_=5, psb_ik_r0n2_=6
+  integer(psb_ipk_), parameter :: psb_ik_xn2_=7, psb_ik_errnum_=8, psb_ik_errden_=9
+  integer(psb_ipk_), parameter :: psb_ik_eps_=10, psb_ik_rn2_=11
   integer(psb_ipk_), parameter :: psb_ik_stopc_=1, psb_ik_trace_=2, psb_ik_itmax_=3
   integer(psb_ipk_), parameter :: psb_ik_ivsz_=16
   type psb_itconv_type

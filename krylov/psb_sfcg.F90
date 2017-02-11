@@ -209,7 +209,7 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
        & scratch=.true.,mold=x%v)
 
 
-    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
   itx=0
 
   restart: do 

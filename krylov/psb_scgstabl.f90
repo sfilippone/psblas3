@@ -245,7 +245,7 @@ Subroutine psb_scgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   rt0 => wwrk(10)
   
 
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
   if (info /= psb_success_) Then 
      call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999

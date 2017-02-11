@@ -137,7 +137,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_) :: itx, i, istop_, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ictxt, np, me  
-  Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt
+  Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt, r0n2
   real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name
   character(len=*), parameter :: methdname='RGMRES'
@@ -258,6 +258,21 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     bni = psb_geamax(b,desc_a,info)
   else if (istop_ == 2) then 
     bn2 = psb_genrm2(b,desc_a,info)
+  else if (istop_ == 3) then
+    call psb_geaxpby(done,b,dzero,v(1),desc_a,info)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call psb_spmm(-done,a,x,done,v(1),desc_a,info,work=aux)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    r0n2 = psb_genrm2(v(1),desc_a,info)
   endif
   errnum = dzero
   errden = done
@@ -274,7 +289,6 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   
     ! compute r0 = b-ax0
     ! check convergence
-    ! compute v1 = r0/||r0||_2
 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
@@ -319,6 +333,10 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
       rni = psb_genrm2(v(1),desc_a,info)
       errnum = rni
       errden = bn2
+    else if (istop_ == 3) then 
+      rni = psb_genrm2(v(1),desc_a,info)
+      errnum = rni
+      errden = r0n2
     endif
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
@@ -397,6 +415,14 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         errnum = rni
         errden = bn2
+      else if (istop_ == 3) then 
+        !
+        ! compute the residual 2-norm as byproduct of the solution
+        ! procedure of the least-squares problem
+        !
+        rni = abs(rs(i+1))
+        errnum = rni
+        errden = r0n2
       endif
 
       if (errnum <= eps*errden) then 
