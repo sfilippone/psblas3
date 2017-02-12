@@ -38,7 +38,7 @@ program psb_cf_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file,renum
 
   ! sparse matrices
   type(psb_cspmat_type) :: a, aux_a
@@ -61,7 +61,7 @@ program psb_cf_sample
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
-  real(psb_spk_)   :: err, eps
+  real(psb_spk_)   :: err, eps, cond
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -160,21 +160,14 @@ program psb_cf_sample
 
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
-         b_col_glob(i) = (1.0,1.0)
+         b_col_glob(i) = cone
       enddo      
     endif
-    call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
   else
 
     call psb_bcast(ictxt,m_problem)
-    call psb_realloc(m_problem,1,aux_b,ircode)
-    if (ircode /= 0) then
-       call psb_errpush(psb_err_alloc_dealloc_,name)
-       goto 9999
-    endif
     b_col_glob =>aux_b(:,1)
-    call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
   end if
 
   ! switch over different partition types
@@ -186,8 +179,7 @@ program psb_cf_sample
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
@@ -200,20 +192,19 @@ program psb_cf_sample
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
 
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
-    call psb_matdist(aux_a, a,  ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
+    call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
   end if
 
+  call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_)
   call psb_geall(x_col,desc_a,info)
-  call x_col%set(czero)
+  call x_col%zero()
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  call r_col%set(czero)
+  call r_col%zero()
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
   
@@ -246,12 +237,12 @@ program psb_cf_sample
      write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
      write(psb_out_unit,'(" ")')
   end if
-
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,&
+       & istop=istopc,irst=irst)
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
@@ -278,7 +269,6 @@ program psb_cf_sample
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
     write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
-!!$    write(psb_out_unit,*)"Condition number         : ",cond
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize

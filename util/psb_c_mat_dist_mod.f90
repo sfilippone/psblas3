@@ -35,7 +35,7 @@ module psb_c_mat_dist_mod
 
   interface psb_matdist
     subroutine psb_cmatdist(a_glob, a, ictxt, desc_a,&
-         & info, b_glob, b, x_glob, x, parts, v, inroot,fmt,mold)
+         & info, parts, v, inroot,fmt,mold)
       !
       ! an utility subroutine to distribute a matrix among processors
       ! according to a user defined data distribution, using
@@ -70,17 +70,6 @@ module psb_c_mat_dist_mod
       !  type (desc_type)                  :: desc_a
       !     on exit : the updated array descriptor
       !
-      !  complex(psb_spk_),  optional      :: b_glob(:)
-      !     on entry: RHS      
-      !     
-      !  type(psb_c_vect_type), optional      :: b
-      !     on exit : this will contain the local right hand side.
-      !
-      !  complex(psb_spk_),  optional      :: x_glob(:)
-      !     on entry: initial guess      
-      !     
-      !  type(psb_c_vect_type), optional      :: x
-      !     on exit : this will contain the local right hand side.
       !
       !  integer(psb_ipk_), optional    :: inroot
       !     on entry: specifies processor holding a_glob. default: 0
@@ -96,10 +85,6 @@ module psb_c_mat_dist_mod
       type(psb_cspmat_type)      :: a
       type(psb_desc_type)        :: desc_a
       integer(psb_ipk_), intent(out)       :: info
-      complex(psb_spk_), optional       :: b_glob(:)
-      type(psb_c_vect_type), optional   :: b
-      complex(psb_spk_), optional       :: x_glob(:)
-      type(psb_c_vect_type), optional   :: x
       integer(psb_ipk_), optional       :: inroot
       character(len=*), optional :: fmt
       class(psb_c_base_sparse_mat), optional :: mold

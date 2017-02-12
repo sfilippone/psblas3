@@ -38,7 +38,7 @@ program psb_sf_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file,renum
 
   ! sparse matrices
   type(psb_sspmat_type) :: a, aux_a
@@ -52,7 +52,6 @@ program psb_sf_sample
   real(psb_spk_), pointer  :: b_col_glob(:)
   type(psb_s_vect_type)    :: b_col, x_col, r_col
 
-
   ! communications data structure
   type(psb_desc_type):: desc_a
 
@@ -62,7 +61,7 @@ program psb_sf_sample
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
-  real(psb_spk_)   :: err, eps,cond
+  real(psb_spk_)   :: err, eps, cond
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -71,7 +70,7 @@ program psb_sf_sample
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer(psb_ipk_) :: i,info,j,m_problem
+  integer(psb_ipk_) :: i,info,j,m_problem, err_act
   integer(psb_ipk_) :: internal, m,ii,nnzero
   real(psb_dpk_) :: t1, t2, tprec
   real(psb_spk_) :: r_amax, b_amax, scale,resmx,resmxp
@@ -155,27 +154,20 @@ program psb_sf_sample
       write(psb_out_unit,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
-        call psb_errpush(psb_err_alloc_dealloc_,name)
-        goto 9999
+         call psb_errpush(psb_err_alloc_dealloc_,name)
+         goto 9999
       endif
 
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
-        b_col_glob(i) = 1.d0
-      enddo
+         b_col_glob(i) = sone
+      enddo      
     endif
-    call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
   else
 
     call psb_bcast(ictxt,m_problem)
-    call psb_realloc(m_problem,1,aux_b,ircode)
-    if (ircode /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,name)
-      goto 9999
-    endif
     b_col_glob =>aux_b(:,1)
-    call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
   end if
 
   ! switch over different partition types
@@ -187,8 +179,7 @@ program psb_sf_sample
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
     
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
@@ -201,30 +192,29 @@ program psb_sf_sample
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
 
   else 
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
-    call psb_matdist(aux_a, a,  ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
+    call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
   end if
 
+  call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_)
   call psb_geall(x_col,desc_a,info)
-  call x_col%set(szero)
+  call x_col%zero()
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  call r_col%set(szero)
+  call r_col%zero()
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
-
-
+  
+  
   call psb_amx(ictxt, t2)
-
+  
   if (iam == psb_root_) then
-    write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
-    write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+     write(psb_out_unit,'(" ")')
   end if
 
   ! 
@@ -236,27 +226,26 @@ program psb_sf_sample
   call psb_precbld(a,desc_a,prec,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
-    goto 9999
+     call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
+     goto 9999
   end if
-
-
-  call psb_amx(ictxt, tprec)
-
+  
+  
+  call psb_amx(ictxt,tprec)
+  
   if(iam == psb_root_) then
-    write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
-    write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
+     write(psb_out_unit,'(" ")')
   end if
   cond = szero
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,&
-       & irst=irst,cond=cond)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,&
+       & istop=istopc,irst=irst,cond=cond)
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
-
   call psb_amx(ictxt,t2)
   call psb_geaxpby(sone,b_col,szero,r_col,desc_a,info)
   call psb_spmm(-sone,a,x_col,sone,r_col,desc_a,info)
@@ -281,14 +270,13 @@ program psb_sf_sample
     write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
     write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
     write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
-    write(psb_out_unit,*)"Condition number         : ",cond
+    write(psb_out_unit,'("Condition number         : ",es12.5)')cond
     write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
     write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     write(psb_out_unit,'("Storage type for DESC_A           : ",a)')&
          &  desc_a%get_fmt()
   end if
-!!$  call psb_precdump(prec,info,prefix=trim(mtrx_file)//'_')
 
   call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
   if (info == psb_success_) &
@@ -312,13 +300,12 @@ program psb_sf_sample
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
-
+  
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
-
   call psb_exit(ictxt)
   stop
 
