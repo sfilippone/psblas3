@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_is_local -- </TITLE>
-<META NAME="description" CONTENT="psb_is_local -- ">
+<TITLE>psb_is_owned -- </TITLE>
+<META NAME="description" CONTENT="psb_is_owned -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node90.html">
 <LINK REL="previous" HREF="node88.html">
-<LINK REL="up" HREF="node68.html">
+<LINK REL="up" HREF="node70.html">
 <LINK REL="next" HREF="node90.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1358"
+<A NAME="tex2html1364"
   HREF="node90.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1354"
-  HREF="node68.html">
+<A NAME="tex2html1360"
+  HREF="node70.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1348"
+<A NAME="tex2html1354"
   HREF="node88.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1356"
+<A NAME="tex2html1362"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1359"
-  HREF="node90.html">psb_local_index</A>
-<B> Up:</B> <A NAME="tex2html1355"
-  HREF="node68.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1349"
-  HREF="node88.html">psb_owned_index</A>
- &nbsp; <B>  <A NAME="tex2html1357"
+<B> Next:</B> <A NAME="tex2html1365"
+  HREF="node90.html">psb_owned_index</A>
+<B> Up:</B> <A NAME="tex2html1361"
+  HREF="node70.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1355"
+  HREF="node88.html">psb_loc_to_glob   Local</A>
+ &nbsp; <B>  <A NAME="tex2html1363"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000721000000000000000">
-psb_is_local  -- </A>
+<H2><A NAME="SECTION000719000000000000000">
+psb_is_owned  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_is_local(x, desc_a)
+call psb_is_owned(x, desc_a)
 </PRE>
 
 <P>
@@ -102,7 +102,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
   <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is  local to the current process
+ ALT="$x$"> is  owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
@@ -116,7 +116,7 @@ Intent: <B>out</B>.
 
 <OL>
 <LI>This routine returns a <code>.true.</code> value for an index
-  that is local to the current process, including the halo
+  that is strictly owned by the current process, excluding the halo
   indices
 </LI>
 </OL>

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
-<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
+<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
+<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,53 +20,54 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node104.html">
 <LINK REL="previous" HREF="node102.html">
-<LINK REL="up" HREF="node96.html">
+<LINK REL="up" HREF="node98.html">
 <LINK REL="next" HREF="node104.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1540"
+<A NAME="tex2html1546"
   HREF="node104.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1536"
-  HREF="node96.html">
+<A NAME="tex2html1542"
+  HREF="node98.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1530"
+<A NAME="tex2html1536"
   HREF="node102.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1538"
+<A NAME="tex2html1544"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1541"
-  HREF="node104.html">psb_abort   Abort</A>
-<B> Up:</B> <A NAME="tex2html1537"
-  HREF="node96.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1531"
-  HREF="node102.html">psb_wtime   Wall</A>
- &nbsp; <B>  <A NAME="tex2html1539"
+<B> Next:</B> <A NAME="tex2html1547"
+  HREF="node104.html">psb_wtime   Wall</A>
+<B> Up:</B> <A NAME="tex2html1543"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1537"
+  HREF="node102.html">psb_get_mpicomm   Get</A>
+ &nbsp; <B>  <A NAME="tex2html1545"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00087000000000000000">
-psb_barrier -- Sinchronization point  parallel
-  environment</A>
+<H2><A NAME="SECTION00085000000000000000">
+psb_get_rank -- Get the MPI rank</A>
 </H2>
 
 <P>
 <PRE>
-call psb_barrier(icontxt)
+call psb_get_rank(rank, icontxt, id)
 </PRE>
 
 <P>
-This subroutine acts as an explicit synchronization point for  the  PSBLAS
-parallel virtual  machine. 
+This subroutine returns the MPI rank of the  PSBLAS process <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img129.png"
+ ALT="$id$">
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -83,6 +84,41 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
+<DT><STRONG>id</STRONG></DT>
+<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value. <!-- MATH
+ $0 \le id \le np-1$
+ -->
+<IMG
+ WIDTH="113" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img130.png"
+ ALT="$0 \le id \le np-1$"> </DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>rank</STRONG></DT>
+<DD>The MPI rank associated with the  PSBLAS process <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img129.png"
+ ALT="$id$">.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
 
 <P>

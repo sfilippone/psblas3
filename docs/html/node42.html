@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Vector Methods</TITLE>
-<META NAME="description" CONTENT="Vector Methods">
+<TITLE>Dense Vector Data Structure</TITLE>
+<META NAME="description" CONTENT="Dense Vector Data Structure">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,9 +18,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node43.html">
-<LINK REL="previous" HREF="node41.html">
-<LINK REL="up" HREF="node41.html">
+<LINK REL="next" HREF="node49.html">
+<LINK REL="previous" HREF="node22.html">
+<LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node43.html">
 </HEAD>
 
@@ -30,7 +30,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   HREF="node43.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
 <A NAME="tex2html754"
-  HREF="node41.html">
+  HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
 <A NAME="tex2html748"
   HREF="node41.html">
@@ -40,21 +40,128 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
 <B> Next:</B> <A NAME="tex2html759"
-  HREF="node43.html">get_nrows   Get</A>
+  HREF="node43.html">Vector Methods</A>
 <B> Up:</B> <A NAME="tex2html755"
-  HREF="node41.html">Dense Vector Data Structure</A>
+  HREF="node9.html">Data Structures and Classes</A>
 <B> Previous:</B> <A NAME="tex2html749"
-  HREF="node41.html">Dense Vector Data Structure</A>
+  HREF="node41.html">Named Constants</A>
  &nbsp; <B>  <A NAME="tex2html757"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043100000000000000">
-Vector Methods</A>
-</H3>
+<H2><A NAME="SECTION00043000000000000000"></A>
+<A NAME="sec:vecttype"></A>
+<BR>
+Dense Vector Data Structure
+</H2>
+The vdata<TT>psb_T_vect_type</TT> data structure
+encapsulates the dense vectors in a way similar to sparse matrices,
+i.e. including a base type vbasedata<TT>    psb_T_base_vect_type</TT>.  
+The user will not, in general, access the vector components directly,
+but rather via the routines of sec.&nbsp;<A HREF="node70.html#sec:toolsrout">6</A>. Among other
+simple things, we define here an extraction method that can be used to
+get a full copy of the part of the vector stored on the local
+process. 
+
+<P>
+The type declaration is shown in
+figure&nbsp;<A HREF="#fig:vectype">5</A> where <code>T</code> is a placeholder for the
+data type and precision variants 
+<DL>
+<DT><STRONG>I</STRONG></DT>
+<DD>Integer;
+</DD>
+<DT><STRONG>S</STRONG></DT>
+<DD>Single precision real;
+</DD>
+<DT><STRONG>D</STRONG></DT>
+<DD>Double precision real;
+</DD>
+<DT><STRONG>C</STRONG></DT>
+<DD>Single precision complex;
+</DD>
+<DT><STRONG>Z</STRONG></DT>
+<DD>Double precision complex.
+</DD>
+</DL>
+The actual data is contained in the polymorphic component <code>v%v</code>; 
+the separation between the application and the actual data is
+essential for cases where it is necessary to link to data storage made
+available elsewhere outside the direct control of the
+compiler/application, e.g. data stored in a graphics  accelerator's
+private memory. 
+
+<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="918"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
+    The PSBLAS defined data type that
+    contains a dense vector.</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+</DIV><TABLE  WIDTH="85%">
+<TR><TD>
+<PRE>
+  type psb_T_base_vect_type
+    TYPE(KIND_), allocatable :: v(:)
+  end type psb_T_base_vect_type
+
+  type psb_T_vect_type
+    class(psb_T_base_vect_type), allocatable :: v 
+  end type  psb_T_vect_type
+</PRE></TD></TR>
+</TABLE>
+<DIV ALIGN="CENTER">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
 <BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html760"
+  HREF="node43.html">Vector Methods</A>
+<LI><A NAME="tex2html761"
+  HREF="node44.html">get_nrows -- Get number of  rows in a dense vector</A>
+<LI><A NAME="tex2html762"
+  HREF="node45.html">sizeof  -- Get memory occupation in bytes
+of  a dense vector</A>
+<LI><A NAME="tex2html763"
+  HREF="node46.html">set  -- Set contents of the vector</A>
+<LI><A NAME="tex2html764"
+  HREF="node47.html">get_vect  -- Get a copy of the vector contents</A>
+<LI><A NAME="tex2html765"
+  HREF="node48.html">clone -- Clone current object</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html758"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html754"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html748"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html756"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html759"
+  HREF="node43.html">Vector Methods</A>
+<B> Up:</B> <A NAME="tex2html755"
+  HREF="node9.html">Data Structures and Classes</A>
+<B> Previous:</B> <A NAME="tex2html749"
+  HREF="node41.html">Named Constants</A>
+ &nbsp; <B>  <A NAME="tex2html757"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

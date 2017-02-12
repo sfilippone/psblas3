@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_wtime -- Wall clock timing</TITLE>
-<META NAME="description" CONTENT="psb_wtime -- Wall clock timing">
+<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
+<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,61 +20,83 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node103.html">
 <LINK REL="previous" HREF="node101.html">
-<LINK REL="up" HREF="node96.html">
+<LINK REL="up" HREF="node98.html">
 <LINK REL="next" HREF="node103.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1528"
+<A NAME="tex2html1534"
   HREF="node103.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1524"
-  HREF="node96.html">
+<A NAME="tex2html1530"
+  HREF="node98.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1518"
+<A NAME="tex2html1524"
   HREF="node101.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1526"
+<A NAME="tex2html1532"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1529"
-  HREF="node103.html">psb_barrier   Sinchronization</A>
-<B> Up:</B> <A NAME="tex2html1525"
-  HREF="node96.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1519"
-  HREF="node101.html">psb_get_rank   Get</A>
- &nbsp; <B>  <A NAME="tex2html1527"
+<B> Next:</B> <A NAME="tex2html1535"
+  HREF="node103.html">psb_get_rank   Get</A>
+<B> Up:</B> <A NAME="tex2html1531"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1525"
+  HREF="node101.html">psb_exit   Exit</A>
+ &nbsp; <B>  <A NAME="tex2html1533"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00086000000000000000">
-psb_wtime -- Wall clock timing</A>
+<H2><A NAME="SECTION00084000000000000000">
+psb_get_mpicomm -- Get the MPI communicator</A>
 </H2>
 
 <P>
 <PRE>
-time = psb_wtime()
+call psb_get_mpicomm(icontxt, icomm)
 </PRE>
 
 <P>
-This function returns a wall clock timer. The resolution of the timer
-is dependent on the underlying parallel environment implementation.
+This subroutine returns the MPI communicator associated with a PSBLAS context
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Exit </B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>the elapsed time in seconds.
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Returned  as: a  <code>real(psb_dpk_)</code>  variable.
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
 </DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icomm</STRONG></DT>
+<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
 </DL>
 
 <P>

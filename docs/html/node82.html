@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
+<TITLE>psb_geall -- Allocates a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geall -- Allocates a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node83.html">
 <LINK REL="previous" HREF="node81.html">
-<LINK REL="up" HREF="node68.html">
+<LINK REL="up" HREF="node70.html">
 <LINK REL="next" HREF="node83.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1274"
+<A NAME="tex2html1280"
   HREF="node83.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1270"
-  HREF="node68.html">
+<A NAME="tex2html1276"
+  HREF="node70.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1264"
+<A NAME="tex2html1270"
   HREF="node81.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1272"
+<A NAME="tex2html1278"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1275"
-  HREF="node83.html">psb_gefree   Frees</A>
-<B> Up:</B> <A NAME="tex2html1271"
-  HREF="node68.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1265"
-  HREF="node81.html">psb_geins   Dense</A>
- &nbsp; <B>  <A NAME="tex2html1273"
+<B> Next:</B> <A NAME="tex2html1281"
+  HREF="node83.html">psb_geins   Dense</A>
+<B> Up:</B> <A NAME="tex2html1277"
+  HREF="node70.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1271"
+  HREF="node81.html">psb_sprn   Reinit</A>
+ &nbsp; <B>  <A NAME="tex2html1279"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000714000000000000000">
-psb_geasb -- Assembly a dense matrix</A>
+<H2><A NAME="SECTION000712000000000000000">
+psb_geall -- Allocates a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_geasb(x, desc_a, info, mold)
+call psb_geall(x, desc_a, info, n, lb)
 </PRE>
 
 <P>
@@ -79,20 +79,41 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
-<DT><STRONG>mold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
+<DT><STRONG>n</STRONG></DT>
+<DD>The number of columns of the dense matrix to be allocated.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B> 
 <BR>
-Type: <B>optional</B>.
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
-only allowed when <IMG
+Specified as: Integer scalar, default <IMG
+ WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img107.png"
+ ALT="$1$">. It is not a valid argument  if <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is of type vdata<TT>psb_T_vect_type</TT>.
+ ALT="$x$"> is a
+rank-1 array. 
+</DD>
+<DT><STRONG>lb</STRONG></DT>
+<DD>The lower bound for the column index range of the dense matrix to be allocated.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: Integer scalar, default <IMG
+ WIDTH="12" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img107.png"
+ ALT="$1$">. It is not a valid argument if <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is a
+rank-1 array. 
 </DD>
 </DL>
 
@@ -102,16 +123,16 @@ only allowed when <IMG
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to be assembled.
+<DD>The dense matrix to be allocated.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>out</B>.
 <BR>
-Specified as: a rank one or two array with the ALLOCATABLE or an
-object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+Specified as: a rank one or two array with the ALLOCATABLE  attribute
+or an object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
 <BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -125,7 +146,32 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-<BR><HR>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1280"
+  HREF="node83.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1276"
+  HREF="node70.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1270"
+  HREF="node81.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1278"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1281"
+  HREF="node83.html">psb_geins   Dense</A>
+<B> Up:</B> <A NAME="tex2html1277"
+  HREF="node70.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1271"
+  HREF="node81.html">psb_sprn   Reinit</A>
+ &nbsp; <B>  <A NAME="tex2html1279"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

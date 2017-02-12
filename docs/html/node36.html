@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>tril -- Return the lower triangle</TITLE>
-<META NAME="description" CONTENT="tril -- Return the lower triangle">
+<TITLE>clip_diag -- Cut out main diagonal</TITLE>
+<META NAME="description" CONTENT="clip_diag -- Cut out main diagonal">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,44 +26,41 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html683"
+<A NAME="tex2html688"
   HREF="node37.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html679"
+<A NAME="tex2html684"
   HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html673"
+<A NAME="tex2html678"
   HREF="node35.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html681"
+<A NAME="tex2html686"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html684"
-  HREF="node37.html">triu   Return</A>
-<B> Up:</B> <A NAME="tex2html680"
+<B> Next:</B> <A NAME="tex2html689"
+  HREF="node37.html">tril   Return</A>
+<B> Up:</B> <A NAME="tex2html685"
   HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html674"
-  HREF="node35.html">clip_diag   Cut</A>
- &nbsp; <B>  <A NAME="tex2html682"
+<B> Previous:</B> <A NAME="tex2html679"
+  HREF="node35.html">get_diag   Get</A>
+ &nbsp; <B>  <A NAME="tex2html687"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000421400000000000000">
-tril -- Return the lower triangle</A>
+clip_diag -- Cut out main diagonal</A>
 </H3>
 
 <PRE>
-    call a%tril(b,info[,&amp;
-       &amp; diag,imin,imax,jmin,jmax,rscale,cscale])
+    call a%clip_diag(b,info)
 </PRE>
 
 <P>
-Returns the lower triangular part of submatrix
-<code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
-the range <code>1:imax-imin+1,1:jmax-jmin+1</code>.   
+Returns a copy of <code>a</code> without the main diagonal.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -78,27 +75,13 @@ A variable of type <code>psb_Tspmat_type</code>.
 <BR>
 Scope: <B>local</B>.
 <BR></DD>
-<DT><STRONG>diag</STRONG></DT>
-<DD>Include diagonals up to this one; <code>diag=1</code> means the
-  first superdiagonal, <code>diag=-1</code> means the first subdiagonal. 
-Default 0.
-</DD>
-<DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
-<DD>Minimum and maximum row and column indices.
-<BR>
-Type: optional.
-</DD>
-<DT><STRONG>rscale,cscale</STRONG></DT>
-<DD>Whether to rescale row/column indices.
-Type: optional.
-</DD>
 </DL>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>b</STRONG></DT>
-<DD>A copy  of a subtriangle of <code>a</code>.
+<DD>A copy  of  <code>a</code> without the main diagonal.
 <BR>
 A variable of type <code>psb_Tspmat_type</code>.
 </DD>

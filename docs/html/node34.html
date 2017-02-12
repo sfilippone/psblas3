@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>get_diag -- Get main diagonal</TITLE>
-<META NAME="description" CONTENT="get_diag -- Get main diagonal">
+<TITLE>clean_zeros -- Eliminate zero coefficients</TITLE>
+<META NAME="description" CONTENT="clean_zeros -- Eliminate zero coefficients">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -26,41 +26,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html659"
+<A NAME="tex2html664"
   HREF="node35.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html655"
+<A NAME="tex2html660"
   HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html649"
+<A NAME="tex2html654"
   HREF="node33.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html657"
+<A NAME="tex2html662"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html660"
-  HREF="node35.html">clip_diag   Cut</A>
-<B> Up:</B> <A NAME="tex2html656"
+<B> Next:</B> <A NAME="tex2html665"
+  HREF="node35.html">get_diag   Get</A>
+<B> Up:</B> <A NAME="tex2html661"
   HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html650"
+<B> Previous:</B> <A NAME="tex2html655"
   HREF="node33.html">csclip   Reduce</A>
- &nbsp; <B>  <A NAME="tex2html658"
+ &nbsp; <B>  <A NAME="tex2html663"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000421200000000000000">
-get_diag -- Get main diagonal</A>
+clean_zeros -- Eliminate zero coefficients</A>
 </H3>
 
 <PRE>
-    call a%get_diag(d,info)
+    call a%clean_zeros(info)
 </PRE>
 
 <P>
-Returns a copy of  the main diagonal.
+Eliminates zero coefficients in the input matrix. Note that depending
+on the internal storage format, there may still be some amount of
+zero padding in the output.
+
+<P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -80,10 +84,10 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>d</STRONG></DT>
-<DD>A copy  of the main diagonal.
+<DT><STRONG>a</STRONG></DT>
+<DD>The matrix  <code>a</code> without zero coefficients.
 <BR>
-A one-dimensional array of the appropriate type.
+A variable of type <code>psb_Tspmat_type</code>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Return code. 

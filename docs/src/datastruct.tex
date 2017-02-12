@@ -755,6 +755,30 @@ A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
 
+\subsubsection*{clean\_zeros --- Eliminate zero coefficients}
+\addcontentsline{toc}{paragraph}{clean\_zeros}
+\begin{verbatim}
+    call a%clean_zeros(info)
+\end{verbatim}
+
+Eliminates zero coefficients in the input matrix. Note that depending
+on the internal storage format, there may still be some amount of
+zero padding in the output.
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] the sparse matrix.\\
+A variable of type \verb|psb_Tspmat_type|.\\
+Scope: {\bf local}.\\
+\end{description}
+\begin{description}
+\item[\bf On Return]
+\item[a] The matrix  \verb|a| without zero coefficients.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[info] Return code. 
+\end{description}
+
 \subsubsection*{get\_diag --- Get main diagonal}
 \addcontentsline{toc}{paragraph}{get\_diag}
 \begin{verbatim}
@@ -1027,6 +1051,44 @@ Scope: {\bf local}\\
 \item[Function value] The memory occupation in bytes.
 \end{description}
 
+
+\subsubsection*{set  --- Set contents of the vector}
+\addcontentsline{toc}{paragraph}{set }
+
+\begin{verbatim}
+ call  v%set(alpha[,first,last])
+ call  v%set(vect[,first,last])
+ call  v%zero()
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[v] the dense vector\\
+Scope: {\bf local}\\
+% Type: {\bf required}\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \spdata.
+\item[alpha] A scalar value. \\ Scope: {\bf local} \\ Type: {\bf
+required} \\ Intent: {\bf in}.\\ Specified as: a number of the data
+type indicated in Table~\ref{tab:f90axpby}.
+
+\item[first,last] Boundaries for setting in the vector.\\ Scope: {\bf
+    local} \\ Type: {\bf optional} \\ Intent: {\bf in}.\\ Specified
+  as: integers.
+\item[vect] An  array \\ Scope: {\bf local} \\ Type: {\bf
+required} \\ Intent: {\bf in}.\\ Specified as: a number of the data
+type indicated in Table~\ref{tab:f90axpby}.
+\end{description}
+Note that a call to \verb|v%zero()| is provided as a shorthand, but
+is equivalent to a call to \verb|v%set(zero)| with  the \verb|zero|
+constant having the appropriate type and kind.
+
+\begin{description}
+\item[\bf On Return]
+\item[v] the dense vector, with updated entries\\
+Scope: {\bf local}\\
+\end{description}
 
 \subsubsection*{get\_vect  --- Get a copy of the vector contents}
 \addcontentsline{toc}{paragraph}{get\_vect }

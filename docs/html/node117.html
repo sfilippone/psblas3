@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
+<TITLE>hb_read -- Read a sparse matrix from a file in the Harwell-Boeing format</TITLE>
+<META NAME="description" CONTENT="hb_read -- Read a sparse matrix from a file in the Harwell-Boeing format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,49 +20,49 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node118.html">
 <LINK REL="previous" HREF="node116.html">
-<LINK REL="up" HREF="node114.html">
+<LINK REL="up" HREF="node116.html">
 <LINK REL="next" HREF="node118.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1712"
+<A NAME="tex2html1718"
   HREF="node118.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1708"
-  HREF="node114.html">
+<A NAME="tex2html1714"
+  HREF="node116.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1702"
+<A NAME="tex2html1708"
   HREF="node116.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1710"
+<A NAME="tex2html1716"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1713"
-  HREF="node118.html">mm_array_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1709"
-  HREF="node114.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1703"
-  HREF="node116.html">hb_write   Write</A>
- &nbsp; <B>  <A NAME="tex2html1711"
+<B> Next:</B> <A NAME="tex2html1719"
+  HREF="node118.html">hb_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1715"
+  HREF="node116.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1709"
+  HREF="node116.html">Utilities</A>
+ &nbsp; <B>  <A NAME="tex2html1717"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000103000000000000000">
-mm_mat_read -- Read a sparse matrix from a
-  file in the MatrixMarket format</A>
+<H2><A NAME="SECTION000101000000000000000">
+ hb_read -- Read a sparse matrix from a file in the
+  Harwell-Boeing format</A>
 </H2>
 
 <P>
 <BR>
 <IMG
- WIDTH="395" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img150.png"
+ WIDTH="462" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img148.png"
  ALT="\begin{lstlisting}
-call mm_mat_read(a, iret, iunit, filename)
+call hb_read(a, iret, iunit, filename, b, mtitle)
 \end{lstlisting}">
 <BR>
 
@@ -104,6 +104,24 @@ Type:<B>required</B>.
 <BR>
 Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
 </DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>Optional</B> 
+<BR>
+An  array of type real or complex, rank 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
+</DD>
+<DT><STRONG>mtitle</STRONG></DT>
+<DD>Matrix title.
+<BR>
+Type: <B>Optional</B> 
+<BR>
+A charachter variable of length 72 holding a copy of the
+matrix title as specified by the Harwell-Boeing format and contained
+in the input file.
+</DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -114,7 +132,30 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<BR><HR>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1718"
+  HREF="node118.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1714"
+  HREF="node116.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1708"
+  HREF="node116.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1716"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1719"
+  HREF="node118.html">hb_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1715"
+  HREF="node116.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1709"
+  HREF="node116.html">Utilities</A>
+ &nbsp; <B>  <A NAME="tex2html1717"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

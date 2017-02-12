@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
-<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
+<TITLE>Data management routines</TITLE>
+<META NAME="description" CONTENT="Data management routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,244 +18,119 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node71.html">
-<LINK REL="previous" HREF="node69.html">
-<LINK REL="up" HREF="node68.html">
+<LINK REL="next" HREF="node98.html">
+<LINK REL="previous" HREF="node65.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node71.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1130"
+<A NAME="tex2html1109"
   HREF="node71.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1126"
-  HREF="node68.html">
+<A NAME="tex2html1105"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1120"
+<A NAME="tex2html1099"
   HREF="node69.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1128"
+<A NAME="tex2html1107"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1131"
-  HREF="node71.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html1127"
-  HREF="node68.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1121"
-  HREF="node69.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1129"
+<B> Next:</B> <A NAME="tex2html1110"
+  HREF="node71.html">psb_cdall   Allocates</A>
+<B> Up:</B> <A NAME="tex2html1106"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1100"
+  HREF="node69.html">psb_scatter   Scatter</A>
+ &nbsp; <B>  <A NAME="tex2html1108"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00072000000000000000">
-psb_cdins -- Communication descriptor insert
+<H1><A NAME="SECTION00070000000000000000"></A>
+<A NAME="sec:toolsrout"></A>
+<BR>
+Data management routines
+</H1>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1111"
+  HREF="node71.html">psb_cdall -- Allocates a communication descriptor</A>
+<LI><A NAME="tex2html1112"
+  HREF="node72.html">psb_cdins -- Communication descriptor insert
   routine</A>
-</H2>
-
-<P>
-<PRE>
-call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
-call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
-</PRE>
-
-<P>
-This subroutine examines the edges of the graph associated with the
-discretization mesh (and isomorphic to the sparsity pattern of a
-linear system coefficient matrix), storing them as necessary into the
-communication descriptor. In the first form the edges are specified as
-pairs of indices <IMG
- WIDTH="76" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img98.png"
- ALT="$ia(i),ja(i)$">; the starting index <IMG
- WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img99.png"
- ALT="$ia(i)$"> should
-belong to the current process. 
-In the second form only the remote indices <IMG
- WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img100.png"
- ALT="$ja(i)$"> are specified. 
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>nz</STRONG></DT>
-<DD>the number of points being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value.
-</DD>
-<DT><STRONG>ia</STRONG></DT>
-<DD>the indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>ja</STRONG></DT>
-<DD>the indices of the end vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>mask</STRONG></DT>
-<DD>Mask entries in <code>ja</code>, they are inserted only when the
-  corresponding <code>mask</code> entries are <code>.true.</code>
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a logical  array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">, default <code>.true.</code>.
-</DD>
-<DT><STRONG>lidx</STRONG></DT>
-<DD>User defined local indices for <code>ja</code>.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the updated communication descriptor.
-<BR>
-Scope:<B>local</B>.
-<BR>
-Type:<B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
-<DT><STRONG>ila</STRONG></DT>
-<DD>the local indices of the starting vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-</DD>
-<DT><STRONG>jla</STRONG></DT>
-<DD>the local indices of the end vertex of the edges  being inserted.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>out</B>.
-<BR>
-Specified as: an integer array of length <IMG
- WIDTH="22" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img101.png"
- ALT="$nz$">.
-
-<P>
-</DD>
-</DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>This routine may only be called if the descriptor is in the
-  build state;
-</LI>
-<LI>This routine automatically ignores edges that do not
-insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process.
-</LI>
-<LI>The second form of this routine will be useful when dealing with
-  user-specified index mappings; see also&nbsp;<A HREF="node7.html#sec:usermaps">2.3.1</A>.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1130"
-  HREF="node71.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1126"
-  HREF="node68.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1120"
-  HREF="node69.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1128"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1131"
-  HREF="node71.html">psb_cdasb   Communication</A>
-<B> Up:</B> <A NAME="tex2html1127"
-  HREF="node68.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1121"
-  HREF="node69.html">psb_cdall   Allocates</A>
- &nbsp; <B>  <A NAME="tex2html1129"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<LI><A NAME="tex2html1113"
+  HREF="node73.html">psb_cdasb -- Communication descriptor assembly
+  routine</A>
+<LI><A NAME="tex2html1114"
+  HREF="node74.html">psb_cdcpy -- Copies a communication descriptor</A>
+<LI><A NAME="tex2html1115"
+  HREF="node75.html">psb_cdfree -- Frees a communication descriptor</A>
+<LI><A NAME="tex2html1116"
+  HREF="node76.html">psb_cdbldext -- Build an extended  communication
+  descriptor</A>
+<LI><A NAME="tex2html1117"
+  HREF="node77.html">psb_spall -- Allocates a sparse matrix</A>
+<LI><A NAME="tex2html1118"
+  HREF="node78.html">psb_spins -- Insert a cloud of elements into a sparse
+  matrix</A>
+<LI><A NAME="tex2html1119"
+  HREF="node79.html">psb_spasb -- Sparse matrix assembly routine</A>
+<LI><A NAME="tex2html1120"
+  HREF="node80.html">psb_spfree -- Frees a sparse matrix</A>
+<LI><A NAME="tex2html1121"
+  HREF="node81.html">psb_sprn -- Reinit sparse matrix structure for psblas
+  routines.</A>
+<LI><A NAME="tex2html1122"
+  HREF="node82.html">psb_geall -- Allocates a dense matrix</A>
+<LI><A NAME="tex2html1123"
+  HREF="node83.html">psb_geins -- Dense matrix insertion routine</A>
+<LI><A NAME="tex2html1124"
+  HREF="node84.html">psb_geasb -- Assembly a dense matrix</A>
+<LI><A NAME="tex2html1125"
+  HREF="node85.html">psb_gefree -- Frees a dense matrix</A>
+<LI><A NAME="tex2html1126"
+  HREF="node86.html">psb_gelp -- Applies a left permutation to a dense
+  matrix</A>
+<LI><A NAME="tex2html1127"
+  HREF="node87.html">psb_glob_to_loc -- Global to local indices
+  convertion</A>
+<LI><A NAME="tex2html1128"
+  HREF="node88.html">psb_loc_to_glob -- Local to global indices
+  conversion</A>
+<LI><A NAME="tex2html1129"
+  HREF="node89.html">psb_is_owned  -- </A>
+<LI><A NAME="tex2html1130"
+  HREF="node90.html">psb_owned_index  -- </A>
+<LI><A NAME="tex2html1131"
+  HREF="node91.html">psb_is_local  -- </A>
+<LI><A NAME="tex2html1132"
+  HREF="node92.html">psb_local_index  -- </A>
+<LI><A NAME="tex2html1133"
+  HREF="node93.html">psb_get_boundary -- Extract list of boundary
+  elements</A>
+<LI><A NAME="tex2html1134"
+  HREF="node94.html">psb_get_overlap -- Extract list of overlap
+  elements</A>
+<LI><A NAME="tex2html1135"
+  HREF="node95.html">psb_sp_getrow -- Extract row(s) from a sparse
+  matrix</A>
+<LI><A NAME="tex2html1136"
+  HREF="node96.html">psb_sizeof -- Memory occupation</A>
+<LI><A NAME="tex2html1137"
+  HREF="node97.html">Sorting utilities -- </A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
 
 </BODY>
 </HTML>

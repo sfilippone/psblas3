@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
-<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
+<TITLE>psb_is_local -- </TITLE>
+<META NAME="description" CONTENT="psb_is_local -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node92.html">
 <LINK REL="previous" HREF="node90.html">
-<LINK REL="up" HREF="node68.html">
+<LINK REL="up" HREF="node70.html">
 <LINK REL="next" HREF="node92.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1382"
+<A NAME="tex2html1388"
   HREF="node92.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1378"
-  HREF="node68.html">
+<A NAME="tex2html1384"
+  HREF="node70.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1372"
+<A NAME="tex2html1378"
   HREF="node90.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1380"
+<A NAME="tex2html1386"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1383"
-  HREF="node92.html">psb_get_overlap   Extract</A>
-<B> Up:</B> <A NAME="tex2html1379"
-  HREF="node68.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1373"
-  HREF="node90.html">psb_local_index</A>
- &nbsp; <B>  <A NAME="tex2html1381"
+<B> Next:</B> <A NAME="tex2html1389"
+  HREF="node92.html">psb_local_index</A>
+<B> Up:</B> <A NAME="tex2html1385"
+  HREF="node70.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1379"
+  HREF="node90.html">psb_owned_index</A>
+ &nbsp; <B>  <A NAME="tex2html1387"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000723000000000000000">
-psb_get_boundary -- Extract list of boundary
-  elements</A>
+<H2><A NAME="SECTION000721000000000000000">
+psb_is_local  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_boundary(bndel, desc, info)
+call psb_is_local(x, desc_a)
 </PRE>
 
 <P>
@@ -69,7 +68,18 @@ call psb_get_boundary(bndel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer index.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a scalar integer.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -87,42 +97,27 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>bndel</STRONG></DT>
-<DD>The list of boundary elements on the calling process, in
-  local numbering.
-<BR>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A logical mask which is true if 
+  <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"> is  local to the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
-<BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
 <BR></DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
 </DL>
 
 <P>
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>If there are no boundary elements (i.e., if the local part of
-  the connectivity graph is self-contained) the output vector is set
-  to the ``not allocated'' state. 
-</LI>
-<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
-  number of boundary elements. 
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is local to the current process, including the halo
+  indices
 </LI>
 </OL>
 

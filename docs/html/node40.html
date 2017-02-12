@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Named Constants</TITLE>
-<META NAME="description" CONTENT="Named Constants">
+<TITLE>clone -- Clone current object</TITLE>
+<META NAME="description" CONTENT="clone -- Clone current object">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,6 +18,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node41.html">
 <LINK REL="previous" HREF="node39.html">
 <LINK REL="up" HREF="node22.html">
 <LINK REL="next" HREF="node41.html">
@@ -25,56 +26,65 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html729"
+<A NAME="tex2html736"
   HREF="node41.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html725"
+<A NAME="tex2html732"
   HREF="node22.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html721"
+<A NAME="tex2html726"
   HREF="node39.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html727"
+<A NAME="tex2html734"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html730"
-  HREF="node41.html">Dense Vector Data Structure</A>
-<B> Up:</B> <A NAME="tex2html726"
+<B> Next:</B> <A NAME="tex2html737"
+  HREF="node41.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html733"
   HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html722"
-  HREF="node39.html">clone   Clone</A>
- &nbsp; <B>  <A NAME="tex2html728"
+<B> Previous:</B> <A NAME="tex2html727"
+  HREF="node39.html">psb_set_mat_default   Set</A>
+ &nbsp; <B>  <A NAME="tex2html735"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421800000000000000"></A>
-<A NAME="sec:sp_constants"></A>
-<BR>
-Named Constants
+<H3><A NAME="SECTION000421800000000000000">
+clone -- Clone current object</A>
 </H3>
+
+<P>
+<PRE>
+call  a%clone(b,info)
+</PRE>
+
+<P>
 <DL>
-<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
-<DD>Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
-<DT><STRONG>psb_dupl_add_</STRONG></DT>
-<DD>Duplicate coefficients should be added;	         
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_dupl_err_</STRONG></DT>
-<DD>Duplicate coefficients should trigger an error conditino
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_upd_dflt_</STRONG></DT>
-<DD>Default update strategy for matrix coefficients;
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy of the input object.
 </DD>
-<DT><STRONG>psb_upd_srch_</STRONG></DT>
-<DD>Update strategy based on search into the data structure;
-</DD>
-<DT><STRONG>psb_upd_perm_</STRONG></DT>
-<DD>Update strategy based on additional
-  permutation data (see tools routine description).
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_sum -- Global sum</TITLE>
-<META NAME="description" CONTENT="psb_sum -- Global sum">
+<TITLE>psb_abort -- Abort a computation</TITLE>
+<META NAME="description" CONTENT="psb_abort -- Abort a computation">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,52 +20,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node107.html">
 <LINK REL="previous" HREF="node105.html">
-<LINK REL="up" HREF="node96.html">
+<LINK REL="up" HREF="node98.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1576"
+<A NAME="tex2html1582"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1572"
-  HREF="node96.html">
+<A NAME="tex2html1578"
+  HREF="node98.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1566"
+<A NAME="tex2html1572"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1574"
+<A NAME="tex2html1580"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1577"
-  HREF="node107.html">psb_max   Global</A>
-<B> Up:</B> <A NAME="tex2html1573"
-  HREF="node96.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1567"
-  HREF="node105.html">psb_bcast   Broadcast</A>
- &nbsp; <B>  <A NAME="tex2html1575"
+<B> Next:</B> <A NAME="tex2html1583"
+  HREF="node107.html">psb_bcast   Broadcast</A>
+<B> Up:</B> <A NAME="tex2html1579"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1573"
+  HREF="node105.html">psb_barrier   Sinchronization</A>
+ &nbsp; <B>  <A NAME="tex2html1581"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000810000000000000000">
-psb_sum -- Global sum</A>
+<H2><A NAME="SECTION00088000000000000000">
+psb_abort -- Abort a computation</A>
 </H2>
 
 <P>
 <PRE>
-call psb_sum(icontxt, dat, root)
+call psb_abort(icontxt)
 </PRE>
 
 <P>
-This subroutine implements a sum reduction  operation based on the
-underlying communication library. 
+This subroutine aborts computation on the parallel virtual machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
@@ -82,98 +81,10 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>The local contribution to the global sum.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
-</DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Process to hold the final sum, or <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
- ALT="$-1$"> to make it available
-  on all processes.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value <!-- MATH
- $-1<= root <= np-1$
- -->
-<IMG
- WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img132.png"
- ALT="$-1&lt;= root &lt;= np-1$">, default -1.  </DD>
 </DL>
 
 <P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>dat</STRONG></DT>
-<DD>On destination process(es), the result of the sum operation.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: an integer, real or complex variable, which may be a
-scalar, or a rank 1 or 2 array. 
-<BR>
-Type, kind, rank and size must agree on all processes.
-</DD>
-</DL>
-
-<P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-
-<OL>
-<LI>The <code>dat</code> argument is both input and output, and its
-  value may be changed even on processes different from the final
-  result destination.
-</LI>
-<LI>The <code>dat</code> argument may also be a long integer scalar.
-</LI>
-</OL>
-
-<P>
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html1576"
-  HREF="node107.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1572"
-  HREF="node96.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1566"
-  HREF="node105.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1574"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html1577"
-  HREF="node107.html">psb_max   Global</A>
-<B> Up:</B> <A NAME="tex2html1573"
-  HREF="node96.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1567"
-  HREF="node105.html">psb_bcast   Broadcast</A>
- &nbsp; <B>  <A NAME="tex2html1575"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
+<BR><HR>
 
 </BODY>
 </HTML>

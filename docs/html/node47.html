@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Preconditioner data structure</TITLE>
-<META NAME="description" CONTENT="Preconditioner data structure">
+<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
+<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,71 +19,72 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node48.html">
-<LINK REL="previous" HREF="node41.html">
-<LINK REL="up" HREF="node9.html">
+<LINK REL="previous" HREF="node46.html">
+<LINK REL="up" HREF="node42.html">
 <LINK REL="next" HREF="node48.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html816"
+<A NAME="tex2html824"
   HREF="node48.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html812"
-  HREF="node9.html">
+<A NAME="tex2html820"
+  HREF="node42.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html806"
+<A NAME="tex2html814"
   HREF="node46.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html814"
+<A NAME="tex2html822"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html817"
-  HREF="node48.html">Heap data structure</A>
-<B> Up:</B> <A NAME="tex2html813"
-  HREF="node9.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html807"
-  HREF="node46.html">clone   Clone</A>
- &nbsp; <B>  <A NAME="tex2html815"
+<B> Next:</B> <A NAME="tex2html825"
+  HREF="node48.html">clone   Clone</A>
+<B> Up:</B> <A NAME="tex2html821"
+  HREF="node42.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html815"
+  HREF="node46.html">set   Set</A>
+ &nbsp; <B>  <A NAME="tex2html823"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00044000000000000000"></A>
-<A NAME="sec:prec"></A>
-<BR>
-Preconditioner data structure
-</H2>
-Our base library  offers support for  simple well known preconditioners
-like Diagonal Scaling or Block Jacobi with incomplete
-factorization ILU(0). 
+<H3><A NAME="SECTION00043500000000000000">
+get_vect  -- Get a copy of the vector contents</A>
+</H3>
 
 <P>
-A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
-figure&nbsp;<A HREF="#fig:prectype">6</A>. The <code>psb_prec_type</code> 
-data type may contain a simple preconditioning matrix with the
-associated communication descriptor.The internal preconditioner is allocated appropriately with the
-dynamic type corresponding to the desired preconditioner. 
-
-<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="886"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
-The PSBLAS defined data type that contains a preconditioner.</CAPTION>
-<TR><TD><FONT SIZE="-1">  
-</FONT>
-<DIV ALIGN="CENTER"></DIV><TABLE  WIDTH="90%">
-<TR><TD>
 <PRE>
-  type psb_Tprec_type
-    class(psb_T_base_prec_type), allocatable :: prec
-  end type psb_Tprec_type
-</PRE></TD></TR>
-</TABLE>
-<DIV ALIGN="CENTER"></DIV></TD></TR>
-</TABLE>
-</DIV>
+extv = v%get_vect()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>v</STRONG></DT>
+<DD>the dense vector
+<BR>
+Scope: <B>local</B>
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>An allocatable array holding a copy of the dense
+  vector contents.
+</DD>
+</DL>
 
 <P>
 <BR><HR>

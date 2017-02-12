@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>mm_array_write -- Write a dense array from a file in the MatrixMarket format</TITLE>
-<META NAME="description" CONTENT="mm_array_write -- Write a dense array from a file in the MatrixMarket format">
+<TITLE>mm_array_read -- Read a dense array from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_array_read -- Read a dense array from a file in the MatrixMarket format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,50 +18,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node121.html">
 <LINK REL="previous" HREF="node119.html">
-<LINK REL="up" HREF="node114.html">
+<LINK REL="up" HREF="node116.html">
 <LINK REL="next" HREF="node121.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1746"
+<A NAME="tex2html1754"
   HREF="node121.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1742"
-  HREF="node114.html">
+<A NAME="tex2html1750"
+  HREF="node116.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1738"
+<A NAME="tex2html1744"
   HREF="node119.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1744"
+<A NAME="tex2html1752"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1747"
-  HREF="node121.html">Preconditioner routines</A>
-<B> Up:</B> <A NAME="tex2html1743"
-  HREF="node114.html">Utilities</A>
-<B> Previous:</B> <A NAME="tex2html1739"
-  HREF="node119.html">mm_mat_write   Write</A>
- &nbsp; <B>  <A NAME="tex2html1745"
+<B> Next:</B> <A NAME="tex2html1755"
+  HREF="node121.html">mm_mat_write   Write</A>
+<B> Up:</B> <A NAME="tex2html1751"
+  HREF="node116.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1745"
+  HREF="node119.html">mm_mat_read   Read</A>
+ &nbsp; <B>  <A NAME="tex2html1753"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000106000000000000000">
-mm_array_write --  Write a dense array from a
+<H2><A NAME="SECTION000104000000000000000">
+mm_array_read -- Read a dense array from a
   file in the MatrixMarket format</A>
 </H2>
 
 <P>
 <BR>
 <IMG
- WIDTH="424" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img153.png"
+ WIDTH="415" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img151.png"
  ALT="\begin{lstlisting}
-call mm_array_write(b, iret, iunit, filename)
+call mm_array_read(b, iret, iunit, filename)
 \end{lstlisting}">
 <BR>
 
@@ -73,14 +74,8 @@ call mm_array_write(b, iret, iunit, filename)
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>Rigth hand side(s).
-<BR>
-Type: <B>required</B> 
-<BR>
-An  array of type real or complex, rank 1 or 2; will be written.. </DD>
 <DT><STRONG>filename</STRONG></DT>
-<DD>The name of the file to be written.
+<DD>The name of the file to be read.
 <BR>
 Type:<B>optional</B>.
 <BR>
@@ -101,6 +96,15 @@ Specified as: an integer value. Only meaningful if filename is not <code>-</code
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>Rigth hand side(s).
+<BR>
+Type: <B>required</B> 
+<BR>
+An  array of type real or complex, rank 1 or 2 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side, otherwise will be left in the UNALLOCATED state. 
 </DD>
 <DT><STRONG>iret</STRONG></DT>
 <DD>Error code.

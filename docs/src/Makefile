@@ -158,7 +158,7 @@ TEXLNFIL = $(addprefix $(PWD)/,$(TEXFILES))
 
 #============================================================================
 
-all: pdf
+all: pdf html
 	
 pdf: $(PDF) copypdf
 html: $(HTML)
