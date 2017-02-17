@@ -1,12 +1,14 @@
 include Make.inc
 
-all: libd based precd kryld utild
+all: libd based precd kryld utild cbindd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
 based: libd
 precd utild: based
 kryld: precd based
+
+cbindd: precd kryld utild 
 
 libd:
 	(if test ! -d lib ; then mkdir lib; fi)
@@ -19,6 +21,8 @@ kryld:
 	cd krylov && $(MAKE) lib
 utild:
 	cd util&& $(MAKE) lib 
+cbindd:
+	cd cbind&& $(MAKE) lib 
 
 install: all
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) &&\
@@ -38,6 +42,7 @@ clean:
 	cd prec && $(MAKE) clean 
 	cd krylov && $(MAKE) clean
 	cd util && $(MAKE) clean
+	cd cbind && $(MAKE) clean
 
 check: all
 	make check -C test/serial
@@ -51,6 +56,7 @@ veryclean: cleanlib
 	cd prec && $(MAKE) veryclean 
 	cd krylov && $(MAKE) veryclean
 	cd util && $(MAKE) veryclean
+	cd cbind && $(MAKE) clean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
