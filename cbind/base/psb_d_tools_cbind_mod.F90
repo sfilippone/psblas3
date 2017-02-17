@@ -10,7 +10,7 @@ contains
  function psb_c_dgeall(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: xh
     type(psb_c_object_type) :: cdh
 
@@ -39,7 +39,7 @@ contains
   function psb_c_dgeasb(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: xh
     type(psb_c_object_type) :: cdh
 
@@ -69,7 +69,7 @@ contains
   function psb_c_dgefree(xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: xh
     type(psb_c_object_type) :: cdh
 
@@ -101,9 +101,9 @@ contains
  function psb_c_dgeins(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
-    integer(c_int), value :: nz
-    integer(c_int)        :: irw(*)
+    integer(psb_c_int) :: res   
+    integer(psb_c_int), value :: nz
+    integer(psb_c_int)        :: irw(*)
     real(c_double)        :: val(*)
     type(psb_c_object_type) :: xh
     type(psb_c_object_type) :: cdh
@@ -135,9 +135,9 @@ contains
  function psb_c_dgeins_add(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
-    integer(c_int), value :: nz
-    integer(c_int)        :: irw(*)
+    integer(psb_c_int) :: res   
+    integer(psb_c_int), value :: nz
+    integer(psb_c_int)        :: irw(*)
     real(c_double)        :: val(*)
     type(psb_c_object_type) :: xh
     type(psb_c_object_type) :: cdh
@@ -169,7 +169,7 @@ contains
  function psb_c_dspall(mh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: mh
     type(psb_c_object_type) :: cdh
 
@@ -199,7 +199,7 @@ contains
  function psb_c_dspasb(mh,cdh) bind(c) result(res)
    
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: mh
     type(psb_c_object_type) :: cdh
 
@@ -228,7 +228,7 @@ contains
   function psb_c_dspfree(mh,cdh) bind(c) result(res)
    
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     type(psb_c_object_type) :: mh
     type(psb_c_object_type) :: cdh
 
@@ -263,8 +263,8 @@ contains
     use psb_d_rsb_mat_mod
 #endif
     implicit none 
-    integer(c_int) :: res   
-    integer(c_int), value :: cdh, mh,upd,dupl
+    integer(psb_c_int) :: res   
+    integer(psb_c_int), value :: cdh, mh,upd,dupl
     character(c_char)     :: afmt(*)
     integer               :: info,n, fdupl
     character(len=5)      :: fafmt
@@ -299,9 +299,9 @@ contains
  function psb_c_dspins(nz,irw,icl,val,mh,cdh) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
-    integer(c_int), value :: nz
-    integer(c_int)        :: irw(*), icl(*) 
+    integer(psb_c_int) :: res   
+    integer(psb_c_int), value :: nz
+    integer(psb_c_int)        :: irw(*), icl(*) 
     real(c_double)        :: val(*)
     type(psb_c_object_type) :: mh
     type(psb_c_object_type) :: cdh
@@ -332,7 +332,7 @@ contains
   function psb_c_dsprn(mh,cdh,clear) bind(c) result(res)
 
     implicit none 
-    integer(c_int) :: res   
+    integer(psb_c_int) :: res   
     logical(c_bool), value :: clear
     type(psb_c_object_type) :: mh
     type(psb_c_object_type) :: cdh
@@ -364,8 +364,8 @@ contains
 !!$  function psb_c_dspprint(mh) bind(c) result(res)
 !!$
 !!$    implicit none 
-!!$    integer(c_int) :: res   
-!!$    integer(c_int),  value :: mh
+!!$    integer(psb_c_int) :: res   
+!!$    integer(psb_c_int),  value :: mh
 !!$    integer                :: info
 !!$
 !!$

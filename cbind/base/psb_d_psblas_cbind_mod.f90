@@ -8,7 +8,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int) :: res
+    integer(psb_c_int) :: res
 
     type(psb_c_object_type) :: xh,yh, cdh
     real(c_double), value   :: alpha,beta
@@ -195,7 +195,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int) :: res
+    integer(psb_c_int) :: res
 
     type(psb_c_object_type) :: ah,xh,yh, cdh
     real(c_double), value :: alpha, beta
@@ -238,7 +238,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int) :: res
+    integer(psb_c_int) :: res
 
     type(psb_c_object_type) :: ah,xh,yh, cdh
     real(c_double), value :: alpha, beta

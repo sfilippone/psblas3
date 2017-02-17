@@ -8,7 +8,7 @@ contains
     use psb_base_mod, only : psb_get_errstatus
     implicit none 
     
-    integer(c_int)  :: res
+    integer(psb_c_int)  :: res
     
     res = psb_get_errstatus()
   end function psb_c_get_errstatus
@@ -17,7 +17,7 @@ contains
     use psb_base_mod, only : psb_init
     implicit none 
     
-    integer(c_int)  :: psb_c_init
+    integer(psb_c_int)  :: psb_c_init
     
     integer :: ictxt
 
@@ -27,7 +27,7 @@ contains
   
   subroutine psb_c_exit_ctxt(ictxt) bind(c)
     use psb_base_mod, only : psb_exit
-    integer(c_int), value :: ictxt
+    integer(psb_c_int), value :: ictxt
     
     call psb_exit(ictxt,close=.false.)
     return
@@ -35,7 +35,7 @@ contains
   
   subroutine psb_c_exit(ictxt) bind(c)
     use psb_base_mod, only : psb_exit
-    integer(c_int), value :: ictxt
+    integer(psb_c_int), value :: ictxt
     
     call psb_exit(ictxt)
     return
@@ -43,7 +43,7 @@ contains
   
   subroutine psb_c_abort(ictxt) bind(c)
     use psb_base_mod, only : psb_abort
-    integer(c_int), value :: ictxt
+    integer(psb_c_int), value :: ictxt
     
     call psb_abort(ictxt)
     return
@@ -52,8 +52,8 @@ contains
 
   subroutine psb_c_info(ictxt,iam,np) bind(c)
     use psb_base_mod, only : psb_info
-    integer(c_int), value :: ictxt
-    integer(c_int)        :: iam,np
+    integer(psb_c_int), value :: ictxt
+    integer(psb_c_int)        :: iam,np
     
     call psb_info(ictxt,iam,np)
     return
@@ -61,7 +61,7 @@ contains
   
   subroutine psb_c_barrier(ictxt) bind(c)
     use psb_base_mod, only : psb_barrier
-    integer(c_int), value :: ictxt
+    integer(psb_c_int), value :: ictxt
 
     call psb_barrier(ictxt)
   end subroutine psb_c_barrier
@@ -75,8 +75,8 @@ contains
   subroutine psb_c_ibcast(ictxt,n,v,root) bind(c)
     use psb_base_mod, only : psb_bcast
     implicit none 
-    integer(c_int), value :: ictxt,n, root
-    integer(c_int)        :: v(*) 
+    integer(psb_c_int), value :: ictxt,n, root
+    integer(psb_c_int)        :: v(*) 
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -90,7 +90,7 @@ contains
   subroutine psb_c_dbcast(ictxt,n,v,root) bind(c)
     use psb_base_mod, only : psb_bcast
     implicit none 
-    integer(c_int), value :: ictxt,n, root
+    integer(psb_c_int), value :: ictxt,n, root
     real(c_double)        :: v(*) 
     
     if (n < 0) then 
@@ -105,7 +105,7 @@ contains
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
     use psb_base_mod, only : psb_bcast, psb_info
     implicit none 
-    integer(c_int), value :: ictxt, root
+    integer(psb_c_int), value :: ictxt, root
     character(c_char)     :: v(*) 
     integer :: n, iam, np
     
@@ -127,8 +127,8 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     character(c_char), intent(inout)  :: cmesg(*)
-    integer(c_int), intent(in), value :: len
-    integer(c_int) :: res
+    integer(psb_c_int), intent(in), value :: len
+    integer(psb_c_int) :: res
     character(len=psb_max_errmsg_len_), allocatable :: fmesg(:)
     character(len=psb_max_errmsg_len_) :: tmp
     integer :: i, j, ll, il
