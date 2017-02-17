@@ -12,7 +12,7 @@ contains
     implicit none 
 
     integer(c_int) :: res   
-    type(psb_c_object_type) :: xh
+    type(psb_c_dvector) :: xh
 
     type(psb_d_vect_type), pointer :: vp
     integer               :: info
@@ -31,7 +31,7 @@ contains
 
     integer(c_int)    :: res   
     real(c_double)    :: v(*)
-    type(psb_c_object_type) :: xh
+    type(psb_c_dvector) :: xh
     
     type(psb_d_vect_type), pointer :: vp
     real(psb_dpk_), allocatable :: fv(:)
@@ -53,7 +53,7 @@ contains
     implicit none 
 
     integer(c_int)    :: res   
-    type(psb_c_object_type) :: xh
+    type(psb_c_dvector) :: xh
     
     type(psb_d_vect_type), pointer :: vp
     integer               :: info
@@ -75,7 +75,7 @@ contains
     implicit none 
     integer(c_int) :: res
 
-    type(psb_c_object_type) :: mh
+    type(psb_c_dspmat) :: mh
     type(psb_dspmat_type), pointer :: ap
     integer                 ::  info
 
@@ -98,7 +98,7 @@ contains
     implicit none 
     integer(c_int) :: res
 
-    type(psb_c_object_type) :: mh
+    type(psb_c_dspmat) :: mh
     type(psb_dspmat_type), pointer :: ap
     integer                 ::  info
 
