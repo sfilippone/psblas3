@@ -4,9 +4,24 @@
 extern "C" {
   typedef char _Bool;
 #endif
+
+#include <float.h>
+#include <complex.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
   
-  typedef int psb_err_t;
-  typedef int psb_ctx_t;
+
+#if defined(LONG_INTEGERS_)
+  typedef int64_t psb_i_t;
+#else
+  typedef int32_t psb_i_t;
+#endif
+  typedef float  psb_s_t;
+  typedef double psb_d_t;
+  typedef float  complex psb_c_t;
+  typedef double complex psb_z_t;
 #define PSB_ERR_ERROR  -1
 #define PSB_ERR_SUCCESS 0
   
@@ -17,44 +32,44 @@ extern "C" {
   
   
 
-  int psb_c_error();
-  int psb_c_clean_errstack();
+  psb_i_t psb_c_error();
+  psb_i_t psb_c_clean_errstack();
   void psb_c_print_errmsg();
   char *psb_c_pop_errmsg();
-  int  psb_c_f2c_errmsg(char *, int);
+  psb_i_t  psb_c_f2c_errmsg(char *, psb_i_t);
   void psb_c_seterraction_ret();
   void psb_c_seterraction_print();
   void psb_c_seterraction_abort();
 
   /* Environment routines */ 
-  int    psb_c_init();
-  void   psb_c_exit_ctxt(int ictxt);
-  void   psb_c_exit(int ictxt);
-  void   psb_c_abort(int ictxt);
-  void   psb_c_barrier(int ictxt);
-  void   psb_c_info(int ictxt, int *iam, int *np);
-  double psb_c_wtime();
-  int    psb_c_get_errstatus();
+  psb_i_t psb_c_init();
+  void    psb_c_exit_ctxt(psb_i_t ictxt);
+  void    psb_c_exit(psb_i_t ictxt);
+  void    psb_c_abort(psb_i_t ictxt);
+  void    psb_c_barrier(psb_i_t ictxt);
+  void    psb_c_info(psb_i_t ictxt, psb_i_t *iam, psb_i_t *np);
+  psb_d_t  psb_c_wtime();
+  psb_i_t psb_c_get_errstatus();
 
-  void   psb_c_ibcast(int ictxt, int n, int *v, int root);
-  void   psb_c_dbcast(int ictxt, int n, double *v, int root);
-  void   psb_c_hbcast(int ictxt, const char *v, int root);
+  void   psb_c_ibcast(psb_i_t ictxt, psb_i_t n, psb_i_t *v, psb_i_t root);
+  void   psb_c_dbcast(psb_i_t ictxt, psb_i_t n, psb_d_t *v, psb_i_t root);
+  void   psb_c_hbcast(psb_i_t ictxt, const char *v, psb_i_t root);
   
   /* Descriptor/integer routines */ 
   psb_c_descriptor* psb_c_new_descriptor();
-  int    psb_c_cdall_vg(int ng, int *vg, int ictxt, psb_c_descriptor *cd);
-  int    psb_c_cdall_vl(int nl, int *vl, int ictxt, psb_c_descriptor *cd);
-  int    psb_c_cdall_nl(int nl, int ictxt, psb_c_descriptor *cd);
-  int    psb_c_cdall_repl(int n, int ictxt, psb_c_descriptor *cd);
-  int    psb_c_cdasb(psb_c_descriptor *cd);
-  int    psb_c_cdfree(psb_c_descriptor *cd);
-  int    psb_c_cdins(int nz, const int *ia, const int *ja, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vg(psb_i_t ng, psb_i_t *vg, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_i_t *vl, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_repl(psb_i_t n, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdfree(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdins(psb_i_t nz, const psb_i_t *ia, const psb_i_t *ja, psb_c_descriptor *cd);
   
 
-  int    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
-  int    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
-  int    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
-  int    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
 
 
   /*  legal values for upd argument */ 

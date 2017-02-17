@@ -111,6 +111,14 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
+AC_PROG_CC_C99()
+if test "$ac_cv_prog_cc_c99" == "no" ; then
+	AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+	CDEFINES="$ac_cv_prog_cc_c99 $CDEFINES"
+fi	
+
+ 
 
 ###############################################################################
 #			Suitable MPI compilers detection
@@ -529,6 +537,7 @@ fi
 PAC_ARG_LONG_INTEGERS
 if test x"$pac_cv_long_integers" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
+   CDEFINES="-DLONG_INTEGERS_ $CDEFINES";	
 fi
 
 #

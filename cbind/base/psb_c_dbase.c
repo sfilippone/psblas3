@@ -13,7 +13,7 @@ psb_c_dvector* psb_c_new_dvector()
 double* psb_c_dvect_get_cpy(psb_c_dvector *xh)
 { 
   double *temp=NULL;
-  int vsize=0; 
+  psb_i_t vsize=0; 
   
   if ((vsize=psb_c_dvect_get_nrows(xh))<0) 
     return(temp);

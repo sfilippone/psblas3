@@ -1,10 +1,11 @@
 module psb_cpenv_mod
   use iso_c_binding
-
+  use psb_objhandle_mod
+  
 contains
   
   function psb_c_get_errstatus() bind(c) result(res)
-    use psb_base_mod
+    use psb_base_mod, only : psb_get_errstatus
     implicit none 
     
     integer(c_int)  :: res
@@ -13,7 +14,7 @@ contains
   end function psb_c_get_errstatus
 
   function psb_c_init() bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_init
     implicit none 
     
     integer(c_int)  :: psb_c_init
@@ -25,7 +26,7 @@ contains
   end function psb_c_init
   
   subroutine psb_c_exit_ctxt(ictxt) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_exit
     integer(c_int), value :: ictxt
     
     call psb_exit(ictxt,close=.false.)
@@ -33,7 +34,7 @@ contains
   end subroutine psb_c_exit_ctxt
   
   subroutine psb_c_exit(ictxt) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_exit
     integer(c_int), value :: ictxt
     
     call psb_exit(ictxt)
@@ -41,7 +42,7 @@ contains
   end subroutine psb_c_exit
   
   subroutine psb_c_abort(ictxt) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_abort
     integer(c_int), value :: ictxt
     
     call psb_abort(ictxt)
@@ -50,7 +51,7 @@ contains
   
 
   subroutine psb_c_info(ictxt,iam,np) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_info
     integer(c_int), value :: ictxt
     integer(c_int)        :: iam,np
     
@@ -59,20 +60,20 @@ contains
   end subroutine psb_c_info
   
   subroutine psb_c_barrier(ictxt) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_barrier
     integer(c_int), value :: ictxt
 
     call psb_barrier(ictxt)
   end subroutine psb_c_barrier
   
   real(c_double) function psb_c_wtime() bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_wtime
     
     psb_c_wtime = psb_wtime()
   end function psb_c_wtime
 
   subroutine psb_c_ibcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_bcast
     implicit none 
     integer(c_int), value :: ictxt,n, root
     integer(c_int)        :: v(*) 
@@ -87,7 +88,7 @@ contains
   end subroutine psb_c_ibcast
 
   subroutine psb_c_dbcast(ictxt,n,v,root) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_bcast
     implicit none 
     integer(c_int), value :: ictxt,n, root
     real(c_double)        :: v(*) 
@@ -102,7 +103,7 @@ contains
   end subroutine psb_c_dbcast
 
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_bcast, psb_info
     implicit none 
     integer(c_int), value :: ictxt, root
     character(c_char)     :: v(*) 
@@ -122,7 +123,7 @@ contains
   end subroutine psb_c_hbcast
 
   function psb_c_f2c_errmsg(cmesg,len) bind(c) result(res)
-    use psb_base_mod
+    use psb_base_mod, only : psb_errpop,psb_max_errmsg_len_
     use psb_base_string_cbind_mod
     implicit none 
     character(c_char), intent(inout)  :: cmesg(*)
@@ -152,17 +153,17 @@ contains
   end function psb_c_f2c_errmsg
 
   subroutine psb_c_seterraction_ret() bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_set_erraction, psb_act_ret_
     call psb_set_erraction(psb_act_ret_)
   end subroutine psb_c_seterraction_ret
 
   subroutine psb_c_seterraction_print() bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_set_erraction, psb_act_print_
     call psb_set_erraction(psb_act_print_)
   end subroutine psb_c_seterraction_print
 
   subroutine psb_c_seterraction_abort() bind(c)
-    use psb_base_mod
+    use psb_base_mod, only : psb_set_erraction, psb_act_abort_
     call psb_set_erraction(psb_act_abort_)
   end subroutine psb_c_seterraction_abort
     
