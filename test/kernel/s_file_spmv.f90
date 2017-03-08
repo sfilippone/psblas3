@@ -62,7 +62,7 @@ program s_file_spmv
   character(len=20)  :: name
   character(len=2)   :: filefmt
   integer(psb_ipk_), parameter :: iunit=12
-  integer(psb_ipk_), parameter :: times=10
+  integer(psb_ipk_), parameter :: times=20
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
@@ -157,18 +157,11 @@ program s_file_spmv
         b_col_glob(i) = 1.d0
       enddo
     endif
-    call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
   else
 
     call psb_bcast(ictxt,m_problem)
-    call psb_realloc(m_problem,1,aux_b,ircode)
-    if (ircode /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,name)
-      goto 9999
-    endif
     b_col_glob =>aux_b(:,1)
-    call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
 
   end if
 
@@ -181,8 +174,7 @@ program s_file_spmv
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
     
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
@@ -195,18 +187,19 @@ program s_file_spmv
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt, desc_a,info,fmt=afmt,v=ivg)
 
   else 
-    if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
-    call psb_matdist(aux_a, a,  ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
+    if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')
+    call psb_matdist(aux_a, a,  ictxt, desc_a,info,fmt=afmt,parts=part_block)
   end if
 
   call psb_geall(x_col,desc_a,info)
   call x_col%set(sone)
   call psb_geasb(x_col,desc_a,info)
+  call psb_geall(b_col,desc_a,info)
+  call x_col%zero()
+  call psb_geasb(b_col,desc_a,info)
   t2 = psb_wtime() - t1
 
 
