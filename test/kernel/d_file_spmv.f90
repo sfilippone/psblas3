@@ -166,6 +166,7 @@ program d_file_spmv
   end if
 
   ! switch over different partition types
+  write(psb_out_unit,'("Number of processors : ",i0)')np
   if (ipart == 0) then 
     call psb_barrier(ictxt)
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
