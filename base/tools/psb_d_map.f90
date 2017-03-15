@@ -111,7 +111,7 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_d_map_X2Y
 
-subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
+subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_d_map_X2Y_vect
   implicit none 
   type(psb_dlinmap_type), intent(in)   :: map
@@ -119,11 +119,13 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   type(psb_d_vect_type), intent(inout) :: x,y
   integer(psb_ipk_), intent(out)                 :: info 
   real(psb_dpk_), optional          :: work(:)
+  type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
-  type(psb_d_vect_type)          :: xt, yt
+  type(psb_d_vect_type), target  :: xt, yt
+  type(psb_d_vect_type),pointer  :: ptx, pty
   real(psb_dpk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
-       &  map_kind, nr, ictxt
+       &  map_kind, nr, ictxt, iam, np
   character(len=20), parameter   :: name='psb_map_X2Yv'
 
   info = psb_success_
@@ -139,54 +141,66 @@ subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
   case(psb_map_aggr_)
 
     ictxt = map%p_desc_Y%get_context()
+    call psb_info(ictxt,iam,np)
     nr2   = map%p_desc_Y%get_global_rows()
-    nc2   = map%p_desc_Y%get_local_cols() 
-    call yt%bld(nc2,mold=x%v)
-    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
-    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,x,dzero,yt,info)
-    if ((info == psb_success_) .and. map%p_desc_Y%is_repl()) then
-      yta = yt%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
-      call yt%set(yta)
+    nc2   = map%p_desc_Y%get_local_cols()
+    if (present(vty)) then
+      pty => vty
+    else
+      call yt%bld(nc2,mold=x%v)
+      pty => yt
     end if
-    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,x,dzero,pty,info)
+    if ((info == psb_success_) .and. map%p_desc_Y%is_repl().and.(np>1)) then
+      yta = pty%get_vect()
+      call psb_sum(ictxt,yta(1:nr2))
+      call pty%set(yta)
+    end if
+    if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%p_desc_Y,info)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     else 
-      call yt%free(info)
+      if (.not.present(vty)) call yt%free(info)
     end if
 
   case(psb_map_gen_linear_)
 
     ictxt = map%desc_Y%get_context()
+    call psb_info(ictxt,iam,np)
     nr1   = map%desc_X%get_local_rows() 
     nc1   = map%desc_X%get_local_cols() 
     nr2   = map%desc_Y%get_global_rows()
     nc2   = map%desc_Y%get_local_cols() 
 
-    call xt%bld(nc1,mold=x%v)
-    call yt%bld(nc2,mold=y%v)
-
-    xta = x%get_vect()
-    call xt%set(xta(1:nr1))
-    if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
-    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,xt,dzero,yt,info)
-    if ((info == psb_success_) .and. map%desc_Y%is_repl()) then
-      yta = yt%get_vect()
-      call psb_sum(ictxt,yta(1:nr2))
-      call yt%set(yta)
+    if (present(vtx).and.present(vty)) then
+      ptx => vtx
+      pty => vty
+    else
+      call xt%bld(nc1,mold=x%v)
+      call yt%bld(nc2,mold=y%v)
+      ptx => xt
+      pty => yt
     end if
-    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    
+    call psb_geaxpby(done,x,@XZERO,ptx,map%desc_X,info)
+    if (info == psb_success_) call psb_halo(ptx,map%desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,ptx,dzero,pty,info)
+    if ((info == psb_success_) .and. map%desc_Y%is_repl().and.(np>1)) then
+      yta = pty%get_vect()
+      call psb_sum(ictxt,yta(1:nr2))
+      call pty%set(yta)
+    end if
+    if (info == psb_success_) call psb_geaxpby(alpha,pty,beta,y,map%desc_Y,info)
     if (info /= psb_success_) then 
       write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     else
-      call xt%free(info)
-      call yt%free(info)
+      if (.not.present(vtx)) call xt%free(info)
+      if (.not.present(vty)) call yt%free(info)
     end if
    
-
   case default
     write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
          & map_kind, psb_map_aggr_, psb_map_gen_linear_

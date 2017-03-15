@@ -65,7 +65,7 @@ module psb_z_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_X2Y
-    subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work)
+    subroutine psb_z_map_X2Y_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_z_vect_mod, only : psb_z_vect_type
       import :: psb_ipk_, psb_dpk_, psb_zlinmap_type
       implicit none 
@@ -74,6 +74,7 @@ module psb_z_linmap_mod
       type(psb_z_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
+      type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_z_map_X2Y_vect
   end interface
 
@@ -88,7 +89,7 @@ module psb_z_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
     end subroutine psb_z_map_Y2X
-    subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work)
+    subroutine psb_z_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_z_vect_mod, only : psb_z_vect_type
       import :: psb_ipk_, psb_dpk_, psb_zlinmap_type
       implicit none 
@@ -97,6 +98,7 @@ module psb_z_linmap_mod
       type(psb_z_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_dpk_), optional       :: work(:)
+      type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_z_map_Y2X_vect
   end interface
 
@@ -170,8 +172,9 @@ contains
     class(psb_z_base_sparse_mat), intent(in), optional :: mold
     class(psb_i_base_vect_type), intent(in), optional  :: imold
 
-    call map%map_X2Y%cscnv(info,type=type,mold=mold)
-    if (info == psb_success_)&
+    if (map%map_X2Y%is_asb())&
+         & call map%map_X2Y%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_ .and.map%map_Y2X%is_asb())&
          & call map%map_Y2X%cscnv(info,type=type,mold=mold)
     if (present(imold)) then 
       call map%desc_X%cnv(mold=imold)
