@@ -306,7 +306,7 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
   type(psb_c_vect_type),pointer  :: ptx, pty
   complex(psb_spk_), allocatable :: xta(:), yta(:)
   integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
-       & map_kind, nr, ictxt
+       & map_kind, nr, ictxt, iam, np
   character(len=20), parameter   :: name='psb_map_Y2Xv'
 
   info = psb_success_
@@ -322,6 +322,7 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
   case(psb_map_aggr_)
 
     ictxt = map%p_desc_X%get_context()
+    call psb_info(ictxt,iam,np)
     nr2   = map%p_desc_X%get_global_rows()
     nc2   = map%p_desc_X%get_local_cols() 
     if (present(vty)) then
@@ -348,6 +349,7 @@ subroutine psb_c_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
   case(psb_map_gen_linear_)
 
     ictxt = map%desc_X%get_context()
+    call psb_info(ictxt,iam,np)
     nr1   = map%desc_Y%get_local_rows() 
     nc1   = map%desc_Y%get_local_cols() 
     nr2   = map%desc_X%get_global_rows()
