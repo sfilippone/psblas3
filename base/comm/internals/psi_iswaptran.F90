@@ -157,7 +157,8 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
     return
 end subroutine psi_iswaptranm
 
-subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
+     & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_itranidxm
   use psb_error_mod
@@ -209,11 +210,11 @@ subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
     goto 9999
   endif
 
-
-  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
   swap_recv = iand(flag,psb_swap_recv_) /= 0
+
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
@@ -242,9 +243,7 @@ subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-
       call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
-
 
       brvidx(proc_to_comm) = rcv_pt
       rvsz(proc_to_comm)   = n*nerv
@@ -264,7 +263,6 @@ subroutine psi_itranidxm(iictxt,iicomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,wo
       goto 9999
     end if
   end if
-
 
   totrcv_ = max(totrcv_,1)
   totsnd_ = max(totsnd_,1)
@@ -657,9 +655,8 @@ end subroutine psi_iswaptranv
 !   
 !   
 ! 
-
-
-subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,&
+     & totxch,totsnd,totrcv,work,info)
 
   use psi_mod, psb_protect_name => psi_itranidxv
   use psb_error_mod
@@ -687,12 +684,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
-!!$  integer(psb_ipk_) :: np, me, nesd, nerv,&
-!!$       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
-!!$       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
-!!$       & snd_pt, rcv_pt, pnti, data_, n 
-!!$  integer(psb_ipk_), allocatable, dimension(:) :: bsdidx, brvidx,&
-!!$       & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
@@ -742,7 +733,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
     rvsz(:) = 0 
 
     ! prepare info for communications
-
 
     pnti   = 1
     snd_pt = 1
@@ -857,7 +847,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
 
@@ -917,7 +906,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
 
@@ -962,7 +950,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
   else if (swap_recv) then
@@ -979,11 +966,9 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
   end if
-
 
   if (do_recv) then 
 
@@ -1003,7 +988,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
     end do
 
   end if
-
 
   if (swap_mpi) then 
     deallocate(sdsz,rvsz,bsdidx,brvidx,rvhd,prcid,sdhd,&
@@ -1028,10 +1012,6 @@ subroutine psi_itranidxv(iictxt,iicomm,flag,beta,y,idx,totxch,totsnd,totrcv,work
 
     return
 end subroutine psi_itranidxv
-
-
-!
-!
 !
 !
 ! Subroutine: psi_iswaptran_vect
@@ -1131,6 +1111,7 @@ subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
   use psi_mod, psb_protect_name => psi_itran_vidx_vect
   use psb_error_mod
+  use psb_realloc_mod
   use psb_desc_mod
   use psb_penv_mod
   use psb_i_base_vect_mod
@@ -1191,18 +1172,21 @@ subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
 
   if (debug) write(*,*) me,'Internal buffer'
   if (do_send) then 
-    if (allocated(y%comid)) then 
-      ! 
-      ! Unfinished communication? Something is wrong....
-      !
-      info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
+    if (allocated(y%comid)) then
+      if (any(y%comid /= mpi_request_null)) then 
+        ! 
+        ! Unfinished communication? Something is wrong....
+        !
+        info=psb_err_mpi_error_
+        ierr(1) = -2
+        call psb_errpush(info,name,i_err=ierr)
+        goto 9999
+      end if
     end if
     if (debug) write(*,*) me,'do_send start'
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
+    y%comid = mpi_request_null
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -1248,7 +1232,6 @@ subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
     call y%device_wait()
 
     if (debug) write(*,*) me,' isend'
-
     !
     ! Then send
     !
@@ -1351,16 +1334,19 @@ subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
       call y%sct(snd_pt,nesd,idx,beta)
       pnti   = pnti + nerv + nesd + 3
     end do
-
-  
     !
-    ! Then wait 
+    ! Waited for everybody, clean up
+    !
+    y%comid = mpi_request_null
+
+    !
+    ! Then wait for device
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
     if (debug) write(*,*) me,' free buffer'
-    call y%free_buffer(info)
-    if (info == 0) call y%free_comid(info)
+!!$    call y%free_buffer(info)
+!!$    if (info == 0) call y%free_comid(info)
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -1386,7 +1372,7 @@ end subroutine psi_itran_vidx_vect
 ! Subroutine: psi_iswaptran_vect
 !   Data exchange among processes.
 !
-!   Takes care of Y an exanspulated vector.
+!   Takes care of Y an encaspulated vector.
 !   
 !   
 subroutine psi_iswaptran_multivect(flag,beta,y,desc_a,work,info,data)
@@ -1461,14 +1447,13 @@ subroutine psi_iswaptran_multivect(flag,beta,y,desc_a,work,info,data)
   end subroutine psi_iswaptran_multivect
 
 
-
 !
 !
-! Subroutine: psi_itran_vidx_vect
+! Subroutine: psi_itran_vidx_multivect
 !   Data exchange among processes.
 !
-!   Takes care of Y an exanspulated vector. Relies on the gather/scatter methods
-!   of vectors. 
+!   Takes care of Y an encapsulated multivector. Relies on the gather/scatter methods
+!   of multivectors. 
 !   
 !   The real workhorse: the outer routine will only choose the index list
 !   this one takes the index list and does the actual exchange. 
@@ -1480,9 +1465,10 @@ subroutine psi_itran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
 
   use psi_mod, psb_protect_name => psi_itran_vidx_multivect
   use psb_error_mod
+  use psb_realloc_mod
   use psb_desc_mod
   use psb_penv_mod
-  use psb_i_base_vect_mod
+  use psb_i_base_multivect_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -1542,17 +1528,20 @@ subroutine psi_itran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   if (debug) write(*,*) me,'Internal buffer'
   if (do_send) then 
     if (allocated(y%comid)) then 
-      ! 
-      ! Unfinished communication? Something is wrong....
-      !
-      info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
+      if (any(y%comid /= mpi_request_null)) then 
+        ! 
+        ! Unfinished communication? Something is wrong....
+        !
+        info=psb_err_mpi_error_
+        ierr(1) = -2
+        call psb_errpush(info,name,i_err=ierr)
+        goto 9999
+      end if
     end if
     if (debug) write(*,*) me,'do_send start'
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
+    y%comid = mpi_request_null
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -1593,12 +1582,11 @@ subroutine psi_itran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     end do
 
     !
-    ! Then wait 
+    ! Then wait for device
     !
     call y%device_wait()
 
     if (debug) write(*,*) me,' isend'
-
     !
     ! Then send
     !
@@ -1686,8 +1674,6 @@ subroutine psi_itran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     end do
 
     if (debug) write(*,*) me,' scatter'      
-
-
     pnti   = 1
     snd_pt = totrcv_+1
     rcv_pt = 1
@@ -1707,13 +1693,18 @@ subroutine psi_itran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
 
   
     !
-    ! Then wait 
+    ! Waited for com, cleanup comid
+    !
+    y%comid = mpi_request_null
+    
+    !
+    ! Then wait for device
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
-    if (debug) write(*,*) me,' free buffer'
-    call y%free_buffer(info)
-    if (info == 0) call y%free_comid(info)
+!!$    if (debug) write(*,*) me,' free buffer'
+!!$    call y%free_buffer(info)
+!!$    if (info == 0) call y%free_comid(info)
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
