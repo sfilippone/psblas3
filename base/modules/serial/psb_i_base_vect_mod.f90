@@ -105,6 +105,7 @@ module psb_i_base_vect_mod
     procedure, nopass  :: use_buffer   => i_base_use_buffer
     procedure, pass(x) :: new_buffer   => i_base_new_buffer
     procedure, nopass  :: device_wait  => i_base_device_wait
+    procedure, pass(x) :: maybe_free_buffer  => i_base_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i_base_free_buffer
     procedure, pass(x) :: new_comid    => i_base_new_comid
     procedure, pass(x) :: free_comid   => i_base_free_comid
@@ -419,7 +420,6 @@ contains
     call x%sync()
   end subroutine i_base_asb
 
-
   !
   !> Function  base_free:
   !! \memberof  psb_i_base_vect_type
@@ -445,6 +445,63 @@ contains
   end subroutine i_base_free
 
   
+
+  !
+  !> Function  base_free_buffer:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief Free aux buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine i_base_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine i_base_free_buffer
+
+  !
+  !> Function  base_maybe_free_buffer:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief Conditionally Free aux buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine i_base_maybe_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = 0 
+    if (psb_get_maybe_free_buffer())&
+         &  call x%free_buffer(info)
+
+  end subroutine i_base_maybe_free_buffer
+
+  !
+  !> Function  base_free_comid:
+  !! \memberof  psb_i_base_vect_type
+  !! \brief Free aux MPI communication id buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine i_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i_base_free_comid
+
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -770,27 +827,6 @@ contains
   end subroutine i_base_new_comid
 
 
-  subroutine i_base_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
-  end subroutine i_base_free_buffer
-
-  subroutine i_base_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none 
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine i_base_free_comid
-
-
   !
   ! shortcut alpha=1 beta=0
   ! 
@@ -955,6 +991,7 @@ module psb_i_base_multivect_mod
     procedure, nopass  :: use_buffer   => i_base_mlv_use_buffer
     procedure, pass(x) :: new_buffer   => i_base_mlv_new_buffer
     procedure, nopass  :: device_wait  => i_base_mlv_device_wait
+    procedure, pass(x) :: maybe_free_buffer  => i_base_mlv_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i_base_mlv_free_buffer
     procedure, pass(x) :: new_comid    => i_base_mlv_new_comid
     procedure, pass(x) :: free_comid   => i_base_mlv_free_comid
@@ -1496,6 +1533,19 @@ contains
     call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine i_base_mlv_new_comid
 
+
+  subroutine i_base_mlv_maybe_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_i_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+
+    info = 0 
+    if (psb_get_maybe_free_buffer())&
+         &  call x%free_buffer(info)
+
+  end subroutine i_base_mlv_maybe_free_buffer
 
   subroutine i_base_mlv_free_buffer(x,info)
     use psb_realloc_mod

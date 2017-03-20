@@ -1345,8 +1345,8 @@ subroutine psi_stran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
     if (debug) write(*,*) me,' free buffer'
-!!$    call y%free_buffer(info)
-!!$    if (info == 0) call y%free_comid(info)
+    call y%maybe_free_buffer(info)
+    if (info == 0) call y%free_comid(info)
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -1702,9 +1702,9 @@ subroutine psi_stran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
-!!$    if (debug) write(*,*) me,' free buffer'
-!!$    call y%free_buffer(info)
-!!$    if (info == 0) call y%free_comid(info)
+    if (debug) write(*,*) me,' free buffer'
+    call y%maybe_free_buffer(info)
+    if (info == 0) call y%free_comid(info)
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999

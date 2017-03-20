@@ -153,9 +153,20 @@ module psb_realloc_mod
          & psb_zsize1d, psb_zsize2d
   end interface psb_size
 
+  logical, private :: do_maybe_free_buffer = .true.
 
 Contains
+  
+  function psb_get_maybe_free_buffer() result(res)
+    logical :: res
+    res = do_maybe_free_buffer
+  end function psb_get_maybe_free_buffer
 
+  subroutine psb_set_maybe_free_buffer(val)
+    logical, intent(in) :: val
+    do_maybe_free_buffer = val
+  end subroutine psb_set_maybe_free_buffer
+  
   subroutine psb_i_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
