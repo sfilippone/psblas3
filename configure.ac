@@ -260,7 +260,7 @@ fi
 if test "X$psblas_cv_fc" == "Xgcc" ; then
 PAC_HAVE_MODERN_GFORTRAN(
 	[],
-        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.6 or later.])]
+        [AC_MSG_ERROR([Bailing out.])]
 )
 fi
 # TODO : SEE _AC_PROG_FC_V
@@ -542,37 +542,37 @@ fi
 PAC_FORTRAN_TEST_TR15581( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_CLASS_TBP( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_SOURCE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SOURCE= allocation. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_ISO_C_BIND( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_C_BINDING $FDEFINES"],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 #
@@ -799,15 +799,15 @@ FDEFINES=$(PSBFDEFINES)
 
 # These should be portable rules, arent they?
 .c.o:
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $< -o $@
 .f.o:
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $< -o $@
 .f90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $< -o $@
 .F.o:
-	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
+	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@'
 
 
 AC_SUBST(PSBLASRULES)

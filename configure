@@ -651,6 +651,7 @@ FINCLUDES
 CINCLUDES
 METIS_LIBS
 AMD_LIBS
+BLAS_LIBS
 INSTALL_SAMPLESDIR
 INSTALL_DOCSDIR
 INSTALL_INCLUDEDIR
@@ -681,7 +682,6 @@ BASEMODNAME
 CDEFINES
 FDEFINES
 LAPACK_LIBS
-BLAS_LIBS
 EGREP
 GREP
 CPP
@@ -787,6 +787,7 @@ with_module_path
 enable_dependency_tracking
 enable_long_integers
 with_blas
+with_blasdir
 with_lapack
 with_rsb
 with_metis
@@ -1467,6 +1468,7 @@ Optional Packages:
   --with-module-path      additional MODULE_PATH flags to be added: will
                           prepend to MODULE_PATH
   --with-blas=<lib>       use BLAS library <lib>
+  --with-blasdir=<dir>    search for BLAS library in <dir>
   --with-lapack=<lib>     use LAPACK library <lib>
   --with-rsb              Specify Recursive Sparse BLAS library linkage info
                           (that is, the output of librsb-config --static
@@ -5757,7 +5759,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
  cat >conftest.$ac_ext <<_ACEOF
 
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -5791,10 +5793,12 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 	  { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
+		     { $as_echo "$as_me:$LINENO: Sorry, we require GNU Fortran version 4.8.4 or later." >&5
+$as_echo "$as_me: Sorry, we require GNU Fortran version 4.8.4 or later." >&6;}
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
-		      { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
-$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.6 or later." >&2;}
+		      { { $as_echo "$as_me:$LINENO: error: Bailing out." >&5
+$as_echo "$as_me: error: Bailing out." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7706,9 +7710,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7777,9 +7781,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7864,9 +7868,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7937,9 +7941,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -8000,9 +8004,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -8062,9 +8066,9 @@ $as_echo "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -8663,6 +8667,17 @@ case $with_blas in
 	*) BLAS_LIBS="-l$with_blas" ;;
 esac
 
+# Check whether --with-blasdir was given.
+if test "${with_blasdir+set}" = set; then
+  withval=$with_blasdir;
+fi
+
+case $with_blasdir in
+  "") ;;
+      *) if test -d $with_blasdir; then
+	    BLAS_LIBDIR="-L$with_blasdir";
+	fi ;;
+esac
 # Get fortran linker names of BLAS functions to check for.
 #AC_FC_FUNC(sgemm)
 #AC_FC_FUNC(dgemm)
@@ -8678,7 +8693,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 # First, check BLAS_LIBS environment variable
 if test $pac_blas_ok = no; then
 if test "x$BLAS_LIBS" != x; then
-	save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
+	save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $BLAS_LIBDIR $LIBS"
 	{ $as_echo "$as_me:$LINENO: checking for sgemm in $BLAS_LIBS" >&5
 $as_echo_n "checking for sgemm in $BLAS_LIBS... " >&6; }
 	cat >conftest.$ac_ext <<_ACEOF
@@ -8724,7 +8739,7 @@ $as_echo "$pac_blas_ok" >&6; }
 fi
 fi
 
-
+LIBS="$BLAS_LIBDIR $save_LIBS "
 # BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
 if test $pac_blas_ok = no; then
 	ac_ext=c
@@ -8926,7 +8941,7 @@ fi
 $as_echo "$ac_cv_lib_cblas_cblas_dgemm" >&6; }
 if test "x$ac_cv_lib_cblas_cblas_dgemm" = x""yes; then
   pac_blas_ok=yes
-			 BLAS_LIBS="-lcblas -lf77blas -latlas"
+			 BLAS_LIBS="-lcblas -lf77blas -latlas $BLAS_LIBDIR"
 fi
 
 fi
@@ -9135,7 +9150,7 @@ fi
 $as_echo "$ac_cv_lib_satlas_cblas_dgemm" >&6; }
 if test "x$ac_cv_lib_satlas_cblas_dgemm" = x""yes; then
   pac_blas_ok=yes
-			 BLAS_LIBS="-lsatlas"
+			 BLAS_LIBS="-lsatlas $BLAS_LIBDIR"
 fi
 
 fi
@@ -9299,7 +9314,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_sgemm_sgemm" >&5
 $as_echo "$ac_cv_lib_sgemm_sgemm" >&6; }
 if test "x$ac_cv_lib_sgemm_sgemm" = x""yes; then
-  pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"
+  pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas $BLAS_LIBDIR"
 fi
 
 fi
@@ -9308,6 +9323,67 @@ fi
 
 fi
 
+
+# BLAS in OpenBLAS?
+if test $pac_blas_ok = no; then
+  ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+  { $as_echo "$as_me:$LINENO: checking for sgemm in -lopenblas" >&5
+$as_echo_n "checking for sgemm in -lopenblas... " >&6; }
+if test "${ac_cv_lib_openblas_sgemm+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopenblas  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+      program main
+      call sgemm
+      end
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_openblas_sgemm=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_openblas_sgemm=no
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_openblas_sgemm" >&5
+$as_echo "$ac_cv_lib_openblas_sgemm" >&6; }
+if test "x$ac_cv_lib_openblas_sgemm" = x""yes; then
+  pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"
+fi
+
+fi
 # BLAS in Alpha CXML library?
 if test $pac_blas_ok = no; then
 	{ $as_echo "$as_me:$LINENO: checking for sgemm in -lcxml" >&5
@@ -9359,7 +9435,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_cxml_sgemm" >&5
 $as_echo "$ac_cv_lib_cxml_sgemm" >&6; }
 if test "x$ac_cv_lib_cxml_sgemm" = x""yes; then
-  pac_blas_ok=yes;BLAS_LIBS="-lcxml"
+  pac_blas_ok=yes;BLAS_LIBS="-lcxml $BLAS_LIBDIR"
 fi
 
 fi
@@ -9415,7 +9491,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_dxml_sgemm" >&5
 $as_echo "$ac_cv_lib_dxml_sgemm" >&6; }
 if test "x$ac_cv_lib_dxml_sgemm" = x""yes; then
-  pac_blas_ok=yes;BLAS_LIBS="-ldxml"
+  pac_blas_ok=yes;BLAS_LIBS="-ldxml $BLAS_LIBDIR"
 fi
 
 
@@ -9522,7 +9598,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_sunperf_sgemm" >&5
 $as_echo "$ac_cv_lib_sunperf_sgemm" >&6; }
 if test "x$ac_cv_lib_sunperf_sgemm" = x""yes; then
-  BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
+  BLAS_LIBS="-xlic_lib=sunperf -lsunmath $BLAS_LIBDIR"
                                  pac_blas_ok=yes
 fi
 
@@ -9583,7 +9659,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_scs_sgemm" >&5
 $as_echo "$ac_cv_lib_scs_sgemm" >&6; }
 if test "x$ac_cv_lib_scs_sgemm" = x""yes; then
-  pac_blas_ok=yes; BLAS_LIBS="-lscs"
+  pac_blas_ok=yes; BLAS_LIBS="-lscs $BLAS_LIBDIR"
 fi
 
 fi
@@ -9644,7 +9720,7 @@ $as_echo "$ac_res" >&6; }
 as_val=`eval 'as_val=${'$as_ac_Lib'}
 		 $as_echo "$as_val"'`
    if test "x$as_val" = x""yes; then
-  pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"
+  pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath $BLAS_LIBDIR"
 fi
 
 fi
@@ -9754,15 +9830,83 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_essl_sgemm" >&5
 $as_echo "$ac_cv_lib_essl_sgemm" >&6; }
 if test "x$ac_cv_lib_essl_sgemm" = x""yes; then
-  pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas"
+  pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas $BLAS_LIBDIR"
 fi
 
 fi
 
+	fi
+# BLAS in generic BLAS library?
+if test $pac_blas_ok = no; then
+  ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+
+{ $as_echo "$as_me:$LINENO: checking for sgemm in -lblas" >&5
+$as_echo_n "checking for sgemm in -lblas... " >&6; }
+if test "${ac_cv_lib_blas_sgemm+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lblas  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+      program main
+      call sgemm
+      end
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_blas_sgemm=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_blas_sgemm=no
 fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_blas_sgemm" >&5
+$as_echo "$ac_cv_lib_blas_sgemm" >&6; }
+if test "x$ac_cv_lib_blas_sgemm" = x""yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBLAS 1
+_ACEOF
+
+  LIBS="-lblas $LIBS"
+
+else
+  pac_blas_ok=yes;BLAS_LIBS="-lblas $BLAS_LIBDIR"
+fi
+
+fi
+
 # BLAS linked to by default?  (happens on some supercomputers)
 if test $pac_blas_ok = no; then
-	save_LIBS="$LIBS"; LIBS="$LIBS"
 	cat >conftest.$ac_ext <<_ACEOF
       program main
       call sgemm
@@ -9800,7 +9944,6 @@ fi
 rm -rf conftest.dSYM
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
-	LIBS="$save_LIBS"
 fi
 
 # Generic BLAS library?
@@ -9859,11 +10002,10 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_blas_sgemm" >&5
 $as_echo "$ac_cv_lib_blas_sgemm" >&6; }
 if test "x$ac_cv_lib_blas_sgemm" = x""yes; then
-  pac_blas_ok=yes; BLAS_LIBS="-lblas"
+  pac_blas_ok=yes; BLAS_LIBS="-lblas $BLAS_LIBDIR"
 fi
 
 fi
-
 
 
 LIBS="$pac_blas_save_LIBS"
@@ -11707,15 +11849,15 @@ FDEFINES=$(PSBFDEFINES)
 
 # These should be portable rules, arent they?
 .c.o:
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $< -o $@
 .f.o:
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $< -o $@
 .f90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $< -o $@
 .F.o:
-	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
+	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@'
 
 
 
