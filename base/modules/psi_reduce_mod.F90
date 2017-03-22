@@ -178,7 +178,7 @@ module psi_reduce_mod
 
   interface psb_nrm2
     module procedure psb_s_nrm2s_ic, psb_s_nrm2v_ic,&
-         & psb_d_nrm2s_ic, psb_d_nrm2v_ic
+         & psb_d_nrm2s_ic
   end interface
 #endif
 
@@ -199,6 +199,7 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_imaxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -210,31 +211,49 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_ipk_) :: dat_
+    integer(psb_ipk_), allocatable :: co_dat_[:]
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) :: iam, np, info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iinfo, me
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_max,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_max,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_imaxs
 
   subroutine psb_imaxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -246,43 +265,61 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iinfo, me
 
 #if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_max,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_max,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_imaxv
 
   subroutine psb_imaxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
-    implicit none 
+    implicit none
 #ifdef MPI_H
     include 'mpif.h'
 #endif
@@ -290,39 +327,57 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iinfo, me
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_max,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_max,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_imaxm
 
 #if defined(LONG_INTEGERS)
   subroutine psb_i4maxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -335,7 +390,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) ::  dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_mpid_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_mpik_) :: iinfo
 
 
@@ -347,18 +403,35 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_max,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_max,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_max,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_i4maxs
 
   subroutine psb_i4maxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -370,8 +443,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -383,26 +456,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_max,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_max,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4maxv
 
   subroutine psb_i4maxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -414,8 +505,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:,:), co_dat_(:,:)[*]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 
@@ -427,20 +518,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_max,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_max,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4maxm
@@ -450,6 +558,7 @@ contains
 
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8maxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -462,30 +571,41 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_long_int_k_) ::  dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_long_int_k_), allocatable ::  co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
-    call psb_info(ictxt,iam,np)
-
-    if (present(root)) then 
-      root_ = root
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      root_ = -1
-    endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_max,ictxt,info)
-      dat = dat_
-    else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_max,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_i8maxs
 
   subroutine psb_i8maxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -497,10 +617,9 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
-
 #if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
@@ -510,26 +629,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_max,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_max,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8maxv
 
   subroutine psb_i8maxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -541,8 +678,8 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -554,20 +691,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_max,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_max,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8maxm
@@ -576,6 +730,7 @@ contains
 
 
   subroutine psb_smaxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -588,29 +743,47 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_smaxs
 
   subroutine psb_smaxv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -623,39 +796,58 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
-    call psb_info(ictxt,iam,np)
 
+    call psb_info(ictxt,iam,np)
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_max,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_smaxv
 
   subroutine psb_smaxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -667,38 +859,55 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then
+        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_spk_,mpi_max,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_smaxm
 
   subroutine psb_dmaxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -711,30 +920,48 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_max,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_max,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_dmaxs
 
   subroutine psb_dmaxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -746,40 +973,59 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
-    call psb_info(ictxt,iam,np)
 
+    call psb_info(ictxt,iam,np)
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_max,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_dpk_,mpi_max,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
+
   end subroutine psb_dmaxv
 
   subroutine psb_dmaxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -791,33 +1037,49 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_max,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then
+        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_dpk_,mpi_max,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_max,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_dmaxm
@@ -830,6 +1092,7 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_imins(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -841,30 +1104,48 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_ipk_) :: dat_
+    integer(psb_ipk_), allocatable :: co_dat_[:]
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_min,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_min,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_imins
 
   subroutine psb_iminv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -877,39 +1158,57 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iminv
 
   subroutine psb_iminm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -921,39 +1220,57 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_min,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_min,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iminm
 
 #if defined(LONG_INTEGERS)
   subroutine psb_i4mins(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -966,29 +1283,47 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) ::  dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_mpik_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_mpik_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_min,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_min,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_min,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_i4mins
 
   subroutine psb_i4minv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1001,38 +1336,56 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 #if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4minv
 
   subroutine psb_i4minm(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1045,33 +1398,50 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_min,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_min,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4minm
@@ -1081,6 +1451,7 @@ contains
 
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8mins(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1093,29 +1464,47 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_long_int_k_) ::  dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_long_int_k_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_min,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_min,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_i8mins
 
   subroutine psb_i8minv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1128,38 +1517,56 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me 
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8minv
 
   subroutine psb_i8minm(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1172,33 +1579,50 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_min,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_min,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8minm
@@ -1208,6 +1632,7 @@ contains
 
 
   subroutine psb_smins(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1220,30 +1645,48 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_smins
 
   subroutine psb_sminv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1255,39 +1698,58 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
-    call psb_info(ictxt,iam,np)
 
+    call psb_info(ictxt,iam,np)
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_spk_,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_sminv
 
   subroutine psb_sminm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1299,38 +1761,55 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then
+        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_spk_,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_sminm
 
   subroutine psb_dmins(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1343,30 +1822,48 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_min,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)   
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_min,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_dmins
 
   subroutine psb_dminv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1378,40 +1875,58 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
-    call psb_info(ictxt,iam,np)
 
+    call psb_info(ictxt,iam,np)
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_dpk_,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_dminv
 
   subroutine psb_dminm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1423,33 +1938,49 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
-
+    me = this_image()
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_min,ictxt,info)
-    else
-      if (iam == root_) then 
-        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-        dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
-      end if
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then
+        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_r_dpk_,mpi_min,ictxt,info)
+      else
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_min,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_dminm
@@ -1463,7 +1994,7 @@ contains
 
 
   subroutine psb_iamxs(ictxt,dat,root)
-
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1476,8 +2007,9 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_ipk_) :: dat_
+    integer(psb_ipk_), allocatable :: co_dat_[:]
     integer(psb_mpik_) :: iam, np, info
-    integer(psb_ipk_) :: iinfo
+    integer(psb_ipk_) :: iinfo, me
 
 #if !defined(SERIAL_MPI)
 
@@ -1488,18 +2020,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
-      dat = dat_
-    else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
-    endif
 
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamx)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
+    endif
 #endif    
   end subroutine psb_iamxs
 
   subroutine psb_iamxv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1512,8 +2062,8 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -1525,26 +2075,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_iamx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iamxv
 
   subroutine psb_iamxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1556,8 +2125,8 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -1569,20 +2138,38 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_iamx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_iamx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_iamx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iamxm
@@ -1591,6 +2178,7 @@ contains
 #if defined(LONG_INTEGERS)
   subroutine psb_i4amxs(ictxt,dat,root)
 
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1603,6 +2191,7 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) :: dat_
+    integer(psb_mpik_), allocatable :: co_dat_[:]
     integer(psb_mpik_) :: iam, np, info
     integer(psb_mpik_) :: iinfo
 
@@ -1615,19 +2204,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
-      dat = dat_
-    else
-      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
-    endif
 
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=abs(dat)
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=abs(dat)
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
+    endif
 #endif    
   end subroutine psb_i4amxs
 
   subroutine psb_i4amxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1639,8 +2245,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -1652,26 +2258,51 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
+    if (if_caf2) then
+        if (root_ == -1) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          if (iinfo == psb_success_) call co_max(co_dat_)
+          if (iinfo == psb_success_) dat=co_dat_
+        else
+          if (iam == root_) then 
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	    co_dat_=abs(dat)
+            call co_max(co_dat_, result_image=root_+1)
+            if (me == root_ + 1) dat=co_dat_
+          else
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(1)[*], STAT=iinfo)
+            call co_max(co_dat_, result_image=root_+1)
+            dat_=co_dat_
+          end if
+        endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4amxv
 
   subroutine psb_i4amxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1683,8 +2314,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 
@@ -1696,20 +2327,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=abs(dat)
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (iam == root_) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          call co_max(co_dat_, result_image=root_+1)
+          if (me == root_ + 1) dat=co_dat_
+        else
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(1,1)[*], STAT=iinfo)
+          call co_max(co_dat_, result_image=root_+1)
+          dat_=co_dat_
+        end if
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_i4amx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4amxm
@@ -1719,6 +2374,7 @@ contains
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8amxs(ictxt,dat,root)
 
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1731,7 +2387,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_long_int_k_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -1743,18 +2400,35 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
-      dat = dat_
-    else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
-    endif
 
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=abs(dat)
+        call co_max(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=abs(dat)
+        call co_max(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
+    endif
 #endif    
   end subroutine psb_i8amxs
 
   subroutine psb_i8amxv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -1767,8 +2441,8 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -1780,26 +2454,51 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
+    if (if_caf2) then
+        if (root_ == -1) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          if (iinfo == psb_success_) call co_max(co_dat_)
+          if (iinfo == psb_success_) dat=co_dat_
+        else
+          if (iam == root_) then 
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	    co_dat_=abs(dat)
+            call co_max(co_dat_, result_image=root_+1)
+            if (me == root_ + 1) dat=co_dat_
+          else
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(1)[*], STAT=iinfo)
+            call co_max(co_dat_, result_image=root_+1)
+            dat_=co_dat_
+          end if
+        endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8amxv
 
   subroutine psb_i8amxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1811,8 +2510,8 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -1824,20 +2523,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=abs(dat)
+        if (iinfo == psb_success_) call co_max(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (iam == root_) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          call co_max(co_dat_, result_image=root_+1)
+          if (me == root_ + 1) dat=co_dat_
+        else
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(1,1)[*], STAT=iinfo)
+          call co_max(co_dat_, result_image=root_+1)
+          dat_=co_dat_
+        end if
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_i8amx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8amxm
@@ -1847,6 +2570,7 @@ contains
 
 
   subroutine psb_samxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1859,11 +2583,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -1871,6 +2597,23 @@ contains
     else
       root_ = -1
     endif
+
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samx)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
     if (root_ == -1) then 
       call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
       dat = dat_
@@ -1878,11 +2621,13 @@ contains
       call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
+    endif
 #endif    
   end subroutine psb_samxs
 
   subroutine psb_samxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1894,12 +2639,13 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -1907,26 +2653,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_samx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        end if
+    endif
     endif
 #endif    
   end subroutine psb_samxv
 
   subroutine psb_samxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1938,12 +2703,11 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -1951,25 +2715,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_samx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_samx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_samxm
 
   subroutine psb_damxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -1982,11 +2765,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -1994,18 +2779,38 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damx_op,ictxt,info)
-      dat = dat_
+
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        sync all
+        call co_reduce(co_dat_, caf_damx)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_damx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_damxs
 
   subroutine psb_damxv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2017,12 +2822,13 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2030,27 +2836,46 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_damx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_damx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_damx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
+             & mpi_damx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_damxv
 
   subroutine psb_damxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2062,12 +2887,11 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2075,26 +2899,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_damx)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_damx, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_damxm
 
 
   subroutine psb_camxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2107,11 +2950,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2119,17 +2964,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
-      dat = dat_
+
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_camxs
 
   subroutine psb_camxv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -2143,11 +3007,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_spk_), allocatable :: co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2155,25 +3021,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amx_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_camxv
 
   subroutine psb_camxm(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -2187,11 +3072,11 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_spk_), allocatable :: co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2199,25 +3084,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amx_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_camxm
 
   subroutine psb_zamxs(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2230,11 +3134,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2242,17 +3148,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,ictxt,info)
-      dat = dat_
+
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_zamxs
 
   subroutine psb_zamxv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -2266,11 +3191,13 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_dpk_), allocatable :: co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
+
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2278,27 +3205,46 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
-           & mpi_zamx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amx_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
+             & mpi_zamx_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zamxv
 
   subroutine psb_zamxm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2311,11 +3257,11 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_dpk_), allocatable :: co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
-
     call psb_info(ictxt,iam,np)
 
     if (present(root)) then 
@@ -2323,23 +3269,42 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amx_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amx_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamx_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zamxm
+
 
 
 
@@ -2350,7 +3315,8 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_iamns(ictxt,dat,root)
-
+    
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2363,7 +3329,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_ipk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_ipk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2375,19 +3342,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
-      dat = dat_
-    else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
-    endif
 
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamn)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
+    else
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
+    endif
 #endif    
   end subroutine psb_iamns
 
   subroutine psb_iamnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2399,8 +3384,8 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2412,26 +3397,46 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
+
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_iamn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_iamn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
-      else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
-      end if
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
+      else 
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iamnv
 
   subroutine psb_iamnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2443,8 +3448,8 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_ipk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2456,20 +3461,38 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_iamn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_iamn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_iamn_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_iamn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_iamnm
@@ -2478,6 +3501,7 @@ contains
 #if defined(LONG_INTEGERS)
   subroutine psb_i4amns(ictxt,dat,root)
 
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2490,7 +3514,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_mpik_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_mpik_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2502,12 +3527,26 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amn_op,ictxt,info)
-      dat = dat_
+
+    if (if_caf) then
+      if (root_ == -1) then
+	co_dat_=abs(dat)
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=abs(dat)
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,,mpi_i4amn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,,mpi_i4amn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 
 #endif    
@@ -2515,6 +3554,7 @@ contains
 
   subroutine psb_i4amnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2526,8 +3566,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2539,26 +3579,51 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_i4amn_op,ictxt,info)
+    if (if_caf) then
+        if (root_ == -1) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          if (iinfo == psb_success_) call co_min(co_dat_)
+          if (iinfo == psb_success_) dat=co_dat_
+        else
+          if (iam == root_) then 
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	    co_dat_=abs(dat)
+            call co_min(co_dat_, result_image=root_+1)
+            if (me == root_ + 1) dat=co_dat_
+          else
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(1)[*], STAT=iinfo)
+            call co_min(co_dat_, result_image=root_+1)
+            dat_=co_dat_
+          end if
+        endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_i4amn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4amnv
 
   subroutine psb_i4amnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2570,8 +3635,8 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_mpik_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_mpik_) :: iinfo
 
 
@@ -2583,20 +3648,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_i4amn_op,ictxt,info)
+    if (if_caf) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=abs(dat)
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (iam == root_) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          call co_min(co_dat_, result_image=root_+1)
+          if (me == root_ + 1) dat=co_dat_
+        else
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(1,1)[*], STAT=iinfo)
+          call co_min(co_dat_, result_image=root_+1)
+          dat_=co_dat_
+        end if
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_i4amn_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_i4amn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4amnm
@@ -2606,6 +3695,7 @@ contains
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8amns(ictxt,dat,root)
 
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2618,7 +3708,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_long_int_k_), save :: co_dat_[*]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2630,19 +3721,32 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
-      dat = dat_
+    if (if_caf) then
+      if (root_ == -1) then
+	co_dat_=abs(dat)
+        call co_min(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=abs(dat)
+        call co_min(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
-
 #endif    
   end subroutine psb_i8amns
 
   subroutine psb_i8amnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2654,8 +3758,8 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2667,26 +3771,51 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
+    if (if_caf) then
+        if (root_ == -1) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          if (iinfo == psb_success_) call co_min(co_dat_)
+          if (iinfo == psb_success_) dat=co_dat_
+        else
+          if (iam == root_) then 
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	    co_dat_=abs(dat)
+            call co_min(co_dat_, result_image=root_+1)
+            if (me == root_ + 1) dat=co_dat_
+          else
+            if (allocated(co_dat_)) deallocate(co_dat_)
+            allocate (co_dat_(1)[*], STAT=iinfo)
+            call co_min(co_dat_, result_image=root_+1)
+            dat_=co_dat_
+          end if
+        endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8amnv
 
   subroutine psb_i8amnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2698,8 +3827,8 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    integer(psb_long_int_k_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2711,20 +3840,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
+    if (if_caf) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=abs(dat)
+        if (iinfo == psb_success_) call co_min(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (iam == root_) then 
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	  co_dat_=abs(dat)
+          call co_min(co_dat_, result_image=root_+1)
+          if (me == root_ + 1) dat=co_dat_
+        else
+          if (allocated(co_dat_)) deallocate(co_dat_)
+          allocate (co_dat_(1,1)[*], STAT=iinfo)
+          call co_min(co_dat_, result_image=root_+1)
+          dat_=co_dat_
+        end if
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+        dat_=dat
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_i8amn_op,ictxt,info)
+      else
+        if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
         call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
-      else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
-      end if
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_i8amn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8amnm
@@ -2734,6 +3887,7 @@ contains
 
 
   subroutine psb_samns(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2746,7 +3900,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2758,18 +3913,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samn)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_samns
 
   subroutine psb_samnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2781,8 +3954,8 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2794,26 +3967,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_samn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_samn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_samnv
 
   subroutine psb_samnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2825,8 +4017,8 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2838,25 +4030,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
+
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_samn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_samn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_samnm
 
   subroutine psb_damns(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2869,7 +4081,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2881,18 +4094,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damn_op,ictxt,info)
-      dat = dat_
+
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_damn)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_damn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_damns
 
   subroutine psb_damnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2904,8 +4136,8 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -2917,27 +4149,46 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_damn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_damn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_damn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
+             & mpi_damn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_damnv
 
   subroutine psb_damnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2949,8 +4200,8 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -2962,26 +4213,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_damn)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_damn, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_damn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_damnm
 
 
   subroutine psb_camns(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -2994,7 +4264,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3006,18 +4277,38 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        sync all
+        call caf_camn_reduces(co_dat_)
+        sync all
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call caf_camn_reduces(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_camns
 
   subroutine psb_camnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3030,7 +4321,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_spk_), allocatable :: co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3042,26 +4334,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amn_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_camnv
 
   subroutine psb_camnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3074,7 +4385,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_spk_), allocatable :: co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -3086,25 +4398,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amn_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_camn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_camnm
 
   subroutine psb_zamns(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3117,7 +4448,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3129,18 +4461,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      me = this_image()
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_zamns
 
   subroutine psb_zamnv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3153,7 +4503,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_dpk_), allocatable :: co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3165,27 +4516,46 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
-           & mpi_zamn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amn_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
+             & mpi_zamn_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zamnv
 
   subroutine psb_zamnm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3198,7 +4568,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_), allocatable :: dat_(:,:)
-    integer(psb_mpik_) :: iam, np,  info
+    complex(psb_dpk_), allocatable :: co_dat_(:,:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -3210,25 +4581,41 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,ictxt,info)
+    if (if_caf2) then
+      me = this_image()
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call caf_amn_reduce(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call caf_amn_reduce(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
-      else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
-      end if
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,ictxt,info)
+      else 
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_zamn_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zamnm
-
-
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !  SUM
@@ -3236,7 +4623,7 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine psb_isums(ictxt,dat,root)
-
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3249,7 +4636,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_ipk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_ipk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -3261,18 +4649,34 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
-
 #endif    
   end subroutine psb_isums
 
   subroutine psb_isumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3285,7 +4689,7 @@ contains
     integer(psb_ipk_), intent(inout)          :: dat(:)
     integer(psb_mpik_), intent(in), optional  :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:)
+    integer(psb_ipk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3298,26 +4702,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_isumv
 
   subroutine psb_isumm(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3330,7 +4752,7 @@ contains
     integer(psb_ipk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_ipk_), allocatable :: dat_(:,:)
+    integer(psb_ipk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3343,20 +4765,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_ipk_integer,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+         call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_isumm
@@ -3426,19 +4865,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer2,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer2,mpi_sum,ictxt,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        else
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i2sumv
@@ -3469,19 +4925,36 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer2,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer2,mpi_sum,ictxt,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        else
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer2,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i2summ
@@ -3492,6 +4965,7 @@ contains
 #if defined(LONG_INTEGERS)
   subroutine psb_i4sums(ictxt,dat,root)
 
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3504,7 +4978,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_mpik_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_mpik_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -3516,18 +4991,35 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 
 #endif    
   end subroutine psb_i4sums
 
   subroutine psb_i4sumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3540,7 +5032,7 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:)
+    integer(psb_mpik_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
@@ -3552,25 +5044,43 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,info)
-      dat_=dat
-      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,info)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,info)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4sumv
 
   subroutine psb_i4summ(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3583,7 +5093,7 @@ contains
     integer(psb_mpik_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_mpik_), allocatable :: dat_(:,:)
+    integer(psb_mpik_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
 
 #if !defined(SERIAL_MPI)
@@ -3594,20 +5104,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
-      dat_=dat
-      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_def_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_def_integer,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,info)  
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_def_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i4summ
@@ -3616,7 +5143,7 @@ contains
 
 #if !defined(LONG_INTEGERS)
   subroutine psb_i8sums(ictxt,dat,root)
-
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3629,7 +5156,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     integer(psb_long_int_k_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    integer(psb_long_int_k_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 #if !defined(SERIAL_MPI)
@@ -3641,18 +5169,34 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
-
 #endif    
   end subroutine psb_i8sums
 
   subroutine psb_i8sumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3665,7 +5209,7 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:)
+    integer(psb_long_int_k_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3678,25 +5222,43 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+              & psb_mpi_lng_integer,mpi_sum,ictxt,info)  
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8sumv
 
   subroutine psb_i8summ(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3709,7 +5271,7 @@ contains
     integer(psb_long_int_k_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    integer(psb_long_int_k_), allocatable :: dat_(:,:)
+    integer(psb_long_int_k_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3722,20 +5284,37 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_=dat
-      if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lng_integer,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
+             & psb_mpi_lng_integer,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_=dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_lng_integer,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_i8summ
@@ -3745,6 +5324,7 @@ contains
 
 
   subroutine psb_ssums(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3757,7 +5337,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3769,17 +5350,34 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_ssums
 
   subroutine psb_ssumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3792,7 +5390,7 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3805,25 +5403,43 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_ssumv
 
   subroutine psb_ssumm(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -3836,7 +5452,7 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3849,25 +5465,43 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_ssumm
 
   subroutine psb_dsums(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3880,7 +5514,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -3892,18 +5527,35 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_dsums
 
   subroutine psb_dsumv(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3915,7 +5567,7 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3928,27 +5580,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
+             & mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_dsumv
 
   subroutine psb_dsumm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -3960,7 +5630,7 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:,:)
+    real(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -3973,26 +5643,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_dsumm
 
 
   subroutine psb_csums(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4005,7 +5693,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -4017,17 +5706,34 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_csums
 
   subroutine psb_csumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -4040,7 +5746,7 @@ contains
     complex(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    complex(psb_spk_), allocatable :: dat_(:)
+    complex(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -4053,26 +5759,44 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_csumv
 
   subroutine psb_csumm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4084,7 +5808,7 @@ contains
     complex(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    complex(psb_spk_), allocatable :: dat_(:,:)
+    complex(psb_spk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -4097,25 +5821,43 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_spk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_csumm
 
   subroutine psb_zsums(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4128,7 +5870,8 @@ contains
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
     complex(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    complex(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -4140,17 +5883,34 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,ictxt,info)
-      dat = dat_
+    if (if_caf2) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_sum(co_dat_)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_zsums
 
   subroutine psb_zsumv(ictxt,dat,root)
+    use psb_caf_mod
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -4163,7 +5923,7 @@ contains
     complex(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:)
+    complex(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -4176,27 +5936,45 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
-           & mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,&
+             & mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zsumv
 
   subroutine psb_zsumm(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4208,7 +5986,7 @@ contains
     complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    complex(psb_dpk_), allocatable :: dat_(:,:)
+    complex(psb_dpk_), allocatable :: dat_(:,:), co_dat_(:,:)[:]
     integer(psb_mpik_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -4221,23 +5999,41 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,ictxt,info)
+    if (if_caf2) then
+      if (root_ == -1) then
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_sum(co_dat_)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_sum(co_dat_, result_image=root_+1)
+        dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        if (iinfo == psb_success_)&
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,ictxt,info)
       else
-        call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        else
+          call psb_realloc(1,1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_c_dpk_,mpi_sum,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_zsumm
+
 
   ! !!!!!!!!!!!!
   !
@@ -4245,6 +6041,7 @@ contains
   !
   ! !!!!!!!!!!!!
   subroutine psb_s_nrm2s(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4257,7 +6054,8 @@ contains
     integer(psb_mpik_), intent(in), optional  :: root
     integer(psb_mpik_) :: root_
     real(psb_spk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_spk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -4269,17 +6067,48 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,ictxt,info)
-      dat = dat_
+    if (if_caf) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_snrm2)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_snrm2, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_s_nrm2s
 
+  pure real(psb_dpk_) function caf_inrm2b(vin, vinout)
+    implicit none
+    real(psb_dpk_), intent(in)    :: vin
+    real(psb_dpk_), intent(in) :: vinout
+    integer(psb_ipk_) :: i
+    real(psb_dpk_) :: w, z
+    w = max( vin, vinout )
+    z = min( vin, vinout )
+    if ( z == dzero ) then
+      caf_inrm2b = w
+    else
+      caf_inrm2b = w*sqrt( done +( z / w )**2 )
+    end if
+  end function caf_inrm2b
+
   subroutine psb_d_nrm2s(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4292,30 +6121,46 @@ contains
     integer(psb_mpik_), intent(in), optional  :: root
     integer(psb_mpik_) :: root_
     real(psb_dpk_) :: dat_
-    integer(psb_mpik_) :: iam, np, info
+    real(psb_dpk_), allocatable :: co_dat_[:]
+    integer(psb_mpik_) :: iam, np, info, me
     integer(psb_ipk_) :: iinfo
 
 
 #if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
-
     if (present(root)) then 
       root_ = root
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_dnrm2_op,ictxt,info)
-      dat = dat_
+    if (if_caf) then
+      if (allocated(co_dat_)) deallocate(co_dat_)
+      allocate(co_dat_[*])
+      if (root_ == -1) then
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_dnrm2)
+        dat=co_dat_
+      else
+        me = this_image()
+	co_dat_=dat
+        call co_reduce(co_dat_,caf_dnrm2, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif    
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_dnrm2_op,root_,ictxt,info)
-      if (iam == root_) dat = dat_
+      if (root_ == -1) then 
+        call mpi_allreduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_dnrm2_op,ictxt,info)
+        dat = dat_
+      else
+        call mpi_reduce(dat,dat_,1,psb_mpi_r_dpk_,mpi_dnrm2_op,root_,ictxt,info)
+        if (iam == root_) dat = dat_
+      endif
     endif
 #endif    
   end subroutine psb_d_nrm2s
 
   subroutine psb_s_nrm2v(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4327,8 +6172,8 @@ contains
     real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional    :: root
     integer(psb_mpik_) :: root_
-    real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_spk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -4340,29 +6185,48 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
-           & mpi_snrm2_op,ictxt,info)
+    if (if_caf) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_snrm2)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_snrm2, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
-             & mpi_snrm2_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
+             & mpi_snrm2_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,&
-             & mpi_snrm2_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
+               & mpi_snrm2_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,&
+               & mpi_snrm2_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_s_nrm2v
 
   subroutine psb_d_nrm2v(ictxt,dat,root)
     use psb_realloc_mod
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -4374,8 +6238,8 @@ contains
     real(psb_dpk_), intent(inout)  :: dat(:)
     integer(psb_mpik_), intent(in), optional  :: root
     integer(psb_mpik_) :: root_
-    real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: iam, np,  info
+    real(psb_dpk_), allocatable :: dat_(:), co_dat_(:)[:]
+    integer(psb_mpik_) :: iam, np,  info, me
     integer(psb_ipk_) :: iinfo
 
 
@@ -4387,23 +6251,41 @@ contains
     else
       root_ = -1
     endif
-    if (root_ == -1) then 
-      call psb_realloc(size(dat),dat_,iinfo)
-      dat_ = dat
-      if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-           & mpi_dnrm2_op,ictxt,info)
+    if (if_caf) then
+      me = this_image()
+      if (root_ == -1) then 
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        if (iinfo == psb_success_) call co_reduce(co_dat_,caf_dnrm2)
+        if (iinfo == psb_success_) dat=co_dat_
+      else
+        if (allocated(co_dat_)) deallocate(co_dat_)
+        allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
+	co_dat_=dat
+        call co_reduce(co_dat_, caf_dnrm2, result_image=root_+1)
+        if (me == root_ + 1) dat=co_dat_
+      endif
+      if (allocated(co_dat_)) deallocate(co_dat_)
     else
-      if (iam == root_) then 
+      if (root_ == -1) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
-             & mpi_dnrm2_op,root_,ictxt,info)
+        if (iinfo == psb_success_) &
+             & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
+             & mpi_dnrm2_op,ictxt,info)
       else
-        call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,&
-             & mpi_dnrm2_op,root_,ictxt,info)
-      end if
+        if (iam == root_) then 
+          call psb_realloc(size(dat),dat_,iinfo)
+          dat_ = dat
+          call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_dpk_,&
+               & mpi_dnrm2_op,root_,ictxt,info)
+        else
+          call psb_realloc(1,dat_,iinfo)
+          call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_dpk_,&
+               & mpi_dnrm2_op,root_,ictxt,info)
+        end if
+      endif
     endif
 #endif    
   end subroutine psb_d_nrm2v

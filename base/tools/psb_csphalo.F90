@@ -58,7 +58,7 @@
 Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_csphalo
-
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -195,8 +195,12 @@ Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
-  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,& 
-       & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  if (if_caf) then
+    call caf_alltoall(sdsz,rvsz,1, minfo)
+  else
+    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,& 
+         & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'

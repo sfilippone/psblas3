@@ -244,6 +244,14 @@ module psi_i_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswapdata_multivect
+    subroutine psi_iswap_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag,m
+      integer(psb_ipk_), intent(out)         :: info
+      integer(psb_ipk_)         :: y(:,:)
+      integer(psb_ipk_)                      :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswap_xchg_m
     subroutine psi_iswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -253,6 +261,14 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxm
+    subroutine psi_iswap_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      integer(psb_ipk_)            :: y(:)
+      integer(psb_ipk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswap_xchg_v
     subroutine psi_iswapidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -262,6 +278,14 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxv
+    subroutine psi_iswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      class(psb_i_base_vect_type)            :: y
+      integer(psb_ipk_)                         :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswap_xchg_vect
     subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -326,6 +350,14 @@ module psi_i_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_iswaptran_multivect
+    subroutine psi_iswaptran_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag,m
+      integer(psb_ipk_), intent(out)         :: info
+      integer(psb_ipk_)         :: y(:,:)
+      integer(psb_ipk_)                      :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswaptran_xchg_m
     subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -335,6 +367,14 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxm
+    subroutine psi_iswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      integer(psb_ipk_)         :: y(:)
+      integer(psb_ipk_)                      :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswaptran_xchg_v
     subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -344,6 +384,14 @@ module psi_i_mod
       integer(psb_ipk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxv
+    subroutine psi_iswaptran_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
+      import 
+      integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+      integer(psb_ipk_), intent(out)         :: info
+      class(psb_i_base_vect_type)            :: y
+      integer(psb_ipk_)                      :: beta
+      class(psb_xch_idx_type), intent(inout) :: xchg
+    end subroutine psi_iswaptran_xchg_vect
     subroutine psi_itran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 

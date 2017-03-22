@@ -416,9 +416,7 @@ subroutine test_psb_imax_s(this)
 	Class(CafTestMethod), intent(inout) :: this
         integer :: dat, check, root, info, np, icontxt
 	call prepare_test(dat,check,root,info, np, icontxt)
-        print*,'dat, check before', dat, check, this_image()
         call psb_max(icontxt, dat, root)
-        print*,'dat after', dat, this_image()
 	@assertEqual(dat,check)
 	call psb_exit(icontxt)
 end subroutine test_psb_imax_s
@@ -442,9 +440,7 @@ subroutine test_psb_dmax_s(this)
         double precision :: dat, check
         integer :: root, info, np, icontxt
 	call prepare_test(dat,check,root,info, np, icontxt)
-        print*,'dat, check before', dat, check, this_image()
         call psb_max(icontxt, dat, root)
-        print*,'dat after', dat, this_image()
 	@assertEqual(dat,check)
 	call psb_exit(icontxt)
 end subroutine test_psb_dmax_s
@@ -535,9 +531,7 @@ subroutine test2_psb_imax_s(this)
 	Class(CafTestMethod), intent(inout) :: this
         integer :: dat, check, root, info, np, icontxt
 	call prepare_test2(dat,check,root,info, np, icontxt)
-        print*,'dat, check before', dat, check, this_image()
         call psb_max(icontxt, dat, root)
-        print*,'dat after', dat, this_image()
 	@assertEqual(dat,check)
 	call psb_exit(icontxt)
 end subroutine test2_psb_imax_s
@@ -561,9 +555,7 @@ subroutine test2_psb_dmax_s(this)
         double precision :: dat, check
         integer :: root, info, np, icontxt
 	call prepare_test2(dat,check,root,info, np, icontxt)
-        print*,'dat, check before', dat, check, this_image()
         call psb_max(icontxt, dat, root)
-        print*,'dat after', dat, this_image()
 	@assertEqual(dat,check)
 	call psb_exit(icontxt)
 end subroutine test2_psb_dmax_s

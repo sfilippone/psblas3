@@ -83,6 +83,8 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
   !
   use psb_base_mod
   use psb_mat_mod
+  use iso_fortran_env
+  use psb_caf_mod
   implicit none
 
   ! parameters
@@ -113,6 +115,14 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
   integer(psb_ipk_), parameter    :: nb=30
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
+  !logical, parameter :: if_caf=.true.
+ 
+  !CAF variables
+  integer(psb_ipk_), allocatable  :: b_irow(:)[:],b_icol(:)[:]
+  real(psb_dpk_), allocatable    :: b_val(:)[:]
+  integer(psb_ipk_), save :: b_ll[*], b_nnr[*]
+  type(event_type), save :: ll_done[*], transf_done[*]
+   
 
   info = psb_success_
   err  = 0
@@ -247,6 +257,94 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
     ! now we should insert rows i_count..j_count-1
     nnr = j_count - i_count
     
+    if (if_caf) then
+      if (iam == root) then
+      ll = 0
+      do i= i_count, j_count-1
+        call a_glob%csget(i,i,nz,&
+             & irow,icol,val,info,nzin=ll,append=.true.)
+        if (info /= psb_success_) then            
+          if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+            write(psb_err_unit,*) 'Allocation failure? This should not happen!'
+          end if
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        end if
+        ll = ll + nz
+      end do
+
+      if (allocated(b_val)) deallocate(b_val)
+      if (allocated(b_irow)) deallocate(b_irow)
+      if (allocated(b_icol)) deallocate(b_icol)
+
+      allocate(b_val(ll)[*], b_irow(ll)[*], b_icol(ll)[*])
+      do k_count = 1, np_sharing
+        iproc = iwork(k_count)
+        !print*,'np_sharing', np_sharing        
+        if (iproc == iam) then
+          call psb_spins(ll,irow,icol,val,a,desc_a,info)
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
+            ch_err='psb_spins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        else
+          
+          b_ll[iproc + 1]=ll
+          b_nnr[iproc + 1]=nnr
+          event post(ll_done[iproc+1])
+          !print*,'root has post ll_done for', iproc+1
+          b_val(1:ll)=val(1:ll)
+          b_irow(1:ll)=irow(1:ll)
+          b_icol(1:ll)=icol(1:ll)
+          event post(transf_done[iproc+1])
+          !print*,'root has post transf_done for', iproc+1
+        endif
+      end do
+    else if (iam /= root) then
+      
+      if (allocated(b_val)) deallocate(b_val)
+      if (allocated(b_irow)) deallocate(b_irow)
+      if (allocated(b_icol)) deallocate(b_icol)
+
+      allocate(b_val(1)[*], b_irow(1)[*], b_icol(1)[*])
+      do k_count = 1, np_sharing
+        iproc = iwork(k_count)
+        if (iproc == iam) then
+          !print*,iproc+1,' waiting for ll_done', np_sharing
+          event wait(ll_done)
+          !print*,iproc+1,'stopped waiting for ll_done'
+          ll = b_ll
+          nnr = b_nnr
+          if (ll > size(irow)) then 
+            write(psb_err_unit,*) iam,'need to reallocate ',ll
+            deallocate(val,irow,icol)
+            allocate(val(ll),irow(ll),icol(ll),stat=info)
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
+              ch_err='Allocate'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if  
+          endif
+          !print*,iproc+1,' waiting for transf_done'
+          event wait(transf_done)
+          !print*,iproc+1,'stopped waiting for transf_done'
+          val(1:ll)=b_val(1:ll)[root+1]
+          icol(1:ll)=b_icol(1:ll)[root+1]
+          irow(1:ll)=b_irow(1:ll)[root+1]
+          call psb_spins(ll,irow,icol,val,a,desc_a,info)
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
+            ch_err='psspins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        endif
+      end do
+    endif
+  else   
     if (iam == root) then
       
       ll = 0
@@ -280,7 +378,7 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
           call psb_snd(ictxt,irow(1:ll),iproc)
           call psb_snd(ictxt,icol(1:ll),iproc)
           call psb_snd(ictxt,val(1:ll),iproc)
-          call psb_rcv(ictxt,ll,iproc)
+          !call psb_rcv(ictxt,ll,iproc)
         endif
       end do
     else if (iam /= root) then
@@ -305,7 +403,7 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,irow(1:ll),root)
           call psb_rcv(ictxt,icol(1:ll),root)
           call psb_rcv(ictxt,val(1:ll),root)
-          call psb_snd(ictxt,ll,root)
+          !call psb_snd(ictxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
           if(info /= psb_success_) then
             info=psb_err_from_subroutine_
@@ -316,6 +414,7 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
         endif
       end do
     endif
+  endif
     i_count = j_count
   end do
 

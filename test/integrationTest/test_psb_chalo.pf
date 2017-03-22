@@ -2354,7 +2354,6 @@ subroutine test_psb_chalo_tran_8imgs_vect_b(this)
         !GETTING BACK X
         v = x%get_vect()
 
-        PRINT*,'-------', ME, V
 	if ((me==1).or.(me==2)) then
 		true = 1
 	else

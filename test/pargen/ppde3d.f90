@@ -147,6 +147,7 @@ program ppde3d
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
+  real(psb_dpk_), allocatable :: v(:)
 
   ! other variables
   integer(psb_ipk_) :: info, i
@@ -236,6 +237,11 @@ program ppde3d
   eps   = 1.d-9
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+  if (iam == psb_root_) then
+    fname="sol3d.mtx"
+    v=xxv%get_vect()
+    call mm_array_write(v,"exact solution", info,iunit=138, filename=fname)
+  endif
 
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_

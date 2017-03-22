@@ -1,6 +1,6 @@
 include ../../Make.inc
 
-BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
+BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o psb_caf_mod.o
 COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o
 UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
@@ -36,9 +36,8 @@ UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod
 	serial/psb_c_base_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_c_csc_mat_mod.o serial/psb_c_mat_mod.o \
 	serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_mat_mod.o 
 
-
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
-OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
+OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
 LIBDIR=..
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
@@ -57,7 +56,7 @@ psb_realloc_mod.o:  psb_error_mod.o
 $(UTIL_MODS): $(BASIC_MODS)
 
 psi_penv_mod.o: psi_comm_buffers_mod.o 
-psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
+psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o psb_caf_mod.o
 
 
 aux/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
@@ -154,6 +153,10 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 
 psb_base_mod.o: $(MODULES)
+
+
+psb_caf_mod.o: psb_caf_mod.f90 psb_const_mod.o
+	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 
 	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@

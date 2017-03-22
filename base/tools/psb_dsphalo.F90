@@ -58,7 +58,7 @@
 Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_dsphalo
-
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -195,8 +195,12 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
-  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,& 
-       & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  if (if_caf) then
+      call caf_alltoall(sdsz,rvsz,1, minfo)
+  else
+      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,& 
+           & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'
@@ -278,13 +282,21 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-
-  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
-       & acoo%val,rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+  if (if_caf) then
+    call caf_alltoallv(valsnd,sdsz,bsdindx, acoo%val, rvsz,&
+         & brvindx, minfo)
+    call caf_alltoallv(iasnd,sdsz,bsdindx, acoo%ia, rvsz,&
+         & brvindx, minfo)
+    call caf_alltoallv(jasnd,sdsz,bsdindx, acoo%ja, rvsz,&
+         & brvindx, minfo)
+  else
+    call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
+         & acoo%val,rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
+    call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+         & acoo%ia,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+    call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_integer,&
+         & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+  endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'

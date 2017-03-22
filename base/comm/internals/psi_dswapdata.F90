@@ -89,6 +89,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -142,7 +143,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   else
     call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_xchg,info)
@@ -190,7 +191,6 @@ subroutine psi_dswap_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
 
   info=psb_success_
   name='psi_swap_xchg_m'
-  print*,me
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
@@ -755,6 +755,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -808,7 +809,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
   else
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_xchg,info)
@@ -856,7 +857,6 @@ subroutine psi_dswap_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
 
   info=psb_success_
   name='psi_swap_xchg_v'
-  print*, name
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
@@ -1375,6 +1375,7 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -1429,7 +1430,7 @@ subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
   else
     call psi_swapdata(ictxt,icomm,flag,beta,y,d_xchg,info)
@@ -1478,7 +1479,6 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
 
   info=psb_success_
   name='psi_xchg_vect'
-  print*,name
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
@@ -1533,9 +1533,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
     !
     if (allocated(buffer)) deallocate(buffer)
     !write(*,*) 'Allocating buffer',xchg%max_buffer_size
-    print*,'allocating buffer', me
     allocate(buffer(xchg%max_buffer_size)[*],stat=info)
-    print*,'buffer allocated', me
     if (allocated(sndbuf)) deallocate(sndbuf)
     if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
     if (info /= 0) then

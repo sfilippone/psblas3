@@ -63,20 +63,23 @@ end subroutine psi_renum_index
 subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   use psi_mod, psi_protect_name =>  psi_cnv_v2xch
   use psb_realloc_mod
+  use psb_caf_mod
   implicit none
   integer(psb_ipk_), intent(in)         :: ictxt, vidx_in(:)
   type(psb_xch_idx_type), intent(inout) :: xch_idx
   integer(psb_ipk_), intent(out)        :: info
 
   !     ....local scalars....      
-  integer(psb_ipk_) :: np, me
+  integer(psb_ipk_) :: np, me, img
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: nxch, nsnd, nrcv, nesd,nerv, ip, j, k, ixch
   !     ...parameters
   integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: debug=.false.
   character(len=20)  :: name
-
+  integer(psb_ipk_), allocatable :: buf_rmt_rcv_bnd(:)[:], buf_rmt_snd_bnd(:)[:]
+  type(event_type), allocatable, save :: snd_done(:)[:]
+  type(event_type), save :: rcv_done[*]
   name='psi_cnv_v2xch'
   call psb_get_erraction(err_act)
   debug_level = psb_get_debug_level()
@@ -85,6 +88,8 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   info = psb_success_
   
   call psb_info(ictxt,me,np)
+  me = this_image()
+  np = num_images()
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
@@ -114,6 +119,12 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   ixch   = 1
   xch_idx%loc_snd_bnd(1) = 1
   xch_idx%loc_rcv_bnd(1) = 1 
+  if (if_caf) then
+    if (allocated(buf_rmt_rcv_bnd)) deallocate(buf_rmt_rcv_bnd)
+    if (allocated(buf_rmt_snd_bnd)) deallocate(buf_rmt_snd_bnd)
+    if (allocated(snd_done)) deallocate(snd_done)
+    allocate(buf_rmt_rcv_bnd(np*2)[*], buf_rmt_snd_bnd(np*2)[*], snd_done(np)[*])
+  endif
   do 
     if (ip > size(vidx_in)) then 
       write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
@@ -131,17 +142,32 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
          & vidx_in(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd)
     xch_idx%loc_rcv_bnd(ixch+1) =  xch_idx%loc_rcv_bnd(ixch) + nerv
     xch_idx%loc_snd_bnd(ixch+1) =  xch_idx%loc_snd_bnd(ixch) + nesd
-    call psb_snd(ictxt,xch_idx%loc_rcv_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
-    call psb_snd(ictxt,xch_idx%loc_snd_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
-    call psb_rcv(ictxt,xch_idx%rmt_rcv_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
-    call psb_rcv(ictxt,xch_idx%rmt_snd_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
+    img = xch_idx%prcs_xch(ixch) + 1
+!Here I am assuming that all the data exchange between two images takes place in one exchange
+    if (if_caf) then
+      buf_rmt_rcv_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_rcv_bnd(ixch:ixch+1)
+      buf_rmt_snd_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_snd_bnd(ixch:ixch+1)
+      event post(snd_done(me)[img])
+      event wait(snd_done(img))
+      xch_idx%rmt_rcv_bnd(ixch,1:2)=buf_rmt_rcv_bnd(img*2 - 1 : img*2)
+      xch_idx%rmt_snd_bnd(ixch,1:2)=buf_rmt_snd_bnd(img*2 - 1 : img*2)
+    else
+      call psb_snd(ictxt,xch_idx%loc_rcv_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
+      call psb_snd(ictxt,xch_idx%loc_snd_bnd(ixch:ixch+1),xch_idx%prcs_xch(ixch))
+      call psb_rcv(ictxt,xch_idx%rmt_rcv_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
+      call psb_rcv(ictxt,xch_idx%rmt_snd_bnd(ixch,1:2),xch_idx%prcs_xch(ixch))
+    endif
     ip     = ip+nerv+nesd+3
     ixch   = ixch + 1 
   end do
   xch_idx%rmt_rcv_bnd(:,2) = xch_idx%rmt_rcv_bnd(:,2) - 1
   xch_idx%rmt_snd_bnd(:,2) = xch_idx%rmt_snd_bnd(:,2) - 1
-  
-  
+  if (if_caf) then
+    if (allocated(buf_rmt_rcv_bnd)) deallocate(buf_rmt_rcv_bnd)
+    if (allocated(buf_rmt_snd_bnd)) deallocate(buf_rmt_snd_bnd)
+    if (allocated(snd_done)) deallocate(snd_done)
+    sync all
+  endif
   call psb_erractionrestore(err_act)
   return
 

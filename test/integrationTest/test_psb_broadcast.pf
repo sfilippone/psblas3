@@ -347,7 +347,6 @@ subroutine test_psb_dbroadcast_s(this)
         double precision :: dat, check
 	integer :: root, info, np, icontxt
 	call prepare_test(dat,check,root,info, np, icontxt)
-        print*,'from test:', this_image(), dat
         call psb_bcast(icontxt, dat, root)
 	@assertEqual(dat,check)
 	call psb_exit(icontxt)

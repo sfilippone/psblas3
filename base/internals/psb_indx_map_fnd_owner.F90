@@ -1,4 +1,4 @@
-!!$ 
+!ii!$ 
 !!$              Parallel Sparse BLAS  version 3.4
 !!$    (C) Copyright 2006, 2010, 2015
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
@@ -51,6 +51,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
+  use psb_caf_mod
   use psb_indx_map_mod, psb_protect_name => psb_indx_map_fnd_owner
 #ifdef MPI_MOD
   use mpi
@@ -168,10 +169,13 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     if (gettime) then 
       t3 = psb_wtime()
     end if
-
-    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_integer,&
-         & hproc,hsz,hidx,psb_mpi_ipk_integer,&
-         & icomm,minfo)
+    if (if_caf) then
+      call caf_allgatherv(idx, hsz(me+1), hproc, hsz, hidx, info)
+    else
+      call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_integer,&
+           & hproc,hsz,hidx,psb_mpi_ipk_integer,&
+           & icomm,minfo)
+    endif
     if (gettime) then 
       tamx = psb_wtime() - t3
     end if
@@ -211,11 +215,15 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
     if (gettime) then 
       t3 = psb_wtime()
     end if
+ 
 
     ! Collect all the answers with alltoallv (need sizes) 
-    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,&
-         & rvsz,1,psb_mpi_def_integer,icomm,minfo)
-
+    if (if_caf) then
+      call caf_alltoall(sdsz,rvsz, 1, minfo)
+    else
+      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,&
+           & rvsz,1,psb_mpi_def_integer,icomm,minfo)
+    endif
     isz = sum(rvsz) 
 
     allocate(answers(isz,2),idxsrch(nv,2),stat=info)
@@ -228,9 +236,15 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       rvidx(ip) = j
       j         = j + rvsz(ip)
     end do
-    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_integer,&
-         & answers(:,1),rvsz,rvidx,psb_mpi_ipk_integer,&
-         & icomm,minfo)
+    print*,'---------hproc', hproc,'sdsz',sdsz,'sdidx',sdidx,'answers',answers(:,1), 'rvsz', rvsz,'rvidx', rvidx, this_image()
+
+    if (if_caf) then
+      call caf_alltoallv(hproc, sdsz,sdidx, answers(:,1),rvsz,rvidx, minfo)
+    else
+      call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_integer,&
+           & answers(:,1),rvsz,rvidx,psb_mpi_ipk_integer,&
+           & icomm,minfo)
+    endif
     if (gettime) then 
       tamx = psb_wtime() - t3 + tamx
     end if

@@ -93,6 +93,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -147,7 +148,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   else
     call  psi_swaptran(ictxt,icomm,flag,n,beta,y,d_xchg,info)
@@ -756,6 +757,7 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -809,7 +811,7 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call  psi_swaptran(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
   else
     call  psi_swaptran(ictxt,icomm,flag,beta,y,d_xchg,info)
@@ -855,7 +857,6 @@ subroutine psi_zswaptran_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
-  print*,' call psi_dswaptran_xchg_v'
   info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
@@ -1393,6 +1394,7 @@ subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -1447,7 +1449,7 @@ subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
-  if (.false.) then
+  if (.not.(if_caf2)) then
     call  psi_swaptran(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
   else
     call  psi_swaptran(ictxt,icomm,flag,beta,y,d_xchg,info)

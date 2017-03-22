@@ -89,6 +89,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -107,6 +108,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
+  class(psb_xch_idx_type), pointer     :: d_xchg
   character(len=20)  :: name
 
   info=psb_success_
@@ -134,14 +136,19 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
+  call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info)
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
 
+  if (.not.(if_caf2)) then
+    call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  else
+    call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_xchg,info)
+  endif
 
-  call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -151,6 +158,174 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
     return
 end subroutine psi_iswapdatam
+
+subroutine psi_iswap_xchg_m(iictxt,iicomm,flag,m,beta,y,xchg,info)
+  use psi_mod, psb_protect_name => psi_iswap_xchg_m
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_desc_mod
+  use psb_penv_mod
+  use psb_i_base_vect_mod
+  use iso_fortran_env
+  implicit none   
+  integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag, m
+  integer(psb_ipk_), intent(out)         :: info
+  integer(psb_ipk_)                      :: y(:,:)
+  integer(psb_ipk_)                      :: beta
+  class(psb_xch_idx_type), intent(inout) :: xchg
+  ! locals
+  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+       & proc_to_comm, p2ptag, iret
+  integer(psb_ipk_) :: nesd, nerv,&
+       & err_act, i, idx_pt, totsnd_, totrcv_,p1,p2,isz,rp1,rp2,&
+       & snd_pt, rcv_pt, pnti, n, ip, img, nxch, myself
+  integer :: count
+  integer(psb_ipk_), allocatable, save :: buffer(:)[:], sndbuf(:)
+  type(event_type), allocatable, save :: ufg(:)[:]
+  type(event_type), allocatable, save :: clear[:]
+  integer, save :: last_clear_count = 0
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
+       & albf,do_send,do_recv
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name
+
+  info=psb_success_
+  name='psi_swap_datav'
+  call psb_erractionsave(err_act)
+  ictxt = iictxt
+  icomm = iicomm
+  call psb_info(ictxt,me,np) 
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  n=1
+
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
+  do_send = swap_mpi .or. swap_sync .or. swap_send
+  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+
+  if (.not.(do_send.and.do_recv)) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='Unimplemented case in xchg_vect')
+    goto 9999
+  end if
+
+  if (.not.allocated(ufg)) then
+    !write(*,*) 'Allocating events',np
+    allocate(ufg(np)[*],stat=info)
+    if (info == 0) allocate(clear[*],stat=info)
+    if (info /= 0) then
+
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray events allocation')
+      goto 9999
+    end if
+  else
+
+    if (last_clear_count>0) &
+         & event wait(clear,until_count=last_clear_count)
+  end if
+
+  if (psb_size(buffer) < xchg%max_buffer_size) then
+    !
+    ! By construction, max_buffer_size was computed with a collective. 
+    !
+    if (allocated(buffer)) deallocate(buffer)
+    if (allocated(sndbuf)) deallocate(sndbuf)
+    !write(*,*) 'Allocating buffer',xchg%max_buffer_size
+    allocate(buffer(xchg%max_buffer_size)[*],stat=info)
+    if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
+    if (info /= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray buffer allocation')
+      goto 9999
+    end if
+  end if
+
+  if (.false.) then
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
+      call psi_gth(isz,m,xchg%loc_snd_idx(p1:p2),y,buffer(p1:p2))
+      event post(ufg(myself)[img])
+    end do
+
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+      call psi_sct(isz,m,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta,y)
+      event post(clear[img])
+
+    end do
+    last_clear_count = nxch
+  else
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      call psi_gth(isz,m,xchg%loc_snd_idx(p1:p2),&
+           & y,sndbuf(p1:p2))
+      buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+    end do
+    !
+    ! Doing event post later should provide more opportunities for
+    ! overlap
+    ! 
+    do ip= 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event post(ufg(myself)[img])
+    end do
+
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
+      call psi_sct(isz,m,xchg%loc_rcv_idx(p1:p2),&
+        & buffer(p1:p2),beta, y)
+      event post(clear[img])
+    end do
+
+    last_clear_count = nxch
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end subroutine psi_iswap_xchg_m
 
 subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
      & totxch,totsnd,totrcv,work,info)
@@ -580,6 +755,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -598,6 +774,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer(psb_ipk_), pointer :: d_idx(:)
+  class(psb_xch_idx_type), pointer     :: d_xchg
   character(len=20)  :: name
 
   info=psb_success_
@@ -626,13 +803,20 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
+
   call desc_a%get_list(data_,d_idx,totxch,idxr,idxs,info) 
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
 
-  call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  if (.not.(if_caf2)) then
+    call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  else
+    call psi_swapdata(ictxt,icomm,flag,beta,y,d_xchg,info)
+  endif
+
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -644,6 +828,173 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
 end subroutine psi_iswapdatav
 
 
+subroutine psi_iswap_xchg_v(iictxt,iicomm,flag,beta,y,xchg,info)
+  use psi_mod, psb_protect_name => psi_iswap_xchg_v
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_desc_mod
+  use psb_penv_mod
+  use psb_i_base_vect_mod
+  use iso_fortran_env
+  implicit none   
+  integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+  integer(psb_ipk_), intent(out)         :: info
+  integer(psb_ipk_)                      :: y(:)
+  integer(psb_ipk_)                      :: beta
+  class(psb_xch_idx_type), intent(inout) :: xchg
+  ! locals
+  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+       & proc_to_comm, p2ptag, iret
+  integer(psb_ipk_) :: nesd, nerv,&
+       & err_act, i, idx_pt, totsnd_, totrcv_,p1,p2,isz,rp1,rp2,&
+       & snd_pt, rcv_pt, pnti, n, ip, img, nxch, myself
+  integer :: count
+  integer(psb_ipk_), allocatable, save :: buffer(:)[:], sndbuf(:)
+  type(event_type), allocatable, save :: ufg(:)[:]
+  type(event_type), allocatable, save :: clear[:]
+  integer, save :: last_clear_count = 0
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
+       & albf,do_send,do_recv
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name
+
+  info=psb_success_
+  name='psi_swap_datav'
+  call psb_erractionsave(err_act)
+  ictxt = iictxt
+  icomm = iicomm
+  call psb_info(ictxt,me,np) 
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  n=1
+
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
+  do_send = swap_mpi .or. swap_sync .or. swap_send
+  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+
+  if (.not.(do_send.and.do_recv)) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='Unimplemented case in xchg_vect')
+    goto 9999
+  end if
+
+  if (.not.allocated(ufg)) then
+    !write(*,*) 'Allocating events',np
+    allocate(ufg(np)[*],stat=info)
+    if (info == 0) allocate(clear[*],stat=info)
+    if (info /= 0) then
+
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray events allocation')
+      goto 9999
+    end if
+  else
+
+    if (last_clear_count>0) &
+         & event wait(clear,until_count=last_clear_count)
+  end if
+
+  if (psb_size(buffer) < xchg%max_buffer_size) then
+    !
+    ! By construction, max_buffer_size was computed with a collective. 
+    !
+    if (allocated(buffer)) deallocate(buffer)
+    if (allocated(sndbuf)) deallocate(sndbuf)
+    !write(*,*) 'Allocating buffer',xchg%max_buffer_size
+    allocate(buffer(xchg%max_buffer_size)[*],stat=info)
+    if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
+    if (info /= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray buffer allocation')
+      goto 9999
+    end if
+  end if
+
+  if (.false.) then
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
+      call psi_gth(isz,xchg%loc_snd_idx(p1:p2),y,buffer(p1:p2))
+      event post(ufg(myself)[img])
+    end do
+
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+      call psi_sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta,y)
+      event post(clear[img])
+
+    end do
+    last_clear_count = nxch
+  else
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      call psi_gth(isz,xchg%loc_snd_idx(p1:p2),&
+           & y,sndbuf(p1:p2))
+      buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+    end do
+    !
+    ! Doing event post later should provide more opportunities for
+    ! overlap
+    ! 
+    do ip= 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event post(ufg(myself)[img])
+    end do
+
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
+      call psi_sct(isz,xchg%loc_rcv_idx(p1:p2),&
+        & buffer(p1:p2),beta, y)
+      event post(clear[img])
+    end do
+
+    last_clear_count = nxch
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+end subroutine psi_iswap_xchg_v
 
 !
 !
@@ -1026,6 +1377,7 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_desc_mod
   use psb_penv_mod
+  use psb_caf_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -1045,6 +1397,7 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   class(psb_i_base_vect_type), pointer :: d_vidx
+  class(psb_xch_idx_type), pointer     :: d_xchg
   character(len=20)  :: name
 
   info=psb_success_
@@ -1074,12 +1427,18 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
   end if
 
   call desc_a%get_list(data_,d_vidx,totxch,idxr,idxs,info) 
+  if (info == 0) call desc_a%get_list(data_,d_xchg,info)
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
 
-  call psi_swapdata(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+  if (.not.(if_caf2)) then
+    call psi_swapdata(ictxt,icomm,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+  else
+    call psi_swapdata(ictxt,icomm,flag,beta,y,d_xchg,info)
+  endif
+
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -1089,6 +1448,187 @@ subroutine psi_iswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
     return
 end subroutine psi_iswapdata_vect
+
+subroutine psi_iswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
+  use psi_mod, psb_protect_name => psi_iswap_xchg_vect
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_desc_mod
+  use psb_penv_mod
+  use psb_i_base_vect_mod
+  use iso_fortran_env
+  implicit none   
+  integer(psb_ipk_), intent(in)          :: iictxt,iicomm,flag
+  integer(psb_ipk_), intent(out)         :: info
+  class(psb_i_base_vect_type)            :: y
+  integer(psb_ipk_)                      :: beta
+  class(psb_xch_idx_type), intent(inout) :: xchg
+
+  ! locals
+  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+       & proc_to_comm, p2ptag, iret
+  integer(psb_ipk_) :: nesd, nerv,&
+       & err_act, i, idx_pt, totsnd_, totrcv_,p1,p2,isz,rp1,rp2,&
+       & snd_pt, rcv_pt, pnti, n, ip, img, nxch, myself
+  integer :: count
+  integer(psb_ipk_), allocatable, save :: buffer(:)[:], sndbuf(:)
+  type(event_type), allocatable, save :: ufg(:)[:]
+  type(event_type), allocatable, save :: clear[:]
+  integer, save :: last_clear_count = 0
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
+       & albf,do_send,do_recv
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name
+
+  info=psb_success_
+  name='psi_xchg_vect'
+  call psb_erractionsave(err_act)
+  ictxt = iictxt
+  icomm = iicomm
+
+  call psb_info(ictxt,me,np) 
+  if (np == -1) then
+    info=psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (np /= num_images()) then
+    write(*,*) 'Something is wrong MPI vs CAF ', np, num_images()
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='Num_images  /= np')
+    goto 9999
+  end if
+
+  n=1
+
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
+  do_send = swap_mpi .or. swap_sync .or. swap_send
+  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+
+  if (.not.(do_send.and.do_recv)) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='Unimplemented case in xchg_vect')
+    goto 9999
+  end if
+  if (.not.allocated(ufg)) then
+    !write(*,*) 'Allocating events',np
+    allocate(ufg(np)[*],stat=info)
+    if (info == 0) allocate(clear[*],stat=info)
+    if (info /= 0) then
+
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray events allocation')
+      goto 9999
+    end if
+  else
+    if (last_clear_count>0) &
+         & event wait(clear,until_count=last_clear_count)
+  end if
+  me = this_image()
+  if (psb_size(buffer) < xchg%max_buffer_size) then
+    !
+    ! By construction, max_buffer_size was computed with a collective. 
+    !
+    if (allocated(buffer)) deallocate(buffer)
+    !write(*,*) 'Allocating buffer',xchg%max_buffer_size, me
+    allocate(buffer(xchg%max_buffer_size)[*],stat=info)
+    if (allocated(sndbuf)) deallocate(sndbuf)
+    if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
+    if (info /= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Coarray buffer allocation')
+      goto 9999
+    end if
+  end if
+  if (.false.) then 
+    !sync all
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
+      call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(p1:p2))
+      event post(ufg(myself)[img])
+    end do
+
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+      call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta)
+      event post(clear[img])
+
+    end do
+    last_clear_count = nxch
+
+  else
+
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_snd_bnd(ip)
+      p2  = xchg%loc_snd_bnd(ip+1)-1
+      rp1 = xchg%rmt_rcv_bnd(ip,1)
+      rp2 = xchg%rmt_rcv_bnd(ip,2)
+      isz = p2-p1+1
+      !write(0,*) myself,'Posting for ',img,' boundaries: ',rp1,rp2
+      if (.false.) then 
+        call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(rp1:rp2)[img])
+      else
+        call y%gth(isz,xchg%loc_snd_idx(p1:p2),sndbuf(p1:p2))
+        buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+      end if
+    end do
+    !
+    ! Doing event post later should provide more opportunities for
+    ! overlap
+    ! 
+    do ip= 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event post(ufg(myself)[img])
+    end do
+    do ip = 1, nxch
+      img = xchg%prcs_xch(ip) + 1
+      event wait(ufg(img))
+      img = xchg%prcs_xch(ip) + 1
+      p1  = xchg%loc_rcv_bnd(ip)
+      p2  = xchg%loc_rcv_bnd(ip+1)-1
+      isz = p2-p1+1
+      rp1 = xchg%rmt_snd_bnd(ip,1)
+      rp2 = xchg%rmt_snd_bnd(ip,2)
+      !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
+      call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(p1:p2),beta)
+      event post(clear[img])
+    end do
+
+    last_clear_count = nxch
+
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psi_iswap_xchg_vect
 
 
 !

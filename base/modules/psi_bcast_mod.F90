@@ -70,6 +70,7 @@ contains
 
 
   subroutine psb_ibcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -79,8 +80,8 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     integer(psb_ipk_), intent(inout)   :: dat
+    integer(psb_ipk_), allocatable :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
-
     integer(psb_mpik_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
@@ -90,12 +91,22 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_ipk_integer,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf 
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_ipk_integer,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_ibcasts
 
   subroutine psb_ibcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -105,6 +116,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     integer(psb_ipk_), intent(inout) :: dat(:)
+    integer(psb_ipk_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional  :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -114,13 +126,23 @@ contains
     else
       root_ = psb_root_
     endif
-
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+   endif
 #endif    
   end subroutine psb_ibcastv
 
   subroutine psb_ibcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -130,6 +152,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     integer(psb_ipk_), intent(inout) :: dat(:,:)
+    integer(psb_ipk_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -140,14 +163,24 @@ contains
     else
       root_ = psb_root_
     endif
-
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf 
+      if (allocated(dat_buf)) deallocate(dat_buf) 
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_ibcastm
 
 
   subroutine psb_sbcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -157,6 +190,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     real(psb_spk_), intent(inout)   :: dat
+    real(psb_spk_), allocatable  :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -168,13 +202,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_r_spk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_r_spk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_sbcasts
 
 
   subroutine psb_sbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -184,6 +228,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     real(psb_spk_), intent(inout) :: dat(:)
+    real(psb_spk_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -195,13 +240,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
-
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_sbcastv
 
   subroutine psb_sbcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -211,6 +266,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     real(psb_spk_), intent(inout) :: dat(:,:)
+    real(psb_spk_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -222,14 +278,24 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
-
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_sbcastm
 
 
   subroutine psb_dbcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -239,6 +305,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     real(psb_dpk_), intent(inout)   :: dat
+    real(psb_dpk_), allocatable  :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -250,13 +317,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_r_dpk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_r_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_dbcasts
 
 
   subroutine psb_dbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -266,6 +343,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     real(psb_dpk_), intent(inout) :: dat(:)
+    real(psb_dpk_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -277,12 +355,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_dbcastv
 
   subroutine psb_dbcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -292,6 +381,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     real(psb_dpk_), intent(inout) :: dat(:,:)
+    real(psb_dpk_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -303,12 +393,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_dbcastm
 
   subroutine psb_cbcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -318,10 +419,10 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     complex(psb_spk_), intent(inout)   :: dat
+    complex(psb_spk_), allocatable   :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
-
 #if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
@@ -329,12 +430,22 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_c_spk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_r_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_cbcasts
 
   subroutine psb_cbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -344,6 +455,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     complex(psb_spk_), intent(inout) :: dat(:)
+    complex(psb_spk_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -355,12 +467,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_spk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_c_spk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_cbcastv
 
   subroutine psb_cbcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -370,6 +493,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     complex(psb_spk_), intent(inout) :: dat(:,:)
+    complex(psb_spk_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -381,12 +505,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_spk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf 
+      if (allocated(dat_buf)) deallocate(dat_buf) 
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_c_spk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_cbcastm
 
   subroutine psb_zbcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -396,6 +531,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     complex(psb_dpk_), intent(inout)   :: dat
+    complex(psb_dpk_), allocatable   :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -407,12 +543,25 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_c_dpk_,root_,ictxt,info)
+    if (if_caf2) then
+
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      !print*,'****',this_image(), dat_buf, dat
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      !print*,'***** after',this_image(), dat
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_c_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_zbcasts
 
   subroutine psb_zbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -422,6 +571,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     complex(psb_dpk_), intent(inout) :: dat(:)
+    complex(psb_dpk_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -433,12 +583,23 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,ictxt,info) 
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,ictxt,info) 
+    endif
 #endif    
   end subroutine psb_zbcastv
 
   subroutine psb_zbcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -448,6 +609,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     complex(psb_dpk_), intent(inout) :: dat(:,:)
+    complex(psb_dpk_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -459,13 +621,24 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf 
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_c_dpk_,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_zbcastm
 
 
   subroutine psb_hbcasts(ictxt,dat,root,length)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -492,13 +665,13 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-
     call mpi_bcast(dat,length_,MPI_CHARACTER,root_,ictxt,info)
 #endif    
 
   end subroutine psb_hbcasts
 
   subroutine psb_hbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -522,13 +695,13 @@ contains
     size_   = size(dat) 
 
     call psb_info(ictxt,iam,np)
-
     call mpi_bcast(dat,length_*size_,MPI_CHARACTER,root_,ictxt,info)
 #endif    
 
   end subroutine psb_hbcastv
 
   subroutine psb_lbcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -538,6 +711,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)             :: ictxt
     logical, intent(inout)          :: dat
+    logical, allocatable         :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional   :: root
 
     integer(psb_mpik_) :: iam, np, root_,info
@@ -549,14 +723,24 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,MPI_LOGICAL,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,MPI_LOGICAL,root_,ictxt,info)
+    endif
 #endif    
 
   end subroutine psb_lbcasts
 
 
   subroutine psb_lbcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -566,6 +750,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)             :: ictxt
     logical, intent(inout)          :: dat(:)
+    logical, allocatable          :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional   :: root
 
     integer(psb_mpik_) :: iam, np, root_,info
@@ -577,16 +762,25 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,ictxt,info)
+    if (if_caf2) then
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,ictxt,info)
+    endif
 #endif    
 
   end subroutine psb_lbcastv
 
-
 #if !defined(LONG_INTEGERS)
 
   subroutine psb_i8bcasts(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -596,6 +790,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)      :: ictxt
     integer(psb_long_int_k_), intent(inout)   :: dat
+    integer(psb_long_int_k_), allocatable   :: dat_buf[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -607,12 +802,22 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_lng_integer,root_,ictxt,info)
+    if (if_caf2) then
+      if (allocated(dat_buf)) deallocate(dat_buf)
+      allocate(dat_buf[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,1,psb_mpi_lng_integer,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_i8bcasts
 
   subroutine psb_i8bcastv(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -622,6 +827,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     integer(psb_long_int_k_), intent(inout) :: dat(:)
+    integer(psb_long_int_k_), allocatable :: dat_buf(:)[:]
     integer(psb_mpik_), intent(in), optional  :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -632,12 +838,22 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    if (if_caf2) then
+      allocate(dat_buf(size(dat))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_i8bcastv
 
   subroutine psb_i8bcastm(ictxt,dat,root)
+    use psb_caf_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -647,6 +863,7 @@ contains
 #endif
     integer(psb_mpik_), intent(in)    :: ictxt
     integer(psb_long_int_k_), intent(inout) :: dat(:,:)
+    integer(psb_long_int_k_), allocatable :: dat_buf(:,:)[:]
     integer(psb_mpik_), intent(in), optional :: root
 
     integer(psb_mpik_) :: iam, np, root_,  info
@@ -658,8 +875,17 @@ contains
       root_ = psb_root_
     endif
 
-    call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    if (if_caf2) then
+      allocate(dat_buf(size(dat,1),size(dat,2))[*])
+      dat_buf=dat
+      sync all
+      call co_broadcast(dat_buf,root_ + 1)
+      dat = dat_buf  
+      if (allocated(dat_buf)) deallocate(dat_buf)
+    else
+      call psb_info(ictxt,iam,np)
+      call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    endif
 #endif    
   end subroutine psb_i8bcastm
 

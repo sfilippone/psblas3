@@ -1,1 +1,0 @@
-ADD_TEST_SUITE(test_psb_swapdata_suite)

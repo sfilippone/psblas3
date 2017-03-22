@@ -63,6 +63,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   use psb_base_mod, psb_protect_name => psb_zcdbldext
   use psi_mod
+  use psb_caf_mod
 
 #ifdef MPI_MOD
   use mpi
@@ -467,9 +468,13 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! Exchange data requests with everybody else: so far we have 
       ! accumulated RECV requests, we have an all-to-all to build
       ! matchings SENDs.
-      !       
-      call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1, &
-           & psb_mpi_def_integer,icomm,minfo)
+      !   
+      if (if_caf) then
+        call caf_alltoall(sdsz,rvsz,1, minfo)
+      else    
+        call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1, &
+             & psb_mpi_def_integer,icomm,minfo)
+      endif
       if (minfo /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='mpi_alltoall')

@@ -126,6 +126,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   use psb_const_mod
   use psb_error_mod
   use psb_desc_mod
+  use psb_caf_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -272,8 +273,13 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   dl_mpi = dl_lda
-  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_integer,&
-       & dep_list,dl_mpi,psb_mpi_ipk_integer,icomm,minfo)
+  
+  if (if_caf) then
+   call caf_allgather(itmp,dl_mpi, dep_list, minfo)
+  else
+    call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_integer,&
+         & dep_list,dl_mpi,psb_mpi_ipk_integer,icomm,minfo)
+  endif
   info = minfo
   if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 

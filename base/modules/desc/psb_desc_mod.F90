@@ -707,7 +707,7 @@ contains
 
     do 
       if (ip > size(idx)) then 
-        write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
+        write(psb_err_unit,*) trim(name),': Warning: out of size of input vector ', this_image(),ip, size(idx)
         exit
       end if
       if (idx(ip) == -1) exit

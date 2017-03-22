@@ -5,7 +5,7 @@ include $(INCDIR)/Make.inc.psblas
 # Libraries used
 #
 LIBDIR=$(BASEDIR)/lib/
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
+PSBLAS_LIB= -L$(LIBDIR) -L/opencoarray-1.7.4 -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base -lcaf_mpi
 LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).

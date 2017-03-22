@@ -98,8 +98,11 @@
 !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
 !
 !
+
+
 subroutine psi_desc_index(desc,index_in,dep_list,&
      & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+  use psb_caf_mod
   use psb_desc_mod
   use psb_realloc_mod
   use psb_error_mod
@@ -165,6 +168,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   !     to be received/sent (in the final psblas descriptor).
   !     be careful of the inversion
   !   
+
   allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
   if(info /= psb_success_) then
     info=psb_err_alloc_dealloc_
@@ -186,7 +190,14 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  !call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+
+  if (if_caf) then  
+    call caf_alltoall(sdsz, rvsz,1, minfo)
+  else
+    call mpi_alltoall(sdsz,1,psb_mpi_def_integer,rvsz,1,psb_mpi_def_integer,icomm,minfo)
+  endif
+
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
@@ -291,9 +302,13 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     brvindx(proc+1) = idxr
     idxr = idxr + rvsz(proc+1)
   end do
+  if (if_caf) then
+    call caf_alltoallv(sndbuf, sdsz, bsdindx, rcvbuf, rvsz, brvindx, minfo)
+  else
+    call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
+         & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_integer,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
+  endif
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999
