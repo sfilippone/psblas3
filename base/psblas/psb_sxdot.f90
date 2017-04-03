@@ -1,8 +1,8 @@
 !   
-!                Parallel Sparse BLAS  version 3.4
-!      (C) Copyright 2006, 2010, 2015
-!                         Salvatore Filippone    University of Rome Tor Vergata
-!                         Alfredo Buttari        CNRS-IRIT, Toulouse
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -159,8 +159,8 @@ end function psb_sxdot
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006, 2010, 2015, 2017
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -316,8 +316,8 @@ end function sxdot
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006, 2010, 2015, 2017
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 
@@ -448,8 +448,8 @@ end subroutine psb_sxdotvs
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006, 2010, 2015, 2017
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 

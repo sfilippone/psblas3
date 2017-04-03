@@ -1,8 +1,8 @@
 C
-C             Parallel Sparse BLAS  version 3.4
-C   (C) Copyright 2015
-C                      Salvatore Filippone    University of Rome Tor Vergata
-C                      Alfredo Buttari        CNRS-IRIT, Toulouse
+C             Parallel Sparse BLAS  version 3.5
+C   (C) Copyright 2006, 2010, 2015, 2017
+C       Salvatore Filippone    Cranfield University 
+C       Alfredo Buttari        CNRS-IRIT, Toulouse
 C
 C Redistribution and use in source and binary forms, with or without
 C modification, are permitted provided that the following conditions

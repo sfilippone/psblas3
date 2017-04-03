@@ -1,8 +1,8 @@
 !   
-!                Parallel Sparse BLAS  version 3.4
-!      (C) Copyright 2006, 2010, 2015
-!                         Salvatore Filippone    University of Rome Tor Vergata
-!                         Alfredo Buttari        CNRS-IRIT, Toulouse
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -132,8 +132,8 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
 end subroutine psb_salloc
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006, 2010, 2015, 2017
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
 !!$ 

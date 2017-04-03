@@ -1,8 +1,8 @@
 !   
-!                Parallel Sparse BLAS  version 3.4
-!      (C) Copyright 2006, 2010, 2015
-!                         Salvatore Filippone    University of Rome Tor Vergata
-!                         Alfredo Buttari        CNRS-IRIT, Toulouse
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -472,7 +472,7 @@ contains
     
     if(present(me)) then
       write(tmpmsg,&
-           & '("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a20)')&
+           & '("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a)')&
            & me,err_c,trim(r_name)
     else
       write(tmpmsg,'("PSBLAS Error (",i0,") in subroutine: ",a)')&

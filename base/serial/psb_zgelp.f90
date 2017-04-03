@@ -1,7 +1,7 @@
 !   
-!                Parallel Sparse BLAS  version 3.4
-!      (C) Copyright 2006, 2010, 2015
-!                         Salvatore Filippone    University of Rome Tor Vergata
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
 !                         Alfredo Buttari        University of Rome Tor Vergata
 !   
 !    Redistribution and use in source and binary forms, with or without
@@ -126,8 +126,8 @@ end subroutine psb_zgelp
 
 
 !!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
+!!$              Parallel Sparse BLAS  version 3.5
+!!$    (C) Copyright 2006, 2010, 2015, 2017
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
