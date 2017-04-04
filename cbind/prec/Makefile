@@ -11,7 +11,7 @@ OBJS=psb_prec_cbind_mod.o psb_dprec_cbind_mod.o psb_c_dprec.o
 CMOD=psb_prec_cbind.h psb_c_dprec.h
 
 
-LIBMOD=psb_prec_cbind_mod$(.mod) 
+LIBMOD=psb_prec_cbind_mod$(.mod)  psb_prec_cbind_mod$(.mod) 
 LOCAL_MODS=$(LIBMOD)
 LIBNAME=$(CPRECLIBNAME)	
 
