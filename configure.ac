@@ -111,11 +111,11 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
-AC_PROG_CC_C99()
-if test "$ac_cv_prog_cc_c99" == "no" ; then
-	AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+AC_PROG_CC_STDC()
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
-	CDEFINES="$ac_cv_prog_cc_c99 $CDEFINES"
+   C99OPT="$ac_cv_prog_cc_stdc";
 fi	
 
  
@@ -141,7 +141,7 @@ if test "X$MPICC" = "X" ; then
     AC_CHECK_PROGS([MPICC],[mpxlc mpcc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
-
+AC_PROG_CC_STDC
 
 AC_LANG([Fortran])
 
@@ -453,9 +453,6 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      EXTRA_OPT="-mismatch_all"
 fi
 
-#FCFLAGS="${F90COPT}"
-
-# COPT,FCOPT, F90COPT are aliases for FFLAGS,CFLAGS,FCFLAGS .
 
 ##############################################################################
 # Compilers variables selection 
@@ -466,7 +463,7 @@ FC=${FC}
 MPF77=${MPIFC}
 CC=${CC}
 MPCC=${MPICC}
-
+CCOPT="$CCOPT $C99OPT"
 
 
 ##############################################################################

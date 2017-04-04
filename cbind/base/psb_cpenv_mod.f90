@@ -102,6 +102,21 @@ contains
     call psb_bcast(ictxt,v(1:n),root=root)
   end subroutine psb_c_dbcast
 
+  subroutine psb_c_zbcast(ictxt,n,v,root) bind(c)
+    use psb_base_mod
+    implicit none 
+    integer(psb_c_int), value :: ictxt,n, root
+    complex(c_double_complex)     :: v(*) 
+    
+    if (n < 0) then 
+      write(0,*) 'Wrong size in BCAST'
+      return
+    end if
+    if (n==0) return 
+    
+    call psb_bcast(ictxt,v(1:n),root=root)
+  end subroutine psb_c_zbcast
+
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
     use psb_base_mod, only : psb_bcast, psb_info
     implicit none 

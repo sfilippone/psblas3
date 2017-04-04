@@ -1,34 +1,34 @@
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 !
 ! File: psi_zswapdata.F90
 !
@@ -140,7 +140,6 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-
   call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
   if (info /= psb_success_) goto 9999
 
@@ -197,6 +196,7 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -230,7 +230,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
     ! prepare info for communications
 
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -249,7 +248,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
   else
@@ -310,7 +308,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
   else if (swap_sync) then
 
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -337,7 +334,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
         end if
         rcvbuf(rcv_pt:rcv_pt+n*nerv-1) = sndbuf(snd_pt:snd_pt+n*nesd-1)
       end if
-
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -348,7 +344,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   else if (swap_send .and. swap_recv) then
 
     ! First I post all the non blocking receives
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -371,7 +366,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
     ! Then I post all the blocking sends
     if (usersend)  call mpi_barrier(icomm,iret)
-
 
     pnti   = 1
     snd_pt = 1
@@ -407,7 +401,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
     end do
 
 
-
     pnti   = 1
     do i=1, totxch
       proc_to_comm = idx(pnti+psb_proc_id_)
@@ -438,7 +431,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
   else if (swap_send) then
 
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -448,7 +440,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       nesd = idx(pnti+nerv+psb_n_elem_send_)
       if (nesd>0) call psb_snd(ictxt,&
            & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-      
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -456,7 +447,6 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
     end do
 
   else if (swap_recv) then
-
 
     pnti   = 1
     snd_pt = 1
@@ -474,10 +464,7 @@ subroutine psi_zswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
   end if
 
-
-
   if (do_recv) then 
-
 
     pnti   = 1
     snd_pt = 1
@@ -604,7 +591,8 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
+  icomm = desc_a%get_mpic()
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -618,9 +606,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  icomm = desc_a%get_mpic()
-
-  if(present(data)) then
+  if (present(data)) then
     data_ = data
   else
     data_ = psb_comm_halo_
@@ -642,7 +628,6 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
     return
 end subroutine psi_zswapdatav
-
 
 
 !
@@ -700,6 +685,7 @@ subroutine psi_zswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   call psb_erractionsave(err_act)
   ictxt = iictxt
   icomm = iicomm
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -708,8 +694,7 @@ subroutine psi_zswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   endif
 
   n=1
-
-  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
   swap_recv = iand(flag,psb_swap_recv_) /= 0
@@ -911,7 +896,6 @@ subroutine psi_zswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       proc_to_comm = idx(pnti+psb_proc_id_)
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
-
       p2ptag = psb_dcomplex_swap_tag
 
       if ((proc_to_comm /= me).and.(nerv>0)) then
@@ -1051,9 +1035,8 @@ subroutine psi_zswapdata_vect(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -1156,8 +1139,7 @@ subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   endif
 
   n=1
-
-  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
   swap_recv = iand(flag,psb_swap_recv_) /= 0
@@ -1170,18 +1152,21 @@ subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
   if (debug) write(*,*) me,'Internal buffer'
   if (do_send) then 
-    if (allocated(y%comid)) then 
-      ! 
-      ! Unfinished communication? Something is wrong....
-      !
-      info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
+    if (allocated(y%comid)) then
+      if (any(y%comid /= mpi_request_null)) then 
+        ! 
+        ! Unfinished communication? Something is wrong....
+        !
+        info=psb_err_mpi_error_
+        ierr(1) = -2
+        call psb_errpush(info,name,i_err=ierr)
+        goto 9999
+      end if
     end if
     if (debug) write(*,*) me,'do_send start'
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
+    y%comid = mpi_request_null
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -1324,15 +1309,18 @@ subroutine psi_zswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       call y%sct(rcv_pt,nerv,idx,beta)
       pnti   = pnti + nerv + nesd + 3
     end do
-
+    !
+    ! Waited for everybody, clean up
+    !
+    y%comid = mpi_request_null
 
     !
-    ! Then wait 
+    ! Then wait for device
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
     if (debug) write(*,*) me,' free buffer'
-    call y%free_buffer(info)
+    call y%maybe_free_buffer(info)
     if (info == 0) call y%free_comid(info)
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,name)
@@ -1355,10 +1343,9 @@ end subroutine psi_zswap_vidx_vect
 ! Subroutine: psi_zswapdata_multivect
 !   Data exchange among processes.
 !
-!   Takes care of Y an exanspulated multivector.
+!   Takes care of Y an encaspulated vector.
 !   
 !   
-! 
 subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_zswapdata_multivect
@@ -1391,9 +1378,8 @@ subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
+  ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info=psb_err_context_error_
@@ -1436,7 +1422,7 @@ end subroutine psi_zswapdata_multivect
 ! Subroutine: psi_zswap_vidx_multivect
 !   Data exchange among processes.
 !
-!   Takes care of Y an exanspulated multivector. Relies on the gather/scatter methods
+!   Takes care of Y an encapsulated multivector. Relies on the gather/scatter methods
 !   of multivectors. 
 !   
 !   The real workhorse: the outer routine will only choose the index list
@@ -1464,8 +1450,8 @@ subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)         :: iictxt,iicomm,flag
   integer(psb_ipk_), intent(out)        :: info
   class(psb_z_base_multivect_type) :: y
-  complex(psb_dpk_)           :: beta
-  complex(psb_dpk_), target   :: work(:)
+  complex(psb_dpk_)         :: beta
+  complex(psb_dpk_), target :: work(:)
   class(psb_i_base_vect_type), intent(inout) :: idx
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
@@ -1506,22 +1492,26 @@ subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
 
   totrcv_ = totrcv * n
   totsnd_ = totsnd * n
+
   call idx%sync()
 
   if (debug) write(*,*) me,'Internal buffer'
   if (do_send) then 
     if (allocated(y%comid)) then 
-      ! 
-      ! Unfinished communication? Something is wrong....
-      !
-      info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
-      goto 9999
+      if (any(y%comid /= mpi_request_null)) then 
+        ! 
+        ! Unfinished communication? Something is wrong....
+        !
+        info=psb_err_mpi_error_
+        ierr(1) = -2
+        call psb_errpush(info,name,i_err=ierr)
+        goto 9999
+      end if
     end if
     if (debug) write(*,*) me,'do_send start'
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
+    y%comid = mpi_request_null
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -1561,7 +1551,7 @@ subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
     end do
 
     !
-    ! Then wait 
+    ! Then wait for device
     !
     call y%device_wait()
 
@@ -1649,7 +1639,6 @@ subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
     if (debug) write(*,*) me,' scatter'      
@@ -1669,10 +1658,13 @@ subroutine psi_zswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
     end do
-
-
     !
-    ! Then wait 
+    ! Waited for com, cleanup comid
+    !
+    y%comid = mpi_request_null
+    
+    !
+    ! Then wait for device
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()

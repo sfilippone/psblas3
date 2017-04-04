@@ -1,34 +1,34 @@
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 !
 ! package: psb_d_base_vect_mod
 !
@@ -106,6 +106,7 @@ module psb_d_base_vect_mod
     procedure, nopass  :: use_buffer   => d_base_use_buffer
     procedure, pass(x) :: new_buffer   => d_base_new_buffer
     procedure, nopass  :: device_wait  => d_base_device_wait
+    procedure, pass(x) :: maybe_free_buffer  => d_base_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => d_base_free_buffer
     procedure, pass(x) :: new_comid    => d_base_new_comid
     procedure, pass(x) :: free_comid   => d_base_free_comid
@@ -450,7 +451,6 @@ contains
     call x%sync()
   end subroutine d_base_asb
 
-
   !
   !> Function  base_free:
   !! \memberof  psb_d_base_vect_type
@@ -476,6 +476,63 @@ contains
   end subroutine d_base_free
 
   
+
+  !
+  !> Function  base_free_buffer:
+  !! \memberof  psb_d_base_vect_type
+  !! \brief Free aux buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine d_base_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%combuf)) &
+         &  deallocate(x%combuf,stat=info)
+  end subroutine d_base_free_buffer
+
+  !
+  !> Function  base_maybe_free_buffer:
+  !! \memberof  psb_d_base_vect_type
+  !! \brief Conditionally Free aux buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine d_base_maybe_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = 0 
+    if (psb_get_maybe_free_buffer())&
+         &  call x%free_buffer(info)
+
+  end subroutine d_base_maybe_free_buffer
+
+  !
+  !> Function  base_free_comid:
+  !! \memberof  psb_d_base_vect_type
+  !! \brief Free aux MPI communication id buffer
+  !!           
+  !!  \param info  return code
+  !!
+  !
+  subroutine d_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine d_base_free_comid
+
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -1229,27 +1286,6 @@ contains
   end subroutine d_base_new_comid
 
 
-  subroutine d_base_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none 
-    class(psb_d_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
-  end subroutine d_base_free_buffer
-
-  subroutine d_base_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none 
-    class(psb_d_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine d_base_free_comid
-
-
   !
   ! shortcut alpha=1 beta=0
   ! 
@@ -1447,6 +1483,7 @@ module psb_d_base_multivect_mod
     procedure, nopass  :: use_buffer   => d_base_mlv_use_buffer
     procedure, pass(x) :: new_buffer   => d_base_mlv_new_buffer
     procedure, nopass  :: device_wait  => d_base_mlv_device_wait
+    procedure, pass(x) :: maybe_free_buffer  => d_base_mlv_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => d_base_mlv_free_buffer
     procedure, pass(x) :: new_comid    => d_base_mlv_new_comid
     procedure, pass(x) :: free_comid   => d_base_mlv_free_comid
@@ -2468,6 +2505,19 @@ contains
     call psb_realloc(n,2_psb_ipk_,x%comid,info)
   end subroutine d_base_mlv_new_comid
 
+
+  subroutine d_base_mlv_maybe_free_buffer(x,info)
+    use psb_realloc_mod
+    implicit none 
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+
+    info = 0 
+    if (psb_get_maybe_free_buffer())&
+         &  call x%free_buffer(info)
+
+  end subroutine d_base_mlv_maybe_free_buffer
 
   subroutine d_base_mlv_free_buffer(x,info)
     use psb_realloc_mod

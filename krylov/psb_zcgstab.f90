@@ -1,59 +1,59 @@
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
-!!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!!$ C                                                                      C
-!!$ C  References:                                                         C
-!!$ C          [1] Duff, I., Marrone, M., Radicati, G., and Vittoli, C.    C
-!!$ C              Level 3 basic linear algebra subprograms for sparse     C
-!!$ C              matrices: a user level interface                        C
-!!$ C              ACM Trans. Math. Softw., 23(3), 379-401, 1997.          C
-!!$ C                                                                      C
-!!$ C                                                                      C
-!!$ C         [2]  S. Filippone, M. Colajanni                              C
-!!$ C              PSBLAS: A library for parallel linear algebra           C
-!!$ C              computation on sparse matrices                          C
-!!$ C              ACM Trans. on Math. Softw., 26(4), 527-550, Dec. 2000.  C
-!!$ C                                                                      C
-!!$ C         [3] M. Arioli, I. Duff, M. Ruiz                              C
-!!$ C             Stopping criteria for iterative solvers                  C
-!!$ C             SIAM J. Matrix Anal. Appl., Vol. 13, pp. 138-144, 1992   C
-!!$ C                                                                      C
-!!$ C                                                                      C
-!!$ C         [4] R. Barrett et al                                         C
-!!$ C             Templates for the solution of linear systems             C
-!!$ C             SIAM, 1993                                          
-!!$ C                                                                      C
-!!$ C                                                                      C
-!!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
+!   CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!   C                                                                      C
+!   C  References:                                                         C
+!   C          [1] Duff, I., Marrone, M., Radicati, G., and Vittoli, C.    C
+!   C              Level 3 basic linear algebra subprograms for sparse     C
+!   C              matrices: a user level interface                        C
+!   C              ACM Trans. Math. Softw., 23(3), 379-401, 1997.          C
+!   C                                                                      C
+!   C                                                                      C
+!   C         [2]  S. Filippone, M. Colajanni                              C
+!   C              PSBLAS: A library for parallel linear algebra           C
+!   C              computation on sparse matrices                          C
+!   C              ACM Trans. on Math. Softw., 26(4), 527-550, Dec. 2000.  C
+!   C                                                                      C
+!   C         [3] M. Arioli, I. Duff, M. Ruiz                              C
+!   C             Stopping criteria for iterative solvers                  C
+!   C             SIAM J. Matrix Anal. Appl., Vol. 13, pp. 138-144, 1992   C
+!   C                                                                      C
+!   C                                                                      C
+!   C         [4] R. Barrett et al                                         C
+!   C             Templates for the solution of linear systems             C
+!   C             SIAM, 1993                                          
+!   C                                                                      C
+!   C                                                                      C
+!   CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 ! File:  psb_zcgstab.f90
 !
 ! Subroutine: psb_zcgstab

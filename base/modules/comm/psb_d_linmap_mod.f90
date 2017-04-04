@@ -1,34 +1,34 @@
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 !
 !
 ! package: psb_d_linmap_mod
@@ -65,7 +65,7 @@ module psb_d_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_X2Y
-    subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work)
+    subroutine psb_d_map_X2Y_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dpk_, psb_dlinmap_type
       implicit none 
@@ -74,6 +74,7 @@ module psb_d_linmap_mod
       type(psb_d_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
+      type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_d_map_X2Y_vect
   end interface
 
@@ -88,7 +89,7 @@ module psb_d_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_Y2X
-    subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work)
+    subroutine psb_d_map_Y2X_vect(alpha,x,beta,y,map,info,work,vtx,vty)
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dpk_, psb_dlinmap_type
       implicit none 
@@ -97,6 +98,7 @@ module psb_d_linmap_mod
       type(psb_d_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
+      type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_d_map_Y2X_vect
   end interface
 
@@ -170,8 +172,9 @@ contains
     class(psb_d_base_sparse_mat), intent(in), optional :: mold
     class(psb_i_base_vect_type), intent(in), optional  :: imold
 
-    call map%map_X2Y%cscnv(info,type=type,mold=mold)
-    if (info == psb_success_)&
+    if (map%map_X2Y%is_asb())&
+         & call map%map_X2Y%cscnv(info,type=type,mold=mold)
+    if (info == psb_success_ .and.map%map_Y2X%is_asb())&
          & call map%map_Y2X%cscnv(info,type=type,mold=mold)
     if (present(imold)) then 
       call map%desc_X%cnv(mold=imold)

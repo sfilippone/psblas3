@@ -16,7 +16,7 @@ program d_matgen
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
-!!$  type(psb_dprec_type)  :: prec
+!    type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices

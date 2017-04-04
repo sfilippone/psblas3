@@ -1,34 +1,34 @@
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.4
-!!$    (C) Copyright 2006, 2010, 2015
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 program s_file_spmv
   use psb_base_mod
   use psb_util_mod
@@ -62,7 +62,7 @@ program s_file_spmv
   character(len=20)  :: name
   character(len=2)   :: filefmt
   integer(psb_ipk_), parameter :: iunit=12
-  integer(psb_ipk_), parameter :: times=10
+  integer(psb_ipk_), parameter :: times=20
   integer(psb_ipk_) :: iparm(20)
 
   ! other variables
@@ -157,22 +157,16 @@ program s_file_spmv
         b_col_glob(i) = 1.d0
       enddo
     endif
-    call psb_bcast(ictxt,b_col_glob(1:m_problem))
 
   else
 
     call psb_bcast(ictxt,m_problem)
-    call psb_realloc(m_problem,1,aux_b,ircode)
-    if (ircode /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,name)
-      goto 9999
-    endif
     b_col_glob =>aux_b(:,1)
-    call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
 
   end if
 
   ! switch over different partition types
+  write(psb_out_unit,'("Number of processors : ",i0)')np
   if (ipart == 0) then 
     call psb_barrier(ictxt)
     if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
@@ -181,8 +175,7 @@ program s_file_spmv
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
     
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
@@ -195,18 +188,19 @@ program s_file_spmv
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,v=ivg)
+    call psb_matdist(aux_a, a, ictxt, desc_a,info,fmt=afmt,v=ivg)
 
   else 
-    if (iam==psb_root_) write(psb_out_unit,'("Partition type: block")')
-    call psb_matdist(aux_a, a,  ictxt, &
-         & desc_a,info,b_glob=b_col_glob,b=b_col,fmt=afmt,parts=part_block)
+    if (iam==psb_root_) write(psb_out_unit,'("Partition type: default block")')
+    call psb_matdist(aux_a, a,  ictxt, desc_a,info,fmt=afmt,parts=part_block)
   end if
 
   call psb_geall(x_col,desc_a,info)
   call x_col%set(sone)
   call psb_geasb(x_col,desc_a,info)
+  call psb_geall(b_col,desc_a,info)
+  call x_col%zero()
+  call psb_geasb(b_col,desc_a,info)
   t2 = psb_wtime() - t1
 
 
