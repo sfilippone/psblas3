@@ -52,7 +52,10 @@ extern "C" {
   psb_i_t psb_c_get_errstatus();
 
   void   psb_c_ibcast(psb_i_t ictxt, psb_i_t n, psb_i_t *v, psb_i_t root);
+  void   psb_c_sbcast(psb_i_t ictxt, psb_i_t n, psb_s_t *v, psb_i_t root);
   void   psb_c_dbcast(psb_i_t ictxt, psb_i_t n, psb_d_t *v, psb_i_t root);
+  void   psb_c_cbcast(psb_i_t ictxt, psb_i_t n, psb_c_t *v, psb_i_t root);
+  void   psb_c_zbcast(psb_i_t ictxt, psb_i_t n, psb_z_t *v, psb_i_t root);
   void   psb_c_hbcast(psb_i_t ictxt, const char *v, psb_i_t root);
   
   /* Descriptor/integer routines */ 

@@ -48,15 +48,15 @@ check: all
 	make check -C test/serial
 
 cleanlib:
-	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
-	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
+	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
+	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
 
 veryclean: cleanlib
 	cd base && $(MAKE) veryclean
 	cd prec && $(MAKE) veryclean 
 	cd krylov && $(MAKE) veryclean
 	cd util && $(MAKE) veryclean
-	cd cbind && $(MAKE) clean
+	cd cbind && $(MAKE) veryclean
 	cd test/fileread && $(MAKE) clean
 	cd test/pargen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
