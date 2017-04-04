@@ -5,7 +5,7 @@ LIBDIR=../lib
 INCDIR=../include
 LIBNAME=$(CBINDLIBNAME)
 
-lib: based 
+lib: based precd
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) *.h $(INCDIR)
 
@@ -13,10 +13,13 @@ lib: based
 
 based:
 	cd base && $(MAKE) lib LIBNAME=$(LIBNAME) 
+precd:
+	cd prec && $(MAKE) lib LIBNAME=$(LIBNAME) 
 
 
 clean: 
 	cd base && $(MAKE) clean
+	cd prec && $(MAKE) clean
 
 
 veryclean: clean 
