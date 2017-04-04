@@ -1,4 +1,4 @@
-module psb_d_serial_cbind_mod
+module psb_c_serial_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
@@ -8,13 +8,13 @@ module psb_d_serial_cbind_mod
 contains
 
   
-  function psb_c_dvect_get_nrows(xh) bind(c) result(res)
+  function psb_c_cvect_get_nrows(xh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int) :: res   
-    type(psb_c_dvector) :: xh
+    type(psb_c_cvector) :: xh
 
-    type(psb_d_vect_type), pointer :: vp
+    type(psb_c_vect_type), pointer :: vp
     integer               :: info
 
     res = -1
@@ -24,17 +24,17 @@ contains
       res = vp%get_nrows()
     end if
 
-  end function psb_c_dvect_get_nrows
+  end function psb_c_cvect_get_nrows
   
-  function psb_c_dvect_f_get_cpy(v,xh) bind(c) result(res)
+  function psb_c_cvect_f_get_cpy(v,xh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int)    :: res   
-    real(c_double)    :: v(*)
-    type(psb_c_dvector) :: xh
+    complex(c_float_complex)    :: v(*)
+    type(psb_c_cvector) :: xh
     
-    type(psb_d_vect_type), pointer :: vp
-    real(psb_dpk_), allocatable :: fv(:)
+    type(psb_c_vect_type), pointer :: vp
+    complex(psb_spk_), allocatable :: fv(:)
     integer               :: info, sz
 
     res = -1
@@ -46,16 +46,16 @@ contains
       v(1:sz) = fv(1:sz)
     end if
 
-  end function psb_c_dvect_f_get_cpy
+  end function psb_c_cvect_f_get_cpy
 
   
-  function psb_c_dvect_zero(xh) bind(c) result(res)
+  function psb_c_cvect_zero(xh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int)    :: res   
-    type(psb_c_dvector) :: xh
+    type(psb_c_cvector) :: xh
     
-    type(psb_d_vect_type), pointer :: vp
+    type(psb_c_vect_type), pointer :: vp
     integer               :: info
 
     res = -1
@@ -65,18 +65,18 @@ contains
       call vp%zero()
     end if
 
-  end function psb_c_dvect_zero
+  end function psb_c_cvect_zero
 
   
-  function psb_c_dmat_get_nrows(mh) bind(c) result(res)
+  function psb_c_cmat_get_nrows(mh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dspmat) :: mh
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_c_cspmat) :: mh
+    type(psb_cspmat_type), pointer :: ap
     integer                 ::  info
 
     res = 0
@@ -88,18 +88,18 @@ contains
     
     res = ap%get_nrows()
 
-  end function psb_c_dmat_get_nrows
+  end function psb_c_cmat_get_nrows
 
   
-  function psb_c_dmat_get_ncols(mh) bind(c) result(res)
+  function psb_c_cmat_get_ncols(mh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dspmat) :: mh
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_c_cspmat) :: mh
+    type(psb_cspmat_type), pointer :: ap
     integer                 ::  info
 
     res = 0
@@ -111,9 +111,9 @@ contains
     
     res = ap%get_ncols()
 
-  end function psb_c_dmat_get_ncols
+  end function psb_c_cmat_get_ncols
 
 
 
-end module psb_d_serial_cbind_mod
+end module psb_c_serial_cbind_mod
 

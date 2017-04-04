@@ -1,4 +1,4 @@
-module psb_d_tools_cbind_mod
+module psb_z_tools_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
@@ -7,15 +7,15 @@ module psb_d_tools_cbind_mod
 
 contains
 
- function psb_c_dgeall(xh,cdh) bind(c) result(res)
+ function psb_c_zgeall(xh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer               :: info
 
     res = -1
@@ -34,17 +34,17 @@ contains
     res = min(0,info)
     
     return
-  end function psb_c_dgeall
+  end function psb_c_zgeall
 
-  function psb_c_dgeasb(xh,cdh) bind(c) result(res)
+  function psb_c_zgeasb(xh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer               :: info
 
     res = -1
@@ -64,17 +64,17 @@ contains
     res = min(0,info)
     
     return
-  end function psb_c_dgeasb
+  end function psb_c_zgeasb
   
-  function psb_c_dgefree(xh,cdh) bind(c) result(res)
+  function psb_c_zgefree(xh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer               :: info
 
     res = -1
@@ -95,21 +95,21 @@ contains
     xh%item = c_null_ptr
     
     return
-  end function psb_c_dgefree
+  end function psb_c_zgefree
   
 
- function psb_c_dgeins(nz,irw,val,xh,cdh) bind(c) result(res)
+ function psb_c_zgeins(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
     integer(psb_c_int), value :: nz
     integer(psb_c_int)        :: irw(*)
-    real(c_double)        :: val(*)
-    type(psb_c_dvector) :: xh
+    complex(c_double_complex)        :: val(*)
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer               :: info
 
     res = -1
@@ -129,21 +129,21 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dgeins
+  end function psb_c_zgeins
 
 
- function psb_c_dgeins_add(nz,irw,val,xh,cdh) bind(c) result(res)
+ function psb_c_zgeins_add(nz,irw,val,xh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
     integer(psb_c_int), value :: nz
     integer(psb_c_int)        :: irw(*)
-    real(c_double)        :: val(*)
-    type(psb_c_dvector) :: xh
+    complex(c_double_complex)        :: val(*)
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer               :: info
 
     res = -1
@@ -163,18 +163,18 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dgeins_add
+  end function psb_c_zgeins_add
 
 
- function psb_c_dspall(mh,cdh) bind(c) result(res)
+ function psb_c_zspall(mh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dspmat) :: mh
+    type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info,n
 
     res = -1
@@ -192,19 +192,19 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dspall
+  end function psb_c_zspall
 
 
 
- function psb_c_dspasb(mh,cdh) bind(c) result(res)
+ function psb_c_zspasb(mh,cdh) bind(c) result(res)
    
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dspmat) :: mh
+    type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info,n
 
     res = -1
@@ -222,18 +222,18 @@ contains
     call psb_spasb(ap,descp,info)
     res = min(0,info)
     return
-  end function psb_c_dspasb
+  end function psb_c_zspasb
 
 
-  function psb_c_dspfree(mh,cdh) bind(c) result(res)
+  function psb_c_zspfree(mh,cdh) bind(c) result(res)
    
     implicit none 
     integer(psb_c_int) :: res   
-    type(psb_c_dspmat) :: mh
+    type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info,n
 
     res = -1
@@ -252,15 +252,15 @@ contains
     res = min(0,info)
     mh%item=c_null_ptr
     return
-  end function psb_c_dspfree
+  end function psb_c_zspfree
 
 
 #if 0
 
-  function psb_c_dspasb_opt(mh,cdh,afmt,upd,dupl) bind(c) result(res)
+  function psb_c_zspasb_opt(mh,cdh,afmt,upd,dupl) bind(c) result(res)
 
 #ifdef HAVE_LIBRSB
-    use psb_d_rsb_mat_mod
+    use psb_z_rsb_mat_mod
 #endif
     implicit none 
     integer(psb_c_int) :: res   
@@ -269,7 +269,7 @@ contains
     integer               :: info,n, fdupl
     character(len=5)      :: fafmt
 #ifdef HAVE_LIBRSB
-    type(psb_d_rsb_sparse_mat) :: arsb
+    type(psb_z_rsb_sparse_mat) :: arsb
 #endif
 
     res = -1
@@ -293,21 +293,21 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dspasb_opt
+  end function psb_c_zspasb_opt
 #endif
 
- function psb_c_dspins(nz,irw,icl,val,mh,cdh) bind(c) result(res)
+ function psb_c_zspins(nz,irw,icl,val,mh,cdh) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
     integer(psb_c_int), value :: nz
     integer(psb_c_int)        :: irw(*), icl(*) 
-    real(c_double)        :: val(*)
-    type(psb_c_dspmat) :: mh
+    complex(c_double_complex)        :: val(*)
+    type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info,n
 
     res = -1
@@ -326,19 +326,19 @@ contains
     call psb_spins(nz,irw(1:nz),icl(1:nz),val(1:nz),ap,descp,info)
     res = min(0,info)
     return
-  end function psb_c_dspins
+  end function psb_c_zspins
 
 
-  function psb_c_dsprn(mh,cdh,clear) bind(c) result(res)
+  function psb_c_zsprn(mh,cdh,clear) bind(c) result(res)
 
     implicit none 
     integer(psb_c_int) :: res   
     logical(c_bool), value :: clear
-    type(psb_c_dspmat) :: mh
+    type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer                :: info
     logical                :: fclear 
 
@@ -359,9 +359,9 @@ contains
     res = min(0,info)
 
     return
-  end function psb_c_dsprn
+  end function psb_c_zsprn
 !!$
-!!$  function psb_c_dspprint(mh) bind(c) result(res)
+!!$  function psb_c_zspprint(mh) bind(c) result(res)
 !!$
 !!$    implicit none 
 !!$    integer(psb_c_int) :: res   
@@ -378,8 +378,8 @@ contains
 !!$    res = 0
 !!$
 !!$    return
-!!$  end function psb_c_dspprint
+!!$  end function psb_c_zspprint
 
 
-end module psb_d_tools_cbind_mod
+end module psb_z_tools_cbind_mod
 

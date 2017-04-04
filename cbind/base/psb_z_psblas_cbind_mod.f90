@@ -1,21 +1,21 @@
-module psb_d_psblas_cbind_mod
+module psb_z_psblas_cbind_mod
   use iso_c_binding
   
 contains
   
-  function psb_c_dgeaxpby(alpha,xh,beta,yh,cdh) bind(c) result(res)
+  function psb_c_zgeaxpby(alpha,xh,beta,yh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dvector) :: xh,yh
+    type(psb_c_zvector) :: xh,yh
     type(psb_c_descriptor) :: cdh
-    real(c_double), value   :: alpha,beta
+    complex(c_double_complex), value   :: alpha,beta
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp,yp
+    type(psb_z_vect_type), pointer :: xp,yp
     integer                 :: info
     
 
@@ -41,19 +41,19 @@ contains
 
     res = info
 
-  end function psb_c_dgeaxpby
+  end function psb_c_zgeaxpby
 
-  function psb_c_dgenrm2(xh,cdh) bind(c) result(res)
+  function psb_c_zgenrm2(xh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    real(c_double) :: res
+    real(c_double_complex) :: res
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer                :: info
 
     res = -1.0
@@ -71,19 +71,19 @@ contains
     
     res = psb_genrm2(xp,descp,info)
 
-  end function psb_c_dgenrm2
+  end function psb_c_zgenrm2
   
-  function psb_c_dgeamax(xh,cdh) bind(c) result(res)
+  function psb_c_zgeamax(xh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    real(c_double) :: res
+    real(c_double_complex) :: res
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer                 :: info
 
     res = -1.0
@@ -100,19 +100,19 @@ contains
     
     res = psb_geamax(xp,descp,info)
 
-  end function psb_c_dgeamax
+  end function psb_c_zgeamax
   
-  function psb_c_dgeasum(xh,cdh) bind(c) result(res)
+  function psb_c_zgeasum(xh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    real(c_double) :: res
+    real(c_double_complex) :: res
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer   :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_z_vect_type), pointer :: xp
     integer                 :: info
 
     res = -1.0
@@ -130,20 +130,20 @@ contains
     
     res = psb_geasum(xp,descp,info)
 
-  end function psb_c_dgeasum
+  end function psb_c_zgeasum
 
   
-  function psb_c_dspnrmi(ah,cdh) bind(c) result(res)
+  function psb_c_zspnrmi(ah,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    real(c_double) :: res
+    real(c_double_complex) :: res
 
-    type(psb_c_dspmat)   :: ah
+    type(psb_c_zspmat)   :: ah
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_zspmat_type), pointer :: ap
     integer                 ::  info
 
     res = -1.0
@@ -160,19 +160,19 @@ contains
 
     res = psb_spnrmi(ap,descp,info)
 
-  end function psb_c_dspnrmi
+  end function psb_c_zspnrmi
 
-  function psb_c_dgedot(xh,yh,cdh) bind(c) result(res)
+  function psb_c_zgedot(xh,yh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    real(c_double) :: res
+    complex(c_double_complex) :: res
 
-    type(psb_c_dvector) :: xh,yh
+    type(psb_c_zvector) :: xh,yh
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp,yp
+    type(psb_z_vect_type), pointer :: xp,yp
     integer               :: info
 
     res = -1.0
@@ -193,23 +193,23 @@ contains
     end if
     res = psb_gedot(xp,yp,descp,info)
 
-  end function psb_c_dgedot
+  end function psb_c_zgedot
 
 
-  function psb_c_dspmm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
+  function psb_c_zspmm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dspmat) :: ah
-    type(psb_c_dvector) :: xh,yh
+    type(psb_c_zspmat) :: ah
+    type(psb_c_zvector) :: xh,yh
     type(psb_c_descriptor) :: cdh
-    real(c_double), value :: alpha, beta
+    complex(c_double_complex), value :: alpha, beta
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp,yp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_z_vect_type), pointer :: xp,yp
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info
 
     res = -1
@@ -238,23 +238,23 @@ contains
 
     res = info
 
-  end function psb_c_dspmm
+  end function psb_c_zspmm
 
 
-  function psb_c_dspsm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
+  function psb_c_zspsm(alpha,ah,xh,beta,yh,cdh) bind(c) result(res)
     use psb_base_mod
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dspmat) :: ah
-    type(psb_c_dvector) :: xh,yh
+    type(psb_c_zspmat) :: ah
+    type(psb_c_zvector) :: xh,yh
     type(psb_c_descriptor) :: cdh
-    real(c_double), value :: alpha, beta
+    complex(c_double_complex), value :: alpha, beta
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp,yp
-    type(psb_dspmat_type), pointer :: ap
+    type(psb_z_vect_type), pointer :: xp,yp
+    type(psb_zspmat_type), pointer :: ap
     integer               :: info
 
     res = -1
@@ -283,7 +283,7 @@ contains
 
     res = info
 
-  end function psb_c_dspsm
+  end function psb_c_zspsm
   
 
-end module psb_d_psblas_cbind_mod
+end module psb_z_psblas_cbind_mod
