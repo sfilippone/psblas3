@@ -4,8 +4,8 @@ LIBDIR=$(TOP)/lib
 INCLUDEDIR=$(TOP)/include
 HERE=..
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCLUDEDIR) 
-CINCLUDES=-I. -I$(INCLUDEDIR)
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(INCLUDEDIR) 
+CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
 OBJS=psb_prec_cbind_mod.o psb_dprec_cbind_mod.o psb_c_dprec.o
 CMOD=psb_prec_cbind.h psb_c_dprec.h

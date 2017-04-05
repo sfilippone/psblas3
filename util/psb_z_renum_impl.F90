@@ -232,7 +232,7 @@ contains
 
 
   subroutine psb_mat_renum_amd(a,info,operm)
-#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+#if defined(HAVE_AMD) 
     use iso_c_binding
 #endif
     use psb_base_mod    
@@ -242,7 +242,7 @@ contains
     integer(psb_ipk_), allocatable, optional, intent(out) :: operm(:)
 
     ! 
-#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+#if defined(HAVE_AMD) 
     interface 
       function psb_amd_order(n,ap,ai,p)&
            & result(res) bind(c,name='psb_amd_order')
@@ -267,7 +267,7 @@ contains
     name = 'mat_renum_amd'
     call psb_erractionsave(err_act)
 
-#if defined(HAVE_AMD) && defined(HAVE_ISO_C_BINDING)
+#if defined(HAVE_AMD) 
 
     info = psb_success_
     nr   = a%get_nrows()

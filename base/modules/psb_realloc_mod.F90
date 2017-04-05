@@ -2743,20 +2743,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC    
 
     call move_alloc(vin,vout)
 
-#else      
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_smove_alloc1d
 
   Subroutine psb_smove_alloc2d(vin,vout,info)
@@ -2766,22 +2755,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_smove_alloc2d
 
   Subroutine psb_dmove_alloc1d(vin,vout,info)
@@ -2791,20 +2767,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC    
 
     call move_alloc(vin,vout)
 
-#else      
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_dmove_alloc1d
 
   Subroutine psb_dmove_alloc2d(vin,vout,info)
@@ -2814,22 +2779,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_dmove_alloc2d
 
   Subroutine psb_cmove_alloc1d(vin,vout,info)
@@ -2839,20 +2791,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_cmove_alloc1d
 
   Subroutine psb_cmove_alloc2d(vin,vout,info)
@@ -2862,22 +2803,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_cmove_alloc2d
 
   Subroutine psb_zmove_alloc1d(vin,vout,info)
@@ -2887,20 +2815,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_zmove_alloc1d
 
   Subroutine psb_zmove_alloc2d(vin,vout,info)
@@ -2910,22 +2827,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_zmove_alloc2d
 
   Subroutine psb_imove_alloc1d(vin,vout,info)
@@ -2935,20 +2839,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_imove_alloc1d
 
   Subroutine psb_imove_alloc2d(vin,vout,info)
@@ -2958,22 +2851,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_imove_alloc2d
 
 #if !defined(LONG_INTEGERS)
@@ -2984,20 +2864,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i8move_alloc1d
 
   Subroutine psb_i8move_alloc2d(vin,vout,info)
@@ -3007,22 +2876,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i8move_alloc2d
 
 #else
@@ -3034,20 +2890,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i4move_alloc1d
 
   Subroutine psb_i4move_alloc1d_i8(vin,vout,info)
@@ -3057,20 +2902,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i4move_alloc1d_i8
  
   Subroutine psb_i4move_alloc2d(vin,vout,info)
@@ -3080,22 +2914,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i4move_alloc2d
  
   Subroutine psb_i4move_alloc2d_i8(vin,vout,info)
@@ -3105,22 +2926,9 @@ Contains
     !
     ! 
     info=psb_success_
-#ifdef HAVE_MOVE_ALLOC
 
     call move_alloc(vin,vout)
 
-#else
-    if (allocated(vout)) then 
-      deallocate(vout,stat=info)
-    end if
-    if (.not.allocated(vin) ) return
-
-    allocate(vout(lbound(vin,1):ubound(vin,1),&
-         & lbound(vin,2):ubound(vin,2)),stat=info)
-    if (info /= psb_success_) return
-    vout = vin
-    deallocate(vin,stat=info)
-#endif
   end Subroutine psb_i4move_alloc2d_i8
 
 #endif
