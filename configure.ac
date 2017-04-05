@@ -570,7 +570,7 @@ PAC_FORTRAN_TEST_SOURCE(
 )
 
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
+	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
