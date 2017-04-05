@@ -1,6 +1,7 @@
 module psb_z_tools_cbind_mod
   use iso_c_binding
   use psb_base_mod
+  use psb_cpenv_mod
   use psb_objhandle_mod
   use psb_base_string_cbind_mod
   use psb_base_tools_cbind_mod
@@ -110,7 +111,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: info
+    integer               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -124,8 +125,15 @@ contains
       return 
     end if
 
-    call psb_geins(nz,irw(1:nz),val(1:nz),&
-         & xp,descp,info, dupl=psb_dupl_ovwrt_)
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then 
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info, dupl=psb_dupl_ovwrt_)
+    else
+      call psb_geins(nz,(irw(1:nz)-(1-ixb)),val(1:nz),&
+           & xp,descp,info, dupl=psb_dupl_ovwrt_)
+    end if
+
     res = min(0,info)
 
     return
@@ -144,7 +152,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: info
+    integer               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -158,8 +166,14 @@ contains
       return 
     end if
 
-    call psb_geins(nz,irw(1:nz),val(1:nz),&
-         & xp,descp,info, dupl=psb_dupl_add_)
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then 
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info, dupl=psb_dupl_add_)
+    else
+      call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
+           & xp,descp,info, dupl=psb_dupl_add_)
+    end if
     res = min(0,info)
 
     return
@@ -308,7 +322,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer               :: info,n
+    integer               :: ixb,info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -322,8 +336,12 @@ contains
       return 
     end if
 
-
-    call psb_spins(nz,irw(1:nz),icl(1:nz),val(1:nz),ap,descp,info)
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then 
+      call psb_spins(nz,irw(1:nz),icl(1:nz),val(1:nz),ap,descp,info)
+    else
+      call psb_spins(nz,(irw(1:nz)+(1-ixb)),(icl(1:nz)+(1-ixb)),val(1:nz),ap,descp,info)
+    end if
     res = min(0,info)
     return
   end function psb_c_zspins

@@ -1,8 +1,25 @@
 module psb_cpenv_mod
   use iso_c_binding
   use psb_objhandle_mod
+
+  integer, private :: psb_c_index_base=0
   
 contains
+  
+  function psb_c_get_index_base() bind(c) result(res)
+    implicit none 
+    
+    integer(psb_c_int)  :: res
+    
+    res = psb_c_index_base
+  end function psb_c_get_index_base
+  
+  subroutine psb_c_set_index_base(base) bind(c) 
+    implicit none     
+    integer(psb_c_int)  :: base
+    
+    psb_c_index_base = base
+  end subroutine psb_c_set_index_base  
   
   function psb_c_get_errstatus() bind(c) result(res)
     use psb_base_mod, only : psb_get_errstatus
