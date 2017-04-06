@@ -28,7 +28,8 @@ psb_c_dspmat* psb_c_dspgather(psb_c_dspmat *ah, psb_c_descriptor *cdh)
 {
   psb_c_dspmat* temp=psb_c_new_dspmat();
 
-  psb_c_dspgather_f(temp, ah, cdh);
+  if (temp != NULL) 
+    psb_c_dspgather_f(temp, ah, cdh);
   return(temp);
 }
 
