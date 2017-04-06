@@ -55,6 +55,9 @@ psb_i_t psb_c_sgeaxpby(psb_s_t alpha, psb_c_svector *xh,
 		       psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspmm(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh, 
 		    psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
+psb_i_t psb_c_sspmm_opt(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh, 
+			psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh,
+			char *trans, bool doswap);
 psb_i_t psb_c_sspsm(psb_s_t alpha, psb_c_sspmat *th, psb_c_svector *xh, 
 		      psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
 #ifdef __cplusplus

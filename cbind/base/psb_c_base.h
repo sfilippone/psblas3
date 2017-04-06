@@ -2,7 +2,7 @@
 #define PSB_C_BASE__
 #ifdef __cplusplus
 extern "C" {
-  typedef char _Bool;
+  /*typedef char _Bool;*/
 #endif
 
 #include <float.h>
@@ -11,6 +11,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
   
 
 #if defined(LONG_INTEGERS_)
@@ -94,6 +95,25 @@ extern "C" {
 #define PSB_AFMT_COO     "COO"
 #define PSB_AFMT_RSB     "RSB"
 
+  /* Transpose argument */
+#define psb_NoTrans_    "N"
+#define psb_Trans_      "T"
+#define psb_ConjTrans_  "C"
+  
+  /*  legal values for halo swap modes argument */ 
+#define  psb_swap_send_  1
+#define  psb_swap_recv_  2
+#define  psb_swap_sync_  4
+#define  psb_swap_mpi_   8
+
+  /*  legal values for ovrl update argument */ 
+#define psb_none_        0
+#define psb_sum_         1
+#define psb_avg_         2
+#define psb_square_root_ 3
+#define psb_setzero_     4
+
+  
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
