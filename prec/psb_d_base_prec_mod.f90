@@ -131,7 +131,7 @@ module psb_d_base_prec_mod
       Implicit None
 
       type(psb_dspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_desc_type), intent(inout), target   :: desc_a
       class(psb_d_base_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
       class(psb_d_base_sparse_mat), intent(in), optional :: amold
