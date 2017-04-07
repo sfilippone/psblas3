@@ -89,7 +89,7 @@ module psb_s_diagprec
            & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type, &
            & psb_i_base_vect_type
       type(psb_sspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_desc_type), intent(inout), target   :: desc_a
       class(psb_s_diag_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
       class(psb_s_base_sparse_mat), intent(in), optional :: amold

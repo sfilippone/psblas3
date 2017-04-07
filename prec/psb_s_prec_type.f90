@@ -76,7 +76,7 @@ module psb_s_prec_type
            & psb_sprec_type, psb_i_base_vect_type
       implicit none
       type(psb_sspmat_type), intent(in), target  :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
+      type(psb_desc_type), intent(inout), target    :: desc_a
       class(psb_sprec_type), intent(inout), target :: prec
       integer(psb_ipk_), intent(out)               :: info
       class(psb_s_base_sparse_mat), intent(in), optional :: amold

@@ -36,7 +36,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,amold,vmold,imold)
   Implicit None
 
   type(psb_dspmat_type), intent(in), target  :: a
-  type(psb_desc_type), intent(in), target      :: desc_a
+  type(psb_desc_type), intent(inout), target      :: desc_a
   class(psb_dprec_type),intent(inout)         :: p
   integer(psb_ipk_), intent(out)               :: info
   class(psb_d_base_sparse_mat), intent(in), optional :: amold

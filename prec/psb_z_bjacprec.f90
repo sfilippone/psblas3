@@ -111,7 +111,7 @@ module psb_z_bjacprec
            & psb_zspmat_type, psb_z_base_sparse_mat, psb_z_base_vect_type, &
            & psb_i_base_vect_type
       type(psb_zspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_desc_type), intent(inout), target   :: desc_a
       class(psb_z_bjac_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
       class(psb_z_base_sparse_mat), intent(in), optional :: amold

@@ -109,7 +109,7 @@ contains
     Implicit None
     
     type(psb_sspmat_type), intent(in), target :: a
-    type(psb_desc_type), intent(in), target   :: desc_a
+    type(psb_desc_type), intent(inout), target   :: desc_a
     class(psb_s_null_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(out)                      :: info
     class(psb_s_base_sparse_mat), intent(in), optional :: amold
