@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
+<!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -13,7 +13,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1075"
+<A NAME="tex2html1076"
   HREF="node68.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1071"
+<A NAME="tex2html1072"
   HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1065"
+<A NAME="tex2html1066"
   HREF="node66.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1073"
+<A NAME="tex2html1074"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1076"
+<B> Next:</B> <A NAME="tex2html1077"
   HREF="node68.html">psb_gather   Gather</A>
-<B> Up:</B> <A NAME="tex2html1072"
+<B> Up:</B> <A NAME="tex2html1073"
   HREF="node65.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1066"
+<B> Previous:</B> <A NAME="tex2html1067"
   HREF="node66.html">psb_halo   Halo</A>
- &nbsp; <B>  <A NAME="tex2html1074"
+ &nbsp; <B>  <A NAME="tex2html1075"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -77,11 +77,11 @@ x \leftarrow Q x
 where:
 <DL>
 <DT><STRONG><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">
 </DD>
@@ -110,7 +110,7 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -137,7 +137,7 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="577" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="576" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
  SRC="img63.png"
  ALT="\begin{lstlisting}
 call psb_ovrl(x, desc_a, info)
@@ -155,7 +155,7 @@ call psb_ovrl(x, desc_a, info, update=update_type, work=work)
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense matrix <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
@@ -225,7 +225,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a one dimensional array of the same type of <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 
@@ -236,7 +236,7 @@ Specified as: a one dimensional array of the same type of <IMG
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense result matrix <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$">.
 <BR>
@@ -300,7 +300,7 @@ Sample discretization mesh.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="534" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="533" HEIGHT="453" ALIGN="BOTTOM" BORDER="0"
  SRC="img68.png"
  ALT="\includegraphics[scale=0.65]{figures/try8x8_ov.eps}">
 
@@ -325,7 +325,7 @@ distribution is such that each process will own 40 entries in the
 index space, with an overlap of 16  entries placed at local indices 25 
 through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
 in the <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"> vector, and process 1 assigns a value of 2, then after a
 call to <code>psb_ovrl</code> with <code>psb_avg_</code> and a call to
@@ -739,26 +739,26 @@ Process  1</FONT></TD>
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1075"
+<A NAME="tex2html1076"
   HREF="node68.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1071"
+<A NAME="tex2html1072"
   HREF="node65.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1065"
+<A NAME="tex2html1066"
   HREF="node66.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1073"
+<A NAME="tex2html1074"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1076"
+<B> Next:</B> <A NAME="tex2html1077"
   HREF="node68.html">psb_gather   Gather</A>
-<B> Up:</B> <A NAME="tex2html1072"
+<B> Up:</B> <A NAME="tex2html1073"
   HREF="node65.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1066"
+<B> Previous:</B> <A NAME="tex2html1067"
   HREF="node66.html">psb_halo   Halo</A>
- &nbsp; <B>  <A NAME="tex2html1074"
+ &nbsp; <B>  <A NAME="tex2html1075"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

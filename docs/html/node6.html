@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
+<!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -13,7 +13,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html262"
+<A NAME="tex2html263"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html258"
+<A NAME="tex2html259"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html252"
+<A NAME="tex2html253"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html260"
+<A NAME="tex2html261"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html263"
+<B> Next:</B> <A NAME="tex2html264"
   HREF="node7.html">User-defined index mappings</A>
-<B> Up:</B> <A NAME="tex2html259"
+<B> Up:</B> <A NAME="tex2html260"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html253"
+<B> Previous:</B> <A NAME="tex2html254"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html261"
+ &nbsp; <B>  <A NAME="tex2html262"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -64,7 +64,7 @@ space to which there corresponds an index space and a matrix sparsity
 pattern. As an example, consider a cell-centered finite-volume
 discretization of  the Navier-Stokes equations on a simulation domain;
 the index space <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> is isomorphic to the set of cell centers,
 whereas the pattern of the associated linear system matrix is
@@ -75,7 +75,7 @@ by the discretization stencil.
 Thus the first order of business is to establish an index space, and
 this is done with a call to  <code>psb_cdall</code> in which we specify the
 size of the index space <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img16.png"
  ALT="$n$"> and the allocation of the elements of the
 index space to the various processes making up the MPI (virtual)
@@ -84,7 +84,7 @@ parallel machine.
 <P>
 The index space is partitioned among processes, and this creates a
 mapping from the ``global'' numbering <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> to a numbering
 ``local'' to each process; each process <IMG
@@ -99,7 +99,7 @@ mapping from the ``global'' numbering <IMG
  SRC="img17.png"
  ALT="$1\dots n_{\hbox{row}_i}$">, each element of which corresponds to a certain
 element of <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$">. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
@@ -109,7 +109,7 @@ library will translate into the appropriate ``local'' numbering.
 
 <P>
 For  a given index space <IMG
- WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="46" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
  ALT="$1\dots n$"> there are many possible associated
 topologies, i.e. many different discretization stencils; thus the
@@ -249,32 +249,32 @@ from optimal.
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
 <UL>
-<LI><A NAME="tex2html264"
+<LI><A NAME="tex2html265"
   HREF="node7.html">User-defined index mappings</A>
 </UL>
 <!--End of Table of Child-Links-->
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html262"
+<A NAME="tex2html263"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html258"
+<A NAME="tex2html259"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html252"
+<A NAME="tex2html253"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html260"
+<A NAME="tex2html261"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html263"
+<B> Next:</B> <A NAME="tex2html264"
   HREF="node7.html">User-defined index mappings</A>
-<B> Up:</B> <A NAME="tex2html259"
+<B> Up:</B> <A NAME="tex2html260"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html253"
+<B> Previous:</B> <A NAME="tex2html254"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html261"
+ &nbsp; <B>  <A NAME="tex2html262"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

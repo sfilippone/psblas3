@@ -34,33 +34,6 @@ module psb_z_prec_mod
   use psb_z_prec_type
   use psb_z_base_prec_mod
 
-  interface psb_precbld
-    subroutine psb_zprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      import :: psb_ipk_, psb_desc_type, psb_zspmat_type,&
-           & psb_z_base_sparse_mat, psb_dpk_, psb_z_base_vect_type, &
-           & psb_zprec_type
-      implicit none
-      type(psb_zspmat_type), intent(in), target  :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_zprec_type), intent(inout)        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      character, intent(in),optional             :: upd
-      character(len=*), intent(in), optional     :: afmt
-      class(psb_z_base_sparse_mat), intent(in), optional :: amold
-      class(psb_z_base_vect_type), intent(in), optional  :: vmold
-    end subroutine psb_zprecbld
-  end interface
-
-  interface psb_precinit
-    subroutine psb_zprecinit(prec,ptype,info)
-      import :: psb_ipk_, psb_desc_type, psb_zspmat_type, psb_dpk_, psb_zprec_type
-      implicit none
-      type(psb_zprec_type), intent(inout)    :: prec
-      character(len=*), intent(in)           :: ptype
-      integer(psb_ipk_), intent(out)                   :: info
-    end subroutine psb_zprecinit
-  end interface
-
   interface psb_precset
     subroutine psb_zprecseti(prec,what,val,info)
       import :: psb_ipk_, psb_desc_type, psb_zspmat_type, psb_dpk_, psb_zprec_type

@@ -165,9 +165,8 @@ program psb_zf_sample
     endif
 
   else
-
     call psb_bcast(ictxt,m_problem)
-    b_col_glob =>aux_b(:,1)
+
   end if
 
   ! switch over different partition types
@@ -219,11 +218,11 @@ program psb_zf_sample
 
   ! 
 
-  call psb_precinit(prec,ptype,info)
+  call prec%init(ptype,info)
 
   ! building the preconditioner
   t1 = psb_wtime()
-  call psb_precbld(a,desc_a,prec,info)
+  call prec%build(a,desc_a,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_precbld')
@@ -237,6 +236,7 @@ program psb_zf_sample
      write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
      write(psb_out_unit,'(" ")')
   end if
+  
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -258,7 +258,7 @@ program psb_zf_sample
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
   if (iam == psb_root_) then 
-    call psb_precdescr(prec)
+    call prec%descr()
     write(psb_out_unit,'("Matrix: ",a)')mtrx_file
     write(psb_out_unit,'("Computed solution on ",i8," processors")')np
     write(psb_out_unit,'("Iterations to convergence: ",i6)')iter
@@ -302,7 +302,7 @@ program psb_zf_sample
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
-  call psb_precfree(prec,info)
+  call prec%free(info)
   call psb_cdfree(desc_a,info)
   call psb_exit(ictxt)
   stop

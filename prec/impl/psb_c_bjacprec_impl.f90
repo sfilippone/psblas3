@@ -407,7 +407,7 @@ subroutine psb_c_bjac_precinit(prec,info)
 end subroutine psb_c_bjac_precinit
 
 
-subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
 
   use psb_base_mod
   use psb_prec_mod, only : psb_ilu_fct
@@ -418,10 +418,9 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   type(psb_desc_type), intent(in), target   :: desc_a
   class(psb_c_bjac_prec_type),intent(inout) :: prec
   integer(psb_ipk_), intent(out)                      :: info
-  character, intent(in), optional           :: upd
-  character(len=*), intent(in), optional    :: afmt
   class(psb_c_base_sparse_mat), intent(in), optional :: amold
   class(psb_c_base_vect_type), intent(in), optional  :: vmold
+  class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   !     .. Local Scalars ..                                                       
   integer(psb_ipk_) ::    i, m
@@ -544,9 +543,6 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
   if (present(amold)) then 
     call prec%av(psb_l_pr_)%cscnv(info,mold=amold)
     call prec%av(psb_u_pr_)%cscnv(info,mold=amold)
-  else if (present(afmt)) then 
-    call prec%av(psb_l_pr_)%cscnv(info,type=afmt)
-    call prec%av(psb_u_pr_)%cscnv(info,type=afmt)
   end if
 
   call psb_erractionrestore(err_act)

@@ -104,7 +104,7 @@ contains
     return
   end subroutine psb_z_null_precinit
 
-  subroutine psb_z_null_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+  subroutine psb_z_null_precbld(a,desc_a,prec,info,amold,vmold,imold)
     
     Implicit None
     
@@ -112,10 +112,10 @@ contains
     type(psb_desc_type), intent(in), target   :: desc_a
     class(psb_z_null_prec_type),intent(inout) :: prec
     integer(psb_ipk_), intent(out)                      :: info
-    character, intent(in), optional           :: upd
-    character(len=*), intent(in), optional    :: afmt
     class(psb_z_base_sparse_mat), intent(in), optional :: amold
     class(psb_z_base_vect_type), intent(in), optional  :: vmold
+    class(psb_i_base_vect_type), intent(in), optional  :: imold
+    
     integer(psb_ipk_) :: err_act, nrow
     character(len=20)  :: name='z_null_precbld'
 
@@ -157,6 +157,8 @@ contains
   
 
   subroutine psb_z_null_precdescr(prec,iout)
+    use psb_penv_mod
+    use psb_error_mod
     
     Implicit None
 
@@ -165,7 +167,7 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='z_null_precset'
-    integer(psb_ipk_) :: iout_
+    integer(psb_ipk_) :: iout_, ictxt, iam, np 
 
     call psb_erractionsave(err_act)
 
@@ -176,8 +178,11 @@ contains
     else
       iout_ = 6 
     end if
+    ictxt = prec%ictxt
+    call psb_info(ictxt,iam,np)
 
-    write(iout_,*) 'No preconditioning'
+    if (iam == psb_root_) &
+         & write(iout_,*) 'No preconditioning'
 
     call psb_erractionrestore(err_act)
     return

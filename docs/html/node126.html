@@ -1,19 +1,19 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
+<!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
-<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
+<TITLE>apply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="apply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -26,40 +26,40 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1829"
+<A NAME="tex2html1831"
   HREF="node127.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1825"
+<A NAME="tex2html1827"
   HREF="node123.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1819"
+<A NAME="tex2html1821"
   HREF="node125.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1827"
+<A NAME="tex2html1829"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1830"
-  HREF="node127.html">psb_precdescr   Prints</A>
-<B> Up:</B> <A NAME="tex2html1826"
+<B> Next:</B> <A NAME="tex2html1832"
+  HREF="node127.html">descr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1828"
   HREF="node123.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1820"
-  HREF="node125.html">psb_precbld   Builds</A>
- &nbsp; <B>  <A NAME="tex2html1828"
+<B> Previous:</B> <A NAME="tex2html1822"
+  HREF="node125.html">build   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1830"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION000113000000000000000">
-psb_precaply -- Preconditioner application
+apply -- Preconditioner application
   routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_precaply(prec,x,y,desc_a,info,trans,work)
-call psb_precaply(prec,x,desc_a,info,trans)
+call prec%apply(x,y,desc_a,info,trans,work)
+call prec%apply(x,desc_a,info,trans)
 </PRE>
 
 <P>

@@ -41,7 +41,7 @@ module psb_s_base_prec_mod
        & psb_sizeof_int, psb_sizeof_long_int, psb_sizeof_sp, psb_sizeof_dp, &
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus, psb_success_,&
        & psb_s_base_sparse_mat, psb_sspmat_type, psb_s_csr_sparse_mat,& 
-       & psb_s_base_vect_type, psb_s_vect_type
+       & psb_s_base_vect_type, psb_s_vect_type, psb_i_base_vect_type
 
   use psb_prec_const_mod
 
@@ -58,6 +58,8 @@ module psb_s_base_prec_mod
     procedure(psb_s_base_apply_vect), pass(prec), deferred :: s_apply_v  
     procedure(psb_s_base_apply), pass(prec), deferred :: s_apply    
     generic, public       :: apply     => s_apply, s_apply_v
+    generic, public       :: build     => precbld
+    generic, public       :: descr     => precdescr
     procedure(psb_s_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_s_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_s_base_precinit), pass(prec), deferred :: precinit   
@@ -122,21 +124,19 @@ module psb_s_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_s_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+    subroutine psb_s_base_precbld(a,desc_a,prec,info,amold,vmold,imold)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_s_vect_type, &
            & psb_s_base_vect_type, psb_sspmat_type, psb_s_base_prec_type,&
-           & psb_s_base_sparse_mat
+           & psb_s_base_sparse_mat, psb_i_base_vect_type
       Implicit None
 
       type(psb_sspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
       class(psb_s_base_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
-      character, intent(in), optional           :: upd
-      character(len=*), intent(in), optional    :: afmt
       class(psb_s_base_sparse_mat), intent(in), optional :: amold
       class(psb_s_base_vect_type), intent(in), optional  :: vmold
-
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
     end subroutine psb_s_base_precbld
   end interface
 

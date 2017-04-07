@@ -106,17 +106,17 @@ module psb_c_bjacprec
   end interface
   
   interface
-    subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+    subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_, &
-           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type
+           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, &
+           & psb_i_base_vect_type
       type(psb_cspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
       class(psb_c_bjac_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
-      character, intent(in), optional           :: upd
-      character(len=*), intent(in), optional    :: afmt
       class(psb_c_base_sparse_mat), intent(in), optional :: amold
       class(psb_c_base_vect_type), intent(in), optional  :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
     end subroutine psb_c_bjac_precbld
   end interface
   
@@ -134,6 +134,7 @@ module psb_c_bjacprec
 contains
 
   subroutine psb_c_bjac_precdescr(prec,iout)
+    use psb_penv_mod
     use psb_error_mod
     implicit none 
 
@@ -142,7 +143,7 @@ contains
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='c_bjac_precdescr'
-    integer(psb_ipk_) :: iout_
+    integer(psb_ipk_) :: iout_, ictxt, iam, np 
 
     call psb_erractionsave(err_act)
 
@@ -159,8 +160,11 @@ contains
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
     end if
+    ictxt = prec%ictxt
+    call psb_info(ictxt,iam,np)
     
-    write(iout_,*) 'Block Jacobi with: ',&
+    if (iam == psb_root_) &
+         & write(iout_,*) 'Block Jacobi with: ',&
          &  fact_names(prec%iprcparm(psb_f_type_))
     
     call psb_erractionrestore(err_act)

@@ -23,11 +23,11 @@ module  \verb|psb_prec_mod|.
 
 
 
-\clearpage\subsection*{psb\_precinit --- Initialize a  preconditioner}
-\addcontentsline{toc}{subsection}{psb\_precinit}
+\clearpage\subsection*{init --- Initialize a  preconditioner}
+\addcontentsline{toc}{subsection}{prec\%init}
 
 \begin{verbatim}
-call psb_precinit(prec, ptype, info)
+call prec%init(ptype, info)
 \end{verbatim}
 
 \begin{description}
@@ -80,11 +80,11 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \end{description}
 
 
-\clearpage\subsection*{psb\_precbld --- Builds a preconditioner}
-\addcontentsline{toc}{subsection}{psb\_precbld}
+\clearpage\subsection*{build --- Builds a preconditioner}
+\addcontentsline{toc}{subsection}{prec\%build}
 
 \begin{verbatim}
-call psb_precbld(a, desc_a, prec, info,amold,vmold)
+call prec%build(a, desc_a, info,amold,vmold)
 \end{verbatim}
 
 \begin{description}
@@ -139,13 +139,13 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_precaply --- Preconditioner application
+\clearpage\subsection*{apply --- Preconditioner application
   routine}
-\addcontentsline{toc}{subsection}{psb\_precaply}
+\addcontentsline{toc}{subsection}{prec\%apply}
 
 \begin{verbatim}
-call psb_precaply(prec,x,y,desc_a,info,trans,work)
-call psb_precaply(prec,x,desc_a,info,trans)
+call prec%apply(x,y,desc_a,info,trans,work)
+call prec%apply(x,desc_a,info,trans)
 \end{verbatim}
 
 \begin{description}
@@ -194,13 +194,13 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_precdescr --- Prints a description of current
+\clearpage\subsection*{descr --- Prints a description of current
   preconditioner}
-\addcontentsline{toc}{subsection}{psb\_precdescr}
+\addcontentsline{toc}{subsection}{prec\%descr}
 
 \begin{verbatim}
-call psb_precdescr(prec)
-call psb_precdescr(prec, iout)
+call prec%descr()
+call prec%descr(iout)
 \end{verbatim}
 
 \begin{description}
@@ -243,6 +243,49 @@ Scope: {\bf local}.\\
 \item[info] Return code. 
 \end{description}
 
+
+\clearpage\subsection*{free --- Free a  preconditioner}
+\addcontentsline{toc}{subsection}{prec\%free}
+
+\begin{verbatim}
+call prec%free(info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+%% \item[iv] integer parameters for the precondtioner. 
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer array, see usage notes. 
+%% \item[rs] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: a long precision real number.
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Releases all internal storage.
 
 %%% Local Variables: 
 %%% mode: latex
