@@ -156,7 +156,7 @@ contains
   end subroutine psb_c_null_precfree
   
 
-  subroutine psb_c_null_precdescr(prec,iout)
+  subroutine psb_c_null_precdescr(prec,iout,root)
     use psb_penv_mod
     use psb_error_mod
     
@@ -164,10 +164,13 @@ contains
 
     class(psb_c_null_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: root
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='c_null_precset'
-    integer(psb_ipk_) :: iout_, ictxt, iam, np 
+    character(len=32) :: dprefix, frmtv
+    integer(psb_ipk_) :: ni
+    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -178,11 +181,20 @@ contains
     else
       iout_ = 6 
     end if
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    end if
+
     ictxt = prec%ictxt
     call psb_info(ictxt,iam,np)
+    if (root_ == -1) root_ = iam
 
-    if (iam == psb_root_) &
-         & write(iout_,*) 'No preconditioning'
+
+    if (iam == root_) &
+         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         & 'No preconditioning'
 
     call psb_erractionrestore(err_act)
     return

@@ -133,17 +133,18 @@ module psb_d_bjacprec
 
 contains
 
-  subroutine psb_d_bjac_precdescr(prec,iout)
+  subroutine psb_d_bjac_precdescr(prec,iout,root)
     use psb_penv_mod
     use psb_error_mod
     implicit none 
 
     class(psb_d_bjac_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: root
 
     integer(psb_ipk_) :: err_act, nrow, info
-    character(len=20)  :: name='d_bjac_precdescr'
-    integer(psb_ipk_) :: iout_, ictxt, iam, np 
+    character(len=20) :: name='d_bjac_precdescr'
+    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -154,17 +155,25 @@ contains
     else
       iout_ = 6 
     end if
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    end if
 
     if (.not.allocated(prec%iprcparm)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
     end if
+
     ictxt = prec%ictxt
     call psb_info(ictxt,iam,np)
-    
-    if (iam == psb_root_) &
-         & write(iout_,*) 'Block Jacobi with: ',&
+    if (root_ == -1) root_ = iam
+
+    if (iam == root_) &
+         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         & 'Block Jacobi with: ',&
          &  fact_names(prec%iprcparm(psb_f_type_))
     
     call psb_erractionrestore(err_act)

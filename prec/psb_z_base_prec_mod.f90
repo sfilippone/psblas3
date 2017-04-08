@@ -60,6 +60,7 @@ module psb_z_base_prec_mod
     generic, public       :: apply     => z_apply, z_apply_v
     generic, public       :: build     => precbld
     generic, public       :: descr     => precdescr
+    procedure, pass(prec) :: desc_prefix => psb_z_base_desc_prefix
     procedure(psb_z_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_z_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_z_base_precinit), pass(prec), deferred :: precinit   
@@ -156,7 +157,7 @@ module psb_z_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_z_base_precdescr(prec,iout)
+    subroutine psb_z_base_precdescr(prec,iout,root)
       import psb_ipk_, psb_dpk_, psb_desc_type, psb_z_vect_type, &
            & psb_z_base_vect_type, psb_zspmat_type, psb_z_base_prec_type,&
            & psb_z_base_sparse_mat
@@ -164,6 +165,7 @@ module psb_z_base_prec_mod
 
       class(psb_z_base_prec_type), intent(in) :: prec
       integer(psb_ipk_), intent(in), optional    :: iout
+      integer(psb_ipk_), intent(in), optional    :: root
 
     end subroutine psb_z_base_precdescr
   end interface
@@ -288,5 +290,28 @@ contains
     res = 0
 
   end function psb_z_base_get_nzeros
+
+  function psb_z_base_desc_prefix(prec) result(res)
+    use psb_base_mod, only : psb_info, psb_root_
+    implicit none 
+    class(psb_z_base_prec_type), intent(in) :: prec
+    character(len=32) :: res 
+    !
+    character(len=32) :: frmtv
+    integer(psb_ipk_) :: ni, ictxt,iam,np
+
+    ictxt = prec%ictxt
+    call psb_info(ictxt,iam,np)
+    
+    res = ''
+    if (iam /= psb_root_) then
+      ni  = floor(log10(1.0*np)) + 1
+      write(frmtv,'(a,i8.8,a)') '(a,i',ni,',a)'
+      write(res,frmtv) 'Process ',iam,': Preconditioner: '
+    else
+      write(res,'(a)') 'Preconditioner: '
+    end if
+
+  end function psb_z_base_desc_prefix
 
 end module psb_z_base_prec_mod

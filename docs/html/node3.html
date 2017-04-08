@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2008 (1.71)
+<!--Converted with LaTeX2HTML 2012 (1.2)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -13,7 +13,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -82,7 +82,6 @@ Linear Algebra Communication Subroutines (BLACS) library&nbsp;[<A
 Usually  there is no need to deal directly with MPI;  however, in some
 cases, MPI routines are used directly to improve efficiency. For
 further details on our communication layer see Sec.&nbsp;<A HREF="node98.html#sec:parenv">7</A>.
-
 <P>
 
 <DIV ALIGN="CENTER"><A NAME="fig:psblas"></A><A NAME="270"></A>
@@ -127,8 +126,7 @@ is equivalent to a partition of the discretization mesh into <EM>sub-domains</EM
 Our library  supports any distribution that keeps together 
 the coefficients of each matrix row; there are no other constraints on
 the variable assignment. 
-This choice is consistent with simple  data distributions 
-such as  <code>CYCLIC(N)</code> and <code>BLOCK</code>, 
+This choice is consistent with simple  data distributions such as  <code>CYCLIC(N)</code> and <code>BLOCK</code>, 
 as well as completely arbitrary assignments of
 equation indices to processes. 
 In particular it is consistent with the

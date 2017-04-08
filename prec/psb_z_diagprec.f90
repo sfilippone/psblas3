@@ -160,18 +160,18 @@ contains
   end subroutine psb_z_diag_precfree
   
 
-  subroutine psb_z_diag_precdescr(prec,iout)
+  subroutine psb_z_diag_precdescr(prec,iout,root)
     use psb_penv_mod
     use psb_error_mod
     Implicit None
 
     class(psb_z_diag_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: root
 
     integer(psb_ipk_) :: err_act, nrow, info
     character(len=20)  :: name='z_diag_precdescr'
-
-    integer(psb_ipk_) :: iout_, ictxt, iam, np 
+    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -182,11 +182,20 @@ contains
     else
       iout_ = 6 
     end if
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    end if
+    
     ictxt = prec%ictxt
     call psb_info(ictxt,iam,np)
+  
+    if (root_ == -1) root_ = iam
     
-    if (iam == psb_root_) &
-         & write(iout_,*) 'Diagonal scaling'
+    if (iam == root_) &
+         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         & 'Diagonal scaling'
 
     call psb_erractionsave(err_act)
 

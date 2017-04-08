@@ -200,7 +200,7 @@ An integer value; 0 means no error has been detected.
 
 \begin{verbatim}
 call prec%descr()
-call prec%descr(iout)
+call prec%descr(iout, root)
 \end{verbatim}
 
 \begin{description}
@@ -213,9 +213,16 @@ Intent: {\bf in}.\\
 Specified as: a preconditioner data structure \precdata.
 \item[iout] output unit.
 Scope: {\bf local} \\
-Type: {\bf optiona}\\
+Type: {\bf optional}\\
 Intent: {\bf in}.\\
-Specified as: an integer number. 
+Specified as: an integer number. Default: default output unit.
+\item[root] Process from which to print
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: an integer number between 0 and $np-1$, in which case
+the specified process will print the description, or $-1$, in which case
+all processes will print. Default: 0. 
 \end{description}
 
 
