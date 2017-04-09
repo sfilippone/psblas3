@@ -11,10 +11,8 @@
 
 # The following ones are the variables used by the PSBLAS make scripts.
 
-F90=@F90@
 FC=@FC@
 CC=@CC@
-F90COPT=@F90COPT@
 FCOPT=@FCOPT@
 CCOPT=@CCOPT@
 FMFLAG=@FMFLAG@
@@ -22,12 +20,10 @@ FIFLAG=@FIFLAG@
 EXTRA_OPT=@EXTRA_OPT@
 
 # These three should be always set!
-MPF90=@MPF90@
-MPF77=@MPF77@
-MPCC=@MPCC@
+MPFC=@MPIFC@
+MPCC=@MPICC@
 
-F90LINK=$(MPF90)
-FLINK=$(MPF77)
+FLINK=$(MPFC)
 
 LIBS=@LIBS@
 

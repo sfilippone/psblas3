@@ -21,7 +21,7 @@ lib: interns mpfobjs $(OBJS)
 interns:
 	cd internals && $(MAKE) lib
 mpfobjs: 
-	$(MAKE) $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)"
+	$(MAKE) $(MPFOBJS) FC="$(MPFC)" 
 
 
 clean:

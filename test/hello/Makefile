@@ -18,11 +18,11 @@ EXEDIR=./runs
 all: hello pingpong
 
 hello: hello.o 
-	$(F90LINK)  hello.o -o hello $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK)  hello.o -o hello $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv hello $(EXEDIR)
 
 pingpong: pingpong.o 
-	$(F90LINK)  pingpong.o -o pingpong $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK)  pingpong.o -o pingpong $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv pingpong $(EXEDIR)
 
 

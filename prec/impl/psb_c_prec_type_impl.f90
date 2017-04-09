@@ -29,15 +29,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-!!$ 
-!!$              Parallel Sparse BLAS  version 3.5
-!!$    (C) Copyright 2006, 2010, 2015, 2017
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
 !!$    1. Redistributions of source code must retain the above copyright
 !!$       notice, this list of conditions and the following disclaimer.
 !!$    2. Redistributions in binary form must reproduce the above copyright

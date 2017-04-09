@@ -41,7 +41,7 @@ module psb_c_base_prec_mod
        & psb_sizeof_int, psb_sizeof_long_int, psb_sizeof_sp, psb_sizeof_dp, &
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus, psb_success_,&
        & psb_c_base_sparse_mat, psb_cspmat_type, psb_c_csr_sparse_mat,& 
-       & psb_c_base_vect_type, psb_c_vect_type
+       & psb_c_base_vect_type, psb_c_vect_type, psb_i_base_vect_type
 
   use psb_prec_const_mod
 
@@ -58,6 +58,9 @@ module psb_c_base_prec_mod
     procedure(psb_c_base_apply_vect), pass(prec), deferred :: c_apply_v  
     procedure(psb_c_base_apply), pass(prec), deferred :: c_apply    
     generic, public       :: apply     => c_apply, c_apply_v
+    generic, public       :: build     => precbld
+    generic, public       :: descr     => precdescr
+    procedure, pass(prec) :: desc_prefix => psb_c_base_desc_prefix
     procedure(psb_c_base_precbld), pass(prec), deferred :: precbld    
     procedure(psb_c_base_sizeof), pass(prec), deferred :: sizeof     
     procedure(psb_c_base_precinit), pass(prec), deferred :: precinit   
@@ -122,21 +125,19 @@ module psb_c_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_c_base_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+    subroutine psb_c_base_precbld(a,desc_a,prec,info,amold,vmold,imold)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_c_vect_type, &
            & psb_c_base_vect_type, psb_cspmat_type, psb_c_base_prec_type,&
-           & psb_c_base_sparse_mat
+           & psb_c_base_sparse_mat, psb_i_base_vect_type
       Implicit None
 
       type(psb_cspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_desc_type), intent(inout), target   :: desc_a
       class(psb_c_base_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
-      character, intent(in), optional           :: upd
-      character(len=*), intent(in), optional    :: afmt
       class(psb_c_base_sparse_mat), intent(in), optional :: amold
       class(psb_c_base_vect_type), intent(in), optional  :: vmold
-
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
     end subroutine psb_c_base_precbld
   end interface
 
@@ -156,7 +157,7 @@ module psb_c_base_prec_mod
 
 
   abstract interface 
-    subroutine psb_c_base_precdescr(prec,iout)
+    subroutine psb_c_base_precdescr(prec,iout,root)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_c_vect_type, &
            & psb_c_base_vect_type, psb_cspmat_type, psb_c_base_prec_type,&
            & psb_c_base_sparse_mat
@@ -164,6 +165,7 @@ module psb_c_base_prec_mod
 
       class(psb_c_base_prec_type), intent(in) :: prec
       integer(psb_ipk_), intent(in), optional    :: iout
+      integer(psb_ipk_), intent(in), optional    :: root
 
     end subroutine psb_c_base_precdescr
   end interface
@@ -288,5 +290,28 @@ contains
     res = 0
 
   end function psb_c_base_get_nzeros
+
+  function psb_c_base_desc_prefix(prec) result(res)
+    use psb_base_mod, only : psb_info, psb_root_
+    implicit none 
+    class(psb_c_base_prec_type), intent(in) :: prec
+    character(len=32) :: res 
+    !
+    character(len=32) :: frmtv
+    integer(psb_ipk_) :: ni, ictxt,iam,np
+
+    ictxt = prec%ictxt
+    call psb_info(ictxt,iam,np)
+    
+    res = ''
+    if (iam /= psb_root_) then
+      ni  = floor(log10(1.0*np)) + 1
+      write(frmtv,'(a,i8.8,a)') '(a,i',ni,',a)'
+      write(res,frmtv) 'Process ',iam,': Preconditioner: '
+    else
+      write(res,'(a)') 'Preconditioner: '
+    end if
+
+  end function psb_c_base_desc_prefix
 
 end module psb_c_base_prec_mod

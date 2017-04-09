@@ -106,17 +106,17 @@ module psb_c_bjacprec
   end interface
   
   interface
-    subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+    subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_, &
-           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type
+           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, &
+           & psb_i_base_vect_type
       type(psb_cspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_desc_type), intent(inout), target   :: desc_a
       class(psb_c_bjac_prec_type),intent(inout) :: prec
       integer(psb_ipk_), intent(out)                      :: info
-      character, intent(in), optional           :: upd
-      character(len=*), intent(in), optional    :: afmt
       class(psb_c_base_sparse_mat), intent(in), optional :: amold
       class(psb_c_base_vect_type), intent(in), optional  :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
     end subroutine psb_c_bjac_precbld
   end interface
   
@@ -133,16 +133,18 @@ module psb_c_bjacprec
 
 contains
 
-  subroutine psb_c_bjac_precdescr(prec,iout)
+  subroutine psb_c_bjac_precdescr(prec,iout,root)
+    use psb_penv_mod
     use psb_error_mod
     implicit none 
 
     class(psb_c_bjac_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: root
 
     integer(psb_ipk_) :: err_act, nrow, info
-    character(len=20)  :: name='c_bjac_precdescr'
-    integer(psb_ipk_) :: iout_
+    character(len=20) :: name='c_bjac_precdescr'
+    integer(psb_ipk_) :: iout_, ictxt, iam, np, root_
 
     call psb_erractionsave(err_act)
 
@@ -153,14 +155,25 @@ contains
     else
       iout_ = 6 
     end if
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    end if
 
     if (.not.allocated(prec%iprcparm)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
     end if
-    
-    write(iout_,*) 'Block Jacobi with: ',&
+
+    ictxt = prec%ictxt
+    call psb_info(ictxt,iam,np)
+    if (root_ == -1) root_ = iam
+
+    if (iam == root_) &
+         &  write(iout_,*) trim(prec%desc_prefix()),' ',&
+         & 'Block Jacobi with: ',&
          &  fact_names(prec%iprcparm(psb_f_type_))
     
     call psb_erractionrestore(err_act)

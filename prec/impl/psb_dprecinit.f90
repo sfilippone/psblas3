@@ -32,14 +32,14 @@
 subroutine psb_dprecinit(p,ptype,info)
 
   use psb_base_mod
-  use psb_d_prec_type
+  use psb_d_prec_type, psb_protect_name => psb_dprecinit
   use psb_d_nullprec, only : psb_d_null_prec_type
   use psb_d_diagprec, only : psb_d_diag_prec_type
   use psb_d_bjacprec, only : psb_d_bjac_prec_type
   implicit none
-  type(psb_dprec_type), intent(inout)    :: p
+  class(psb_dprec_type), intent(inout)   :: p
   character(len=*), intent(in)           :: ptype
-  integer(psb_ipk_), intent(out)                   :: info
+  integer(psb_ipk_), intent(out)         :: info
 
   info = psb_success_
 

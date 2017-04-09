@@ -20,16 +20,16 @@ all: d_file_spmv s_file_spmv pdgenspmv
 
 
 d_file_spmv: $(DTOBJS)
-	$(F90LINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv d_file_spmv $(EXEDIR) 
 
 pdgenspmv: $(DPGOBJS)
-	$(F90LINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(DPGOBJS) -o pdgenspmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv pdgenspmv $(EXEDIR) 
 
 
 s_file_spmv: $(STOBJS)
-	$(F90LINK) $(LOPT) $(STOBJS) -o s_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(STOBJS) -o s_file_spmv $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv s_file_spmv $(EXEDIR) 
 
 

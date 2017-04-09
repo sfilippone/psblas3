@@ -225,20 +225,19 @@ subroutine psb_z_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 end subroutine psb_z_diag_apply
 
 
-subroutine psb_z_diag_precbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
+subroutine psb_z_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   use psb_base_mod
   use psb_z_diagprec, psb_protect_name =>  psb_z_diag_precbld
 
   Implicit None
 
   type(psb_zspmat_type), intent(in), target :: a
-  type(psb_desc_type), intent(in), target   :: desc_a
+  type(psb_desc_type), intent(inout), target   :: desc_a
   class(psb_z_diag_prec_type),intent(inout) :: prec
   integer(psb_ipk_), intent(out)                      :: info
-  character, intent(in), optional           :: upd
-  character(len=*), intent(in), optional    :: afmt
   class(psb_z_base_sparse_mat), intent(in), optional :: amold
   class(psb_z_base_vect_type), intent(in), optional  :: vmold
+  class(psb_i_base_vect_type), intent(in), optional  :: imold
   integer(psb_ipk_) :: err_act, nrow,i
   character(len=20)  :: name='z_diag_precbld'
 

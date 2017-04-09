@@ -32,15 +32,14 @@
 subroutine psb_zprecinit(p,ptype,info)
 
   use psb_base_mod
-  use psb_z_prec_type
+  use psb_z_prec_type, psb_protect_name => psb_zprecinit
   use psb_z_nullprec, only : psb_z_null_prec_type
   use psb_z_diagprec, only : psb_z_diag_prec_type
   use psb_z_bjacprec, only : psb_z_bjac_prec_type
   implicit none
-
-  type(psb_zprec_type), intent(inout)    :: p
+  class(psb_zprec_type), intent(inout)   :: p
   character(len=*), intent(in)           :: ptype
-  integer(psb_ipk_), intent(out)                   :: info
+  integer(psb_ipk_), intent(out)         :: info
 
   info = psb_success_
 

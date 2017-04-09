@@ -19,21 +19,21 @@ all: psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
 
 
 psb_d_pde3d: psb_d_pde3d.o 
-	$(F90LINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde3d $(EXEDIR)
 
 
 psb_s_pde3d: psb_s_pde3d.o 
-	$(F90LINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde3d $(EXEDIR)
 
 psb_d_pde2d: psb_d_pde2d.o 
-	$(F90LINK)  psb_d_pde2d.o -o psb_d_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK)  psb_d_pde2d.o -o psb_d_pde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde2d $(EXEDIR)
 
 
 psb_s_pde2d: psb_s_pde2d.o 
-	$(F90LINK) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde2d $(EXEDIR)
 
 

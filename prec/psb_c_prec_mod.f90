@@ -34,33 +34,6 @@ module psb_c_prec_mod
   use psb_c_prec_type
   use psb_c_base_prec_mod
 
-  interface psb_precbld
-    subroutine psb_cprecbld(a,desc_a,prec,info,upd,amold,afmt,vmold)
-      import :: psb_ipk_, psb_desc_type, psb_cspmat_type,&
-           & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type, &
-           & psb_cprec_type
-      implicit none
-      type(psb_cspmat_type), intent(in), target  :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_cprec_type), intent(inout)        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      character, intent(in),optional             :: upd
-      character(len=*), intent(in), optional     :: afmt
-      class(psb_c_base_sparse_mat), intent(in), optional :: amold
-      class(psb_c_base_vect_type), intent(in), optional  :: vmold
-    end subroutine psb_cprecbld
-  end interface
-
-  interface psb_precinit
-    subroutine psb_cprecinit(prec,ptype,info)
-      import :: psb_ipk_, psb_desc_type, psb_cspmat_type, psb_spk_, psb_cprec_type
-      implicit none
-      type(psb_cprec_type), intent(inout)    :: prec
-      character(len=*), intent(in)           :: ptype
-      integer(psb_ipk_), intent(out)                   :: info
-    end subroutine psb_cprecinit
-  end interface
-
   interface psb_precset
     subroutine psb_cprecseti(prec,what,val,info)
       import :: psb_ipk_, psb_desc_type, psb_cspmat_type, psb_spk_, psb_cprec_type

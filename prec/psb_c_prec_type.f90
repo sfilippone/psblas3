@@ -50,12 +50,40 @@ module psb_c_prec_type
     procedure, pass(prec)               :: sizeof => psb_cprec_sizeof
     procedure, pass(prec)               :: clone  => psb_c_prec_clone
     procedure, pass(prec)               :: free   => psb_c_prec_free
+    procedure, pass(prec)               :: build  => psb_cprecbld
+    procedure, pass(prec)               :: init   => psb_cprecinit
+    procedure, pass(prec)               :: descr  => psb_cfile_prec_descr
   end type psb_cprec_type
 
   interface psb_precfree
     module procedure psb_c_precfree
   end interface
 
+  interface psb_precinit
+    subroutine psb_cprecinit(prec,ptype,info)
+      import :: psb_ipk_, psb_cprec_type
+      implicit none
+      class(psb_cprec_type), intent(inout)   :: prec
+      character(len=*), intent(in)           :: ptype
+      integer(psb_ipk_), intent(out)         :: info
+    end subroutine psb_cprecinit
+  end interface
+
+  interface psb_precbld
+    subroutine psb_cprecbld(a,desc_a,prec,info,amold,vmold,imold)
+      import :: psb_ipk_, psb_desc_type, psb_cspmat_type,&
+           & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type, &
+           & psb_cprec_type, psb_i_base_vect_type
+      implicit none
+      type(psb_cspmat_type), intent(in), target  :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      class(psb_cprec_type), intent(inout), target :: prec
+      integer(psb_ipk_), intent(out)               :: info
+      class(psb_c_base_sparse_mat), intent(in), optional :: amold
+      class(psb_c_base_vect_type), intent(in), optional  :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
+    end subroutine psb_cprecbld
+  end interface
 
   interface psb_precdescr
     module procedure psb_cfile_prec_descr
@@ -120,11 +148,12 @@ module psb_c_prec_type
   
 contains
 
-  subroutine psb_cfile_prec_descr(p,iout)
+  subroutine psb_cfile_prec_descr(prec,iout, root)
     use psb_base_mod
     implicit none 
-    type(psb_cprec_type), intent(in) :: p
+    class(psb_cprec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional    :: iout
+    integer(psb_ipk_), intent(in), optional    :: root
     integer(psb_ipk_) :: iout_,info
     character(len=20) :: name='prec_descr' 
     
@@ -134,11 +163,11 @@ contains
       iout_ = 6 
     end if
 
-    if (.not.allocated(p%prec)) then 
+    if (.not.allocated(prec%prec)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
     end if
-    call p%prec%precdescr(iout)
+    call prec%prec%descr(iout=iout,root=root)
     
   end subroutine psb_cfile_prec_descr
 
