@@ -20,16 +20,16 @@ MMHBOBJS=$(ZH2MOBJS) $(DH2MOBJS) $(DM2HOBJS) $(ZM2HOBJS)
 all: dhb2mm zhb2mm dmm2hb zmm2hb
 
 dhb2mm: $(DH2MOBJS)
-	$(MPF90) -o dhb2mm   $(DH2MOBJS) $(PSBLAS_LIB) $(LDLIBS)
+	$(MPFC) -o dhb2mm   $(DH2MOBJS) $(PSBLAS_LIB) $(LDLIBS)
 dmm2hb: $(DM2HOBJS)
-	$(MPF90) -o dmm2hb   $(DM2HOBJS) $(PSBLAS_LIB) $(LDLIBS)
+	$(MPFC) -o dmm2hb   $(DM2HOBJS) $(PSBLAS_LIB) $(LDLIBS)
 zhb2mm: $(ZH2MOBJS)
-	$(MPF90) -o zhb2mm   $(ZH2MOBJS) $(PSBLAS_LIB) $(LDLIBS)
+	$(MPFC) -o zhb2mm   $(ZH2MOBJS) $(PSBLAS_LIB) $(LDLIBS)
 zmm2hb: $(ZM2HOBJS)
-	$(MPF90) -o zmm2hb   $(ZM2HOBJS) $(PSBLAS_LIB) $(LDLIBS)
+	$(MPFC) -o zmm2hb   $(ZM2HOBJS) $(PSBLAS_LIB) $(LDLIBS)
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(MPFC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
 	/bin/rm -f $(MMHBOBJS) dhb2mm zhb2mm dmm2hb zmm2hb

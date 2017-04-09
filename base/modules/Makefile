@@ -156,22 +156,22 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 psb_base_mod.o: $(MODULES)
 
 psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_comm_buffers_mod.o: psi_comm_buffers_mod.F90 $(BASIC_MODS)
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_p2p_mod.o: psi_p2p_mod.F90 $(BASIC_MODS) 
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_bcast_mod.o: psi_bcast_mod.F90 $(BASIC_MODS) 
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_reduce_mod.o: psi_reduce_mod.F90 $(BASIC_MODS)
-	$(F90)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
+	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:
 	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod)

@@ -1,3 +1,34 @@
+!   
+!                Parallel Sparse BLAS  version 3.5
+!      (C) Copyright 2006, 2010, 2015, 2017
+!        Salvatore Filippone    Cranfield University
+!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!   
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!   
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
   
   use psb_const_mod
@@ -394,3 +425,170 @@ subroutine psi_ssctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_ssctv
+subroutine  saxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
+  use psb_const_mod
+  integer n, m, lldx, lldy, info
+  real(psb_spk_) X(lldx,*), Y(lldy,*)
+  real(psb_spk_) alpha, beta
+  integer(psb_ipk_) :: i, j
+  integer(psb_ipk_) :: int_err(5)
+  character  name*20
+  name='saxpby'
+
+
+  !
+  !     Error handling
+  !
+  info = psb_success_
+  if (m.lt.0) then 
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (n.lt.0) then 
+    info=psb_err_iarg_neg_
+    int_err(1)=1
+    int_err(2)=n
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (lldx.lt.max(1,m)) then 
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=5
+    int_err(2)=1
+    int_err(3)=lldx
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  else if (lldy.lt.max(1,m)) then 
+    info=psb_err_iarg_not_gtia_ii_
+    int_err(1)=8
+    int_err(2)=1
+    int_err(3)=lldy
+    int_err(4)=m
+    call fcpsb_errpush(info,name,int_err)
+    goto 9999
+  endif
+
+  if (alpha.eq.szero) then 
+    if (beta.eq.szero) then 
+      do j=1, n 
+        do i=1,m 
+          y(i,j) = szero
+        enddo
+      enddo
+    else if (beta.eq.sone) then
+      !   
+      !        Do nothing! 
+      !               
+
+    else if (beta.eq.-sone) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = - y(i,j)
+        enddo
+      enddo
+    else  
+      do j=1,n 
+        do i=1,m 
+          y(i,j) =  beta*y(i,j)
+        enddo
+      enddo
+    endif
+
+  else if (alpha.eq.sone) then
+
+    if (beta.eq.szero) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = x(i,j)
+        enddo
+      enddo
+    else if (beta.eq.sone) then
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = x(i,j) + y(i,j)
+        enddo
+      enddo
+
+    else if (beta.eq.-sone) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = x(i,j) - y(i,j)
+        enddo
+      enddo
+    else  
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = x(i,j) + beta*y(i,j)
+        enddo
+      enddo
+    endif
+
+  else if (alpha.eq.-sone) then 
+
+    if (beta.eq.szero) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = -x(i,j)
+        enddo
+      enddo
+    else if (beta.eq.sone) then
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = -x(i,j) + y(i,j)
+        enddo
+      enddo
+
+    else if (beta.eq.-sone) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = -x(i,j) - y(i,j)
+        enddo
+      enddo
+    else  
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = -x(i,j) + beta*y(i,j)
+        enddo
+      enddo
+    endif
+
+  else  
+
+    if (beta.eq.szero) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = alpha*x(i,j)
+        enddo
+      enddo
+    else if (beta.eq.sone) then
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = alpha*x(i,j) + y(i,j)
+        enddo
+      enddo
+
+    else if (beta.eq.-sone) then 
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = alpha*x(i,j) - y(i,j)
+        enddo
+      enddo
+    else  
+      do j=1,n 
+        do i=1,m 
+          y(i,j) = alpha*x(i,j) + beta*y(i,j)
+        enddo
+      enddo
+    endif
+
+  endif
+
+  return
+
+9999 continue
+  call fcpsb_serror()
+  return
+
+end subroutine saxpby

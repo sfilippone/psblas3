@@ -22,16 +22,16 @@ all: psb_sf_sample psb_df_sample psb_cf_sample psb_zf_sample
 psb_sf_sample.o psb_df_sample.o psb_cf_sample.o psb_zf_sample.o: getp.o
 
 psb_sf_sample: $(SFOBJS)
-	$(F90LINK) $(LOPT) $(SFOBJS) -o psb_sf_sample $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(SFOBJS) -o psb_sf_sample $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv psb_sf_sample $(EXEDIR) 
 psb_df_sample: $(DFOBJS)
-	$(F90LINK) $(LOPT) $(DFOBJS) -o psb_df_sample $(PSBLAS_LIB) $(LDLIBS) 
+	$(FLINK) $(LOPT) $(DFOBJS) -o psb_df_sample $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/mv psb_df_sample $(EXEDIR) 
 psb_cf_sample: $(CFOBJS)
-	$(F90LINK) $(LOPT) $(CFOBJS) -o psb_cf_sample $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LOPT) $(CFOBJS) -o psb_cf_sample $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_cf_sample $(EXEDIR) 
 psb_zf_sample: $(ZFOBJS)
-	$(F90LINK) $(LOPT) $(ZFOBJS) -o psb_zf_sample $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LOPT) $(ZFOBJS) -o psb_zf_sample $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_zf_sample $(EXEDIR) 
 
 .f90.o:

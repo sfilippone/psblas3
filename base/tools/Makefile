@@ -35,7 +35,7 @@ lib: mpfobjs $(FOBJS)
 
 
 mpfobjs: 
-	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")
+	(make $(MPFOBJS) FC="$(MPFC)")
 
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS)
