@@ -225,7 +225,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -278,7 +278,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -340,7 +340,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -403,7 +403,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -456,7 +456,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -518,7 +518,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -577,7 +577,7 @@ contains
 
 
 #if !defined(SERIAL_MPI)
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -629,7 +629,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -691,7 +691,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -756,7 +756,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -810,7 +810,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -871,7 +871,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -933,7 +933,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -987,7 +987,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1049,7 +1049,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -1118,7 +1118,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -1171,7 +1171,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1233,7 +1233,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -1296,7 +1296,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -1349,7 +1349,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1411,7 +1411,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -1477,7 +1477,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -1530,7 +1530,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1592,7 +1592,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -1658,7 +1658,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -1712,7 +1712,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1773,7 +1773,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -1835,7 +1835,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -1889,7 +1889,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -1950,7 +1950,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -2021,7 +2021,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -2075,7 +2075,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2138,7 +2138,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2205,7 +2205,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -2258,7 +2258,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
         if (root_ == -1) then 
           if (allocated(co_dat_)) deallocate(co_dat_)
           allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -2327,7 +2327,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -2401,7 +2401,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -2454,7 +2454,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
         if (root_ == -1) then 
           if (allocated(co_dat_)) deallocate(co_dat_)
           allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -2523,7 +2523,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -2598,7 +2598,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -2653,7 +2653,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2715,7 +2715,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2780,7 +2780,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -2836,7 +2836,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2899,7 +2899,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -2965,7 +2965,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -3021,7 +3021,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3084,7 +3084,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3149,7 +3149,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -3205,7 +3205,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3269,7 +3269,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3343,7 +3343,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -3398,7 +3398,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3461,7 +3461,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -3913,7 +3913,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -3967,7 +3967,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4031,7 +4031,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4095,7 +4095,7 @@ contains
       root_ = -1
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -4149,7 +4149,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4213,7 +4213,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4277,7 +4277,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -4334,7 +4334,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4398,7 +4398,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4461,7 +4461,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
@@ -4516,7 +4516,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4581,7 +4581,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       me = this_image()
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
@@ -4649,7 +4649,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -4702,7 +4702,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -4765,7 +4765,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -4865,7 +4865,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -4925,7 +4925,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -4991,7 +4991,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5044,7 +5044,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5104,7 +5104,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -5169,7 +5169,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5222,7 +5222,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5284,7 +5284,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -5350,7 +5350,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5403,7 +5403,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5465,7 +5465,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -5527,7 +5527,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5580,7 +5580,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5643,7 +5643,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -5706,7 +5706,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5759,7 +5759,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5821,7 +5821,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)
@@ -5883,7 +5883,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(co_dat_)) deallocate(co_dat_)
       allocate(co_dat_[*])
       if (root_ == -1) then
@@ -5936,7 +5936,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then 
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1))[*], STAT=iinfo)
@@ -5999,7 +5999,7 @@ contains
     else
       root_ = -1
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (root_ == -1) then
         if (allocated(co_dat_)) deallocate(co_dat_)
         allocate (co_dat_(size(dat,1),size(dat,2))[*], STAT=iinfo)

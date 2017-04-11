@@ -91,7 +91,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -126,7 +126,7 @@ contains
     else
       root_ = psb_root_
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
@@ -163,7 +163,7 @@ contains
     else
       root_ = psb_root_
     endif
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
@@ -202,7 +202,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -240,7 +240,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
@@ -278,7 +278,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
@@ -317,7 +317,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -355,7 +355,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
@@ -393,7 +393,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
@@ -430,7 +430,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -467,7 +467,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
@@ -505,7 +505,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
@@ -543,7 +543,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
 
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
@@ -583,7 +583,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
@@ -621,7 +621,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
@@ -723,7 +723,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -762,7 +762,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
       sync all
@@ -802,7 +802,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       if (allocated(dat_buf)) deallocate(dat_buf)
       allocate(dat_buf[*])
       dat_buf=dat
@@ -838,7 +838,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       allocate(dat_buf(size(dat))[*])
       dat_buf=dat
       sync all
@@ -875,7 +875,7 @@ contains
       root_ = psb_root_
     endif
 
-    if (if_caf2) then
+    if (if_caf) then
       allocate(dat_buf(size(dat,1),size(dat,2))[*])
       dat_buf=dat
       sync all
