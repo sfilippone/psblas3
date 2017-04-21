@@ -7424,6 +7424,192 @@ if test "x$ac_cv_lib_openblas_sgemm" = xyes; then :
 fi
 
 fi
+# BLAS in Intel MKL library?
+if test $pac_blas_ok = no; then
+	# MKL for gfortran
+	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
+		# 64 bit
+		if test $host_cpu = x86_64; then
+			as_ac_Lib=`$as_echo "ac_cv_lib_mkl_gf_lp64_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_gf_lp64" >&5
+$as_echo_n "checking for $sgemm in -lmkl_gf_lp64... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl_gf_lp64 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"
+fi
+
+		# 32 bit
+		elif test $host_cpu = i686; then
+			as_ac_Lib=`$as_echo "ac_cv_lib_mkl_gf_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_gf" >&5
+$as_echo_n "checking for $sgemm in -lmkl_gf... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl_gf -lmkl_gf -lmkl_sequential -lmkl_core -lpthread $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"
+fi
+
+		fi
+	# MKL for other compilers (Intel, PGI, ...?)
+	else
+		# 64-bit
+		if test $host_cpu = x86_64; then
+			as_ac_Lib=`$as_echo "ac_cv_lib_mkl_intel_lp64_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_intel_lp64" >&5
+$as_echo_n "checking for $sgemm in -lmkl_intel_lp64... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl_intel_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"
+fi
+
+		# 32-bit
+		elif test $host_cpu = i686; then
+			as_ac_Lib=`$as_echo "ac_cv_lib_mkl_intel_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_intel" >&5
+$as_echo_n "checking for $sgemm in -lmkl_intel... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl_intel -lmkl_intel -lmkl_sequential -lmkl_core -lpthread $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"
+fi
+
+		fi
+	fi
+fi
+# Old versions of MKL
+if test $pac_blas_ok = no; then
+	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl" >&5
+$as_echo_n "checking for $sgemm in -lmkl... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl -lguide -lpthread $LIBS"
+cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"
+fi
+
+fi
+
+# BLAS in Apple vecLib library?
+if test $pac_blas_ok = no; then
+	save_LIBS="$LIBS"; LIBS="-framework vecLib $LIBS"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -framework vecLib" >&5
+$as_echo_n "checking for $sgemm in -framework vecLib... " >&6; }
+	cat > conftest.$ac_ext <<_ACEOF
+      program main
+      call $sgemm
+      end
+_ACEOF
+if ac_fn_fc_try_link "$LINENO"; then :
+  pac_blas_ok=yes;BLAS_LIBS="-framework vecLib"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_blas_ok" >&5
+$as_echo "$pac_blas_ok" >&6; }
+	LIBS="$save_LIBS"
+fi
 # BLAS in Alpha CXML library?
 if test $pac_blas_ok = no; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sgemm in -lcxml" >&5
