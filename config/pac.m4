@@ -1166,12 +1166,12 @@ if test $pac_blas_ok = no; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_gf_lp64, $sgemm,
-			[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
+			[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
 			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
 				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	# MKL for other compilers (Intel, PGI, ...?)
@@ -1179,26 +1179,26 @@ if test $pac_blas_ok = no; then
 		# 64-bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_intel_lp64, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
 				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_intel, $sgemm,
-				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"],,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
 				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	fi
 fi
 # Old versions of MKL
 if test $pac_blas_ok = no; then
-	AC_CHECK_LIB(mkl, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
+	AC_CHECK_LIB(mkl, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread  $BLAS_LIBDIR"],,[-lguide -lpthread])
 fi
 
 # BLAS in Apple vecLib library?
 if test $pac_blas_ok = no; then
 	save_LIBS="$LIBS"; LIBS="-framework vecLib $LIBS"
 	AC_MSG_CHECKING([for $sgemm in -framework vecLib])
-	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes;BLAS_LIBS="-framework vecLib"])
+	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes;BLAS_LIBS="-framework vecLib $BLAS_LIBDIR"])
 	AC_MSG_RESULT($pac_blas_ok)
 	LIBS="$save_LIBS"
 fi

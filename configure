@@ -7456,7 +7456,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
 fi
 
 		# 32 bit
@@ -7487,7 +7487,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
 fi
 
 		fi
@@ -7521,7 +7521,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
 fi
 
 		# 32-bit
@@ -7552,7 +7552,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"
 fi
 
 		fi
@@ -7586,7 +7586,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"
+  pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread  $BLAS_LIBDIR"
 fi
 
 fi
@@ -7602,7 +7602,7 @@ $as_echo_n "checking for $sgemm in -framework vecLib... " >&6; }
       end
 _ACEOF
 if ac_fn_fc_try_link "$LINENO"; then :
-  pac_blas_ok=yes;BLAS_LIBS="-framework vecLib"
+  pac_blas_ok=yes;BLAS_LIBS="-framework vecLib $BLAS_LIBDIR"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
