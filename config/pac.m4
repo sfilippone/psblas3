@@ -1159,7 +1159,8 @@ if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
   AC_CHECK_LIB(openblas, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"])
 fi
-# BLAS in Intel MKL library?
+				# BLAS in Intel MKL library?
+sgemm="sgemm";
 if test $pac_blas_ok = no; then
 	# MKL for gfortran
 	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
