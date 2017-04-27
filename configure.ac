@@ -341,7 +341,7 @@ if test "X$CCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignements
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   CCOPT="-O3  $CCOPT"
+   CCOPT="-g -O3  $CCOPT"
 
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
@@ -363,7 +363,7 @@ if test "X$CCOPT" == "X" ; then
    # using GCC in conjunction with NAG.
      CCOPT="-O2"
  else 
-     CCOPT="-O2 $CCOPT"
+     CCOPT="-g -O2 $CCOPT"
  fi
 fi
 #CFLAGS="${CCOPT}"
@@ -376,7 +376,7 @@ if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   FCOPT="-O3  $FCOPT"
+   FCOPT="-g -O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F -qlanglvl=extended $FCOPT"
@@ -398,7 +398,7 @@ if test "X$FCOPT" == "X" ; then
      FCOPT="-O2 "
   # NOTE : PG & Sun use -fast instead -O3
  else 
-     FCOPT="-O2 $FCOPT"
+     FCOPT="-g -O2 $FCOPT"
  fi
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then

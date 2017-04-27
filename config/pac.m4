@@ -1038,7 +1038,41 @@ dnl Modified with new name to handle Fortran compilers (such as NAG)
 dnl for which the linking MUST be done with the compiler (i.e.: 
 dnl trying to link the Fortran version of the BLAS with the C compiler 
 dnl would fail even when linking in the compiler's library)
+dnl
+dnl Modified by salvatore.filippone@cranfield.ac.uk to include 
+dnl new tests for MKL from the 2008 version (see license below)
+dnl 
+# LICENSE
+#
+#   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#
+#   This program is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
 
+      
 AC_DEFUN([PAC_BLAS], [
 AC_PREREQ(2.50)
 dnl AC_REQUIRE([AC_FC_LIBRARY_LDFLAGS])
@@ -1124,6 +1158,50 @@ fi
 if test $pac_blas_ok = no; then
   AC_LANG([Fortran])
   AC_CHECK_LIB(openblas, sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lopenblas $BLAS_LIBDIR"])
+fi
+				# BLAS in Intel MKL library?
+sgemm="sgemm";
+if test $pac_blas_ok = no; then
+	# MKL for gfortran
+	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
+		# 64 bit
+		if test $host_cpu = x86_64; then
+			AC_CHECK_LIB(mkl_gf_lp64, $sgemm,
+			[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread])
+		# 32 bit
+		elif test $host_cpu = i686; then
+			AC_CHECK_LIB(mkl_gf, $sgemm,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
+		fi
+	# MKL for other compilers (Intel, PGI, ...?)
+	else
+		# 64-bit
+		if test $host_cpu = x86_64; then
+			AC_CHECK_LIB(mkl_intel_lp64, $sgemm,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread])
+		# 32-bit
+		elif test $host_cpu = i686; then
+			AC_CHECK_LIB(mkl_intel, $sgemm,
+				[pac_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread  $BLAS_LIBDIR"],,
+				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread])
+		fi
+	fi
+fi
+# Old versions of MKL
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(mkl, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread  $BLAS_LIBDIR"],,[-lguide -lpthread])
+fi
+
+# BLAS in Apple vecLib library?
+if test $pac_blas_ok = no; then
+	save_LIBS="$LIBS"; LIBS="-framework vecLib $LIBS"
+	AC_MSG_CHECKING([for $sgemm in -framework vecLib])
+	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes;BLAS_LIBS="-framework vecLib $BLAS_LIBDIR"])
+	AC_MSG_RESULT($pac_blas_ok)
+	LIBS="$save_LIBS"
 fi
 # BLAS in Alpha CXML library? 
 if test $pac_blas_ok = no; then

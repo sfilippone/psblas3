@@ -6,7 +6,7 @@ Changelog. A lot less detailed than usual, at least for past
 2017/04/05: make ISO_C_BINDING and MOVE_ALLOC mandatory prereq. 
 2017/03/20: Changes for GPU codes: added buffers to MAPs, reduce number of
 	malloc/free, added new maybe_free_buffers method on vector. 
-2017/02/12: New stopping criterion, soimplified mat_dist
+2017/02/12: New stopping criterion, simplified mat_dist
 2017/02/06: Fixes for --enable-long-integers and for RPM build.
 2016/07/14: Fix matrix print with renumbering.	
 2016/06/18: New thresholds for quicksort	
