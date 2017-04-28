@@ -113,7 +113,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    character :: ftrans
+    character :: ftran
     integer                 :: info
     
 
@@ -130,8 +130,8 @@ contains
       return 
     end if
 
-    ftrans  = trans
-    call psb_halo(xp,descp,info,data=data,mode=mode,tran=tran)
+    ftran  = tran
+    call psb_halo(xp,descp,info,data=data,mode=mode,tran=ftran)
 
     res = info
     
