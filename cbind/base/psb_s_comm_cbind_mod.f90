@@ -1,4 +1,4 @@
-module psb_d_comm_cbind_mod
+module psb_s_comm_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
@@ -6,15 +6,15 @@ module psb_d_comm_cbind_mod
   
 contains
 
-  function psb_c_d_ovrl(xh,cdh) bind(c) result(res)
+  function psb_c_s_ovrl(xh,cdh) bind(c) result(res)
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_s_vect_type), pointer :: xp
     integer                 :: info
     
 
@@ -35,18 +35,18 @@ contains
 
     res = info
 
-  end function psb_c_d_ovrl
+  end function psb_c_s_ovrl
  
-  function psb_c_d_ovrl_opt(xh,cdh,update,mode) bind(c) result(res)
+  function psb_c_s_ovrl_opt(xh,cdh,update,mode) bind(c) result(res)
     implicit none 
     integer(psb_c_int) :: res
     integer(psb_c_int), value :: update, mode
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_s_vect_type), pointer :: xp
     integer                 :: info
     
 
@@ -67,18 +67,18 @@ contains
 
     res = info
 
-  end function psb_c_d_ovrl_opt
+  end function psb_c_s_ovrl_opt
 
  
-  function psb_c_d_halo(xh,cdh) bind(c) result(res)
+  function psb_c_s_halo(xh,cdh) bind(c) result(res)
     implicit none 
     integer(psb_c_int) :: res
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_s_vect_type), pointer :: xp
     integer                 :: info
     
 
@@ -99,20 +99,20 @@ contains
 
     res = info
 
-  end function psb_c_d_halo
+  end function psb_c_s_halo
  
-  function psb_c_d_halo_opt(xh,cdh,tran,data,mode) bind(c) result(res)
+  function psb_c_s_halo_opt(xh,cdh,tran,data,mode) bind(c) result(res)
     implicit none 
     integer(psb_c_int) :: res
     integer(psb_c_int), value :: data, mode
     character(c_char)      :: tran
         
 
-    type(psb_c_dvector) :: xh
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: xp
+    type(psb_s_vect_type), pointer :: xp
     character :: ftrans
     integer                 :: info
     
@@ -135,21 +135,21 @@ contains
 
     res = info
     
-  end function psb_c_d_halo_opt
+  end function psb_c_s_halo_opt
 
   
-  function psb_c_d_vscatter(ng,gx,xh,cdh) bind(c) result(res)
+  function psb_c_s_vscatter(ng,gx,xh,cdh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int)    :: res
     integer(psb_c_int), value :: ng
-    real(c_double), target :: gx(*)
-    type(psb_c_dvector) :: xh
+    real(c_float), target :: gx(*)
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: vp
-    real(psb_dpk_), pointer :: pgx(:)
+    type(psb_s_vect_type), pointer :: vp
+    real(psb_spk_), pointer :: pgx(:)
     integer               :: info, sz
 
     res = -1
@@ -170,19 +170,19 @@ contains
     call psb_scatter(pgx,vp,descp,info)
     res = info 
 
-  end function psb_c_d_vscatter
+  end function psb_c_s_vscatter
   
-  function psb_c_dvgather(v,xh,cdh) bind(c) result(res)
+  function psb_c_svgather(v,xh,cdh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int)    :: res   
-    real(c_double), target :: v(*)
-    type(psb_c_dvector) :: xh
+    real(c_float), target :: v(*)
+    type(psb_c_svector) :: xh
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_d_vect_type), pointer :: vp
-    real(psb_dpk_), allocatable :: fv(:)
+    type(psb_s_vect_type), pointer :: vp
+    real(psb_spk_), allocatable :: fv(:)
     integer               :: info, sz
 
     res = -1
@@ -203,17 +203,17 @@ contains
     if (res /=0) return          
     sz = size(fv)
     v(1:sz) = fv(1:sz)
-  end function psb_c_dvgather
+  end function psb_c_svgather
     
-  function psb_c_dspgather(gah,ah,cdh) bind(c) result(res)
+  function psb_c_sspgather(gah,ah,cdh) bind(c) result(res)
     implicit none 
 
     integer(psb_c_int)    :: res   
-    type(psb_c_dspmat)   :: ah, gah
+    type(psb_c_sspmat)   :: ah, gah
     type(psb_c_descriptor) :: cdh
     
     type(psb_desc_type), pointer :: descp
-    type(psb_dspmat_type), pointer :: ap, gap
+    type(psb_sspmat_type), pointer :: ap, gap
     integer               :: info, sz
 
     res = -1
@@ -234,6 +234,6 @@ contains
     end if
     call psb_gather(gap,ap,descp,info)
     res = info 
-  end function psb_c_dspgather
+  end function psb_c_sspgather
      
-end module psb_d_comm_cbind_mod
+end module psb_s_comm_cbind_mod
