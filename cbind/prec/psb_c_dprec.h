@@ -14,9 +14,9 @@ typedef struct PSB_C_DPREC {
 
 psb_c_dprec* psb_c_new_dprec();
 
-int  psb_c_dprecinit(psb_c_dprec *ph, const char *ptype);
-int  psb_c_dprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, psb_c_dprec *ph);
-int  psb_c_dprecfree(psb_c_dprec *ph);
+psb_i_t  psb_c_dprecinit(psb_c_dprec *ph, const char *ptype);
+psb_i_t  psb_c_dprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, psb_c_dprec *ph);
+psb_i_t  psb_c_dprecfree(psb_c_dprec *ph);
 #ifdef __cplusplus
 }
 #endif
