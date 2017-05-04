@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include "psb_c_dcomm.h"
-
-#include <stdlib.h>
 #include "psb_c_dbase.h"
 
 

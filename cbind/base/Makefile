@@ -18,9 +18,9 @@ FOBJS= psb_objhandle_mod.o psb_base_cbind_mod.o psb_cpenv_mod.o \
       psb_c_comm_cbind_mod.o psb_z_comm_cbind_mod.o 
 
 COBJS= psb_c_base.o psb_c_sbase.o psb_c_dbase.o psb_c_cbase.o psb_c_zbase.o \
-	psb_c_dcomm.o
+	psb_c_scomm.o psb_c_dcomm.o psb_c_ccomm.o psb_c_zcomm.o
 CMOD=psb_base_cbind.h psb_c_base.h psb_c_sbase.h  psb_c_dbase.h  psb_c_cbase.h  psb_c_zbase.h \
-	psb_c_dcomm.h
+	psb_c_scomm.h psb_c_dcomm.h psb_c_ccomm.h psb_c_zcomm.h
 OBJS=$(FOBJS) $(COBJS)
 
 LIBMOD=psb_base_cbind_mod$(.mod) psb_cpenv_mod$(.mod)  psb_objhandle_mod$(.mod)\
