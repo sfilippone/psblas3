@@ -1,7 +1,7 @@
-This directory contains  the PSBLAS library, version 3.4.
+This directory contains  the PSBLAS library, version 3.5.
 
 
-Existing codes will work untouched with version 3.4, but they will
+Existing codes will work untouched with version 3.5, but they will
 have to be recompiled; new methods have been added for the sake of GPU
 computations, plus the usual bunch of bug fixes.
 
@@ -27,6 +27,14 @@ S. Filippone, A. Buttari:
 Object-Oriented Techniques for Sparse Matrix Computations in Fortran
 2003, 
 ACM Trans. on Math. Software, vol. 38, No. 4, 2012.
+
+The ideas are explored further with the paper:
+
+V. Cardellini, S. Filippone and D. Rouson
+Design Patterns for  sparse-matrix computations on
+hybrid CPU/GPU platforms, 
+Scientific Programming, 22(2014), pp.1-19.
+
 
 Version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
