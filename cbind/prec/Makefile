@@ -25,6 +25,7 @@ lib:  $(OBJS) $(CMOD)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(CMOD) $(HERE)
 	/bin/cp -p $(LIBMOD) $(CMOD) $(INCLUDEDIR)
 
 psb_prec_cbind_mod.o: psb_sprec_cbind_mod.o psb_dprec_cbind_mod.o psb_cprec_cbind_mod.o psb_zprec_cbind_mod.o
