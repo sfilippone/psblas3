@@ -214,7 +214,10 @@ int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor
 	icol[el]=(x)*idim*idim+(y-1)*idim+(z);
 	el=el+1;
       }
-      for (i=0; i<el; i++) irow[i]=glob_row;
+      for (i=0; i<el; i++) {
+	irow[i]=glob_row-1;
+	icol[i]--;
+      }
       if ((ret=psb_c_dspins(el,irow,icol,val,ah,cdh))!=0) 
 	fprintf(stderr,"From psb_c_dspins: %d\n",ret); 
       psb_c_dgeins(1,irow,zt,bh,cdh);
@@ -329,7 +332,7 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Error during matrix build loop\n");
     psb_c_abort(ictxt);
   }    
-
+  psb_c_dmat_name_print(ah,"cbindmat.mtx");
   psb_c_barrier(ictxt);
   /* Set up the preconditioner */ 
   ph  = psb_c_new_dprec();

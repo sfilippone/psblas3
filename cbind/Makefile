@@ -13,7 +13,7 @@ lib: based precd
 
 based:
 	cd base && $(MAKE) lib LIBNAME=$(LIBNAME) 
-precd:
+precd: based
 	cd prec && $(MAKE) lib LIBNAME=$(LIBNAME) 
 
 

@@ -113,7 +113,32 @@ contains
 
   end function psb_c_cmat_get_ncols
 
+  
+  function psb_c_cmat_name_print(mh,name) bind(c) result(res)
+    use psb_base_mod
+    use psb_objhandle_mod
+    use psb_base_string_cbind_mod
+    implicit none 
+    integer(psb_c_int) :: res
 
+    character(c_char)        :: name(*)
+    type(psb_c_cspmat) :: mh
+    type(psb_cspmat_type), pointer :: ap
+    integer                 ::  info
+    character(1024)         :: fname
+
+    res = 0
+    if (c_associated(mh%item)) then 
+      call c_f_pointer(mh%item,ap)
+    else
+      return 
+    end if
+    call stringc2f(name,fname)
+    
+    call ap%print(fname,head='PSBLAS Cbinding Interface')
+
+  end function psb_c_cmat_name_print
+  
 
 end module psb_c_serial_cbind_mod
 
