@@ -16,7 +16,7 @@ contains
   
   subroutine psb_c_set_index_base(base) bind(c) 
     implicit none     
-    integer(psb_c_int)  :: base
+    integer(psb_c_int), value  :: base
     
     psb_c_index_base = base
   end subroutine psb_c_set_index_base  

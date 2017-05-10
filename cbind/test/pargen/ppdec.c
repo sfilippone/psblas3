@@ -123,7 +123,7 @@ int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor
   info = 0;
   psb_c_info(ictxt,&iam,&np);
   deltah = (double) 1.0/(idim-1);
-
+  psb_c_set_index_base(1);
   for (glob_row=1; glob_row<=ng; glob_row++) {
 
     /* Check if I have to do something about this entry */
@@ -213,10 +213,6 @@ int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor
 	val[el] = val[el]/(deltah*deltah);
 	icol[el]=(x)*idim*idim+(y-1)*idim+(z);
 	el=el+1;
-      }
-      for (i=0; i<el; i++) {
-	irow[i]=glob_row-1;
-	icol[i]--;
       }
       if ((ret=psb_c_dspins(el,irow,icol,val,ah,cdh))!=0) 
 	fprintf(stderr,"From psb_c_dspins: %d\n",ret); 
