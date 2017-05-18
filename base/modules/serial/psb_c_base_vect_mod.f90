@@ -498,7 +498,10 @@ contains
   !
   !> Function  base_maybe_free_buffer:
   !! \memberof  psb_c_base_vect_type
-  !! \brief Conditionally Free aux buffer
+  !! \brief Conditionally Free aux buffer.
+  !!        In some derived classes, e.g. GPU,
+  !!        does not really frees to avoid  runtime
+  !!        costs
   !!           
   !!  \param info  return code
   !!
