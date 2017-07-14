@@ -191,9 +191,9 @@ subroutine psb_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
       endif
       iz = glob_row-(ix-1)*idim*idim-(iy-1)*idim
       ! x, y, x coordinates
-      x = ix*deltah
-      y = iy*deltah
-      z = iz*deltah
+      x = (ix-1)*deltah
+      y = (iy-1)*deltah
+      z = (iz-1)*deltah
       zt(k) = f_(x,y,z)
       ! internal point: build discretization
       !   
@@ -493,8 +493,8 @@ subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
       endif
       iy = (glob_row-(ix-1)*idim)
       ! x, y
-      x = ix*deltah
-      y = iy*deltah
+      x = (ix-1)*deltah
+      y = (iy-1)*deltah
 
       zt(k) = f_(x,y)
       ! internal point: build discretization
