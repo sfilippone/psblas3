@@ -91,7 +91,7 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
   integer(psb_ipk_) :: i_count, j_count,&
        & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-  integer(psb_ipk_), allocatable  :: iwork(:)
+  integer(psb_ipk_), allocatable  :: iwork(:), iwrk2(:)
   integer(psb_ipk_), allocatable  :: irow(:),icol(:)
   real(psb_spk_), allocatable    :: val(:)
   integer(psb_ipk_), parameter    :: nb=30
@@ -137,7 +137,7 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
   call psb_bcast(ictxt,nnzero, root)
   call psb_bcast(ictxt,nrhs, root)
   liwork = max(np, nrow + ncol)
-  allocate(iwork(liwork), stat = info)
+  allocate(iwork(liwork), iwrk2(np),stat = info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
     int_err(1)=liwork
@@ -198,9 +198,9 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
           j_count = j_count + 1 
           if (j_count-i_count >= nb) exit
           if (j_count > nrow) exit
-          call parts(j_count,nrow,np,iwork, np_sharing)
+          call parts(j_count,nrow,np,iwrk2, np_sharing)
           if (np_sharing /= 1 ) exit
-          if (iwork(1) /= iproc ) exit
+          if (iwrk2(1) /= iproc ) exit
         end do
       end if
     else 
@@ -321,7 +321,7 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
 
 
   
-  deallocate(val,irow,icol,stat=info)
+  deallocate(val,irow,icol,iwork,iwrk2,stat=info)
   if(info /= psb_success_)then
     info=psb_err_from_subroutine_
     ch_err='deallocate'
@@ -329,7 +329,6 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
     goto 9999
   end if
 
-  deallocate(iwork)   
   if (iam == root) write (*, fmt = *) 'end matdist'     
 
   call psb_erractionrestore(err_act)
