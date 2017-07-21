@@ -58,13 +58,13 @@ program psb_cf_sample
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver paramters
-  integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode, ipart,&
+  integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
        & methd, istopc, irst
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_spk_)   :: err, eps, cond
 
   character(len=5)   :: afmt
-  character(len=20)  :: name
+  character(len=20)  :: name, part
   character(len=2)   :: filefmt
   integer(psb_ipk_), parameter :: iunit=12
   integer(psb_ipk_) :: iparm(20)
@@ -105,7 +105,7 @@ program psb_cf_sample
   !  get parameters
   !
   call get_parms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,&
-       & ipart,afmt,istopc,itmax,itrace,irst,eps)
+       & part,afmt,istopc,itmax,itrace,irst,eps)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
@@ -170,17 +170,12 @@ program psb_cf_sample
   end if
 
   ! switch over different partition types
-  if (ipart == 0) then 
-    call psb_barrier(ictxt)
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block vector")')
-    allocate(ivg(m_problem),ipv(np))
-    do i=1,m_problem
-      call part_block(i,m_problem,np,ipv,nv)
-      ivg(i) = ipv(1)
-    enddo
-    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
+  select case(psb_toupper(part)) 
+  case('BLOCK')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
+    call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
     
-  else if (ipart == 2) then 
+  case('GRAPH')
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph vector")')
       write(psb_out_unit,'(" ")')
@@ -193,10 +188,10 @@ program psb_cf_sample
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,v=ivg)
 
-  else 
-    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block subroutine")')
+  case default  
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt,desc_a,info,fmt=afmt,parts=part_block)
-  end if
+  end select
 
   call psb_scatter(b_col_glob,b_col,desc_a,info,root=psb_root_)
   call psb_geall(x_col,desc_a,info)

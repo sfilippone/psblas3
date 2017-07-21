@@ -35,7 +35,7 @@ psb_zf_sample: $(ZFOBJS)
 	/bin/mv psb_zf_sample $(EXEDIR) 
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(MPFC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
 	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(SFOBJS) $(CFOBJS)\
