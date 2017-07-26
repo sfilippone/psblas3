@@ -1,0 +1,2436 @@
+module test_psb_halo
+use pfunit_mod
+use psb_base_mod
+implicit none
+include 'mpif.h'
+contains
+
+
+! A dense vector of size 6: [1 1 1 2 2 2]. 3rd and 4th entries (global) are halo indices.
+! Before halo exchange: img1 [1 1 1 4] img2 [2 2 2 3]
+! After  halo exchange: img1 [1 1 1 2] img2 [2 2 2 1]
+subroutine prepare_test2imgs(desc_a,x,check, np, icontxt, info)
+	use psb_base_mod
+	IMPLICIT NONE
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt, info
+	integer, intent(in) :: np
+	integer :: me, i=0, j
+	integer, parameter :: nrows=6
+	integer ::  mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	me = this_image()
+        info = 0
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+	allocate(vg(nrows),  STAT=info)
+	if (info == 0) allocate(ia(nrows),  STAT=info)
+	if (info == 0) allocate(val(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  	print*,'ERROR in desc allocation', info
+	  	stop
+	endif
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+        if (info /=0) then
+		print*,'ERROR in psb_cdins', info
+		stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  	print*,'an error in psb_cdasb', info
+	  	stop
+	endif
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	sync all
+
+	!Let's modify x, so we need to update halo indices
+	if ((me == 1).or.(me == 2)) then
+	  	x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+
+	!Let's build the expected solution
+	if (allocated(check)) deallocate(check)
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1), STAT=info)
+	else
+		allocate(check(1),     STAT=info)
+	endif
+        if (info /=0) then
+        	print*,'ERROR in allocating vectors', info
+                stop
+        endif
+        if (me == 1 ) then
+		check(1:mid)=1.0d0
+		check(mid + 1)=2.0d0
+	else if (me == 2) then
+		check(1:mid)=2.0d0
+		check(mid + 1)=1.0d0
+	else
+		check(1)=0.0d0
+	endif        
+
+	if (allocated(vg))  deallocate(vg)
+	if (allocated(ia))  deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test2imgs
+
+! Before halo exchange: img1 [1 1 1, 4] img2 [2 2 2, 3]
+! After  halo exchange: img1 [1 1 2, 2] img2 [6 4 4, 1]
+subroutine prepare_test2imgs_tran(desc_a,x,check, np, icontxt, info)
+	IMPLICIT NONE
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt, info
+	integer, intent(in) :: np
+	integer :: me, i=0, j
+	integer, parameter :: nrows=6
+	integer ::  mid, true
+	integer, allocatable :: vg(:), ia(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+	me = this_image()
+        info = 0
+	if (np < 2) then
+		print*,'You need at least 2 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+	allocate(vg(nrows),  STAT=info)
+	if (info == 0) allocate(ia(nrows),  STAT=info)
+	if (info == 0) allocate(val(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	!Use only 2 processes
+	!Assuming nrows is a multiple of 2 so mid is an integer
+	!Distribute equally to the two processes
+	mid=nrows/2
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+
+	do i=mid+1, nrows
+		vg(i)=1
+	enddo
+
+	do i=1,size(ia,1)
+		ia(i)=i
+	enddo
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+
+	do i=mid + 1,nrows
+		val(i)=2.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  	print*,'ERROR in desc allocation', info
+	  	stop
+	endif
+	if ( me == 1)	call psb_cdins(nz=1,ia=(/mid/),ja=(/mid+1/), desc_a=desc_a, info=info)
+	if ( me == 2)   call psb_cdins(nz=1,ia=(/mid+1/),ja=(/mid/), desc_a=desc_a, info=info)
+        if (info /=0) then
+		print*,'ERROR in psb_cdins', info
+		stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  	print*,'an error in psb_cdasb', info
+	  	stop
+	endif
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=ia, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	sync all
+
+	!Let's modify x, so we need to update halo indices
+	if ((me == 1).or.(me == 2)) then
+	  	x%v%v(mid +1)=x%v%v(mid+1) + 2.0d0
+	endif
+
+	!Let's build the expected solution
+	if (allocated(check)) deallocate(check)
+	if ((me == 1).or.(me==2)) then
+		allocate(check(mid+1), STAT=info)
+	else
+		allocate(check(1),     STAT=info)
+	endif
+        if (info /=0) then
+        	print*,'ERROR in allocating vectors', info
+                stop
+        endif
+
+        if (me == 1 ) then
+		check(1:mid-1)=1.0d0
+		check(mid)=4.0d0
+		check(mid + 1)=4.0d0
+	else if (me == 2) then
+		check(1)=6.0d0
+		check(mid-1:mid)=2.0d0
+		check(mid + 1)=3.0d0
+	else
+		check(1)=0.0d0
+	endif        
+
+
+	if (allocated(vg))  deallocate(vg)
+	if (allocated(ia))  deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test2imgs_tran
+
+
+subroutine prepare_test4imgs(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer, optional :: info
+	integer :: me, i=0, j,nz
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	me = this_image()
+        info = 0
+	if (np < 4) then
+		print*,'You need at least 4 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 4 processes
+	!Assuming nrows is a multiple of 4 so mid is an integer
+	!Distribute equally to the two processes
+
+	mid=nrows/4
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, 2*mid
+		vg(i)=1
+	enddo
+	do i=2*mid + 1, 3*mid
+		vg(i)=2
+	enddo
+	do i=3*mid+1, nrows
+		vg(i)=3
+	enddo
+
+	if (me == 1) nz = 5
+	if (me == 2) nz = 7
+	if (me == 3) nz = 7
+	if (me == 4) nz = 5
+        if (me > 4)  nz = 0
+ 
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+
+	if (me == 1) then
+
+	  ia(1)=2
+	  ja(1)=1
+
+	  ia(2)=1
+	  ja(2)=2
+
+	  ia(3)=2
+	  ja(3)=3
+
+	  ia(4)=1
+	  ja(4)=4
+
+	  ia(5)=2
+	  ja(5)=5
+	endif
+
+	if (me == 2) then
+
+	  ia(1)=4
+	  ja(1)=1
+
+	  ia(2)=3
+	  ja(2)=2
+
+	  ia(3)=4
+	  ja(3)=3
+
+	  ia(4)=3
+	  ja(4)=4
+
+	  ia(5)=4
+	  ja(5)=5
+
+	  ia(6)=3
+	  ja(6)=6
+
+	  ia(7)=4
+	  ja(7)=6
+
+	endif
+
+	if (me == 3) then
+	  ia(1)=5
+	  ja(1)=2
+
+	  ia(2)=6
+	  ja(2)=3
+
+	  ia(3)=5
+	  ja(3)=4
+
+	  ia(4)=6
+	  ja(4)=5
+
+	  ia(5)=5
+	  ja(5)=6
+
+	  ia(6)=6
+	  ja(6)=7
+
+	  ia(7)=5
+	  ja(7)=8
+
+
+	endif
+
+	if (me == 4) then
+	  ia(1)=7
+	  ja(1)=4
+
+	  ia(2)=8
+	  ja(2)=5
+
+	  ia(3)=7
+	  ja(3)=6
+
+	  ia(4)=8
+	  ja(4)=7
+
+	  ia(5)=7
+	  ja(5)=8
+	endif
+
+
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+	do i=  mid + 1, 2*mid
+		val(i)=2.
+	enddo
+	do i=2*mid + 1, 3*mid
+		val(i)=3.
+	enddo
+	do i=3*mid + 1, nrows
+		val(i)=4.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+
+	call psb_cdasb(desc_a, info)
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	if (me==1) nz = 5
+	if (me==2) nz = 6
+	if (me==3) nz = 7
+	if (me==4) nz = 5
+	if (me > 4) nz = 1
+        if (allocated(check)) deallocate(check)
+	allocate (check(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	if (me == 1) then
+		check(1)=2
+		check(2)=2
+		check(3)=8
+		check(4)=8
+		check(5)=18
+	endif
+	if (me == 2) then
+		check(1)=8
+		check(2)=8
+		check(3)=2
+		check(4)=2
+		check(5)=18
+		check(6)=18
+	endif
+	if (me == 3) then
+		check(1)=18
+		check(2)=18
+		check(3)=1
+		check(4)=8
+		check(5)=8
+		check(6)=32
+		check(7)=32
+
+	endif
+	if (me == 4) then
+		check(1)=32
+		check(2)=32
+		check(3)=8
+		check(4)=18
+		check(5)=18
+	endif
+
+        ! END OF SETUP
+
+	call psb_barrier(icontxt)
+
+	!We can do something better here
+        x%v%v = x%v%v*2*me
+
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test4imgs
+
+subroutine prepare_test4imgs_tran(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer, optional :: info
+	integer :: me, i=0, j,nz
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	me = this_image()
+        info = 0
+	if (np < 4) then
+		print*,'You need at least 4 processes to run this test.'
+                info = 1
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 4 processes
+	!Assuming nrows is a multiple of 4 so mid is an integer
+	!Distribute equally to the two processes
+
+	mid=nrows/4
+
+	do i=1, mid
+		vg(i)=0
+	enddo
+	do i=mid+1, 2*mid
+		vg(i)=1
+	enddo
+	do i=2*mid + 1, 3*mid
+		vg(i)=2
+	enddo
+	do i=3*mid+1, nrows
+		vg(i)=3
+	enddo
+
+	if (me == 1) nz = 5
+	if (me == 2) nz = 7
+	if (me == 3) nz = 7
+	if (me == 4) nz = 5
+        if (me > 4)  nz = 0
+ 
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+
+	if (me == 1) then
+
+	  ia(1)=2
+	  ja(1)=1
+
+	  ia(2)=1
+	  ja(2)=2
+
+	  ia(3)=2
+	  ja(3)=3
+
+	  ia(4)=1
+	  ja(4)=4
+
+	  ia(5)=2
+	  ja(5)=5
+	endif
+
+	if (me == 2) then
+
+	  ia(1)=4
+	  ja(1)=1
+
+	  ia(2)=3
+	  ja(2)=2
+
+	  ia(3)=4
+	  ja(3)=3
+
+	  ia(4)=3
+	  ja(4)=4
+
+	  ia(5)=4
+	  ja(5)=5
+
+	  ia(6)=3
+	  ja(6)=6
+
+	  ia(7)=4
+	  ja(7)=6
+
+	endif
+
+	if (me == 3) then
+	  ia(1)=5
+	  ja(1)=2
+
+	  ia(2)=6
+	  ja(2)=3
+
+	  ia(3)=5
+	  ja(3)=4
+
+	  ia(4)=6
+	  ja(4)=5
+
+	  ia(5)=5
+	  ja(5)=6
+
+	  ia(6)=6
+	  ja(6)=7
+
+	  ia(7)=5
+	  ja(7)=8
+
+
+	endif
+
+	if (me == 4) then
+	  ia(1)=7
+	  ja(1)=4
+
+	  ia(2)=8
+	  ja(2)=5
+
+	  ia(3)=7
+	  ja(3)=6
+
+	  ia(4)=8
+	  ja(4)=7
+
+	  ia(5)=7
+	  ja(5)=8
+	endif
+
+
+
+	do i=1,mid
+		val(i)=1.
+	enddo
+	do i=  mid + 1, 2*mid
+		val(i)=2.
+	enddo
+	do i=2*mid + 1, 3*mid
+		val(i)=3.
+	enddo
+	do i=3*mid + 1, nrows
+		val(i)=4.
+	enddo
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+
+	call psb_cdasb(desc_a, info)
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+	if (me==1) nz = 5
+	if (me==2) nz = 6
+	if (me==3) nz = 7
+	if (me==4) nz = 5
+	if (me > 4) nz = 1
+        if (allocated(check)) deallocate(check)
+	allocate (check(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	if (me == 1) then
+		check(1)=6
+		check(2)=12
+		check(3)=4
+		check(4)=4
+		check(5)=6
+	endif
+	if (me == 2) then
+		check(1)=24
+		check(2)=40
+		check(3)=4
+		check(4)=4
+		check(5)=12
+		check(6)=12
+	endif
+	if (me == 3) then
+		check(1)=60
+		check(2)=54
+		check(3)=6
+		check(4)=12
+		check(5)=12
+		check(6)=24
+		check(7)=24
+
+	endif
+	if (me == 4) then
+		check(1)=56
+		check(2)=56
+		check(3)=16
+		check(4)=24
+		check(5)=24
+	endif
+
+        ! END OF SETUP
+
+	call psb_barrier(icontxt)
+
+	!We can do something better here
+        x%v%v = x%v%v*2*me
+
+        if (allocated(vg)) deallocate(vg)
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test4imgs_tran
+
+subroutine prepare_test8imgs(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer :: info
+	integer :: me, i=0, j,nz
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 1
+	if (me == 2) nz = 2
+	if (me == 3) nz = 3
+	if ((me >= 4).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 0
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=6
+
+	endif
+
+	if (me == 2) then
+
+	  ia(1)=2
+	  ja(1)=1
+
+	  ia(2)=2
+	  ja(2)=7
+
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+
+	  ia(2)=3
+	  ja(2)=2
+
+	  ia(3)=3
+	  ja(3)=8
+
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=2
+
+	  ia(2)=4
+	  ja(2)=3
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=3
+
+	  ia(2)=5
+	  ja(2)=4
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=4
+
+	  ia(2)=6
+	  ja(2)=5
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=5
+
+	  ia(2)=7
+	  ja(2)=6
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=6
+
+	  ia(2)=8
+	  ja(2)=7
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+	sync all
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  print*,'an error in desc allocation', me, info
+	  stop
+	endif
+
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+        if (info /=0) then
+	  print*,'an error in psb_cdins', me, info
+	  stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  print*,'an error in psb_cdasb', me, info
+	  stop
+	endif
+
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 2
+	if (me == 2) nz = 3
+	if (me == 3) nz = 4
+	if ((me >= 4).and.(me <= 8)) nz = 3
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz))
+	if (me == 1) then
+		check(1)=2
+		check(2)=12
+	endif
+	if (me == 2) then
+		check(1)=4
+		check(2)=2
+		check(3)=14
+	endif
+	if (me == 3) then
+		check(1)=6
+		check(2)=2
+		check(3)=4
+		check(4)=16
+
+	endif
+	if (me == 4) then
+		check(1)=8
+		check(2)=4
+		check(3)=6
+	endif
+	if (me == 5) then
+		check(1)=10
+		check(2)=6
+		check(3)=8
+	endif
+	if (me == 6) then
+		check(1)=12
+		check(2)=8
+		check(3)=10
+	endif
+	if (me == 7) then
+		check(1)=14
+		check(2)=10
+		check(3)=12
+	endif
+	if (me == 8) then
+		check(1)=16
+		check(2)=12
+		check(3)=14
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+       
+	if (allocated(vg)) deallocate(vg)
+	if (allocated(ia)) deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test8imgs
+
+subroutine prepare_test8imgs_tran(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer :: info
+	integer :: me, i=0, j,nz
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 1
+	if (me == 2) nz = 2
+	if (me == 3) nz = 3
+	if ((me >= 4).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 0
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=6
+
+	endif
+
+	if (me == 2) then
+
+	  ia(1)=2
+	  ja(1)=1
+
+	  ia(2)=2
+	  ja(2)=7
+
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+
+	  ia(2)=3
+	  ja(2)=2
+
+	  ia(3)=3
+	  ja(3)=8
+
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=2
+
+	  ia(2)=4
+	  ja(2)=3
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=3
+
+	  ia(2)=5
+	  ja(2)=4
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=4
+
+	  ia(2)=6
+	  ja(2)=5
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=5
+
+	  ia(2)=7
+	  ja(2)=6
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=6
+
+	  ia(2)=8
+	  ja(2)=7
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+	sync all
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+        if (info /=0) then
+	  print*,'an error in desc allocation', me, info
+	  stop
+	endif
+
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+        if (info /=0) then
+	  print*,'an error in psb_cdins', me, info
+	  stop
+	endif
+
+	call psb_cdasb(desc_a, info)
+        if (info /=0) then
+	  print*,'an error in psb_cdasb', me, info
+	  stop
+	endif
+
+
+	allocate(irw(nrows))
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 2
+	if (me == 2) nz = 3
+	if (me == 3) nz = 4
+	if ((me >= 4).and.(me <= 8)) nz = 3
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz))
+	if (me == 1) then
+		check(1)=9
+		check(2)=7
+	endif
+	if (me == 2) then
+		check(1)=15
+		check(2)=3
+		check(3)=9
+	endif
+	if (me == 3) then
+		check(1)=21
+		check(2)=4
+		check(3)=5
+		check(4)=11
+
+	endif
+	if (me == 4) then
+		check(1)=27
+		check(2)=6
+		check(3)=7
+	endif
+	if (me == 5) then
+		check(1)=33
+		check(2)=8
+		check(3)=9
+	endif
+	if (me == 6) then
+		check(1)=46
+		check(2)=10
+		check(3)=13
+	endif
+	if (me == 7) then
+		check(1)=38
+		check(2)=12
+		check(3)=13
+	endif
+	if (me == 8) then
+		check(1)=27
+		check(2)=14
+		check(3)=15
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+       
+	if (allocated(vg)) deallocate(vg)
+	if (allocated(ia)) deallocate(ia)
+	if (allocated(val)) deallocate(val)
+
+end subroutine prepare_test8imgs_tran
+
+subroutine prepare_test8imgs_b(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer, optional :: info
+	integer :: me, i=0, j,nz, info_
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 7
+	if ((me >= 2).and.(me <= 8)) nz = 1
+	if (me > 8) nz = 0
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=2
+
+	  ia(2)=1
+	  ja(2)=3
+
+	  ia(3)=1
+	  ja(3)=4
+
+	  ia(4)=1
+	  ja(4)=5
+
+	  ia(5)=1
+	  ja(5)=6
+
+	  ia(6)=1
+	  ja(6)=7
+
+	  ia(7)=1
+	  ja(7)=8
+
+	endif
+
+	if (me == 2) then
+	  ia(1)=2
+	  ja(1)=1
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=1
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=1
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=1
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=1
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=1
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+        if (allocated(irw)) deallocate(irw)
+	allocate(irw(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 8
+	if ((me >= 2).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	if (me == 1) then
+		check(1)=2
+		check(2)=4
+		check(3)=6
+		check(4)=8
+		check(5)=10
+		check(6)=12
+		check(7)=14
+		check(8)=16
+	endif
+	if (me == 2) then
+		check(1)=4
+		check(2)=2
+	endif
+	if (me == 3) then
+		check(1)=6
+		check(2)=2
+
+	endif
+	if (me == 4) then
+		check(1)=8
+		check(2)=2
+	endif
+	if (me == 5) then
+		check(1)=10
+		check(2)=2
+	endif
+	if (me == 6) then
+		check(1)=12
+		check(2)=2
+	endif
+	if (me == 7) then
+		check(1)=14
+		check(2)=2
+	endif
+	if (me == 8) then
+		check(1)=16
+		check(2)=2
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+
+
+	if (allocated(vg)) deallocate(vg)
+	if (allocated(ia)) deallocate(ia)
+	if (allocated(val)) deallocate(val)
+	if (allocated(irw)) deallocate(irw)
+end subroutine prepare_test8imgs_b
+
+
+subroutine prepare_test8imgs_tran_b(desc_a,x,check,np,icontxt, info)
+	implicit none
+	type(psb_desc_type), intent(out):: desc_a
+	type(psb_d_vect_type), intent(out) :: x
+        real(psb_dpk_), allocatable, intent(out) :: check(:)
+	integer, intent(out) :: icontxt
+	integer, intent(in) :: np
+        integer, optional :: info
+	integer :: me, i=0, j,nz, info_
+	integer, parameter :: nrows = 8
+	integer :: mid, true
+	integer, allocatable :: vg(:), ia(:), ja(:), irw(:)
+        real(psb_dpk_), allocatable :: val(:)
+	integer(psb_ipk_) :: iictxt, icomm, flag
+        class(psb_xch_idx_type), pointer :: xchg
+
+	if (np < 8) then
+		print*,'You need at least 8 processes to run this test.'
+		return
+	endif
+	call psb_init(icontxt,np,MPI_COMM_WORLD)
+        me = this_image()
+	!Allocate vectors
+        if (allocated(vg)) deallocate(vg)
+	allocate(vg(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+        if (allocated(val)) deallocate(val)
+	allocate(val(nrows),  STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	!Use only 8 processes
+	!Each process has a line
+
+	do i=1, nrows
+		vg(i)=i-1
+	enddo
+
+	if (me == 1) nz = 7
+	if ((me >= 2).and.(me <= 8)) nz = 1
+	if (me > 8) nz = 0
+        if (allocated(ia)) deallocate(ia)
+        if (allocated(ja)) deallocate(ja)
+
+	allocate(ia(nz),ja(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+
+	if (me == 1) then
+
+	  ia(1)=1
+	  ja(1)=2
+
+	  ia(2)=1
+	  ja(2)=3
+
+	  ia(3)=1
+	  ja(3)=4
+
+	  ia(4)=1
+	  ja(4)=5
+
+	  ia(5)=1
+	  ja(5)=6
+
+	  ia(6)=1
+	  ja(6)=7
+
+	  ia(7)=1
+	  ja(7)=8
+
+	endif
+
+	if (me == 2) then
+	  ia(1)=2
+	  ja(1)=1
+	endif
+
+	if (me == 3) then
+	  ia(1)=3
+	  ja(1)=1
+	endif
+
+	if (me == 4) then
+	  ia(1)=4
+	  ja(1)=1
+	endif
+
+	if (me == 5) then
+	  ia(1)=5
+	  ja(1)=1
+	endif
+
+	if (me == 6) then
+	  ia(1)=6
+	  ja(1)=1
+	endif
+
+	if (me == 7) then
+	  ia(1)=7
+	  ja(1)=1
+	endif
+
+	if (me == 8) then
+	  ia(1)=8
+	  ja(1)=1
+	endif
+
+
+	do i=1,nrows
+		val(i)=me
+	enddo
+
+
+	call psb_cdall(icontxt,desc_a,info, vg=vg)
+	call psb_cdins(nz=nz,ia=ia,ja=ja, desc_a=desc_a, info=info)
+	call psb_cdasb(desc_a, info)
+
+        if (allocated(irw)) deallocate(irw)
+	allocate(irw(nrows), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+
+	do i=1,nrows
+		irw(i)=i
+	enddo
+
+
+	call psb_geall(x,desc_a,info)
+	call psb_geins(m=nrows, irw=irw, val=val,x=x, desc_a=desc_a, info=info)
+	call psb_geasb(x,desc_a,info)
+
+
+
+	if (me == 1) nz = 8
+	if ((me >= 2).and.(me <= 8)) nz = 2
+	if (me > 8) nz = 1
+
+	if (allocated(check)) deallocate(check)
+	allocate (check(nz), STAT=info)
+        if (info /=0) then
+	  	print*,'ERROR while allocating some vectors'
+         	 info = -1
+          	stop
+        endif
+	if (me == 1) then
+		check(1)=44
+		check(2)=3
+		check(3)=4
+		check(4)=5
+		check(5)=6
+		check(6)=7
+		check(7)=8
+		check(8)=9
+	endif
+	if (me == 2) then
+		check(1)=7
+		check(2)=3
+	endif
+	if (me == 3) then
+		check(1)=10
+		check(2)=4
+
+	endif
+	if (me == 4) then
+		check(1)=13
+		check(2)=5
+	endif
+	if (me == 5) then
+		check(1)=16
+		check(2)=6
+	endif
+	if (me == 6) then
+		check(1)=19
+		check(2)=7
+	endif
+	if (me == 7) then
+		check(1)=22
+		check(2)=8
+	endif
+	if (me == 8) then
+		check(1)=25
+		check(2)=9
+	endif
+        if (me > 8) then
+                check(1)=0
+        endif
+        ! END OF SETUP
+
+        
+
+	call psb_barrier(icontxt)
+	!We can do something better here
+        x%v%v = x%v%v + me
+
+
+	if (allocated(vg)) deallocate(vg)
+	if (allocated(ia)) deallocate(ia)
+	if (allocated(val)) deallocate(val)
+	if (allocated(irw)) deallocate(irw)
+end subroutine prepare_test8imgs_tran_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_2imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_2imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_2imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_2imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_2imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_2imgs_vect
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_2imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_2imgs_vect
+
+
+@test(nimgs=[std])
+subroutine test_psb_halo_2imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+        v = m(:,1)
+	@assertEqual(true*check,true*v)
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_2imgs_m
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_2imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test2imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info, tran='T')
+        v = m(:,1)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_2imgs_m
+
+@test(nimgs=[std])
+subroutine test_psb_halo_4imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_4imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_4imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_4imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_4imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_4imgs_vect
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_4imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_4imgs_vect
+
+@test(nimgs=[std])
+subroutine test_psb_halo_4imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+        v = m(:,1)
+	@assertEqual(true*check,true*v)
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_4imgs_m
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_4imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test4imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info, tran='T')
+        v = m(:,1)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_4imgs_m
+
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_v(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_v
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_vect
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_vect(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_vect
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+        v = m(:,1)
+	@assertEqual(true*check,true*v)
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_m
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_m(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info, tran='T')
+        v = m(:,1)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_m
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_v_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_v_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_v_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+	call psb_halo(v, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	if (allocated(v)) deallocate(v)
+	if (allocated(check)) deallocate(check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_v_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_vect_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_vect_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_vect_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+	call psb_halo(x, desc_a, info, tran='T')
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+        v = x%get_vect()
+
+        PRINT*,'-------', ME, V
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+	deallocate(v,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_vect_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_8imgs_m_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+        v = m(:,1)
+	@assertEqual(true*check,true*v)
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_8imgs_m_b
+
+@test(nimgs=[std])
+subroutine test_psb_halo_tran_8imgs_m_b(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer :: me, np, info
+	integer :: icontxt, true
+        real(psb_dpk_), allocatable :: v(:), m(:,:), check(:)
+	type(psb_desc_type):: desc_a
+	type(psb_d_vect_type) :: x
+
+	me = this_image()
+	np = this%getNumImages()
+        call prepare_test8imgs_tran_b(desc_a,x,check, np, icontxt, info)
+	@assertEqual(0,info, "ERROR in preparing the test")
+        ! END OF SETUP
+        v = x%get_vect()
+        allocate(m(size(v),1))
+        m(:,1) = v
+	call psb_halo(m, desc_a, info, tran='T')
+        v = m(:,1)
+	@assertEqual(0,info, "ERROR in psb_halo")
+        !GETTING BACK X
+	if ((me==1).or.(me==2)) then
+		true = 1
+	else
+		true=0
+	endif
+	@assertEqual(true*check,true*v)
+
+	deallocate(v,m,check)
+	call psb_gefree(x, desc_a, info)
+	call psb_cdfree(desc_a, info)
+	call psb_exit(icontxt)
+end subroutine test_psb_halo_tran_8imgs_m_b
+
+end module test_psb_halo
+

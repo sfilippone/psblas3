@@ -1,0 +1,693 @@
+module test_psb_caf
+use pfunit_mod
+use psb_base_mod
+use psb_caf_mod
+implicit none
+include 'mpif.h'
+
+
+contains
+
+@test(nimgs=[std])
+subroutine test_iscatterv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	integer, allocatable ::snd(:), rcv(:),mpi_rcv(:), sdispls(:), scounts(:)
+	integer :: me, np, rcounts, index, root=1
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*6),rcv(2), mpi_rcv(2))
+        allocate(sdispls(np), scounts(np))
+	snd=0
+        sdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    scounts(i)=2
+            sdispls(i)=sdispls(i-1) + 2
+	  else
+	    scounts(i)=1
+	    if (i>1) sdispls(i)=sdispls(i-1) + 4
+	  endif
+	enddo
+        do i=1,np
+          index=sdispls(i)+1
+	  snd(index)=index
+          if (scounts(i)==2) snd(index+1)=index+1
+	enddo
+        if (MOD(me,2)==1) then
+	  rcounts = 1
+        else
+	  rcounts = 2
+	endif
+	rcv=13
+	mpi_rcv=13
+        sync all
+	call caf_iscatterv(snd, scounts, rcv, sdispls, rcounts, 1,info)
+	call mpi_scatterv(snd, scounts,sdispls, mpi_integer,&
+	         & mpi_rcv,rcounts,mpi_integer,MPI_COMM_WORLD,0,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, scounts)
+   
+end subroutine test_iscatterv
+
+@test(nimgs=[std])
+subroutine test_sscatterv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	real, allocatable ::snd(:)
+        real, allocatable :: rcv(:),mpi_rcv(:)
+	integer, allocatable :: sdispls(:), scounts(:)
+	integer :: me, np, rcounts, index, root=1
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*6),rcv(2), mpi_rcv(2))
+        allocate(sdispls(np), scounts(np))
+	snd=0.0e0
+        sdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    scounts(i)=2
+            sdispls(i)=sdispls(i-1) + 2
+	  else
+	    scounts(i)=1
+	    if (i>1) sdispls(i)=sdispls(i-1) + 4
+	  endif
+	enddo
+        do i=1,np
+          index=sdispls(i)+1
+	  snd(index)=real(index)
+          if (scounts(i)==2) snd(index+1)=real(index+1)
+	enddo
+        if (MOD(me,2)==1) then
+	  rcounts = 1
+        else
+	  rcounts = 2
+	endif
+	rcv=13.0e0
+	mpi_rcv=13.0e0
+        sync all
+	call caf_scatterv(snd, scounts, rcv, sdispls, rcounts, 1,info)
+	call mpi_scatterv(snd, scounts,sdispls, mpi_real,&
+	         & mpi_rcv,rcounts,mpi_real,MPI_COMM_WORLD,0,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, scounts)
+   
+end subroutine test_sscatterv
+
+@test(nimgs=[std])
+subroutine test_dscatterv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	double precision, allocatable ::snd(:)
+        double precision, allocatable :: rcv(:),mpi_rcv(:)
+	integer, allocatable :: sdispls(:), scounts(:)
+	integer :: me, np, rcounts, index, root=1
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*6),rcv(2), mpi_rcv(2))
+        allocate(sdispls(np), scounts(np))
+	snd=0.0d0
+        sdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    scounts(i)=2
+            sdispls(i)=sdispls(i-1) + 2
+	  else
+	    scounts(i)=1
+	    if (i>1) sdispls(i)=sdispls(i-1) + 4
+	  endif
+	enddo
+        do i=1,np
+          index=sdispls(i)+1
+	  snd(index)=dble(index)
+          if (scounts(i)==2) snd(index+1)=dble(index+1)
+	enddo
+        if (MOD(me,2)==1) then
+	  rcounts = 1
+        else
+	  rcounts = 2
+	endif
+	rcv=13.0d0
+	mpi_rcv=13.0d0
+        sync all
+	call caf_scatterv(snd, scounts, rcv, sdispls, rcounts, 1,info)
+	call mpi_scatterv(snd, scounts,sdispls, mpi_double,&
+	         & mpi_rcv,rcounts,mpi_double,MPI_COMM_WORLD,0,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, scounts)
+   
+end subroutine test_dscatterv
+
+@test(nimgs=[std])
+subroutine test_cscatterv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	complex, allocatable ::snd(:)
+        complex, allocatable :: rcv(:),mpi_rcv(:)
+	integer, allocatable :: sdispls(:), scounts(:)
+	integer :: me, np, rcounts, index, root=1
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*6),rcv(2), mpi_rcv(2))
+        allocate(sdispls(np), scounts(np))
+	snd=cmplx(0.0e0,0.0e0)
+        sdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    scounts(i)=2
+            sdispls(i)=sdispls(i-1) + 2
+	  else
+	    scounts(i)=1
+	    if (i>1) sdispls(i)=sdispls(i-1) + 4
+	  endif
+	enddo
+        do i=1,np
+          index=sdispls(i)+1
+	  snd(index)=cmplx(real(index),real(index))
+          if (scounts(i)==2) snd(index+1)=cmplx(real(index+1),real(index+1))
+	enddo
+        if (MOD(me,2)==1) then
+	  rcounts = 1
+        else
+	  rcounts = 2
+	endif
+	rcv=cmplx(13.0,13.0)
+	mpi_rcv=cmplx(13.0,13.0)
+        sync all
+	call caf_scatterv(snd, scounts, rcv, sdispls, rcounts, 1,info)
+	call mpi_scatterv(snd, scounts,sdispls, mpi_complex,&
+	         & mpi_rcv,rcounts,mpi_complex,MPI_COMM_WORLD,0,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, scounts)
+   
+end subroutine test_cscatterv
+
+
+@test(nimgs=[std])
+subroutine test_zscatterv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	double complex, allocatable ::snd(:)
+        double complex, allocatable :: rcv(:),mpi_rcv(:)
+	integer, allocatable :: sdispls(:), scounts(:)
+	integer :: me, np, rcounts, index, root=1
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*6),rcv(2), mpi_rcv(2))
+        allocate(sdispls(np), scounts(np))
+	snd=(0.0d0,0.0d0)
+        sdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    scounts(i)=2
+            sdispls(i)=sdispls(i-1) + 2
+	  else
+	    scounts(i)=1
+	    if (i>1) sdispls(i)=sdispls(i-1) + 4
+	  endif
+	enddo
+        do i=1,np
+          index=sdispls(i)+1
+	  snd(index)=cmplx(dble(index),dble(index))
+          if (scounts(i)==2) snd(index+1)=cmplx(dble(index+1),dble(index+1))
+	enddo
+        if (MOD(me,2)==1) then
+	  rcounts = 1
+        else
+	  rcounts = 2
+	endif
+	rcv=(13.0d0,13.0d0)
+	mpi_rcv=(13.0d0,13.0d0)
+        sync all
+	call caf_scatterv(snd, scounts, rcv, sdispls, rcounts, 1,info)
+	call mpi_scatterv(snd, scounts,sdispls, mpi_double_complex,&
+	         & mpi_rcv,rcounts,mpi_double_complex,MPI_COMM_WORLD,0,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, scounts)
+   
+end subroutine test_zscatterv
+
+@test(nimgs=[std])
+subroutine test_caf_allgather(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	integer:: ierr, status(MPI_STATUS_SIZE)
+	integer, parameter :: size_=10
+	integer :: snd(size_)
+	integer, allocatable ::rcv(:,:),mpi_rcv(:,:)
+	integer ::np, me, info
+
+	call MPI_COMM_RANK(MPI_COMM_WORLD, me, ierr)
+	me = this_image()
+	np=num_images()
+	allocate(rcv(size_,0:np))
+	allocate(mpi_rcv(size_,0:np))
+	rcv=me
+	mpi_rcv=me
+        snd = me - 1
+	if (me == 1) then
+	  snd(1:5)=(/1,32512,-1622251464,32512,62485/)
+	endif
+	if (me == 2) then
+	  snd(1:5)=(/0,2,62488,62489,62490/)
+	endif
+	if (me == 3) then
+	  snd(1:5)=(/2,3,0,0,0/)
+	endif
+	if (me == 4) then
+	  snd(1:5)=(/2,62497,62498,62499,62500/)
+	endif
+	call caf_allgather(snd, size_, rcv, info)
+	call mpi_allgather(snd,size_,mpi_integer,&
+           & mpi_rcv,size_,mpi_integer,MPI_COMM_WORLD,ierr)
+	@assertEqual(mpi_rcv,rcv)
+	deallocate(rcv, mpi_rcv)
+end subroutine test_caf_allgather
+
+@test(nimgs=[std])
+subroutine test_iallgatherv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	integer, allocatable ::snd(:), rcv(:),mpi_rcv(:), sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*6), mpi_rcv(np*6))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=me
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 2
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 4
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=13
+	mpi_rcv=13
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_integer,&
+	         & mpi_rcv,rcounts,rdispls,mpi_integer,MPI_COMM_WORLD,ierr)
+
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+   
+end subroutine test_iallgatherv
+
+@test(nimgs=[std])
+subroutine test_sallgatherv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+        real, allocatable:: snd(:), rcv(:), mpi_rcv(:)
+	integer, allocatable :: sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*6), mpi_rcv(np*6))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=real(me)
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 2
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 4
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=13.0e0
+	mpi_rcv=13.0e0
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_real,&
+	         & mpi_rcv,rcounts,rdispls,mpi_real,MPI_COMM_WORLD,ierr)
+
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+ 
+end subroutine test_sallgatherv
+
+
+@test(nimgs=[std])
+subroutine test_dallgatherv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+        double precision, allocatable:: snd(:), rcv(:), mpi_rcv(:)
+	integer, allocatable :: sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*6), mpi_rcv(np*6))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=dble(me)
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 2
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 4
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=13.0d0
+	mpi_rcv=13.0d0
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_double_precision,&
+	         & mpi_rcv,rcounts,rdispls,mpi_double_precision,MPI_COMM_WORLD,ierr)
+
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+ 
+end subroutine test_dallgatherv
+
+
+@test(nimgs=[std])
+subroutine test_callgatherv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+        complex, allocatable:: snd(:), rcv(:), mpi_rcv(:)
+	integer, allocatable :: sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*6), mpi_rcv(np*6))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=cmplx(me,me)
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 2
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 4
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=(13.0e0,13.0e0)
+	mpi_rcv=(13.0e0,13.0e0)
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_complex,&
+	         & mpi_rcv,rcounts,rdispls,mpi_complex,MPI_COMM_WORLD,ierr)
+        if (this_image()==1) then
+        endif
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+   
+end subroutine test_callgatherv
+
+@test(nimgs=[std])
+subroutine test_zallgatherv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+        double complex, allocatable:: snd(:), rcv(:), mpi_rcv(:)
+	integer, allocatable :: sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*6), mpi_rcv(np*6))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=cmplx(dble(me),dble(me))
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 2
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 4
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=(13.0d0,13.0d0)
+	mpi_rcv=(13.0d0,13.0d0)
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_double_complex,&
+	         & mpi_rcv,rcounts,rdispls,mpi_double_complex,MPI_COMM_WORLD,ierr)
+        if (this_image()==1) then
+        endif
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+   
+end subroutine test_zallgatherv
+
+@test(nimgs=[std])
+subroutine test_allgatherv2(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	integer, allocatable ::snd(:), rcv(:),mpi_rcv(:), sdispls(:), rdispls(:), rcounts(:)
+	integer :: me, np, scounts
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(2),rcv(np*3), mpi_rcv(np*3))
+        allocate(sdispls(np), rcounts(np), rdispls(np))
+	snd=me
+        rdispls(1)=0
+	do i=1,np
+	  if (MOD(i,2) == 0) then
+  	    rcounts(i)=2
+            rdispls(i)=rdispls(i-1) + 1
+	  else
+	    rcounts(i)=1
+	    if (i>1) rdispls(i)=rdispls(i-1) + 2
+	  endif
+	enddo
+        if (MOD(me,2)==1) then
+	  scounts = 1
+        else
+	  scounts = 2
+	endif
+	rcv=13
+	mpi_rcv=13
+        sync all
+	call caf_allgatherv(snd, scounts, rcv, rcounts, rdispls, info)
+	call mpi_allgatherv(snd, scounts, mpi_integer,&
+	         & mpi_rcv,rcounts,rdispls,mpi_integer,MPI_COMM_WORLD,ierr)
+	@assertEqual(mpi_rcv(1:size(rcv,1)),rcv)
+        deallocate(snd,rcv, mpi_rcv)
+        deallocate(sdispls, rcounts, rdispls)
+end subroutine test_allgatherv2
+
+@test(nimgs=[std])
+subroutine test_alltoall(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE)
+	integer :: size_
+	integer, allocatable :: snd(:)
+	integer, allocatable ::rcv(:),mpi_rcv(:)
+	integer :: me, np
+	integer :: scount, info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+	np = num_images()
+        if (allocated(snd)) deallocate(snd)
+        if (allocated(snd)) deallocate(rcv)
+        if (allocated(snd)) deallocate(mpi_rcv)
+        if (np >= 2) then 
+	  allocate(snd(np*2),rcv(np*2),mpi_rcv(np*2), STAT=ierr)
+        else
+	  allocate(snd(4),rcv(4),mpi_rcv(4), STAT=ierr)
+	endif
+	snd=me
+	if (me==1) then
+	  snd(1:4)=(/0,10,0,0/)
+	endif
+	if (me==2) then
+	  snd(1:4)=(/10,0,10,0/)
+	endif
+	if (me==3) then
+	  snd(1:4)=(/0,10,0,10/)
+	endif
+	if (me==1) then
+	  snd(1:4)=(/0,0,10,0/)
+	endif
+	rcv=13
+	mpi_rcv=13
+	call caf_alltoall(snd, rcv, 1, info)
+	call mpi_alltoall(snd,1,mpi_integer,&
+	         & mpi_rcv,1,mpi_integer,MPI_COMM_WORLD,ierr)
+	@assertEqual(mpi_rcv,rcv)
+
+        if (allocated(snd)) deallocate(snd)
+        if (allocated(snd)) deallocate(rcv)
+        if (allocated(snd)) deallocate(mpi_rcv)   
+end subroutine test_alltoall
+
+@test(nimgs=[std])
+subroutine test_alltoallv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+	integer, allocatable ::snd(:), rcv(:),mpi_rcv(:), sdispls(:), scounts(:), rdispls(:), rcounts(:)
+	integer :: me, np
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*2),rcv(np*2),mpi_rcv(np*2))
+        allocate(scounts(np), sdispls(np), rcounts(np), rdispls(np))
+	snd=me
+        if (MOD(me,2)==0) then 
+	  do i=1,np
+	    rcounts(i)=1
+	    rdispls(i)=i-1
+	  enddo
+        else
+	  do i=1,np
+	    rcounts(i)=2
+	    rdispls(i)=(i-1)*2
+	  enddo
+	endif
+        sdispls(1)=0
+        do i=1,np
+          if (MOD(i,2)==0) then
+	    scounts(i) = 1
+            sdispls(i)=sdispls(i-1) + 2
+          else
+	    scounts(i)=2
+            if (i>1) sdispls(i)=sdispls(i-1) + 1
+	  endif
+	enddo
+	rcv=13
+	mpi_rcv=13
+	call caf_alltoallv(snd, scounts, sdispls, rcv, rcounts, rdispls, info)
+	call mpi_alltoallv(snd,scounts,sdispls, mpi_integer,&
+	         & mpi_rcv,rcounts,rdispls,mpi_integer,MPI_COMM_WORLD,ierr)
+	@assertEqual(mpi_rcv,rcv)
+   
+end subroutine test_alltoallv
+
+@test(nimgs=[std])
+subroutine test_dalltoallv(this)
+	implicit none
+	Class(CafTestMethod), intent(inout) :: this
+	INTEGER::myrank, ierr, status(MPI_STATUS_SIZE), i
+        double precision, allocatable :: snd(:), rcv(:), mpi_rcv(:)
+	integer, allocatable :: sdispls(:), scounts(:), rdispls(:), rcounts(:)
+	integer :: me, np
+	integer :: info
+	!call MPI_INIT(ierr)
+	call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, ierr)
+	me=this_image()
+        np = num_images()
+        allocate(snd(np*2),rcv(np*2),mpi_rcv(np*2))
+        allocate(scounts(np), sdispls(np), rcounts(np), rdispls(np))
+	snd=dble(me)
+        if (MOD(me,2)==0) then 
+	  do i=1,np
+	    rcounts(i)=1
+	    rdispls(i)=i-1
+	  enddo
+        else
+	  do i=1,np
+	    rcounts(i)=2
+	    rdispls(i)=(i-1)*2
+	  enddo
+	endif
+        sdispls(1)=0
+        do i=1,np
+          if (MOD(i,2)==0) then
+	    scounts(i) = 1
+            sdispls(i)=sdispls(i-1) + 2
+          else
+	    scounts(i)=2
+            if (i>1) sdispls(i)=sdispls(i-1) + 1
+	  endif
+	enddo
+	rcv=dble(13)
+	mpi_rcv=dble(13)
+	call caf_dalltoallv(snd, scounts, sdispls, rcv, rcounts, rdispls, info)
+	call mpi_alltoallv(snd,scounts,sdispls, mpi_double,&
+	         & mpi_rcv,rcounts,rdispls,mpi_double,MPI_COMM_WORLD,ierr)
+	@assertEqual(mpi_rcv,rcv)
+   
+end subroutine test_dalltoallv
+end module test_psb_caf

@@ -1,0 +1,570 @@
+Changelog. A lot less detailed than usual, at least for past
+	history.
+2017/04/09: Remove all remaining .F files, and remove configure checks for
+	F77. Define version 3.5.0
+2017/04/08: All PREC methods now invoked through preconditioner object. 	
+2017/04/05: make ISO_C_BINDING and MOVE_ALLOC mandatory prereq. 
+2017/03/20: Changes for GPU codes: added buffers to MAPs, reduce number of
+	malloc/free, added new maybe_free_buffers method on vector. 
+2017/02/12: New stopping criterion, simplified mat_dist
+2017/02/06: Fixes for --enable-long-integers and for RPM build.
+2016/07/14: Fix matrix print with renumbering.	
+2016/06/18: New thresholds for quicksort	
+2016/06/03: New source dir organization	
+2016/05/05: Fix fakempi
+2016/02/24: Fix init of hash inside cdbldext.
+2016/01/06: Default COND to 0.
+2015/12/17: Added clean_zeros method to spmat.	
+2015/12/14: Fixed mat_dist
+2015/12/08: Make LOCX allocatable
+2015/12/02: Reworked scatter interfaces.	
+2015/10/17: Fix configure for ATLAS packaging.
+2015/07/17: Fix cdbldext.
+2015/07/10: Begin integration of multivectors.	
+2015/04/25: New optional args in V%set. 	
+2015/04/14: New absval method for vectors.
+	
+2015/03/20: Optimizations of  TO/FROM routines, use of is_by_rows in COO.
+	
+2015/01/05: Fix silly bug in format conversion csr_from_coo.
+	
+2014/12/21: Change error handling routines to make them more flexible for
+            C binding. More compact prologues/epilogues. 
+	
+2014/11/12: Fix silly bug in MMIO: cycling through rank-2 dense read/write was
+            transposing! 	
+2014/10/22: Implement norm-1 and norm-infinity at base_sparse_mat relying
+	    on srwsum/aclsum.
+	
+2014/10/15: Merged changes into trunk. Declare version 3.3
+	
+2014/10/10: Fix recutions when root /= -1	
+
+2014/09/10: Use int32/64 kinds & friends  from ISO_FORTRAN_ENV	
+	
+2014/08/30: New multivector types. Vector insertion now takes other
+  	    vectors as well as arrays. 
+	
+2014/07/10: CSPUT has now two specifics, with arrays or vector types.
+	    	
+	
+2014/07/02: Matrices have host/device status.	
+	
+2014/06/11: Check for bug on multiple generic names. 
+	
+2014/05/05: Make sure CSPUT ignores (at most a warning) indices not
+            belonging. 
+	
+2014/04/14: Sort status in COO. Changes in error handling for CSPUT.
+	
+2014/03/31: get_diag, rowsum & friends changed into functions. 
+	
+2014/03/26: TRIL/TRIU interfaces. Fixed mm_array_read/write. 
+            Multiple generic names for norms and io.
+	
+2014/03/18: New defaults for MOLD & friends. 
+	
+2014/01/27: Fixed error conditions on mmio. 	
+
+2013/12/12: New sparse-sparse matrix product, with CSR-CSR, CSC-CSC new
+	    versions, while keeping the old version at hand. 
+	
+2013/12/04: Fix computation of output space for getrow & friends.
+	
+2013/12/02: Reimplement coo%fix method: use more memory if available, but
+	    faster. Fix small interfacing problems with getrow/getblk/getptn.
+	
+2013/11/25: Limit usage of coo%fix method.
+	
+2013/11/07: Merged integer vector changes.
+	
+2013/10/01: New desc_type methods calling into indxmap methods.
+	
+2013/09/30: Restructure index conversion methods, simplify.
+	
+2013/09/26: Simplify checks in  matrix-vector products
+	
+2013/08/01: Defined new get_fmt method for vectors
+	
+2013/06/19: Fixed type match bug in daxpby/saxpby/zaxpby. 
+	
+2013/06/05: Fix INTENT in APPEND methods. 	
+2013/05/10: test/serial now contains an example of how to define a new 
+	    format.
+2013/04/20: Fix scaling and norm methods for matrices with unit diagonal.
+	
+2013/04/20: Fix add-by-one for unit triangular matrices.
+	
+2013/03/31: Implement CLONE method for vectors, maps and preconditioners.
+	    Make base_prec abstract.      
+	
+2013/03/13: doxygen docs for base_vect. Fix afmt to be len=* in genpde.	
+	
+2013/03/01: Changes in method naming scheme for matrices. 
+	    Change name of descriptor module.
+	
+2012/12/11: Various fixes for 8-bytes integers.
+	
+2012/12/04: Rename specifics for GLOB_TO_LOC/LOC_TO_GLOB. Parametrize type
+	    identifiers for MPI calls.
+	
+2012/11/26: Infinite loop bug in sparse AXPBY.
+	
+2012/10/24: Split serial_mod to improve build time. 	
+	
+2012/07/12: Cleanup Krylov routines. 	
+	
+2012/06/26: Fixed bug in prec%apply with 'C', and usage of rotations in
+	    GMRES. 	
+2012/06/08: Fix silly bug in GPS renumbering.
+	
+2012/05/25: Fixed docs for release 3.0
+	
+2012/05/21: Fix configure script to work around configure failure on Cray.
+	
+2012/04/30: Change descriptor's move_alloc and free to work on
+            uninitialized input.	
+	
+2012/04/15: New LOCAL argument to geins/spins. New LIDX argument to CDALL
+            with VL to allow for user-specified local numbering. 
+	
+2012/04/05: Default implementation of MV_TO_COO and MV_FROM_COO based on
+            CP. 
+
+2012/03/01: Make ISO_C_BINDING a prerequisite. 
+	
+2012/02/21: Added experimental support for 8-bytes integers.
+	    Refactored the problem generation methods and the pargen 
+	    sample programs.
+	
+2012/02/15: Fixed major perf problem with genblock. 
+	
+2012/01/30: Reworked norms 1 and infty, added sparse mat norm1.
+
+2012/01/10: Bunch of fixes and configury improvements from Cray FTN	
+
+2012/01/03: Split preconditioners into interface/implementation. 	
+	
+2011/11/27: Merged may routines from preprocessing project psblas-testpre.
+	
+2011/11/21: Added test for ISO_C_BINDING and AMD renumbering.
+	
+2011/11/19: Added the scratch option to the vect ASB routine. 
+	
+2011/11/11: Makefile fixes allowing for parallel make. 	
+
+2011/10/25: Major upgrade defining the encapsulated vector types,
+            providing further support for GPU.
+	
+2011/10/05: Split preconditioner modules to alleviate memory pressure
+	    on the compiler, esp. XLF. 
+	    Fixed bug in glist map. 
+	
+2011/08/01: MOLD methods and various fixes for NAG configry.
+	
+2011/07/25: Bunch of fixes for problems uncovered by Cray FTN.	
+
+2011/06/15: Changed get_local_rows and friends 	into methods.
+
+	
+2011/03/25: Added version identification constants.
+	
+2011/03/10: Added support for sparse dot products. Changed intent of X in 
+	    preconditioner apply to allow for GPU extensions.
+
+2011/02/27: Reworked PRINT methods, for vectors as well. 	
+	
+2011/02/11: Changes to accommodate Cray compiler. 
+	
+2011/01/07: Silly bugs in spgather MPI data types and in z_nubmm calling
+	    cnumbmm. Also, don't use allocate on assignment with GNU. 
+
+2011/01/02: Finish descriptor reform by eliminating matrix_data. Switch 
+	    all f03 extensions into f90. 
+
+2010/12/16: Merge new descriptors with CLASS(PSB_INDX_MAP) internal maps. 
+	    Updated various descriptor-related routines.
+	
+2010/11/29: opt subdir containing ELL and RSB. test/newfmt. 
+
+2010/11/22: PRECBLD now takes a MOLD argument for its matrices. 
+ 	
+2010/10/26: Fixed configure to use MPI wrappers. Fixed example in CXX: the
+	    MOLD actual argument should be polymorphic.
+	
+2010/09/02: Fixed inheritance hierarchy of MOLD method. Merged into trunk.	
+	
+2010/09/01: Changed Makefiles to allow for multiple submakes.	
+	
+2010/08/31: Defined the MOLD method. Put under IFDEF in opposition to 
+	    MOLD= in allocation of CLASS variables. 
+	
+2010/07/29: Make the aux component of base_mat a static array; works 
+	    around a problem with gfortran. The library does not fully
+            work yet under gfortran.
+2010/05/10: Fixed fakempi. Now works under XLF 13.1
+	
+2010/04/29: Restructure KRYLOV modules. 
+	
+2010/04/29: Take out BLACS.
+	
+2010/04/27: Reworked inheritance chain for PREC.
+	
+2010/04/27: Fixed private attribute. Various fixes for compilation
+            with gfortran. 
+	
+2010/04/21: Added shortcut for CSR in ILU_FACT 
+	
+2010/03/23: Restructured the module structure. 
+	
+	
+2009/12/15: Tons of bug fixes, also from testing on IBM XLF. 
+	
+2009/09/15: First working OO implementation for serial routines on sparse
+	    matrix data structures. Only D for the time being. 
+	
+2009/08/25: New configure flag 
+	    --enable-serial
+	    for serial-only  compilation. 	
+2009/06/24: Changed order of arguments in sp_scal to make it uniform with 
+	    rest of library.
+2009/05/15: Changed interface to matdist.	
+2009/05/12: Added support for NAG Fortran compiler	
+2009/03/16: Release 2.3.1
+	
+2009/01/27: Renamed psb_transfer into psb_move_alloc. 	
+2009/01/08: Require GNU Fortran 4.3 or later.	
+2008/11/04: Repackaged and streamlined linear maps. 
+	
+2008/10/16: Fixed internal structure of psb_inter_desc. 	
+	
+2008/09/23: Fix borderline cases where one process does not own any 
+	    indices from the global space.
+	
+2008/09/18: Defined psb_sizeof to be integer(8). Added support
+	    into psb_sum, psb_amx and other reductions for long int
+	    scalars. 
+	
+2008/09/16: Implemented new scheme for index conversion.
+	    Changed cdall with an option to suppress global checks. 
+	
+2008/09/02: Improved psi_fnd_owner performace.
+	
+2008/09/01: Better timings in the pargen test cases.
+
+2008/08/28: Changed CDALL in case of VL to handle overlapped indices. 	
+	
+2008/07/28: New sorting/reordering modules.	
+	
+2008/07/24: Addded HTML version of user's guide.	
+	
+2008/07/22: Fixed I/O for Harwell-Boeing and Matrix Market examples
+	
+2008/05/27: Merged single precision branch.
+	
+2008/04/28: Fixed trimming space in sparse matrix conversion.
+	    Fixed performance issue in cdins.
+	
+2008/03/25: Fix performance bug in psi_idx_ins_cnv. Changed names of 
+            some internal components of preconditioner data structure.
+
+2008/03/27: Merged the experimental branch for implementing the AVL tree
+            data structure in Fortran instead of relying on C and passing
+	    functions around to perform comparisons. There seems to be
+	    some performance advantage, although not very large.
+	
+2008/03/25: Merged in changes from the 2.2-maint branch re: error
+	    messages, performance bug in psi_idx_ins_cnv.
+	
+2008/02/26: New psb_linmap_init, psb_linmap_ins, psb_linmap_asb for a
+	    general linear operator mapping among index spaces.
+	
+2008/02/18: Branched off for  Version 2.2
+
+2008/02/08: Merged changes from intermesh branch: we now have an
+	    inter_desc_type object. Currently we only implement the
+	    version needed for aggregation algorithms in the algebraic
+	    multigrid preconditioners, but we'll define more general
+	    (linear) maps soon enough. 
+
+2008/01/25: Various changes to variables controlling conditional
+	    compilation on the Fortran side: removed NETLIB_BLACS, now
+	    HAVE_METIS HAVE_ESSL_BLACS HAVE_KSENDID.
+	    Files impacted: Make.inc.XXX, base/modules/psb_penv_mod,
+	    util/psb_metispart_mod
+	
+	
+2008/01/18: Centralized convergence checks. Still partial for RGMRES. 	
+	
+2008/01/14: Merged changes for handling of transpose vs. overlap.
+	
+2008/01/10: Changed name of GMRESR into RGMRES for consistency.
+	
+2007/12/21: Merged in debug infrastructure, internal and html docs. 
+	
+2007/11/14: Fix INTENT(IN) on X vector in preconditioner routines.
+	
+2007/10/15: Repackaged the sorting routines in a submodule of their
+	    own, adding some heap management and heapsort utilities for the
+	    benefit of the multilevel preconditioners. 
+
+2007/09/28: Moved gelp and csrp to serial. Changed interface to
+    	    sphalo: the new one makes more sense.
+            Updated documentation. 
+
+2007/09/14: Second round of serial changes: merged into trunk, fixed
+	    JAD regeneration and srch_upd now works.           
+
+2007/09/10: First round of serial changes: implemented serial
+	    psb_spcnv unifying multiple functionalities.
+
+2007/09/04: Implemented RGMRES for complex data.
+
+2007/06/04: Fixed implementation of fctint and coins: assume size
+	    arrays caused troubles on some compilers. Documentation of
+	    set_large_threshold. 
+
+2007/05/22: Defined psb_precinit. 
+
+2007/05/15: Defined psb_sizeof.
+
+2007/05/15: Merged in various fixes coming from tests on SP5 and
+	    HP-Itanium.	 
+
+2007/04/08: Changed the implementation of psb_sp_getrow & friends.  
+
+2007/03/27: Merged in changes for enabling compilation on SUN.
+
+2007/02/22: Fixed various misalignments between real and complex.
+	    Defined new psb_sp_clip routines.
+	    Fixed psb_rwextd.
+	    Changed the USE statements, minimizing size of modules and
+	    maximizing consistency checks. 
+
+2007/02/01: Merged serial version: we provide a minimal fake mpi to
+	    allow compiling and running without mpi and blacs. Only
+	    tested with gnu42 so far.
+
+2007/01/23: Defined new field ext_index in desc_type, and
+	    fixed long standing inconsistency in usage of overlap for
+	    AS preconditioners. Modified halo to accept selector for
+	    halo_index vs. ext_index.
+
+2007/01/11: Migrated repository to SVN. 
+
+2007/01/11: MLD2P4 has been moved to the new org. Now tackling the 
+            test dirs.
+
+2007/01/09: First try at reorganizing directories. Subdir MLD2P4 still
+	    to be fixed. Documentation still to be updated. 
+
+2006/12/11: Documented options in glob_to_loc.
+
+2006/12/06: Fixed raw aggregation.
+
+2006/12/05: Taken out extra interfaces; inserted use modules with ONLY
+	    clauses where appropriate.
+
+2006/11/30: Fixed a bug in raw aggregation. Note: raw aggregation
+	    gives different results from smoothed with omega=0.0,
+	    because in the latter we have explicitly stored zero
+	    coefficients that would be absent in the first, thus
+	    generating different ILU factorizations.
+
+2006/11/28: Merged the mods for descriptors of large index spaces to
+	    avoid having the GLOB_TO_LOC array. Took the chance to
+	    reorganize the descriptor build routines and define some
+	    access functions for descriptor features and entries, so
+	    as not to use the descriptor components directly. Tested
+	    with AS, 2- and 3- level Post smoothers. 
+
+2006/11/09: The allocatable version works, but under gcc42 there is a
+	    compiler bug when using -fbounds-check. 
+
+2006/11/08: Merged the allocatable version; hope everything works!
+
+2006/11/08: Branched version psblas2-2-0-maint, and defined tag
+	    2.0.2.6 
+
+2006/11/02: Done in the allocatable branch: repackaging of cdasb and
+	    friends, taking out AVL trees where they were not
+	    absolutely needed, and new dcsrmv routine. 
+
+2006/11/01: Merged changes in the handling of data exchange.
+
+2006/10/03: Merged in the multilevel preconditioner stuff. This is
+	    still experimental, especially the interfaces are not
+	    stable yet. 
+
+2006/10/03: Declared version 2.0.2.5 for reference purposes.
+
+2006/10/03: Fixed a bunch of minor bugs, incuding the sorting routines
+	    imsr  and imsrx. Added a default call to blacs_exit inside
+	    psb_exit fixed a bad termination in test/pargen/ppde90.f90
+
+2006/09/02: Declared version 2.0.2, after having fixed a lot of
+	    details in the environment routines.
+
+2006/07/25: Defined a new psb_wtime function. Modified precset to
+	    have a non-optional INFO dummy argument.
+
+2006/07/06: Fixed bug in swaptran. Added psb_krylov generic interface.
+
+2006/07/04: Ooops, the GetRow mod in SMMP is a performance hit.
+	    Need to investigate further. 
+
+2006/06/21: Bug fix in hb_read when dealing with symmetric matrices. 
+
+2006/06/20: Rewritten symbmm and numbmm from SMMP to be intependent of
+	    CSR  storage by using GetRow. Still need to test for
+	    performance. 
+
+2006/06/16: Defined GetRow. This way we may close the mat objects.
+	    Next we will rewrite SMMP to only make use of GetRow,
+	    not to rely on CSR storage format. 
+
+2006/05/29: Added BLACS-like routines for data communication,
+	    broadcasts, reductions, send/receive.
+
+2006/05/25: Added environment management routines.
+
+2006/05/03: Bug fixes, plus some change in the internals for SPINS,
+	    preparing hooks for insertion with local numbering.
+
+2006/04/24: Minor changes to the interface of dense tools routines,
+	    trying to achieve a uniform look & feel.
+	    Rewritten documentation; it is now reasonable, though not
+	    perfect, except for the preconditioner routines. 
+	    We can now declare RC3. 
+
+2006/04/21: A bunch of fixes related to various matrix initialization 
+	    problems that were revealed while testing on SP5.         
+
+2006/04/18: Changed interface to spasb and csdp: better handling of 
+	    regeneration. To be tested further for sophisticated uses.
+
+2006/03/31: We declare RC2 now. Improved I/O routines in test/Fileread.
+
+2006/03/24: We have a complex version now, working (not necessarily bug free). 
+
+2006/03/15: Started move to complex version.  
+
+2006/03/01: Complete restructure of PREC section. 
+
+2006/02/01: New naming scheme.
+
+2006/01/01: New multilevel preconditioning wih smoothed aggregation.
+
+2005/09   : Now enabled UMFPACK complete factorization as basis for AS. 
+
+2005/05/04: Now enabled SuperLU complete factorization as basis for AS. 
+
+2005/04/29: First version with decoupled 2-level.
+
+2005/04/06: Started work on decoupling the preconditioner aggregation
+	    for 2-level from the main factorization. 
+
+2005/03/30: First version of new DSC/SP allocate/insert/assembly
+	    routines.  
+2005/03/17: First version of RGMRES. To be refined. 
+
+2005/03/08: dSwapTran aligned with dSwapData. Taken out SwapOverlap.
+	    also moved onto iSwapX.
+
+2005/03/07: dSwapData rewritten to achieve: 1. better performance;
+	    2. more flexible functionality. It is now possible to
+	    avoid SwapOvrlap entirely, relying on just SwapData.
+	    SwapTran is still alive, since it reads the descriptors in
+	    "transpose" mode. Also, added work areas to preconditioner
+	    routine, to avoid excessive allocation in the halo/overlap
+	    exchange.
+
+2005/03/04: Had to put in a workaround for a gfortran bug:
+	    tolower/toupper cannot be functions. 
+
+2005/02/09: Explicit storage choice for the smoother. This seems
+            to be changing a little bit the actual preconditioner. 
+	    To be evaluated further.
+
+2005/02/08: Renamed F90_PSPREC to PSB_PRCAPLY and Preconditioner to   
+	    PSB_PRCBLD. Changed the way PRCAPLY decides what to do.
+	    Still needs a PSB_PRCSET to be called before PRCBLD.
+
+2005/01/28: Started moving functionalities to a SERIAL F90 layer. Also
+	    defined a new COMM layer, to enable implementing SPMM
+	    directly in F90.
+
+2005/01/20: Finally taken out a direct call to the F77 DCSDP from
+	    SPASB. 
+
+2005/01/18: After much work, we now have 2-level Additive Schwarz
+	    prototype implemented and working. We now start a major
+	    code cleanup that will take some time. Mainly we want to
+	    move a lot of the serial F77 functionality into  a new F95
+	    serial layer, to simplify the parallel F95 code. 
+
+2004/11/25: Following the introduction of Additive Shwarz and
+	    variants, we have now renamed DECOMP_ and friends as
+	    DESC_; this makes things more readable. Sooner or later
+	    we're going to merge this into mainline, but this version
+	    is still very much in a state of flux.
+
+2004/07/18: For use with gfortran we need to declare the pointer
+	    components  with NULL() initialization. This rules out
+	    VAST and PGI.
+
+2004/07/15: First development version with gfortran from the current 
+	    snapshot of gcc 3.5.0. 
+	    It is now possible in PSI_dSwapData to opt for
+	    SEND|RECEIVE|SYNC data exchange; plan is to extend to all
+	    data exchange functions, plus making it available as an
+	    option from the F90 level.
+  
+2004/07/06: Merged in a lot of stuff coming mainly from the ASM
+	    development; full merge will have to wait  a little more.
+	    Among other things:
+	    use of psimod
+	    new choice parms for overlap
+	    new data exchange for swapdata, to be extended.
+	    multicolumn CSMM.
+	    use psrealloc
+	    new format for marking a matrix as suitable for update. 
+	    
+
+2003/12/09: Changed DSALLOC and DSASB to make sure whenever a dense
+	    matrix is allocated it is also zeroed out. 
+
+2003/10/13: Added call to BLACS_SET in the solvers to ensure global
+	    heterogeneous coherence in the combine operations.
+
+2003/09/30: Added LOC_TO_GLOB and GLOB_TO_LOC support routines. 
+
+2003/09/30: Changed interface for smart update capabilities: choose
+	    with optional parameters in ASB routines. 
+
+2003/09/16: IFC 7.0 had a strange behaviour in the test programs:
+	    sometimes the declaration of PARTS dummy argument with an
+	    INTERFACE would not work, requiring an EXTERNAL
+	    declaration. The proper INTERFACE works now with 7.1.
+
+2003/03/10: Halo data exchange in F90_PSHALO can now be applied to
+	    integer data; create appropriate support routines. 
+
+2002/12/05: Initial version of Fileread sample programs.
+
+2002/11/19: Fixes for JAD preconditioner.
+
+2002/11/19: Methods for patterns: create a  descriptor without a
+	    matrix. 
+
+2001/11/16: Reviewed the interfaces: in the tools section we really
+	    need the POINTER attribute for dense vectors, but not in
+	    the computational routines; taking it  out allows more
+	    flexibility. 
+
+2001/09/16: Smart update capabilities.
+
+2001/03/16: Renumbering routines.
+
+2001/01/14: Added extensions to compute multiple DOTs and AMAXs at once;
+

@@ -1,0 +1,13 @@
+11                  Number of inputs
+sherman1.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+sherman1_b.mtx             http://www.cise.ufl.edu/research/sparse/matrices/index.html
+MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
+BICGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
+BJAC                Preconditioner NONE  DIAG  BJAC  
+CSR                 Storage format CSR COO JAD 
+0                   IPART: Partition method 0: BLK   2: graph (with Metis) 
+2                   ISTOPC
+01000               ITMAX
+-1                  ITRACE
+04                  IRST     (restart for RGMRES and BiCGSTABL) 
+1.d-6               EPS

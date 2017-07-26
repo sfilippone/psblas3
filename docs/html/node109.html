@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_max -- Global maximum</TITLE>
+<META NAME="description" CONTENT="psb_max -- Global maximum">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node110.html">
+<LINK REL="previous" HREF="node108.html">
+<LINK REL="up" HREF="node98.html">
+<LINK REL="next" HREF="node110.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1619"
+  HREF="node110.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1615"
+  HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1609"
+  HREF="node108.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1617"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1620"
+  HREF="node110.html">psb_min   Global</A>
+<B> Up:</B> <A NAME="tex2html1616"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1610"
+  HREF="node108.html">psb_sum   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1618"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000811000000000000000">
+psb_max -- Global maximum</A>
+</H2>
+
+<P>
+<PRE>
+call psb_max(icontxt, dat, root)
+</PRE>
+
+<P>
+This subroutine implements a maximum valuereduction
+operation based on the underlying communication library. 
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
+</DD>
+<DT><STRONG>dat</STRONG></DT>
+<DD>The local contribution to the global maximum.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: an integer or  real variable, which may be a
+scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
+</DD>
+<DT><STRONG>root</STRONG></DT>
+<DD>Process to hold the final maximum, or <IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1$"> to make it available
+  on all processes.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $-1<= root <= np-1$
+ -->
+<IMG
+ WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img132.png"
+ ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>dat</STRONG></DT>
+<DD>On destination process(es), the result of the maximum operation.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer or  real variable, which may be a
+scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all processes.
+</DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>The <code>dat</code> argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+</LI>
+<LI>The <code>dat</code> argument may also be a long integer scalar.
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1619"
+  HREF="node110.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1615"
+  HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1609"
+  HREF="node108.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1617"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1620"
+  HREF="node110.html">psb_min   Global</A>
+<B> Up:</B> <A NAME="tex2html1616"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1610"
+  HREF="node108.html">psb_sum   Global</A>
+ &nbsp; <B>  <A NAME="tex2html1618"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,202 @@
+This directory contains  the PSBLAS library, version 3.4.
+
+
+Existing codes will work untouched with version 3.4, but they will
+have to be recompiled; new methods have been added for the sake of GPU
+computations, plus the usual bunch of bug fixes.
+
+
+This version requires a working Fortran 2003 compiler; we do not use
+all of the language features (specifically, so far we did not employ
+FINAL subroutines), but the features we use were sufficient in
+identifying bugs in ALL compilers we tried (all the bugs have been
+reported and mostly fixed by the respective vendors). 
+
+
+The new internals have been completely overhauled, and in many cases
+rewritten; they now enable a much better interfacing with user-defined
+storage formats. If the user is only interested in the predefined
+formats, then the user's guide should be sufficient; what is somewhat
+lacking is documentation on how to add to the library, i.e. a
+developers' guide; stay tuned. 
+
+
+ 
+The architecture of the Fortran 2003 sparse BLAS is described in 
+S. Filippone, A. Buttari:
+Object-Oriented Techniques for Sparse Matrix Computations in Fortran
+2003, 
+ACM Trans. on Math. Software, vol. 38, No. 4, 2012.
+
+Version 1.0 of the library was described in:
+S. Filippone, M. Colajanni
+PSBLAS: A library for parallel linear algebra computation on sparse matrices
+ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
+
+
+UTILITIES
+The test/util directory contains some utilities to convert to/from
+Harwell-Boeing and MatrixMarket file formats. 
+
+
+DOCUMENTATION
+
+See docs/psblas-3.4.pdf; an HTML version of the same document is
+available in docs/html. 
+Please consult the sample programs, especially 
+test/pargen/ppde[23]d.f90
+
+
+
+OTHER SOFTWARE CREDITS 
+
+We originally included a modified implementation of some of the
+Sparker (serial sparse BLAS)  material; this has been completely
+rewritten, way beyond the intention(s) and responsibilities of the
+original developers. 
+The main reference for the serial sparse BLAS is: 
+Duff, I., Marrone, M., Radicati, G., and Vittoli, C.
+Level 3 basic linear algebra subprograms for sparse matrices: a user 
+level interface
+ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+
+
+INSTALLING
+
+To compile and run our software you will need the following
+prerequisites (see also SERIAL below):
+
+1. A working version of MPI
+
+2. A version of the BLAS; if you don't have a specific version for
+   your platform you may try ATLAS available from
+   http://math-atlas.sourceforge.net/ 
+
+3. We have had good results with  the METIS library, from 
+   http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
+   This is optional; it is  used in the util and test/fileread
+   directories but only if you specify --with-metis.
+
+4. If you have the AMD package of Davis, Duff and Amestoy, you can
+   specify  --with-amd (see ./configure --help for more details). 
+
+The configure script will generate a Make.inc file suitable for
+building the library.  
+The script is capable of recognizing the needed libraries with their
+default names; if they are in unusual places consider adding the paths
+with --with-libs, or explicitly specifying the names in --with-blas, etc. 
+Please note that a common way for the configure script to fail is to
+specify inconsistent MPI vs. plain compilers, either directly or
+indirectly via environment variables; e.g. specifying the Intel
+compiler with FC=ifort while at the same time having an  MPIFC=mpif90
+which points to GNU Fortran. 
+The best way to avoid this situation is (in our opinion) to use the
+environment modules package (see http://modules.sourceforge.net/), and
+load the relevant variables with (e.g.)  
+module load gnu46 openmpi
+This will delegate to the modules setup to make sure that the version
+of openmpi in use is the one compiled with the gnu46 compilers. 
+After the configure script has completed you can always tweak the
+Make.inc  file yourself. 
+
+After you have Make.inc fixed,  run 
+ make 
+to  compile the library; go to the test directory and its
+subdirectories to get test programs done.   
+If you specify --prefix=/path you can do make install and the
+libraries will be installed under /path/lib, while the module files
+will be installed under /path/include.
+
+SERIAL
+
+Configuring with --enable-serial will provide a fake MPI stub library
+that enables running in pure serial mode; no MPI installation is
+needed in this case (but note that the fake MPI stubs are only
+guaranteed to cover what we use internally, it's not a complete
+replacement). 
+
+EXPERIMENTAL
+
+We have an experimental flag --enable-long-integers that will enable having
+8-byte integer data, allowing an index space larger than 2G; some
+small cases have been tested but we do not offer full guarantee (yet). 
+
+
+COMPILER NOTES.
+
+This code is confirmed to work with the following compilers (or
+later versions thereof): 
+       NAGware 5.2;
+       GNU 4.7.3;  
+       Cray CCE 8.0.1;
+
+They are all recognized by the configure script. 
+
+To make the script work with the Cray CCE environment, it is
+recommended to use the following:
+./configure FC=ftn F77=ftn CC=cc MPF90=ftn MPF77=ftn MPCC=cc
+with both CCE and GNU lower-level compilers. 
+
+XLF 13.1 configures correctly, but then fails with ICEs (Internal
+Compiler Error) at build time. We do not yet know whether XLF 14
+compiles correctly. 
+
+For the GNU compilers 4.6.x we are aware of a number of memory management
+issues that might surface in your applications; most of them (that
+we're aware of) are solved in version 4.7.2 or later.  
+
+The Intel compiler up to version 12.1 fails to compile, as of the last
+version we got access to. 
+
+
+
+KNOWN ISSUES.
+
+An annoying problem exists with some versions of MPI: if the configure
+script sets -DMPI_MOD the MPI call interfaces will be resolved by
+using the MPI Fortran module. 
+However usage of the  module may cause compilation to fail when
+coupled with the debugging option -g, because the compiler complains
+that it cannot find a matching interface for some of the
+communication routines.
+The solution: either take out the -g option, or, if you really need to
+debug, edit Make.inc to force -DMPI_H in place of -DMPI_MOD. 
+
+
+TODO:
+Fix all reamining bugs. Bugs? We dont' have any ! ;-)
+
+
+The PSBLAS team. 
+
+RELATED SOFTWARE
+
+If you are looking for more sophisticated preconditioners, you may be
+interested in the package  MLD2P4 from http://www.mld2p4.it 
+
+
+Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
+
+Credits for version 3:
+Salvatore  Filippone
+Alfredo    Buttari
+
+Credits for version 2.2:
+Michele Martone contributed the initial version of the configure
+machinery.  
+
+Credits for version 2.0:
+Salvatore  Filippone
+Alfredo    Buttari
+
+
+Credits for version 1.0:
+
+Salvatore  Filippone
+Michele    Colajanni
+Fabio      Cerioni
+Stefano    Maiolatesi
+Dario      Pascucci
+
+
+

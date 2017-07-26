@@ -1,0 +1,132 @@
+\documentclass[10pt,a4paper,twoside]{article}
+\usepackage{pstricks}
+\usepackage{fancybox}
+\usepackage{amsfonts}
+% \usepackage{minitoc}
+% \setcounter{minitocdepth}{2}
+\usepackage[bookmarks=true, 
+            bookmarksnumbered=true, 
+            bookmarksopen=false, 
+            plainpages=false,
+            pdfpagelabels,
+            colorlinks, 
+            linkcolor=blue]{hyperref}
+\usepackage{ifthen}
+\usepackage{graphicx}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\usepackage{listings}
+
+%\newboolean{mtc}
+%\setboolean{mtc}{true}
+
+\pdfoutput=0
+% \relax
+% \pdfcompresslevel=0             %-- 0 = none, 9 = best
+% \pdfinfo{                       %-- Info dictionary of PDF output  /Author (Alfredo Buttari)
+%   /Title (Parallel Sparse BLAS V. 3.5.0)
+%   /Subject (Parallel Sparse Basic Linear Algebra Subroutines)
+%   /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners)
+%   /Creator (pdfLaTeX)
+%   /Producer ($Id: userguide.tex 1978 2007-10-19 14:51:12Z sfilippo $)
+% }
+% \pdfcatalog{          %-- Catalog dictionary of PDF output.
+%   /URI (http://ce.uniroma2.it/psblas)
+% } 
+
+\newcounter{subroutine}[subsection]
+\newcounter{example}[subroutine]
+\makeatletter
+\def\subroutine{\@ifstar{\@subroutine}{\clearpage\@subroutine}}%
+\def\@subroutine#1#2{%
+\stepcounter{subroutine}%
+      \section*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{subsection}{#1}%
+      \markright{#1}}%
+\newcommand{\subsubroutine}[2]{%
+\stepcounter{subroutine}%
+      \subsection*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{subsubsection}{#1}%
+      \markright{#1}}%
+\newcommand{\subsubsubroutine}[2]{%
+\stepcounter{subroutine}%
+      \subsubsection*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{paragraph}{#1}%
+      \markright{#1}}%
+\newcommand{\examplename}{Example}
+\newcommand{\syntaxname}{Syntax}
+\def\syntax{\@ifstar{\@ssyntax}{\@syntax}}%
+\def\@syntax{\nobreak\section*{\syntaxname}%
+     \@ssyntax}%
+\def\@ssyntax#1#2{%
+  \nobreak
+   \setbox\@tempboxa\hbox{#1\ {\em $($#2$)$}}%
+   \ifdim \wd\@tempboxa >\hsize
+        \setbox\@tempboxa\hbox{\em $($#2$)$}
+	\ifdim\wd\@tempboxa >\hsize
+          \flushright#1\ \em$($#2$)$\endflushright%
+	\else
+         \hbox to\hsize{#1\hfil}%
+         \hbox to\hsize{\hfil\box\@tempboxa}%
+        \fi
+     \else
+       \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+   \fi\par\vskip\baselineskip}
+\makeatother
+\newcommand{\example}{\stepcounter{example}%
+\section*{\examplename~\theexample}}
+
+\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_prec\_type}}}
+\newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_type}}}
+\newcommand{\spdata}{\hyperlink{spdata}{{\tt psb\_Tspmat\_type}}}
+\newcommand{\vdata}{\hyperlink{vdata}{{\tt psb\_T\_vect\_type}}}
+\newcommand{\spbasedata}{\hypertarget{spbasedata}{{\tt psb\_T\_base\_sparse\_mat}}}
+\newcommand{\vbasedata}{\hypertarget{vbasedata}{{\tt psb\_T\_base\_vect\_type}}}
+
+\begin{document}
+\lstset{language=Fortran}
+
+{\LARGE\bfseries PSBLAS\\[.8ex] User's and Reference
+  Guide}\\[\baselineskip]
+\emph{\large A reference guide for the Parallel Sparse BLAS library}\\[3ex]
+{\bfseries Salvatore Filippone\\
+   Alfredo Buttari } \\
+ University of Rome ``Tor Vergata'', Italy\\[2ex]
+%\\[10ex]
+%\today
+Software version: 3.5.0\\
+%\today
+May 1st, 2017
+\cleardoublepage
+\begingroup
+  \renewcommand*{\thepage}{toc}
+  \pagenumbering{roman}   % Roman numbering
+  \setcounter{page}{1}    % Abstract start on page ii
+  \tableofcontents
+\endgroup  
+
+\cleardoublepage
+
+\pagenumbering{arabic}  % Arabic numbering
+\setcounter{page}{1}    % Chapters start on page 1
+
+\include{intro}
+\include{datastruct}
+\include{psbrout}
+\include{commrout}
+\include{toolsrout}
+\include{penv}
+\include{error}
+\include{util}
+\include{precs}
+\include{methods}
+
+\cleardoublepage
+
+\input{biblio}
+
+\end{document}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: 'userguide'
+%%% End: 

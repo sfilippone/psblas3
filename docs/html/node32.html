@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>cscnv -- Convert to a different storage format</TITLE>
+<META NAME="description" CONTENT="cscnv -- Convert to a different storage format">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node33.html">
+<LINK REL="previous" HREF="node31.html">
+<LINK REL="up" HREF="node22.html">
+<LINK REL="next" HREF="node33.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html641"
+  HREF="node33.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html637"
+  HREF="node22.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html631"
+  HREF="node31.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html639"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html642"
+  HREF="node33.html">csclip   Reduce</A>
+<B> Up:</B> <A NAME="tex2html638"
+  HREF="node22.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html632"
+  HREF="node31.html">is_lower, is_upper, is_triangle, is_unit</A>
+ &nbsp; <B>  <A NAME="tex2html640"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000421000000000000000">
+cscnv -- Convert to a different storage format</A>
+</H3>
+
+<P>
+<PRE>
+call  a%cscnv(b,info [, type, mold, dupl])
+call  a%cscnv(info [, type, mold, dupl])
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+<DT><STRONG>type</STRONG></DT>
+<DD>a string requesting a new format.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting a new format.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>an integer value specifing how to handle duplicates (see
+  Named Constants below)
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>b,a</STRONG></DT>
+<DD>A copy  of <code>a</code> with a new storage format.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

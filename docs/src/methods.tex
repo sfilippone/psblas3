@@ -1,0 +1,151 @@
+\section{Iterative Methods}
+\label{sec:methods}
+
+In this chapter we provide routines for preconditioners and iterative
+methods. The interfaces for Krylov subspace methods are available in
+the module \verb|psb_krylov_mod|.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Krylov Methods driver routine
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage\subsection*{psb\_krylov \label{krylov} --- Krylov Methods Driver
+      Routine}
+\addcontentsline{toc}{subsection}{psb\_krylov}
+
+This subroutine is a driver that provides a general interface for all
+the Krylov-Subspace family methods implemented in PSBLAS version 2. 
+
+The stopping criterion can take the following values:
+\begin{description}
+\item[1]  normwise backward error  in the infinity
+norm;  the iteration is stopped when 
+\[ err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps \]
+\item[2] Relative residual in the 2-norm; the iteration is stopped
+when
+\[ err = \frac{\|r_i\|}{\|b\|_2} < eps \]
+\item[3] Relative residual reduction in the 2-norm; the iteration is stopped
+when
+\[ err = \frac{\|r_i\|}{\|r_0\|_2} < eps \]
+\end{description}
+The behaviour is controlled by  the  istop argument (see
+later). In the above formulae, $x_i$ is the tentative solution and
+$r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration. 
+
+
+\begin{lstlisting}
+call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&
+     & itmax,iter,err,itrace,irst,istop,cond)
+\end{lstlisting}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[method] a string that defines the iterative method to be
+  used. Supported values are:
+  \begin{description}
+  \item[CG:] the Conjugate Gradient method;
+  \item[CGS:] the Conjugate Gradient Stabilized method;
+
+  \item[GCR:] the Generalized Conjugate Residual method;
+  \item[FCG:] the Flexible Conjugate Gradient method\footnote{Note:
+      the implementation is for $FCG(1)$.};
+
+  \item[BICG:] the Bi-Conjugate Gradient method;
+  \item[BICGSTAB:] the Bi-Conjugate Gradient Stabilized method;
+  \item[BICGSTABL:] the Bi-Conjugate Gradient Stabilized method with restarting;
+  \item[RGMRES:] the Generalized Minimal Residual method with restarting.
+  \end{description}
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \spdata.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \precdata.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as:  a rank one array or an object of type \vdata.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as:  a rank one array or an object of type \vdata.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace] If $>0$  print out an informational message about
+  convergence  every $itrace$ iterations.\\ 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+\item[irst]  An integer specifying the restart parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Values: $irst>0$. This is employed for the BiCGSTABL or RGMRES
+methods, otherwise it is ignored. 
+
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+of the residual, 3: use the residual reduction in the 2-norm. Default: 2. 
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as:  a rank one array or an object of type \vdata.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Returned  as: an integer variable.
+\item[err]  The convergence estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Returned  as: a real number.
+\item[cond]  An estimate of the condition number of matrix $A$; only
+  available with the $CG$ method on real data.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Returned  as: a real number. A correct result will be greater than or
+equal to one; if specified for non-real data, or an error occurred,
+zero is returned.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 

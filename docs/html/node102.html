@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
+<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node103.html">
+<LINK REL="previous" HREF="node101.html">
+<LINK REL="up" HREF="node98.html">
+<LINK REL="next" HREF="node103.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1535"
+  HREF="node103.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1531"
+  HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1525"
+  HREF="node101.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1533"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1536"
+  HREF="node103.html">psb_get_rank   Get</A>
+<B> Up:</B> <A NAME="tex2html1532"
+  HREF="node98.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1526"
+  HREF="node101.html">psb_exit   Exit</A>
+ &nbsp; <B>  <A NAME="tex2html1534"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00084000000000000000">
+psb_get_mpicomm -- Get the MPI communicator</A>
+</H2>
+
+<P>
+<PRE>
+call psb_get_mpicomm(icontxt, icomm)
+</PRE>
+
+<P>
+This subroutine returns the MPI communicator associated with a PSBLAS context
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context identifying the virtual
+  parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>icomm</STRONG></DT>
+<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR></DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

@@ -1,0 +1,1810 @@
+\section{Data management routines}
+\label{sec:toolsrout}
+
+
+%
+%%   psb_cdall %%
+%
+\subsection*{psb\_cdall --- Allocates a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdall}
+
+\begin{verbatim}
+call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
+call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
+call psb_cdall(icontxt, desc_a, info,nl=nl)
+call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
+\end{verbatim}
+
+This subroutine initializes the communication descriptor associated
+with an index space. One of the  optional arguments
+\verb|parts|, \verb|vg|, \verb|vl|, \verb|nl|  or \verb|repl| 
+must be specified, thereby choosing
+the specific initialization strategy.
+\begin{description}
+\item[\bf  On Entry ]
+\item[Type:] Synchronous.
+\item[icontxt] the communication context.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value.
+\item[vg] Data allocation: each index $i\in \{1\dots mg\}$ is allocated
+  to process $vg(i)$.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. 
+\item[flag] Specifies whether entries in $vg$ are zero- or one-based.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value $0,1$, default $0$.
+
+\item[mg] the (global) number of rows of the problem.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. It is required if \verb|parts| or
+\verb|repl| is specified, it is optional if \verb|vg| is specified. 
+\item[parts] the subroutine that defines the partitioning scheme.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: a subroutine. 
+\item[vl] Data allocation: the set of global indices 
+  $vl(1:nl)$ belonging to the calling process. \\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. 
+\item[nl] Data allocation: in a generalized block-row distribution the
+  number of indices belonging to the current process. \\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. May be specified together with
+\verb|vl|. 
+\item[repl] Data allocation: build a replicated index space 
+  (i.e. all processes own all indices).\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: the logical value \verb|.true.|
+\item[globalcheck] Data allocation: do global checks on the local
+  index lists \verb|vl|\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical value, default: \verb|.true.|
+\item[lidx] Data allocation: the set of local  indices 
+  $lidx(1:nl)$ to be assigned to the global indices $vl$. \\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf out}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item One of the optional arguments  \verb|parts|, \verb|vg|,
+  \verb|vl|, \verb|nl|  or \verb|repl| must be specified, thereby choosing the
+  initialization   strategy as follows:
+\begin{description}
+\item[parts] In this case we have a subroutine specifying the mapping
+  between global indices and process/local index pairs. If this
+  optional argument   is specified, then it is mandatory to 
+  specify the argument \verb|mg| as well.  
+  The subroutine must conform to the following interface: 
+\begin{verbatim}
+  interface 
+     subroutine psb_parts(glob_index,mg,np,pv,nv)
+       integer, intent (in)  :: glob_index,np,mg
+       integer, intent (out) :: nv, pv(*)
+     end subroutine psb_parts
+  end interface
+\end{verbatim}
+  The input arguments are:
+  \begin{description}
+    \item[glob\_index] The global index to be mapped;
+    \item[np] The number of processes in the mapping;
+    \item[mg] The total number of global rows in the mapping;
+  \end{description}
+  The output arguments are:
+  \begin{description}
+    \item[nv] The number of entries in \verb|pv|;
+    \item[pv] A vector containing the indices of the processes to
+    which the global index should be assigend; each entry must satisfy
+    $0\le pv(i) < np$; if $nv>1$ we have an index assigned to multiple
+    processes, i.e. we have an overlap among the subdomains.
+  \end{description}
+\item[vg] In this case the association between an index and a process
+  is specified via an integer vector  \verb|vg(1:mg)|; 
+  each index $i \in \{1\dots mg\}$  is assigned to process $vg(i)$. 
+  The vector \verb|vg| must be identical on all
+  calling processes; its entries may have the ranges $(0\dots np-1)$
+  or $(1\dots np)$ according to the value of \verb|flag|.  
+  The size $mg$ may be  specified via the optional argument \verb|mg|;
+  the default is to use the entire vector \verb|vg|, thus having
+  \verb|mg=size(vg)|. 
+\item[vl] In this case we are specifying the list of indices
+  \verb|vl(1:nl)| assigned   to the current process; thus, the global
+  problem size $mg$ is given by 
+  the range of the aggregate of the individual vectors \verb|vl| specified
+  in the calling processes. The size may be specified via the optional
+  argument \verb|nl|; the default is to use the entire vector
+  \verb|vl|, thus having   \verb|nl=size(vl)|.  
+  If \verb|globalcheck=.true.|   the subroutine will check how many
+  times  each entry in the global   index   space $(1\dots mg)$ is
+  specified in the input lists   \verb|vl|, thus allowing for the
+  presence of overlap in the input,   and checking for ``orphan''
+  indices.    If \verb|globalcheck=.false.|, the subroutine will not
+  check for   overlap, and may be significantly faster, but   the user
+  is implicitly guaranteeing that there are neither orphan   nor
+  overlap indices.  
+\item[lidx] The optional argument \verb|lidx| is available for
+  those cases in which the user has already established a
+  global-to-local mapping; if it is specified, each  index in
+  \verb|vl(i)| will be mapped to the corresponding local index
+  \verb|lidx(i)|. When specifying the argument \verb|lidx| the user
+  would also likely employ \verb|lidx| in calls to \verb|psb_cdins|
+  and \verb|local| in calls to \verb|psb_spins| and \verb|psb_geins|;
+  see also sec.~\ref{sec:usermaps}. 
+\item[nl] If this argument is specified alone (i.e. without \verb|vl|)
+  the  result is  a generalized row-block   distribution in which each
+  process $I$ gets assigned a consecutive   chunk of $N_I=nl$ global
+  indices. 
+\item[repl] This arguments specifies to replicate all indices on
+  all processes. This is a special purpose data allocation that is
+  useful in the construction of some multilevel preconditioners.
+\end{description}
+\item On exit from this routine the descriptor is in the build
+  state. 
+\item Calling the routine with \verb|vg| or \verb|parts| implies that
+  every process will scan the entire index space to figure out the
+  local indices.
+\item Overlapped indices are possible with both \verb|parts| and
+  \verb|vl| invocations.
+\item When the subroutine is invoked with \verb|vl| in
+  conjunction with \verb|globalcheck=.true.|, it will perform a scan
+  of the index   space to search for overlap or orphan indices.
+\item When the subroutine is invoked with \verb|vl| in
+  conjunction with \verb|globalcheck=.false.|, no index space scan
+  will take place. Thus it is the responsibility of the user to make
+  sure that the indices specified in \verb|vl| have neither orphans nor
+  overlaps; if this assumption fails, results will be 
+  unpredictable. 
+\item Orphan and overlap indices are
+  impossible by construction when the subroutine is invoked with
+  \verb|nl| (alone),  or \verb|vg|.
+\end{enumerate}
+
+
+%
+%%   psb_cdins %%
+%
+\clearpage\subsection*{psb\_cdins --- Communication descriptor insert
+  routine}
+\addcontentsline{toc}{subsection}{psb\_cdins}
+
+\begin{verbatim}
+call psb_cdins(nz, ia, ja, desc_a, info [,ila,jla])
+call psb_cdins(nz,ja,desc,info[,jla,mask,lidx])
+\end{verbatim}
+
+This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a
+linear system coefficient matrix), storing them as necessary into the
+communication descriptor. In the first form the edges are specified as
+pairs of indices $ia(i),ja(i)$; the starting index $ia(i)$ should
+belong to the current process. 
+In the second form only the remote indices $ja(i)$ are specified. 
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[nz] the number of points being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value.
+\item[ia] the indices of the starting vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of length $nz$.
+\item[ja]  the indices of the end vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of length $nz$.
+\item[mask] Mask entries in \verb|ja|, they are inserted only when the
+  corresponding \verb|mask| entries are \verb|.true.|\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical  array of length $nz$, default \verb|.true.|.
+\item[lidx]  User defined local indices for \verb|ja|.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of length $nz$.
+%% \item[is] the row offset.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf optional}.\\a
+%% Specified as: an integer value.
+%% \item[js] the column offset.\\
+%% Scope: {\bf local}.\\
+%% Type: {\bf optional}.\\
+%% Specified as: an integer value.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_a] the updated communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\item[ila] the local indices of the starting vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+\item[jla]  the local indices of the end vertex of the edges  being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf out}.\\
+Specified as: an integer array of length $nz$.
+
+\end{description}
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This routine may only be called if the descriptor is in the
+  build state;
+\item  This routine automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process.
+\item The second form of this routine will be useful when dealing with
+  user-specified index mappings; see also~\ref{sec:usermaps}.
+\end{enumerate}
+
+
+
+%
+%%   psb_cdasb %%
+%
+\clearpage\subsection*{psb\_cdasb --- Communication descriptor assembly
+  routine}
+\addcontentsline{toc}{subsection}{psb\_cdasb}
+
+\begin{verbatim}
+call psb_cdasb(desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+%\item[arg] 
+\end{description}
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On exit from this routine the descriptor is in the assembled
+  state. 
+\end{enumerate}
+
+
+
+%
+%%   psb_cdcpy %%
+%
+\clearpage\subsection*{psb\_cdcpy --- Copies a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdcpy}
+
+\begin{verbatim}
+call psb_cdcpy(desc_in, desc_out, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[desc\_in] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_out] the communication descriptor copy.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf out}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%
+%%   psb_cdfree %%
+%
+\clearpage\subsection*{psb\_cdfree --- Frees a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdfree}
+
+\begin{verbatim}
+call psb_cdfree(desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] the communication descriptor to be freed.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+%
+%%   psb_cdcpy %%
+%
+\clearpage\subsection*{psb\_cdbldext --- Build an extended  communication
+  descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdbldext}
+
+\begin{verbatim}
+call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
+\end{verbatim}
+
+This subroutine builds an extended communication descriptor, based on
+the input descriptor \verb|desc_a| and on the stencil specified
+through the input sparse matrix \verb|a|. 
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] A sparse matrix
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data type.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \spdata.
+\item[nl] the number of additional layers desired.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value $nl\ge 0$. 
+\item[extype] the kind of estension required.\\
+Scope:{\bf global}.\\
+Type:{\bf optional }.\\
+Intent: {\bf in}.\\
+Specified as: an integer value
+\verb|psb_ovt_xhal_|, \verb|psb_ovt_asov_|, default: \verb|psb_ovt_xhal_|
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_out] the extended communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item Specifying \verb|psb_ovt_xhal_| for the \verb|extype| argument
+  the user will obtain a descriptor for a domain partition in which
+  the additional layers are fetched as part of an (extended) halo;
+  however the index-to-process mapping is identical to that of the
+  base descriptor;
+\item Specifying \verb|psb_ovt_asov_| for the \verb|extype| argument
+  the user will obtain a descriptor with an overlapped decomposition:
+  the additional layer is aggregated to  the local subdomain (and thus
+  is an overlap), and a new halo extending beyond the last additional
+  layer is formed. 
+\end{enumerate}
+
+
+%% %
+%% %%   psb_cdren %%
+%% %
+%% \subsection*{psb\_cdren --- Applies a renumeration to a
+%% communication descriptor}
+%% \addcontentsline{toc}{subsection}{psb\_cdren}
+
+%% \syntax{call psb\_cdren}{trans, iperm, desc\_a, info}
+
+%% \begin{description}
+%% \item[\bf On Entry]
+%% \item[Type:] Asynchronous.
+%% \item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+%% \item[iperm] An integer array containing permutation information.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer one-dimensional array.\\
+%% \item[desc\_a] the communication descriptor.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf required}.\\
+%% Specified as: a structured data of type \descdata.
+%% \end{description}
+
+%% \begin{description}
+%% \item[\bf On Return]
+%% \item[info] Error code.
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer variable.
+%% \end{description}
+
+
+
+
+%
+%%   psb_descprt %%
+%
+%% \subsection*{psb\_cdprt --- Prints a descriptor}
+%%\addcontentsline{toc}{subsection}{psb\_cdprt}
+
+%% \syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
+
+%% \begin{description}
+%% \item[Type:] Asynchronous.
+%% \item[\bf On Entry]
+%% \item[iout] An integer that defines the output unit.
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: Integer scalar.\\
+%% \item[desc\_a] The communication descriptor of type \descdata that
+%%   must be printed.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: a variable of type \descdata.\\
+%% \end{description}
+
+%% \begin{description}
+%% \item[\bf On Return]
+%% \item[glob] ??????
+%% \item[short] ??????
+%% \end{description}
+
+
+
+%
+%%   psb_spalloc %%
+%
+\clearpage\subsection*{psb\_spall --- Allocates a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spall}
+
+\begin{verbatim}
+call psb_spall(a, desc_a, info, nnz)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[nnz] An estimate of the number of nonzeroes in the local
+  part of the assembled matrix.\\ 
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[a] the matrix to be allocated.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On exit from this routine the sparse matrix  is in the build
+  state.
+\item The descriptor may be in either the build or assembled state.
+\item Providing a good estimate for the number of nonzeroes $nnz$ in
+  the assembled matrix may substantially improve performance in the
+  matrix build phase, as it will reduce or eliminate the need for
+  (potentially multiple) data reallocations. 
+\end{enumerate}
+
+
+
+%
+%%   psb_spins %%
+%
+\clearpage\subsection*{psb\_spins --- Insert a cloud of elements into a sparse
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_spins}
+
+\begin{verbatim}
+call psb_spins(nz, ia, ja, val, a, desc_a, info [,local])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[nz] the number of elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer scalar.
+\item[ia] the row indices of the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of size $nz$.
+\item[ja] the column indices of the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array of size $nz$.
+\item[val] the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an array of size $nz$. Must be of the same type and kind
+of the coefficients  of the sparse matrix $a$.
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local}. \\
+Type: {\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a variable of type \descdata.\\
+\item[local] Whether the entries in the indices vectors \verb|ia|,
+  \verb|ja| are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
+%% \item[is] the starting row on matrix $a$.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf optional}.\\
+%% Specified as: an integer vaule.
+%% \item[js] the starting column on matrix $a$.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf optional}\\
+%% Specified as: an integer value
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[a] the matrix into which elements will be inserted.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local}. \\
+Type: {\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a variable of type \descdata.\\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor may be in either the
+  build or assembled state.
+\item On entry to this routine the sparse matrix may be in either the
+  build or update state. 
+\item If the descriptor is in the build state, then the sparse matrix
+  must also be in the build state; the action of the routine is to
+  (implicitly) call \verb|psb_cdins| to add entries to the sparsity
+  pattern; each sparse matrix entry implicitly defines a graph edge,
+  that is passed to the descriptor routine for the appropriate
+  processing;
+\item The coefficients to be inserted are represented by the ordered
+  triples $ia(i),ja(i),val(i)$, for $i=1,\dots,nz$; these triples
+  should belong to the current process, i.e. $ia(i)$ should be one of
+  the local indices, but are otherwise arbitrary;
+\item There is no
+  requirement that a given row must be passed in its entirety to a
+  single call to this routine: the buildup of a row may be split into
+  as many calls as desired;
+\item Coefficients from different rows   may also be mixed up freely
+  in a single call, according to the application needs; 
+\item Any coefficients from matrix rows not owned by the calling
+  process are silently ignored;
+\item If the descriptor is in the assembled state, then any entries in
+  the sparse matrix that would generate additional communication
+  requirements are  ignored; 
+\item If the matrix is in the update state, any entries in positions
+  that were not present in the original matrix are ignored. 
+\end{enumerate}
+
+%
+%%   psb_spasb %%
+%
+\clearpage\subsection*{psb\_spasb --- Sparse matrix assembly routine}
+\addcontentsline{toc}{subsection}{psb\_spasb}
+
+\begin{verbatim}
+call psb_spasb(a, desc_a, info, afmt, upd, dupl, mold)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[afmt] the storage format for the sparse matrix.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an array of characters. Defalt:  'CSR'.
+\item[upd] Provide for updates to the matrix coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_upd_srch_|, \verb|psb_upd_perm_|
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\item[mold] The desired dynamic type for the internal matrix storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \spbasedata. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[a] the matrix to be assembled.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. \verb|psb_cdasb| must already have been called.
+\item The sparse matrix may be in either the build or update state;
+\item Duplicate entries are detected and handled in both build and
+  update state, with the exception of the error action that is only
+  taken in the build state, i.e. on the first assembly; 
+\item If the update choice is \verb|psb_upd_perm_|, then subsequent
+  calls to \verb|psb_spins| to update the matrix must be arranged in
+  such a way as to produce exactly the same sequence of coefficient
+  values as encountered at the first assembly; 
+\item The output storage format need not be the same on all
+  processes; 
+\item On exit from this routine the matrix is in the assembled state,
+  and thus is suitable for the computational routines. 
+\end{enumerate}
+
+
+
+%% %
+%% %%   psb_spcnv %%
+%% %
+%% \subsection*{psb\_spcnv --- Converts a sparse matrix storage
+%% format}
+%%\addcontentsline{toc}{subsection}{psb\_spcnv}
+
+%% \syntax{call psb\_spcnv}{a, b, desc\_a, info}
+
+%% \begin{description}
+%% \item[\bf On Entry]
+%% \item[a] the matrix to be converted.\\
+%% Scope:{\bf local}\\
+%% Type:{\bf required}\\
+%% Specified as: a structured data of type \spdata.
+%% \item[desc\_a] the communication descriptor.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf required}.\\
+%% Specified as: a structured data of type \descdata.
+%% \end{description}
+
+%% \begin{description}
+%% \item[\bf On Return]
+%% \item[b] the converted matrix.\\
+%% Scope:{\bf local}\\
+%% Type:{\bf required}\\
+%% Specified as: a structured data of type \spdata.
+%% \item[info] Error code.
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer variable.
+%% \end{description}
+
+
+
+%
+%%   psb_spfree %%
+%
+\clearpage\subsection*{psb\_spfree --- Frees a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spfree}
+
+\begin{verbatim}
+call psb_spfree(a, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the matrix to be freed.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+
+%
+%%   psb_sprn %%
+%
+\clearpage\subsection*{psb\_sprn --- Reinit sparse matrix structure for psblas
+  routines.}
+\addcontentsline{toc}{subsection}{psb\_sprn}
+
+\begin{verbatim}
+call psb_sprn(a, decsc_a, info, clear)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the matrix to be reinitialized.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[clear] Choose whether to zero out matrix coefficients\\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Default: true.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On exit from this routine the sparse matrix is in the update
+  state. 
+\end{enumerate}
+%
+%%   psb_spupdate %%
+%
+%% \subsection*{psb\_spupdate --- Updates a sparse matrix.}
+%%\addcontentsline{toc}{subsection}{psb\_spupdate}
+
+%% \syntax{call psb\_spupdate}{a, ia, ja, blck, desc\_a, info, ix, jx, updflag}
+
+%% \begin{description}
+%% \item[\bf On Entry]
+%% \end{description}
+
+%% \begin{description}
+%% \item[\bf On Return]
+%% \end{description}
+%% %
+%% %%   psb_csrp %%
+%% %
+%% \subsection*{psb\_csrp --- Applies a right permutation to a sparse
+%% matrix}
+%%\addcontentsline{toc}{subsection}{psb\_csrp}
+
+%% \syntax{call psb\_csrp}{trans, iperm, a, info}
+
+%% \begin{description}
+%% \item[\bf On Entry]
+%% \item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+%% \item[iperm] An integer array containing permutation information.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer one-dimensional array.\\
+%% \item[a] The sparse matrix to be permuted.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: a \spdata variable.\\
+%% \begin{description}
+%% \item[\bf On Return]
+%% \item[info] Error code.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf required}\\
+%% Specified as: Integer scalar.\\
+%% \end{description}
+
+
+%
+%%   psb_alloc %%
+%
+\clearpage\subsection*{psb\_geall --- Allocates a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geall}
+
+\begin{verbatim}
+call psb_geall(x, desc_a, info, n, lb)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a variable of type \descdata.\\
+\item[n] The number of columns of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: Integer scalar, default $1$. It is not a valid argument  if $x$ is a
+rank-1 array. 
+\item[lb] The lower bound for the column index range of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: Integer scalar, default $1$. It is not a valid argument if $x$ is a
+rank-1 array. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a rank one or two array with the ALLOCATABLE  attribute
+or an object of type \vdata, of type real, complex or integer.\\ 
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%
+%%   psb_ins %%
+%
+\clearpage\subsection*{psb\_geins --- Dense matrix insertion routine}
+\addcontentsline{toc}{subsection}{psb\_geins}
+
+\begin{verbatim}
+call psb_geins(m, irw, val, x, desc_a, info [,dupl,local])
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[m] Number of rows in $val$  to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value.
+\item[irw] Indices of the rows to be inserted. Specifically, row $i$
+  of $val$ will be inserted into the local row corresponding to the
+  global row index $irw(i)$.
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array.
+\item[val] the dense submatrix to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a rank 1 or 2  array.
+Specified as: an integer value.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[dupl] How to handle duplicate coefficients.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
+\verb|psb_dupl_add_|.
+\item[local] Whether the entries in the index vector \verb|irw|,
+   are already in local  numbering. \\
+ Scope:{\bf local}.\\
+ Type:{\bf optional}.\\
+ Specified as: a logical value; default: \verb|.false.|.
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] the output dense matrix.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as:  a rank one or two array or an object of type \vdata, of
+type real, complex or integer.\\ 
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item Dense vectors/matrices do not have an associated state;
+\item Duplicate entries are either overwritten or added, there is no
+  provision for raising an error condition. 
+\end{enumerate}
+
+
+%
+%%   psb_asb %%
+%
+\clearpage\subsection*{psb\_geasb --- Assembly a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geasb}
+
+\begin{verbatim}
+call psb_geasb(x, desc_a, info, mold)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a variable of type \descdata.\\
+\item[mold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata; this is
+only allowed when $x$ is of type \vdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The dense matrix to be assembled.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+%
+%%   psb_free %%
+%
+\clearpage\subsection*{psb\_gefree --- Frees a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_gefree}
+
+\begin{verbatim}
+call psb_gefree(x, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] The dense matrix to
+  be freed.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type \vdata, of type real, complex or integer.\\
+
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a variable of type \descdata.\\
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%
+%%   psb_gelp %%
+%
+\clearpage\subsection*{psb\_gelp --- Applies a left permutation to a dense
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_gelp}
+
+\begin{verbatim}
+call psb_gelp(trans, iperm, x, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+\item[iperm] An integer array containing permutation information.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an integer one-dimensional array.\\
+\item[x] The dense matrix to be permuted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a one or two dimensional array.\\
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%
+%%   psb_glob_to_loc %%
+%
+\clearpage\subsection*{psb\_glob\_to\_loc --- Global to local indices
+  convertion}
+\addcontentsline{toc}{subsection}{psb\_glob\_to\_loc}
+
+\begin{verbatim}
+call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
+call psb_glob_to_loc(x, desc_a, info, iact,owned)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] An integer vector of indices to be converted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\item[owned] Specfies valid range of input 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+If true, then only indices strictly owned by the current process are
+considered valid, if false then halo indices are also
+accepted. Default: false. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] If $y$ is not present,
+  then $x$ is overwritten with the translated integer indices. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a rank one integer array.
+\item[y] If $y$ is  present,
+  then $y$ is overwritten with the translated integer indices, and $x$
+  is left unchanged. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Specified as: a rank one integer array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item If an input index is out of range, then the corresponding output
+  index is set to a negative number;
+\item The default \verb|I|gnore means that the negative output is the
+  only action taken on an out-of-range input.
+\end{enumerate}
+
+
+\clearpage\subsection*{psb\_loc\_to\_glob --- Local to global indices
+  conversion}
+\addcontentsline{toc}{subsection}{psb\_loc\_to\_glob}
+
+\begin{verbatim}
+call psb_loc_to_glob(x, y, desc_a, info, iact)
+call psb_loc_to_glob(x, desc_a, info, iact)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] An integer vector of indices to be converted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] If $y$ is not present,
+  then $x$ is overwritten with the translated integer indices. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a rank one integer array.
+\item[y] If $y$ is not present,
+  then $y$ is overwritten with the translated integer indices, and $x$
+  is left unchanged. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Specified as: a rank one integer array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+%
+%%   psb_loc_to_glob %%
+%
+\clearpage\subsection*{psb\_is\_owned  --- }
+\addcontentsline{toc}{subsection}{psb\_is\_owned }
+
+\begin{verbatim}
+call psb_is_owned(x, desc_a)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer index.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a scalar integer.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] A logical mask which is true if 
+  $x$ is  owned by the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for an index
+  that is strictly owned by the current process, excluding the halo
+  indices
+\end{enumerate}
+
+
+\clearpage\subsection*{psb\_owned\_index  --- }
+\addcontentsline{toc}{subsection}{psb\_owned\_index }
+
+\begin{verbatim}
+call psb_owned_index(y, x, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer indices.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a scalar or a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] A logical mask which is true for all corresponding entries of
+  $x$ that are owned by the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a scalar or rank one logical array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for those indices
+  that are strictly owned by the current process, excluding the halo
+  indices
+\end{enumerate}
+
+
+\clearpage\subsection*{psb\_is\_local  --- }
+\addcontentsline{toc}{subsection}{psb\_is\_local }
+
+\begin{verbatim}
+call psb_is_local(x, desc_a)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer index.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a scalar integer.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] A logical mask which is true if 
+  $x$ is  local to the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for an index
+  that is local to the current process, including the halo
+  indices
+\end{enumerate}
+
+\clearpage\subsection*{psb\_local\_index  --- }
+\addcontentsline{toc}{subsection}{psb\_local\_index }
+
+\begin{verbatim}
+call psb_local_index(y, x, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer indices.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a scalar or a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] A logical mask which is true for all corresponding entries of
+  $x$ that are local to  the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a scalar or rank one logical array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for those indices
+  that are local to  the current process, including the halo
+  indices.
+\end{enumerate}
+
+
+
+%
+%%   psb_ins %%
+%
+\clearpage\subsection*{psb\_get\_boundary --- Extract list of boundary
+  elements}
+\addcontentsline{toc}{subsection}{psb\_get\_boundary}
+
+\begin{verbatim}
+call psb_get_boundary(bndel, desc, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[bndel] The list of boundary elements on the calling process, in
+  local numbering.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.\\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item If there are no boundary elements (i.e., if the local part of
+  the connectivity graph is self-contained) the output vector is set
+  to the ``not allocated'' state. 
+\item Otherwise the size of \verb|bndel| will be exactly equal to the
+  number of boundary elements. 
+\end{enumerate}
+
+\clearpage\subsection*{psb\_get\_overlap --- Extract list of overlap
+  elements}
+\addcontentsline{toc}{subsection}{psb\_get\_overlap}
+
+\begin{verbatim}
+call psb_get_overlap(ovrel, desc, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[ovrel] The list of overlap elements on the calling process, in
+  local numbering.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a rank one array with the ALLOCATABLE
+attribute, of type integer.\\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item If there are no overlap elements the output vector is set
+  to the ``not allocated'' state.  
+\item Otherwise the size of \verb|ovrel| will be exactly equal to the
+  number of overlap elements. 
+\end{enumerate}
+
+
+
+\clearpage\subsection*{psb\_sp\_getrow --- Extract row(s) from a sparse
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_sp\_getrow}
+
+\begin{verbatim}
+call psb_sp_getrow(row, a, nz, ia, ja, val, info, &
+              & append, nzin, lrw)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[row] The (first) row to be extracted.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an integer $>0$.
+\item[a] the matrix from  which to get rows.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \spdata.
+\item[append] Whether to append or overwrite existing output.\\
+Scope:{\bf local}\\
+Type:{\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a logical value default: false (overwrite).
+\item[nzin] Input size to be appended to.\\
+Scope:{\bf local}\\
+Type:{\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: an integer $>0$. When append is true, specifies how many
+entries in the output vectors are already filled. 
+\item[lrw] The last  row to be extracted.\\
+Scope:{\bf local}\\
+Type:{\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: an integer $>0$, default: $row$.
+
+%% \item[is] the starting row on matrix $a$.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf optional}.\\
+%% Specified as: an integer vaule.
+%% \item[js] the starting column on matrix $a$.\\
+%% Scope:{\bf local}.\\
+%% Type:{\bf optional}\\
+%% Specified as: an integer value
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[nz] the number of elements returned by this call.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf out}.\\
+Returned  as: an integer scalar.
+\item[ia] the row indices.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: an integer array with the \verb|ALLOCATABLE| attribute.
+\item[ja] the column indices of the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: an integer array with the \verb|ALLOCATABLE| attribute.
+\item[val] the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a real  array with the \verb|ALLOCATABLE| attribute.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The output $nz$ is always the size of the output generated by
+  the current call; thus, if \verb|append=.true.|, the total output
+  size will be $nzin+nz$, with the newly extracted coefficients stored in
+  entries \verb|nzin+1:nzin+nz| of the array arguments;
+\item When \verb|append=.true.|  the output arrays are reallocated as
+  necessary;
+\item The row and column indices are returned in the local numbering
+  scheme; if the global numbering is desired, the user may employ the
+  \verb|psb_loc_to_glob| routine on the output.
+\end{enumerate}
+
+
+
+
+\clearpage\subsection*{psb\_sizeof --- Memory occupation}
+\addcontentsline{toc}{subsection}{psb\_sizeof}
+
+This function computes the memory occupation of a PSBLAS object.
+
+
+\begin{verbatim}
+isz = psb_sizeof(a)
+isz = psb_sizeof(desc_a)
+isz = psb_sizeof(prec)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[a] A sparse matrix
+$A$. \\ 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] Communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[\bf On Return] 
+\item[Function value] The memory occupation of the object specified in
+  the calling sequence, in bytes.\\
+Scope: {\bf local} \\
+Returned  as: an \verb|integer(psb_long_int_k_)| number.
+\end{description}
+
+
+\clearpage\subsection*{Sorting utilities --- }
+\addcontentsline{toc}{subsection}{Sorting utilities}
+
+{\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort
+  algorithm}
+
+{\par\noindent\large\bfseries psb\_qsort --- Sorting by the Quicksort
+  algorithm}
+
+{\par\noindent\large\bfseries psb\_hsort --- Sorting by the Heapsort  algorithm}
+\begin{verbatim}
+call psb_msort(x,ix,dir,flag)
+call psb_qsort(x,ix,dir,flag)
+call psb_hsort(x,ix,dir,flag)
+\end{verbatim}
+
+These  serial routines sort a sequence $X$ into ascending or
+descending  order. The argument meaning is identical for the three
+calls; the only difference is the algorithm used to accomplish the
+task (see Usage Notes below). 
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf  On Entry ]
+\item[x] The sequence to be sorted.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex  array of rank 1.
+\item[ix] A vector of indices.\\
+Type:{\bf optional}.\\
+Specified as: an integer array of (at least) the same size as $X$.
+\item[dir] The desired ordering.\\
+Type:{\bf optional}.\\
+Specified as: an integer value: \begin{description}
+\item[Integer and real data:] \verb|psb_sort_up_|,
+\verb|psb_sort_down_|, \verb|psb_asort_up_|, \verb|psb_asort_down_|;
+default \verb|psb_sort_up_|. 
+\item[Complex data:] \verb|psb_lsort_up_|,
+\verb|psb_lsort_down_|, \verb|psb_asort_up_|, \verb|psb_asort_down_|;
+default \verb|psb_lsort_up_|. 
+\end{description}
+\item[flag] Whether to keep the original values in $IX$.\\
+Type:{\bf optional}.\\
+Specified as: an integer value \verb|psb_sort_ovw_idx_| or
+\verb|psb_sort_keep_idx_|; default \verb|psb_sort_ovw_idx_|.
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The sequence of values, in the chosen ordering.\\ 
+Type:{\bf required}.\\
+Specified as: an integer, real or complex array of rank 1.
+\item[ix] A vector of indices.\\
+Type: {\bf Optional} \\
+An integer array of rank 1, whose entries are moved to the same
+position as the corresponding entries in $x$.
+\end{description}
+
+{\goodbreak\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item For integer or real data the sorting can be performed in the up/down direction, on the
+  natural or absolute values;
+\item For  complex data the sorting can  be done in a lexicographic
+  order (i.e.: sort on the real part with ties broken according to
+  the imaginary part) or on the absolute values; 
+\item The routines return the items in the chosen ordering; the
+  output difference is the handling of  ties (i.e. items with an
+  equal   value) in the original input. With the merge-sort algorithm
+  ties are   preserved in the same relative order as they had in the
+  original   sequence,  while this is not guaranteed for quicksort or
+  heapsort; 
+\item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
+  where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
+  i$; thus, upon return from the subroutine, for each
+  index $i$ we have in $ix(i)$ the position that the item $x(i)$
+  occupied in the original data sequence;
+\item If $flag = psb\_sort\_keep\_idx\_$  the routine will assume that
+  the entries in $ix(:)$ have already been initialized by the user;
+\item The three sorting algorithms have a similar $O(n \log n)$ expected
+  running time; in the average case quicksort will be the
+  fastest and merge-sort the slowest. However note that:
+\begin{enumerate}
+\item The worst case running time for quicksort is $O(n^2)$; the algorithm
+  implemented here follows the well-known median-of-three heuristics,
+  but the worst case may still apply;
+\item The worst case running time for merge-sort and heap-sort is
+  $O(n\log n)$  as the average case;
+\item The merge-sort algorithm is implemented to take advantage of 
+  subsequences that may be already in the desired ordering prior to
+  the subroutine call; this situation is relatively common when
+  dealing with groups of indices of sparse matrix entries, thus
+  merge-sort is the preferred  choice when a sorting is needed
+  by other routines in the library. 
+\end{enumerate}
+\end{enumerate}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 

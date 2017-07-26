@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format</TITLE>
+<META NAME="description" CONTENT="mm_mat_read -- Read a sparse matrix from a file in the MatrixMarket format">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node120.html">
+<LINK REL="previous" HREF="node118.html">
+<LINK REL="up" HREF="node116.html">
+<LINK REL="next" HREF="node120.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1743"
+  HREF="node120.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1739"
+  HREF="node116.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1733"
+  HREF="node118.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1741"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1744"
+  HREF="node120.html">mm_array_read   Read</A>
+<B> Up:</B> <A NAME="tex2html1740"
+  HREF="node116.html">Utilities</A>
+<B> Previous:</B> <A NAME="tex2html1734"
+  HREF="node118.html">hb_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1742"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000103000000000000000">
+mm_mat_read -- Read a sparse matrix from a
+  file in the MatrixMarket format</A>
+</H2>
+
+<P>
+<BR>
+<IMG
+ WIDTH="395" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="\begin{lstlisting}
+call mm_mat_read(a, iret, iunit, filename)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>filename</STRONG></DT>
+<DD>The name of the file to be read.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: a character variable containing a valid file name, or
+<code>-</code>, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: <code>-</code>. 
+</DD>
+<DT><STRONG>iunit</STRONG></DT>
+<DD>The Fortran file unit number.
+<BR>
+Type:<B>optional</B>.
+<BR>
+Specified as: an integer value. Only meaningful if filename is not <code>-</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix read from file.
+<BR>
+Type:<B>required</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>iret</STRONG></DT>
+<DD>Error code.
+<BR>
+Type: <B>required</B> 
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

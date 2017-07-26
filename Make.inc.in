@@ -1,0 +1,66 @@
+# This is Make.inc file generated automatically by the PSBLAS configure script.
+# It should be ready to use, included by Makefile.
+# If it gives problems, consider editing it.
+
+# These lines are quite portable.
+.mod=@MODEXT@
+.fh=.fh
+.SUFFIXES: 
+.SUFFIXES: .f90 .F90 .f .F .c .o
+
+
+# The following ones are the variables used by the PSBLAS make scripts.
+
+FC=@FC@
+CC=@CC@
+FCOPT=@FCOPT@
+CCOPT=@CCOPT@
+FMFLAG=@FMFLAG@
+FIFLAG=@FIFLAG@
+EXTRA_OPT=@EXTRA_OPT@
+
+# These three should be always set!
+MPFC=@MPIFC@
+MPCC=@MPICC@
+
+FLINK=$(MPFC)
+
+LIBS=@LIBS@
+
+# BLAS, BLACS and METIS libraries.
+BLAS=@BLAS_LIBS@
+METIS_LIB=@METIS_LIBS@
+AMD_LIB=@AMD_LIBS@
+LAPACK=@LAPACK_LIBS@
+EXTRA_COBJS=@FAKEMPI@
+
+PSBFDEFINES=@FDEFINES@
+PSBCDEFINES=@CDEFINES@
+AR=@AR@
+RANLIB=@RANLIB@
+
+INSTALL=@INSTALL@
+INSTALL_DATA=@INSTALL_DATA@
+INSTALL_DIR=@INSTALL_DIR@
+INSTALL_LIBDIR=@INSTALL_LIBDIR@
+INSTALL_INCLUDEDIR=@INSTALL_INCLUDEDIR@
+INSTALL_DOCSDIR=@INSTALL_DOCSDIR@
+INSTALL_SAMPLESDIR=@INSTALL_SAMPLESDIR@
+
+# the following is the flag for /bin/cp which shall copy the file only for updating (timestamp based)--on GNU Linux, '-u'
+CPUPDFLAG=
+
+LIBDIR=@LIBDIR@
+RSB_LIBS=@RSB_LIBS@
+BASELIBNAME=@BASELIBNAME@
+PRECLIBNAME=@PRECLIBNAME@
+METHDLIBNAME=@METHDLIBNAME@
+UTILLIBNAME=@UTILLIBNAME@
+BASEMODNAME=@BASEMODNAME@
+PRECMODNAME=@PRECMODNAME@
+METHDMODNAME=@METHDMODNAME@
+UTILMODNAME=@UTILMODNAME@
+
+
+@PSBLASRULES@
+

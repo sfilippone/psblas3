@@ -1,0 +1,103 @@
+Design principles for this directory.
+
+1. What is a sparse matrix? 
+   It is an object which does have some properties (number of rows,
+   number of columns, whether it is a triangle, and in that case
+   upper/lower, unit/nonunit), a state (null, build, assembled,
+   update), a type (real/complex, single/double), and a storage
+   format.  
+   Thus we have a three-level inheritance chain: 
+   i.   The  base object, defining the methods to set/query the various
+        properties, and allocate and  free. Some of the property
+        getters/setters, allocate and free depend on the storage
+        format, so at this level they will just throw an error. 
+   ii.  The X_base_object, where X=s,d,c,z  thus defining the
+        type. At this level we define the computational interfaces to
+	MV and SV, since they require the type of the vectors/scalars
+   	involved (should also add NRMI here!!!!), but again they will
+   	be empty shells. We also define the interface to CSPUT,
+   	required to build the object, and TO_COO,FROM_COO (see
+   	below). 
+   iii. The X_YYY_object where the real implementation of the
+      	MV/SV/NRMI/CSPUT/ALLOCATE/FREE/TO_COO/FROM_COO takes place.  
+
+2. What is a sparse matrix (take 2)? 
+   The above structure by itself does not allow a sparse matrix to
+   switch among different storage formats during its life. To do this,
+   we define all of the above to be INNER objects, encapsulated in an
+   OUTER object which is what the rest of the library sees, as
+   follows: 
+     
+   type :: psbn_d_sparse_mat
+
+     class(psbn_d_base_sparse_mat), allocatable  :: a 
+    
+   end type psbn_d_sparse_mat
+   type(psbn_d_sparse_mat) :: a
+
+   In this way we can have an outer object whose type is stable
+   both statically (at compile time) and at runtime, while at runtime
+   the type of the inner object switches from COO to CSR to whatever as
+   needed. All of the methods are simply thrown onto the corresponding
+   methods of the (allocatable, polymorphic) component A%A as needed
+   (provided the component is allocated, that is).
+   This is what is called a STATE design pattern (different from the
+   internal state we discussed above).
+
+   As an example, consider the allocate/build/assembly cycle: 
+   the outer code would do the following: 
+   1.  Allocate(psbn_d_coo_sparse_mat ::  a%a) 
+
+   2. During the build loop a call to A%CSINS() gets translated into
+      CALL A%A%CSINS()
+    
+   3. At assembly time the code would do the following
+      subroutine psb_spasb(a,....)
+      type(psbn_d_sparse_mat), intent(inout)  :: a 
+
+      class(psbn_d_base_sparse_mat), allocatable :: temp
+
+      select case (TYPE)
+      case('CSR')
+         allocate(psbn_d_csr_sparse_mat :: temp, stat=info)
+      end select				 
+      call temp%from_coo(a%a)
+      call a%a%free()
+      call move_alloc(temp,a%a)
+      
+
+   4. Note in the above that to_coo, from_coo are defined so that every
+      conceivable  storage representation provides just 2 conversion
+      routines, avoiding quadratic explosion. But since all have to
+      provide them, the to_coo/from_coo is defined in d_base_mat_mod
+      together with d_coo_sparse_mat, which enjoys the "crown prince"
+      status with respect to all the other types derived from
+      d_base_sparse_mat (its "siblings"). 
+
+   5. How does a user add a new storage format? Very simple. After
+      deriving the class and implementing all the necessary methods,
+      the user declares in the program a dummy variable of the new
+      inner type 
+
+      type(X_YYY_sparse_mat) :: reftype
+
+
+      then calls 
+        call psb_spasb(a,....,mold=reftype)
+
+      In psb_spasb we have
+      class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+
+      if (present(mold)) then 
+        allocate(temp,source=mold,stat=info)
+      end select				 
+      call temp%from_coo(a%a)
+      call a%a%free()
+      call move_alloc(temp,a%a)
+  
+      AND IT'S DONE! Nothing else in the library requires the explicit
+      knowledge of type of  MOLD. 
+
+
+    
+  

@@ -1,0 +1,300 @@
+\section{Preconditioner routines}
+\label{sec:precs}
+
+% \section{Preconditioners}
+\label{sec:psprecs}
+The base PSBLAS library  contains the implementation of two simple
+preconditioning techniques:
+\begin{itemize}
+\item Diagonal Scaling
+\item Block Jacobi with ILU(0) factorization
+%% \item Additive Schwarz with the Restricted Additive Schwarz and
+%%   Additive Schwarz with Harmonic extensions;
+\end{itemize}
+The supporting data type and subroutine interfaces are defined in the
+module  \verb|psb_prec_mod|.
+
+%% We also provide a companion  package of multi-level Additive
+%%   Schwarz preconditioners called MD2P4; this is actually a family of 
+%%   preconditioners since there is the possibility to choose between
+%%   many variants, and is currently in an experimental stateIts
+%%   documentation is planned to appear after stabilization of the
+%%   package, which will characterize release  2.1 of our library.
+
+
+
+\clearpage\subsection*{init --- Initialize a  preconditioner}
+\addcontentsline{toc}{subsection}{prec\%init}
+
+\begin{verbatim}
+call prec%init(ptype, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[ptype] the type of preconditioner. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a character string, see usage notes.
+%% \item[iv] integer parameters for the precondtioner. 
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer array, see usage notes. 
+%% \item[rs] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: a long precision real number.
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Legal inputs to this subroutine are interpreted depending on the
+$ptype$ string as follows\footnote{The string is case-insensitive}:
+\begin{description}
+\item[NONE] No preconditioning, i.e. the preconditioner is just a copy
+  operator.
+\item[DIAG] Diagonal scaling; each entry of the input vector is
+  multiplied by the reciprocal of the sum of the absolute values of
+  the coefficients in the corresponding row of matrix  $A$;
+\item[BJAC] Precondition by a  factorization of the
+  block-diagonal of matrix $A$, where block boundaries are determined
+  by the data allocation boundaries for each process; requires no
+  communication. Only the incomplete factorization $ILU(0)$ is
+  currently implemented.  
+\end{description}
+
+
+\clearpage\subsection*{build --- Builds a preconditioner}
+\addcontentsline{toc}{subsection}{prec\%build}
+
+\begin{verbatim}
+call prec%build(a, desc_a, info,amold,vmold)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the system sparse matrix.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}, target.\\
+Specified as: a sparse matrix data structure \spdata.
+\item[prec] the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: an already initialized precondtioner data structure \precdata\\
+\item[desc\_a] the problem communication descriptor. 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}, target.\\
+Specified as: a communication descriptor data structure \descdata.
+%% \item[upd] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Intent: {\bf in}.\\
+%% Specified as: a character.
+\item[amold] The desired dynamic type for the internal matrix storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \spbasedata. 
+\item[vmold] The desired dynamic type for the internal vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from \vbasedata. 
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[prec] the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a precondtioner data structure \precdata\\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+\clearpage\subsection*{apply --- Preconditioner application
+  routine}
+\addcontentsline{toc}{subsection}{prec\%apply}
+
+\begin{verbatim}
+call prec%apply(x,y,desc_a,info,trans,work)
+call prec%apply(x,desc_a,info,trans)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[x] the source vector.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as:  a rank one array or an object of type \vdata. 
+\item[desc\_a] the problem communication descriptor.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a communication data structure \descdata.
+\item[trans] 
+Scope: {\bf } \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character.
+\item[work] an optional work space
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf inout}.\\
+Specified as: a double precision array.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] the destination vector.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as:  a rank one array or an object of type \vdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+\clearpage\subsection*{descr --- Prints a description of current
+  preconditioner}
+\addcontentsline{toc}{subsection}{prec\%descr}
+
+\begin{verbatim}
+call prec%descr()
+call prec%descr(iout, root)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[iout] output unit.
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: an integer number. Default: default output unit.
+\item[root] Process from which to print
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: an integer number between 0 and $np-1$, in which case
+the specified process will print the description, or $-1$, in which case
+all processes will print. Default: 0. 
+\end{description}
+
+
+
+\clearpage\subsection*{clone --- clone  current
+  preconditioner}
+\addcontentsline{toc}{subsection}{clone}
+\begin{verbatim}
+call  prec%clone(precout,info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+% Type: {\bf required}.\\
+% Intent: {\bf in}.\\
+% Specified as: a object of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[precout] A copy of the input object.
+\item[info] Return code. 
+\end{description}
+
+
+\clearpage\subsection*{free --- Free a  preconditioner}
+\addcontentsline{toc}{subsection}{prec\%free}
+
+\begin{verbatim}
+call prec%free(info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[prec] the preconditioner.\\
+Scope: {\bf local}.\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+%% \item[iv] integer parameters for the precondtioner. 
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer array, see usage notes. 
+%% \item[rs] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: a long precision real number.
+\item[\bf On Exit]
+
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
+\item[info] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Error code: if no error, 0 is returned.
+\end{description}
+{\par\noindent\large\bfseries Notes}
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
+Releases all internal storage.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 

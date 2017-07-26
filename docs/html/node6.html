@@ -1,0 +1,282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Application structure</TITLE>
+<META NAME="description" CONTENT="Application structure">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node8.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html263"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html259"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html253"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html261"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html264"
+  HREF="node7.html">User-defined index mappings</A>
+<B> Up:</B> <A NAME="tex2html260"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html254"
+  HREF="node5.html">Library contents</A>
+ &nbsp; <B>  <A NAME="tex2html262"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00033000000000000000"></A>
+<A NAME="sec:appstruct"></A>
+<BR>
+Application structure
+</H2>
+
+<P>
+The main underlying principle of the PSBLAS library is that the
+library objects are created and exist with reference to a discretized
+space to which there corresponds an index space and a matrix sparsity
+pattern. As an example, consider a cell-centered finite-volume
+discretization of  the Navier-Stokes equations on a simulation domain;
+the index space <IMG
+ WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$1\dots n$"> is isomorphic to the set of cell centers,
+whereas the pattern of the associated linear system matrix is
+isomorphic to the adjacency graph imposed on the discretization mesh
+by the discretization stencil. 
+
+<P>
+Thus the first order of business is to establish an index space, and
+this is done with a call to  <code>psb_cdall</code> in which we specify the
+size of the index space <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img16.png"
+ ALT="$n$"> and the allocation of the elements of the
+index space to the various processes making up the MPI (virtual)
+parallel machine. 
+
+<P>
+The index space is partitioned among processes, and this creates a
+mapping from the ``global'' numbering <IMG
+ WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$1\dots n$"> to a numbering
+``local'' to each process; each process <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"> will own a certain subset
+<!-- MATH
+ $1\dots n_{\hbox{row}_i}$
+ -->
+<IMG
+ WIDTH="77" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.png"
+ ALT="$1\dots n_{\hbox{row}_i}$">, each element of which corresponds to a certain
+element of <IMG
+ WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$1\dots n$">. The user does not set explicitly this mapping;
+when the application needs to indicate to which element of the index
+space a certain item is related, such as the row and column index of a
+matrix coefficient, it does so in the ``global'' numbering, and the
+library will translate into the appropriate ``local'' numbering. 
+
+<P>
+For  a given index space <IMG
+ WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$1\dots n$"> there are many possible associated
+topologies, i.e. many different discretization stencils; thus the
+description of the index space is not completed until the user has
+defined a sparsity pattern, either explicitly through <code>psb_cdins</code>
+or implicitly through <code>psb_spins</code>. The descriptor is finalized
+with a call to <code>psb_cdasb</code> and a sparse matrix with a call to
+<code>psb_spasb</code>. After <code>psb_cdasb</code> each process <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$"> will have
+defined a set of ``halo'' (or ``ghost'') indices
+<!-- MATH
+ $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$
+ -->
+<IMG
+ WIDTH="130" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img18.png"
+ ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$">, denoting elements of the index
+space that are <I>not</I> assigned to process <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">; however the
+variables associated with them are needed to complete computations
+associated with the sparse matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">, and thus they have to be
+fetched from (neighbouring) processes. The descriptor of the index
+space is built exactly for the purpose of properly sequencing the
+communication steps required to achieve this objective. 
+
+<P>
+A simple application structure will walk through the index space
+allocation, matrix/vector creation and linear system solution as
+follows:
+
+<OL>
+<LI>Initialize parallel environment with <code>psb_init</code>
+</LI>
+<LI>Initialize index space with <code>psb_cdall</code>
+</LI>
+<LI>Allocate sparse matrix and dense vectors with <code>psb_spall</code>
+  and <code>psb_geall</code>
+</LI>
+<LI>Loop over all local rows, generate matrix and vector entries,
+  and insert them with <code>psb_spins</code> and <code>psb_geins</code>
+</LI>
+<LI>Assemble the various entities: 
+
+<OL>
+<LI><code>psb_cdasb</code>
+</LI>
+<LI><code>psb_spasb</code>
+</LI>
+<LI><code>psb_geasb</code>
+</LI>
+</OL>
+</LI>
+<LI>Choose the preconditioner to be used with <code>psb_precset</code> and
+  build it with <code>psb_precbld</code>
+</LI>
+<LI>Call the iterative method of choice, e.g. <code>psb_bicgstab</code>
+</LI>
+</OL>
+This is the structure of the sample program
+<code>test/pargen/ppde.f90</code>. 
+
+<P>
+For a simulation in which the same discretization mesh is used over
+multiple time steps, the following structure may be more appropriate:
+
+<OL>
+<LI>Initialize parallel environment with <code>psb_init</code>
+</LI>
+<LI>Initialize index space with <code>psb_cdall</code>
+</LI>
+<LI>Loop over the topology of the discretization mesh and build the
+  descriptor with <code>psb_cdins</code>
+</LI>
+<LI>Assemble the descriptor with <code>psb_cdasb</code>
+</LI>
+<LI>Allocate the sparse matrices and dense vectors with
+  <code>psb_spall</code> and <code>psb_geall</code>
+</LI>
+<LI>Loop over the time steps: 
+
+<OL>
+<LI>If after first time step, 
+  reinitialize the sparse matrix with <code>psb_sprn</code>; also zero out
+  the dense vectors;
+</LI>
+<LI>Loop over the mesh, generate the coefficients and insert/update
+  them with <code>psb_spins</code> and <code>psb_geins</code>
+</LI>
+<LI>Assemble with <code>psb_spasb</code> and <code>psb_geasb</code>
+</LI>
+<LI>Choose and build preconditioner with <code>psb_precset</code> and
+  <code>psb_precbld</code>
+</LI>
+<LI>Call the iterative method of choice, e.g. <code>psb_bicgstab</code>
+ 
+</LI>
+</OL>
+</LI>
+</OL>
+The insertion routines will be called as many times as needed; 
+they only need to  be called on the data that is actually
+allocated to the current process, i.e. each process generates its own
+data. 
+
+<P>
+In principle there is no specific order in the calls to
+<code>psb_spins</code>, nor is there a requirement to build a matrix row in
+its entirety before calling the routine; this allows the application
+programmer to walk through the discretization mesh element by element,
+generating the main part of a given matrix row but also contributions
+to the rows corresponding to neighbouring elements. 
+
+<P>
+From a functional point of view it is even possible to execute one
+call for each nonzero coefficient; however this would have a
+substantial computational overhead. It is therefore advisable to pack
+a certain amount of data into each call to the insertion routine, say
+touching on a few tens of rows; the best performng value would depend
+on both the architecture of the computer being used and on the problem
+structure. 
+At the opposite extreme, it would be possible to generate the entire
+part of a coefficient matrix residing on a process and pass it in a
+single call to <code>psb_spins</code>; this, however, would entail a
+doubling of memory occupation, and thus would be almost always far
+from optimal. 
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html265"
+  HREF="node7.html">User-defined index mappings</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html263"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html259"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html253"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html261"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html264"
+  HREF="node7.html">User-defined index mappings</A>
+<B> Up:</B> <A NAME="tex2html260"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html254"
+  HREF="node5.html">Library contents</A>
+ &nbsp; <B>  <A NAME="tex2html262"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

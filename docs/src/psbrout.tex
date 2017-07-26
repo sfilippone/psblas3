@@ -1,0 +1,1154 @@
+\section{Computational routines}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      DENSE MATRIX SUM
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage\subsection*{psb\_geaxpby --- General Dense Matrix Sum}
+\addcontentsline{toc}{subsection}{psb\_geaxpby}
+
+This subroutine is an interface to the computational kernel for
+dense matrix sum:
+\[ y \leftarrow  \alpha\> x+ \beta y \] 
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global dense submatrix $x_{:, :1}$
+%% \item[$y$] represents the global dense submatrix $y_{:, :}$
+%% \end{description}
+
+\begin{verbatim}
+call psb_geaxpby(alpha, x, beta, y, desc_a, info)
+\end{verbatim}
+%% \syntax*{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
+
+%( calculating y <- alpha*x+beta*y )
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
+\hline
+Short Precision Real & psb\_geaxpby \\
+Long Precision Real & psb\_geaxpby \\
+Short Precision Complex & psb\_geaxpby \\
+Long Precision Complex & psb\_geaxpby \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90axpby}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[alpha] the scalar $\alpha$.\\ Scope: {\bf global} \\ Type: {\bf
+required} \\ Intent: {\bf in}.\\ Specified as: a number of the data
+type indicated in Table~\ref{tab:f90axpby}.
+\item[x] the local portion of global dense matrix
+$x$.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a rank one or two array or an object of type \vdata\ 
+containing numbers of type 
+specified in Table~\ref{tab:f90axpby}.  The rank of $x$ must be the same of $y$. 
+\item[beta] the scalar $\beta$.\\
+Scope: {\bf global} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a number of the data type indicated in Table~\ref{tab:f90axpby}.
+\item[y] the local portion of the global dense matrix
+$y$. \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as:  a rank one or two array or an object of type \vdata\  containing numbers of the type 
+indicated in Table~\ref{tab:f90axpby}.  The rank of $y$ must be the same of $x$. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+%% \item[n] number of columns in dense submatrices $x$ and $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: \verb|min(size(x,2),size(y,2))|.\\
+%% Specified as: an integer variable $n\ge 0$.
+%% \item[jx]  the column index of the global dense matrix $x$,
+%% identifying the first column of the submatrix $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jx = 1$.\\
+%% Specified as: an integer variable $jx\ge 1$. 
+%% \item[jy]  the column index of the global dense matrix $y$,
+%% identifying the first column of the submatrix $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jy = 1$.\\
+%% Specified as: an integer variable $jy\ge 1$. 
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] the local portion of result submatrix $y$.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as: a rank one or two array or an object of type \vdata\ containing numbers of the type
+indicated in Table~\ref{tab:f90axpby}.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       F90DOT PRODUCT
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage\subsection*{psb\_gedot --- Dot Product}
+\addcontentsline{toc}{subsection}{psb\_gedot}
+
+This function computes dot product between two vectors $x$ and
+$y$.\\
+If $x$ and $y$ are real vectors
+it computes dot-product as:
+\[dot \leftarrow x^T y\]
+Else if $x$ and $y$ are complex vectors then it computes dot-product as:
+\[dot \leftarrow x^H y\]
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$y$] represents the global subvector $y_{:,jy}$
+%% \end{description}
+
+\begin{verbatim}
+psb_gedot(x, y, desc_a, info)
+\end{verbatim}
+%% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$dot$, $x$, $y$ & {\bf Function}\\
+\hline
+Short Precision Real & psb\_gedot \\
+Long Precision Real & psb\_gedot \\
+Short Precision Complex & psb\_gedot \\	
+Long Precision Complex & psb\_gedot \\	
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90dot}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$.\\
+%%  This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90dot}. The rank of $x$ must be the same of $y$. 
+\item[y] the local portion of global dense matrix
+$y$. \\
+%% This function computes the location of the first element of
+%% local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90dot}. The rank of $y$ must be the same of $x$. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jx = 1$.\\
+
+%% \item[jy]  the column index of global dense matrix $y$,
+%% identifying the column of subvector $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jy = 1$.\\
+%% Specified as: an integer variable $jy\ge 1$. 
+\item[\bf On Return] 
+\item[Function value] is the dot product of subvectors $x$ and $y$.\\
+Scope: {\bf global} \\
+Specified as: a number of the data type indicated in Table~\ref{tab:f90dot}.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       F90DOT PRODUCT
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage\subsection*{psb\_gedots --- Generalized Dot Product}
+\addcontentsline{toc}{subsection}{psb\_gedots}
+
+This subroutine computes a series of  dot products among the columns of
+two dense matrices  $x$ and $y$: 
+\[ res(i) \leftarrow x(:,i)^T y(:,i)\]
+If the matrices are complex, then the
+usual convention applies, i.e. the conjugate transpose of $x$ is
+used. If $x$ and $y$ are of rank one, then $res$ is a scalar, else it
+is a rank one array. 
+
+\begin{verbatim}
+call psb_gedots(res, x, y, desc_a, info)
+\end{verbatim}
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$res$, $x$, $y$ & {\bf Subroutine}\\
+\hline
+Short Precision Real & psb\_gedots \\
+Long Precision Real & psb\_gedots \\
+Short Precision Complex & psb\_gedots \\	
+Long Precision Complex & psb\_gedots \\	
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90mdot}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90mdot}. The rank of $x$ must be the same of $y$. 
+\item[y] the local portion of global dense matrix
+$y$. \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90mdot}. The rank of $y$ must be the same of $x$. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[\bf On Return] 
+\item[res] is the dot product of subvectors $x$ and $y$.\\
+Scope: {\bf global} \\
+Intent: {\bf out}.\\
+Specified as: a number or a rank-one array  of the data type indicated
+in Table~\ref{tab:f90dot}. 
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       VECTOR INFINITY-NORM 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_normi --- Infinity-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_normi}    
+
+This function computes 
+ the infinity-norm of a vector $x$.\\
+If $x$ is a real  vector
+it computes infinity norm as:
+\[ amax \leftarrow \max_i |x_i|\]
+else if $x$ is a complex vector then it computes the infinity-norm  as:
+\[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \end{description}
+
+\begin{verbatim}
+psb_geamax(x, desc_a, info)
+psb_normi(x, desc_a, info)
+\end{verbatim}
+%% \syntax*{psb\_geamax}{x, desc\_a, info, jx}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$amax$ & $x$ & {\bf Function}\\
+\hline
+Short Precision Real& Short Precision Real & psb\_geamax \\
+Long Precision Real&Long Precision Real & psb\_geamax \\
+Short Precision Real&Short Precision Complex & psb\_geamax \\
+Long Precision Real&Long Precision Complex & psb\_geamax \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90amax}}
+\end{table}
+
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\  
+containing numbers of type specified in
+Table~\ref{tab:f90amax}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $jx = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
+
+\item[\bf On Return] 
+\item[Function value] is the infinity norm of subvector $x$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       Infinity norm
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage\subsection*{psb\_geamaxs --- Generalized Infinity Norm}
+\addcontentsline{toc}{subsection}{psb\_geamaxs}
+
+This subroutine computes a series of  infinity norms on the columns of
+a  dense matrix  $x$: 
+\[ res(i) \leftarrow \max_k |x(k,i)| \]
+
+\begin{verbatim}
+call psb_geamaxs(res, x, desc_a, info)
+\end{verbatim}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$res$&  $x$& {\bf Subroutine}\\
+\hline
+Short Precision Real    &Short Precision Real    & psb\_geamaxs\\
+Long Precision Real    &Long Precision Real    & psb\_geamaxs\\
+Short Precision Real &Short Precision Complex & psb\_geamaxs\\	
+Long Precision Real &Long Precision Complex & psb\_geamaxs\\	
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90mamax}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. \\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90mamax}. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[\bf On Return] 
+\item[res] is the infinity norm of the columns of $x$.\\
+Scope: {\bf global} \\
+Intent: {\bf out}.\\
+Specified as: a number or a rank-one array  of long precision real numbers. 
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       1-NORM OF A VECTOR
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_norm1 --- 1-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_norm1}    
+
+This function computes the 1-norm of a vector $x$.\\
+If $x$ is a real vector
+it computes 1-norm as:
+\[ asum \leftarrow  \|x_i\|\]
+else if $x$ is a complex vector then it computes 1-norm  as:
+\[ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
+
+
+\begin{verbatim}
+psb_geasum(x, desc_a, info)
+psb_norm1(x, desc_a, info)
+\end{verbatim}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$asum$ & $x$ & {\bf Function}\\
+\hline
+Short Precision Real&Short Precision Real & psb\_geasum \\
+Long Precision Real&Long Precision Real & psb\_geasum \\
+Short Precision Real&Short Precision Complex & psb\_geasum \\
+Long Precision Real&Long Precision Complex & psb\_geasum \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90asum}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90asum}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+
+\item[\bf On Return] 
+\item[Function value] is the 1-norm of vector $x$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real  number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+\clearpage\subsection*{psb\_geasums --- Generalized 1-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_geasums}    
+
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  $x$: 
+\[ res(i) \leftarrow \max_k |x(k,i)| \]
+This function computes the 1-norm of a vector $x$.\\
+If $x$ is a real vector 
+it computes 1-norm as:
+\[ res(i) \leftarrow  \|x_i\|\]
+else if $x$ is a complex vector then it computes 1-norm  as:
+\[ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
+
+
+\begin{verbatim}
+call psb_geasums(res, x, desc_a, info)
+\end{verbatim}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$res$ & $x$ & {\bf Subroutine}\\
+\hline
+Short Precision Real&Short Precision Real & psb\_geasums \\
+Long Precision Real&Long Precision Real & psb\_geasums \\
+Short Precision Real&Short Precision Complex & psb\_geasums \\
+Long Precision Real&Long Precision Complex & psb\_geasums \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90asums}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90asums}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+
+\item[\bf On Return] 
+\item[res] contains the 1-norm of (the columns of) $x$.\\
+Scope: {\bf global} \\
+Intent: {\bf out}.\\
+Short as: a long precision real  number.
+Specified as: a long precision real  number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       2-NORM OF A VECTOR 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_norm2 --- 2-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_norm2}    
+
+This function computes the 2-norm of a vector $x$.\\
+If $x$ is a  real  vector
+it computes 2-norm as:
+\[ nrm2 \leftarrow \sqrt{x^T x}\]
+else if $x$ is a complex vector then it computes 2-norm  as:
+\[ nrm2 \leftarrow \sqrt{x^H x}\]
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \end{description}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$nrm2$ & $x$ & {\bf Function}\\
+\hline
+Short Precision Real&Short Precision Real & psb\_genrm2 \\
+Long Precision Real&Long Precision Real & psb\_genrm2 \\
+Short Precision Real&Short Precision Complex & psb\_genrm2 \\
+Long Precision Real&Long Precision Complex & psb\_genrm2 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrm2}}
+\end{table}
+
+\begin{verbatim}
+psb_genrm2(x, desc_a, info)
+psb_norm2(x, desc_a, info)
+\end{verbatim}
+%% \syntax*{psb\_genrm2}{x, desc\_a, info, jx}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$.%%  This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90nrm2}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $jx = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
+
+\item[\bf On Return] 
+\item[Function Value] is the 2-norm of subvector $x$.\\
+Scope: {\bf global} \\
+Type: {\bf required} \\
+Specified as: a long precision real number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+\clearpage\subsection*{psb\_genrm2s --- Generalized 2-Norm of Vector}
+\addcontentsline{toc}{subsection}{psb\_genrm2s}    
+
+This subroutine computes a series of  2-norms on the columns of
+a  dense matrix  $x$: 
+\[ res(i) \leftarrow \|x(:,i)\|_2 \]
+
+
+\begin{verbatim}
+call psb_genrm2s(res, x, desc_a, info)
+\end{verbatim}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$res$ & $x$ & {\bf Subroutine}\\
+\hline
+Short Precision Real&Short Precision Real & psb\_genrm2s \\
+Long Precision Real&Long Precision Real & psb\_genrm2s \\
+Short Precision Real&Short Precision Complex & psb\_genrm2s \\
+Long Precision Real&Long Precision Complex & psb\_genrm2s \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrm2s}}
+\end{table}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90nrm2s}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+
+\item[\bf On Return] 
+\item[res] contains the 1-norm of (the columns of) $x$.\\
+Scope: {\bf global} \\
+Intent: {\bf out}.\\
+Specified as: a long precision real  number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       1-NORM OF A MATRIX 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_norm1 --- 1-Norm of Sparse Matrix}
+\addcontentsline{toc}{subsection}{psb\_norm1}    
+
+This function computes the 1-norm of a matrix $A$:\\
+
+\[ nrm1 \leftarrow \|A\|_1 \]
+where:
+\begin{description}
+\item[$A$] represents the global matrix $A$
+\end{description}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$A$ & {\bf Function}\\
+\hline
+Short Precision Real & psb\_spnrm1 \\
+Long Precision Real & psb\_spnrm1 \\
+Short Precision Complex & psb\_spnrm1 \\
+Long Precision Complex & psb\_spnrm1 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrm1}}
+\end{table}
+
+\begin{verbatim}
+psb_spnrm1(A, desc_a, info)
+psb_norm1(A, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the local  portion of the global sparse matrix
+$A$. \\   
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \spdata.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[\bf On Return] 
+\item[Function value] is the 1-norm of sparse submatrix $A$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       INFINITY-NORM OF A MATRIX 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_normi --- Infinity Norm of Sparse Matrix}
+\addcontentsline{toc}{subsection}{psb\_normi}    
+
+This function computes the infinity-norm of a matrix $A$:\\
+
+\[ nrmi \leftarrow \|A\|_\infty \]
+where:
+\begin{description}
+\item[$A$] represents the global matrix $A$
+\end{description}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$A$ & {\bf Function}\\
+\hline
+Short Precision Real & psb\_spnrmi \\
+Long Precision Real & psb\_spnrmi \\
+Short Precision Complex & psb\_spnrmi \\
+Long Precision Complex & psb\_spnrmi \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrmi}}
+\end{table}
+
+\begin{verbatim}
+psb_spnrmi(A, desc_a, info)
+psb_normi(A, desc_a, info)
+\end{verbatim}
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[a] the local  portion of the global sparse matrix
+$A$. \\   
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \spdata.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[\bf On Return] 
+\item[Function value] is the infinity-norm of sparse submatrix $A$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       SPARSE MATRIX by DENSE MATRIX PRODUCT
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_spmm --- Sparse Matrix by Dense Matrix
+  Product}
+\addcontentsline{toc}{subsection}{psb\_spmm}   
+
+This subroutine computes the Sparse Matrix by Dense Matrix Product:
+
+\begin{equation}
+y \leftarrow \alpha  A  x + \beta y
+\label{eq:f90spmm_no_tra}
+\end{equation}
+\begin{equation}
+y \leftarrow \alpha  A^T x + \beta y
+\label{eq:f90spmm_tra}
+\end{equation}
+\begin{equation}
+y \leftarrow \alpha  A^H  x + \beta y
+\label{eq:f90spmm_con}
+\end{equation}
+
+where:
+\begin{description}
+\item[$x$] is the global dense matrix $x_{:, :}$
+\item[$y$] is the global dense matrix $y_{:, :}$
+\item[$A$] is the global sparse matrix $A$
+\end{description}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$A$, $x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
+\hline
+Short Precision Real & psb\_spmm \\
+Long Precision Real & psb\_spmm \\
+Short Precision Complex & psb\_spmm \\
+Long Precision Complex & psb\_spmm \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90spmm}}
+\end{table}
+
+\begin{verbatim}
+call psb_spmm(alpha, a, x, beta, y, desc_a, info)
+call psb_spmm(alpha, a, x, beta, y,desc_a, info, &
+             & trans, work)
+\end{verbatim} 
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[alpha] the scalar $\alpha$.\\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a number of the data type indicated in
+Table~\ref{tab:f90spmm}. 
+\item[a] the local portion of the sparse matrix
+$A$. \\ 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \spdata.
+\item[x] the local portion of global dense matrix
+$x$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90spmm}.  The rank of $x$ must be the same of $y$. 
+\item[beta] the scalar $\beta$.\\
+Scope: {\bf global} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a number of the data type indicated in Table~\ref{tab:f90spmm}.
+\item[y] the local portion of global dense matrix
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90spmm}. The rank of $y$ must be the same of $x$. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[trans] indicates what kind of operation to perform.
+\begin{description}
+\item[trans = N] the operation is specified by equation \ref{eq:f90spmm_no_tra}
+\item[trans = T] the operation is specified by equation
+\ref{eq:f90spmm_tra}
+\item[trans = C] the operation is specified by equation
+\ref{eq:f90spmm_con}
+\end{description}
+Scope: {\bf global} \\
+Type: {\bf optional}\\	
+Intent: {\bf in}.\\
+Default: $trans = N$\\	
+Specified as: a character variable.
+%% \item[k] number of columns in dense submatrices $x$ and $y$. \\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\	
+%% Default: \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
+%% Specified as: an integer variable $ k \ge 1$.
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $iy = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
+%% \item[jy]  the column index of global dense matrix $y$,
+%% identifying the column of subvector $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
+%% Default: $jy = 1$\\	
+%% Specified as: an integer variable $jy\ge 1$. 
+
+\item[work]  work array.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\	
+Intent: {\bf inout}.\\
+Specified as: a rank one array of the same type of $x$ and $y$ with
+the TARGET attribute. 
+
+\item[\bf On Return]
+\item[y] the local portion of result matrix $y$.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as: an array of rank one or two
+containing numbers of type specified in
+Table~\ref{tab:f90spmm}.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       TRIANGULAR SYSTEM SOLVE
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage\subsection*{psb\_spsm --- Triangular System Solve}
+\addcontentsline{toc}{subsection}{psb\_spsm}   
+
+This subroutine computes the Triangular System Solve:
+
+\begin{eqnarray*}
+y &\leftarrow& \alpha  T^{-1}  x + \beta y\\
+y &\leftarrow& \alpha D  T^{-1}  x + \beta y\\
+y &\leftarrow& \alpha  T^{-1}  D x + \beta y\\
+y &\leftarrow& \alpha  T^{-T}  x + \beta y\\
+y &\leftarrow& \alpha D  T^{-T}  x + \beta y\\
+y &\leftarrow& \alpha  T^{-T}  D x + \beta y\\
+y &\leftarrow& \alpha  T^{-H}  x + \beta y\\
+y &\leftarrow& \alpha D  T^{-H}  x + \beta y\\
+y &\leftarrow& \alpha  T^{-H}  D x + \beta y\\
+\end{eqnarray*}
+
+
+where:
+\begin{description}
+\item[$x$] is the global dense matrix $x_{:, :}$
+\item[$y$] is the global dense matrix $y_{:, :}$
+\item[$T$] is the global sparse block triangular submatrix $T$
+\item[$D$] is the scaling diagonal matrix.
+\end{description}
+
+\begin{verbatim}
+call psb_spsm(alpha, t, x, beta, y, desc_a, info)
+call psb_spsm(alpha, t, x, beta, y, desc_a, info,&
+             & trans, unit, choice, diag, work)
+\end{verbatim} 
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+\hline
+$T$, $x$, $y$, $D$, $\alpha$, $\beta$ & {\bf Subroutine}\\
+\hline
+Short Precision Real & psb\_spsm \\
+Long Precision Real & psb\_spsm \\
+Short Precision Complex & psb\_spsm \\
+Long Precision Complex & psb\_spsm \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90spsm}}
+\end{table}
+
+
+
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf On Entry]
+\item[alpha] the scalar $\alpha$.\\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a number of the data type indicated in
+Table~\ref{tab:f90spsm}.
+\item[t] the global portion of the sparse matrix
+$T$.  \\ 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object type specified in
+\S~\ref{sec:datastruct}.
+\item[x] the local portion of global dense matrix
+$x$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ .
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90spsm}.  The rank of $x$ must be the same of $y$. 
+\item[beta] the scalar $\beta$.\\
+Scope: {\bf global} \\
+Type: {\bf required} \\
+Intent: {\bf in}.\\
+Specified as: a number of the data type indicated in Table~\ref{tab:f90spsm}.
+\item[y] the local portion of global dense matrix
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ .
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as:  a rank one or two array or an object of type \vdata\ 
+containing numbers of type specified in
+Table~\ref{tab:f90spsm}. The rank of $y$ must be the same of $x$. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: an object of type \descdata.
+\item[trans] specify with {\em unitd} the operation to perform.
+\begin{description}
+\item[trans = 'N'] the operation is with no transposed matrix
+\item[trans = 'T'] the operation is with transposed matrix.
+\item[trans = 'C'] the operation is with conjugate transposed matrix.
+\end{description}
+Scope: {\bf global} \\
+Type: {\bf optional}\\	
+Intent: {\bf in}.\\
+Default: $trans = N$\\	
+Specified as: a character variable.
+\item[unitd] specify with {\em trans} the operation to perform.
+\begin{description}
+\item[unitd = 'U'] the operation is with no scaling
+\item[unitd = 'L'] the operation is with left scaling
+\item[unitd = 'R'] the operation is with right scaling.
+\end{description}
+Scope: {\bf global} \\
+Type: {\bf optional}\\	
+Intent: {\bf in}.\\
+Default: $unitd = U$\\	
+Specified as: a character variable.
+\item[choice] specifies the update of overlap elements to be performed
+  on exit:
+\begin{description}
+\item \verb|psb_none_|
+\item \verb|psb_sum_|
+\item \verb|psb_avg_|
+\item \verb|psb_square_root_|
+\end{description}
+Scope: {\bf global} \\
+Type: {\bf optional}\\	
+Intent: {\bf in}.\\
+Default: \verb|psb_avg_|\\	
+Specified as: an integer variable.
+\item[diag] the diagonal scaling matrix.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\	
+Intent: {\bf in}.\\
+Default: $diag(1) = 1 (no scaling)$\\	
+Specified as: a rank one  array containing numbers of the type
+indicated in Table~\ref{tab:f90spsm}.
+\item[work] a work array. \\
+Scope: {\bf local} \\
+Type: {\bf optional}\\	
+Intent: {\bf inout}.\\
+Specified as: a rank one array of the same type of $x$ with the
+TARGET attribute. 
+
+\item[\bf On Return] 
+\item[y] the local portion of global dense matrix
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf inout}.\\
+Specified as: an array of rank one or two
+containing numbers of type specified in
+Table~\ref{tab:f90spsm}.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 
