@@ -63,8 +63,8 @@ module psb_error_mod
        & psb_clean_errstack, psb_error_handler, &
        & psb_ser_error_handler, psb_par_error_handler, &
        & psb_ser_error_print_stack, psb_par_error_print_stack,&
-       & psb_error_print_stack, psb_errmsg, psb_ach_errmsg
-
+       & psb_error_print_stack, psb_errmsg, psb_ach_errmsg, & 
+       & psb_set_global_checks, psb_clear_global_checks, psb_get_global_checks
 
   interface psb_error_handler
     subroutine psb_ser_error_handler(err_act)
@@ -161,9 +161,31 @@ module psb_error_mod
   integer(psb_ipk_), save   :: verbosity_level = 1 
   integer(psb_ipk_), save   :: err_action      = psb_act_abort_
   integer(psb_ipk_), save   :: debug_level     = 0, debug_unit, serial_debug_level=0
+  logical, save             :: comm_global_checks = .false.
 
 contains
+  subroutine psb_set_global_checks(val)
+    logical, intent(in), optional :: val
 
+    if (present(val)) then
+      comm_global_checks = val
+    else
+      comm_global_checks = .true.
+    end if
+  end subroutine psb_set_global_checks
+  subroutine psb_clear_global_checks()
+
+    comm_global_checks = .false.
+    
+  end subroutine psb_clear_global_checks
+
+  function psb_get_global_checks() result(val)
+    logical :: val
+
+    val = comm_global_checks
+  end function psb_get_global_checks
+    
+  
 #if defined(LONG_INTEGERS)
   subroutine psb_errcomm_ipk(ictxt, err)
     integer(psb_ipk_), intent(in)   :: ictxt

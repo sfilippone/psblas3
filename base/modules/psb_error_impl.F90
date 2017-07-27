@@ -5,7 +5,7 @@ subroutine psb_errcomm(ictxt, err)
   integer(psb_mpik_), intent(in)   :: ictxt
   integer(psb_ipk_), intent(inout):: err
   
-  call psb_amx(ictxt, err)
+  if (psb_get_global_checks()) call psb_amx(ictxt, err)
 
 end subroutine psb_errcomm
 

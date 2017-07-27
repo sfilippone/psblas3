@@ -253,11 +253,17 @@ contains
     integer(psb_ipk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out) :: iam, np
 
-    integer(psb_mpik_) :: iictxt, iiam, inp
-    iictxt = ictxt
-    call psb_info(iictxt,iiam,inp)
-    iam = iiam
-    np  = inp
+    !
+    ! Simple caching scheme, keep track
+    ! of the last CTXT encountered. 
+    !
+    integer(psb_mpik_), save :: lctxt=-1, lam, lnp
+    if (ictxt /= lctxt) then
+      lctxt = ictxt
+      call psb_info(lctxt,lam,lnp)
+    end if
+    iam = lam
+    np  = lnp
   end subroutine psb_info_ipk
   
 
@@ -515,8 +521,10 @@ contains
     integer(psb_mpik_), intent(in)  :: ictxt
     integer(psb_mpik_), intent(out) :: iam, np
     integer(psb_mpik_) :: info
-    ! Cache the values for the most recent CTXT to speed
-    ! up subsequent queries
+    !
+    ! Simple caching scheme, keep track
+    ! of the last CTXT encountered. 
+    !  
     integer(psb_mpik_), save :: lctxt=-1, lam, lnp
     
 #if defined(SERIAL_MPI) 
@@ -527,7 +535,7 @@ contains
     np  = -1
     if (ictxt == lctxt) then
       iam = lam
-      np  = lnp 
+      np  = lnp
     else
       if (ictxt /= mpi_comm_null) then 
         call mpi_comm_size(ictxt,np,info) 
@@ -537,7 +545,7 @@ contains
       end if
       lctxt = ictxt
       lam   = iam
-      lnp    = np 
+      lnp   = np
     end if
 #endif    
 

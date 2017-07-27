@@ -5,7 +5,7 @@ include $(INCDIR)/Make.inc.psblas
 # Libraries used
 #
 LIBDIR=$(INSTALLDIR)/lib/
-PSBLAS_LIB= -L$(LIBDIR) -L/opencoarray-1.7.4  -lcaf_mpi -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
+PSBLAS_LIB= -L$(LIBDIR)  -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
@@ -35,7 +35,7 @@ psb_zf_sample: $(ZFOBJS)
 	/bin/mv psb_zf_sample $(EXEDIR) 
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(MPFC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
 	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(SFOBJS) $(CFOBJS)\
