@@ -519,6 +519,11 @@ contains
     integer(psb_mpik_), intent(in)  :: ictxt
     integer(psb_mpik_), intent(out) :: iam, np
     integer(psb_mpik_) :: info
+    !
+    ! Simple caching scheme, keep track
+    ! of the last CTXT encountered. 
+    !  
+    integer(psb_mpik_), save :: lctxt=-1, lam, lnp
     
 #if defined(SERIAL_MPI) 
     iam = 0
@@ -526,11 +531,19 @@ contains
 #else    
     iam = -1
     np  = -1
-    if (ictxt /= mpi_comm_null) then 
-      call mpi_comm_size(ictxt,np,info) 
-      if (info /= mpi_success) np = -1 
-      call mpi_comm_rank(ictxt,iam,info) 
-      if (info /= mpi_success) iam = -1 
+    if (ictxt == lctxt) then
+      iam = lam
+      np  = lnp
+    else
+      if (ictxt /= mpi_comm_null) then 
+        call mpi_comm_size(ictxt,np,info) 
+        if (info /= mpi_success) np = -1 
+        call mpi_comm_rank(ictxt,iam,info) 
+        if (info /= mpi_success) iam = -1 
+      end if
+      lctxt = ictxt
+      lam   = iam
+      lnp   = np
     end if
 #endif    
 
