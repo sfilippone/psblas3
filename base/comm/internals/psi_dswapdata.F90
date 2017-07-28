@@ -887,8 +887,6 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
           img = xchg%prcs_xch(ip) + 1
           img_list(ip)=img
         end do
-        sync images(img_list)
-        if (allocated(img_list)) deallocate(img_list)
       endif
     endif
     if (do_recv) then
@@ -907,6 +905,8 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
           event post(clear[img])
         end do
       else
+        sync images(img_list)
+        if (allocated(img_list)) deallocate(img_list)
         do ip = 1, nxch
           img = xchg%prcs_xch(ip) + 1
           !event wait(ufg(img))
