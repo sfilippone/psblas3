@@ -33,6 +33,7 @@
 !
 program pdgenspmv
   use psb_base_mod
+  use psi_mod
   use psb_util_mod
   implicit none
 
@@ -46,17 +47,18 @@ program pdgenspmv
   real(psb_dpk_) :: t1, t2, tprec, flops, tflops, tt1, tt2, bdwdth
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_dspmat_type) :: a, ad, ah
+  type(psb_d_csr_sparse_mat) :: acsr
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
   type(psb_d_vect_type)  :: xv,bv, vtst
-  real(psb_dpk_), allocatable :: tst(:)
+  real(psb_dpk_), allocatable :: tst(:), work(:)
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr, nrl, ncl, lwork
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes
   real(psb_dpk_)   :: err, eps
   integer(psb_ipk_), parameter :: times=10
@@ -109,6 +111,12 @@ program pdgenspmv
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  nrl = desc_a%get_local_rows()
+  ncl = desc_a%get_local_cols()
+  call a%csclip(ad,info,jmax=nrl)
+  call a%csclip(ah,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
+  lwork = 2*ncl
+  allocate(work(lwork), stat=info) 
 
   call xv%set(done)
 
@@ -124,8 +132,13 @@ program pdgenspmv
   ! FIXME: cache flush needed here
   call psb_barrier(ictxt)
   tt1 = psb_wtime()
-  do i=1,times 
-    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'t')
+  do i=1,times
+    call psi_swapdata(psb_swap_send_,&
+         & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
+    call psb_csmm(done,ad,xv,dzero,bv,info)
+    call psi_swapdata(psb_swap_recv_,&
+         & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
+    call ah%a%csmv(done,xv%v%v(nrl+1:),done,bv%v%v,info)
   end do
   call psb_barrier(ictxt)
   tt2 = psb_wtime() - tt1

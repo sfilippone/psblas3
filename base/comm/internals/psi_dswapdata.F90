@@ -738,7 +738,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
   logical, parameter :: do_events=.false.
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
-  integer, allocatable :: img_list(:)
+  integer, allocatable, save :: img_list(:)
   info=psb_success_
   name='psi_xchg_vect'
   call psb_erractionsave(err_act)
@@ -882,7 +882,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
         end do
       else
        !versions with sync images
-        if (allocated(img_list)) deallocate(img_list)
+        if (allocated(img_list)) deallocate(img_list)        
         allocate(img_list(nxch))
         do ip= 1, nxch
           img = xchg%prcs_xch(ip) + 1
