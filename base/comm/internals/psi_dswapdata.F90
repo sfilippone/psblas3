@@ -735,6 +735,7 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
   integer, save :: last_clear_count = 0
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
+  logical, parameter :: do_events=.false.
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
   integer, allocatable :: img_list(:)
