@@ -49,10 +49,11 @@ program pdgenspmv
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a, ad, ah
   type(psb_d_csr_sparse_mat) :: acsr
+  type(psb_d_csre_sparse_mat) :: acsre
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
-  type(psb_d_vect_type)  :: xv,bv, vtst
+  type(psb_d_vect_type)  :: xv,bv, vtst,bvh
   real(psb_dpk_), allocatable :: tst(:), work(:)
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
@@ -109,12 +110,14 @@ program pdgenspmv
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+  call psb_geasb(bvh,desc_a,info,scratch=.true.)
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   nrl = desc_a%get_local_rows()
   ncl = desc_a%get_local_cols()
   call a%csclip(ad,info,jmax=nrl)
   call a%csclip(ah,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
+  call ah%cscnv(info,mold=acsre)
   lwork = 2*ncl
   allocate(work(lwork), stat=info) 
 
@@ -135,16 +138,18 @@ program pdgenspmv
   do i=1,times
     call psi_swapdata(psb_swap_send_,&
          & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
-    call psb_csmm(done,ad,xv,dzero,bv,info)
+    call psb_csmm(done,ad,xv,dzero,bvh,info)
     call psi_swapdata(psb_swap_recv_,&
          & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
-    call ah%a%csmv(done,xv%v%v(nrl+1:),done,bv%v%v,info)
+    call ah%a%csmv(done,xv%v%v(nrl+1:),done,bvh%v%v,info)
   end do
   call psb_barrier(ictxt)
   tt2 = psb_wtime() - tt1
   call psb_amx(ictxt,tt2)
-
+  
   call psb_amx(ictxt,t2)
+  call psb_geaxpby(-done,bv,done,bvh,desc_a,info)
+  err = psb_genrm2(bvh,desc_a,info)
   nr       = desc_a%get_global_rows() 
   annz     = a%get_nzeros()
   amatsize = a%sizeof()
@@ -171,7 +176,7 @@ program pdgenspmv
     write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,tt2
     write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') tt2*1.d3/(1.d0*times)
     write(psb_out_unit,'("MFLOPS                   (trans.): ",F20.3)') tflops/1.d6
-
+    write(psb_out_unit,'("Difference                       : ",E20.12)') err
     !
     ! This computation is valid for CSR
     !

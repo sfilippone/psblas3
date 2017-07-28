@@ -3180,3 +3180,365 @@ contains
   end subroutine csr_spspmm
 
 end subroutine psb_dcsrspspmm
+
+
+
+
+! == ===================================
+!
+!
+!
+! Computational routines
+!
+!
+!
+!
+!
+!
+! == ===================================
+
+subroutine psb_d_csre_csmv(alpha,a,x,beta,y,info,trans) 
+  use psb_error_mod
+  use psb_string_mod
+  use psb_d_csr_mat_mod, psb_protect_name => psb_d_csre_csmv
+  implicit none 
+  class(psb_d_csre_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+  real(psb_dpk_), intent(inout)       :: y(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in)     :: trans
+
+  character :: trans_
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
+  real(psb_dpk_) :: acc
+  logical   :: tra, ctra
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='d_csr_csmv'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (a%is_dev())   call a%sync()
+
+  if (present(trans)) then
+    trans_ = trans
+  else
+    trans_ = 'N'
+  end if
+
+  if (.not.a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  tra  = (psb_toupper(trans_) == 'T')
+  ctra = (psb_toupper(trans_) == 'C')
+
+  if (tra.or.ctra) then 
+    m = a%get_ncols()
+    n = a%get_nrows()
+  else
+    n = a%get_ncols()
+    m = a%get_nrows()
+  end if
+
+  if (size(x,1)<n) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = n; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+
+  call psb_d_csre_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
+       & a%is_triangle(),a%is_unit(),&
+       & x,beta,y,tra,ctra) 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+
+  subroutine psb_d_csre_csmv_inner(m,n,alpha,irp,ja,val,is_triangle,is_unit,&
+       & x,beta,y,tra,ctra) 
+    integer(psb_ipk_), intent(in)             :: m,n,irp(*),ja(*)
+    real(psb_dpk_), intent(in)      :: alpha, beta, x(*),val(*)
+    real(psb_dpk_), intent(inout)   :: y(*)
+    logical, intent(in)             :: is_triangle,is_unit,tra, ctra
+
+
+    integer(psb_ipk_) :: i,j,k, ir, jc
+    real(psb_dpk_) :: acc
+
+    if (alpha == dzero) then
+      if (beta == dzero) then
+        do i = 1, m
+          y(i) = dzero
+        enddo
+      else
+        do  i = 1, m
+          y(i) = beta*y(i)
+        end do
+      endif
+      return
+    end if
+
+
+    if ((.not.tra).and.(.not.ctra)) then 
+
+      if (beta == dzero) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = alpha*acc
+          end do
+
+        end if
+
+
+      else if (beta == done) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            if (acc /= dzero) y(i) = y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            if (acc /= dzero)  y(i) = y(i) -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+             if (acc /= dzero)  y(i) = y(i) + alpha*acc
+          end do
+
+        end if
+
+      else if (beta == -done) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) + alpha*acc
+          end do
+
+        end if
+
+      else 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) - acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) + alpha*acc
+          end do
+
+        end if
+
+      end if
+
+    else if (tra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i) = -y(i) 
+        end do
+      else
+        do i=1, m
+          y(i) = beta*y(i) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) +  val(j)*x(i)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) -  val(j)*x(i)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) + alpha*val(j)*x(i)
+          end do
+        enddo
+
+      end if
+
+    else if (ctra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i) = -y(i) 
+        end do
+      else
+        do i=1, m
+          y(i) = beta*y(i) 
+        end do
+      end if
+
+      if (alpha == done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) +  (val(j))*x(i)
+          end do
+        enddo
+
+      else if (alpha == -done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) -  (val(j))*x(i)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) + alpha*(val(j))*x(i)
+          end do
+        enddo
+
+      end if
+
+    endif
+
+    if (is_unit) then 
+      do i=1, min(m,n)
+        y(i) = y(i) + alpha*x(i)
+      end do
+    end if
+
+
+  end subroutine psb_d_csre_csmv_inner
+
+
+end subroutine psb_d_csre_csmv
