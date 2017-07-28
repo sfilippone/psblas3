@@ -767,11 +767,11 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-  if (.not.(do_send.and.do_recv)) then
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Unimplemented case in xchg_vect')
-    goto 9999
-  end if
+  !if (.not.(do_send.and.do_recv)) then
+  !  info = psb_err_internal_error_
+  !  call psb_errpush(info,name,a_err='Unimplemented case in xchg_vect')
+  !  goto 9999
+  !end if
 
   if (.not.allocated(ufg)) then
     !write(*,*) 'Allocating events',np
@@ -784,87 +784,56 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
       goto 9999
     end if
   else
-    if (last_clear_count>0) &
-         & event wait(clear,until_count=last_clear_count)
+    if(do_send) then
+      if (last_clear_count>0) &
+           & event wait(clear,until_count=last_clear_count)
+    endif
   end if
   me = this_image()
-  if (psb_size(buffer) < xchg%max_buffer_size) then
-    !
-    ! By construction, max_buffer_size was computed with a collective. 
-    !
-    if (allocated(buffer)) deallocate(buffer)
-    if (this_image()==1) write(*,*) '--------Allocating buffer vect',xchg%max_buffer_size
-    allocate(buffer(xchg%max_buffer_size)[*],stat=info)
-    if (allocated(sndbuf)) deallocate(sndbuf)
-    if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
-    if (info /= 0) then
-      info = psb_err_internal_error_
-      call psb_errpush(info,name,a_err='Coarray buffer allocation')
-      goto 9999
+
+  if (do_send) then
+    if (psb_size(buffer) < xchg%max_buffer_size) then
+      !
+      ! By construction, max_buffer_size was computed with a collective. 
+      !
+      if (allocated(buffer)) deallocate(buffer)
+      allocate(buffer(xchg%max_buffer_size)[*],stat=info)
+      if (allocated(sndbuf)) deallocate(sndbuf)
+      if (info == 0) allocate(sndbuf(xchg%max_buffer_size),stat=info)
+      if (info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info,name,a_err='Coarray buffer allocation')
+        goto 9999
+      end if
     end if
-  end if
+  endif
   if (.false.) then 
     !sync all
     nxch = size(xchg%prcs_xch)
     myself = this_image()
-    do ip = 1, nxch
-      img = xchg%prcs_xch(ip) + 1
-      p1  = xchg%loc_snd_bnd(ip)
-      p2  = xchg%loc_snd_bnd(ip+1)-1
-      rp1 = xchg%rmt_rcv_bnd(ip,1)
-      rp2 = xchg%rmt_rcv_bnd(ip,2)
-      isz = p2-p1+1
-      !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
-      call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(p1:p2))
-      event post(ufg(myself)[img])
-    end do
-
-    do ip = 1, nxch
-      img = xchg%prcs_xch(ip) + 1
-      event wait(ufg(img))
-      img = xchg%prcs_xch(ip) + 1
-      p1  = xchg%loc_rcv_bnd(ip)
-      p2  = xchg%loc_rcv_bnd(ip+1)-1
-      isz = p2-p1+1
-      rp1 = xchg%rmt_snd_bnd(ip,1)
-      rp2 = xchg%rmt_snd_bnd(ip,2)
-      !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
-      call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta)
-      event post(clear[img])
-
-    end do
-    last_clear_count = nxch
-
-  else
-
-    nxch = size(xchg%prcs_xch)
-    myself = this_image()
-    do ip = 1, nxch
-      img = xchg%prcs_xch(ip) + 1
-      p1  = xchg%loc_snd_bnd(ip)
-      p2  = xchg%loc_snd_bnd(ip+1)-1
-      rp1 = xchg%rmt_rcv_bnd(ip,1)
-      rp2 = xchg%rmt_rcv_bnd(ip,2)
-      isz = p2-p1+1
-      !write(0,*) myself,'Posting for ',img,' boundaries: ',rp1,rp2
-      if (.false.) then 
-        call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(rp1:rp2)[img])
-      else
-        call y%gth(isz,xchg%loc_snd_idx(p1:p2),sndbuf(p1:p2))
-        buffer(rp1:rp2)[img] = sndbuf(p1:p2)
-      end if
-    end do
-    !
-    ! Doing event post later should provide more opportunities for
-    ! overlap
-    ! 
-    if (.false.) then 
-      !Version with events
-      do ip= 1, nxch
+    if (do_send) then
+      do ip = 1, nxch
         img = xchg%prcs_xch(ip) + 1
-        event post(ufg(myself)[img])
+        p1  = xchg%loc_snd_bnd(ip)
+        p2  = xchg%loc_snd_bnd(ip+1)-1
+        rp1 = xchg%rmt_rcv_bnd(ip,1)
+        rp2 = xchg%rmt_rcv_bnd(ip,2)
+        isz = p2-p1+1
+        !write(0,*) myself,'Posting for ',img,' boundaries: ',p1,p2
+        call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(p1:p2))
+         event post(ufg(myself)[img])
       end do
-
+    endif
+  
+    if (do_recv) then
+      if (.not.allocated(buffer)) then 
+        ! 
+        ! No matching send? Something is wrong....
+        !
+        info = psb_err_internal_error_
+        call psb_errpush(info,name,a_err='Coarray buffer allocation')
+        goto 9999
+      end if
       do ip = 1, nxch
         img = xchg%prcs_xch(ip) + 1
         event wait(ufg(img))
@@ -874,35 +843,84 @@ subroutine psi_dswap_xchg_vect(iictxt,iicomm,flag,beta,y,xchg,info)
         isz = p2-p1+1
         rp1 = xchg%rmt_snd_bnd(ip,1)
         rp2 = xchg%rmt_snd_bnd(ip,2)
-        !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
-        call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(p1:p2),beta)
+        !write(0,*) myself,'Getting from ',img,'Remote boundaries: ',rp1,rp2
+        call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(rp1:rp2)[img],beta)
         event post(clear[img])
       end do
-    else
-     !versions with sync images
-      if (allocated(img_list)) deallocate(img_list)
-      allocate(img_list(nxch))
-      do ip= 1, nxch
-        img = xchg%prcs_xch(ip) + 1
-        img_list(ip)=img
-      end do
+      last_clear_count = nxch
+    endif
+  else
 
-      sync images(img_list)
-
-      if (allocated(img_list)) deallocate(img_list)
+    nxch = size(xchg%prcs_xch)
+    myself = this_image()
+    if (do_send) then
       do ip = 1, nxch
         img = xchg%prcs_xch(ip) + 1
-        !event wait(ufg(img))
-        img = xchg%prcs_xch(ip) + 1
-        p1  = xchg%loc_rcv_bnd(ip)
-        p2  = xchg%loc_rcv_bnd(ip+1)-1
+        p1  = xchg%loc_snd_bnd(ip)
+        p2  = xchg%loc_snd_bnd(ip+1)-1
+        rp1 = xchg%rmt_rcv_bnd(ip,1)
+        rp2 = xchg%rmt_rcv_bnd(ip,2)
         isz = p2-p1+1
-        rp1 = xchg%rmt_snd_bnd(ip,1)
-        rp2 = xchg%rmt_snd_bnd(ip,2)
-        !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
-        call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(p1:p2),beta)
-        event post(clear[img])
+        !write(0,*) myself,'Posting for ',img,' boundaries: ',rp1,rp2
+        if (.false.) then 
+          call y%gth(isz,xchg%loc_snd_idx(p1:p2),buffer(rp1:rp2)[img])
+        else
+          call y%gth(isz,xchg%loc_snd_idx(p1:p2),sndbuf(p1:p2))
+          buffer(rp1:rp2)[img] = sndbuf(p1:p2)
+        end if
       end do
+      !
+      ! Doing event post later should provide more opportunities for
+      ! overlap
+      ! 
+      if (do_events) then
+        !Version with events
+        do ip= 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          event post(ufg(myself)[img])
+        end do
+      else
+       !versions with sync images
+        if (allocated(img_list)) deallocate(img_list)
+        allocate(img_list(nxch))
+        do ip= 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          img_list(ip)=img
+        end do
+        sync images(img_list)
+        if (allocated(img_list)) deallocate(img_list)
+      endif
+    endif
+    if (do_recv) then
+      if (do_events) then
+        do ip = 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          event wait(ufg(img))
+          img = xchg%prcs_xch(ip) + 1
+          p1  = xchg%loc_rcv_bnd(ip)
+          p2  = xchg%loc_rcv_bnd(ip+1)-1
+          isz = p2-p1+1
+          rp1 = xchg%rmt_snd_bnd(ip,1)
+          rp2 = xchg%rmt_snd_bnd(ip,2)
+          !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
+          call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(p1:p2),beta)
+          event post(clear[img])
+        end do
+      else
+        do ip = 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          !event wait(ufg(img))
+          img = xchg%prcs_xch(ip) + 1
+          p1  = xchg%loc_rcv_bnd(ip)
+          p2  = xchg%loc_rcv_bnd(ip+1)-1
+          isz = p2-p1+1
+          rp1 = xchg%rmt_snd_bnd(ip,1)
+          rp2 = xchg%rmt_snd_bnd(ip,2)
+          !write(0,*) myself,'Getting from ',img,' boundaries: ',p1,p2
+          call y%sct(isz,xchg%loc_rcv_idx(p1:p2),buffer(p1:p2),beta)
+          event post(clear[img])
+        end do
+      endif
     endif
     last_clear_count = nxch
   end if
