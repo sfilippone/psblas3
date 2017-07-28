@@ -43,10 +43,10 @@ program pdgenspmv
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
-  real(psb_dpk_) :: t1, t2, tprec, flops, tflops, tt1, tt2, bdwdth
+  real(psb_dpk_) :: t1, t2, tprec, flops, tflops, tflops1, tt1, tt2, bdwdth, th, th1 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_dspmat_type) :: a, ad, ah, ah1
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -54,12 +54,13 @@ program pdgenspmv
   real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
+  type(psb_d_csre_sparse_mat) :: acsre
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr,nrl,ncl
+  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes, ahnnz
   real(psb_dpk_)   :: err, eps
-  integer(psb_ipk_), parameter :: times=10
+  integer(psb_ipk_), parameter :: times=50
 
   ! other variables
   integer(psb_ipk_) :: info, i
@@ -109,7 +110,9 @@ program pdgenspmv
   end if
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
-
+!!$  write(fname,'(a,i3.3,a,i3.3,a,i3.3,a)') 'testmat-',idim,'-',np,'-',iam,'.mtx'
+!!$  call a%print(fname,head="psb-testing")
+  
   call xv%set(done)
 
   call psb_barrier(ictxt)
@@ -121,43 +124,67 @@ program pdgenspmv
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
+  nrl = desc_a%get_local_rows()
+  ncl = desc_a%get_local_cols()
+  call a%csclip(ad,info,jmax=nrl)
+  call a%csclip(ah,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
+  call a%csclip(ah1,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
+  call ah%cscnv(info,mold=acsre)
+  call ah1%cscnv(info,mold=acsre)
+  
+  
   ! FIXME: cache flush needed here
   call psb_barrier(ictxt)
   tt1 = psb_wtime()
   do i=1,times 
-    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'t')
+    call psb_csmm(done,ah,xv,done,bv,info)
   end do
   call psb_barrier(ictxt)
-  tt2 = psb_wtime() - tt1
-  call psb_amx(ictxt,tt2)
+  th = psb_wtime() - tt1
+  call psb_barrier(ictxt)
+  tt1 = psb_wtime()
+  do i=1,times 
+    call psb_csmm(done,ah1,xv,done,bv,info)
+  end do
+  call psb_barrier(ictxt)
+  th1 = psb_wtime() - tt1
+  call psb_amx(ictxt,th1)
 
   call psb_amx(ictxt,t2)
   nr       = desc_a%get_global_rows() 
   annz     = a%get_nzeros()
+  ahnnz    = ah%get_nzeros()
   amatsize = a%sizeof()
   descsize = psb_sizeof(desc_a)
   call psb_sum(ictxt,annz)
+  call psb_sum(ictxt,ahnnz)
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
 
   if (iam == psb_root_) then
-    flops = 2.d0*times*annz
-    tflops=flops
+    flops   = 2.d0*times*annz
+    tflops  = 2.d0*times*ahnnz
+    tflops1 = 2.d0*times*ahnnz
     write(psb_out_unit,'("Matrix: ell1 ",i0)') idim
     write(psb_out_unit,'("Test on                          : ",i20," processors")') np
     write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
     write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
+    write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') ahnnz
     write(psb_out_unit,'("Memory occupation                : ",i20,"           ")') amatsize
     write(psb_out_unit,'("Number of flops (",i0," prod)        : ",F20.0,"           ")') times,flops
-    flops = flops / (t2)
-    tflops = tflops / (tt2)
+    flops   = flops / (t2)
+    tflops  = tflops / (th)
+    tflops1 = tflops1 / (th1)    
     write(psb_out_unit,'("Time for ",i0," products (s)         : ",F20.3)')times, t2
     write(psb_out_unit,'("Time per product    (ms)         : ",F20.3)') t2*1.d3/(1.d0*times)
     write(psb_out_unit,'("MFLOPS                           : ",F20.3)') flops/1.d6
 
-    write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,tt2
-    write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') tt2*1.d3/(1.d0*times)
+    write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,th
+    write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') th*1.d3/(1.d0*times)
     write(psb_out_unit,'("MFLOPS                   (trans.): ",F20.3)') tflops/1.d6
+    write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,th1
+    write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') th1*1.d3/(1.d0*times)
+    write(psb_out_unit,'("MFLOPS                   (trans.): ",F20.3)') tflops1/1.d6
 
     !
     ! This computation is valid for CSR

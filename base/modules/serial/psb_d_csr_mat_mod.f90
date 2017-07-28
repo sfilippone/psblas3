@@ -101,6 +101,15 @@ module psb_d_csr_mat_mod
 
   end type psb_d_csr_sparse_mat
 
+  type, extends(psb_d_csr_sparse_mat) :: psb_d_csre_sparse_mat
+
+  contains
+    procedure, pass(a) :: csmv        => psb_d_csre_csmv
+    procedure, nopass  :: get_fmt     => d_csre_get_fmt
+    
+  end type psb_d_csre_sparse_mat
+
+
   private :: d_csr_get_nzeros, d_csr_free,  d_csr_get_fmt, &
        & d_csr_get_size, d_csr_sizeof, d_csr_get_nz_row, &
        & d_csr_is_by_rows
@@ -494,6 +503,19 @@ module psb_d_csr_mat_mod
     end subroutine psb_d_csr_scals
   end interface
   
+  !> \memberof psb_d_csre_sparse_mat
+  !! \see psb_d_base_mat_mod::psb_d_base_csmv
+  interface 
+    subroutine psb_d_csre_csmv(alpha,a,x,beta,y,info,trans) 
+      import :: psb_ipk_, psb_d_csre_sparse_mat, psb_dpk_
+      class(psb_d_csre_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+      real(psb_dpk_), intent(inout)       :: y(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in)     :: trans
+    end subroutine psb_d_csre_csmv
+  end interface
+
 
 
 contains 
@@ -511,16 +533,16 @@ contains
   ! == ===================================
 
 
-  
+
   function d_csr_is_by_rows(a) result(res)
     implicit none 
     class(psb_d_csr_sparse_mat), intent(in) :: a
     logical  :: res
     res = .true.
-     
+
   end function d_csr_is_by_rows
 
-  
+
   function d_csr_sizeof(a) result(res)
     implicit none 
     class(psb_d_csr_sparse_mat), intent(in) :: a
@@ -529,7 +551,7 @@ contains
     res = res + psb_sizeof_dp  * psb_size(a%val)
     res = res + psb_sizeof_int * psb_size(a%irp)
     res = res + psb_sizeof_int * psb_size(a%ja)
-      
+
   end function d_csr_sizeof
 
   function d_csr_get_fmt() result(res)
@@ -537,7 +559,13 @@ contains
     character(len=5) :: res
     res = 'CSR'
   end function d_csr_get_fmt
-  
+
+  function d_csre_get_fmt() result(res)
+    implicit none 
+    character(len=5) :: res
+    res = 'CSRe'
+  end function d_csre_get_fmt
+
   function d_csr_get_nzeros(a) result(res)
     implicit none 
     class(psb_d_csr_sparse_mat), intent(in) :: a
@@ -551,7 +579,7 @@ contains
     integer(psb_ipk_) :: res
 
     res = -1
-    
+
     if (allocated(a%ja)) then 
       res = size(a%ja)
     end if
@@ -570,17 +598,17 @@ contains
   function  d_csr_get_nz_row(idx,a) result(res)
 
     implicit none
-    
+
     class(psb_d_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_), intent(in)                  :: idx
     integer(psb_ipk_) :: res
-    
+
     res = 0 
- 
+
     if ((1<=idx).and.(idx<=a%get_nrows())) then 
       res = a%irp(idx+1)-a%irp(idx)
     end if
-    
+
   end function d_csr_get_nz_row
 
 
@@ -608,7 +636,7 @@ contains
     call a%set_null()
     call a%set_nrows(izero)
     call a%set_ncols(izero)
-    
+
     return
 
   end subroutine d_csr_free

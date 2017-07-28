@@ -11,45 +11,41 @@
 
 # The following ones are the variables used by the PSBLAS make scripts.
 
-F90=caf
-FC= caf
-CC=mpicc 
-F90COPT=-O3    
-FCOPT=-O3 
-CCOPT=-O3 
+FC=caf
+CC=mpicc
+FCOPT=-g -O3  
+CCOPT=-g -O3  
 FMFLAG=-I
 FIFLAG=-I
 EXTRA_OPT=
 
 # These three should be always set!
-MPF90=caf 
-MPF77=caf 
-MPCC=mpicc 
+MPFC=caf
+MPCC=mpicc
 
-F90LINK=$(MPF90)
-FLINK=$(MPF77)
+FLINK=$(MPFC)
 
-LIBS= -L/home/users/pasqua/NUMERICAL/LIB/atlas/gnu491 
+LIBS= 
 
 # BLAS, BLACS and METIS libraries.
-BLAS=-lcblas -lf77blas -latlas
-METIS_LIB=
+BLAS=-lcblas -lf77blas -latlas -L/opt/atlas/3.8.4/gnu/7.1.0/lib
+METIS_LIB=-lmetis -L/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/Lib -L/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/lib
 AMD_LIB=
 LAPACK=-llapack
 EXTRA_COBJS=
 
-PSBFDEFINES= -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DHAVE_ISO_C_BINDING -DHAVE_MOVE_ALLOC -DMPI_MOD 
-PSBCDEFINES=-DLowerUnderscore -DPtr64Bits 
+PSBFDEFINES=-DHAVE_METIS -DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DMPI_MOD 
+PSBCDEFINES=-DHAVE_METIS_ -I/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/include -I/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/Include  -DLowerUnderscore -DPtr64Bits 
 AR=ar -cur
 RANLIB=ranlib
 
 INSTALL=/usr/bin/install -c
 INSTALL_DATA=${INSTALL} -m 644
-INSTALL_DIR=/home/users/pasqua/Ambra/LIB/PSBLAS
-INSTALL_LIBDIR=/home/users/pasqua/Ambra/LIB/PSBLAS/lib
-INSTALL_INCLUDEDIR=/home/users/pasqua/Ambra/LIB/PSBLAS/include
-INSTALL_DOCSDIR=/home/users/pasqua/Ambra/LIB/PSBLAS/docs
-INSTALL_SAMPLESDIR=/home/users/pasqua/Ambra/LIB/PSBLAS/samples
+INSTALL_DIR=/opt/psblas/CAF/7.1.0-csr
+INSTALL_LIBDIR=/opt/psblas/CAF/7.1.0-csr/lib
+INSTALL_INCLUDEDIR=/opt/psblas/CAF/7.1.0-csr/include
+INSTALL_DOCSDIR=/opt/psblas/CAF/7.1.0-csr/docs
+INSTALL_SAMPLESDIR=/opt/psblas/CAF/7.1.0-csr/samples
 
 # the following is the flag for /bin/cp which shall copy the file only for updating (timestamp based)--on GNU Linux, '-u'
 CPUPDFLAG=
@@ -75,12 +71,8 @@ FDEFINES=$(PSBFDEFINES)
 # These should be portable rules, arent they?
 .c.o:
 	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $< -o $@
-.f.o:
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $< -o $@
 .f90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) -c $< -o $@
-.F.o:
-	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $< -o $@
+	$(FC) $(FCOPT) $(FINCLUDES) -c $< -o $@
 .F90.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 
