@@ -150,6 +150,7 @@ program psb_d_pde3d
 
   ! other variables
   integer(psb_ipk_) :: info, i
+  integer(psb_ipk_), parameter :: n_loop=100
   character(len=20) :: name,ch_err
   character(len=40) :: fname
 
@@ -227,9 +228,11 @@ program psb_d_pde3d
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
   eps   = 1.d-9
-  call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
-
+  do i=1,n_loop
+    call xxv%set(dzero)
+    call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
+         & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+  enddo
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='solver routine'
