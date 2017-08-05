@@ -163,7 +163,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   i=1
   if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': start ',info
-
+!!$  write(0,*) 'extract_dep_list ',me,npr
   pointer_dep_list=1
   if (is_bld) then 
     do while (desc_str(i) /= -1)
@@ -272,7 +272,12 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   dl_mpi = dl_lda
 
-   call caf_allgather(itmp,dl_mpi, dep_list, minfo)
+  if (.false.) then 
+    call caf_allgather(itmp, dl_mpi, dep_list, minfo)
+  else
+    call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_integer,&
+         & dep_list,dl_mpi,psb_mpi_ipk_integer,icomm,minfo)
+  end if
   if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_

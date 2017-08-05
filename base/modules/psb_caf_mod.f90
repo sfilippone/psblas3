@@ -1131,6 +1131,7 @@ t2 = mpi_wtime() - t1
   end subroutine caf_zgatherv
 
   subroutine caf_iallgatherv(snd, scount, rcv, rcount, rdispls, info)
+    use psb_realloc_mod
     implicit none
     integer(psb_ipk_), intent(in) :: scount, snd(:), rcount(:), rdispls(:)
     integer(psb_ipk_), allocatable, intent(inout) :: rcv(:)
@@ -1149,16 +1150,22 @@ t2 = mpi_wtime() - t1
       info = -4
       return
     endif
-
+!   write(0,*) 'caf_allgatherv',me,np
+!   call flush(0)
+!   sync all 
     if (allocated(snd_buf)) deallocate(snd_buf)
     allocate(snd_buf(scount)[*], STAT=info)
-    if (info/=0) return
+    if (info/=0)then
+      write(0,*) me, 'Info on allocate ',info
+      return
+    end if
 
     if (allocated(rcv).and.(size(rcv,1) < rdispls(np) + rcount(np))) then
-      call move_alloc(rcv,rcv_tmp)
-      allocate(rcv(rdispls(np)+rcount(np)))
-      rcv(1:size(rcv_tmp,1))=rcv_tmp
-      deallocate(rcv_tmp)
+      call psb_realloc(rdispls(np)+rcount(np),rcv,info)
+!!$      call move_alloc(rcv,rcv_tmp)
+!!$      allocate(rcv(rdispls(np)+rcount(np)))
+!!$      rcv(1:size(rcv_tmp,1))=rcv_tmp
+!!$      deallocate(rcv_tmp)
     endif
     snd_buf(1:scount)=snd(1:scount)
 
@@ -1365,39 +1372,75 @@ t2 = mpi_wtime() - t1
     integer(psb_ipk_), allocatable :: snd_buf(:)[:]
     type(event_type), allocatable :: snd_copied(:)[:]
     double precision :: t1, t2
-        t1 = mpi_wtime()
-            np = num_images()
-            me = this_image()
-            info = 0
-            if (size(rcv,1) < scount) then
-              info = -3
-              print*,'error', info, size(rcv,1), scount
-              return
-            endif
-             if (size(rcv,2) < np) then
-              info = -4
-              print*,'error', info, size(rcv,2), np
-              return
-            endif
-            if (allocated(snd_buf)) deallocate(snd_buf)
-            if (allocated(snd_copied)) deallocate(snd_copied)
-            allocate(snd_buf(size(snd,1))[*])
-            allocate(snd_copied(np)[*]) 
-            !allocate(snd_buf(size(snd,1))[*]) 
-            snd_buf=snd
-            do img=1,np
-              event post(snd_copied(me)[img])
-            enddo
-            !sync all
-            do img=1,np
-              event wait(snd_copied(img))
-              rcv(:,img)=snd_buf(:)[img]
-            enddo
-            if (allocated(snd_buf)) deallocate(snd_buf)
-            if (allocated(snd_copied)) deallocate(snd_copied)
-            !Not sure this is necessary...
-            sync all    
-        t2 = mpi_wtime() - t1
+    t1 = mpi_wtime()
+    np = num_images()
+    me = this_image()
+    info = 0
+    if (size(rcv,1) < scount) then
+      info = -3
+      print*,'error', info, size(rcv,1), scount
+      return
+    endif
+    if (size(rcv,2) < np) then
+      info = -4
+      print*,'error', info, size(rcv,2), np
+      return
+    endif
+!   write(*,*) 'Hello from ',me,' of:', np,size(snd,1)
+!   sync all 
+    if (.true.) then 
+!!$    if (allocated(snd_buf)) deallocate(snd_buf)
+!!$    if (allocated(snd_copied)) deallocate(snd_copied)
+    allocate(snd_buf(size(snd,1))[*],stat=info)
+    if (info /= 0) then
+      write(*,*) 'Error on allocating snd_buf ',me
+      stop
+    end if
+    allocate(snd_copied(np)[*],stat=info) 
+    if (info /= 0) then
+      write(*,*) 'Error on allocating snd_copied ',me
+      stop
+    end if
+    !allocate(snd_buf(size(snd,1))[*]) 
+    snd_buf(:)=snd(:)
+!   write(*,*) 'Sending  from ',me,':', snd(:)
+    do img=1,np
+      event post(snd_copied(me)[img])
+    enddo
+    !sync all
+    if(.false.) then 
+      do img=1,np
+        event wait(snd_copied(img))
+        rcv(:,img)=snd_buf(:)[img]
+      enddo
+    else
+      do img=me+1,np
+        event wait(snd_copied(img))
+        rcv(:,img)=snd_buf(:)[img]
+      enddo
+      do img=1,me
+        event wait(snd_copied(img))
+        rcv(:,img)=snd_buf(:)[img]
+      enddo
+
+    end if
+    !if (allocated(snd_buf))
+    deallocate(snd_buf)
+    !if (allocated(snd_copied))
+    deallocate(snd_copied)
+    !Not sure this is necessary...
+    !sync all
+  else if(.false.) then 
+    do img=1,np
+      if (me == img) rcv(:,img) = snd(:)
+      call co_broadcast(rcv(:,img),img)
+    end do
+  else if(.false.) then
+    rcv(:,:) = 0
+    rcv(:,me) = snd(:)
+    call co_sum(rcv)
+  end if
+    t2 = mpi_wtime() - t1
   end subroutine caf_allgather
 
 

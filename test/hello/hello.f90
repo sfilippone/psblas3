@@ -1,21 +1,22 @@
 program hello
-  use psb_base_mod
+  use iso_fortran_env
   implicit none
-  integer iam, np, icontxt, ip, jp, idummy
+  integer me, np, icontxt, ip, jp, idummy
+  integer :: snd_buf(4)[*]
+  type(event_type), allocatable :: snd_copied(:)[:]
 
-  call psb_init(icontxt)
-  call psb_info(icontxt,iam,np)            
-  !   have all processes check in 
-  if ((iam >= 0).and.(iam < np)) then 
-    if (iam == 0)  then 
-      do ip = 1, np-1
-        call psb_rcv(icontxt,idummy,ip)          
-      enddo
-      write(*,*) 'Hello, world: all ',np, &
-           & ' processes checked in!'
-    else
-      call psb_snd(icontxt,idummy,0)
-    endif
+
+  me = this_image()
+  np = num_images()
+  
+  write(*,*) 'Hello from ',me,' of:', np
+  snd_buf(1:4) = me*(/1,2,3,4/)
+
+  sync all
+  if (me == 1) then
+    do ip=1,np
+      write(*,*) 'From ',ip,' :',snd_buf(:)[ip]
+    end do
   end if
-  call psb_exit(icontxt)
+  
 end program hello

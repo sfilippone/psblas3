@@ -131,7 +131,7 @@ program psb_d_pde3d
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
-  real(psb_dpk_) :: t1, t2, tprec 
+  real(psb_dpk_) :: t1, t2, tprec, tslv, tprcavg, tslvavg
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
@@ -152,7 +152,8 @@ program psb_d_pde3d
   integer(psb_ipk_) :: info, i
   character(len=20) :: name,ch_err
   character(len=40) :: fname
-
+  integer(psb_ipk_) :: itest, ntests
+  integer, parameter :: ntdef=10, nwrmup=4
   info=psb_success_
 
 
@@ -166,7 +167,7 @@ program psb_d_pde3d
   endif
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde3d90'
-  call psb_set_errverbosity(itwo)
+  call psb_set_errverbosity(itwo*500)
   call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
@@ -178,7 +179,7 @@ program psb_d_pde3d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ntests)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -201,45 +202,70 @@ program psb_d_pde3d
   !  prepare the preconditioner.
   !  
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ptype,info)
+  tslv  = 1d300
+  tprec = 1d300
+  tprcavg = 0
+  tslvavg = 0
+  do itest=1, ntests+nwrmup
 
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()
-  call prec%build(a,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_precbld'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
+    call prec%init(ptype,info)
 
-  tprec = psb_wtime()-t1
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()
+    call prec%build(a,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_precbld'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-  call psb_amx(ictxt,tprec)
-
-  if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
+    t2 = psb_wtime()-t1
+    call psb_amx(ictxt,t2)
+    if (itest>nwrmup) then
+      tprec = min(tprec,t2)
+      tprcavg = tprcavg + t2
+    end if
+    call prec%free(info)
+  end do
+  
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
+  call prec%init(ptype,info)
+  call prec%build(a,desc_a,info)
   call prec%descr()
-  !
-  ! iterative method parameters 
-  !
-  if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
-  call psb_barrier(ictxt)
-  t1 = psb_wtime()  
-  eps   = 1.d-9
-  call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='solver routine'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
 
-  call psb_barrier(ictxt)
-  t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
+  do itest=1, ntests+nwrmup
+
+    !
+    ! iterative method parameters 
+    !
+    call xxv%zero()
+    if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()  
+    eps   = 1.d-9
+    call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
+         & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='solver routine'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+    call psb_barrier(ictxt)
+    t2 = psb_wtime() - t1
+    call psb_amx(ictxt,t2)
+    if (itest>nwrmup) then
+      tslv = min(tslv,t2)
+      tslvavg = tslvavg + t2
+    end if
+
+  end do
+
+
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
@@ -249,8 +275,12 @@ program psb_d_pde3d
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
-    write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
+    write(psb_out_unit,'("Number of processors          : ",i0)') np
+    write(psb_out_unit,'("Preconditioner time min       : ",es12.5)')tprec
+    write(psb_out_unit,'("Preconditioner time avg       : ",es12.5)')tprcavg
+    write(psb_out_unit,'("Time to solve system min      : ",es12.5)')tslv
+    write(psb_out_unit,'("Time to solve system  avg     : ",es12.5)')tslvavg
+    write(psb_out_unit,'("Time per iteration    avg     : ",es12.5)')tslvavg/iter
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
     write(psb_out_unit,'("Info  on exit                 : ",i0)')info
@@ -267,7 +297,6 @@ program psb_d_pde3d
   call psb_gefree(bv,desc_a,info)
   call psb_gefree(xxv,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call prec%free(info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -276,7 +305,7 @@ program psb_d_pde3d
     goto 9999
   end if
 
-  call psb_exit(ictxt)
+  call psb_exit(ictxt,close=.false.)
   stop
 
 9999 call psb_error(ictxt)
@@ -287,10 +316,10 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst,ntests)
     integer(psb_ipk_) :: ictxt
     character(len=*) :: kmethd, ptype, afmt
-    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst, ntests
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: ip
 
@@ -325,6 +354,11 @@ contains
         else
           irst=1
         endif
+        if (ip >= 8) then
+          read(psb_inp_unit,*) ntests
+        else
+          ntests = ntdef
+        endif
         ! broadcast parameters to all processors    
 
 
@@ -353,6 +387,7 @@ contains
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)
     call psb_bcast(ictxt,irst)
+    call psb_bcast(ictxt,ntests)
 
     return
 

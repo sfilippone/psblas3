@@ -47,20 +47,24 @@ program pdgenspmv
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a, ad, ah, ah1
+  type(psb_d_csr_sparse_mat) :: acsr
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
-  type(psb_d_vect_type)  :: xv,bv, vtst
-  real(psb_dpk_), allocatable :: tst(:)
+  type(psb_d_vect_type)  :: xv,bv, vtst,bvh
+  real(psb_dpk_), allocatable :: tst(:), work(:)
+  real(psb_dpk_), allocatable :: xvc(:)[:], bvc(:)[:]
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
-  type(psb_d_csre_sparse_mat) :: acsre
+  !  type(psb_d_csre_sparse_mat) :: acsre
 
   ! solver parameters
-  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr,nrl,ncl
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr,nrl,ncl, lwork, nclmx
+  integer(psb_ipk_) :: ip, img, nxch, p1,p2
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes, ahnnz
   real(psb_dpk_)   :: err, eps
-  integer(psb_ipk_), parameter :: times=50
+  integer(psb_ipk_) :: times
+  integer(psb_ipk_), parameter :: iwarm=10
 
   ! other variables
   integer(psb_ipk_) :: info, i
@@ -91,7 +95,7 @@ program pdgenspmv
   !
   !  get parameters
   !
-  call get_parms(ictxt,afmt,idim)
+  call get_parms(ictxt,afmt,idim, times)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -108,52 +112,87 @@ program pdgenspmv
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+  call psb_geasb(bvh,desc_a,info,scratch=.true.)
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 !!$  write(fname,'(a,i3.3,a,i3.3,a,i3.3,a)') 'testmat-',idim,'-',np,'-',iam,'.mtx'
 !!$  call a%print(fname,head="psb-testing")
-  
-  call xv%set(done)
 
+
+  !
+  ! Coarrays for experiment
+  !
+  nrl = desc_a%get_local_rows()
+  ncl = desc_a%get_local_cols()
+  nclmx = ncl
+  call psb_amx(ictxt,nclmx)
+  allocate(xvc(nclmx)[*])
+  allocate(bvc(nclmx)[*])
+  xvc(1:ncl) = done *(/(i,i=1,ncl)/)
+  bvc(:) = dzero
+  call xv%set(xvc(1:ncl))
+
+
+  do i=1,iwarm
+    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
+  end do
+
+  
+  ! FIXME: cache flush needed here
+  do i=1,iwarm
+    call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
+  end do
   call psb_barrier(ictxt)
-  t1 = psb_wtime()
+  tt1 = psb_wtime()
   do i=1,times 
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
   end do
   call psb_barrier(ictxt)
-  t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
-
-  nrl = desc_a%get_local_rows()
-  ncl = desc_a%get_local_cols()
-  call a%csclip(ad,info,jmax=nrl)
-  call a%csclip(ah,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
-  call a%csclip(ah1,info,jmin=nrl+1,jmax=ncl,cscale=.true.)
-  call ah%cscnv(info,mold=acsre)
-  call ah1%cscnv(info,mold=acsre)
-  
-  
-  ! FIXME: cache flush needed here
-  call psb_barrier(ictxt)
-  tt1 = psb_wtime()
-  do i=1,times 
-    call psb_csmm(done,ah,xv,done,bv,info)
-  end do
-  call psb_barrier(ictxt)
   th = psb_wtime() - tt1
-  call psb_barrier(ictxt)
-  tt1 = psb_wtime()
-  do i=1,times 
-    call psb_csmm(done,ah1,xv,done,bv,info)
-  end do
-  call psb_barrier(ictxt)
-  th1 = psb_wtime() - tt1
-  call psb_amx(ictxt,th1)
+  call psb_amx(ictxt,th)
 
-  call psb_amx(ictxt,t2)
+  if (.true.) then 
+  associate(xchg => desc_a%halo_xch)
+    ! FIXME: cache flush needed here
+    nxch = size(xchg%prcs_xch)
+    write(0,*) this_image(),nxch,nrl,ncl,' Exchanging with ',xchg%prcs_xch+1
+    do i=1,iwarm
+      ! Sync images
+      sync images(xchg%prcs_xch+1)
+      do ip = 1, nxch
+        img = xchg%prcs_xch(ip) + 1
+        p1  = xchg%loc_rcv_bnd(ip)
+        p2  = xchg%loc_rcv_bnd(ip+1)-1
+        write(0,*) this_image(),'Boundaries ',p1,p2,' :',xchg%loc_rcv_idx(p1:p2),':',xchg%rmt_rcv_idx(p1:p2)
+        xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img] 
+      end do
+      call  a%csmv(done,xvc,dzero,bvc,info)
+    end do
+    call psb_barrier(ictxt)
+    tt1 = psb_wtime()
+    do i=1,times
+      ! Sync images
+      sync images(xchg%prcs_xch+1)
+      do ip = 1, nxch
+        img = xchg%prcs_xch(ip) + 1
+        p1  = xchg%loc_rcv_bnd(ip)
+        p2  = xchg%loc_rcv_bnd(ip+1)-1
+        !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img] 
+      end do
+      call  a%csmv(done,xvc,dzero,bvc,info)
+    end do
+    call psb_barrier(ictxt)
+    tt2 = psb_wtime() - tt1
+    call psb_amx(ictxt,tt2)
+  end associate
+  call bvh%set(bvc(1:ncl))
+  endif
+  
+  call psb_geaxpby(-done,bv,done,bvh,desc_a,info)
+  err = psb_genrm2(bvh,desc_a,info)
+
   nr       = desc_a%get_global_rows() 
   annz     = a%get_nzeros()
-  ahnnz    = ah%get_nzeros()
   amatsize = a%sizeof()
   descsize = psb_sizeof(desc_a)
   call psb_sum(ictxt,annz)
@@ -163,39 +202,36 @@ program pdgenspmv
 
   if (iam == psb_root_) then
     flops   = 2.d0*times*annz
-    tflops  = 2.d0*times*ahnnz
-    tflops1 = 2.d0*times*ahnnz
+    tflops  = flops
+
     write(psb_out_unit,'("Matrix: ell1 ",i0)') idim
     write(psb_out_unit,'("Test on                          : ",i20," processors")') np
     write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
     write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
-    write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') ahnnz
     write(psb_out_unit,'("Memory occupation                : ",i20,"           ")') amatsize
     write(psb_out_unit,'("Number of flops (",i0," prod)        : ",F20.0,"           ")') times,flops
-    flops   = flops / (t2)
-    tflops  = tflops / (th)
-    tflops1 = tflops1 / (th1)    
-    write(psb_out_unit,'("Time for ",i0," products (s)         : ",F20.3)')times, t2
-    write(psb_out_unit,'("Time per product    (ms)         : ",F20.3)') t2*1.d3/(1.d0*times)
+    flops   = flops / (th)
+    tflops  = tflops / (tt2)
+
+    write(psb_out_unit,'("Time for ",i0," products (s)         : ",F20.3)')times, th
+    write(psb_out_unit,'("Time per product    (ms)         : ",F20.3)') th*1.d3/(1.d0*times)
     write(psb_out_unit,'("MFLOPS                           : ",F20.3)') flops/1.d6
 
-    write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,th
-    write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') th*1.d3/(1.d0*times)
-    write(psb_out_unit,'("MFLOPS                   (trans.): ",F20.3)') tflops/1.d6
-    write(psb_out_unit,'("Time for ",i0," products (s) (trans.): ",F20.3)') times,th1
-    write(psb_out_unit,'("Time per product    (ms) (trans.): ",F20.3)') th1*1.d3/(1.d0*times)
-    write(psb_out_unit,'("MFLOPS                   (trans.): ",F20.3)') tflops1/1.d6
+    write(psb_out_unit,'("Time for ",i0," products (s) nw      : ",F20.3)')times, tt2
+    write(psb_out_unit,'("Time per product    (ms)    nw   : ",F20.3)') tt2*1.d3/(1.d0*times)
+    write(psb_out_unit,'("MFLOPS                           : ",F20.3)') tflops/1.d6
+
+    write(psb_out_unit,'("Difference                       : ",E20.12)') err
 
     !
     ! This computation is valid for CSR
     !
     nbytes = nr*(2*psb_sizeof_dp + psb_sizeof_int)+&
          & annz*(psb_sizeof_dp + psb_sizeof_int)
-    bdwdth = times*nbytes/(t2*1.d6)
+    bdwdth = times*nbytes/(th*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S                         : ",F20.3)') bdwdth
-    bdwdth = times*nbytes/(tt2*1.d6)
-    write(psb_out_unit,'("MBYTES/S                  (trans): ",F20.3)') bdwdth
+
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
     
@@ -227,10 +263,10 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,afmt,idim)
+  subroutine  get_parms(ictxt,afmt,idim, times)
     integer(psb_ipk_) :: ictxt
     character(len=*) :: afmt
-    integer(psb_ipk_) :: idim
+    integer(psb_ipk_) :: idim, times
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: intbuf(10), ip
 
@@ -239,9 +275,11 @@ contains
     if (iam == 0) then
       read(psb_inp_unit,*) afmt
       read(psb_inp_unit,*) idim
+      read(psb_inp_unit,*) times
     endif
     call psb_bcast(ictxt,afmt)
     call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,times)
     
     if (iam == 0) then
       write(psb_out_unit,'("Testing matrix       : ell1")')      

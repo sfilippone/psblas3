@@ -155,7 +155,7 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 psb_base_mod.o: $(MODULES)
 
-psb_caf_mod.o: psb_caf_mod.f90 psb_const_mod.o
+psb_caf_mod.o: psb_caf_mod.f90 psb_const_mod.o psb_realloc_mod.o
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(F90COPT) $(EXTRA_OPT) -c $< -o $@
 
 psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 

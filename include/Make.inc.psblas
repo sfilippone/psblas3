@@ -28,24 +28,24 @@ FLINK=$(MPFC)
 LIBS= 
 
 # BLAS, BLACS and METIS libraries.
-BLAS=-lcblas -lf77blas -latlas -L/opt/atlas/3.8.4/gnu/7.1.0/lib
-METIS_LIB=-lmetis -L/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/Lib -L/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/lib
+BLAS=-lopenblas -L/mnt/gpfs0/home/e802756/builds/openblas/0.2.20
+METIS_LIB=
 AMD_LIB=
-LAPACK=-llapack
+LAPACK=
 EXTRA_COBJS=
 
-PSBFDEFINES=-DHAVE_METIS -DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DMPI_MOD 
-PSBCDEFINES=-DHAVE_METIS_ -I/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/include -I/opt/parmetis/4.0.3/mpich/3.2.0/gnu/7.1.0/Include  -DLowerUnderscore -DPtr64Bits 
+PSBFDEFINES=-DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DMPI_MOD 
+PSBCDEFINES=-DLowerUnderscore -DPtr64Bits 
 AR=ar -cur
 RANLIB=ranlib
 
 INSTALL=/usr/bin/install -c
 INSTALL_DATA=${INSTALL} -m 644
-INSTALL_DIR=/opt/psblas/CAF/7.1.0-csr
-INSTALL_LIBDIR=/opt/psblas/CAF/7.1.0-csr/lib
-INSTALL_INCLUDEDIR=/opt/psblas/CAF/7.1.0-csr/include
-INSTALL_DOCSDIR=/opt/psblas/CAF/7.1.0-csr/docs
-INSTALL_SAMPLESDIR=/opt/psblas/CAF/7.1.0-csr/samples
+INSTALL_DIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107
+INSTALL_LIBDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/lib
+INSTALL_INCLUDEDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/include
+INSTALL_DOCSDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/docs
+INSTALL_SAMPLESDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/samples
 
 # the following is the flag for /bin/cp which shall copy the file only for updating (timestamp based)--on GNU Linux, '-u'
 CPUPDFLAG=

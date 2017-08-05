@@ -236,6 +236,7 @@ program psb_d_pde2d
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'("Number of processors          : ",i0)') np
     write(psb_out_unit,'("Time to solve system          : ",es12.5)')t2
     write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter

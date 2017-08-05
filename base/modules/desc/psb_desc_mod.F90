@@ -204,6 +204,7 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable :: rmt_rcv_bnd(:,:)
     integer(psb_ipk_), allocatable :: loc_rcv_bnd(:)
     integer(psb_ipk_), allocatable :: loc_snd_bnd(:)
+    integer(psb_ipk_), allocatable :: rmt_rcv_idx(:)
     integer(psb_ipk_), allocatable :: loc_rcv_idx(:)
     integer(psb_ipk_), allocatable :: loc_snd_idx(:)
     integer(psb_ipk_)  :: max_buffer_size=0
