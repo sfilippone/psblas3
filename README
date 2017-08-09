@@ -1,6 +1,9 @@
 This directory contains  the PSBLAS library, version 3.5.
 
 
+New features: additional Krylov methods  FCG and GCR.
+
+
 Existing codes will work untouched with version 3.5, but they will
 have to be recompiled; new methods have been added for the sake of GPU
 computations, plus the usual bunch of bug fixes.
@@ -188,6 +191,7 @@ Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
 Credits for version 3:
 Salvatore  Filippone
 Alfredo    Buttari
+Ambra	   Abdullahi Hassan 
 
 Credits for version 2.2:
 Michele Martone contributed the initial version of the configure
