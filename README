@@ -186,12 +186,13 @@ If you are looking for more sophisticated preconditioners, you may be
 interested in the package  MLD2P4 from http://www.mld2p4.it 
 
 
-Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
+Contact: Salvatore Filippone     salvatore.filippone@cranfield.ac.uk
 
 Credits for version 3:
 Salvatore  Filippone
 Alfredo    Buttari
-Ambra	   Abdullahi Hassan 
+Ambra	   Abdullahi Hassan
+Pasqua	   D'Ambra
 
 Credits for version 2.2:
 Michele Martone contributed the initial version of the configure
