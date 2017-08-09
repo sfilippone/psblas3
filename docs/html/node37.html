@@ -56,14 +56,15 @@ tril -- Return the lower triangle</A>
 </H3>
 
 <PRE>
-    call a%tril(b,info[,&amp;
-       &amp; diag,imin,imax,jmin,jmax,rscale,cscale])
+    call a%tril(l,info[,&amp;
+       &amp; diag,imin,imax,jmin,jmax,rscale,cscale,u])
 </PRE>
 
 <P>
 Returns the lower triangular part of submatrix
 <code>A(imin:imax,jmin:jmax)</code>, optionally rescaling row/col indices to
-the range <code>1:imax-imin+1,1:jmax-jmin+1</code>.   
+the range <code>1:imax-imin+1,1:jmax-jmin+1</code> and returing the
+complementary upper triangle. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -97,8 +98,13 @@ Type: optional.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>A copy  of a subtriangle of <code>a</code>.
+<DT><STRONG>l</STRONG></DT>
+<DD>A copy  of the lower triangle of <code>a</code>.
+<BR>
+A variable of type <code>psb_Tspmat_type</code>.
+</DD>
+<DT><STRONG>u</STRONG></DT>
+<DD>(optional) A copy  of the upper triangle of <code>a</code>.
 <BR>
 A variable of type <code>psb_Tspmat_type</code>.
 </DD>

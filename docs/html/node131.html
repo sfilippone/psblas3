@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2012 (1.2)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_krylov -- Krylov Methods Driver Routine</TITLE>
+<META NAME="description" CONTENT="psb_krylov -- Krylov Methods Driver Routine">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="previous" HREF="node130.html">
+<LINK REL="up" HREF="node130.html">
+<LINK REL="next" HREF="node132.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1888"
+  HREF="node132.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1884"
+  HREF="node130.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1880"
+  HREF="node130.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1886"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1889"
+  HREF="node132.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1885"
+  HREF="node130.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1881"
+  HREF="node130.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1887"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000121000000000000000"></A><A NAME="krylov"></A>
+<BR>
+psb_krylov  -- Krylov Methods Driver
+      Routine
+</H2>
+
+<P>
+This subroutine is a driver that provides a general interface for all
+the Krylov-Subspace family methods implemented in PSBLAS version 2. 
+
+<P>
+The stopping criterion can take the following values:
+<DL>
+<DT><STRONG>1</STRONG></DT>
+<DD>normwise backward error  in the infinity
+norm;  the iteration is stopped when 
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="205" HEIGHT="44" BORDER="0"
+ SRC="img157.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{(\Vert A\Vert\Vert x_i\Vert+\Vert b\Vert)} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+</DD>
+<DT><STRONG>2</STRONG></DT>
+<DD>Relative residual in the 2-norm; the iteration is stopped
+when
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{\|b\|_2} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="121" HEIGHT="44" BORDER="0"
+ SRC="img158.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert b\Vert _2} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+</DD>
+<DT><STRONG>3</STRONG></DT>
+<DD>Relative residual reduction in the 2-norm; the iteration is stopped
+when
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+err = \frac{\|r_i\|}{\|r_0\|_2} < eps
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="129" HEIGHT="44" BORDER="0"
+ SRC="img159.png"
+ ALT="\begin{displaymath}err = \frac{\Vert r_i\Vert}{\Vert r_0\Vert _2} &lt; eps \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+</DD>
+</DL>
+The behaviour is controlled by  the  istop argument (see
+later). In the above formulae, <IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img160.png"
+ ALT="$x_i$"> is the tentative solution and
+<IMG
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img161.png"
+ ALT="$r_i=b-Ax_i$"> the corresponding residual at the <IMG
+ WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$i$">-th iteration. 
+
+<P>
+<BR>
+<IMG
+ WIDTH="482" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img162.png"
+ ALT="\begin{lstlisting}
+call psb_krylov(method,a,prec,b,x,eps,desc_a,info,&amp;
+&amp; itmax,iter,err,itrace,irst,istop,cond)
+\end{lstlisting}">
+<BR>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>method</STRONG></DT>
+<DD>a string that defines the iterative method to be
+  used. Supported values are:
+  <DL>
+<DT><STRONG>CG:</STRONG></DT>
+<DD>the Conjugate Gradient method;
+  
+</DD>
+<DT><STRONG>CGS:</STRONG></DT>
+<DD>the Conjugate Gradient Stabilized method;
+
+<P>
+</DD>
+<DT><STRONG>GCR:</STRONG></DT>
+<DD>the Generalized Conjugate Residual method;
+  
+</DD>
+<DT><STRONG>FCG:</STRONG></DT>
+<DD>the Flexible Conjugate Gradient method<A NAME="tex2html31"
+  HREF="footnode.html#foot8033"><SUP>4</SUP></A>;
+
+<P>
+</DD>
+<DT><STRONG>BICG:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient method;
+  
+</DD>
+<DT><STRONG>BICGSTAB:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method;
+  
+</DD>
+<DT><STRONG>BICGSTABL:</STRONG></DT>
+<DD>the Bi-Conjugate Gradient Stabilized method with restarting;
+  
+</DD>
+<DT><STRONG>RGMRES:</STRONG></DT>
+<DD>the Generalized Minimal Residual method with restarting.
+  
+</DD>
+</DL>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the local portion of global sparse matrix
+<IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_Tspmat_type</TT>.
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>The data structure containing the preconditioner.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>b</STRONG></DT>
+<DD>The RHS vector. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The initial guess. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>eps</STRONG></DT>
+<DD>The stopping tolerance. 
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a real number. 
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>itmax</STRONG></DT>
+<DD>The maximum number of iterations to perform.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Default: <IMG
+ WIDTH="99" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img164.png"
+ ALT="$itmax = 1000$">.
+<BR>
+Specified as: an integer variable <IMG
+ WIDTH="76" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img165.png"
+ ALT="$itmax \ge 1$">.
+</DD>
+<DT><STRONG>itrace</STRONG></DT>
+<DD>If <IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img111.png"
+ ALT="$&gt;0$"> print out an informational message about
+  convergence  every <IMG
+ WIDTH="45" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img166.png"
+ ALT="$itrace$"> iterations.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR></DD>
+<DT><STRONG>irst</STRONG></DT>
+<DD>An integer specifying the restart parameter.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: <IMG
+ WIDTH="60" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img167.png"
+ ALT="$irst&gt;0$">. This is employed for the BiCGSTABL or RGMRES
+methods, otherwise it is ignored. 
+
+<P>
+</DD>
+<DT><STRONG>istop</STRONG></DT>
+<DD>An integer specifying the stopping criterion.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+of the residual, 3: use the residual reduction in the 2-norm. Default: 2. 
+</DD>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The computed solution. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>iter</STRONG></DT>
+<DD>The number of iterations performed.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: an integer variable.
+</DD>
+<DT><STRONG>err</STRONG></DT>
+<DD>The convergence estimate on exit.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number.
+</DD>
+<DT><STRONG>cond</STRONG></DT>
+<DD>An estimate of the condition number of matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">; only
+  available with the <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img168.png"
+ ALT="$CG$"> method on real data.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Returned  as: a real number. A correct result will be greater than or
+equal to one; if specified for non-real data, or an error occurred,
+zero is returned.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+
+<P>
+
+<P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1888"
+  HREF="node132.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1884"
+  HREF="node130.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1880"
+  HREF="node130.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1886"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1889"
+  HREF="node132.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html1885"
+  HREF="node130.html">Iterative Methods</A>
+<B> Previous:</B> <A NAME="tex2html1881"
+  HREF="node130.html">Iterative Methods</A>
+ &nbsp; <B>  <A NAME="tex2html1887"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
