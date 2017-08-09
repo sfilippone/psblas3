@@ -630,8 +630,8 @@ end subroutine psb_d_base_csclip
 ! this is just based on the getrow.
 ! If performance is critical it can be overridden.
 !
-subroutine psb_d_base_tril(a,b,info,&
-     & diag,imin,imax,jmin,jmax,rscale,cscale)
+subroutine psb_d_base_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -639,12 +639,16 @@ subroutine psb_d_base_tril(a,b,info,&
   implicit none
 
   class(psb_d_base_sparse_mat), intent(in) :: a
-  class(psb_d_coo_sparse_mat), intent(out) :: b
+  class(psb_d_coo_sparse_mat), intent(out) :: l
   integer(psb_ipk_),intent(out)            :: info
   integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
   logical, intent(in), optional            :: rscale,cscale
+  class(psb_d_coo_sparse_mat), optional, intent(out) :: u
+  
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
-  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  real(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
@@ -700,28 +704,70 @@ subroutine psb_d_base_tril(a,b,info,&
     nb = jmax_  
   endif
 
-  call b%allocate(mb,nb)
-  nzin = b%get_nzeros() ! At this point it should be 0
 
-  do i=imin_,imax_
-    k = min(jmax_,i+diag_)
-    call a%csget(i,i,nzout,b%ia,b%ja,b%val,info,&
-         & jmin=jmin_, jmax=k, append=.true., &
-         & nzin=nzin)
-    if (info /= psb_success_) goto 9999
-    call b%set_nzeros(nzin+nzout)
-    nzin = nzin+nzout 
-  end do
-  call b%fix(info)
-  nzout = b%get_nzeros()
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call psb_realloc(max(mb,nb),ia,info)
+    call psb_realloc(max(mb,nb),ja,info)
+    call psb_realloc(max(mb,nb),val,info)
+    do i=imin_,imax_
+      call a%csget(i,i,nzout,ia,ja,val,info,&
+           & jmin=jmin_, jmax=jmax_)
+      do k=1, nzout
+        j = ja(k) 
+        if (j-i<=diag_) then
+          nzlin = nzlin + 1
+          l%ia(nzlin)  = ia(k)
+          l%ja(nzlin)  = ja(k)
+          l%val(nzlin) = val(k)
+        else
+          nzuin = nzuin + 1
+          u%ia(nzuin)  = ia(k)
+          u%ja(nzuin)  = ja(k)
+          u%val(nzuin) = val(k)
+        end if
+      end do
+    end do
+    
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ >= -1).and.(imin_ == jmin_)) then 
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    do i=imin_,imax_
+      k = min(jmax_,i+diag_)
+      call a%csget(i,i,nzout,l%ia,l%ja,l%val,info,&
+           & jmin=jmin_, jmax=k, append=.true., &
+           & nzin=nzin)
+      if (info /= psb_success_) goto 9999
+      call l%set_nzeros(nzin+nzout)
+      nzin = nzin+nzout 
+    end do
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
   if (rscale_) &
-       & b%ia(1:nzout) = b%ia(1:nzout) - imin_ + 1
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
   if (cscale_) &
-       & b%ja(1:nzout) = b%ja(1:nzout) - jmin_ + 1
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
   
   if ((diag_ <= 0).and.(imin_ == jmin_)) then 
-    call b%set_triangle(.true.)
-    call b%set_lower(.true.)
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
   end if
 
   if (info /= psb_success_) goto 9999
@@ -735,8 +781,8 @@ subroutine psb_d_base_tril(a,b,info,&
 
 end subroutine psb_d_base_tril
 
-subroutine psb_d_base_triu(a,b,info,&
-     & diag,imin,imax,jmin,jmax,rscale,cscale)
+subroutine psb_d_base_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -744,12 +790,16 @@ subroutine psb_d_base_triu(a,b,info,&
   implicit none
 
   class(psb_d_base_sparse_mat), intent(in) :: a
-  class(psb_d_coo_sparse_mat), intent(out) :: b
+  class(psb_d_coo_sparse_mat), intent(out) :: u
   integer(psb_ipk_),intent(out)            :: info
   integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
   logical, intent(in), optional            :: rscale,cscale
+  class(psb_d_coo_sparse_mat), optional, intent(out) :: l
+  
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
-  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  real(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
@@ -805,28 +855,69 @@ subroutine psb_d_base_triu(a,b,info,&
     nb = jmax_  
   endif
 
-  call b%allocate(mb,nb)
-  nzin = b%get_nzeros() ! At this point it should be 0
 
-  do i=imin_,imax_
-    k = max(jmin_,i+diag_)
-    call a%csget(i,i,nzout,b%ia,b%ja,b%val,info,&
-         & jmin=k, jmax=jmax_, append=.true., &
-         & nzin=nzin)
-    if (info /= psb_success_) goto 9999
-    call b%set_nzeros(nzin+nzout)
-    nzin = nzin+nzout 
-  end do
-  call b%fix(info)
-  nzout = b%get_nzeros()
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+  
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call psb_realloc(max(mb,nb),ia,info)
+    call psb_realloc(max(mb,nb),ja,info)
+    call psb_realloc(max(mb,nb),val,info)
+    do i=imin_,imax_
+      call a%csget(i,i,nzout,ia,ja,val,info,&
+           & jmin=jmin_, jmax=jmax_)
+      do k=1, nzout
+        j = ja(k) 
+        if (j-i<diag_) then
+          nzlin = nzlin + 1
+          l%ia(nzlin)  = ia(k)
+          l%ja(nzlin)  = ja(k)
+          l%val(nzlin) = val(k)
+        else
+          nzuin = nzuin + 1
+          u%ia(nzuin)  = ia(k)
+          u%ja(nzuin)  = ja(k)
+          u%val(nzuin) = val(k)
+        end if
+      end do
+    end do
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ <=1).and.(imin_ == jmin_)) then 
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros()       
+    do i=imin_,imax_
+      k = max(jmin_,i+diag_)
+      call a%csget(i,i,nzout,u%ia,u%ja,u%val,info,&
+           & jmin=k, jmax=jmax_, append=.true., &
+           & nzin=nzin)
+      if (info /= psb_success_) goto 9999
+      call u%set_nzeros(nzin+nzout)
+      nzin = nzin+nzout 
+    end do
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
   if (rscale_) &
-       & b%ia(1:nzout) = b%ia(1:nzout) - imin_ + 1
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
   if (cscale_) &
-       & b%ja(1:nzout) = b%ja(1:nzout) - jmin_ + 1
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
   
   if ((diag_ >= 0).and.(imin_ == jmin_)) then 
-    call b%set_triangle(.true.)
-    call b%set_upper(.true.)
+    call u%set_triangle(.true.)
+    call u%set_upper(.true.)
   end if
 
   if (info /= psb_success_) goto 9999

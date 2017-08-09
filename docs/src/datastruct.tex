@@ -826,13 +826,14 @@ A variable of type \verb|psb_Tspmat_type|.
 \subsubsection*{tril --- Return the lower triangle}
 \addcontentsline{toc}{paragraph}{tril}
 \begin{verbatim}
-    call a%tril(b,info[,&
-       & diag,imin,imax,jmin,jmax,rscale,cscale])
+    call a%tril(l,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale,u])
 \end{verbatim}
 
 Returns the lower triangular part of submatrix
 \verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
-the range \verb|1:imax-imin+1,1:jmax-jmin+1|.   
+the range \verb|1:imax-imin+1,1:jmax-jmin+1| and returing the
+complementary upper triangle. 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
@@ -849,7 +850,9 @@ Type: optional.
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[b] A copy  of a subtriangle of \verb|a|.\\
+\item[l] A copy  of the lower triangle of \verb|a|.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[u] (optional) A copy  of the upper triangle of \verb|a|.\\
 A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}
@@ -857,13 +860,14 @@ A variable of type \verb|psb_Tspmat_type|.
 \subsubsection*{triu --- Return the upper triangle}
 \addcontentsline{toc}{paragraph}{triu}
 \begin{verbatim}
-    call a%triu(b,info[,&
-       & diag,imin,imax,jmin,jmax,rscale,cscale])
+    call a%triu(u,info[,&
+       & diag,imin,imax,jmin,jmax,rscale,cscale,l])
 \end{verbatim}
 
 Returns the upper triangular part of submatrix
 \verb|A(imin:imax,jmin:jmax)|, optionally rescaling row/col indices to
-the range \verb|1:imax-imin+1,1:jmax-jmin+1|.   
+the range \verb|1:imax-imin+1,1:jmax-jmin+1|, and returing the
+complementary lower triangle. 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
@@ -880,7 +884,9 @@ Type: optional.
 \end{description}
 \begin{description}
 \item[\bf On Return]
-\item[b] A copy  of a subtriangle of \verb|a|.\\
+\item[u]  A copy  of the upper triangle of \verb|a|.\\
+A variable of type \verb|psb_Tspmat_type|.
+\item[l] (optional) A copy  of the lower triangle of \verb|a|.\\
 A variable of type \verb|psb_Tspmat_type|.
 \item[info] Return code. 
 \end{description}

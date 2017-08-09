@@ -481,26 +481,28 @@ module psb_s_mat_mod
   end interface
   
   interface 
-    subroutine psb_s_tril(a,b,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+    subroutine psb_s_tril(a,l,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,u)
       import :: psb_ipk_, psb_sspmat_type, psb_spk_
       class(psb_sspmat_type), intent(in)      :: a
-      class(psb_sspmat_type), intent(inout)   :: b
+      class(psb_sspmat_type), intent(inout)   :: l
       integer(psb_ipk_),intent(out)           :: info
       integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional           :: rscale,cscale
+      class(psb_sspmat_type), optional, intent(inout)   :: u
     end subroutine psb_s_tril
   end interface
   
   interface 
-    subroutine psb_s_triu(a,b,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+    subroutine psb_s_triu(a,u,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,l)
       import :: psb_ipk_, psb_sspmat_type, psb_spk_
       class(psb_sspmat_type), intent(in)      :: a
-      class(psb_sspmat_type), intent(inout)   :: b
+      class(psb_sspmat_type), intent(inout)   :: u
       integer(psb_ipk_),intent(out)           :: info
       integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional           :: rscale,cscale
+      class(psb_sspmat_type), optional, intent(inout)   :: l
     end subroutine psb_s_triu
   end interface
 

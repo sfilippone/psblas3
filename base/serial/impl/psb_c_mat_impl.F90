@@ -906,24 +906,24 @@ subroutine psb_c_csgetblk(imin,imax,a,b,info,&
 end subroutine psb_c_csgetblk
 
 
-subroutine psb_c_tril(a,b,info,diag,imin,imax,&
-     & jmin,jmax,rscale,cscale)
+subroutine psb_c_tril(a,l,info,diag,imin,imax,&
+     & jmin,jmax,rscale,cscale,u)
   use psb_error_mod
   use psb_const_mod
   use psb_c_base_mat_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_tril
   implicit none 
   class(psb_cspmat_type), intent(in)      :: a
-  class(psb_cspmat_type), intent(inout)   :: b
+  class(psb_cspmat_type), intent(inout)   :: l
   integer(psb_ipk_),intent(out)           :: info
   integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
   logical, intent(in), optional           :: rscale,cscale
+  class(psb_cspmat_type), optional, intent(inout)   :: u
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='tril'
   logical, parameter :: debug=.false.
-  type(psb_c_coo_sparse_mat), allocatable  :: acoo
-
+  type(psb_c_coo_sparse_mat), allocatable  :: lcoo, ucoo
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -932,22 +932,29 @@ subroutine psb_c_tril(a,b,info,diag,imin,imax,&
     call psb_errpush(info,name)
     goto 9999
   endif
-  allocate(acoo,stat=info)    
-  call b%free()
-
-  if (info == psb_success_) then 
-    call a%a%tril(acoo,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+  allocate(lcoo,stat=info)    
+  call l%free()
+  if (present(u)) then
+    if (info == psb_success_) allocate(ucoo,stat=info)    
+    call u%free()
+    if (info == psb_success_) call a%a%tril(lcoo,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,ucoo)
+    if (info == psb_success_) call move_alloc(ucoo,u%a)
+    if (info == psb_success_) call u%cscnv(info,mold=a%a)
   else
-    info = psb_err_alloc_dealloc_
+    if (info == psb_success_) then 
+      call a%a%tril(lcoo,info,diag,imin,imax,&
+           & jmin,jmax,rscale,cscale)
+    else
+      info = psb_err_alloc_dealloc_
+    end if
   end if
-  if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info == psb_success_) call b%cscnv(info,mold=a%a)
+  if (info == psb_success_) call move_alloc(lcoo,l%a)
+  if (info == psb_success_) call l%cscnv(info,mold=a%a)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 
@@ -956,23 +963,24 @@ subroutine psb_c_tril(a,b,info,diag,imin,imax,&
 
 end subroutine psb_c_tril
 
-subroutine psb_c_triu(a,b,info,diag,imin,imax,&
-     & jmin,jmax,rscale,cscale)
+subroutine psb_c_triu(a,u,info,diag,imin,imax,&
+     & jmin,jmax,rscale,cscale,l)
   use psb_error_mod
   use psb_const_mod
   use psb_c_base_mat_mod
   use psb_c_mat_mod, psb_protect_name => psb_c_triu
   implicit none 
   class(psb_cspmat_type), intent(in)      :: a
-  class(psb_cspmat_type), intent(inout)   :: b
+  class(psb_cspmat_type), intent(inout)   :: u
   integer(psb_ipk_),intent(out)           :: info
   integer(psb_ipk_), intent(in), optional :: diag,imin,imax,jmin,jmax
   logical, intent(in), optional           :: rscale,cscale
+  class(psb_cspmat_type), optional, intent(inout)   :: l
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='triu'
   logical, parameter :: debug=.false.
-  type(psb_c_coo_sparse_mat), allocatable  :: acoo
+  type(psb_c_coo_sparse_mat), allocatable  :: lcoo, ucoo
 
 
   info = psb_success_
@@ -983,22 +991,30 @@ subroutine psb_c_triu(a,b,info,diag,imin,imax,&
     goto 9999
   endif
 
-  allocate(acoo,stat=info)    
-  call b%free()
+  allocate(ucoo,stat=info)    
+  call u%free()
 
-  if (info == psb_success_) then 
-    call a%a%triu(acoo,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+  if (present(l)) then
+    if (info == psb_success_) allocate(lcoo,stat=info)    
+    call l%free()
+    if (info == psb_success_) call a%a%triu(ucoo,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,lcoo)
+    if (info == psb_success_) call move_alloc(lcoo,l%a)
+    if (info == psb_success_) call l%cscnv(info,mold=a%a)
   else
-    info = psb_err_alloc_dealloc_
+    if (info == psb_success_) then 
+      call a%a%triu(ucoo,info,diag,imin,imax,&
+           & jmin,jmax,rscale,cscale)
+    else
+      info = psb_err_alloc_dealloc_
+    end if
   end if
-  if (info == psb_success_) call move_alloc(acoo,b%a)
-  if (info == psb_success_) call b%cscnv(info,mold=a%a)
+  if (info == psb_success_) call move_alloc(ucoo,u%a)
+  if (info == psb_success_) call u%cscnv(info,mold=a%a)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 

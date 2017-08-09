@@ -416,7 +416,7 @@ module psb_d_base_mat_mod
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         
-  !!  \param b     the output (sub)matrix
+  !!  \param l     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
   !!  \param imin [1] the minimum row index we are interested in 
@@ -429,17 +429,19 @@ module psb_d_base_mat_mod
   !!          ( iren cannot be specified with rscale/cscale)
   !!  \param append [false] append to ia,ja 
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param u  [none]  copy of the complementary triangle
   !!           
   !
   interface 
-    subroutine psb_d_base_tril(a,b,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+    subroutine psb_d_base_tril(a,l,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,u)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: b
+      class(psb_d_coo_sparse_mat), intent(out) :: l
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out) :: u
     end subroutine psb_d_base_tril
   end interface
   
@@ -456,8 +458,9 @@ module psb_d_base_mat_mod
   !!         Moreover, apply a clipping by copying entries A(I,J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
+  !!         Optionally copies the lower triangle at the same time
   !!         
-  !!  \param b     the output (sub)matrix
+  !!  \param u     the output (sub)matrix
   !!  \param info  return code
   !!  \param diag [0] the last diagonal (J-I) to be considered.
   !!  \param imin [1] the minimum row index we are interested in 
@@ -470,17 +473,19 @@ module psb_d_base_mat_mod
   !!          ( iren cannot be specified with rscale/cscale)
   !!  \param append [false] append to ia,ja 
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param l  [none]  copy of the complementary triangle
   !!           
   !
   interface 
-    subroutine psb_d_base_triu(a,b,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale)
+    subroutine psb_d_base_triu(a,u,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,l)
       import :: psb_ipk_, psb_d_base_sparse_mat, psb_d_coo_sparse_mat, psb_dpk_
       class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: b
+      class(psb_d_coo_sparse_mat), intent(out) :: u
       integer(psb_ipk_),intent(out)              :: info
       integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
       logical, intent(in), optional              :: rscale,cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out) :: l
     end subroutine psb_d_base_triu
   end interface
   
