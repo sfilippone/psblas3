@@ -110,6 +110,7 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   if (info == 0) call psb_realloc(nsnd,xch_idx%loc_snd_idx,info)
   if (info == 0) call psb_realloc(nrcv,xch_idx%loc_rcv_idx,info)
   if (info == 0) call psb_realloc(nrcv,xch_idx%rmt_rcv_idx,info)
+  if (info == 0) call psb_realloc(nsnd,xch_idx%rmt_snd_idx,info)
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -137,11 +138,11 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
     if (vidx_in(ip) == -1) exit
     xch_idx%prcs_xch(ixch) = vidx_in(ip)
     nerv   = vidx_in(ip+psb_n_elem_recv_)
-!!$    write(*,*) 'Check on receive option ',ip,nerv,xch_idx%loc_rcv_bnd(ixch)
+    write(*,*) 'Check on receive option ',ip,nerv,xch_idx%loc_rcv_bnd(ixch)
     xch_idx%loc_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1) = &
          & vidx_in(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv)
     nesd   = vidx_in(ip+nerv+psb_n_elem_send_)
-!!$    write(*,*) 'Check on send option ',ip,nesd,xch_idx%loc_snd_bnd(ixch)
+    write(*,*) 'Check on send option ',ip,nesd,xch_idx%loc_snd_bnd(ixch)
     xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1) = &
          & vidx_in(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd)
     xch_idx%loc_rcv_bnd(ixch+1) =  xch_idx%loc_rcv_bnd(ixch) + nerv
@@ -151,12 +152,18 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
     sync images(img)
     buf_rmt_rcv_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_rcv_bnd(ixch:ixch+1)
     buf_rmt_snd_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_snd_bnd(ixch:ixch+1)
-!!$    if (img == 2) write(*,*) this_image(),'Send idx to 2:',&
-!!$         & xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
+    if (img == 2) write(*,*) this_image(),nesd,'Send idx to 2:',&
+         & xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
+    if (img == 2) write(*,*) this_image(),nerv,'Recv idx fr 2:',&
+         & xch_idx%loc_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1)
     buf_rmt_rcv_idx(1:nesd)[img] = xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
     buf_rmt_snd_idx(1:nerv)[img] = xch_idx%loc_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1)
     event post(snd_done(me)[img])
     event wait(snd_done(img))
+    if (this_image() == 2) write(*,*) img,nesd,'Send idx on 2:',&
+         & buf_rmt_snd_idx(1:nesd),':',xch_idx%loc_rcv_bnd(ixch),xch_idx%loc_rcv_bnd(ixch)+nerv-1
+    if (this_image() == 2) write(*,*) img,nerv,'Recv idx on 2:',&
+         & buf_rmt_rcv_idx(1:nerv),':',xch_idx%loc_snd_bnd(ixch),xch_idx%loc_snd_bnd(ixch)+nesd-1
     xch_idx%rmt_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1) = &
          & buf_rmt_rcv_idx(1:nerv)
     xch_idx%rmt_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1) = &
@@ -170,6 +177,8 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   xch_idx%rmt_snd_bnd(:,2) = xch_idx%rmt_snd_bnd(:,2) - 1
   if (allocated(buf_rmt_rcv_bnd)) deallocate(buf_rmt_rcv_bnd)
   if (allocated(buf_rmt_snd_bnd)) deallocate(buf_rmt_snd_bnd)
+  if (allocated(buf_rmt_rcv_idx)) deallocate(buf_rmt_rcv_idx)
+  if (allocated(buf_rmt_snd_idx)) deallocate(buf_rmt_snd_idx)
   if (allocated(snd_done)) deallocate(snd_done)
   !sync all
   call psb_erractionrestore(err_act)

@@ -160,32 +160,43 @@ program pdgenspmv
       ! FIXME: cache flush needed here
       nxch = size(xchg%prcs_xch)
 !!$      if (this_image()==2) write(0,*) this_image(),nxch,nrl,ncl,' Exchanging with ',xchg%prcs_xch+1
+      temp = 0.d0
+      xvc(nrl+1:) = 0.d0
       do i=1,iwarm
-        temp = 0.d0
-        xvc(nrl+1:) = 0.d0
         ! Sync images
-        !sync images(xchg%prcs_xch+1)
-        do ip=1,nxch
-          img = xchg%prcs_xch(ip) + 1
-          event post(ready[img])
-        end do
-        event wait(ready, until_count=nxch)
-        do ip = 1, nxch
-          img = xchg%prcs_xch(ip) + 1
-          p1  = xchg%loc_rcv_bnd(ip)
-          p2  = xchg%loc_rcv_bnd(ip+1)-1
+        sync images(xchg%prcs_xch+1)
+        if (.false.) then 
+          do ip = 1, nxch
+            img = xchg%prcs_xch(ip) + 1
+            p1  = xchg%loc_rcv_bnd(ip)
+            p2  = xchg%loc_rcv_bnd(ip+1)-1
 !!$          if (this_image()==2) write(0,*) this_image(),'Boundaries ',&
 !!$               & p1,p2,' :',xchg%loc_rcv_idx(p1:p2),':',xchg%rmt_rcv_idx(p1:p2)
 !!$        xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
-          
-          temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+            
+            temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
 !!$          xvc(xchg%loc_rcv_idx(p1:p2)) = temp(p1:p2)
 !!$          if (this_image()==2) write(0,*) this_image(),' :x: ',ip,' : ',&
 !!$               &xvc(xchg%loc_rcv_idx(p1:p2)),' : ',xv%v%v(xchg%loc_rcv_idx(p1:p2))
-        end do
+          end do
 !!$        if (this_image()==2) write(0,*) this_image(),' :x: ',&
 !!$             &xvc(nrl+1:ncl),' : ',xv%v%v(nrl+1:ncl)
-        call  a%csmv(done,xvc,dzero,bvc,info)
+          call  a%csmv(done,xvc,dzero,bvc,info)
+        else
+          do ip = 1, nxch
+            img = xchg%prcs_xch(ip) + 1
+            p1  = xchg%loc_snd_bnd(ip)
+            p2  = xchg%loc_snd_bnd(ip+1)-1
+            !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+            write(0,*) this_image(),'Boundaries ',&
+                 & p1,p2,' :',xchg%loc_snd_idx(p1:p2),':',xchg%rmt_snd_idx(p1:p2)            
+            temp(p1:p2) = xvc(xchg%loc_snd_idx(p1:p2))
+            xvc(xchg%rmt_snd_idx(p1:p2))[img] = temp(p1:p2)
+          end do
+          sync images(xchg%prcs_xch+1)
+          call  a%csmv(done,xvc,dzero,bvc,info)
+          
+        end if
       end do
       call psb_barrier(ictxt)
       tt1 = psb_wtime()
@@ -197,16 +208,27 @@ program pdgenspmv
 !!$          event post(ready[img])
 !!$        end do
 !!$        event wait(ready, until_count=nxch)
-        
-        do ip = 1, nxch
-          img = xchg%prcs_xch(ip) + 1
-          sync images (img)
-          p1  = xchg%loc_rcv_bnd(ip)
-          p2  = xchg%loc_rcv_bnd(ip+1)-1
-          !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]         
-          temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
-          xvc(xchg%loc_rcv_idx(p1:p2)) = temp(p1:p2)
-        end do
+        if (.true.) then         
+          do ip = 1, nxch
+            img = xchg%prcs_xch(ip) + 1
+            sync images (img)
+            p1  = xchg%loc_rcv_bnd(ip)
+            p2  = xchg%loc_rcv_bnd(ip+1)-1
+            !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]         
+            temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+            xvc(xchg%loc_rcv_idx(p1:p2)) = temp(p1:p2)
+          end do
+        else
+          do ip = 1, nxch
+            img = xchg%prcs_xch(ip) + 1
+            p1  = xchg%loc_snd_bnd(ip)
+            p2  = xchg%loc_snd_bnd(ip+1)-1
+            !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]         
+            temp(p1:p2) = xvc(xchg%loc_snd_idx(p1:p2))
+            xvc(xchg%rmt_snd_idx(p1:p2))[img] = temp(p1:p2)
+          end do
+          sync images(xchg%prcs_xch+1)
+        end if
         call  a%csmv(done,xvc,dzero,bvc,info)
       end do
       call psb_barrier(ictxt)
