@@ -51,9 +51,10 @@ program pdgenspmv
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
-  type(psb_d_vect_type)  :: xv,bv, vtst,bvh
-  real(psb_dpk_), allocatable :: tst(:), work(:)
+  type(psb_d_vect_type)  :: xv,bv, vtst,bvh, xvh
+  real(psb_dpk_), allocatable :: tst(:), work(:), temp(:)
   real(psb_dpk_), allocatable :: xvc(:)[:], bvc(:)[:]
+  type(event_type), allocatable :: ready[:]
   ! blacs parameters
   integer(psb_ipk_) :: ictxt, iam, np
   !  type(psb_d_csre_sparse_mat) :: acsre
@@ -62,9 +63,9 @@ program pdgenspmv
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst, nr,nrl,ncl, lwork, nclmx
   integer(psb_ipk_) :: ip, img, nxch, p1,p2
   integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, annz, nbytes, ahnnz
-  real(psb_dpk_)   :: err, eps
+  real(psb_dpk_)   :: err, eps, err2
   integer(psb_ipk_) :: times
-  integer(psb_ipk_), parameter :: iwarm=10
+  integer(psb_ipk_), parameter :: iwarm=2
 
   ! other variables
   integer(psb_ipk_) :: info, i
@@ -73,7 +74,7 @@ program pdgenspmv
 
   info=psb_success_
 
-  
+
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
 
@@ -117,8 +118,8 @@ program pdgenspmv
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
 !!$  write(fname,'(a,i3.3,a,i3.3,a,i3.3,a)') 'testmat-',idim,'-',np,'-',iam,'.mtx'
 !!$  call a%print(fname,head="psb-testing")
-
-
+  
+  
   !
   ! Coarrays for experiment
   !
@@ -126,8 +127,11 @@ program pdgenspmv
   ncl = desc_a%get_local_cols()
   nclmx = ncl
   call psb_amx(ictxt,nclmx)
+!!$  write(*,*) iam,'NCLMX',nclmx,ncl
   allocate(xvc(nclmx)[*])
   allocate(bvc(nclmx)[*])
+  allocate(ready[*])
+  allocate(temp(nclmx))
   xvc(1:ncl) = done *(/(i,i=1,ncl)/)
   bvc(:) = dzero
   call xv%set(xvc(1:ncl))
@@ -137,7 +141,7 @@ program pdgenspmv
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
   end do
 
-  
+
   ! FIXME: cache flush needed here
   do i=1,iwarm
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
@@ -150,46 +154,81 @@ program pdgenspmv
   call psb_barrier(ictxt)
   th = psb_wtime() - tt1
   call psb_amx(ictxt,th)
-
+  
   if (.true.) then 
-  associate(xchg => desc_a%halo_xch)
-    ! FIXME: cache flush needed here
-    nxch = size(xchg%prcs_xch)
-    write(0,*) this_image(),nxch,nrl,ncl,' Exchanging with ',xchg%prcs_xch+1
-    do i=1,iwarm
-      ! Sync images
-      sync images(xchg%prcs_xch+1)
-      do ip = 1, nxch
-        img = xchg%prcs_xch(ip) + 1
-        p1  = xchg%loc_rcv_bnd(ip)
-        p2  = xchg%loc_rcv_bnd(ip+1)-1
-        write(0,*) this_image(),'Boundaries ',p1,p2,' :',xchg%loc_rcv_idx(p1:p2),':',xchg%rmt_rcv_idx(p1:p2)
-        xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img] 
+    associate(xchg => desc_a%halo_xch)
+      ! FIXME: cache flush needed here
+      nxch = size(xchg%prcs_xch)
+!!$      if (this_image()==2) write(0,*) this_image(),nxch,nrl,ncl,' Exchanging with ',xchg%prcs_xch+1
+      do i=1,iwarm
+        temp = 0.d0
+        xvc(nrl+1:) = 0.d0
+        ! Sync images
+        !sync images(xchg%prcs_xch+1)
+        do ip=1,nxch
+          img = xchg%prcs_xch(ip) + 1
+          event post(ready[img])
+        end do
+        event wait(ready, until_count=nxch)
+        do ip = 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          p1  = xchg%loc_rcv_bnd(ip)
+          p2  = xchg%loc_rcv_bnd(ip+1)-1
+!!$          if (this_image()==2) write(0,*) this_image(),'Boundaries ',&
+!!$               & p1,p2,' :',xchg%loc_rcv_idx(p1:p2),':',xchg%rmt_rcv_idx(p1:p2)
+!!$        xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+          
+          temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+!!$          xvc(xchg%loc_rcv_idx(p1:p2)) = temp(p1:p2)
+!!$          if (this_image()==2) write(0,*) this_image(),' :x: ',ip,' : ',&
+!!$               &xvc(xchg%loc_rcv_idx(p1:p2)),' : ',xv%v%v(xchg%loc_rcv_idx(p1:p2))
+        end do
+!!$        if (this_image()==2) write(0,*) this_image(),' :x: ',&
+!!$             &xvc(nrl+1:ncl),' : ',xv%v%v(nrl+1:ncl)
+        call  a%csmv(done,xvc,dzero,bvc,info)
       end do
-      call  a%csmv(done,xvc,dzero,bvc,info)
-    end do
-    call psb_barrier(ictxt)
-    tt1 = psb_wtime()
-    do i=1,times
-      ! Sync images
-      sync images(xchg%prcs_xch+1)
-      do ip = 1, nxch
-        img = xchg%prcs_xch(ip) + 1
-        p1  = xchg%loc_rcv_bnd(ip)
-        p2  = xchg%loc_rcv_bnd(ip+1)-1
-        !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img] 
+      call psb_barrier(ictxt)
+      tt1 = psb_wtime()
+      do i=1,times
+        ! Sync images
+!        sync images(xchg%prcs_xch+1)
+!!$        do ip=1,nxch
+!!$          img = xchg%prcs_xch(ip) + 1
+!!$          event post(ready[img])
+!!$        end do
+!!$        event wait(ready, until_count=nxch)
+        
+        do ip = 1, nxch
+          img = xchg%prcs_xch(ip) + 1
+          sync images (img)
+          p1  = xchg%loc_rcv_bnd(ip)
+          p2  = xchg%loc_rcv_bnd(ip+1)-1
+          !xvc(xchg%loc_rcv_idx(p1:p2)) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]         
+          temp(p1:p2) = xvc(xchg%rmt_rcv_idx(p1:p2))[img]
+          xvc(xchg%loc_rcv_idx(p1:p2)) = temp(p1:p2)
+        end do
+        call  a%csmv(done,xvc,dzero,bvc,info)
       end do
-      call  a%csmv(done,xvc,dzero,bvc,info)
-    end do
-    call psb_barrier(ictxt)
-    tt2 = psb_wtime() - tt1
-    call psb_amx(ictxt,tt2)
-  end associate
-  call bvh%set(bvc(1:ncl))
+      call psb_barrier(ictxt)
+      tt2 = psb_wtime() - tt1
+      call psb_amx(ictxt,tt2)
+    end associate
+    call bvh%set(bvc(1:ncl))
+    call xvh%set(xvc(1:ncl))
   endif
+!!$  do i=2,2
+!!$    sync all
+!!$    if (i==this_image()) then 
+!!$      write(0,*) this_image(),' Xdiff ',xv%v%v(nrl+1:ncl) -xvc(nrl+1:ncl)
+!!$      write(0,*) this_image(),' X1 ',xv%v%v(nrl+1:ncl) 
+!!$      write(0,*) this_image(),' X2 ',xvc(nrl+1:ncl)
+!!$    end if
+!!$  end do
   
   call psb_geaxpby(-done,bv,done,bvh,desc_a,info)
   err = psb_genrm2(bvh,desc_a,info)
+  call psb_geaxpby(-done,xv,done,xvh,desc_a,info)
+  err2 = psb_genrm2(xvh,desc_a,info)
 
   nr       = desc_a%get_global_rows() 
   annz     = a%get_nzeros()
@@ -222,6 +261,7 @@ program pdgenspmv
     write(psb_out_unit,'("MFLOPS                           : ",F20.3)') tflops/1.d6
 
     write(psb_out_unit,'("Difference                       : ",E20.12)') err
+    write(psb_out_unit,'("Difference                       : ",E20.12)') err2
 
     !
     ! This computation is valid for CSR
@@ -234,9 +274,9 @@ program pdgenspmv
 
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    
+
   end if
-  
+
 
   !  
   !  cleanup storage and exit
@@ -256,7 +296,7 @@ program pdgenspmv
   stop
 
 9999 call psb_error(ictxt)
-
+  
   stop
 
 contains
@@ -280,7 +320,7 @@ contains
     call psb_bcast(ictxt,afmt)
     call psb_bcast(ictxt,idim)
     call psb_bcast(ictxt,times)
-    
+
     if (iam == 0) then
       write(psb_out_unit,'("Testing matrix       : ell1")')      
       write(psb_out_unit,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
@@ -368,4 +408,4 @@ contains
       g = exp(y**2-z**2)
     end if
   end function g
-end program pdgenspmv
+end program

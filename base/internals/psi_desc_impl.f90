@@ -77,7 +77,8 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   integer(psb_ipk_) :: debug_level, debug_unit
   logical, parameter :: debug=.false.
   character(len=20)  :: name
-  integer(psb_ipk_), allocatable :: buf_rmt_rcv_bnd(:)[:], buf_rmt_snd_bnd(:)[:], buf_rmt_idx(:)[:]
+  integer(psb_ipk_), allocatable :: buf_rmt_rcv_bnd(:)[:], buf_rmt_snd_bnd(:)[:]
+  integer(psb_ipk_), allocatable :: buf_rmt_rcv_idx(:)[:], buf_rmt_snd_idx(:)[:]
   type(event_type), allocatable, save :: snd_done(:)[:]
   type(event_type), save :: rcv_done[*]
   name='psi_cnv_v2xch'
@@ -126,7 +127,8 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
   if (allocated(snd_done)) deallocate(snd_done)
   
   allocate(buf_rmt_rcv_bnd(np*2)[*], buf_rmt_snd_bnd(np*2)[*], snd_done(np)[*])
-  allocate(buf_rmt_idx(mxnrcv)[*])
+  allocate(buf_rmt_rcv_idx(mxnrcv)[*])
+  allocate(buf_rmt_snd_idx(mxnrcv)[*])
   do 
     if (ip > size(vidx_in)) then 
       write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
@@ -145,14 +147,20 @@ subroutine psi_cnv_v2xch(ictxt, vidx_in, xch_idx,info)
     xch_idx%loc_rcv_bnd(ixch+1) =  xch_idx%loc_rcv_bnd(ixch) + nerv
     xch_idx%loc_snd_bnd(ixch+1) =  xch_idx%loc_snd_bnd(ixch) + nesd
     img = xch_idx%prcs_xch(ixch) + 1
-!Here I am assuming that all the data exchange between two images takes place in one exchange
+    !Here I am assuming that all the data exchange between two images takes place in one exchange
+    sync images(img)
     buf_rmt_rcv_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_rcv_bnd(ixch:ixch+1)
     buf_rmt_snd_bnd(me*2 - 1 : me*2)[img]= xch_idx%loc_snd_bnd(ixch:ixch+1)
-    buf_rmt_idx(1:nesd)[img] = xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
+!!$    if (img == 2) write(*,*) this_image(),'Send idx to 2:',&
+!!$         & xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
+    buf_rmt_rcv_idx(1:nesd)[img] = xch_idx%loc_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1)
+    buf_rmt_snd_idx(1:nerv)[img] = xch_idx%loc_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1)
     event post(snd_done(me)[img])
     event wait(snd_done(img))
     xch_idx%rmt_rcv_idx(xch_idx%loc_rcv_bnd(ixch):xch_idx%loc_rcv_bnd(ixch)+nerv-1) = &
-         & buf_rmt_idx(1:nerv)
+         & buf_rmt_rcv_idx(1:nerv)
+    xch_idx%rmt_snd_idx(xch_idx%loc_snd_bnd(ixch):xch_idx%loc_snd_bnd(ixch)+nesd-1) = &
+         & buf_rmt_snd_idx(1:nesd)
     xch_idx%rmt_rcv_bnd(ixch,1:2)=buf_rmt_rcv_bnd(img*2 - 1 : img*2)
     xch_idx%rmt_snd_bnd(ixch,1:2)=buf_rmt_snd_bnd(img*2 - 1 : img*2)
     ip     = ip+nerv+nesd+3

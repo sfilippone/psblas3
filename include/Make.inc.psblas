@@ -41,11 +41,11 @@ RANLIB=ranlib
 
 INSTALL=/usr/bin/install -c
 INSTALL_DATA=${INSTALL} -m 644
-INSTALL_DIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107
-INSTALL_LIBDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/lib
-INSTALL_INCLUDEDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/include
-INSTALL_DOCSDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/docs
-INSTALL_SAMPLESDIR=/mnt/gpfs0/home/e802756/NUMERICAL/CAF/7.1.0-ompi1107/samples
+INSTALL_DIR=/mnt/gpfs0/home/e802756/NUMERICAL/DEV/8.0.0-caf-xp
+INSTALL_LIBDIR=/mnt/gpfs0/home/e802756/NUMERICAL/DEV/8.0.0-caf-xp/lib
+INSTALL_INCLUDEDIR=/mnt/gpfs0/home/e802756/NUMERICAL/DEV/8.0.0-caf-xp/include
+INSTALL_DOCSDIR=/mnt/gpfs0/home/e802756/NUMERICAL/DEV/8.0.0-caf-xp/docs
+INSTALL_SAMPLESDIR=/mnt/gpfs0/home/e802756/NUMERICAL/DEV/8.0.0-caf-xp/samples
 
 # the following is the flag for /bin/cp which shall copy the file only for updating (timestamp based)--on GNU Linux, '-u'
 CPUPDFLAG=
