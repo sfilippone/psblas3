@@ -277,9 +277,9 @@ program psb_d_pde3d
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'("Number of processors          : ",i0)') np
     write(psb_out_unit,'("Preconditioner time min       : ",es12.5)')tprec
-    write(psb_out_unit,'("Preconditioner time avg       : ",es12.5)')tprcavg
+    write(psb_out_unit,'("Preconditioner time avg       : ",es12.5)')tprcavg/ntests
     write(psb_out_unit,'("Time to solve system min      : ",es12.5)')tslv
-    write(psb_out_unit,'("Time to solve system  avg     : ",es12.5)')tslvavg
+    write(psb_out_unit,'("Time to solve system  avg     : ",es12.5)')tslvavg/ntests
     write(psb_out_unit,'("Time per iteration    avg     : ",es12.5)')tslvavg/iter
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
