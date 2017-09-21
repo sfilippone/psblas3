@@ -80,19 +80,21 @@ Module psb_z_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_zasb(x, desc_a, info)
+    subroutine psb_zasb(x, desc_a, info, scratch)
       import
       implicit none
       type(psb_desc_type), intent(in) ::  desc_a
       complex(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
       integer(psb_ipk_), intent(out)            ::  info
+      logical, intent(in), optional        :: scratch
     end subroutine psb_zasb
-    subroutine psb_zasbv(x, desc_a, info)
+    subroutine psb_zasbv(x, desc_a, info, scratch)
       import
       implicit none
       type(psb_desc_type), intent(in) ::  desc_a
       complex(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer(psb_ipk_), intent(out)        ::  info
+      logical, intent(in), optional        :: scratch
     end subroutine psb_zasbv
     subroutine psb_zasb_vect(x, desc_a, info,mold, scratch)
       import

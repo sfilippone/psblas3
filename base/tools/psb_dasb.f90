@@ -42,18 +42,20 @@
 !    x(:,:)  - real, allocatable    The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                return code
-subroutine psb_dasb(x, desc_a, info)
+subroutine psb_dasb(x, desc_a, info, scratch)
   use psb_base_mod, psb_protect_name => psb_dasb
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
   real(psb_dpk_), allocatable, intent(inout) ::  x(:,:)
   integer(psb_ipk_), intent(out)            ::  info
+  logical, intent(in), optional        :: scratch
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me,nrow,ncol, err_act
   integer(psb_ipk_) :: i1sz, i2sz
   integer(psb_ipk_) :: debug_level, debug_unit
+  logical :: scratch_
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
@@ -62,6 +64,8 @@ subroutine psb_dasb(x, desc_a, info)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
+  scratch_ = .false.
+  if (present(scratch)) scratch_ = scratch
 
   if (.not.psb_is_ok_desc(desc_a)) then
     info=psb_err_input_matrix_unassembled_
@@ -107,13 +111,15 @@ subroutine psb_dasb(x, desc_a, info)
     endif
   endif
 
-  ! ..update halo elements..
-  call psb_halo(x,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_halo'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+  if (.not.scratch_) then 
+    ! ..update halo elements..
+    call psb_halo(x,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='psb_halo'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
@@ -170,18 +176,20 @@ end subroutine psb_dasb
 !    x(:)    - real, allocatable    The matrix to be assembled.
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                Return  code
-subroutine psb_dasbv(x, desc_a, info)
+subroutine psb_dasbv(x, desc_a, info, scratch)
   use psb_base_mod, psb_protect_name => psb_dasbv
   implicit none
 
   type(psb_desc_type), intent(in)                 ::  desc_a
   real(psb_dpk_), allocatable, intent(inout) ::  x(:)
   integer(psb_ipk_), intent(out)        ::  info
+  logical, intent(in), optional        :: scratch
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me
   integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
+  logical :: scratch_
   character(len=20)    :: name,ch_err
 
   info = psb_success_
@@ -191,6 +199,8 @@ subroutine psb_dasbv(x, desc_a, info)
   ictxt   = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
+  scratch_ = .false.
+  if (present(scratch)) scratch_ = scratch
 
   call psb_info(ictxt, me, np)
 
@@ -221,13 +231,15 @@ subroutine psb_dasbv(x, desc_a, info)
     endif
   endif
 
-  ! ..update halo elements..
-  call psb_halo(x,desc_a,info)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='f90_pshalo'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+  if (.not.scratch_) then 
+    ! ..update halo elements..
+    call psb_halo(x,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='f90_pshalo'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

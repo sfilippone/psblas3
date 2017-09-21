@@ -79,19 +79,21 @@ Module psb_i_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_iasb(x, desc_a, info)
+    subroutine psb_iasb(x, desc_a, info, scratch)
       import
       implicit none
       type(psb_desc_type), intent(in) ::  desc_a
       integer(psb_ipk_), allocatable, intent(inout)       ::  x(:,:)
       integer(psb_ipk_), intent(out)            ::  info
+      logical, intent(in), optional        :: scratch
     end subroutine psb_iasb
-    subroutine psb_iasbv(x, desc_a, info)
+    subroutine psb_iasbv(x, desc_a, info, scratch)
       import
       implicit none
       type(psb_desc_type), intent(in) ::  desc_a
       integer(psb_ipk_), allocatable, intent(inout)   ::  x(:)
       integer(psb_ipk_), intent(out)        ::  info
+      logical, intent(in), optional        :: scratch
     end subroutine psb_iasbv
     subroutine psb_iasb_vect(x, desc_a, info,mold, scratch)
       import
