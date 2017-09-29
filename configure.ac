@@ -36,7 +36,7 @@ dnl NOTE : There is no cross compilation support.
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],3.5, salvatore.filippone@cranfield.ac.uk)
+AC_INIT([PSBLAS],3.5, [https://github.com/sfilippone/psblas3/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
