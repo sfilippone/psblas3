@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------------*/
-/*              Parallel Sparse BLAS  v2.2					    */
-/*    (C) Copyright 2007 Salvatore Filippone    University of Rome Tor Vergata      */
+/*              Parallel Sparse BLAS  v 3.5.0					    */
+/*    (C) Copyright 2017 Salvatore Filippone   Cranfield University                 */
 /* 										    */
 /*  Redistribution and use in source and binary forms, with or without		    */
 /*  modification, are permitted provided that the following conditions		    */
@@ -62,12 +62,8 @@
 /* In this sample program the index space of the discretized			    */
 /* computational domain is first numbered sequentially in a standard way, 	    */
 /* then the corresponding vector is distributed according to an HPF BLOCK	    */
-/* distribution directive.							    */
-/*										    */
-/* Boundary conditions are set in a very simple way, by adding 			    */
-/* equations of the form							    */
-/*										    */
-/*   u(x,y) = rhs(x,y)								    */
+/* distribution directive. The discretization ensures there are IDIM                */
+/* *internal* points in each direction.                                             */
 /*                                                                                  */
 /*----------------------------------------------------------------------------------*/
 
@@ -78,144 +74,136 @@
 
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
+#include "psb_krylov_cbind.h"
 
 #define LINEBUFSIZE 1024
 #define NBMAX       20
+#define DUMPMATRIX  0
 
 double  a1(double x, double y, double  z)
 {
-  return(1.0);
+  return(1.0/80.0);
 }
 double a2(double x, double y, double  z)
 {
-  return(20.0*y);
+  return(1.0/80.0);
 }
 double a3(double x, double y, double  z)
 {
-  return(1.0);
+  return(1.0/80.0);
 }
-double  a4(double x, double y, double  z)
+double  c(double x, double y, double  z)
 {
-  return(1.0);
+  return(0.0);
 }
 double  b1(double x, double y, double  z)
 {
-  return(1.0);
+  return(1.0/sqrt(3.0));
 }
 double b2(double x, double y, double  z)
 {
-  return(1.0);
+  return(1.0/sqrt(3.0));
 }
 double b3(double x, double y, double  z)
 {
-  return(1.0);
+  return(1.0/sqrt(3.0));
+}
+
+double g(double x, double y, double z)
+{
+  if (x == 1.0) {
+    return(1.0);
+  } else if (x == 0.0) {
+    return( exp(-y*y-z*z));
+  } else {
+    return(0.0);
+  }
 }
 
 int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor *cdh,
 	   psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
   int iam, np;
-  int x, y, z, el,glob_row,i,info,ret;
-  double gx, gy, gz, deltah;
+  int ix, iy, iz, el,glob_row,i,info,ret;
+  double x, y, z, deltah, sqdeltah, deltah2;
   double val[10*NBMAX], zt[NBMAX];
   int irow[10*NBMAX], icol[10*NBMAX];
 
   info = 0;
   psb_c_info(ictxt,&iam,&np);
-  deltah = (double) 1.0/(idim-1);
-  psb_c_set_index_base(1);
-  for (glob_row=1; glob_row<=ng; glob_row++) {
+  deltah = (double) 1.0/(idim+2);
+  sqdeltah = deltah*deltah;
+  deltah2  = 2.0* deltah;
+  psb_c_set_index_base(0);
+  for (glob_row=0; glob_row < ng; glob_row++) {
 
     /* Check if I have to do something about this entry */
-    if (vg[glob_row-1] == iam) {
+    if (vg[glob_row] == iam) {
       el=0;
-      if ( (glob_row%(idim*idim)) == 0) {
-	x = glob_row/(idim*idim);
-      } else {
-	x = glob_row/(idim*idim)+1;
-      }
-      if (((glob_row-(x-1)*idim*idim)%idim) == 0) {
-	y = (glob_row-(x-1)*idim*idim)/idim;
-      } else {
-	y = (glob_row-(x-1)*idim*idim)/idim+1;
-      }
-      z = glob_row-(x-1)*idim*idim-(y-1)*idim;
-      gx=x*deltah;
-      gy=y*deltah;
-      gz=z*deltah;
+      ix = glob_row/(idim*idim);
+      iy = (glob_row-ix*idim*idim)/idim;
+      iz = glob_row-ix*idim*idim-iy*idim;
+      x=(ix+1)*deltah;
+      y=(iy+1)*deltah;
+      z=(iz+1)*deltah;
       zt[0] = 0.0;
       /*  internal point: build discretization */
       /*  term depending on   (x-1,y,z)        */
-	
-      if (x==1) {
-	val[el] = -b1(gx,gy,gz)-a1(gx,gy,gz);
-	val[el] /= deltah*deltah;
-	zt[0] = exp(-gy*gy-gz*gz)*(-val[el]);
+      val[el] = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2;	
+      if (ix==0) {
+	zt[0] += g(0.0,y,z)*(-val[el]);
       } else {
-	val[el]=-b1(gx,gy,gz) -a1(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x-2)*idim*idim+(y-1)*idim+(z);
+	icol[el]=(ix-1)*idim*idim+(iy)*idim+(iz);
 	el=el+1;
       }
-      /*  term depending on     (x,y-1,z) */ 
-      if (y==1) { 
-	val[el]=-b2(gx,gy,gz)-a2(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	zt[0] = exp(-gy*gy-gz*gz)*exp(-gx)*(-val[el]);
+      /*  term depending on     (x,y-1,z) */
+      val[el]  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2;	      
+      if (iy==0) { 
+	zt[0] += g(x,0.0,z)*(-val[el]);
       } else {
-	val[el]=-b2(gx,gy,gz)-a2(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x-1)*idim*idim+(y-2)*idim+(z);
+	icol[el]=(ix)*idim*idim+(iy-1)*idim+(iz);
 	el=el+1;
       }
       /* term depending on     (x,y,z-1)*/
-      if (z==1) { 
-	val[el]=-b3(gx,gy,gz)-a3(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	zt[0] = exp(-gy*gy-gz*gz)*exp(-gx)*(-val[el]);
+      val[el]=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2;
+      if (iz==0) { 
+	zt[0] += g(x,y,0.0)*(-val[el]);
       } else {
-	val[el]=-b3(gx,gy,gz)-a3(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x-1)*idim*idim+(y-1)*idim+(z-1);
+	icol[el]=(ix)*idim*idim+(iy)*idim+(iz-1);
 	el=el+1;
       }
       /* term depending on     (x,y,z)*/
-      val[el]=2*b1(gx,gy,gz)+2*b2(gx,gy,gz)+2*b3(gx,gy,gz)      
-	+a1(gx,gy,gz)+a2(gx,gy,gz)+a3(gx,gy,gz);
-      val[el] = val[el]/(deltah*deltah);
-      icol[el]=(x-1)*idim*idim+(y-1)*idim+(z);
+      val[el]=2.0*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah + c(x,y,z);
+      icol[el]=(ix)*idim*idim+(iy)*idim+(iz);
       el=el+1;
       /*  term depending on     (x,y,z+1) */
-      if (z==idim) { 
-	val[el]=-b1(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	zt[0] = exp(-gy*gy-gz*gz)*exp(-gx)*(-val[el]);
+      val[el] = -a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2;
+      if (iz==idim-1) { 
+	zt[0] += g(x,y,1.0)*(-val[el]);
       } else {
-	val[el]=-b1(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x-1)*idim*idim+(y-1)*idim+(z+1);
+	icol[el]=(ix)*idim*idim+(iy)*idim+(iz+1);
 	el=el+1;
       }
       /* term depending on     (x,y+1,z) */
-      if (y==idim) { 
-	val[el]=-b2(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	zt[0] = exp(-gy*gy-gz*gz)*exp(-gx)*(-val[el]);
+      val[el] = -a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2;
+      if (iy==idim-1) { 
+	zt[0] += g(x,1.0,z)*(-val[el]);
       } else {
-	val[el]=-b2(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x-1)*idim*idim+(y)*idim+(z);
+	icol[el]=(ix)*idim*idim+(iy+1)*idim+(iz);
 	el=el+1;
       }
       /*  term depending on     (x+1,y,z) */
-      if (x<idim) { 
-	val[el]=-b3(gx,gy,gz);
-	val[el] = val[el]/(deltah*deltah);
-	icol[el]=(x)*idim*idim+(y-1)*idim+(z);
+      val[el] = -a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2;
+      if (ix==idim-1) { 
+	zt[0] += g(1.0,y,z)*(-val[el]);
+      } else {
+	icol[el]=(ix+1)*idim*idim+(iy)*idim+(iz);
 	el=el+1;
       }
+      for (i=0; i<el; i++) irow[i]=glob_row;
       if ((ret=psb_c_dspins(el,irow,icol,val,ah,cdh))!=0) 
-	fprintf(stderr,"From psb_c_dspins: %d\n",ret); 
+	fprintf(stderr,"From psb_c_dspins: %d\n",ret);
+      irow[0] = glob_row; 
       psb_c_dgeins(1,irow,zt,bh,cdh);
       zt[0]=0.0;
       psb_c_dgeins(1,irow,zt,xh,cdh);
@@ -246,8 +234,9 @@ int main(int argc, char *argv[])
   double t1,t2,eps,err;
   double *xv, *bv, *rv;
   double one=1.0, zero=0.0, res2;
-  /* psb_c_SolverOptions options; */
+  psb_c_SolverOptions options; 
   psb_c_descriptor *cdh;
+  FILE *vectfile;
   
   ictxt = psb_c_init();
   psb_c_info(ictxt,&iam,&np);
@@ -328,14 +317,13 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Error during matrix build loop\n");
     psb_c_abort(ictxt);
   }    
-  psb_c_dmat_name_print(ah,"cbindmat.mtx");
   psb_c_barrier(ictxt);
   /* Set up the preconditioner */ 
   ph  = psb_c_new_dprec();
   psb_c_dprecinit(ph,ptype);
   ret=psb_c_dprecbld(ah,cdh,ph);
   fprintf(stderr,"From psb_c_dprecbld: %d\n",ret); 
-#if 0 
+
   /* Set up the solver options */ 
   psb_c_DefaultSolverOptions(&options);
   options.eps    = 1.e-9;
@@ -354,7 +342,6 @@ int main(int argc, char *argv[])
     psb_c_print_errmsg();
   }
   fprintf(stderr,"After cleanup %d\n",psb_c_get_errstatus());
-#endif   
   /* Check 2-norm of residual on exit */ 
   psb_c_dgeaxpby(one,bh,zero,rh,cdh); 
   psb_c_dspmm(-one,ah,xh,one,rh,cdh); 
@@ -368,11 +355,14 @@ int main(int argc, char *argv[])
     
   }
 
-#if 0
-  bv = psb_c_dvect_get_cpy(bh);
-  nlr=psb_c_cd_get_local_rows(cdh);
+#if DUMPATRIX
+  psb_c_dmat_name_print(ah,"cbindmat.mtx");
+  nlr = psb_c_cd_get_local_rows(cdh);
+  bv  = psb_c_dvect_get_cpy(bh);
+  vectfile=fopen("cbindb.mtx","w");
   for (i=0;i<nlr; i++)
-    fprintf(stdout,"RHS: %d %d %lf\n",iam,i,bv[i]);
+    fprintf(vectfile,"%lf\n",bv[i]);
+  fclose(vectfile);
 
 
   xv = psb_c_dvect_get_cpy(xh);

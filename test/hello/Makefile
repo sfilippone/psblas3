@@ -1,5 +1,6 @@
 BASEDIR=../..
 INCDIR=$(BASEDIR)/include
+MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
@@ -10,7 +11,7 @@ LDLIBS=$(PSBLDLIBS)
 # Compilers and such
 #
 CCOPT= -g
-FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 
 EXEDIR=./runs

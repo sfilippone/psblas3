@@ -23,8 +23,9 @@ psb_d_t* psb_c_dvect_get_cpy(psb_c_dvector *xh)
   
   if ((temp=(psb_d_t *)malloc(vsize*sizeof(psb_d_t)))!=NULL)
     psb_c_dvect_f_get_cpy(temp,xh);
- 
- return(temp);
+
+  fprintf(stderr,"dvect_get_cpy: %lf\n",temp[0]);
+  return(temp);
 
 }
 

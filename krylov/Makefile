@@ -4,6 +4,7 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 
 MODOBJS= psb_base_krylov_conv_mod.o \
 	psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o \
@@ -23,19 +24,19 @@ OBJS=$(F90OBJS) $(MODOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(METHDLIBNAME)	
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 
 psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o:  psb_base_krylov_conv_mod.o
 psb_krylov_conv_mod.o: psb_s_krylov_conv_mod.o psb_c_krylov_conv_mod.o psb_d_krylov_conv_mod.o psb_z_krylov_conv_mod.o 
 $(F90OBJS): $(MODOBJS)
-$(OBJS): $(INCDIR)/$(PRECMODNAME)$(.mod)  $(INCDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(MODDIR)/$(PRECMODNAME)$(.mod)  $(MODDIR)/$(BASEMODNAME)$(.mod)
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

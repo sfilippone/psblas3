@@ -2,19 +2,20 @@ TOP=../../..
 include $(TOP)/Make.inc
 LIBDIR=$(TOP)/lib
 INCLUDEDIR=$(TOP)/include
+MODDIR=$(TOP)/modules/
 HERE=../..
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(INCLUDEDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) 
 CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
 PSBC_LIBS= -L$(LIBDIR) -lpsb_cbind
-PSB_LIBS=-lpsb_prec -lpsb_base -L$(LIBDIR)
+PSB_LIBS=-lpsb_krylov -lpsb_prec -lpsb_base -L$(LIBDIR)
 #    -lpsb_krylov_cbind
 
 #
 # Compilers and such
 #
-CCOPT= -g
+#CCOPT= -g
 #FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 CINCLUDES=-I$(LIBDIR) $(FIFLAG)$(INCLUDEDIR) $(FIFLAG)$(PSBLAS_INCDIR)
 

@@ -43,7 +43,7 @@ psb_i_t    psb_c_smat_get_ncols(psb_c_sspmat *mh);
 /* psb_i_t    psb_c_sspasb_opt(psb_c_sspmat *mh, psb_c_descriptor *cdh,  */
 /* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
 psb_i_t    psb_c_ssprn(psb_c_sspmat *mh, psb_c_descriptor *cdh, _Bool clear);
-/* psb_i_t    psb_c_sspprint(psb_c_sspmat *mh); */
+psb_i_t    psb_c_smat_name_print(psb_c_sspmat *mh, char *name); 
 
 /* psblas computational routines */
 psb_s_t psb_c_sgedot(psb_c_svector *xh, psb_c_svector *yh, psb_c_descriptor *cdh);

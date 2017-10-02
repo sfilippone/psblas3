@@ -2,6 +2,7 @@ include ../Make.inc
 
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 HERE=.
 MODOBJS=psb_prec_const_mod.o\
 	psb_s_prec_type.o psb_d_prec_type.o psb_c_prec_type.o psb_z_prec_type.o \
@@ -16,19 +17,19 @@ MODOBJS=psb_prec_const_mod.o\
 
 LIBNAME=$(PRECLIBNAME)
 COBJS=
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 OBJS=$(F90OBJS) $(COBJS) $(MPFOBJS) $(MODOBJS)
 
 lib:  $(OBJS) impld
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 impld: $(OBJS)
 	cd impl && $(MAKE)
 
-$(OBJS): $(INCDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(MODDIR)/$(BASEMODNAME)$(.mod)
 
 
 psb_s_base_prec_mod.o psb_d_base_prec_mod.o psb_c_base_prec_mod.o psb_z_base_prec_mod.o: psb_prec_const_mod.o

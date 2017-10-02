@@ -130,7 +130,7 @@ contains
       call psb_geins(nz,irw(1:nz),val(1:nz),&
            & xp,descp,info, dupl=psb_dupl_ovwrt_)
     else
-      call psb_geins(nz,(irw(1:nz)-(1-ixb)),val(1:nz),&
+      call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
            & xp,descp,info, dupl=psb_dupl_ovwrt_)
     end if
 

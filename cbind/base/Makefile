@@ -2,9 +2,10 @@ TOP=../..
 include $(TOP)/Make.inc
 LIBDIR=$(TOP)lib
 INCLUDEDIR=$(TOP)/include
+MODDIR=$(TOP)/modules
 HERE=..
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(INCLUDEDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) 
 CINCLUDES=-I. -I$(HERE) -I$(INCLUDEDIR)
 
 FOBJS= psb_objhandle_mod.o psb_base_cbind_mod.o psb_cpenv_mod.o \

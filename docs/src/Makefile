@@ -1,4 +1,4 @@
-## $Id$
+## $Id: Makefile 10536 2017-04-09 19:15:54Z sfilippo $
 ##---------------------------------------------------------------------------
 ## LaTeX Makefile
 ## Copyright (C) 1996-2001  Michael Forman	Michael.Forman@Colorado.EDU
@@ -254,7 +254,7 @@ define header
   @echo "#---------------------------------------------------------------------"
   @echo "MAKEFILE = LaTeX PDF Makefile"
   @echo "AUTHOR   = Alfredo Buttari"
-  @echo 'ID       = $$Id$ ' 
+  @echo 'ID       = $$Id: Makefile 10536 2017-04-09 19:15:54Z sfilippo $ ' 
   @echo "#---------------------------------------------------------------------"
   @echo
   @echo "ACRO     = $(ACRO) $(ACROFLAGS) $(PDF)"
