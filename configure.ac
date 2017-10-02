@@ -92,7 +92,8 @@ case $samplesdir in
    \/* )   eval "INSTALL_SAMPLESDIR=$samplesdir";;
    * ) eval "INSTALL_SAMPLESDIR=$INSTALL_DIR/samples";;
 esac
-AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR $INSTALL_SAMPLESDIR])
+INSTALL_MODULESDIR=$INSTALL_DIR/modules
+AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_MODULESDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR $INSTALL_SAMPLESDIR])
 
 dnl
 dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
@@ -117,6 +118,14 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
+AC_PROG_CC_STDC()
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+   C99OPT="$ac_cv_prog_cc_stdc";
+fi	
+
+ 
 
 ###############################################################################
 #			Suitable MPI compilers detection
@@ -138,7 +147,7 @@ if test "X$MPICC" = "X" ; then
     AC_CHECK_PROGS([MPICC],[mpxlc mpcc mpiicc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
-
+AC_PROG_CC_STDC
 
 AC_LANG([Fortran])
 
@@ -401,12 +410,12 @@ fi
 
 
 # COPT,FCOPT are aliases for CFLAGS,FCFLAGS .
-
 ##############################################################################
 # Compilers variables selection 
 ##############################################################################
 FC=${FC}
 CC=${CC}
+CCOPT="$CCOPT $C99OPT"
 
 
 ##############################################################################
@@ -473,6 +482,7 @@ fi
 PAC_ARG_LONG_INTEGERS
 if test x"$pac_cv_long_integers" == x"yes" ; then
    FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
+   CDEFINES="-DLONG_INTEGERS_ $CDEFINES";	
 fi
 
 #
@@ -720,6 +730,7 @@ AC_SUBST(INSTALL_LIBDIR)
 AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 AC_SUBST(INSTALL_SAMPLESDIR)
+AC_SUBST(INSTALL_MODULESDIR)
 
 AC_SUBST(BLAS_LIBS)
 AC_SUBST(AMD_LIBS)

@@ -3,6 +3,7 @@ include ../Make.inc
 
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 
 HERE=.
 
@@ -24,18 +25,18 @@ COBJS=metis_int.o psb_amd_order.o
 OBJS=$(COBJS) $(MODOBJS) $(IMPLOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(INCDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
 
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 $(HERE)/$(LIBNAME): $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-$(OBJS): $(INCDIR)/$(BASEMODNAME)$(.mod)
+$(OBJS): $(MODDIR)/$(BASEMODNAME)$(.mod)
 psb_util_mod.o: $(BASEOBJS)
 psb_metispart_mod.o: metis_int.o
 psb_mat_dist_mod.o:  psb_s_mat_dist_mod.o psb_d_mat_dist_mod.o psb_c_mat_dist_mod.o psb_z_mat_dist_mod.o 

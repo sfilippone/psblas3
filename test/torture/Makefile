@@ -1,11 +1,12 @@
 BASEDIR=../..
 INCDIR=$(BASEDIR)/include/
+MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 LIBDIR=$(BASEDIR)/lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 CCOPT= -g
-FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 PSBTOBJS=psbtf.o psb_mvsv_tester.o  \
 	psb_s_mvsv_tester.o psb_d_mvsv_tester.o psb_c_mvsv_tester.o \

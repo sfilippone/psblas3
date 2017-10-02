@@ -2,6 +2,7 @@ include ../../Make.inc
 
 LIBDIR=../../lib
 INCDIR=../../include
+MODDIR=../../modules
 HERE=..
 OBJS=psb_s_prec_type_impl.o psb_d_prec_type_impl.o \
      psb_c_prec_type_impl.o psb_z_prec_type_impl.o \
@@ -20,7 +21,7 @@ OBJS=psb_s_prec_type_impl.o psb_d_prec_type_impl.o \
 
 LIBNAME=$(PRECLIBNAME)
 COBJS=
-FINCLUDES=$(FMFLAG).. $(FMFLAG)$(INCDIR) 
+FINCLUDES=$(FMFLAG).. $(FMFLAG)$(MODDIR) 
 
 lib:  $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

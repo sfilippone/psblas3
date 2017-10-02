@@ -3,11 +3,12 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 LIBNAME=$(BASELIBNAME)
 
 lib: mods sr cm in pb tl
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(INCDIR)
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 sr cm in pb tl: mods
 

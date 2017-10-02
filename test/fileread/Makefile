@@ -1,5 +1,6 @@
 INSTALLDIR=../..
 INCDIR=$(INSTALLDIR)/include/
+MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
@@ -8,7 +9,7 @@ LIBDIR=$(INSTALLDIR)/lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 LDLIBS=$(PSBLDLIBS)
 
-FINCLUDES=$(FMFLAG)$(INCDIR) $(FMFLAG).
+FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 SFOBJS=getp.o  psb_sf_sample.o   
 DFOBJS=getp.o  psb_df_sample.o   
