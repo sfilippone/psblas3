@@ -1,29 +1,6 @@
 This directory contains  the PSBLAS library, version 3.5.
 
 
-New features: additional Krylov methods  FCG and GCR.
-
-
-Existing codes will work untouched with version 3.5, but they will
-have to be recompiled; new methods have been added for the sake of GPU
-computations, plus the usual bunch of bug fixes.
-
-
-This version requires a working Fortran 2003 compiler; we do not use
-all of the language features (specifically, so far we did not employ
-FINAL subroutines), but the features we use were sufficient in
-identifying bugs in ALL compilers we tried (all the bugs have been
-reported and mostly fixed by the respective vendors). 
-
-
-The new internals have been completely overhauled, and in many cases
-rewritten; they now enable a much better interfacing with user-defined
-storage formats. If the user is only interested in the predefined
-formats, then the user's guide should be sufficient; what is somewhat
-lacking is documentation on how to add to the library, i.e. a
-developers' guide; stay tuned. 
-
-
  
 The architecture of the Fortran 2003 sparse BLAS is described in 
 S. Filippone, A. Buttari:
@@ -126,52 +103,12 @@ needed in this case (but note that the fake MPI stubs are only
 guaranteed to cover what we use internally, it's not a complete
 replacement). 
 
-EXPERIMENTAL
+LONG INTEGERS
 
 We have an experimental flag --enable-long-integers that will enable having
 8-byte integer data, allowing an index space larger than 2G; some
 small cases have been tested but we do not offer full guarantee (yet). 
 
-
-COMPILER NOTES.
-
-This code is confirmed to work with the following compilers (or
-later versions thereof): 
-       NAGware 5.2;
-       GNU 4.7.3;  
-       Cray CCE 8.0.1;
-
-They are all recognized by the configure script. 
-
-To make the script work with the Cray CCE environment, it is
-recommended to use the following:
-./configure FC=ftn F77=ftn CC=cc MPF90=ftn MPF77=ftn MPCC=cc
-with both CCE and GNU lower-level compilers. 
-
-XLF 13.1 configures correctly, but then fails with ICEs (Internal
-Compiler Error) at build time. We do not yet know whether XLF 14
-compiles correctly. 
-
-For the GNU compilers 4.6.x we are aware of a number of memory management
-issues that might surface in your applications; most of them (that
-we're aware of) are solved in version 4.7.2 or later.  
-
-The Intel compiler up to version 12.1 fails to compile, as of the last
-version we got access to. 
-
-
-
-KNOWN ISSUES.
-
-An annoying problem exists with some versions of MPI: if the configure
-script sets -DMPI_MOD the MPI call interfaces will be resolved by
-using the MPI Fortran module. 
-However usage of the  module may cause compilation to fail when
-coupled with the debugging option -g, because the compiler complains
-that it cannot find a matching interface for some of the
-communication routines.
-The solution: either take out the -g option, or, if you really need to
-debug, edit Make.inc to force -DMPI_H in place of -DMPI_MOD. 
 
 
 TODO:
@@ -182,35 +119,9 @@ The PSBLAS team.
 
 RELATED SOFTWARE
 
+
 If you are looking for more sophisticated preconditioners, you may be
-interested in the package  MLD2P4 from http://www.mld2p4.it 
+interested in the package  MLD2P4 from http://github.com/sfilippone/mld2p4-2
 
 
-Contact: Salvatore Filippone     salvatore.filippone@cranfield.ac.uk
-
-Credits for version 3:
-Salvatore  Filippone
-Alfredo    Buttari
-Ambra	   Abdullahi Hassan
-Pasqua	   D'Ambra
-Daniela    di Serafino
-
-Credits for version 2.2:
-Michele Martone contributed the initial version of the configure
-machinery.  
-
-Credits for version 2.0:
-Salvatore  Filippone
-Alfredo    Buttari
-
-
-Credits for version 1.0:
-
-Salvatore  Filippone
-Michele    Colajanni
-Fabio      Cerioni
-Stefano    Maiolatesi
-Dario      Pascucci
-
-
-
+Contact: https://github.com/sfilippone/psblas3

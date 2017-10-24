@@ -1,0 +1,125 @@
+WHAT'S NEW
+
+
+Version 3.5.
+   1. New Krylov methods methods  FCG and GCR are now available.
+   2. Existing codes will work untouched with version 3.5, but they
+      will have to be recompiled; new methods have been added for the
+      sake of GPU computations, plus the usual bunch of bug fixes.
+   3. An experimental C interface is available; this is neither
+      complete nor fully documented, feedback welcome. 
+
+
+
+Version 3. 
+This version requires a working Fortran 2003 compiler; we do not use
+all of the language features (specifically, so far we did not employ
+FINAL subroutines), but the features we use were sufficient in
+identifying bugs in ALL compilers we tried (all the bugs have been
+reported and mostly fixed by the respective vendors). 
+
+
+The new internals have been completely overhauled, and in many cases
+rewritten; they now enable a much better interfacing with user-defined
+storage formats. If the user is only interested in the predefined
+formats, then the user's guide should be sufficient; what is somewhat
+lacking is documentation on how to add to the library, i.e. a
+developers' guide; stay tuned. 
+
+
+ 
+The architecture of the Fortran 2003 sparse BLAS is described in 
+S. Filippone, A. Buttari:
+Object-Oriented Techniques for Sparse Matrix Computations in Fortran
+2003, 
+ACM Trans. on Math. Software, vol. 38, No. 4, 2012.
+
+The ideas are explored further with the paper:
+
+V. Cardellini, S. Filippone and D. Rouson
+Design Patterns for  sparse-matrix computations on
+hybrid CPU/GPU platforms, 
+Scientific Programming, 22(2014), pp.1-19.
+
+
+Version 1.0 of the library was described in:
+S. Filippone, M. Colajanni
+PSBLAS: A library for parallel linear algebra computation on sparse matrices
+ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
+
+
+
+
+COMPILER NOTES.
+
+This code is confirmed to work with the following compilers (or
+later versions thereof): 
+       NAGware 5.2;
+       GNU 4.7.3;  
+       Cray CCE 8.0.1;
+
+They are all recognized by the configure script. 
+
+To make the script work with the Cray CCE environment, it is
+recommended to use the following:
+./configure FC=ftn F77=ftn CC=cc MPF90=ftn MPF77=ftn MPCC=cc
+with both CCE and GNU lower-level compilers. 
+
+For the GNU compilers 4.6.x we are aware of a number of memory management
+issues that might surface in your applications; most of them (that
+we're aware of) are solved in version 4.7.2 or later.  
+
+The Intel compiler up to version 12.1 fails to compile, as of the last
+version we got access to. 
+
+
+KNOWN ISSUES.
+
+An annoying problem exists with some versions of MPI: if the configure
+script sets -DMPI_MOD the MPI call interfaces will be resolved by
+using the MPI Fortran module. 
+However usage of the  module may cause compilation to fail when
+coupled with the debugging option -g, because the compiler complains
+that it cannot find a matching interface for some of the
+communication routines.
+The solution: either take out the -g option, or, if you really need to
+debug, edit Make.inc to force -DMPI_H in place of -DMPI_MOD. 
+
+
+
+The PSBLAS team. 
+
+RELATED SOFTWARE
+
+If you are looking for more sophisticated preconditioners, you may be
+interested in the package  MLD2P4 from http://github.com/sfilippone/mld2p4-2
+
+
+Contact: https://github.com/sfilippone/psblas3
+
+Credits for version 3:
+Salvatore  Filippone
+Alfredo    Buttari
+Ambra	   Abdullahi Hassan
+Pasqua	   D'Ambra
+Daniela    di Serafino
+
+Credits for version 2.2:
+Michele Martone contributed the initial version of the configure
+machinery.  
+
+Credits for version 2.0:
+Salvatore  Filippone
+Alfredo    Buttari
+
+
+Credits for version 1.0:
+
+Salvatore  Filippone
+Michele    Colajanni
+Fabio      Cerioni
+Stefano    Maiolatesi
+Dario      Pascucci
+
+
+
