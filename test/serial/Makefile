@@ -3,7 +3,7 @@
 #
 BASEDIR=../..
 INCDIR=$(BASEDIR)/include/
-MODDIR=$(INSTALLDIR)/modules/
+MODDIR=$(BASEDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 LIBDIR=$(BASEDIR)/lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
