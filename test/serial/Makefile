@@ -3,7 +3,7 @@
 #
 BASEDIR=../..
 INCDIR=$(BASEDIR)/include/
-MODDIR=$(INSTALLDIR)/modules/
+MODDIR=$(BASEDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 LIBDIR=$(BASEDIR)/lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
@@ -12,21 +12,22 @@ LDLIBS=$(PSBLDLIBS)
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 
-EXEDIR=./runs
+EXEDIR=./runs/
 
 
 all: d_matgen 
 
 psb_d_xyz_impl.o d_matgen.o: psb_d_xyz_mat_mod.o 
 
-d_matgen: d_matgen.o psb_d_xyz_mat_mod.o psb_d_xyz_impl.o   
+d_matgen: d_matgen.o psb_d_xyz_mat_mod.o psb_d_xyz_impl.o
+	mkdir $(EXEDIR) || true
 	$(FLINK) $(LINKOPT) d_matgen.o psb_d_xyz_mat_mod.o psb_d_xyz_impl.o \
 	 -o d_matgen  $(PSBLAS_LIB) $(LDLIBS) 
 	/bin/cp -p $(CPUPDFLAG) d_matgen $(EXEDIR)	
 #	/bin/mv d_matgen $(EXEDIR)	
 
 check: all
-	cd runs && echo 5 | ./d_matgen
+	cd $(EXEDIR) && echo 5 | ./d_matgen
 
 clean: 
 	/bin/rm -f  d_matgen.o  \
