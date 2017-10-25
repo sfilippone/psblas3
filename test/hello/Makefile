@@ -29,7 +29,7 @@ pingpong: pingpong.o
 
 
 clean: 
-	/bin/rm -f hello.o pingpong.o runs
+	/bin/rm -f hello.o pingpong.o $(EXEDIR)
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

@@ -36,7 +36,7 @@ s_file_spmv: $(STOBJS)
 
 
 clean: 
-	/bin/rm -f $(DBOBJSS) $(DBOBJS) $(DTOBJS) $(STOBJS)
+	/bin/rm -f $(DBOBJSS) $(DBOBJS) $(DTOBJS) $(STOBJS) $(EXEDIR)
 
 lib:
 	(cd ../../; make library)
