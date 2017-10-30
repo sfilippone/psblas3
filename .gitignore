@@ -1,0 +1,17 @@
+*.a
+*.o
+*.mod
+*~
+
+# header files generated
+cbind/*.h
+
+# Make.inc generated
+/Make.inc
+
+# generated folder
+include/
+
+# the executable from tests
+runs
+
