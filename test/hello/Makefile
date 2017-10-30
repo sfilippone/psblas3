@@ -1,6 +1,6 @@
 BASEDIR=../..
 INCDIR=$(BASEDIR)/include
-MODDIR=$(BASEDIR)/modules/
+MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
@@ -29,7 +29,8 @@ pingpong: pingpong.o
 
 
 clean: 
-	/bin/rm -f hello.o pingpong.o $(EXEDIR)
+	/bin/rm -f hello.o pingpong.o
+	$(EXEDIR)/hello 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
