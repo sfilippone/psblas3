@@ -1,5 +1,5 @@
-This directory contains  the PSBLAS library, version 3.5.
-
+PSBLAS library, version 3.5.
+============================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
 S. Filippone, A. Buttari
@@ -18,20 +18,20 @@ matrices, ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 
 
 UTILITIES
+---------
 The test/util directory contains some utilities to convert to/from
 Harwell-Boeing and MatrixMarket file formats.
 
 
 DOCUMENTATION
-
+-------------
 See docs/psblas-3.5.pdf; an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
 test/pargen/psb_[sd]_pde[23]d.f90
 
 
-
 OTHER SOFTWARE CREDITS 
-
+----------------------
 We originally included a modified implementation of some of the Sparker
 (serial sparse BLAS)  material; this has been completely rewritten, way
 beyond the intention(s) and responsibilities of the original developers.
@@ -42,7 +42,7 @@ level interface, ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
 
 INSTALLING
-
+----------
 To compile and run our software you will need the following
 prerequisites (see also SERIAL below):
 
@@ -90,30 +90,31 @@ install and the libraries will be installed under /path/lib, while the
 module files will be installed under /path/include.
 
 SERIAL
-
+------
 Configuring with --enable-serial will provide a fake MPI stub library
 that enables running in pure serial mode; no MPI installation is needed
 in this case (but note that the fake MPI stubs are only guaranteed to
 cover what we use internally, it's not a complete replacement). 
 
 LONG INTEGERS
-
+-------------
 We have an experimental flag --enable-long-integers that will enable 
 having 8-byte integer data, allowing an index space larger than 2G; some
 small cases have been tested but we do not offer full guarantee (yet).
 
 
-TODO:
+TODO
+----
 Fix all reamining bugs. Bugs? We dont' have any ! ;-)
 
 
 The PSBLAS team. 
 
 RELATED SOFTWARE
-
+----------------
 If you are looking for more sophisticated preconditioners, you may be
-interested in the package MLD2P4 from 
-http://github.com/sfilippone/mld2p4-2
+interested in the package MLD2P4 from
+<http://github.com/sfilippone/mld2p4-2>
 
 
-Contact: https://github.com/sfilippone/psblas3
+Contact: <https://github.com/sfilippone/psblas3>
