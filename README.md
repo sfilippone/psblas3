@@ -87,7 +87,8 @@ make
 to  compile the library; go to the test directory and its subdirectories
 to get test programs done. If you specify `--prefix=/path` you can do make
 install and the libraries will be installed under `/path/lib`, while the
-module files will be installed under `/path/include`.
+module files will be installed under `/path/modules`. The regular and
+experimental C interface header files are under `/path/include`.
 
 SERIAL
 ------
