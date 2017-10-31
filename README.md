@@ -72,18 +72,18 @@ MPIFC=mpif90 which points to GNU Fortran. The best way to avoid this
 situation is (in our opinion) to use the environment modules package
 (see http://modules.sourceforge.net/), and load the relevant
 variables with (e.g.) 
-'''
+```
 module load gnu46 openmpi
-'''
+```
 This will delegate to the modules setup to make sure that the version of
 openmpi in use is the one compiled with the gnu46 compilers. After the
 configure script has completed you can always tweak the Make.inc file
 yourself. 
 
 After you have Make.inc fixed,  run 
-'''
+```
 make
-''' 
+``` 
 to  compile the library; go to the test directory and its subdirectories
 to get test programs done. If you specify --prefix=/path you can do make
 install and the libraries will be installed under /path/lib, while the
