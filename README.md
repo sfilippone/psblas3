@@ -1,5 +1,5 @@
-PSBLAS library, version 3.5.
-============================
+PSBLAS library, version 3.5
+===========================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
 >S. Filippone, A. Buttari. Object-Oriented Techniques for Sparse Matrix
@@ -19,7 +19,7 @@ Version 1.0 of the library is described in:
 
 UTILITIES
 ---------
-The test/util directory contains some utilities to convert to/from
+The `test/util` directory contains some utilities to convert to/from
 Harwell-Boeing and MatrixMarket file formats.
 
 
@@ -86,8 +86,8 @@ make
 ``` 
 to  compile the library; go to the test directory and its subdirectories
 to get test programs done. If you specify `--prefix=/path` you can do make
-install and the libraries will be installed under /path/lib, while the
-module files will be installed under /path/include.
+install and the libraries will be installed under `/path/lib`, while the
+module files will be installed under `/path/include`.
 
 SERIAL
 ------
