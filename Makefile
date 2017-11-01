@@ -37,7 +37,7 @@ install: all
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
-	   $(INSTALL_DATA) README LICENSE  $(INSTALL_DOCSDIR))
+	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR))
 	(./mkdir.sh  $(INSTALL_SAMPLESDIR) && \
 	     /bin/cp -fr test/pargen test/fileread test/kernel $(INSTALL_SAMPLESDIR) && \
 	     ./mkdir.sh $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pargen/* $(INSTALL_SAMPLESDIR)/cbind)
