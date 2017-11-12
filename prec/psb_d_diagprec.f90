@@ -163,8 +163,6 @@ contains
   subroutine psb_d_diag_precdescr(prec,iout,root)
     use psb_penv_mod
     use psb_error_mod
-    use psb_penv_mod
-    use psb_error_mod
     Implicit None
 
     class(psb_d_diag_prec_type), intent(in) :: prec

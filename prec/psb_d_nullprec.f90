@@ -122,7 +122,7 @@ contains
     call psb_erractionsave(err_act)
 
     info = psb_success_
-
+    call prec%set_ctxt(desc_a%get_ctxt())
     
     call psb_erractionrestore(err_act)
     return
@@ -157,8 +157,6 @@ contains
   
 
   subroutine psb_d_null_precdescr(prec,iout,root)
-    use psb_penv_mod
-    use psb_error_mod
     use psb_penv_mod
     use psb_error_mod
     

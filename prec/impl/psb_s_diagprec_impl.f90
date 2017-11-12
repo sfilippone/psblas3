@@ -244,6 +244,7 @@ subroutine psb_s_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   call psb_erractionsave(err_act)
 
   info = psb_success_
+  call prec%set_ctxt(desc_a%get_ctxt())
   nrow = desc_a%get_local_rows()
 
   prec%d=a%get_diag(info) 

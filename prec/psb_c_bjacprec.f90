@@ -135,7 +135,6 @@ contains
 
   subroutine psb_c_bjac_precdescr(prec,iout,root)
     use psb_penv_mod
-    use psb_penv_mod
     use psb_error_mod
     implicit none 
 
