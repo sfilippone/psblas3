@@ -356,8 +356,10 @@ follows:
 \item \verb|psb_spasb|
 \item \verb|psb_geasb|
 \end{enumerate}
-\item Choose the preconditioner to be used with \verb|psb_precset| and
-  build it with \verb|psb_precbld|
+\item Choose the preconditioner to be used with \verb|prec%init| and
+  build it with \verb|prec%build|\footnote{The subroutine style {\tt
+      psb\_precinit} and {\tt psb\_precbl} are still supported for
+    backward compatibility}. 
 \item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
 \end{enumerate}
 This is the structure of the sample program
@@ -381,8 +383,8 @@ multiple time steps, the following structure may be more appropriate:
 \item Loop over the mesh, generate the coefficients and insert/update
   them with \verb|psb_spins| and \verb|psb_geins|
 \item Assemble with \verb|psb_spasb| and \verb|psb_geasb|
-\item Choose and build preconditioner with \verb|psb_precset| and
-  \verb|psb_precbld|
+\item Choose and build preconditioner with \verb|prec%init| and
+  \verb|prec%build|
 \item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
  \end{enumerate}
 \end{enumerate}
