@@ -439,10 +439,9 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
 
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt, me, np)
-
+  ictxt=desc_a%get_ctxt()
   call prec%set_ctxt(ictxt)
+  call psb_info(ictxt, me, np)
 
   m = a%get_nrows()
   if (m < 0) then

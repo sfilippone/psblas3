@@ -246,7 +246,7 @@ subroutine psb_c_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
   info = psb_success_
   call prec%set_ctxt(desc_a%get_ctxt())
   nrow = desc_a%get_local_rows()
-
+  
   prec%d=a%get_diag(info) 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_
