@@ -7,15 +7,15 @@ set ( CMAKE_BUILD_TYPE "Release"
 set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 
 # Add option and check environment to determine if developer tests should be run
-if($ENV{OPENCOARRAYS_DEVELOPER})
-  option(CAF_RUN_DEVELOPER_TESTS "Run tests intended only for developers" ON)
+if($ENV{PSBLAS_DEVELOPER})
+  option(MPI_RUN_DEVELOPER_TESTS "Run tests intended only for developers" ON)
 else()
-  option(CAF_RUN_DEVELOPER_TESTS "Run tests intended only for developers" OFF)
+  option(MPI_RUN_DEVELOPER_TESTS "Run tests intended only for developers" OFF)
 endif()
-mark_as_advanced(CAF_RUN_DEVELOPER_TESTS)
+mark_as_advanced(MPI_RUN_DEVELOPER_TESTS)
 
-if( NOT DEFINED ENV{OPENCOARRAYS_DEVELOPER})
-  set ( ENV{OPENCOARRAYS_DEVELOPER} FALSE )
+if( NOT DEFINED ENV{PSBLAS_DEVELOPER})
+  set ( ENV{PSBLAS_DEVELOPER} FALSE )
 endif()
 
 # Name project and specify source languages
@@ -25,9 +25,9 @@ file(STRINGS ".VERSION" first_line
   )
 
 string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+"
-  OpenCoarraysVersion "${first_line}")
+  PSBLAS_Version "${first_line}")
 
-if((NOT (OpenCoarraysVersion MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+")) AND (EXISTS "${CMAKE_SOURCE_DIR}/.git"))
+if((NOT (PSBLAS_Version MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+")) AND (EXISTS "${CMAKE_SOURCE_DIR}/.git"))
   message( STATUS "Build from git repository detected")
   find_package(Git)
   if(GIT_FOUND)
@@ -37,7 +37,7 @@ if((NOT (OpenCoarraysVersion MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+")) AND (EXISTS "$
       OUTPUT_VARIABLE git_output
       OUTPUT_STRIP_TRAILING_WHITESPACE)
     if((git_status STREQUAL "0") AND (git_output MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+"))
-      set(OpenCoarraysVersion "${git_output}")
+      set(PSBLAS_Version "${git_output}")
     endif()
     execute_process(COMMAND "${GIT_EXECUTABLE}" describe --always
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -58,20 +58,24 @@ if((NOT (OpenCoarraysVersion MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+")) AND (EXISTS "$
   endif()
 endif()
 
-if(NOT (OpenCoarraysVersion MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+"))
+if(NOT (PSBLAS_Version MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+"))
   message( WARNING "Could not extract version from git, falling back on .VERSION, line 3.")
-  file(STRINGS ".VERSION" OpenCoarraysVersion
+  file(STRINGS ".VERSION" PSBLAS_Version
   REGEX "[0-9]+\\.[0-9]+\\.[0-9]+"
   )
 endif()
 
 if(NOT full_git_describe)
-  set(full_git_describe ${OpenCoarraysVersion})
+  set(full_git_describe ${PSBLAS_Version})
 endif()
 
-project(opencoarrays VERSION "${OpenCoarraysVersion}" LANGUAGES C Fortran)
-message( STATUS "Building OpenCoarrays version: ${full_git_describe}" )
-set(OpenCoarrays_dist_string "OpenCoarrays-${full_git_describe}")
+# Strip leading "v" character from PSBLAS version tags
+string(REPLACE "v" "" PSBLAS_Version "${PSBLAS_Version}")
+
+project(psblas VERSION "${PSBLAS_Version}" LANGUAGES C Fortran)
+
+message( STATUS "Building PSBLAS version: ${full_git_describe}" )
+set(PSBLAS_dist_string "PSBLAS-${full_git_describe}")
 
 #Print an error message on an attempt to build inside the source directory tree:
 if ("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}")
@@ -84,11 +88,11 @@ if ("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}")
     "\nYou must now run something like:\n"
     "  $ rm -r CMakeCache.txt CMakeFiles/"
     "\n"
-    "Please create a directory outside the opencoarrays source tree and build under that outside directory "
+    "Please create a directory outside the PSBLAS source tree and build under that outside directory "
     "in a manner such as\n"
-    "  $ mkdir build-opencarrays\n"
-    "  $ cd build-opencoarrays\n"
-    "  $ CC=gcc FC=gfortran cmake -DBUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install/dir /path/to/opencoarrays/src/dir \n"
+    "  $ mkdir build\n"
+    "  $ cd build\n"
+    "  $ CC=gcc FC=gfortran cmake -DBUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install/dir /path/to/psblas3/src/dir \n"
     "\nsubstituting the appropriate syntax for your shell (the above line assumes the bash shell)."
     )
 endif()
@@ -104,7 +108,7 @@ else()
   message(WARNING
     "\n"
     "Attempting to build with untested Fortran compiler: ${CMAKE_Fortran_COMPILER_ID}. "
-    "Please report any failures to opencoarrays@googlegroups.com\n\n"
+    "Please report any failures at https://github.com/sfilippone/psblas3\n\n"
   )
 endif()
 
@@ -148,32 +152,6 @@ the C compiler if it matches the Fortran compiler ID." )
   endif()
   set( CMAKE_Fortran_COMPILER_VERSION "${DETECTED_VER}" )
 endif()
-
-  # We have populated CMAKE_Fortran_COMPILER_VERSION if it was missing
-  if(gfortran_compiler AND (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 5.0.0))
-    set(opencoarrays_aware_compiler true)
-    add_definitions(-DPREFIX_NAME=_gfortran_caf_)
-  else()
-    set(opencoarrays_aware_compiler false)
-    add_definitions(-DPREFIX_NAME=_caf_extensions_)
-  endif()
-  if(gfortran_compiler AND (CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 5.4.0))
-    # GCC patch to fix issue accepted for 5.4 release
-    # See https://github.com/sourceryinstitute/opencoarrays/issues/28 and
-    # https://groups.google.com/forum/#!msg/opencoarrays/RZOwwYTqG80/46S9eL696dgJ
-    message( STATUS "Disabling optimization flags due to GCC < 5.4 bug")
-    set(CMAKE_Fortran_FLAGS_RELEASE -O0
-      CACHE STRING "Flags used by the compiler during release builds." FORCE)
-    set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g -DNDEBUG -O0"
-      CACHE STRING "Flags used by the compiler during release builds with debug info" FORCE)
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O0")
-  endif()
-  if ( gfortran_compiler AND ( NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0 ) )
-    add_definitions(-DGCC_GE_7) # Tell library to build against GFortran 7.x bindings b/c we might be using clang for C
-  endif()
-  if ( gfortran_compiler AND ( NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 8.0.0 ) )
-    add_definitions(-DGCC_GE_8) # Tell library to build against GFortran 8.x bindings w/ descriptor change
-  endif()
 
 if(gfortran_compiler)
   set(OLD_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
@@ -236,8 +214,8 @@ list(REMOVE_DUPLICATES MPI_Fortran_INCLUDE_PATH)
 # Test for consistent MPI environment
 if (NOT MPIEXEC)
   message ( ERROR "CMake failed to find `mpiexec` or similar. If building with `./install.sh` please
-report this bug to the OpenCoarrays developers at
-https://github.com/sourceryinstitute/opencoarrays/issues, otherwise point CMake
+report this bug to the PSBLAS developers at
+https://github.com/sfilippone/psblas3/issues, otherwise point CMake
 to the desired MPI runtime.")
 endif()
 
@@ -269,8 +247,8 @@ else()
 which differs from the location of MPICC and/or MPIFC which are in
 \"${MPICC_DIR}\" and \"${MPIFC_DIR},\" respectively.
 This is likely indicative of a problem. If building with `./install.sh` please report
-this to the OpenCoarrays developers by filing a new issue at:
-https://github.com/sourceryinstitute/OpenCoarrays/issues/new")
+this to the PSBLAS developers by filing a new issue at:
+https://github.com/sourceryinstitute/PSBLAS/issues/new")
 endif()
 
 #-----------------------------------------------
@@ -281,7 +259,7 @@ if( (MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES 
 "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable. This is
 known to cause segmentation faults for some Fortran codes. See, e.g.,
 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71729 or
-https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
+https://github.com/sourceryinstitute/PSBLAS/issues/317.
 
 `noexecstack` is being replaced with `execstack`"
     )
@@ -403,11 +381,7 @@ unset(OLD_INCLUDES)
 unset(OLD_LIBRARIES)
 
 if ( (NOT MPI_Fortran_MODULE_COMPILES) AND (NOT MPI_Fortran_INCLUDE_COMPILES) )
-  message ( WARNING "It appears that the Fortran MPI compiler is not working. "
-    "For OpenCoarrays Aware compilers, this may be irrelavent: "
-    "  The src/extensions/opencoarrays.F90 module will be disabled, but it is "
-    "  possible that the build will succeed, despite this fishy circumstance."
-    )
+  message ( WARNING "It appears that the Fortran MPI compiler is not working. ")
 endif()
 
 if ( MPI_Fortran_MODULE_COMPILES )
@@ -415,7 +389,7 @@ if ( MPI_Fortran_MODULE_COMPILES )
 else()
   message ( WARNING "It appears that MPI was built with a different Fortran compiler. "
     "It is possible that this may cause unpredictable behavior. The build will continue "
-    "using `mpif.h` BUT please report any suspicious behavior to the OpenCoarrays "
+    "using `mpif.h` BUT please report any suspicious behavior to the PSBLAS "
     "developers."
     )
 endif()
@@ -433,8 +407,8 @@ include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
 # Use standardized GNU install directory conventions
 #---------------------------------------------------
 include(GNUInstallDirs)
-set(mod_dir_tail "${OpenCoarrays_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${OpenCoarrays_dist_string}-tests")
+set(mod_dir_tail "${PSBLAS_dist_string}_${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${PSBLAS_dist_string}-tests")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
@@ -447,7 +421,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/doc/man/man1/caf.1" "${CMAKE_SOURCE_DIR}/doc/
   COMPONENT documentation)
 
 #---------------------------------------------------
-# Define macro for compiling with caf wrapper script
+# Define macro for compiling with wrapper script
 #---------------------------------------------------
 function(caf_compile_executable target main_depend)
   foreach(includedir IN LISTS MPI_Fortran_INCLUDE_PATH)
@@ -477,9 +451,9 @@ enable_testing()
 find_program(SHELLCHECK_EXE shellcheck
   DOC "Path to shellcheck executable for linting scripts"
   )
-if (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER})
+if (MPI_RUN_DEVELOPER_TESTS OR $ENV{PSBLAS_DEVELOPER})
   if(NOT SHELLCHECK_EXE)
-    message( AUTHOR_WARNING "OpenCoarrays developers should install shellcheck to test/lint all shell scripts.
+    message( AUTHOR_WARNING "PSBLAS developers should install shellcheck to test/lint all shell scripts.
     See https://github.com/koalaman/shellcheck#installing for info on obtaining shellcheck.")
   endif()
 endif()
@@ -489,7 +463,7 @@ function(lint_script script_dir script_name)
     add_test(NAME "shellcheck:${script_name}"
       COMMAND ${SHELLCHECK_EXE} -x "${script_dir}/${script_name}"
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-  elseif (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER})
+  elseif (MPI_RUN_DEVELOPER_TESTS OR $ENV{PSBLAS_DEVELOPER})
     message( AUTHOR_WARNING "test: shellcheck:${script_name} not run because shellcheck not installed." )
   endif()
 endfunction()
@@ -525,39 +499,39 @@ define_property(TARGET
 #-------------------------------
 # Recurse into the src directory
 #-------------------------------
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+#include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_subdirectory(src)
+#add_subdirectory(src)
 
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
-install(EXPORT OpenCoarraysTargets
+install(EXPORT PSBLASTargets
   NAMESPACE
-    OpenCoarrays::
+    PSBLAS::
   DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/opencoarrays"
+    "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
 )
 include(CMakePackageConfigHelpers) # standard CMake module
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/OpenCoarraysConfigVersion.cmake"
-  VERSION "${opencoarrays_VERSION}"
+  "${CMAKE_CURRENT_BINARY_DIR}/PSBLASConfigVersion.cmake"
+  VERSION "${psblas_VERSION}"
   COMPATIBILITY AnyNewerVersion
 )
-configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/OpenCoarraysConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/OpenCoarraysConfig.cmake" @ONLY)
+configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/PSBLASConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/PSBLASConfig.cmake" @ONLY)
 
 install(
   FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/OpenCoarraysConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/OpenCoarraysConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/PSBLASConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/PSBLASConfigVersion.cmake"
   DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/opencoarrays"
+    "${CMAKE_INSTALL_LIBDIR}/cmake/psblas"
 )
 
-add_library(OpenCoarrays INTERFACE)
-target_compile_options(OpenCoarrays INTERFACE -fcoarray=lib)
-target_link_libraries(OpenCoarrays INTERFACE caf_mpi)
+add_library(PSBLAS INTERFACE)
+#target_compile_options(PSBLAS INTERFACE -fcoarray=lib)
+#target_link_libraries(PSBLAS INTERFACE caf_mpi)
 
 #------------------------------------------
 # Add portable unistall command to makefile
@@ -587,157 +561,45 @@ endif ()
 
 include( ProcessorCount )
 ProcessorCount(N_CPU)
-function(add_caf_test name num_caf_img test_target)
+function(add_mpi_test name num_mpi_rank test_target)
   # Function to add MPI tests.
   if(TARGET ${test_target})
-    get_target_property(min_test_imgs ${test_target} MIN_IMAGES)
+    get_target_property(min_test_ranks ${test_target} MIN_IMAGES)
   elseif(TARGET build_${test_target})
-    get_target_property(min_test_imgs build_${test_target} MIN_IMAGES)
+    get_target_property(min_test_ranks build_${test_target} MIN_IMAGES)
   endif()
-  if(min_test_imgs)
-    if(num_caf_img LESS min_test_imgs)
-      message( FATAL_ERROR "Test ${name} requires ${min_test_imgs} but was only given ${num_caf_images}" )
+  if(min_test_ranks)
+    if(num_mpi_rank LESS min_test_ranks)
+      message( FATAL_ERROR "Test ${name} requires ${min_test_ranks} but was only given ${num_mpi_images}" )
     endif()
   endif()
-  if ( ((N_CPU LESS num_caf_img) OR (N_CPU EQUAL 0)) )
-    message(STATUS "Test ${name} is oversubscribed: ${num_caf_img} CAF images requested with ${N_CPU} system processor available.")
+  if ( ((N_CPU LESS num_mpi_rank) OR (N_CPU EQUAL 0)) )
+    message(STATUS "Test ${name} is oversubscribed: ${num_mpi_rank} CAF images requested with ${N_CPU} system processor available.")
     if ( openmpi )
-      if (min_test_imgs)
-	set( num_caf_img ${min_test_imgs} )
+      if (min_test_ranks)
+	set( num_mpi_rank ${min_test_ranks} )
       elseif ( N_CPU LESS 2 )
-        set( num_caf_img 2 )
+        set( num_mpi_rank 2 )
       endif()
       set (test_parameters --oversubscribe)
-      message( STATUS "Open-MPI back end detected, passing --oversubscribe for oversubscribed test, ${name}, with ${num_caf_img} ranks/images." )
+      message( STATUS "Open-MPI back end detected, passing --oversubscribe for oversubscribed test, ${name}, with ${num_mpi_rank} ranks/images." )
     endif()
   endif()
-  set(test_parameters -np ${num_caf_img} ${test_parameters})
-  add_test(NAME ${name} COMMAND "bash" "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/cafrun" ${test_parameters} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_target}")
+  set(test_parameters -np ${num_mpi_rank} ${test_parameters})
+  add_test(NAME ${name} COMMAND "bash" "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/mpirun" ${test_parameters} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_target}")
   set_property(TEST ${name} PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
-endfunction(add_caf_test)
+endfunction(add_mpi_test)
 
-#--------------
-# Add OCA tests
-#--------------
+#-----------------
+# Add PSBLAS tests
+#-----------------
 
-if(opencoarrays_aware_compiler)
-  if (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER})
-    message ( STATUS "Running Developer tests is enabled." )
-  endif()
-  # Unit tests targeting each libcaf_mpi function, argument, and branch of code
-  add_caf_test(initialize_mpi 2 initialize_mpi)
-  add_caf_test(register 2 register)
-  add_caf_test(register_vector 2 register_vector)
-  add_caf_test(register_alloc_vector 2 register_alloc_vector)
-  add_caf_test(allocate_as_barrier 2 allocate_as_barrier)
-  add_caf_test(allocate_as_barrier_proc 8 allocate_as_barrier_proc)
-  if (gfortran_compiler AND (NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0) OR (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER}))
-    message( STATUS "Allocatable components of coarray derived types only supported in GFortran >= 7 with OpenCoarrays > 1.8.4" )
-    message( STATUS "(but full support not anticipated until OpenCoarrays 2.0 release)" )
-    if (CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0)
-      message( AUTHOR_WARNING "Allocatable components of coarray derived type developer tests enabled, despite lack of support in GFortran < 7\n These tests should fail." )
-    endif()
-    add_caf_test(register_alloc_comp_1 2 register_alloc_comp_1)
-    add_caf_test(register_alloc_comp_2 2 register_alloc_comp_2)
-    add_caf_test(register_alloc_comp_3 2 register_alloc_comp_3)
-    add_caf_test(async_comp_alloc 6 async_comp_alloc)
-    add_caf_test(async_comp_alloc_2 2 async_comp_alloc_2)
-    add_caf_test(comp_allocated_1 2 comp_allocated_1)
-    add_caf_test(comp_allocated_2 2 comp_allocated_2)
-  endif()
-  add_caf_test(get_array 2 get_array)
-  add_caf_test(get_self 2 get_self)
-  add_caf_test(send_array 2 send_array)
-  add_caf_test(get_with_offset_1d 2 get_with_offset_1d)
-  add_caf_test(whole_get_array 2 whole_get_array)
-  add_caf_test(strided_get 2 strided_get)
-  add_caf_test(strided_sendget 3 strided_sendget)
-  add_caf_test(co_sum 4 co_sum_test)
-  add_caf_test(co_broadcast 4 co_broadcast_test)
-  add_caf_test(co_min 4 co_min_test)
-  add_caf_test(co_max 4 co_max_test)
-  add_caf_test(syncall 8 syncall)
-  add_caf_test(syncimages 8 syncimages)
-  add_caf_test(syncimages2 8 syncimages2)
-  add_caf_test(duplicate_syncimages 8 duplicate_syncimages)
-  add_caf_test(co_reduce 4 co_reduce_test)
-  add_caf_test(co_reduce_res_im 4 co_reduce_res_im)
-  add_caf_test(co_reduce_string 4 co_reduce_string)
-  add_caf_test(syncimages_status 8 syncimages_status)
-  add_caf_test(sync_ring_abort_np3 3 sync_image_ring_abort_on_stopped_image)
-  add_caf_test(sync_ring_abort_np7 7 sync_image_ring_abort_on_stopped_image)
-  add_caf_test(simpleatomics 8 atomics)
-  # possible logic error in the following test
-#  add_caf_test(increment_my_neighbor 32 increment_my_neighbor)
-
-  # Integration tests verifying the use of libcaf_mpi in applications
-  add_caf_test(hello_multiverse 2 hello_multiverse)
-  add_caf_test(coarray_burgers_pde 2 coarray_burgers_pde)
-  add_caf_test(co_heat 2 co_heat)
-  add_caf_test(asynchronous_hello_world 3 asynchronous_hello_world)
-
-  # Regression tests based on reported issues
-  if((gfortran_compiler AND (NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0)) OR (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER}))
-    if( CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0 )
-      message( AUTHOR_WARNING "Developer tests requested and GFortran < 7: test source-alloc-no-sync may fail" )
-    endif()
-    # GFortran PR 78505 only fixed on trunk/gcc 7, issue #243
-    add_caf_test(source-alloc-no-sync 8 source-alloc-sync)
-  endif()
-
-  # Open GCC 7 regressions
-  if ((CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER}) OR (gfortran_compiler AND (CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0)))
-    add_caf_test(convert-before-put 3 convert-before-put)
-    add_caf_test(put-alloc-comp 2 issue-422-send)
-    add_caf_test(get-put-alloc-comp 3 issue-422-send-get)
-  endif()
-
-  add_caf_test(allocatable_p2p_event_post 4 allocatable_p2p_event_post)
-  # Fixed GCC 7 regressions, should run on GCC 6 and 7
-  add_caf_test(static_event_post_issue_293 3 static_event_post_issue_293)
-
-  # These co_reduce (#172, fixed by PR #332, addl discussion in PR
-  # #331) tests are for bugs not regressions. Should be fixed in all
-  # version of GCC, I beleive
-  add_caf_test(co_reduce-factorial 4 co_reduce-factorial)
-  add_caf_test(co_reduce-factorial-int8 4 co_reduce-factorial-int8)
-  add_caf_test(co_reduce-factorial-int64 4 co_reduce-factorial-int64)
-
-  # IMAGE FAIL tests
-  if(NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0)
-    add_caf_test(image_status_test_1 4 image_status_test_1)
-    if(CAF_ENABLE_FAILED_IMAGES)
-      if ((NOT DEFINED ENV{TRAVIS}) OR (CAF_RUN_DEVELOPER_TESTS OR $ENV{OPENCOARRAYS_DEVELOPER}))
-	add_caf_test(image_fail_test_1 4 image_fail_test_1)
-	set_property(TEST image_fail_test_1 PROPERTY FAIL_REGULAR_EXPRESSION "Test failed.")
-	# No other way to check that image_fail_test_1 passes.
-	add_caf_test(image_fail_and_sync_test_1 4 image_fail_and_sync_test_1)
-        add_caf_test(image_fail_and_sync_test_2 4 image_fail_and_sync_test_2)
-
-	add_caf_test(image_fail_and_sync_test_3 4 image_fail_and_sync_test_3)
-	add_caf_test(image_fail_and_status_test_1 4 image_fail_and_status_test_1)
-	add_caf_test(image_fail_and_failed_images_test_1 4 image_fail_and_failed_images_test_1)
-	add_caf_test(image_fail_and_stopped_images_test_1 4 image_fail_and_stopped_images_test_1)
-	add_caf_test(image_fail_and_get_test_1 4 image_fail_and_get_test_1)
-      endif()
-    endif()
-  endif()
-else()
-  add_test(co_sum_extension test-co_sum-extension.sh)
-  set_property(TEST co_sum_extension PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
-
-  add_test(co_broadcast_extension test-co_broadcast-extension.sh)
-  set_property(TEST co_broadcast_extension PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
-
-  add_test(co_min_extension test-co_min-extension.sh)
-  set_property(TEST co_min_extension PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
-
-  add_test(co_max_extension test-co_max-extension.sh)
-  set_property(TEST co_max_extension PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
-
-  add_test(co_reduce_extension test-co_reduce-extension.sh)
-  set_property(TEST co_reduce_extension PROPERTY PASS_REGULAR_EXPRESSION "Test passed.")
+if (MPI_RUN_DEVELOPER_TESTS OR $ENV{PSBLAS_DEVELOPER})
+  message ( STATUS "Running Developer tests is enabled." )
 endif()
 
-include(cmake/AddInstallationScriptTest.cmake )
-add_installation_script_test(installation-scripts.sh src/tests/installation/)
+# Unit tests targeting each function, argument, and branch of code
+# add_mpi_test(initialize_mpi 2 initialize_mpi)
+
+#include(cmake/AddInstallationScriptTest.cmake )
+#add_installation_script_test(installation-scripts.sh src/tests/installation/)
