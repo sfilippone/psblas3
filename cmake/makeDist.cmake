@@ -26,8 +26,8 @@ if(NOT (git_status STREQUAL "0"))
 ${git_version}")
 endif()
 
-set(archive "OpenCoarrays-${git_version}")
-set(l_archive "opencoarrays-${git_version}")
+set(archive "PSBLAS-${git_version}")
+set(l_archive "PSBLAS-${git_version}")
 set(release_asset "${CMAKE_ARGV4}/${archive}.tar.gz")
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" archive "--prefix=${archive}/" -o "${release_asset}" "${git_version}"
@@ -45,7 +45,7 @@ endif()
 
 file(SHA256 "${release_asset}" tarball_sha256)
 set(sha256_checksum "${tarball_sha256}  ${archive}.tar.gz")
-configure_file("${CMAKE_ARGV3}/cmake/opencoarrays-VER-SHA256.txt.in"
+configure_file("${CMAKE_ARGV3}/cmake/PSBLAS-VER-SHA256.txt.in"
   "${CMAKE_ARGV4}/${l_archive}-SHA256.txt"
   @ONLY)
 message( STATUS
@@ -65,7 +65,7 @@ if(GPG_EXECUTABLE)
     message( WARNING "GPG signing of ${CMAKE_ARGV4}/${l_archive}-SHA256.txt appears to have failed
 with status: ${gpg_status} and output: ${gpg_output}")
   else()
-    configure_file("${CMAKE_ARGV3}/cmake/opencoarrays-VER-SHA256.txt.asc.in"
+    configure_file("${CMAKE_ARGV3}/cmake/PSBLAS-VER-SHA256.txt.asc.in"
       "${CMAKE_ARGV4}/${l_archive}-GPG.comment"
       @ONLY)
     file(READ "${CMAKE_ARGV4}/${l_archive}-GPG.comment" gpg_comment)
