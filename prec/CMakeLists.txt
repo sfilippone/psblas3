@@ -85,68 +85,7 @@ foreach( lib IN LISTS MPI_Fortran_LIBRARIES)
 endforeach()
 string(STRIP "${MPI_LIBS}" MPI_LIBS)
 
-add_library(prec SHARED
-./psb_prec_const_mod.f90
-./psb_c_prec_mod.f90
-./psb_c_base_prec_mod.f90
-./psb_d_bjacprec.f90
-./psb_z_base_prec_mod.f90
-./psb_d_diagprec.f90
-./impl/psb_dprecbld.f90
-./impl/psb_cprecinit.f90
-./impl/psb_dprecinit.f90
-./impl/psb_zilu_fct.f90
-./impl/psb_silu_fct.f90
-./impl/psb_cprecset.f90
-./impl/psb_s_prec_type_impl.f90
-./impl/psb_dilu_fct.f90
-./impl/psb_cprecbld.f90
-./impl/psb_c_diagprec_impl.f90
-./impl/psb_s_bjacprec_impl.f90
-./impl/psb_z_prec_type_impl.f90
-./impl/psb_d_nullprec_impl.f90
-./impl/psb_c_nullprec_impl.f90
-./impl/psb_d_diagprec_impl.f90
-./impl/psb_zprecinit.f90
-./impl/psb_d_prec_type_impl.f90
-./impl/psb_c_prec_type_impl.f90
-./impl/psb_s_nullprec_impl.f90
-./impl/psb_sprecinit.f90
-./impl/psb_z_bjacprec_impl.f90
-./impl/psb_d_bjacprec_impl.f90
-./impl/psb_z_nullprec_impl.f90
-./impl/psb_dprecset.f90
-./impl/psb_c_bjacprec_impl.f90
-./impl/psb_zprecset.f90
-./impl/psb_sprecbld.f90
-./impl/psb_cilu_fct.f90
-./impl/psb_z_diagprec_impl.f90
-./impl/psb_sprecset.f90
-./impl/psb_zprecbld.f90
-./impl/psb_s_diagprec_impl.f90
-./psb_s_base_prec_mod.f90
-./psb_s_bjacprec.f90
-./psb_c_prec_type.f90
-./psb_s_nullprec.f90
-./psb_d_nullprec.f90
-./psb_prec_mod.f90
-./psb_d_prec_type.f90
-./psb_z_prec_type.f90
-./psb_z_prec_mod.f90
-./psb_z_nullprec.f90
-./psb_c_diagprec.f90
-./psb_z_bjacprec.f90
-./psb_s_prec_type.f90
-./psb_c_nullprec.f90
-./psb_prec_type.f90
-./psb_d_prec_mod.f90
-./psb_s_diagprec.f90
-./psb_c_bjacprec.f90
-./psb_s_prec_mod.f90
-./psb_z_diagprec.f90
-./psb_d_base_prec_mod.f90
-)
-add_library(prec_static STATIC
+set(prec_source_files
 ./psb_prec_const_mod.f90
 ./psb_c_prec_mod.f90
 ./psb_c_base_prec_mod.f90
@@ -208,21 +147,30 @@ add_library(prec_static STATIC
 ./psb_d_base_prec_mod.f90
 )
 
+add_library(prec        SHARED ${prec_source_files})
+add_library(prec_static STATIC ${prec_source_files})
+
 target_link_libraries(prec PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
-target_link_libraries(prec_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
+target_link_libraries(prec_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base_static)
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
 
-set_target_properties( prec_static
-  PROPERTIES
-  SOVERSION ${PSBLAS_SO_VERSION}
-)
 set_target_properties ( prec
   PROPERTIES
   SOVERSION ${PSBLAS_SO_VERSION}
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  POSITION_INDEPENDENT_CODE TRUE
+  OUTPUT_NAME prec
 )
-set_target_properties(prec_static PROPERTIES OUTPUT_NAME prec)
+set_target_properties( prec_static
+  PROPERTIES
+  SOVERSION ${PSBLAS_SO_VERSION}
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  POSITION_INDEPENDENT_CODE TRUE
+  OUTPUT_NAME prec_static
+)
+
 get_target_property(libprec_static prec_static OUTPUT_NAME)
 set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libprec_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
@@ -230,7 +178,6 @@ install(TARGETS prec EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
-
 install(TARGETS prec_static EXPORT PSBLAS_Targets
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"

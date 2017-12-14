@@ -85,7 +85,7 @@ foreach( lib IN LISTS MPI_Fortran_LIBRARIES)
 endforeach()
 string(STRIP "${MPI_LIBS}" MPI_LIBS)
 
-add_library(util SHARED
+set(util_source_files
 metis_int.c
 psb_amd_order.c
 psb_blockpart_mod.f90
@@ -119,55 +119,30 @@ psb_z_mmio_impl.f90
 psb_z_renum_impl.F90
 )
 
-add_library(util_static STATIC
-metis_int.c
-psb_amd_order.c
-psb_blockpart_mod.f90
-psb_c_hbio_impl.f90
-psb_c_mat_dist_impl.f90
-psb_c_mat_dist_mod.f90
-psb_c_mmio_impl.f90
-psb_c_renum_impl.F90
-psb_d_hbio_impl.f90
-psb_d_mat_dist_impl.f90
-psb_d_mat_dist_mod.f90
-psb_d_mmio_impl.f90
-psb_d_renum_impl.F90
-psb_gps_mod.f90
-psb_hbio_mod.f90
-psb_i_mmio_impl.f90
-psb_mat_dist_mod.f90
-psb_metispart_mod.F90
-psb_mmio_mod.F90
-psb_renum_mod.f90
-psb_s_hbio_impl.f90
-psb_s_mat_dist_impl.f90
-psb_s_mat_dist_mod.f90
-psb_s_mmio_impl.f90
-psb_s_renum_impl.F90
-psb_util_mod.f90
-psb_z_hbio_impl.f90
-psb_z_mat_dist_impl.f90
-psb_z_mat_dist_mod.f90
-psb_z_mmio_impl.f90
-psb_z_renum_impl.F90
-)
+add_library(util        SHARED ${util_source_files})
+add_library(util_static STATIC ${util_source_files})
 
 target_link_libraries(util PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
-target_link_libraries(util_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
+target_link_libraries(util_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base_static)
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
 
-set_target_properties( util_static
-  PROPERTIES
-  SOVERSION ${PSBLAS_SO_VERSION}
-)
 set_target_properties ( util
   PROPERTIES
   SOVERSION ${PSBLAS_SO_VERSION}
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  POSITION_INDEPENDENT_CODE TRUE
+  OUTPUT_NAME util
 )
-set_target_properties(util_static PROPERTIES OUTPUT_NAME util)
+set_target_properties( util_static
+  PROPERTIES
+  SOVERSION ${PSBLAS_SO_VERSION}
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
+  POSITION_INDEPENDENT_CODE TRUE
+  OUTPUT_NAME util_static
+)
+
 get_target_property(libutil_static util_static OUTPUT_NAME)
 set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libutil_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
@@ -175,7 +150,6 @@ install(TARGETS util EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
-
 install(TARGETS util_static EXPORT PSBLAS_Targets
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"

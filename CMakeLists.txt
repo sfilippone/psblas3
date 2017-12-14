@@ -501,8 +501,6 @@ define_property(TARGET
 #-------------------------------
 #include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-#add_subdirectory(src)
-
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
@@ -612,8 +610,8 @@ add_definitions(
   -DHAVE_METIS_  -DLowerUnderscore -DPtr64Bits
 )
 
-add_subdirectory(base)
-add_subdirectory(prec)
-add_subdirectory(krylov)
-add_subdirectory(util)
+set(directory_list base prec krylov util) # TODO: add cbind
+foreach(directory ${directory_list})
+  add_subdirectory("${directory}")
+endforeach()
 #add_subdirectory(cbind)
