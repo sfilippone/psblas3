@@ -442,9 +442,11 @@ serial/impl/psb_c_mat_impl.F90
 serial/impl/psb_s_base_mat_impl.F90
 serial/impl/psb_d_mat_impl.F90
 serial/impl/psb_z_base_mat_impl.F90
-modules/fakempi.c
 modules/cutil.c
 )
+
+# Add this above and below if the SERIAL_MPI flag is passed:
+# modules/fakempi.c
 
 add_library(base_static STATIC
 internals/psi_desc_impl.f90
@@ -803,7 +805,6 @@ serial/impl/psb_c_mat_impl.F90
 serial/impl/psb_s_base_mat_impl.F90
 serial/impl/psb_d_mat_impl.F90
 serial/impl/psb_z_base_mat_impl.F90
-modules/fakempi.c
 modules/cutil.c
 )
 target_link_libraries(base PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})

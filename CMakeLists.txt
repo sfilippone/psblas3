@@ -613,3 +613,7 @@ add_definitions(
 )
 
 add_subdirectory(base)
+add_subdirectory(prec)
+add_subdirectory(krylov)
+add_subdirectory(util)
+#add_subdirectory(cbind)
