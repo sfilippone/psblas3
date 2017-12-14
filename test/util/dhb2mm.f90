@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006, 2010, 2015, 2017
 !        Salvatore Filippone    Cranfield University
 !        Alfredo Buttari        CNRS-IRIT, Toulouse
-!   
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,22 +27,22 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
 !
-! Storage conversion filter: reads from standar input a sparse matrix 
-! stored in Harwell-Boeing format, and writes to standard output in MatrixMarket 
+!
+!
+! Storage conversion filter: reads from standard input a sparse matrix
+! stored in Harwell-Boeing format, and writes to standard output in MatrixMarket
 ! format
 !
 program dhb2mm
   use psb_base_mod
   use psb_util_mod
   type(psb_dspmat_type) :: a
-  
+
   integer(psb_ipk_) :: info
   character(len=72)  :: mtitle
 
-  
+
   call hb_read(a,info,mtitle=mtitle)
 
   call mm_mat_write(a,mtitle,info)
@@ -51,4 +51,4 @@ program dhb2mm
 
 
 end program dhb2mm
-  
+
