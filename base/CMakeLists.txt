@@ -676,7 +676,6 @@ tools/psb_sasb.f90
 ./psblas/psb_snrmi.f90
 ./psblas/psb_dspmm.f90
 ./psblas/psb_samax.f90
-./psblas/psb_sxdot.f90
 ./psblas/psb_dspnrm1.f90
 ./psblas/psb_sspnrm1.f90
 ./psblas/psb_sspmm.f90
