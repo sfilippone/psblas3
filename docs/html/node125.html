@@ -1,156 +1,134 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>build -- Builds a preconditioner</TITLE>
-<META NAME="description" CONTENT="build -- Builds a preconditioner">
+<TITLE>init -- Initialize a preconditioner</TITLE>
+<META NAME="description" CONTENT="init -- Initialize a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node126.html">
 <LINK REL="previous" HREF="node124.html">
-<LINK REL="up" HREF="node123.html">
+<LINK REL="up" HREF="node124.html">
 <LINK REL="next" HREF="node126.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1820"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1823"
   HREF="node126.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1816"
-  HREF="node123.html">
+<A NAME="tex2html1819"
+  HREF="node124.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1810"
+<A NAME="tex2html1813"
   HREF="node124.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1818"
+<A NAME="tex2html1821"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1821"
-  HREF="node126.html">apply   Preconditioner</A>
-<B> Up:</B> <A NAME="tex2html1817"
-  HREF="node123.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1811"
-  HREF="node124.html">init   Initialize</A>
- &nbsp; <B>  <A NAME="tex2html1819"
+<B> Next:</B> <A NAME="tex2html1824"
+  HREF="node126.html">build   Builds</A>
+<B> Up:</B> <A NAME="tex2html1820"
+  HREF="node124.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1814"
+  HREF="node124.html">Preconditioner routines</A>
+ &nbsp; <B>  <A NAME="tex2html1822"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000112000000000000000">
-build -- Builds a preconditioner</A>
+<H2><A NAME="SECTION000111000000000000000">
+init -- Initialize a  preconditioner</A>
 </H2>
 
 <P>
 <PRE>
-call prec%build(a, desc_a, info,amold,vmold)
+call prec%init(ptype, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>the system sparse matrix.
-Scope: <B>local</B> 
+<DT><STRONG>ptype</STRONG></DT>
+<DD>the type of preconditioner. 
+Scope: <B>global</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in</B>, target.
+Intent: <B>in</B>.
 <BR>
-Specified as: a sparse matrix data structure spdata<TT>psb_Tspmat_type</TT>.
+Specified as: a character string, see usage notes.
+</DD>
+<DT><STRONG><B>On Exit</B></STRONG></DT>
+<DD><P>
 </DD>
 <DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
-Scope: <B>local</B> 
+<DD>Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>inout</B>.
 <BR>
-Specified as: an already initialized precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the problem communication descriptor. 
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>, target.
-<BR>
-Specified as: a communication descriptor data structure descdata<TT>psb_desc_type</TT>.
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>amold</STRONG></DT>
-<DD>The desired dynamic type for the internal matrix storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from spbasedata<TT>psb_T_base_sparse_mat</TT>. 
-</DD>
-<DT><STRONG>vmold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>. 
-
-<P>
-</DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>the preconditioner.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a precondtioner data structure precdata<TT>psb_prec_type</TT>
-<BR></DD>
 <DT><STRONG>info</STRONG></DT>
-<DD>Error code.
+<DD>Scope: <B>global</B> 
 <BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
+Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-An integer value; 0 means no error has been detected. 
+Error code: if no error, 0 is returned.
+</DD>
+</DL>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+Legal inputs to this subroutine are interpreted depending on the
+<SPAN CLASS="MATH"><IMG
+ WIDTH="41" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img154.png"
+ ALT="$ptype$"></SPAN> string as follows<A NAME="tex2html31"
+  HREF="footnode.html#foot7644"><SUP><SPAN CLASS="arabic">4</SPAN></SUP></A>:
+<DL>
+<DT><STRONG>NONE</STRONG></DT>
+<DD>No preconditioning, i.e. the preconditioner is just a copy
+  operator.
+</DD>
+<DT><STRONG>DIAG</STRONG></DT>
+<DD>Diagonal scaling; each entry of the input vector is
+  multiplied by the reciprocal of the sum of the absolute values of
+  the coefficients in the corresponding row of matrix  <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>;
+</DD>
+<DT><STRONG>BJAC</STRONG></DT>
+<DD>Precondition by a  factorization of the
+  block-diagonal of matrix <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></SPAN>, where block boundaries are determined
+  by the data allocation boundaries for each process; requires no
+  communication. Only the incomplete factorization <SPAN CLASS="MATH"><IMG
+ WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img155.png"
+ ALT="$ILU(0)$"></SPAN> is
+  currently implemented.  
 </DD>
 </DL>
 

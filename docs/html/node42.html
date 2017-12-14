@@ -1,167 +1,82 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>Dense Vector Data Structure</TITLE>
-<META NAME="description" CONTENT="Dense Vector Data Structure">
+<TITLE>Named Constants</TITLE>
+<META NAME="description" CONTENT="Named Constants">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node49.html">
-<LINK REL="previous" HREF="node22.html">
-<LINK REL="up" HREF="node9.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node23.html">
 <LINK REL="next" HREF="node43.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html760"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html763"
   HREF="node43.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html756"
-  HREF="node9.html">
+<A NAME="tex2html759"
+  HREF="node23.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html750"
+<A NAME="tex2html755"
   HREF="node41.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html758"
+<A NAME="tex2html761"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html761"
-  HREF="node43.html">Vector Methods</A>
-<B> Up:</B> <A NAME="tex2html757"
-  HREF="node9.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html751"
-  HREF="node41.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html759"
+<B> Next:</B> <A NAME="tex2html764"
+  HREF="node43.html">Dense Vector Data Structure</A>
+<B> Up:</B> <A NAME="tex2html760"
+  HREF="node23.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html756"
+  HREF="node41.html">clone   Clone</A>
+ &nbsp; <B>  <A NAME="tex2html762"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00043000000000000000"></A>
-<A NAME="sec:vecttype"></A>
+<H3><A NAME="SECTION000421900000000000000"></A>
+<A NAME="sec:sp_constants"></A>
 <BR>
-Dense Vector Data Structure
-</H2>
-The vdata<TT>psb_T_vect_type</TT> data structure
-encapsulates the dense vectors in a way similar to sparse matrices,
-i.e. including a base type vbasedata<TT>    psb_T_base_vect_type</TT>.  
-The user will not, in general, access the vector components directly,
-but rather via the routines of sec.&nbsp;<A HREF="node70.html#sec:toolsrout">6</A>. Among other
-simple things, we define here an extraction method that can be used to
-get a full copy of the part of the vector stored on the local
-process. 
-
-<P>
-The type declaration is shown in
-figure&nbsp;<A HREF="#fig:vectype">5</A> where <code>T</code> is a placeholder for the
-data type and precision variants 
+Named Constants
+</H3>
 <DL>
-<DT><STRONG>I</STRONG></DT>
-<DD>Integer;
+<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
+<DD>Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
 </DD>
-<DT><STRONG>S</STRONG></DT>
-<DD>Single precision real;
+<DT><STRONG>psb_dupl_add_</STRONG></DT>
+<DD>Duplicate coefficients should be added;	         
 </DD>
-<DT><STRONG>D</STRONG></DT>
-<DD>Double precision real;
+<DT><STRONG>psb_dupl_err_</STRONG></DT>
+<DD>Duplicate coefficients should trigger an error conditino
 </DD>
-<DT><STRONG>C</STRONG></DT>
-<DD>Single precision complex;
+<DT><STRONG>psb_upd_dflt_</STRONG></DT>
+<DD>Default update strategy for matrix coefficients;
 </DD>
-<DT><STRONG>Z</STRONG></DT>
-<DD>Double precision complex.
+<DT><STRONG>psb_upd_srch_</STRONG></DT>
+<DD>Update strategy based on search into the data structure;
+</DD>
+<DT><STRONG>psb_upd_perm_</STRONG></DT>
+<DD>Update strategy based on additional
+  permutation data (see tools routine description).
 </DD>
 </DL>
-The actual data is contained in the polymorphic component <code>v%v</code>; 
-the separation between the application and the actual data is
-essential for cases where it is necessary to link to data storage made
-available elsewhere outside the direct control of the
-compiler/application, e.g. data stored in a graphics  accelerator's
-private memory. 
-
-<DIV ALIGN="CENTER"><A NAME="fig:vectype"></A><A NAME="923"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
-    The PSBLAS defined data type that
-    contains a dense vector.</CAPTION>
-<TR><TD>
-<DIV ALIGN="CENTER">
-</DIV><TABLE  WIDTH="85%">
-<TR><TD>
-<PRE>
-  type psb_T_base_vect_type
-    TYPE(KIND_), allocatable :: v(:)
-  end type psb_T_base_vect_type
-
-  type psb_T_vect_type
-    class(psb_T_base_vect_type), allocatable :: v 
-  end type  psb_T_vect_type
-</PRE></TD></TR>
-</TABLE>
-<DIV ALIGN="CENTER">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
 
 <P>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html762"
-  HREF="node43.html">Vector Methods</A>
-<LI><A NAME="tex2html763"
-  HREF="node44.html">get_nrows -- Get number of  rows in a dense vector</A>
-<LI><A NAME="tex2html764"
-  HREF="node45.html">sizeof  -- Get memory occupation in bytes
-of  a dense vector</A>
-<LI><A NAME="tex2html765"
-  HREF="node46.html">set  -- Set contents of the vector</A>
-<LI><A NAME="tex2html766"
-  HREF="node47.html">get_vect  -- Get a copy of the vector contents</A>
-<LI><A NAME="tex2html767"
-  HREF="node48.html">clone -- Clone current object</A>
-</UL>
-<!--End of Table of Child-Links-->
-<HR>
-<!--Navigation Panel-->
-<A NAME="tex2html760"
-  HREF="node43.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html756"
-  HREF="node9.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html750"
-  HREF="node41.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html758"
-  HREF="node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
-<BR>
-<B> Next:</B> <A NAME="tex2html761"
-  HREF="node43.html">Vector Methods</A>
-<B> Up:</B> <A NAME="tex2html757"
-  HREF="node9.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html751"
-  HREF="node41.html">Named Constants</A>
- &nbsp; <B>  <A NAME="tex2html759"
-  HREF="node1.html">Contents</A></B> 
-<!--End of Navigation Panel-->
 
 </BODY>
 </HTML>

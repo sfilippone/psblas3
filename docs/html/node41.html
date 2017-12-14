@@ -1,80 +1,87 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>Named Constants</TITLE>
-<META NAME="description" CONTENT="Named Constants">
+<TITLE>clone -- Clone current object</TITLE>
+<META NAME="description" CONTENT="clone -- Clone current object">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node42.html">
 <LINK REL="previous" HREF="node40.html">
-<LINK REL="up" HREF="node22.html">
+<LINK REL="up" HREF="node23.html">
 <LINK REL="next" HREF="node42.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html748"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html753"
   HREF="node42.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html744"
-  HREF="node22.html">
+<A NAME="tex2html749"
+  HREF="node23.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html740"
+<A NAME="tex2html743"
   HREF="node40.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html746"
+<A NAME="tex2html751"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html749"
-  HREF="node42.html">Dense Vector Data Structure</A>
-<B> Up:</B> <A NAME="tex2html745"
-  HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html741"
-  HREF="node40.html">clone   Clone</A>
- &nbsp; <B>  <A NAME="tex2html747"
+<B> Next:</B> <A NAME="tex2html754"
+  HREF="node42.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html750"
+  HREF="node23.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html744"
+  HREF="node40.html">psb_set_mat_default   Set</A>
+ &nbsp; <B>  <A NAME="tex2html752"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421900000000000000"></A>
-<A NAME="sec:sp_constants"></A>
-<BR>
-Named Constants
+<H3><A NAME="SECTION000421800000000000000">
+clone -- Clone current object</A>
 </H3>
+
+<P>
+<PRE>
+call  a%clone(b,info)
+</PRE>
+
+<P>
 <DL>
-<DT><STRONG>psb_dupl_ovwrt_</STRONG></DT>
-<DD>Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
 </DD>
-<DT><STRONG>psb_dupl_add_</STRONG></DT>
-<DD>Duplicate coefficients should be added;	         
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_dupl_err_</STRONG></DT>
-<DD>Duplicate coefficients should trigger an error conditino
+<DT><STRONG>a</STRONG></DT>
+<DD>the sparse matrix.
+<BR>
+Scope: <B>local</B>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG>psb_upd_dflt_</STRONG></DT>
-<DD>Default update strategy for matrix coefficients;
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy of the input object.
 </DD>
-<DT><STRONG>psb_upd_srch_</STRONG></DT>
-<DD>Update strategy based on search into the data structure;
-</DD>
-<DT><STRONG>psb_upd_perm_</STRONG></DT>
-<DD>Update strategy based on additional
-  permutation data (see tools routine description).
+<DT><STRONG>info</STRONG></DT>
+<DD>Return code. 
 </DD>
 </DL>
 

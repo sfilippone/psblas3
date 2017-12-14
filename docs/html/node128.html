@@ -1,63 +1,62 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>clone -- clone current preconditioner</TITLE>
-<META NAME="description" CONTENT="clone -- clone current preconditioner">
+<TITLE>descr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="descr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node129.html">
 <LINK REL="previous" HREF="node127.html">
-<LINK REL="up" HREF="node123.html">
+<LINK REL="up" HREF="node124.html">
 <LINK REL="next" HREF="node129.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1856"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1859"
   HREF="node129.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1852"
-  HREF="node123.html">
+<A NAME="tex2html1855"
+  HREF="node124.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1846"
+<A NAME="tex2html1849"
   HREF="node127.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1854"
+<A NAME="tex2html1857"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1857"
-  HREF="node129.html">free   Free</A>
-<B> Up:</B> <A NAME="tex2html1853"
-  HREF="node123.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1847"
-  HREF="node127.html">descr   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1855"
+<B> Next:</B> <A NAME="tex2html1860"
+  HREF="node129.html">clone   clone</A>
+<B> Up:</B> <A NAME="tex2html1856"
+  HREF="node124.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1850"
+  HREF="node127.html">apply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1858"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000115000000000000000">
-clone -- clone  current
+<H2><A NAME="SECTION000114000000000000000">
+descr -- Prints a description of current
   preconditioner</A>
 </H2>
 
+<P>
 <PRE>
-call  prec%clone(precout,info)
+call prec%descr()
+call prec%descr(iout, root)
 </PRE>
 
 <P>
@@ -70,21 +69,41 @@ call  prec%clone(precout,info)
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>precout</STRONG></DT>
-<DD>A copy of the input object.
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number. Default: default output unit.
 </DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>root</STRONG></DT>
+<DD>Process from which to print
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number between 0 and <SPAN CLASS="MATH"><IMG
+ WIDTH="49" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img156.png"
+ ALT="$np-1$"></SPAN>, in which case
+the specified process will print the description, or <SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1$"></SPAN>, in which case
+all processes will print. Default: 0. 
 </DD>
 </DL>
 

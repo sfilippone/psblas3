@@ -1,140 +1,97 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>init -- Initialize a preconditioner</TITLE>
-<META NAME="description" CONTENT="init -- Initialize a preconditioner">
+<TITLE>Preconditioner routines</TITLE>
+<META NAME="description" CONTENT="Preconditioner routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node125.html">
-<LINK REL="previous" HREF="node123.html">
-<LINK REL="up" HREF="node123.html">
+<LINK REL="next" HREF="node131.html">
+<LINK REL="previous" HREF="node117.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node125.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1808"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1805"
   HREF="node125.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1804"
-  HREF="node123.html">
+<A NAME="tex2html1801"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1798"
+<A NAME="tex2html1795"
   HREF="node123.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1806"
+<A NAME="tex2html1803"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1809"
-  HREF="node125.html">build   Builds</A>
-<B> Up:</B> <A NAME="tex2html1805"
-  HREF="node123.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1799"
-  HREF="node123.html">Preconditioner routines</A>
- &nbsp; <B>  <A NAME="tex2html1807"
+<B> Next:</B> <A NAME="tex2html1806"
+  HREF="node125.html">init   Initialize</A>
+<B> Up:</B> <A NAME="tex2html1802"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1796"
+  HREF="node123.html">mm_array_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1804"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000111000000000000000">
-init -- Initialize a  preconditioner</A>
-</H2>
+<H1><A NAME="SECTION000110000000000000000"></A>
+<A NAME="sec:precs"></A>
+<BR>
+Preconditioner routines
+</H1>
 
 <P>
-<PRE>
-call prec%init(ptype, info)
-</PRE>
+<A NAME="sec:psprecs"></A>The base PSBLAS library  contains the implementation of two simple
+preconditioning techniques:
+
+<UL>
+<LI>Diagonal Scaling
+</LI>
+<LI>Block Jacobi with ILU(0) factorization
+</LI>
+</UL>
+The supporting data type and subroutine interfaces are defined in the
+module  <code>psb_prec_mod</code>.
+The old interfaces <code>psb_precinit</code> and  <code>psb_precbld</code> are still supported for
+backward compatibility
 
 <P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>ptype</STRONG></DT>
-<DD>the type of preconditioner. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character string, see usage notes.
-</DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Error code: if no error, 0 is returned.
-</DD>
-</DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>Legal inputs to this subroutine are interpreted depending on the
-<IMG
- WIDTH="41" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img154.png"
- ALT="$ptype$"> string as follows<A NAME="tex2html31"
-  HREF="footnode.html#foot7601"><SUP>4</SUP></A>:
-<DL>
-<DT><STRONG>NONE</STRONG></DT>
-<DD>No preconditioning, i.e. the preconditioner is just a copy
-  operator.
-</DD>
-<DT><STRONG>DIAG</STRONG></DT>
-<DD>Diagonal scaling; each entry of the input vector is
-  multiplied by the reciprocal of the sum of the absolute values of
-  the coefficients in the corresponding row of matrix  <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">;
-</DD>
-<DT><STRONG>BJAC</STRONG></DT>
-<DD>Precondition by a  factorization of the
-  block-diagonal of matrix <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization <IMG
- WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img155.png"
- ALT="$ILU(0)$"> is
-  currently implemented.  
-</DD>
-</DL>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html1807"
+  HREF="node125.html">init -- Initialize a  preconditioner</A>
+<LI><A NAME="tex2html1808"
+  HREF="node126.html">build -- Builds a preconditioner</A>
+<LI><A NAME="tex2html1809"
+  HREF="node127.html">apply -- Preconditioner application
+  routine</A>
+<LI><A NAME="tex2html1810"
+  HREF="node128.html">descr -- Prints a description of current
+  preconditioner</A>
+<LI><A NAME="tex2html1811"
+  HREF="node129.html">clone -- clone  current
+  preconditioner</A>
+<LI><A NAME="tex2html1812"
+  HREF="node130.html">free -- Free a  preconditioner</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

@@ -1,70 +1,66 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>clean_zeros -- Eliminate zero coefficients</TITLE>
-<META NAME="description" CONTENT="clean_zeros -- Eliminate zero coefficients">
+<TITLE>csclip -- Reduce to a submatrix</TITLE>
+<META NAME="description" CONTENT="csclip -- Reduce to a submatrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node35.html">
 <LINK REL="previous" HREF="node33.html">
-<LINK REL="up" HREF="node22.html">
+<LINK REL="up" HREF="node23.html">
 <LINK REL="next" HREF="node35.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html666"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html669"
   HREF="node35.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html662"
-  HREF="node22.html">
+<A NAME="tex2html665"
+  HREF="node23.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html656"
+<A NAME="tex2html659"
   HREF="node33.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html664"
+<A NAME="tex2html667"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html667"
-  HREF="node35.html">get_diag   Get</A>
-<B> Up:</B> <A NAME="tex2html663"
-  HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html657"
-  HREF="node33.html">csclip   Reduce</A>
- &nbsp; <B>  <A NAME="tex2html665"
+<B> Next:</B> <A NAME="tex2html670"
+  HREF="node35.html">clean_zeros   Eliminate</A>
+<B> Up:</B> <A NAME="tex2html666"
+  HREF="node23.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html660"
+  HREF="node33.html">cscnv   Convert</A>
+ &nbsp; <B>  <A NAME="tex2html668"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421200000000000000">
-clean_zeros -- Eliminate zero coefficients</A>
+<H3><A NAME="SECTION000421100000000000000">
+csclip -- Reduce to a submatrix</A>
 </H3>
 
 <PRE>
-    call a%clean_zeros(info)
+    call a%csclip(b,info[,&amp;
+       &amp; imin,imax,jmin,jmax,rscale,cscale])
 </PRE>
 
 <P>
-Eliminates zero coefficients in the input matrix. Note that depending
-on the internal storage format, there may still be some amount of
-zero padding in the output.
-
-<P>
+Returns the submatrix <code>A(imin:imax,jmin:jmax)</code>, optionally
+rescaling row/col indices to the range
+<code>1:imax-imin+1,1:jmax-jmin+1</code>.  
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -79,13 +75,22 @@ A variable of type <code>psb_Tspmat_type</code>.
 <BR>
 Scope: <B>local</B>.
 <BR></DD>
+<DT><STRONG>imin,imax,jmin,jmax</STRONG></DT>
+<DD>Minimum and maximum row and column indices.
+<BR>
+Type: optional.
+</DD>
+<DT><STRONG>rscale,cscale</STRONG></DT>
+<DD>Whether to rescale row/column indices.
+Type: optional.
+</DD>
 </DL>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>a</STRONG></DT>
-<DD>The matrix  <code>a</code> without zero coefficients.
+<DT><STRONG>b</STRONG></DT>
+<DD>A copy  of a submatrix of <code>a</code>.
 <BR>
 A variable of type <code>psb_Tspmat_type</code>.
 </DD>
