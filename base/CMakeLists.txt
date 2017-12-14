@@ -1,4 +1,91 @@
-add_library(base
+if (NOT MPI_C_FOUND)
+  find_package(MPI REQUIRED)
+
+  set(CMAKE_C_COMPILE_FLAGS ${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS})
+  set(CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS} ${MPI_C_LINK_FLAGS})
+  set(CMAKE_Fortran_COMPILE_FLAGS ${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS})
+  set(CMAKE_Fortran_LINK_FLAGS ${CMAKE_Fortran_LINK_FLAGS} ${MPI_Fortran_LINK_FLAGS})
+  include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
+endif()
+
+if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
+  set(gfortran_compiler true)
+endif()
+
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE("alloca.h" HAVE_ALLOCA)
+if(NOT HAVE_ALLOCA)
+  add_definitions(-DALLOCA_MISSING)
+  message(WARNING "Could not find <alloca.h>. Assuming functionality is provided elsewhere.")
+endif()
+
+set(old_cmake_required_includes "${CMAKE_REQUIRED_INCLUDES}")
+if(CMAKE_REQUIRED_INCLUDES)
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES};${MPI_C_INCLUDE_PATH})
+else()
+  set(CMAKE_REQUIRED_INCLUDES ${MPI_C_INCLUDE_PATH})
+endif()
+set(old_cmake_required_flags "${CMAKE_REQUIRED_FLAGS}")
+if(CMAKE_REQUIRED_FLAGS)
+  set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS};${MPI_C_COMPILE_FLAGS};${MPI_C_LINK_FLAGS})
+else()
+  set(CMAKE_REQUIRED_FLAGS ${MPI_C_COMPILE_FLAGS};${MPI_C_LINK_FLAGS})
+endif()
+set(old_cmake_required_libraries "${CMAKE_REQUIRED_LIBRARIES}")
+if(CMAKE_REQUIRED_LIBRARIES)
+  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES};${MPI_C_LIBRARIES})
+else()
+  set(CMAKE_REQUIRED_LIBRARIES ${MPI_C_LIBRARIES})
+endif()
+
+set(MPI_HEADERS mpi.h)
+include(CheckIncludeFiles)
+CHECK_INCLUDE_FILES("mpi.h;mpi-ext.h" HAVE_MPI_EXT)
+if(HAVE_MPI_EXT)
+  add_definitions(-DHAVE_MPI_EXT_H)
+  set(MPI_HEADERS ${MPI_HEADERS};mpi-ext.h)
+endif()
+
+set(CMAKE_REQUIRED_INCLUDES ${old_cmake_required_includes})
+set(CMAKE_REQUIRED_FLAGS ${old_cmake_required_flags})
+set(CMAKE_REQUIRED_LIBRARIES ${old_cmake_required_libraries})
+
+#---------------------------------------------------
+# Windows Intel MPI compatibility, see GH issue #435
+#---------------------------------------------------
+set(old_cmake_required_includes "${CMAKE_REQUIRED_INCLUDES}")
+if(CMAKE_REQUIRED_INCLUDES)
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES};${MPI_C_INCLUDE_PATH})
+else()
+  set(CMAKE_REQUIRED_INCLUDES ${MPI_C_INCLUDE_PATH})
+endif()
+CHECK_INCLUDE_FILES("mpi.h" HAVE_MPI_H)
+
+include(CheckSymbolExists)
+CHECK_SYMBOL_EXISTS(I_MPI_VERSION "mpi.h" HAVE_Intel_MPI)
+if(HAVE_Intel_MPI AND WIN32)
+  add_definitions(-DUSE_GCC)
+endif()
+set(CMAKE_REQUIRED_INCLUDES ${old_cmake_required_includes})
+
+set(PSBLAS_SO_VERSION 0)
+if(gfortran_compiler)
+  if(NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 7.0.0)
+    set(PSBLAS_SO_VERSION 2)
+  elseif(NOT CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 6.0.0)
+    set(PSBLAS_SO_VERSION 1)
+  endif()
+endif()
+
+set(PSBLAS_MODDIR "${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}")
+set(MOD_DIR_FLAG "${CMAKE_Fortran_MODDIR_FLAG}")
+set(MPI_LIBS "")
+foreach( lib IN LISTS MPI_Fortran_LIBRARIES)
+  set(MPI_LIBS "${MPI_LIBS} \"${lib}\"")
+endforeach()
+string(STRIP "${MPI_LIBS}" MPI_LIBS)
+
+add_library(base SHARED
 internals/psi_desc_impl.f90
 internals/psi_crea_bnd_elem.f90
 internals/psi_bld_tmphalo.f90
@@ -358,4 +445,393 @@ serial/impl/psb_d_mat_impl.F90
 serial/impl/psb_z_base_mat_impl.F90
 modules/fakempi.c
 modules/cutil.c
+)
+
+add_library(base_static STATIC
+internals/psi_desc_impl.f90
+internals/psi_crea_bnd_elem.f90
+internals/psi_bld_tmphalo.f90
+internals/psi_list_search.f90
+internals/psi_crea_ovr_elem.f90
+internals/psi_compute_size.f90
+internals/psi_dl_check.f90
+internals/psi_exist_ovr_elem.f90
+internals/psi_srtlist.f90
+internals/psi_bld_tmpovrl.f90
+internals/psi_crea_index.f90
+internals/psi_sort_dl.f90
+tools/psb_iallc.f90
+tools/psb_c_map.f90
+tools/psb_dspalloc.f90
+tools/psb_cspasb.f90
+tools/psb_dins.f90
+tools/psb_iasb.f90
+tools/psb_sspfree.f90
+tools/psb_cd_lstext.f90
+tools/psb_dsprn.f90
+tools/psb_cins.f90
+tools/psb_csprn.f90
+tools/psb_ifree.f90
+tools/psb_sspasb.f90
+tools/psb_z_map.f90
+tools/psb_zspins.f90
+tools/psb_sins.f90
+tools/psb_cdins.f90
+tools/psb_cspfree.f90
+tools/psb_cdalv.f90
+tools/psb_zallc.f90
+tools/psb_cspins.f90
+tools/psb_dallc.f90
+tools/psb_cdrep.f90
+tools/psb_dspfree.f90
+tools/psb_zspfree.f90
+tools/psb_get_overlap.f90
+tools/psb_cdals.f90
+tools/psb_dfree.f90
+tools/psb_dasb.f90
+tools/psb_zfree.f90
+tools/psb_zins.f90
+tools/psb_cd_switch_ovl_indxmap.f90
+tools/psb_sasb.f90
+./internals/psi_desc_impl.f90
+./internals/psi_crea_bnd_elem.f90
+./internals/psi_bld_tmphalo.f90
+./internals/psi_list_search.f90
+./internals/psi_crea_ovr_elem.f90
+./internals/psi_compute_size.f90
+./internals/psi_dl_check.f90
+./internals/psi_exist_ovr_elem.f90
+./internals/psi_srtlist.f90
+./internals/psi_bld_tmpovrl.f90
+./internals/psi_crea_index.f90
+./internals/psi_sort_dl.f90
+./tools/psb_iallc.f90
+./tools/psb_c_map.f90
+./tools/psb_dspalloc.f90
+./tools/psb_cspasb.f90
+./tools/psb_dins.f90
+./tools/psb_iasb.f90
+./tools/psb_sspfree.f90
+./tools/psb_cd_lstext.f90
+./tools/psb_dsprn.f90
+./tools/psb_cins.f90
+./tools/psb_csprn.f90
+./tools/psb_ifree.f90
+./tools/psb_sspasb.f90
+./tools/psb_z_map.f90
+./tools/psb_zspins.f90
+./tools/psb_sins.f90
+./tools/psb_cdins.f90
+./tools/psb_cspfree.f90
+./tools/psb_cdalv.f90
+./tools/psb_zallc.f90
+./tools/psb_cspins.f90
+./tools/psb_dallc.f90
+./tools/psb_cdrep.f90
+./tools/psb_dspfree.f90
+./tools/psb_zspfree.f90
+./tools/psb_get_overlap.f90
+./tools/psb_cdals.f90
+./tools/psb_dfree.f90
+./tools/psb_dasb.f90
+./tools/psb_zfree.f90
+./tools/psb_zins.f90
+./tools/psb_cd_switch_ovl_indxmap.f90
+./tools/psb_sasb.f90
+./tools/psb_callc.f90
+./tools/psb_cd_reinit.f90
+./tools/psb_cd_set_bld.f90
+./tools/psb_s_map.f90
+./tools/psb_cdprt.f90
+./tools/psb_glob_to_loc.f90
+./tools/psb_zasb.f90
+./tools/psb_zspalloc.f90
+./tools/psb_cspalloc.f90
+./tools/psb_iins.f90
+./tools/psb_d_map.f90
+./tools/psb_cdren.f90
+./tools/psb_casb.f90
+./tools/psb_zsprn.f90
+./tools/psb_sspins.f90
+./tools/psb_zspasb.f90
+./tools/psb_loc_to_glob.f90
+./tools/psb_dspasb.f90
+./tools/psb_cdall.f90
+./tools/psb_sallc.f90
+./tools/psb_ssprn.f90
+./tools/psb_dspins.f90
+./tools/psb_sspalloc.f90
+./tools/psb_cd_inloc.f90
+./tools/psb_sfree.f90
+./tools/psb_cfree.f90
+./modules/psi_c_mod.f90
+./modules/psi_mod.f90
+./modules/aux/psb_string_mod.f90
+./modules/aux/psb_sort_mod.f90
+./modules/aux/psb_s_sort_mod.f90
+./modules/aux/psi_d_serial_mod.f90
+./modules/aux/psi_serial_mod.f90
+./modules/aux/psb_i_sort_mod.f90
+./modules/aux/psi_z_serial_mod.f90
+./modules/aux/psi_i_serial_mod.f90
+./modules/aux/psb_ip_reord_mod.f90
+./modules/aux/psb_c_sort_mod.f90
+./modules/aux/psb_hash_mod.f90
+./modules/aux/psb_d_sort_mod.f90
+./modules/aux/psi_s_serial_mod.f90
+./modules/aux/psi_c_serial_mod.f90
+./modules/aux/psb_z_sort_mod.f90
+./modules/psb_base_mod.f90
+./modules/psi_z_mod.f90
+./modules/desc/psb_indx_map_mod.f90
+./modules/desc/psb_repl_map_mod.f90
+./modules/desc/psb_desc_const_mod.f90
+./modules/desc/psb_gen_block_map_mod.f90
+./modules/desc/psb_hash_map_mod.f90
+./modules/desc/psb_glist_map_mod.f90
+./modules/desc/psb_list_map_mod.f90
+./modules/psi_d_mod.f90
+./modules/tools/psb_i_tools_mod.f90
+./modules/tools/psb_d_tools_mod.f90
+./modules/tools/psb_s_tools_mod.f90
+./modules/tools/psb_tools_mod.f90
+./modules/tools/psb_cd_tools_mod.f90
+./modules/tools/psb_z_tools_mod.f90
+./modules/tools/psb_c_tools_mod.f90
+./modules/psi_s_mod.f90
+./modules/comm/psb_d_linmap_mod.f90
+./modules/comm/psb_s_linmap_mod.f90
+./modules/comm/psb_base_linmap_mod.f90
+./modules/comm/psb_i_comm_mod.f90
+./modules/comm/psb_c_linmap_mod.f90
+./modules/comm/psb_c_comm_mod.f90
+./modules/comm/psb_z_comm_mod.f90
+./modules/comm/psb_z_linmap_mod.f90
+./modules/comm/psb_s_comm_mod.f90
+./modules/comm/psb_d_comm_mod.f90
+./modules/comm/psb_comm_mod.f90
+./modules/comm/psb_linmap_mod.f90
+./modules/psblas/psb_psblas_mod.f90
+./modules/psi_i_mod.f90
+./modules/serial/psb_s_csr_mat_mod.f90
+./modules/serial/psb_z_mat_mod.f90
+./modules/serial/psb_s_base_mat_mod.f90
+./modules/serial/psb_s_base_vect_mod.f90
+./modules/serial/psb_z_csc_mat_mod.f90
+./modules/serial/psb_d_csr_mat_mod.f90
+./modules/serial/psb_s_csc_mat_mod.f90
+./modules/serial/psb_i_base_vect_mod.f90
+./modules/serial/psb_z_base_vect_mod.f90
+./modules/serial/psb_c_csr_mat_mod.f90
+./modules/serial/psb_c_serial_mod.f90
+./modules/serial/psb_c_base_vect_mod.f90
+./modules/serial/psb_s_serial_mod.f90
+./modules/serial/psb_d_csc_mat_mod.f90
+./modules/serial/psb_vect_mod.f90
+./modules/serial/psb_base_mat_mod.f90
+./modules/serial/psb_c_csc_mat_mod.f90
+./modules/serial/psb_z_base_mat_mod.f90
+./modules/serial/psb_z_csr_mat_mod.f90
+./modules/serial/psb_c_mat_mod.f90
+./modules/serial/psb_d_base_mat_mod.f90
+./modules/serial/psb_d_serial_mod.f90
+./modules/serial/psb_c_base_mat_mod.f90
+./modules/serial/psb_d_base_vect_mod.f90
+./modules/serial/psb_serial_mod.f90
+./modules/serial/psb_s_mat_mod.f90
+./modules/serial/psb_z_serial_mod.f90
+./modules/serial/psb_d_mat_mod.f90
+./modules/serial/psb_mat_mod.f90
+./modules/error.f90
+./modules/psb_check_mod.f90
+./comm/psb_shalo.f90
+./comm/psb_dhalo.f90
+./comm/psb_igather.f90
+./comm/internals/psi_iovrl_restr.f90
+./comm/internals/psi_covrl_upd.f90
+./comm/internals/psi_covrl_save.f90
+./comm/internals/psi_sovrl_upd.f90
+./comm/internals/psi_dovrl_restr.f90
+./comm/internals/psi_zovrl_restr.f90
+./comm/internals/psi_dovrl_save.f90
+./comm/internals/psi_zovrl_save.f90
+./comm/internals/psi_sovrl_restr.f90
+./comm/internals/psi_zovrl_upd.f90
+./comm/internals/psi_sovrl_save.f90
+./comm/internals/psi_iovrl_upd.f90
+./comm/internals/psi_covrl_restr.f90
+./comm/internals/psi_iovrl_save.f90
+./comm/internals/psi_dovrl_upd.f90
+./comm/psb_iovrl.f90
+./comm/psb_cgather.f90
+./comm/psb_covrl.f90
+./comm/psb_zovrl.f90
+./comm/psb_ihalo.f90
+./comm/psb_dgather.f90
+./comm/psb_sovrl.f90
+./comm/psb_dovrl.f90
+./comm/psb_zgather.f90
+./comm/psb_zhalo.f90
+./comm/psb_sgather.f90
+./comm/psb_chalo.f90
+./psblas/psb_snrmi.f90
+./psblas/psb_dspmm.f90
+./psblas/psb_samax.f90
+./psblas/psb_sxdot.f90
+./psblas/psb_dspnrm1.f90
+./psblas/psb_sspnrm1.f90
+./psblas/psb_sspmm.f90
+./psblas/psb_dnrmi.f90
+./psblas/psb_zamax.f90
+./psblas/psb_cspmm.f90
+./psblas/psb_dspsm.f90
+./psblas/psb_casum.f90
+./psblas/psb_cnrmi.f90
+./psblas/psb_znrm2.f90
+./psblas/psb_zspsm.f90
+./psblas/psb_camax.f90
+./psblas/psb_dnrm2.f90
+./psblas/psb_znrmi.f90
+./psblas/psb_cspsm.f90
+./psblas/psb_sdot.f90
+./psblas/psb_dasum.f90
+./psblas/psb_zasum.f90
+./psblas/psb_damax.f90
+./psblas/psb_zspmm.f90
+./psblas/psb_cnrm2.f90
+./psblas/psb_ddot.f90
+./psblas/psb_caxpby.f90
+./psblas/psb_cdot.f90
+./psblas/psb_snrm2.f90
+./psblas/psb_sspsm.f90
+./psblas/psb_daxpby.f90
+./psblas/psb_zdot.f90
+./psblas/psb_zaxpby.f90
+./psblas/psb_zspnrm1.f90
+./psblas/psb_sasum.f90
+./psblas/psb_saxpby.f90
+./psblas/psb_cspnrm1.f90
+serial/impl/psb_c_coo_impl.f90
+serial/smmp.f90
+serial/psb_srwextd.f90
+serial/psb_camax_s.f90
+serial/psb_ssymbmm.f90
+serial/psb_cgeprt.f90
+serial/psb_zasum_s.f90
+serial/psi_d_serial_impl.f90
+serial/psb_znumbmm.f90
+serial/psb_cspspmm.f90
+serial/psb_sgeprt.f90
+serial/psb_samax_s.f90
+serial/psb_sasum_s.f90
+serial/psi_i_serial_impl.f90
+serial/psb_aspxpby.f90
+serial/psb_zamax_s.f90
+serial/psi_c_serial_impl.f90
+serial/psb_sspspmm.f90
+serial/psb_cnumbmm.f90
+serial/psi_s_serial_impl.f90
+serial/psb_dspspmm.f90
+serial/psb_zsymbmm.f90
+serial/psb_cgelp.f90
+serial/psb_dnumbmm.f90
+serial/psb_csymbmm.f90
+serial/psb_zgelp.f90
+serial/psb_dsymbmm.f90
+serial/psb_damax_s.f90
+serial/psb_snumbmm.f90
+serial/psb_drwextd.f90
+serial/psb_spge_dot.f90
+serial/psb_spdot_srtd.f90
+serial/psb_crwextd.f90
+internals/psb_indx_map_fnd_owner.F90
+internals/psi_desc_index.F90
+internals/psi_fnd_owner.F90
+internals/psi_extrct_dl.F90
+tools/psb_icdasb.F90
+tools/psb_dsphalo.F90
+tools/psb_zcdbldext.F90
+tools/psb_scdbldext.F90
+tools/psb_zsphalo.F90
+tools/psb_ccdbldext.F90
+tools/psb_cdcpy.F90
+tools/psb_ssphalo.F90
+tools/psb_csphalo.F90
+tools/psb_dcdbldext.F90
+modules/psb_penv_mod.F90
+modules/psi_comm_buffers_mod.F90
+modules/psi_p2p_mod.F90
+modules/desc/psb_desc_mod.F90
+modules/psi_penv_mod.F90
+modules/psb_error_impl.F90
+modules/psb_realloc_mod.F90
+modules/psb_error_mod.F90
+modules/psblas/psb_s_psblas_mod.F90
+modules/psblas/psb_d_psblas_mod.F90
+modules/psblas/psb_c_psblas_mod.F90
+modules/psblas/psb_z_psblas_mod.F90
+modules/psi_reduce_mod.F90
+modules/psb_const_mod.F90
+modules/serial/psb_i_vect_mod.F90
+modules/serial/psb_c_vect_mod.F90
+modules/serial/psb_d_vect_mod.F90
+modules/serial/psb_z_vect_mod.F90
+modules/serial/psb_s_vect_mod.F90
+modules/psi_bcast_mod.F90
+comm/psb_zspgather.F90
+comm/psb_dscatter.F90
+comm/psb_zscatter.F90
+comm/internals/psi_dswapdata.F90
+comm/internals/psi_sswaptran.F90
+comm/internals/psi_sswapdata.F90
+comm/internals/psi_cswaptran.F90
+comm/internals/psi_iswapdata.F90
+comm/internals/psi_zswaptran.F90
+comm/internals/psi_iswaptran.F90
+comm/internals/psi_dswaptran.F90
+comm/internals/psi_zswapdata.F90
+comm/internals/psi_cswapdata.F90
+comm/psb_cspgather.F90
+comm/psb_iscatter.F90
+comm/psb_sscatter.F90
+comm/psb_sspgather.F90
+comm/psb_cscatter.F90
+comm/psb_dspgather.F90
+serial/impl/psb_c_base_mat_impl.F90
+serial/impl/psb_s_mat_impl.F90
+serial/impl/psb_z_mat_impl.F90
+serial/impl/psb_d_base_mat_impl.F90
+serial/impl/psb_c_mat_impl.F90
+serial/impl/psb_s_base_mat_impl.F90
+serial/impl/psb_d_mat_impl.F90
+serial/impl/psb_z_base_mat_impl.F90
+modules/fakempi.c
+modules/cutil.c
+)
+target_link_libraries(base PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+target_link_libraries(base_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING PATTERN "*.mod")
+
+set_target_properties( base_static
+  PROPERTIES
+  SOVERSION ${PSBLAS_SO_VERSION}
+)
+set_target_properties ( base
+  PROPERTIES
+  SOVERSION ${PSBLAS_SO_VERSION}
+)
+set_target_properties(base_static PROPERTIES OUTPUT_NAME base)
+get_target_property(libbase_static base_static OUTPUT_NAME)
+set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libbase_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+install(TARGETS base EXPORT PSBLAS_Targets
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
+
+install(TARGETS base_static EXPORT PSBLAS_Targets
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

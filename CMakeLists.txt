@@ -506,7 +506,7 @@ define_property(TARGET
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
-install(EXPORT PSBLASTargets
+install(EXPORT PSBLAS_Targets
   NAMESPACE
     PSBLAS::
   DESTINATION
@@ -603,5 +603,13 @@ endif()
 
 #include(cmake/AddInstallationScriptTest.cmake )
 #add_installation_script_test(installation-scripts.sh src/tests/installation/)
+
+add_definitions(
+  -DHAVE_METIS -DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DMPI_MOD -DSERIAL_MPI
+)
+# From ./configure CDEFINES section
+add_definitions(
+  -DHAVE_METIS_  -DLowerUnderscore -DPtr64Bits
+)
 
 add_subdirectory(base)
