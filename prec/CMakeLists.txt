@@ -161,14 +161,14 @@ set_target_properties ( prec
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME prec
+  OUTPUT_NAME psb_prec
 )
 set_target_properties( prec_static
   PROPERTIES
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME prec_static
+  OUTPUT_NAME psb_prec
 )
 
 get_target_property(libprec_static prec_static OUTPUT_NAME)

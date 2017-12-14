@@ -456,14 +456,14 @@ set_target_properties(base
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
   SOVERSION ${PSBLAS_SO_VERSION}
-  OUTPUT_NAME base
+  OUTPUT_NAME psb_base
 )
 set_target_properties(base_static
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
   SOVERSION ${PSBLAS_SO_VERSION}
-  OUTPUT_NAME base_static
+  OUTPUT_NAME psb_base
 )
 target_link_libraries(base PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
 target_link_libraries(base_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})

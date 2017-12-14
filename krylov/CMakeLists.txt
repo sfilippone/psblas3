@@ -145,14 +145,14 @@ set_target_properties ( krylov
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME krylov
+  OUTPUT_NAME psb_krylov
 )
 set_target_properties( krylov_static
   PROPERTIES
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME krylov_static
+  OUTPUT_NAME psb_krylov
 )
 
 get_target_property(libkrylov_static krylov_static OUTPUT_NAME)

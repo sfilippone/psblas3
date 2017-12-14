@@ -133,14 +133,14 @@ set_target_properties ( util
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME util
+  OUTPUT_NAME psb_util
 )
 set_target_properties( util_static
   PROPERTIES
   SOVERSION ${PSBLAS_SO_VERSION}
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME util_static
+  OUTPUT_NAME psb_util
 )
 
 get_target_property(libutil_static util_static OUTPUT_NAME)
