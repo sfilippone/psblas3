@@ -610,7 +610,7 @@ add_definitions(
   -DHAVE_METIS_  -DLowerUnderscore -DPtr64Bits
 )
 
-set(directory_list base prec krylov util) # TODO: add cbind
+set(directory_list base prec krylov util test) # TODO: add cbind
 foreach(directory ${directory_list})
   add_subdirectory("${directory}")
 endforeach()
