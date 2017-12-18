@@ -85,7 +85,7 @@ foreach( lib IN LISTS MPI_Fortran_LIBRARIES)
 endforeach()
 string(STRIP "${MPI_LIBS}" MPI_LIBS)
 
-set(directory_list fileread hello kernel pargen torture util)
+set(directory_list hello )#fileread hello kernel pargen torture util)
 if (SERIAL_MPI)
   set(directory_list ${directory_list} serial)
 endif()
