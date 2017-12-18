@@ -147,11 +147,10 @@ set(prec_source_files
 ./psb_d_base_prec_mod.f90
 )
 
-add_library(prec        SHARED ${prec_source_files})
-add_library(prec_static STATIC ${prec_source_files})
+add_library(prec ${prec_source_files})
+
 
 target_link_libraries(prec PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
-target_link_libraries(prec_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base_static)
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
@@ -163,22 +162,8 @@ set_target_properties ( prec
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_prec
 )
-set_target_properties( prec_static
-  PROPERTIES
-  SOVERSION ${PSBLAS_SO_VERSION}
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
-  POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_prec
-)
-
-get_target_property(libprec_static prec_static OUTPUT_NAME)
-set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libprec_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 install(TARGETS prec EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(TARGETS prec_static EXPORT PSBLAS_Targets
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

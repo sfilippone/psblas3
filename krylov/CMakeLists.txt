@@ -131,11 +131,9 @@ psb_zkrylov.f90
 psb_zrgmres.f90
 )
 
-add_library(krylov        SHARED ${krylov_source_files})
-add_library(krylov_static STATIC ${krylov_source_files})
+add_library(krylov ${krylov_source_files})
 
 target_link_libraries(krylov PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} prec)
-target_link_libraries(krylov_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} prec_static)
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
@@ -147,22 +145,8 @@ set_target_properties ( krylov
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_krylov
 )
-set_target_properties( krylov_static
-  PROPERTIES
-  SOVERSION ${PSBLAS_SO_VERSION}
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
-  POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_krylov
-)
-
-get_target_property(libkrylov_static krylov_static OUTPUT_NAME)
-set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libkrylov_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 install(TARGETS krylov EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(TARGETS krylov_static EXPORT PSBLAS_Targets
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

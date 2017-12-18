@@ -119,11 +119,9 @@ psb_z_mmio_impl.f90
 psb_z_renum_impl.F90
 )
 
-add_library(util        SHARED ${util_source_files})
-add_library(util_static STATIC ${util_source_files})
+add_library(util ${util_source_files})
 
 target_link_libraries(util PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base)
-target_link_libraries(util_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} base_static)
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
@@ -135,22 +133,8 @@ set_target_properties ( util
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_util
 )
-set_target_properties( util_static
-  PROPERTIES
-  SOVERSION ${PSBLAS_SO_VERSION}
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
-  POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_util
-)
-
-get_target_property(libutil_static util_static OUTPUT_NAME)
-set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libutil_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 install(TARGETS util EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(TARGETS util_static EXPORT PSBLAS_Targets
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

@@ -448,8 +448,7 @@ if (SERIAL_MPI)
  set(base_source_files ${base_source_files} modules/fakempi.c)
 endif()
 
-add_library(base        SHARED ${base_source_files})
-add_library(base_static STATIC ${base_source_files})
+add_library(base ${base_source_files})
 
 set_target_properties(base
   PROPERTIES
@@ -458,29 +457,13 @@ set_target_properties(base
   SOVERSION ${PSBLAS_SO_VERSION}
   OUTPUT_NAME psb_base
 )
-set_target_properties(base_static
-  PROPERTIES
-  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/${mod_dir_tail}"
-  POSITION_INDEPENDENT_CODE TRUE
-  SOVERSION ${PSBLAS_SO_VERSION}
-  OUTPUT_NAME psb_base
-)
 target_link_libraries(base PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
-target_link_libraries(base_static PRIVATE ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES})
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.mod")
 
-get_target_property(libbase_static base_static OUTPUT_NAME)
-set(PSBLAS_LIBS "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${libbase_static}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
 install(TARGETS base
   EXPORT PSBLAS_Targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(TARGETS base_static
-  EXPORT PSBLAS_Targets
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
