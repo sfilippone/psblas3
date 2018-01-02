@@ -2,8 +2,7 @@ $Format:%d%n%n$
 # Fall back version, probably last release:
 3.5.0
 
-# OpenCoarrays version file. This project uses semantic
-# versioning. For details see http://semver.org
+# PSBLAS version file.
 #
 # Release archive created from commit:
 # $Format:%H %d$
