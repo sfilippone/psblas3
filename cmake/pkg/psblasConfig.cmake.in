@@ -14,4 +14,3 @@ include ( "${@PACKAGE_NAME@_CONFIG_INSTALL_DIR}/@PACKAGE_NAME@-targets.cmake" )
 
 # Make the module files available via include
 set_and_check ( @CMAKE_PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_INSTALL_MOD_DIR@" )
-

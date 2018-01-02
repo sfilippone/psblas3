@@ -146,7 +146,7 @@ set_target_properties ( krylov
   OUTPUT_NAME psb_krylov
 )
 
-install(TARGETS krylov EXPORT PSBLAS_Targets
+install(TARGETS krylov EXPORT ${CMAKE_PROJECT_NAME}-targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

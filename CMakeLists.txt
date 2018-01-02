@@ -336,7 +336,8 @@ write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
   VERSION "${psblas_VERSION}"
   COMPATIBILITY SameMajorVersion
-)
+  )
+
 configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}Config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake" @ONLY)
 

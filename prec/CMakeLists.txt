@@ -163,7 +163,7 @@ set_target_properties ( prec
   OUTPUT_NAME psb_prec
 )
 
-install(TARGETS prec EXPORT PSBLAS_Targets
+install(TARGETS prec EXPORT ${CMAKE_PROJECT_NAME}-targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

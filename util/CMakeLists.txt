@@ -134,7 +134,7 @@ set_target_properties ( util
   OUTPUT_NAME psb_util
 )
 
-install(TARGETS util EXPORT PSBLAS_Targets
+install(TARGETS util EXPORT ${CMAKE_PROJECT_NAME}-targets
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
