@@ -93,14 +93,14 @@ subroutine psb_d_csc_csmv(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<n) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = n; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -366,14 +366,14 @@ subroutine psb_d_csc_csmm(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<n) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = n; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -650,14 +650,14 @@ subroutine psb_d_csc_cssv(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = m; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -864,14 +864,14 @@ subroutine psb_d_csc_cssm(alpha,a,x,beta,y,info,trans)
 
   if (size(x,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = m; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
 
   if (size(y,1)<m) then 
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
