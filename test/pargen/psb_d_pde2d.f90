@@ -558,35 +558,50 @@ contains
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: ip
+    integer(psb_ipk_) :: ip, inp_unit
+    character(len=1024)   :: filename
 
     call psb_info(ictxt, iam, np)
 
     if (iam == 0) then
-      read(psb_inp_unit,*) ip
+      if (command_argument_count()>0) then
+        call get_command_argument(1,filename)
+        inp_unit = 30
+        open(inp_unit,file=filename,action='read',iostat=info)
+        if (info /= 0) then
+          write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+          call psb_abort(ictxt)
+          stop
+        else
+          write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+        end if
+      else
+        inp_unit=psb_inp_unit
+      end if
+      read(inp_unit,*) ip
       if (ip >= 3) then
-        read(psb_inp_unit,*) kmethd
-        read(psb_inp_unit,*) ptype
-        read(psb_inp_unit,*) afmt
+        read(inp_unit,*) kmethd
+        read(inp_unit,*) ptype
+        read(inp_unit,*) afmt
 
-        read(psb_inp_unit,*) idim
+        read(inp_unit,*) idim
         if (ip >= 4) then
-          read(psb_inp_unit,*) istopc
+          read(inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 5) then
-          read(psb_inp_unit,*) itmax
+          read(inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 6) then
-          read(psb_inp_unit,*) itrace
+          read(inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 7) then
-          read(psb_inp_unit,*) irst
+          read(inp_unit,*) irst
         else
           irst=1
         endif
@@ -604,8 +619,11 @@ contains
         call psb_abort(ictxt)
         stop 1
       endif
-    end if
+      if (inp_unit /= psb_inp_unit) then
+        close(inp_unit)
+      end if
 
+    end if
     ! broadcast parameters to all processors
     call psb_bcast(ictxt,kmethd)
     call psb_bcast(ictxt,afmt)
@@ -615,7 +633,6 @@ contains
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)
     call psb_bcast(ictxt,irst)
-
 
     return
 
