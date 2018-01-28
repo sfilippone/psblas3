@@ -97,25 +97,14 @@ interested in the package  MLD2P4 from http://github.com/sfilippone/mld2p4-2
 
 Contact: https://github.com/sfilippone/psblas3
 
-Credits for version 3:
-Salvatore  Filippone
+Contributors 
+Salvatore  Filippone 
 Alfredo    Buttari
+Soren 	   Rasmussen
 Ambra	   Abdullahi Hassan
 Pasqua	   D'Ambra
 Daniela    di Serafino
-
-Credits for version 2.2:
-Michele Martone contributed the initial version of the configure
-machinery.  
-
-Credits for version 2.0:
-Salvatore  Filippone
-Alfredo    Buttari
-
-
-Credits for version 1.0:
-
-Salvatore  Filippone
+Michele    Martone
 Michele    Colajanni
 Fabio      Cerioni
 Stefano    Maiolatesi
