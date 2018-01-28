@@ -1,7 +1,7 @@
 !
 !             Parallel Sparse BLAS  version 3.5
 !   (C) Copyright 2006, 2010, 2015, 2017
-!       Salvatore Filippone    Cranfield University 
+!       Salvatore Filippone     
 !       Alfredo Buttari        CNRS-IRIT, Toulouse
 !
 ! Redistribution and use in source and binary forms, with or without
