@@ -81,12 +81,13 @@ module psb_cd_tools_mod
 
 
   interface psb_cdprt
-    subroutine psb_cdprt(iout,desc_p,glob,short)
+    subroutine psb_cdprt(iout,desc_p,glob,short,verbosity)
       import :: psb_ipk_, psb_desc_type
       implicit none 
       type(psb_desc_type), intent(in)    :: desc_p
       integer(psb_ipk_), intent(in)                :: iout
       logical, intent(in), optional      :: glob,short
+      integer(psb_ipk_), intent(in), optional      :: verbosity
     end subroutine psb_cdprt
   end interface
 
