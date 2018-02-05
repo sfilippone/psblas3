@@ -90,9 +90,11 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   end if
   call psb_barrier(ictxt)
   do i=0, np-1
-    if (me == i)  &
-       &  write(iout,*) me,': Local descriptor data: points:',local_points,' halo:',local_halo
-
+    if (me == i)  then 
+      write(iout,*) me,': Local descriptor data: points:',local_points,' halo:',local_halo
+      flush(iout)
+    end if
+    call psb_barrier(ictxt)
   end do
 
   
@@ -175,7 +177,7 @@ contains
     case default
       ! Do nothing
     end select
-    
+    flush(iout)
   end subroutine print_my_xchg
 
 end subroutine psb_cdprt
