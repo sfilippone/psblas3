@@ -177,7 +177,7 @@ contains
     case default
       ! Do nothing
     end select
-    
+    flush(iout)
   end subroutine print_my_xchg
 
 end subroutine psb_cdprt

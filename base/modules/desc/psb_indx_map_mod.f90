@@ -112,9 +112,9 @@ module psb_indx_map_mod
     !> MPI communicator
     integer(psb_mpik_) :: mpic           = -1
     !> Number of global rows
-    integer(psb_ipk_) :: global_rows    = -1
+    integer(psb_lpk_) :: global_rows    = -1
     !> Number of global columns
-    integer(psb_ipk_) :: global_cols    = -1
+    integer(psb_lpk_) :: global_cols    = -1
     !> Number of local rows
     integer(psb_ipk_) :: local_rows     = -1
     !> Number of local columns
@@ -141,18 +141,24 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: get_gc    => base_get_gc
     procedure, pass(idxmap)  :: get_lr    => base_get_lr
     procedure, pass(idxmap)  :: get_lc    => base_get_lc
+
+    procedure, pass(idxmap)  :: set_gri   => base_set_gri
+    procedure, pass(idxmap)  :: set_gci   => base_set_gci
+    procedure, pass(idxmap)  :: set_grl   => base_set_grl
+    procedure, pass(idxmap)  :: set_gcl   => base_set_gcl
+    generic, public          :: set_gr => set_gri, set_grl
+    generic, public          :: set_gc => set_gci, set_gcl
+    
+    procedure, pass(idxmap)  :: set_lr    => base_set_lr
+    procedure, pass(idxmap)  :: set_lc    => base_set_lc
+
+    procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
+    procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
     procedure, pass(idxmap)  :: get_ctxt  => base_get_ctxt
     procedure, pass(idxmap)  :: get_mpic  => base_get_mpic
     procedure, pass(idxmap)  :: sizeof    => base_sizeof
     procedure, pass(idxmap)  :: set_null  => base_set_null
     procedure, nopass        :: row_extendable => base_row_extendable
-
-    procedure, pass(idxmap)  :: set_gr    => base_set_gr
-    procedure, pass(idxmap)  :: set_gc    => base_set_gc
-    procedure, pass(idxmap)  :: set_lr    => base_set_lr
-    procedure, pass(idxmap)  :: set_lc    => base_set_lc
-    procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
-    procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
 
     procedure, nopass        :: get_fmt   => base_get_fmt
 
@@ -191,8 +197,9 @@ module psb_indx_map_mod
   private :: base_get_state, base_set_state, base_is_repl, base_is_bld,&
        & base_is_upd, base_is_asb, base_is_valid, base_is_ovl,&
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
-       & base_get_mpic, base_sizeof, base_set_null, base_set_gr,&
-       & base_set_gc, base_set_lr, base_set_lc, base_set_ctxt,&
+       & base_get_mpic, base_sizeof, base_set_null, &
+       & base_set_gri, base_set_gci, base_set_grl, base_set_gcl, &
+       & base_set_lr, base_set_lc, base_set_ctxt,&
        & base_set_mpic, base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
@@ -255,7 +262,7 @@ contains
   function base_get_gr(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_lpk_) :: val
 
     val = idxmap%global_rows
 
@@ -265,7 +272,7 @@ contains
   function base_get_gc(idxmap) result(val)
     implicit none 
     class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_ipk_) :: val
+    integer(psb_lpk_) :: val
 
     val = idxmap%global_cols
 
@@ -328,21 +335,37 @@ contains
     idxmap%ictxt = val
   end subroutine base_set_ctxt
 
-  subroutine base_set_gr(idxmap,val)
+  subroutine base_set_gri(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_rows = val
-  end subroutine base_set_gr
+  end subroutine base_set_gri
 
-  subroutine base_set_gc(idxmap,val)
+  subroutine base_set_gci(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(in)  :: val
 
     idxmap%global_cols = val
-  end subroutine base_set_gc
+  end subroutine base_set_gci
+
+  subroutine base_set_grl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+
+    idxmap%global_rows = val
+  end subroutine base_set_grl
+
+  subroutine base_set_gcl(idxmap,val)
+    implicit none 
+    class(psb_indx_map), intent(inout) :: idxmap
+    integer(psb_lpk_), intent(in)  :: val
+
+    idxmap%global_cols = val
+  end subroutine base_set_gcl
 
   subroutine base_set_lr(idxmap,val)
     implicit none 

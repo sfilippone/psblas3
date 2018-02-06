@@ -41,6 +41,7 @@ module psb_const_mod
 #endif
   ! This is always an 8-byte  integer.
   integer, parameter  :: psb_long_int_k_ = int64
+  integer, parameter  :: psb_lpk_        = psb_long_int_k_
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpik_ = int32
   !
@@ -60,6 +61,7 @@ module psb_const_mod
   ! This is always an 8-byte  integer.
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
+  integer, parameter  :: psb_lpk_  = psb_long_int_k_
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpik_ = kind(1)
   !
@@ -74,6 +76,9 @@ module psb_const_mod
   integer(psb_mpik_), parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
 #endif
 
+  !
+  ! These variables will be populated at initialization time.
+  !
   integer(psb_ipk_), save        :: psb_sizeof_dp, psb_sizeof_sp
   integer(psb_ipk_), save        :: psb_sizeof_int, psb_sizeof_long_int
   !
