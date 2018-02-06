@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006, 2010, 2015, 2017
 !        Salvatore Filippone    Cranfield University
 !        Alfredo Buttari        CNRS-IRIT, Toulouse
-!   
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -15,7 +15,7 @@
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,8 +27,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 ! File:  psb_sgcr.f90
 !!
 !! Contributors: Ambra Abdullahi (UNITOV) and Pasqua D’Ambra (IAC-CNR)
@@ -54,12 +54,12 @@
 !   C                                                                      C
 !   C         [4] R. Barrett et al                                         C
 !   C             Templates for the solution of linear systems             C
-!   C             SIAM, 1993                                        
-!   C                                                                      C  
+!   C             SIAM, 1993
+!   C                                                                      C
 !   C         [4] Notay, Yvan                                              C
 !   C             Aggregation-based algebraic multigrid method             C
-!   C             SIAM Journal on Scientific Computing 34,                 C 
-!   C             pp. A2288-A2316, 2012                                    C    
+!   C             SIAM Journal on Scientific Computing 34,                 C
+!   C             pp. A2288-A2316, 2012                                    C
 !   C                                                                      C
 !   C                                                                      C
 !   CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -89,20 +89,20 @@
 !                                         performed.
 !    err    -  real   (optional)          Output: error estimate on exit. If the
 !                                         denominator of the estimate is exactly
-!                                         0, it is changed into 1. 
+!                                         0, it is changed into 1.
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
 !    istop  -  integer(optional)          Input: stopping criterion, or how
-!                                         to estimate the error. 
+!                                         to estimate the error.
 !                                         1: err =  |r|/(|a||x|+|b|);  here the iteration is
 !                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         2: err =  |r|/|b|; here the iteration is
 !                                            stopped when  |r| <= eps * |b|
 !                                         where r is the (preconditioned, recursive
-!                                         estimate of) residual. 
-! 
-!    irst   -  integer(optional)          Input: restart parameter 
+!                                         estimate of) residual.
+!
+!    irst   -  integer(optional)          Input: restart parameter
 !
 
 subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
@@ -112,8 +112,8 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   use psb_s_krylov_conv_mod
   use psb_krylov_mod
   implicit none
-  
-  
+
+
   type(psb_sspmat_type), intent(in)    :: a
   Type(psb_desc_type), Intent(in)      :: desc_a
   class(psb_sprec_type), intent(inout) :: prec
@@ -128,7 +128,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   real(psb_spk_), allocatable   :: alpha(:), h(:,:)
   type(psb_s_vect_type), allocatable :: z(:), c(:), c_scale(:)
   type(psb_s_vect_type)   ::  r
-  
+
   real(psb_dpk_) :: r_norm, b_norm, a_norm, derr
   integer(psb_ipk_) :: n_col, mglob, naux, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -145,35 +145,35 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  
+
   ictxt = desc_a%get_context()
-  
+
   call psb_info(ictxt, me, np)
-  if (.not.allocated(b%v)) then 
+  if (.not.allocated(b%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.allocated(x%v)) then 
+  if (.not.allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   mglob = desc_a%get_global_rows()
   n_col = desc_a%get_local_cols()
-  
-  if (present(istop)) then 
-    istop_ = istop 
+
+  if (present(istop)) then
+    istop_ = istop
   else
     istop_ = 2
   endif
-  
+
   !
-  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
-  !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
+  !  ISTOP_ = 1:  Normwise backward error, infinity norm
+  !  ISTOP_ = 2:  ||r||/||b||, 2-norm
   !
-  
+
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=psb_err_invalid_istop_
     int_err(1)=istop_
@@ -181,191 +181,189 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
-  
-  
+
+
   call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
   if (info == psb_success_)&
        & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_    
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
     goto 9999
   end if
-  
-  if (present(itmax)) then 
+
+  if (present(itmax)) then
     itmax_ = itmax
   else
     itmax_ = 1000
   endif
-  
+
   if (present(itrace)) then
     itrace_ = itrace
   else
     itrace_ = 0
   end if
-  
+
   if (present(irst)) then
     nl = irst
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' present: irst: ',irst,nl
   else
-    nl = 10 
+    nl = 10
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' not present: irst: ',irst,nl
   endif
-  
-  if (nl <=0 ) then 
+
+  if (nl <=0 ) then
     info=psb_err_invalid_istop_
     int_err(1)=nl
     err=info
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
-  
-  naux=4*n_col 
+
+  naux=4*n_col
   allocate(aux(naux),h(nl+1,nl+1),&
        &c_scale(nl+1),c(nl+1),z(nl+1), alpha(nl+1), stat=info)
-  
+
   h = szero
-  if (info /= psb_success_) then 
-    info=psb_err_from_subroutine_non_ 
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   call psb_geasb(r, desc_a,info, scratch=.true.,mold=x%v)
-  
+
   do i =1,nl+1
     call psb_geasb(c(i), desc_a,info, scratch=.true.,mold=x%v)
     call psb_geasb(z(i), desc_a,info, scratch=.true.,mold=x%v)
     call psb_geasb(c_scale(i), desc_a,info, scratch=.true.,mold=x%v)
   end do
-  
+
   itx = 0
-  
+
   nrst = -1
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
-  restart: do 
-    if (itx>= itmax_) exit restart 
+  restart: do
+    if (itx>= itmax_) exit restart
     h = szero
-    
+
     it = 0
     ! compute r0 = b-ax0
-    
-    if (info /= psb_success_) then 
-      info=psb_err_from_subroutine_non_ 
+
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
-    
-    
-    call psb_geaxpby(sone, b, szero, r, desc_a, info) 
+
+
+    call psb_geaxpby(sone, b, szero, r, desc_a, info)
     call psb_spmm(-sone,a,x,sone,r,desc_a,info,work=aux)
-    if (info /= psb_success_) then 
-      info=psb_err_from_subroutine_non_ 
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
-    
+
     if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-        
-    nrst = nrst + 1 
-    
-    iteration: do 
-      
+
+    nrst = nrst + 1
+
+    iteration: do
+
       itx = itx + 1
       it = it + 1
-      j = it    
+      j = it
       !Apply preconditioner
-      call prec%apply(r,z(j),desc_a,info,work=aux)  
-      
+      call prec%apply(r,z(j),desc_a,info,work=aux)
+
       call psb_spmm(sone,a,z(j),szero,c(1),desc_a,info,work=aux)
       do i =1, j - 1
-        
-        h(i,j) = psb_gedot(c_scale(i), c(i), desc_a, info)   
-        
+
+        h(i,j) = psb_gedot(c_scale(i), c(i), desc_a, info)
+
         call psb_geaxpby(sone, c(i), szero, c(i+1), desc_a, info)
-        call psb_geaxpby(-h(i,j), c_scale(i), sone, c(i+1), desc_a, info)   
+        call psb_geaxpby(-h(i,j), c_scale(i), sone, c(i+1), desc_a, info)
       end do
-      
+
       h(j,j) = psb_norm2(c(j), desc_a, info)
       hjj = sone/h(j,j)
-      call psb_geaxpby(hjj, c(j), szero, c_scale(j), desc_a, info)   
-      
-      alpha(j) = psb_gedot(c_scale(j), r, desc_a, info) 
-      
+      call psb_geaxpby(hjj, c(j), szero, c_scale(j), desc_a, info)
+
+      alpha(j) = psb_gedot(c_scale(j), r, desc_a, info)
+
       !Update residual
-      call psb_geaxpby(sone, r, szero, r, desc_a, info)   
-      call psb_geaxpby(-alpha(j), c_scale(j), sone, r, desc_a, info)   
-      
+      call psb_geaxpby(sone, r, szero, r, desc_a, info)
+      call psb_geaxpby(-alpha(j), c_scale(j), sone, r, desc_a, info)
+
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      
+
       if (j >= irst) exit iteration
-      
-      
+
+
     end do iteration
-    
+
     m = j
-    
+
     !Compute solution
-    
+
     call strsm('l','u','n','n',m,1,sone,h,size(h,1),alpha,size(alpha,1))
-    
-    if (nrst == 0 ) then    
+
+    if (nrst == 0 ) then
       call x%set(szero)
     endif
     do i=1,m
-      call psb_geaxpby(alpha(i), z(i), sone, x, desc_a, info)   
+      call psb_geaxpby(alpha(i), z(i), sone, x, desc_a, info)
     enddo
-    
-    
-    
-    
+
+
+
+
   end do restart
   m = j
   !Compute solution
   call strsm('l','u','n','n',m,1,sone,h,size(h,1),alpha,size(alpha,1))
   call x%set(szero)
   do i=1,m
-    call psb_geaxpby(alpha(i), z(i), sone, x, desc_a, info)   
+    call psb_geaxpby(alpha(i), z(i), sone, x, desc_a, info)
   enddo
-  
+
   iter = j
-  
+
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
-  
+
   if (info == psb_success_) call psb_gefree(r,desc_a,info)
-  
+
   do j = 1,m
     if (info == psb_success_) call psb_gefree(z(j),desc_a,info)
     if (info == psb_success_) call psb_gefree(c_scale(j),desc_a,info)
   enddo
-  
+
   do i =1,nl+1
-    if (info == psb_success_) call psb_gefree(c(i),desc_a,info)   
+    if (info == psb_success_) call psb_gefree(c(i),desc_a,info)
   end do
-  
+
   if (info == psb_success_) deallocate(aux,h,c_scale,z,c,alpha,stat=info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if
-  
+
   return
 end subroutine psb_sgcr_vect
-
-
