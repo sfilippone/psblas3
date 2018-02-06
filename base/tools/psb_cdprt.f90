@@ -83,16 +83,19 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   global_halo   = local_halo
   call psb_sum(ictxt, global_halo)
   if (me == psb_root_) then
-    write(iout,*) ' Communication descriptor detailed info.'
+    write(iout,*) ' Communication descriptor details '
     write(iout,*) '               Descriptor format:       ',desc_p%get_fmt()    
     write(iout,*) ' Global descriptor data: points:',global_points,' halo:',global_halo
     write(iout,*)
   end if
   call psb_barrier(ictxt)
   do i=0, np-1
-    if (me == i)  &
-       &  write(iout,*) me,': Local descriptor data: points:',local_points,' halo:',local_halo
-
+    if (me == i)  then
+      write(iout,*) me,': Local descriptor data: points:',local_points,&
+           & ' halo:',local_halo
+      write(iout,*) me,': Volume to surface ratio:',real(local_points,psb_dpk_)/real(local_halo,psb_dpk_)
+    end if
+    call psb_barrier(ictxt)
   end do
 
   
@@ -112,11 +115,6 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
        &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_ext_)
     call psb_barrier(ictxt)
   end do
-  
-  
-  
-
-
   
   return
 
@@ -149,9 +147,13 @@ contains
     call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
     select case(verb_)
     case (1) 
-      write(iout,*) me,' Total exchanges ',totxch,' Total sends:',idxs,' Total receives:', idxr
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
     case (2)
-      write(iout,*) me,' Total exchanges ',totxch,' Total sends:',idxs,' Total receives:', idxr
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
       if (totxch == 0) return
       if (.not.associated(vpnt)) return
       if (.not.allocated(vpnt%v)) return
@@ -166,7 +168,7 @@ contains
           totxch = totxch+1
           nerv   = idx(ip+psb_n_elem_recv_)
           nesd   = idx(ip+nerv+psb_n_elem_send_)
-          write(iout,*) '   ',me,' Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
+          write(iout,*) '   ',me,': Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
           idxs = idxs + nesd
           idxr = idxr + nerv
           ip   = ip+nerv+nesd+3
