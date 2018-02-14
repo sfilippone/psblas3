@@ -105,14 +105,14 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_halo'
   do i=0, np-1
     if (me == i)  &
-       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_halo_)
+       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_halo_,glob=glob_)
     call psb_barrier(ictxt)
   end do
   
   if (me==psb_root_) write(iout,*) 'Communication data for : comm_ext'
   do i=0, np-1
     if (me == i)  &
-       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_ext_)
+       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_ext_,glob=glob_)
     call psb_barrier(ictxt)
   end do
   
@@ -129,6 +129,7 @@ contains
     
     integer(psb_ipk_) :: ip, nerv, nesd, totxch,idxr,idxs
     integer(psb_ipk_) :: ictxt, me, np, data_, info, verb_
+    integer(psb_ipk_), allocatable :: gidx(:)
     class(psb_i_base_vect_type), pointer :: vpnt
     
     ictxt = desc_p%get_ctxt()
@@ -145,6 +146,9 @@ contains
     end if
     
     call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    if (glob) &
+         &   call psb_realloc(max(idxr,idxs,1),gidx,info)
+
     select case(verb_)
     case (1) 
       write(iout,*) me,': Total exchanges  :',totxch
@@ -169,6 +173,41 @@ contains
           nerv   = idx(ip+psb_n_elem_recv_)
           nesd   = idx(ip+nerv+psb_n_elem_send_)
           write(iout,*) '   ',me,': Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
+          idxs = idxs + nesd
+          idxr = idxr + nerv
+          ip   = ip+nerv+nesd+3
+        end do
+      end associate
+    case (3)
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
+      if (totxch == 0) return
+      if (.not.associated(vpnt)) return
+      if (.not.allocated(vpnt%v)) return
+      associate(idx => vpnt%v)
+        ip     = 1        
+        do 
+          if (ip > size(idx)) then 
+            write(psb_err_unit,*) ': Warning: out of size of input vector '
+            exit
+          end if
+          if (idx(ip) == -1) exit
+          totxch = totxch+1
+          nerv   = idx(ip+psb_n_elem_recv_)
+          nesd   = idx(ip+nerv+psb_n_elem_send_)
+          write(iout,*) '   ',me,': Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
+          if (glob) then
+            call desc_p%l2g(idx(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd),gidx,info)
+            write(iout,*) '   ',me,': sending to:',idx(ip),' :',gidx(1:nesd)
+            call desc_p%l2g(idx(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv),gidx,info)
+            write(iout,*) '   ',me,': rcvng from:',idx(ip),' :',gidx(1:nerv)
+          else
+            write(iout,*) '   ',me,': sending to:',idx(ip),' :',&
+                 & idx(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd)
+            write(iout,*) '   ',me,': rcvng from:',idx(ip),' :',&
+                 & idx(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv)
+          end if
           idxs = idxs + nesd
           idxr = idxr + nerv
           ip   = ip+nerv+nesd+3
