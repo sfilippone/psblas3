@@ -67,7 +67,7 @@ function psb_sdot_vect(x, y, desc_a,info) result(res)
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   character(len=20)      :: name, ch_err
 
-  name='psb_sdot'
+  name='psb_sdot_vect'
   res = szero
   if (psb_errstatus_fatal()) return 
   info=psb_success_
