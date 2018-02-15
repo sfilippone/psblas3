@@ -50,10 +50,12 @@
 !
 ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
 !
-! In this sample program the index space of the discretized
-! computational domain is first numbered sequentially in a standard way, 
-! then the corresponding vector is distributed according to a BLOCK
-! data distribution.
+! There are two choices available for data distribution:
+! 1. A simple BLOCK distribution
+! 2. A 3D distribution in which the unit cube is partitioned
+!    into subcubes, each one assigned to a process.
+!
+!
 !
 module psb_d_pde3d_mod
 
@@ -73,7 +75,9 @@ module psb_d_pde3d_mod
   interface psb_gen_pde3d
     module procedure  psb_d_gen_pde3d
   end interface psb_gen_pde3d
-
+  
+  integer, private              :: dims(3),coords(3)
+  integer, private, allocatable :: rk2coo(:,:), coo2rk(:,:,:)
   
 contains
 
@@ -86,6 +90,71 @@ contains
 
   end function d_null_func_3d
 
+  !
+  ! Given  a global index IDX and the domain size (NX,NY,NZ)
+  ! compute the point coordinates (I,J,K) 
+  ! Optional argument: base 0 or 1, default 1
+  !
+  ! This mapping is equivalent to a loop nesting:
+  !  idx = base
+  !  do i=1,nx
+  !    do j=1,ny
+  !      do k=1,nz
+  !         ijk2idx(i,j,k) = idx
+  !         idx = idx + 1
+  subroutine  idx2ijk(i,j,k,idx,nx,ny,nz,base)
+    integer(psb_ipk_), intent(out) :: i,j,k
+    integer(psb_ipk_), intent(in)  :: idx,nx,ny,nz
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    integer(psb_ipk) :: base_, idx_
+    if (present(base)) then
+      base_  = base
+    else
+      base_ = 1
+    end if
+
+    idx_ = idx - base_
+    
+    i = idx/(nx*ny)
+    j = (idx - i*nx*ny)/ny
+    k = (idx - i*nx*ny -j*ny)/nz
+
+    i = i + base_
+    j = j + base_
+    k = k + base_
+  end subroutine idx2ijk
+  
+  !
+  ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)
+  ! compute the global index IDX 
+  ! Optional argument: base 0 or 1, default 1
+  !
+  ! This mapping is equivalent to a loop nesting:
+  !  idx = base
+  !  do i=1,nx
+  !    do j=1,ny
+  !      do k=1,nz
+  !         ijk2idx(i,j,k) = idx
+  !         idx = idx + 1
+  subroutine  ijk2idx(idx,i,j,k,nx,ny,nz,base)
+    integer(psb_ipk_), intent(out) :: idx,
+    integer(psb_ipk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    integer(psb_ipk) :: base_
+    if (present(base)) then
+      base_  = base
+    else
+      base_ = 1
+    end if
+
+
+    idx = ((i-base_)*nx*ny + (j-base_)*nx + k -base_) + base_
+    
+  end subroutine ijk2idx
+  
+  
   !
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
