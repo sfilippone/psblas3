@@ -29,16 +29,16 @@ program tryyidxijk
   write(*,*) 'Ok '
   write(*,*) 'npx,npy,npz? '
   read(*,*) npx,npy,npz
-  
+  allocate(v(0:max(npx,npy,npz)))
   call dist1Didx(v,nx,npx)
-  write(*,*) '  X:',v
-  write(*,*) 'SZX:',v(2:npx+1)-v(1:npx)
+  write(*,*) '  X:',v(0:npx)
+  write(*,*) 'SZX:',v(1:npx)-v(0:npx-1)
   call dist1Didx(v,ny,npy)
-  write(*,*) '  Y:',v
-  write(*,*) 'SZY:',v(2:npy+1)-v(1:npy)
+  write(*,*) '  Y:',v(0:npy)
+  write(*,*) 'SZY:',v(1:npy)-v(0:npy-1)
   call dist1Didx(v,nz,npz)
-  write(*,*) '  Z:',v
-  write(*,*) 'SZZ:',v(2:npz+1)-v(1:npz)
+  write(*,*) '  Z:',v(0:npz)
+  write(*,*) 'SZZ:',v(1:npz)-v(0:npz-1)
   
   
 contains
@@ -110,15 +110,17 @@ contains
   ! dist1Didx
   !   Given an index space [base : N-(1-base)] and
   !   a set of NP processes, split the index base as
-  !   evenly as possible, then return the boundaries
-  !   in a vector such that
+  !   evenly as possible, i.e. difference in size 
+  !   between any two processes is either 0 or 1,
+  !   then return the boundaries in a vector
+  !   such that
   !     V(P)   : first index owned by process P
   !     V(P+1) : first index owned by process P+1
   !
   subroutine dist1Didx(v,n,np,base)
     use psb_base_mod, only : psb_ipk_
     implicit none 
-    integer(psb_ipk_), allocatable, intent(out) :: v(:)
+    integer(psb_ipk_), intent(out) :: v(:)
     integer(psb_ipk_), intent(in)  :: n, np
     integer(psb_ipk_), intent(in), optional :: base
     !
@@ -129,7 +131,6 @@ contains
     else
       base_ = 1
     end if
-    allocate(v(np+1))
     
     nb = n/np
     do i=1,mod(n,np)
