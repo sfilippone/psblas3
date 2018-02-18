@@ -50,10 +50,12 @@
 !
 ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
 !
-! In this sample program the index space of the discretized
-! computational domain is first numbered sequentially in a standard way, 
-! then the corresponding vector is distributed according to a BLOCK
-! data distribution.
+! There are three choices available for data distribution:
+! 1. A simple BLOCK distribution
+! 2. A ditribution based on arbitrary assignment of indices to processes,
+!    typically from a graph partitioner
+! 3. A 2D distribution in which the unit square is partitioned
+!    into rectangles, each one assigned to a process.
 !
 module psb_s_pde2d_mod
 
@@ -91,8 +93,9 @@ contains
   !  the rhs. 
   !
   subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,nrl)
+       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
+    use psb_util_mod
     !
     !   Discretizes the partial differential equation
     ! 
@@ -120,7 +123,7 @@ contains
     class(psb_s_base_sparse_mat), optional :: amold
     class(psb_s_base_vect_type), optional :: vmold
     class(psb_i_base_vect_type), optional :: imold
-    integer(psb_ipk_), optional :: nrl
+    integer(psb_ipk_), optional :: partition, nrl,iv(:)
 
     ! Local variables.
 
@@ -129,9 +132,13 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,glob_row,nlr,i,ii,ib,k
+    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
-    integer(psb_ipk_) :: np, iam, nr, nt
+    ! For 2D partition
+    integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
+    integer(psb_ipk_), allocatable :: bndx(:),bndy(:)
+    ! Process grid
+    integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
     integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
@@ -161,6 +168,17 @@ contains
     sqdeltah = deltah*deltah
     deltah2  = 2.e0* deltah
 
+    if (present(partition)) then
+      if ((1<= partition).and.(partition <= 3)) then
+        partition_ = partition
+      else
+        write(*,*) 'Invalid partition choice ',partition,' defaulting to 3'
+        partition_ = 3
+      end if
+    else
+      partition_ = 3
+    end if
+    
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
 
@@ -169,32 +187,121 @@ contains
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
-    if (present(nrl)) then 
-      nr = nrl
-    else
-      !
-      ! Using a simple BLOCK distribution.
-      !
-      nt = (m+np-1)/np
-      nr = max(0,min(nt,m-(iam*nt)))
-    end if
+    select case(partition_)
+    case(1)
+      ! A BLOCK partition 
+      if (present(nrl)) then 
+        nr = nrl
+      else
+        !
+        ! Using a simple BLOCK distribution.
+        !
+        nt = (m+np-1)/np
+        nr = max(0,min(nt,m-(iam*nt)))
+      end if
 
-    nt = nr
-    call psb_sum(ictxt,nt) 
-    if (nt /= m) then 
-      write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+      nt = nr
+      call psb_sum(ictxt,nt) 
+      if (nt /= m) then 
+        write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+        return    
+      end if
+
+      !
+      ! First example  of use of CDALL: specify for each process a number of
+      ! contiguous rows
+      ! 
+      call psb_cdall(ictxt,desc_a,info,nl=nr)
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(2)
+      ! A  partition  defined by the user through IV
+      
+      if (present(iv)) then 
+        if (size(iv) /= m) then
+          write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
+          info = -1
+          call psb_barrier(ictxt)
+          call psb_abort(ictxt)
+          return    
+        end if
+      else
+        write(psb_err_unit,*) iam, 'Initialization error: IV not present'
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+        return    
+      end if
+
+      !
+      ! Second example  of use of CDALL: specify for each row the
+      ! process that owns it 
+      ! 
+      call psb_cdall(ictxt,desc_a,info,vg=iv)
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(3)
+      ! A 2-dimensional partition
+
+      ! A nifty MPI function will split the process list
+      npdims = 0
+      call mpi_dims_create(np,2,npdims,info)
+      npx = npdims(1)
+      npy = npdims(2)
+
+      allocate(bndx(0:npx),bndy(0:npy))
+      ! We can reuse idx2ijk for process indices as well. 
+      call idx2ijk(iamx,iamy,iam,npx,npy,base=0)
+      ! Now let's split the 2D square in rectangles
+      call dist1Didx(bndx,idim,npx)
+      mynx = bndx(iamx+1)-bndx(iamx)
+      call dist1Didx(bndy,idim,npy)
+      myny = bndy(iamy+1)-bndy(iamy)
+
+      ! How many indices do I own? 
+      nlr = mynx*myny
+      allocate(myidx(nlr))
+      ! Now, let's generate the list of indices I own
+      nr = 0
+      do i=bndx(iamx),bndx(iamx+1)-1
+        do j=bndy(iamy),bndx(iamy+1)-1
+          nr = nr + 1
+          call ijk2idx(myidx(nr),i,j,idim,idim)
+        end do
+      end do
+      if (nr /= nlr) then
+        write(psb_err_unit,*) iam,iamx,iamy, 'Initialization error: NR vs NLR ',&
+             & nr,nlr,mynx,myny
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+      end if
+
+      !
+      ! Third example  of use of CDALL: specify for each process
+      ! the set of global indices it owns.
+      ! 
+      call psb_cdall(ictxt,desc_a,info,vl=myidx)
+      
+    case default
+      write(psb_err_unit,*) iam, 'Initialization error: should not get here'
       info = -1
       call psb_barrier(ictxt)
       call psb_abort(ictxt)
-      return    
-    end if
-    call psb_barrier(ictxt)
-    t0 = psb_wtime()
-    call psb_cdall(ictxt,desc_a,info,nl=nr)
+      return
+    end select
+
+    
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info)
+
     call psb_barrier(ictxt)
     talc = psb_wtime()-t0
 
@@ -218,9 +325,6 @@ contains
     endif
 
 
-    myidx = desc_a%get_global_indices()
-    nlr = size(myidx)
-
     ! loop over rows belonging to current process in a block
     ! distribution.
 
@@ -234,13 +338,8 @@ contains
         ! local matrix pointer 
         glob_row=myidx(i)
         ! compute gridpoint coordinates
-        if (mod(glob_row,(idim)) == 0) then
-          ix = glob_row/(idim)
-        else
-          ix = glob_row/(idim)+1
-        endif
-        iy = (glob_row-(ix-1)*idim)
-        ! x, y
+        call idx2ijk(ix,iy,glob_row,idim,idim)
+        ! x, y coordinates
         x = (ix-1)*deltah
         y = (iy-1)*deltah
 
