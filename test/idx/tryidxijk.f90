@@ -16,4 +16,5 @@ program tryidxijk
     sidx = idx
     write(*,*) 'idx2ijk: ',idx,i,j,k, sidx
   end do
+
 end program tryidxijk

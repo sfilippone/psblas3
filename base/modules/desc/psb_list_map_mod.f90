@@ -46,9 +46,12 @@ module psb_list_map_mod
   
   type, extends(psb_indx_map) :: psb_list_map
     integer(psb_ipk_) :: pnt_h          = -1 
-    integer(psb_ipk_), allocatable :: loc_to_glob(:), glob_to_loc(:)
+    integer(psb_lpk_), allocatable :: loc_to_glob(:)
+    integer(psb_ipk_), allocatable :: glob_to_loc(:)
   contains
     procedure, pass(idxmap)  :: init_vl    => list_initvl
+
+    procedure, pass(idxmap)  :: init_lvl   => list_initlvl
 
     procedure, pass(idxmap)  :: sizeof    => list_sizeof
     procedure, pass(idxmap)  :: asb       => list_asb
@@ -563,7 +566,41 @@ contains
     integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_ipk_) ::  i, ix, nl, n, nrt
+    integer(psb_lpk_) :: nl
+    integer(psb_lpk_), allocatable :: lvl(:)
+    integer(psb_mpik_) :: iam, np
+
+    info = 0
+    call psb_info(ictxt,iam,np) 
+    if (np < 0) then 
+      write(psb_err_unit,*) 'Invalid ictxt:',ictxt
+      info = -1
+      return
+    end if
+
+    nl = size(vl) 
+    allocate(lvl(nl),stat=info)
+    if (info /= 0) then
+      info = -1
+      return
+    end if
+
+    lvl(1:nl) = vl(1:nl)
+    call idxmap%init_lvl(ictxt,lvl,info)
+   
+  end subroutine list_initvl
+
+
+  subroutine list_initlvl(idxmap,ictxt,vl,info)
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    class(psb_list_map), intent(inout) :: idxmap
+    integer(psb_mpik_), intent(in) :: ictxt
+    integer(psb_lpk_), intent(in)  :: vl(:)
+    integer(psb_ipk_), intent(out) :: info
+    !  To be implemented
+    integer(psb_lpk_) ::  i, ix, nl, n, nrt
     integer(psb_mpik_) :: iam, np
 
     info = 0
@@ -615,7 +652,7 @@ contains
     idxmap%local_cols   = nl
     call idxmap%set_state(psb_desc_bld_)
    
-  end subroutine list_initvl
+  end subroutine list_initlvl
 
 
   subroutine list_asb(idxmap,info)
