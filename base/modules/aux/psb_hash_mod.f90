@@ -58,8 +58,8 @@ module psb_hash_mod
   !
   type psb_hash_type
     integer(psb_ipk_) :: nbits, hsize, hmask, nk
-    integer(psb_ipk_), allocatable :: table(:,:)
-    integer(psb_long_int_k_) :: nsrch, nacc
+    integer(psb_lpk_), allocatable :: table(:,:)
+    integer(psb_lpk_) :: nsrch, nacc
   end type psb_hash_type
 
 
@@ -67,14 +67,22 @@ module psb_hash_mod
        & HashFreeEntry = -1, HashNotFound = -256
 
   interface psb_hash_init
-    module procedure psb_hash_init_v, psb_hash_init_n
+    module procedure psb_hash_init_v, psb_hash_init_n, &
+         & psb_hash_init_lv, psb_hash_init_ln
   end interface
 
   interface psb_sizeof
     module procedure psb_sizeof_hash_type
   end interface
 
-
+  interface hashval
+    module procedure ihashval, lhashval
+  end interface hashval
+  
+  interface psb_hash_searchinskey
+    module procedure psb_hash_searchinskey, psb_hash_lsearchinskey
+  end interface psb_hash_searchinskey
+  
   interface psb_move_alloc
     module procedure HashTransfer
   end interface
@@ -94,7 +102,7 @@ contains
   ! This is based on the djb2 hashing algorithm
   ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
   !
-  function hashval(key) result(val)
+  function ihashval(key) result(val)
     integer(psb_ipk_), intent(in)  :: key
     integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
     integer(psb_ipk_) :: key_, val, i
@@ -109,7 +117,28 @@ contains
     val = val + ishft(val,-5)
     val = iand(val,mask)
     
-  end function hashval
+  end function ihashval
+  !
+  ! This is based on the djb2 hashing algorithm
+  ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
+  !
+  function lhashval(key) result(val)
+    integer(psb_lpk_), intent(in)  :: key
+    integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
+    integer(psb_ipk_) :: val, i
+    integer(psb_lpk_) :: key_
+
+    key_ = key
+    val  = ival 
+    do i=1, psb_sizeof_long_int
+      val  = val * 33 + iand(key_,255)
+      key_ = ishft(key_,-8)
+    end do
+    
+    val = val + ishft(val,-5)
+    val = iand(val,mask)
+    
+  end function lhashval
 
   
   function psb_Sizeof_hash_type(hash) result(val)
@@ -117,7 +146,7 @@ contains
     integer(psb_long_int_k_) :: val
     val = 4*psb_sizeof_int + 2*psb_sizeof_long_int
     if (allocated(hash%table)) &
-         & val = val + psb_sizeof_int * size(hash%table)
+         & val = val + psb_sizeof_long_int * size(hash%table)
     
   end function psb_Sizeof_hash_type
 
@@ -195,7 +224,7 @@ contains
 
   end subroutine CloneHashTable
 
-  subroutine psb_hash_init_V(v,hash,info)
+  subroutine psb_hash_init_v(v,hash,info)
     integer(psb_ipk_), intent(in)     :: v(:)
     type(psb_hash_type), intent(out) :: hash
     integer(psb_ipk_), intent(out)    :: info 
@@ -214,7 +243,28 @@ contains
         return
       end if
     end do
-  end subroutine psb_hash_init_V
+  end subroutine psb_hash_init_v
+
+  subroutine psb_hash_init_lv(v,hash,info)
+    integer(psb_lpk_), intent(in)     :: v(:)
+    type(psb_hash_type), intent(out) :: hash
+    integer(psb_ipk_), intent(out)    :: info 
+
+    integer(psb_lpk_) :: i,j, nv
+
+    info  = psb_success_
+    nv    = size(v)
+    call psb_hash_init(nv,hash,info) 
+    if (info /= psb_success_) return
+    do i=1,nv 
+      call psb_hash_searchinskey(v(i),j,i,hash,info) 
+      if ((j /= i).or.(info /= HashOK)) then 
+        write(psb_err_unit,*) 'Error from hash_ins',i,v(i),j,info
+        info = HashNotFound
+        return
+      end if
+    end do
+  end subroutine psb_hash_init_lv
 
   subroutine psb_hash_init_n(nv,hash,info)
     integer(psb_ipk_), intent(in)     :: nv
@@ -256,6 +306,46 @@ contains
     hash%nk    = 0
   end subroutine psb_hash_init_n
 
+  subroutine psb_hash_init_ln(nv,hash,info)
+    integer(psb_lpk_), intent(in)     :: nv
+    type(psb_hash_type), intent(out) :: hash
+    integer(psb_ipk_), intent(out)    :: info 
+
+    integer(psb_ipk_) :: hsize,nbits
+
+    info  = psb_success_
+    nbits = 12
+    hsize = 2**nbits
+    !
+    ! Figure out the smallest power of 2 bigger than NV
+    ! Note: in our intended usage NV will be the size of the
+    ! local index space, NOT the global index space.
+    !
+    do 
+      if (hsize < 0) then 
+        write(psb_err_unit,*) 'Error: hash size overflow ',hsize,nbits
+        info = -2 
+        return
+      end if
+      if (hsize > nv) exit
+      nbits = nbits + 1
+      hsize = hsize * 2 
+    end do
+    hash%nbits = nbits
+    hash%hsize = hsize
+    hash%hmask = hsize-1
+    hash%nsrch = 0
+    hash%nacc  = 0 
+    allocate(hash%table(0:hsize-1,2),stat=info) 
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) 'Error: memory allocation failure  ',hsize
+      info = HashOutOfMemory
+      return
+    end if
+    hash%table = HashFreeEntry
+    hash%nk    = 0
+  end subroutine psb_hash_init_ln
+
 
   subroutine psb_hash_realloc(hash,info)
     type(psb_hash_type), intent(inout) :: hash
@@ -284,6 +374,67 @@ contains
     end do
     call HashTransfer(nhash,hash,info)
   end subroutine psb_hash_realloc
+    
+  recursive subroutine psb_hash_lsearchinskey(key,val,nextval,hash,info)
+    integer(psb_lpk_), intent(in)   :: key,nextval
+    type(psb_hash_type)   :: hash
+    integer(psb_lpk_), intent(out)  :: val
+    integer(psb_ipk_), intent(out)  :: info 
+
+    integer(psb_ipk_) :: hsize,hmask, hk, hd
+
+    info  = HashOK
+    hsize = hash%hsize
+    hmask = hash%hmask
+
+    hk = iand(hashval(key),hmask)
+    if (hk == 0) then 
+      hd = 1
+    else 
+      hd = hsize - hk 
+      hd = ior(hd,1)
+    end if
+    if (.not.allocated(hash%table)) then
+      info = HashOutOfMemory
+      return
+    end if
+
+    hash%nsrch = hash%nsrch + 1
+    do 
+      hash%nacc = hash%nacc + 1
+      if (hash%table(hk,1) == key) then 
+        val  = hash%table(hk,2)
+        info = HashDuplicate
+        return
+      end if
+      if (hash%table(hk,1) == HashFreeEntry) then 
+        if (hash%nk == hash%hsize -1) then
+          !
+          ! Note: because of the way we allocate things at CDALL
+          ! time this is really unlikely; if we get here, we
+          ! have at least as many halo indices as internals, which
+          ! means we're already in trouble. But we try to keep going. 
+          !
+          call psb_hash_realloc(hash,info) 
+          if (info /=  HashOk) then             
+            info = HashOutOfMemory
+            return
+          else
+            call psb_hash_searchinskey(key,val,nextval,hash,info)
+            return
+          end if
+        else
+          hash%nk = hash%nk + 1 
+          hash%table(hk,1) = key
+          hash%table(hk,2) = nextval
+          val              = nextval
+          return
+        end if
+      end if
+      hk = hk - hd 
+      if (hk < 0) hk = hk + hsize
+    end do
+  end subroutine psb_hash_lsearchinskey
     
   recursive subroutine psb_hash_searchinskey(key,val,nextval,hash,info)
     integer(psb_ipk_), intent(in)   :: key,nextval
