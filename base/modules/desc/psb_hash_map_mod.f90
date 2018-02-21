@@ -743,6 +743,9 @@ contains
 
   end subroutine hash_g2lv2_ins
 
+  !
+  ! init from VL, with checks on input.
+  !
   subroutine hash_init_vl(idxmap,ictxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
@@ -870,7 +873,9 @@ contains
 
   end subroutine hash_init_vg
 
-
+  !
+  ! init from VL, with no checks on input
+  !
   subroutine hash_init_vlu(idxmap,ictxt,ntot,nl,vlu,info)
     use psb_penv_mod
     use psb_error_mod

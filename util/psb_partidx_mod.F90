@@ -47,9 +47,9 @@ module psb_partidx_mod
   end interface idx2ijk
 
   interface ijk2idx
-    module procedure ijk2idx3d, ijk2idxv, ijk2idx2d!,&
-!!$         & ijk2idx3d, ijk2idxv, ijk2lidx2d,&
-!!$         & lijk2lidx3d, lijk2lidxv, lijk2lidx2d
+    module procedure ijk2idx3d, ijk2idxv, ijk2idx2d,&
+         & ijk2lidx3d, ijk2lidxv, ijk2lidx2d,&
+         & lijk2lidx3d, lijk2lidxv, lijk2lidx2d
   end interface ijk2idx
 
 
@@ -387,6 +387,130 @@ contains
     call ijk2idx(idx,[i,j],[nx,ny],base)
   end subroutine ijk2idx2d
 
+  subroutine  ijk2lidxv(idx,coords,dims,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_ipk_), intent(in)  :: coords(:),dims(:)
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    integer(psb_ipk_) :: base_, i, sz
+    if (present(base)) then
+      base_  = base
+    else
+      base_ = 1
+    end if
+    sz = size(coords)
+    if (sz /= size(dims)) then
+      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      idx = 0
+      return
+    end if
+
+    idx = coords(1) - base_
+    do i=2, sz
+      idx = (idx * dims(i)) + coords(i) - base_
+    end do
+    idx = idx + base_
+    
+  end subroutine ijk2lidxv
+  !
+  ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)
+  ! compute the global index IDX 
+  ! Optional argument: base 0 or 1, default 1
+  !
+  ! This mapping is equivalent to a loop nesting:
+  !  idx = base
+  !  do i=1,nx
+  !    do j=1,ny
+  !      do k=1,nz
+  !         ijk2idx(i,j,k) = idx
+  !         idx = idx + 1
+  subroutine  ijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_ipk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    !    idx = ((i-base_)*nz*ny + (j-base_)*nz + k - base_) + base_
+    call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
+  end subroutine ijk2lidx3d
+
+  subroutine  ijk2lidx2d(idx,i,j,nx,ny,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_ipk_), intent(in)  :: i,j,nx,ny
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    !    idx = ((i-base_)*ny + (j-base_) + base_
+    call ijk2idx(idx,[i,j],[nx,ny],base)
+  end subroutine ijk2lidx2d
+
+
+  subroutine  lijk2lidxv(idx,coords,dims,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_lpk_), intent(in)  :: coords(:),dims(:)
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    integer(psb_lpk_) :: base_, i, sz
+    if (present(base)) then
+      base_  = base
+    else
+      base_ = 1
+    end if
+    sz = size(coords)
+    if (sz /= size(dims)) then
+      write(0,*) 'Error: size mismatch ',size(coords),size(dims)
+      idx = 0
+      return
+    end if
+
+    idx = coords(1) - base_
+    do i=2, sz
+      idx = (idx * dims(i)) + coords(i) - base_
+    end do
+    idx = idx + base_
+    
+  end subroutine lijk2lidxv
+  !
+  ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)
+  ! compute the global index IDX 
+  ! Optional argument: base 0 or 1, default 1
+  !
+  ! This mapping is equivalent to a loop nesting:
+  !  idx = base
+  !  do i=1,nx
+  !    do j=1,ny
+  !      do k=1,nz
+  !         ijk2idx(i,j,k) = idx
+  !         idx = idx + 1
+  subroutine  lijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_lpk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    !    idx = ((i-base_)*nz*ny + (j-base_)*nz + k - base_) + base_
+    call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
+  end subroutine lijk2lidx3d
+
+  subroutine  lijk2lidx2d(idx,i,j,nx,ny,base)
+    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    implicit none 
+    integer(psb_lpk_), intent(out) :: idx
+    integer(psb_lpk_), intent(in)  :: i,j,nx,ny
+    integer(psb_ipk_), intent(in), optional :: base
+    
+    !    idx = ((i-base_)*ny + (j-base_) + base_
+    call ijk2idx(idx,[i,j],[nx,ny],base)
+  end subroutine lijk2lidx2d
+
+  
   !
   ! dist1Didx
   !   Given an index space [base : N-(1-base)] and

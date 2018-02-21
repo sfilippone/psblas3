@@ -52,8 +52,8 @@ module psb_gen_block_map_mod
   use psb_hash_mod
   
   type, extends(psb_indx_map) :: psb_gen_block_map
-    integer(psb_ipk_) :: min_glob_row   = -1
-    integer(psb_ipk_) :: max_glob_row   = -1
+    integer(psb_lpk_) :: min_glob_row   = -1
+    integer(psb_lpk_) :: max_glob_row   = -1
     integer(psb_ipk_), allocatable :: loc_to_glob(:), srt_l2g(:,:), vnl(:)
     type(psb_hash_type)  :: hash
   contains
