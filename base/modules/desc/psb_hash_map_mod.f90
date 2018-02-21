@@ -134,6 +134,8 @@ contains
          & val = val + size(idxmap%hashv)*psb_sizeof_int
     if (allocated(idxmap%glb_lc)) &
          & val = val + size(idxmap%glb_lc)*psb_sizeof_int
+    if (allocated(idxmap%loc_to_glob)) &
+         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_int
     val = val + psb_sizeof(idxmap%hash)
 
   end function hash_sizeof
