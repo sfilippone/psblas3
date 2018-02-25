@@ -99,6 +99,8 @@ module psb_const_mod
   !
   !     Handy & miscellaneous constants
   !
+  integer(psb_lpk_), parameter   :: lzero=0, lone=1
+  integer(psb_lpk_), parameter   :: ltwo=2, lthree=3,lmone=-1
   integer(psb_ipk_), parameter   :: izero=0, ione=1
   integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
   integer(psb_ipk_), parameter   :: psb_root_=0
