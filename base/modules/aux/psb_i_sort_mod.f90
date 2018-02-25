@@ -43,42 +43,17 @@
 module psb_i_sort_mod
   use psb_const_mod
 
-  interface psb_iblsrch
-    function  psb_iblsrch(key,n,v) result(ipos)
-      import :: psb_ipk_
-      integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(:)
-    end function psb_iblsrch
-  end interface psb_iblsrch
-
-  interface psb_ibsrch
-    function  psb_ibsrch(key,n,v) result(ipos)
-      import :: psb_ipk_
-      integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(:)
-    end function psb_ibsrch
-  end interface psb_ibsrch
-
-  interface psb_issrch
-    function psb_issrch(key,n,v) result(ipos)
-      import :: psb_ipk_
-      implicit none
-      integer(psb_ipk_) :: ipos, key, n
-      integer(psb_ipk_) :: v(:)
-    end function psb_issrch
-  end interface psb_issrch
-
   interface psb_isaperm
-    logical function psb_isaperm(n,eip)               
-      import :: psb_ipk_
+    logical function psb_iisaperm(n,eip)               
+      import 
       integer(psb_ipk_), intent(in) :: n                             
       integer(psb_ipk_), intent(in) :: eip(n)
-    end function psb_isaperm
+    end function psb_iisaperm
   end interface psb_isaperm
 
   interface psb_msort_unique
     subroutine psb_imsort_u(x,nout,dir)
-      import :: psb_ipk_, psb_spk_, psb_dpk_
+      import 
       integer(psb_ipk_), intent(inout)           :: x(:) 
       integer(psb_ipk_), intent(out)             :: nout
       integer(psb_ipk_), optional, intent(in)    :: dir
@@ -119,6 +94,26 @@ module psb_i_sort_mod
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_imsort
   end interface psb_msort
+
+
+  interface psb_bsrch
+    function  psb_ibsrch(key,n,v) result(ipos)
+      import 
+      integer(psb_ipk_) :: ipos, n
+      integer(psb_ipk_) :: key
+      integer(psb_ipk_) :: v(:)
+    end function psb_ibsrch
+  end interface psb_bsrch
+
+  interface psb_ssrch
+    function psb_issrch(key,n,v) result(ipos)
+      import 
+      implicit none
+      integer(psb_ipk_) :: ipos, n
+      integer(psb_ipk_) :: key
+      integer(psb_ipk_) :: v(:)
+    end function psb_issrch
+  end interface psb_ssrch
 
   interface 
     subroutine psi_i_msort_up(n,k,l,iret)
@@ -527,7 +522,8 @@ contains
     implicit none 
 
     class(psb_i_idx_heap), intent(inout) :: heap
-    integer(psb_ipk_), intent(out)       :: index,info
+    integer(psb_ipk_), intent(out)       :: index
+    integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_), intent(out)           :: key
 
 

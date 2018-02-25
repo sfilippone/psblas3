@@ -40,139 +40,146 @@
 !  Data Structures and Algorithms
 !  Addison-Wesley
 !
-module psb_d_sort_mod
+module psb_l_sort_mod
   use psb_const_mod
 
+  interface psb_isaperm
+    logical function psb_lisaperm(n,eip)               
+      import 
+      integer(psb_lpk_), intent(in) :: n                             
+      integer(psb_lpk_), intent(in) :: eip(n)
+    end function psb_lisaperm
+  end interface psb_isaperm
 
   interface psb_msort_unique
-    subroutine psb_dmsort_u(x,nout,dir)
+    subroutine psb_lmsort_u(x,nout,dir)
       import 
-      real(psb_dpk_), intent(inout)           :: x(:) 
-      integer(psb_ipk_), intent(out)             :: nout
+      integer(psb_lpk_), intent(inout)           :: x(:) 
+      integer(psb_lpk_), intent(out)             :: nout
       integer(psb_ipk_), optional, intent(in)    :: dir
-    end subroutine psb_dmsort_u
+    end subroutine psb_lmsort_u
   end interface psb_msort_unique
 
-  type psb_d_heap
+  type psb_l_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_dpk_), allocatable    :: keys(:)
+    integer(psb_lpk_), allocatable    :: keys(:)
   contains
-    procedure, pass(heap) :: init       => psb_d_init_heap
-    procedure, pass(heap) :: howmany    => psb_d_howmany
-    procedure, pass(heap) :: insert     => psb_d_insert_heap
-    procedure, pass(heap) :: get_first  => psb_d_heap_get_first
-    procedure, pass(heap) :: dump       => psb_d_dump_heap
-    procedure, pass(heap) :: free       => psb_d_free_heap   
-  end type psb_d_heap
+    procedure, pass(heap) :: init       => psb_l_init_heap
+    procedure, pass(heap) :: howmany    => psb_l_howmany
+    procedure, pass(heap) :: insert     => psb_l_insert_heap
+    procedure, pass(heap) :: get_first  => psb_l_heap_get_first
+    procedure, pass(heap) :: dump       => psb_l_dump_heap
+    procedure, pass(heap) :: free       => psb_l_free_heap   
+  end type psb_l_heap
 
-  type psb_d_idx_heap
+  type psb_l_idx_heap
     integer(psb_ipk_) :: last, dir
-    real(psb_dpk_), allocatable    :: keys(:)
-    integer(psb_ipk_), allocatable :: idxs(:)
+    integer(psb_lpk_), allocatable    :: keys(:)
+    integer(psb_lpk_), allocatable :: idxs(:)
   contains
-    procedure, pass(heap) :: init       => psb_d_idx_init_heap
-    procedure, pass(heap) :: howmany    => psb_d_idx_howmany
-    procedure, pass(heap) :: insert     => psb_d_idx_insert_heap
-    procedure, pass(heap) :: get_first  => psb_d_idx_heap_get_first
-    procedure, pass(heap) :: dump       => psb_d_idx_dump_heap
-    procedure, pass(heap) :: free       => psb_d_idx_free_heap   
-  end type psb_d_idx_heap
+    procedure, pass(heap) :: init       => psb_l_idx_init_heap
+    procedure, pass(heap) :: howmany    => psb_l_idx_howmany
+    procedure, pass(heap) :: insert     => psb_l_idx_insert_heap
+    procedure, pass(heap) :: get_first  => psb_l_idx_heap_get_first
+    procedure, pass(heap) :: dump       => psb_l_idx_dump_heap
+    procedure, pass(heap) :: free       => psb_l_idx_free_heap   
+  end type psb_l_idx_heap
 
 
   interface psb_msort
-    subroutine psb_dmsort(x,ix,dir,flag)
+    subroutine psb_lmsort(x,ix,dir,flag)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
-      integer(psb_ipk_), optional, intent(inout) :: ix(:)
-    end subroutine psb_dmsort
+      integer(psb_lpk_), optional, intent(inout) :: ix(:)
+    end subroutine psb_lmsort
   end interface psb_msort
 
 
   interface psb_bsrch
-    function  psb_dbsrch(key,n,v) result(ipos)
+    function  psb_lbsrch(key,n,v) result(ipos)
       import 
       integer(psb_ipk_) :: ipos, n
-      real(psb_dpk_) :: key
-      real(psb_dpk_) :: v(:)
-    end function psb_dbsrch
+      integer(psb_lpk_) :: key
+      integer(psb_lpk_) :: v(:)
+    end function psb_lbsrch
   end interface psb_bsrch
 
   interface psb_ssrch
-    function psb_dssrch(key,n,v) result(ipos)
+    function psb_lssrch(key,n,v) result(ipos)
       import 
       implicit none
       integer(psb_ipk_) :: ipos, n
-      real(psb_dpk_) :: key
-      real(psb_dpk_) :: v(:)
-    end function psb_dssrch
+      integer(psb_lpk_) :: key
+      integer(psb_lpk_) :: v(:)
+    end function psb_lssrch
   end interface psb_ssrch
 
   interface 
-    subroutine psi_d_msort_up(n,k,l,iret)
+    subroutine psi_l_msort_up(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
-      real(psb_dpk_)  ::  k(n)
-      integer(psb_ipk_) :: l(0:n+1)
-    end subroutine psi_d_msort_up
-    subroutine psi_d_msort_dw(n,k,l,iret)
+      integer(psb_lpk_)  ::  k(n)
+      integer(psb_lpk_) :: l(0:n+1)
+    end subroutine psi_l_msort_up
+    subroutine psi_l_msort_dw(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
-      real(psb_dpk_)  ::  k(n)
-      integer(psb_ipk_) :: l(0:n+1)
-    end subroutine psi_d_msort_dw
+      integer(psb_lpk_)  ::  k(n)
+      integer(psb_lpk_) :: l(0:n+1)
+    end subroutine psi_l_msort_dw
   end interface
   interface 
-    subroutine psi_d_amsort_up(n,k,l,iret)
+    subroutine psi_l_amsort_up(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
-      real(psb_dpk_)  ::  k(n)
-      integer(psb_ipk_) :: l(0:n+1)
-    end subroutine psi_d_amsort_up
-    subroutine psi_d_amsort_dw(n,k,l,iret)
+      integer(psb_lpk_)  ::  k(n)
+      integer(psb_lpk_) :: l(0:n+1)
+    end subroutine psi_l_amsort_up
+    subroutine psi_l_amsort_dw(n,k,l,iret)
       import
       implicit none
       integer(psb_ipk_) :: n, iret
-      real(psb_dpk_)  ::  k(n)
-      integer(psb_ipk_) :: l(0:n+1)
-    end subroutine psi_d_amsort_dw
+      integer(psb_lpk_)  ::  k(n)
+      integer(psb_lpk_) :: l(0:n+1)
+    end subroutine psi_l_amsort_dw
   end interface
   
   
   interface psb_qsort
-    subroutine psb_dqsort(x,ix,dir,flag)
+    subroutine psb_lqsort(x,ix,dir,flag)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
-      integer(psb_ipk_), optional, intent(inout) :: ix(:)
-    end subroutine psb_dqsort
+      integer(psb_lpk_), optional, intent(inout) :: ix(:)
+    end subroutine psb_lqsort
   end interface psb_qsort
   
   interface psb_isort
-    subroutine psb_disort(x,ix,dir,flag)
+    subroutine psb_lisort(x,ix,dir,flag)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
-      integer(psb_ipk_), optional, intent(inout) :: ix(:)
-    end subroutine psb_disort
+      integer(psb_lpk_), optional, intent(inout) :: ix(:)
+    end subroutine psb_lisort
   end interface psb_isort
 
 
   interface psb_hsort
-    subroutine psb_dhsort(x,ix,dir,flag)
+    subroutine psb_lhsort(x,ix,dir,flag)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout)  :: x(:) 
       integer(psb_ipk_), optional, intent(in)    :: dir, flag
-      integer(psb_ipk_), optional, intent(inout) :: ix(:)
-    end subroutine psb_dhsort
+      integer(psb_lpk_), optional, intent(inout) :: ix(:)
+    end subroutine psb_lhsort
   end interface psb_hsort
 
 
   interface 
-    subroutine psi_d_insert_heap(key,last,heap,dir,info)
+    subroutine psi_l_insert_heap(key,last,heap,dir,info)
       import 
       implicit none 
 
@@ -183,16 +190,16 @@ module psb_d_sort_mod
       !   heap: the heap
       !   dir:  sorting direction
 
-      real(psb_dpk_), intent(in)     :: key
-      real(psb_dpk_), intent(inout)  :: heap(:)
+      integer(psb_lpk_), intent(in)     :: key
+      integer(psb_lpk_), intent(inout)  :: heap(:)
       integer(psb_ipk_), intent(in)     :: dir
       integer(psb_ipk_), intent(inout)  :: last
       integer(psb_ipk_), intent(out)    :: info
-    end subroutine psi_d_insert_heap
+    end subroutine psi_l_insert_heap
   end interface
 
   interface 
-    subroutine psi_d_idx_insert_heap(key,index,last,heap,idxs,dir,info)
+    subroutine psi_l_idx_insert_heap(key,index,last,heap,idxs,dir,info)
       import 
       implicit none 
 
@@ -203,142 +210,142 @@ module psb_d_sort_mod
       !   heap: the heap
       !   dir:  sorting direction
 
-      real(psb_dpk_), intent(in)     :: key
-      real(psb_dpk_), intent(inout)  :: heap(:)
-      integer(psb_ipk_), intent(in)     :: index
+      integer(psb_lpk_), intent(in)     :: key
+      integer(psb_lpk_), intent(inout)  :: heap(:)
+      integer(psb_lpk_), intent(in)     :: index
       integer(psb_ipk_), intent(in)     :: dir
-      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_lpk_), intent(inout)  :: idxs(:)
       integer(psb_ipk_), intent(inout)  :: last
       integer(psb_ipk_), intent(out)    :: info
-    end subroutine psi_d_idx_insert_heap
+    end subroutine psi_l_idx_insert_heap
   end interface
 
 
   interface 
-    subroutine psi_d_heap_get_first(key,last,heap,dir,info)
+    subroutine psi_l_heap_get_first(key,last,heap,dir,info)
       import 
       implicit none 
-      real(psb_dpk_), intent(inout)  :: key
+      integer(psb_lpk_), intent(inout)  :: key
       integer(psb_ipk_), intent(inout)  :: last
       integer(psb_ipk_), intent(in)     :: dir
-      real(psb_dpk_), intent(inout)  :: heap(:)
+      integer(psb_lpk_), intent(inout)  :: heap(:)
       integer(psb_ipk_), intent(out)    :: info
-    end subroutine psi_d_heap_get_first
+    end subroutine psi_l_heap_get_first
   end interface
 
   interface 
-    subroutine psi_d_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    subroutine psi_l_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
       import
-      real(psb_dpk_), intent(inout)    :: key
-      integer(psb_ipk_), intent(out)    :: index
-      real(psb_dpk_), intent(inout)    :: heap(:)
+      integer(psb_lpk_), intent(inout)    :: key
+      integer(psb_lpk_), intent(out)    :: index
+      integer(psb_lpk_), intent(inout)    :: heap(:)
       integer(psb_ipk_), intent(in)     :: dir
       integer(psb_ipk_), intent(inout)  :: last
-      integer(psb_ipk_), intent(inout)  :: idxs(:)
+      integer(psb_lpk_), intent(inout)  :: idxs(:)
       integer(psb_ipk_), intent(out)    :: info
-    end subroutine psi_d_idx_heap_get_first
+    end subroutine psi_l_idx_heap_get_first
   end interface
 
   interface 
-    subroutine psi_disrx_up(n,x,ix)
+    subroutine psi_lisrx_up(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_disrx_up
-    subroutine psi_disrx_dw(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lisrx_up
+    subroutine psi_lisrx_dw(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_disrx_dw
-    subroutine psi_disr_up(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lisrx_dw
+    subroutine psi_lisr_up(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_disr_up
-    subroutine psi_disr_dw(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lisr_up
+    subroutine psi_lisr_dw(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_disr_dw
-    subroutine psi_daisrx_up(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lisr_dw
+    subroutine psi_laisrx_up(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daisrx_up
-    subroutine psi_daisrx_dw(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laisrx_up
+    subroutine psi_laisrx_dw(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daisrx_dw
-    subroutine psi_daisr_up(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laisrx_dw
+    subroutine psi_laisr_up(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daisr_up
-    subroutine psi_daisr_dw(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laisr_up
+    subroutine psi_laisr_dw(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daisr_dw
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laisr_dw
   end interface
 
   interface 
-    subroutine psi_dqsrx_up(n,x,ix)
+    subroutine psi_lqsrx_up(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_dqsrx_up
-    subroutine psi_dqsrx_dw(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lqsrx_up
+    subroutine psi_lqsrx_dw(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_dqsrx_dw
-    subroutine psi_dqsr_up(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lqsrx_dw
+    subroutine psi_lqsr_up(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_dqsr_up
-    subroutine psi_dqsr_dw(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lqsr_up
+    subroutine psi_lqsr_dw(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_dqsr_dw
-    subroutine psi_daqsrx_up(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_lqsr_dw
+    subroutine psi_laqsrx_up(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsrx_up
-    subroutine psi_daqsrx_dw(n,x,ix)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laqsrx_up
+    subroutine psi_laqsrx_dw(n,x,ix)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(inout) :: ix(:)
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsrx_dw
-    subroutine psi_daqsr_up(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(inout) :: ix(:)
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laqsrx_dw
+    subroutine psi_laqsr_up(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsr_up
-    subroutine psi_daqsr_dw(n,x)
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laqsr_up
+    subroutine psi_laqsr_dw(n,x)
       import 
-      real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), intent(in)   :: n
-    end subroutine psi_daqsr_dw
+      integer(psb_lpk_), intent(inout)  :: x(:) 
+      integer(psb_lpk_), intent(in)   :: n
+    end subroutine psi_laqsr_dw
   end interface
 
 contains
 
-  subroutine psb_d_init_heap(heap,info,dir)
+  subroutine psb_l_init_heap(heap,info,dir)
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
-    class(psb_d_heap), intent(inout) :: heap
+    class(psb_l_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)            :: info
     integer(psb_ipk_), intent(in), optional   :: dir
 
@@ -359,22 +366,22 @@ contains
     call psb_ensure_size(psb_heap_resize,heap%keys,info)
 
     return
-  end subroutine psb_d_init_heap
+  end subroutine psb_l_init_heap
 
 
-  function psb_d_howmany(heap) result(res)
+  function psb_l_howmany(heap) result(res)
     implicit none 
-    class(psb_d_heap), intent(in) :: heap
+    class(psb_l_heap), intent(in) :: heap
     integer(psb_ipk_) :: res
     res  = heap%last
-  end function psb_d_howmany
+  end function psb_l_howmany
 
-  subroutine psb_d_insert_heap(key,heap,info)
+  subroutine psb_l_insert_heap(key,heap,info)
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
 
-    real(psb_dpk_), intent(in)              :: key
-    class(psb_d_heap), intent(inout) :: heap
+    integer(psb_lpk_), intent(in)              :: key
+    class(psb_l_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)                       :: info
 
     info = psb_success_
@@ -390,32 +397,32 @@ contains
       info = -5
       return
     end if
-    call psi_d_insert_heap(key,&
+    call psi_l_insert_heap(key,&
          & heap%last,heap%keys,heap%dir,info)
 
     return
-  end subroutine psb_d_insert_heap
+  end subroutine psb_l_insert_heap
 
-  subroutine psb_d_heap_get_first(key,heap,info)
+  subroutine psb_l_heap_get_first(key,heap,info)
     implicit none 
 
-    class(psb_d_heap), intent(inout) :: heap
+    class(psb_l_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)     :: info
-    real(psb_dpk_), intent(out)       :: key
+    integer(psb_lpk_), intent(out)       :: key
 
 
     info = psb_success_
 
-    call psi_d_heap_get_first(key,&
+    call psi_l_heap_get_first(key,&
          & heap%last,heap%keys,heap%dir,info)
 
     return
-  end subroutine psb_d_heap_get_first
+  end subroutine psb_l_heap_get_first
 
-  subroutine psb_d_dump_heap(iout,heap,info)
+  subroutine psb_l_dump_heap(iout,heap,info)
 
     implicit none 
-    class(psb_d_heap), intent(in) :: heap
+    class(psb_l_heap), intent(in) :: heap
     integer(psb_ipk_), intent(out)    :: info
     integer(psb_ipk_), intent(in)     :: iout
 
@@ -434,22 +441,22 @@ contains
     else
       write(iout,*) heap%keys(1:heap%last)
     end if
-  end subroutine psb_d_dump_heap
+  end subroutine psb_l_dump_heap
 
-  subroutine psb_d_free_heap(heap,info)
+  subroutine psb_l_free_heap(heap,info)
     implicit none 
-    class(psb_d_heap), intent(inout) :: heap
+    class(psb_l_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
 
-  end subroutine psb_d_free_heap
+  end subroutine psb_l_free_heap
 
-  subroutine psb_d_idx_init_heap(heap,info,dir)
+  subroutine psb_l_idx_init_heap(heap,info,dir)
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
-    class(psb_d_idx_heap), intent(inout) :: heap
+    class(psb_l_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)            :: info
     integer(psb_ipk_), intent(in), optional   :: dir
 
@@ -471,23 +478,23 @@ contains
     call psb_ensure_size(psb_heap_resize,heap%keys,info)
     call psb_ensure_size(psb_heap_resize,heap%idxs,info)
     return
-  end subroutine psb_d_idx_init_heap
+  end subroutine psb_l_idx_init_heap
 
 
-  function psb_d_idx_howmany(heap) result(res)
+  function psb_l_idx_howmany(heap) result(res)
     implicit none 
-    class(psb_d_idx_heap), intent(in) :: heap
+    class(psb_l_idx_heap), intent(in) :: heap
     integer(psb_ipk_) :: res
     res  = heap%last
-  end function psb_d_idx_howmany
+  end function psb_l_idx_howmany
 
-  subroutine psb_d_idx_insert_heap(key,index,heap,info)
+  subroutine psb_l_idx_insert_heap(key,index,heap,info)
     use psb_realloc_mod, only : psb_ensure_size
     implicit none 
 
-    real(psb_dpk_), intent(in)              :: key
-    integer(psb_ipk_), intent(in)                        :: index
-    class(psb_d_idx_heap), intent(inout) :: heap
+    integer(psb_lpk_), intent(in)              :: key
+    integer(psb_lpk_), intent(in)                        :: index
+    class(psb_l_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)                       :: info
 
     info = psb_success_
@@ -505,33 +512,33 @@ contains
       info = -5
       return
     end if
-    call psi_d_idx_insert_heap(key,index,&
+    call psi_l_idx_insert_heap(key,index,&
          & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
-  end subroutine psb_d_idx_insert_heap
+  end subroutine psb_l_idx_insert_heap
 
-  subroutine psb_d_idx_heap_get_first(key,index,heap,info)
+  subroutine psb_l_idx_heap_get_first(key,index,heap,info)
     implicit none 
 
-    class(psb_d_idx_heap), intent(inout) :: heap
-    integer(psb_ipk_), intent(out)       :: index
+    class(psb_l_idx_heap), intent(inout) :: heap
+    integer(psb_lpk_), intent(out)       :: index
     integer(psb_ipk_), intent(out)       :: info
-    real(psb_dpk_), intent(out)           :: key
+    integer(psb_lpk_), intent(out)           :: key
 
 
     info = psb_success_
 
-    call psi_d_idx_heap_get_first(key,index,&
+    call psi_l_idx_heap_get_first(key,index,&
          & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
-  end subroutine psb_d_idx_heap_get_first
+  end subroutine psb_l_idx_heap_get_first
 
-  subroutine psb_d_idx_dump_heap(iout,heap,info)
+  subroutine psb_l_idx_dump_heap(iout,heap,info)
 
     implicit none 
-    class(psb_d_idx_heap), intent(in) :: heap
+    class(psb_l_idx_heap), intent(in) :: heap
     integer(psb_ipk_), intent(out)    :: info
     integer(psb_ipk_), intent(in)     :: iout
 
@@ -554,17 +561,17 @@ contains
       write(iout,*) heap%keys(1:heap%last)
       write(iout,*) heap%idxs(1:heap%last)
     end if
-  end subroutine psb_d_idx_dump_heap
+  end subroutine psb_l_idx_dump_heap
 
-  subroutine psb_d_idx_free_heap(heap,info)
+  subroutine psb_l_idx_free_heap(heap,info)
     implicit none 
-    class(psb_d_idx_heap), intent(inout) :: heap
+    class(psb_l_idx_heap), intent(inout) :: heap
     integer(psb_ipk_), intent(out)           :: info
 
     info=psb_success_
     if (allocated(heap%keys)) deallocate(heap%keys,stat=info)
     if ((info == psb_success_).and.(allocated(heap%idxs))) deallocate(heap%idxs,stat=info)
 
-  end subroutine psb_d_idx_free_heap
+  end subroutine psb_l_idx_free_heap
 
-end module psb_d_sort_mod
+end module psb_l_sort_mod

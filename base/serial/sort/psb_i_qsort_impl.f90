@@ -48,8 +48,8 @@ subroutine psb_iqsort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
-
+  integer(psb_ipk_) :: dir_, flag_, err_act, i
+  integer(psb_ipk_) :: n
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
@@ -140,7 +140,8 @@ subroutine psi_iqsrx_up(n,x,idx)
   !     .. Local Scalars ..
   integer(psb_ipk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
 
@@ -293,7 +294,8 @@ subroutine psi_iqsrx_dw(n,x,idx)
   !     .. Local Scalars ..
   integer(psb_ipk_) :: piv, xk, xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -731,7 +733,8 @@ subroutine psi_iaqsrx_up(n,x,idx)
   integer(psb_ipk_) :: piv, xk
   integer(psb_ipk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -887,7 +890,8 @@ subroutine psi_iaqsrx_dw(n,x,idx)
   integer(psb_ipk_) :: piv, xk
   integer(psb_ipk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1040,7 +1044,8 @@ subroutine psi_iaqsr_up(n,x)
   integer(psb_ipk_) :: piv, xk
   integer(psb_ipk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)
@@ -1180,7 +1185,8 @@ subroutine psi_iaqsr_dw(n,x)
   integer(psb_ipk_) :: piv, xk
   integer(psb_ipk_) :: xt
   integer(psb_ipk_) :: i, j, ilx, iux, istp, lpiv
-  integer(psb_ipk_) :: ixt, n1, n2
+  integer(psb_ipk_) :: n1, n2
+  integer(psb_ipk_) :: ixt
 
   integer(psb_ipk_), parameter :: maxstack=64,nparms=3,ithrs=72
   integer(psb_ipk_) :: istack(nparms,maxstack)

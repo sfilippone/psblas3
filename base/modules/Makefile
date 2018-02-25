@@ -27,7 +27,11 @@ UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod
 	aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
 	aux/psb_ip_reord_mod.o\
-	aux/psb_i_sort_mod.o aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
+	aux/psb_i_ip_reord_mod.o aux/psb_l_ip_reord_mod.o \
+	aux/psb_s_ip_reord_mod.o aux/psb_d_ip_reord_mod.o \
+	aux/psb_c_ip_reord_mod.o aux/psb_z_ip_reord_mod.o \
+	aux/psb_i_sort_mod.o aux/psb_l_sort_mod.o \
+	aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
 	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
 	psb_check_mod.o aux/psb_hash_mod.o\
 	serial/psb_base_mat_mod.o  serial/psb_mat_mod.o\
@@ -64,11 +68,17 @@ aux/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const
 aux/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
 aux/psb_i_sort_mod.o aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
 aux/psb_ip_reord_mod.o aux/psi_serial_mod.o aux/psb_sort_mod.o: $(BASIC_MODS)
-aux/psb_sort_mod.o: aux/psb_i_sort_mod.o aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
-	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o aux/psb_ip_reord_mod.o aux/psi_serial_mod.o
+aux/psb_sort_mod.o: aux/psb_i_sort_mod.o aux/psb_l_sort_mod.o \
+	aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
+	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
+	aux/psb_ip_reord_mod.o aux/psi_serial_mod.o
 aux/psi_serial_mod.o:  aux/psi_i_serial_mod.o \
 	aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o 
 aux/psi_i_serial_mod.o aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o: psb_const_mod.o
+
+aux/psb_ip_reord_mod.o: aux/psb_i_ip_reord_mod.o aux/psb_l_ip_reord_mod.o \
+	aux/psb_s_ip_reord_mod.o aux/psb_d_ip_reord_mod.o \
+	aux/psb_c_ip_reord_mod.o aux/psb_z_ip_reord_mod.o 
 
 serial/psb_base_mat_mod.o: aux/psi_serial_mod.o
 serial/psb_s_base_mat_mod.o serial/psb_d_base_mat_mod.o serial/psb_c_base_mat_mod.o serial/psb_z_base_mat_mod.o: serial/psb_base_mat_mod.o

@@ -48,7 +48,8 @@ subroutine psb_cisort(x,ix,dir,flag)
   integer(psb_ipk_), optional, intent(in)    :: dir, flag
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: dir_, flag_, n, err_act, i
+  integer(psb_ipk_) :: dir_, flag_, err_act
+  integer(psb_ipk_) :: n, i
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
