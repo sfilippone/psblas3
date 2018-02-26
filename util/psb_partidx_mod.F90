@@ -31,7 +31,7 @@
 !    
 !
 ! Purpose: 
-!  Proide  functions to handle a distribution of a general
+!  Provide  functions to handle a distribution of a general
 !  rectangular 2/3/n-dimensional domain onto
 !  a rectangular 2/3/n-dimensional grid of processes
 !

@@ -59,6 +59,8 @@
 !
 !
 module psb_s_pde3d_mod
+
+ 
   use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
        &  psb_sspmat_type, psb_s_vect_type, szero,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
@@ -75,7 +77,6 @@ module psb_s_pde3d_mod
     module procedure  psb_s_gen_pde3d
   end interface psb_gen_pde3d
   
-
 contains
 
   function s_null_func_3d(x,y,z) result(val)
@@ -121,7 +122,7 @@ contains
     character(len=*)      :: afmt
     procedure(s_func_3d), optional :: f
     class(psb_s_base_sparse_mat), optional :: amold
-    class(psb_s_base_vect_type), optional :: vmold
+    class(psb_s_base_vect_type), optional :: vmold 
     class(psb_i_base_vect_type), optional :: imold
     integer(psb_ipk_), optional :: partition, nrl,iv(:)
 
@@ -145,7 +146,7 @@ contains
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_spk_)            :: deltah, sqdeltah, deltah2
-    real(psb_spk_), parameter :: rhs=0.e0,one=1.e0,zero=0.e0
+    real(psb_spk_), parameter :: rhs=szero,one=sone,zero=szero
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
     procedure(s_func_3d), pointer :: f_
@@ -164,9 +165,9 @@ contains
       f_ => s_null_func_3d
     end if
 
-    deltah   = 1.e0/(idim+2)
+    deltah   = sone/(idim+2)
     sqdeltah = deltah*deltah
-    deltah2  = 2.e0* deltah
+    deltah2  = (2*sone)* deltah
 
     if (present(partition)) then
       if ((1<= partition).and.(partition <= 3)) then
@@ -181,7 +182,7 @@ contains
     
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
-
+    
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
@@ -272,7 +273,7 @@ contains
       ! Now, let's generate the list of indices I own
       nr = 0
       do i=bndx(iamx),bndx(iamx+1)-1
-        do j=bndy(iamy),bndx(iamy+1)-1
+        do j=bndy(iamy),bndy(iamy+1)-1
           do k=bndz(iamz),bndz(iamz+1)-1
             nr = nr + 1
             call ijk2idx(myidx(nr),i,j,k,idim,idim,idim)
@@ -381,7 +382,7 @@ contains
         endif
 
         !  term depending on     (x,y,z)
-        val(icoeff)=2.e0*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
+        val(icoeff)=(2*sone)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
              & + c(x,y,z)
         icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
         irow(icoeff) = glob_row
@@ -419,7 +420,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.e0
+      zt(:)=szero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -506,7 +507,7 @@ program psb_s_pde3d
   integer(psb_ipk_) :: idim
 
   ! miscellaneous 
-  real(psb_spk_), parameter :: one = 1.e0
+  real(psb_spk_), parameter :: one = sone
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
@@ -543,6 +544,7 @@ program psb_s_pde3d
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
+  call psb_cd_set_large_threshold(itwo)
   !
   ! Hello world
   !
@@ -778,43 +780,43 @@ contains
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y,z
-    b1=1.e0/sqrt(3.e0)
+    b1=sone/sqrt((3*sone))
   end function b1
   function b2(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y,z
-    b2=1.e0/sqrt(3.e0)
+    b2=sone/sqrt((3*sone))
   end function b2
   function b3(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  b3
     real(psb_spk_), intent(in) :: x,y,z      
-    b3=1.e0/sqrt(3.e0)
+    b3=sone/sqrt((3*sone))
   end function b3
   function c(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  c
     real(psb_spk_), intent(in) :: x,y,z      
-    c=0.e0
+    c=szero
   end function c
   function a1(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a1   
     real(psb_spk_), intent(in) :: x,y,z
-    a1=1.e0/80
+    a1=sone/80
   end function a1
   function a2(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a2
     real(psb_spk_), intent(in) :: x,y,z
-    a2=1.e0/80
+    a2=sone/80
   end function a2
   function a3(x,y,z)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a3
     real(psb_spk_), intent(in) :: x,y,z
-    a3=1.e0/80
+    a3=sone/80
   end function a3
   function g(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
