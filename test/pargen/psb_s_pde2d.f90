@@ -63,29 +63,29 @@ module psb_s_pde2d_mod
        &  psb_sspmat_type, psb_s_vect_type, szero,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
-
   interface 
     function s_func_2d(x,y) result(val)
       import :: psb_spk_
       real(psb_spk_), intent(in) :: x,y
       real(psb_spk_) :: val
     end function s_func_2d
-  end interface
+  end interface 
 
-  interface psb_gen_pde2d 
-    module procedure psb_s_gen_pde2d
+  interface psb_gen_pde2d
+    module procedure  psb_s_gen_pde2d
   end interface psb_gen_pde2d
-
+  
 contains
-
+  
   function s_null_func_2d(x,y) result(val)
 
     real(psb_spk_), intent(in) :: x,y
     real(psb_spk_) :: val
-
+    
     val = szero
 
   end function s_null_func_2d
+
 
 
   !
@@ -145,7 +145,7 @@ contains
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_spk_)            :: deltah, sqdeltah, deltah2
-    real(psb_spk_), parameter :: rhs=0.e0,one=1.e0,zero=0.e0
+    real(psb_spk_), parameter :: rhs=szero,one=sone,zero=szero
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
     procedure(s_func_2d), pointer :: f_
@@ -164,9 +164,9 @@ contains
       f_ => s_null_func_2d
     end if
 
-    deltah   = 1.e0/(idim+2)
+    deltah   = sone/(idim+2)
     sqdeltah = deltah*deltah
-    deltah2  = 2.e0* deltah
+    deltah2  = (2*sone)* deltah
 
     if (present(partition)) then
       if ((1<= partition).and.(partition <= 3)) then
@@ -269,7 +269,7 @@ contains
       ! Now, let's generate the list of indices I own
       nr = 0
       do i=bndx(iamx),bndx(iamx+1)-1
-        do j=bndy(iamy),bndx(iamy+1)-1
+        do j=bndy(iamy),bndy(iamy+1)-1
           nr = nr + 1
           call ijk2idx(myidx(nr),i,j,idim,idim)
         end do
@@ -367,7 +367,7 @@ contains
         endif
 
         !  term depending on     (x,y)
-        val(icoeff)=2.e0*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
+        val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
         icol(icoeff) = (ix-1)*idim+iy
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
@@ -395,7 +395,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.e0
+      zt(:)=0.d0
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -481,7 +481,7 @@ program psb_s_pde2d
   integer(psb_ipk_) :: idim
 
   ! miscellaneous 
-  real(psb_spk_), parameter :: one = 1.e0
+  real(psb_spk_), parameter :: one = sone
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
@@ -741,6 +741,7 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
+
   !
   ! functions parametrizing the differential equation 
   !  
@@ -748,31 +749,31 @@ contains
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y
-    b1=1.e0/sqrt(2.e0)
+    b1=sone/sqrt((2*sone))
   end function b1
   function b2(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y
-    b2=1.e0/sqrt(2.e0)
+    b2=sone/sqrt((2*sone))
   end function b2
   function c(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  c
     real(psb_spk_), intent(in) :: x,y
-    c=0.e0
+    c=0.d0
   end function c
   function a1(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a1   
     real(psb_spk_), intent(in) :: x,y
-    a1=1.e0/80
+    a1=sone/80
   end function a1
   function a2(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a2
     real(psb_spk_), intent(in) :: x,y
-    a2=1.e0/80
+    a2=sone/80
   end function a2
   function g(x,y)
     use psb_base_mod, only : psb_spk_, sone, szero
@@ -785,7 +786,6 @@ contains
       g = exp(-y**2)
     end if
   end function g
-
 end program psb_s_pde2d
 
 
