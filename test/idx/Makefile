@@ -16,17 +16,21 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: tryidxijk
+all: tryidxijk psb_d_pde3d
 
 tryidxijk: tryidxijk.o 
 	$(FLINK)  tryidxijk.o -o tryidxijk $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv tryidxijk $(EXEDIR)
 
+psb_d_pde3d: psb_d_pde3d.o 
+	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_pde3d $(EXEDIR)
+
 
 
 clean: 
-	/bin/rm -f tryidxijk.o  *$(.mod) \
-	$(EXEDIR)/tryidxijk 
+	/bin/rm -f tryidxijk.o psb_d_pde3d.o *$(.mod) \
+	$(EXEDIR)/tryidxijk $(EXEDIR)/psb_d_pde3d
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

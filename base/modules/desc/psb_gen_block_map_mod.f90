@@ -1491,7 +1491,7 @@ contains
     integer(psb_ipk_), intent(in), optional :: lidx(:)
 
     integer(psb_ipk_) :: i, nv, is, ix
-    integer(psb_lpk_) :: ip, lip
+    integer(psb_lpk_) :: ip, lip, lnxt
     integer(psb_ipk_) :: nxt
 
 
@@ -1532,9 +1532,10 @@ contains
                   info = -5
                   return
                 end if
-                nxt = lidx(i)-idxmap%local_rows
-                ip  = idx(i) 
-                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                lnxt = lidx(i)-idxmap%local_rows
+                ip   = idx(i) 
+                call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+                nxt = lnxt
                 if (info >= 0) then 
                   if (lip == nxt) then 
                     ! We have added one item
@@ -1570,10 +1571,10 @@ contains
                 info = -5
                 return
               end if
-              nxt = lidx(i)-idxmap%local_rows
+              lnxt = lidx(i)-idxmap%local_rows
               ip = idx(i) 
-              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
+              call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+              nxt = lnxt 
               if (info >= 0) then 
                 if (lip == nxt) then 
                   ! We have added one item
@@ -1606,10 +1607,11 @@ contains
               if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
                 idx(i) = idx(i) - idxmap%min_glob_row + 1
               else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
-                nv  = idxmap%local_cols-idxmap%local_rows
-                nxt = nv + 1 
-                ip = idx(i) 
-                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                nv   = idxmap%local_cols-idxmap%local_rows
+                lnxt = nv + 1 
+                ip  = idx(i) 
+                call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+                nxt = lnxt 
                 if (info >= 0) then 
                   if (lip == nxt) then 
                     ! We have added one item
@@ -1641,11 +1643,11 @@ contains
             if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
-              nv  = idxmap%local_cols-idxmap%local_rows
-              nxt = nv + 1 
-              ip = idx(i) 
-              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
+              nv   = idxmap%local_cols-idxmap%local_rows
+              lnxt = nv + 1 
+              ip  = idx(i) 
+              call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+              nxt = lnxt
               if (info >= 0) then 
                 if (lip == nxt) then 
                   ! We have added one item
@@ -1808,9 +1810,10 @@ contains
                 idxout(i) = idxin(i) - idxmap%min_glob_row + 1
               else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 nv  = idxmap%local_cols-idxmap%local_rows
-                nxt = nv + 1 
+                lnxt = nv + 1 
                 ip = idxin(i) 
-                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+                nxt = lnxt
                 if (info >= 0) then 
                   if (lip == nxt) then 
                     ! We have added one item
@@ -1843,10 +1846,10 @@ contains
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               nv  = idxmap%local_cols-idxmap%local_rows
-              nxt = nv + 1 
+              lnxt = nv + 1 
               ip = idxin(i) 
-              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
+              call psb_hash_searchinskey(ip,lip,lnxt,idxmap%hash,info)
+              nxt = lnxt
               if (info >= 0) then 
                 if (lip == nxt) then 
                   ! We have added one item
