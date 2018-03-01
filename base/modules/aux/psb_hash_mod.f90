@@ -274,7 +274,7 @@ contains
     integer(psb_ipk_) :: hsize,nbits
 
     info  = psb_success_
-    nbits = 12
+    nbits = 14
     hsize = 2**nbits
     !
     ! Figure out the smallest power of 2 bigger than NV
