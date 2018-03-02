@@ -65,6 +65,7 @@ module psi_comm_buffers_mod
   integer(psb_mpk_), parameter:: psb_int8_tag     = psb_char_tag     + 1
   integer(psb_mpk_), parameter:: psb_int2_tag     = psb_int8_tag     + 1
   integer(psb_mpk_), parameter:: psb_int4_tag     = psb_int2_tag     + 1
+  integer(psb_mpk_), parameter:: psb_long_tag     = psb_int4_tag     + 1
 
   integer(psb_mpk_), parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
   integer(psb_mpk_), parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
@@ -76,6 +77,7 @@ module psi_comm_buffers_mod
   integer(psb_mpk_), parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
   integer(psb_mpk_), parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
   integer(psb_mpk_), parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_long_swap_tag     = psb_long_tag     + psb_int_tag
 
 
   
@@ -89,22 +91,23 @@ module psi_comm_buffers_mod
   integer(psb_mpk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
   integer(psb_mpk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
   integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_long_type     = psb_int4_type     + 1
 
 
   type psb_buffer_node
     integer(psb_mpk_) :: request
     integer(psb_mpk_) :: icontxt 
     integer(psb_mpk_) :: buffer_type
-    integer(psb_ipk_), allocatable        :: intbuf(:)
-    integer(psb_epk_), allocatable :: int8buf(:)
-    integer(2), allocatable               :: int2buf(:)
-    integer(psb_mpk_), allocatable       :: int4buf(:)
-    real(psb_spk_), allocatable           :: realbuf(:)
-    real(psb_dpk_), allocatable           :: doublebuf(:)
-    complex(psb_spk_), allocatable        :: complexbuf(:)
-    complex(psb_dpk_), allocatable        :: dcomplbuf(:)
-    logical, allocatable                  :: logbuf(:)
-    character(len=1), allocatable         :: charbuf(:)
+    integer(psb_ipk_), allocatable     :: intbuf(:)
+    integer(psb_epk_), allocatable     :: int8buf(:)
+    integer(psb_i2pk_), allocatable    :: int2buf(:)
+    integer(psb_mpk_), allocatable     :: int4buf(:)
+    real(psb_spk_), allocatable        :: realbuf(:)
+    real(psb_dpk_), allocatable        :: doublebuf(:)
+    complex(psb_spk_), allocatable     :: complexbuf(:)
+    complex(psb_dpk_), allocatable     :: dcomplbuf(:)
+    logical, allocatable               :: logbuf(:)
+    character(len=1), allocatable      :: charbuf(:)
     type(psb_buffer_node), pointer :: prev=>null(), next=>null()
   end type psb_buffer_node
 
@@ -114,29 +117,14 @@ module psi_comm_buffers_mod
 
 
   interface psi_snd
-    module procedure psi_isnd,&
+    module procedure&
+         & psi_msnd, psi_esnd,&
          & psi_ssnd, psi_dsnd,&
          & psi_csnd, psi_zsnd,&
-         & psi_lsnd, psi_hsnd
+         & psi_logsnd, psi_hsnd,&
+         & psi_i2snd
   end interface
-#if defined(LONG_INTEGERS)
-  interface psi_snd
-    module procedure psi_i4snd
-  end interface
-#endif
 
-#if !defined(LONG_INTEGERS)
-  interface psi_snd
-    module procedure psi_i8snd
-  end interface
-#endif
-
-#if defined(SHORT_INTEGERS)
-  interface psi_snd
-    module procedure psi_i2snd
-  end interface
-#endif
-  
 contains
 
   subroutine psb_init_queue(mesg_queue,info)
@@ -297,7 +285,7 @@ contains
   !  has already been copied. 
   !
   ! !!!!!!!!!!!!!!!!!
-  subroutine psi_isnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_msnd(icontxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -306,7 +294,7 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_) :: icontxt, tag, dest
-    integer(psb_ipk_), allocatable, intent(inout) :: buffer(:)
+    integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
@@ -324,55 +312,17 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_ipk_int,&
+    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_mpk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
     
     call psb_test_nodes(mesg_queue)
 
-  end subroutine psi_isnd
+  end subroutine psi_msnd
 
-#if defined(LONG_INTEGERS)
-  subroutine psi_i4snd(icontxt,tag,dest,buffer,mesg_queue)
-#ifdef MPI_MOD
-    use mpi
-#endif
-    implicit none 
-#ifdef MPI_H
-    include 'mpif.h'
-#endif
-    integer(psb_mpk_) :: icontxt, tag, dest
-    integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
-    type(psb_buffer_queue) :: mesg_queue
-    type(psb_buffer_node), pointer :: node
-    integer(psb_mpk_) :: info
-    integer(psb_mpk_) :: minfo
-    
-    allocate(node, stat=info)
-    if (info /= 0) then 
-      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
-      return
-    end if
-    node%icontxt     = icontxt
-    node%buffer_type = psb_int4_type
-    call move_alloc(buffer,node%int4buf)
-    if (info /= 0) then 
-      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
-      return
-    end if
-    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_int,&
-         & dest,tag,icontxt,node%request,minfo)
-    info = minfo 
-    call psb_insert_node(mesg_queue,node)
-    
-    call psb_test_nodes(mesg_queue)
 
-  end subroutine psi_i4snd
-#endif
-
-#if !defined(LONG_INTEGERS)
-  subroutine psi_i8snd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_esnd(icontxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -399,17 +349,15 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_lpk_int,&
+    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_epk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
     
     call psb_test_nodes(mesg_queue)
 
-  end subroutine psi_i8snd
-#endif
+  end subroutine psi_esnd
 
-#if defined(SHORT_INTEGERS)
   subroutine psi_i2snd(icontxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
@@ -419,7 +367,7 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_) :: icontxt, tag, dest
-    integer(2), allocatable, intent(inout) :: buffer(:)
+    integer(psb_i2pk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
@@ -437,7 +385,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_mpk_int2,&
+    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_i2pk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -445,7 +393,6 @@ contains
     call psb_test_nodes(mesg_queue)
 
   end subroutine psi_i2snd
-#endif
 
   subroutine psi_ssnd(icontxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
@@ -592,7 +539,7 @@ contains
   end subroutine psi_zsnd
 
 
-  subroutine psi_lsnd(icontxt,tag,dest,buffer,mesg_queue)
+  subroutine psi_logsnd(icontxt,tag,dest,buffer,mesg_queue)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -626,7 +573,7 @@ contains
     
     call psb_test_nodes(mesg_queue)
     
-  end subroutine psi_lsnd
+  end subroutine psi_logsnd
 
 
   subroutine psi_hsnd(icontxt,tag,dest,buffer,mesg_queue)

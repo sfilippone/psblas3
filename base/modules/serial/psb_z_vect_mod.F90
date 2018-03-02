@@ -62,8 +62,9 @@ module psb_z_vect_mod
     procedure, pass(x) :: ins_v    => z_vect_ins_v
     generic, public    :: ins      => ins_v, ins_a
     procedure, pass(x) :: bld_x    => z_vect_bld_x
-    procedure, pass(x) :: bld_n    => z_vect_bld_n
-    generic, public    :: bld      => bld_x, bld_n
+    procedure, pass(x) :: bld_mn   => z_vect_bld_mn
+    procedure, pass(x) :: bld_en   => z_vect_bld_en
+    generic, public    :: bld      => bld_x, bld_mn, bld_en
     procedure, pass(x) :: get_vect => z_vect_get_vect
     procedure, pass(x) :: cnv      => z_vect_cnv
     procedure, pass(x) :: set_scal => z_vect_set_scal
@@ -112,7 +113,8 @@ module psb_z_vect_mod
        & z_vect_all, z_vect_reall, z_vect_zero,  z_vect_asb, &
        & z_vect_gthab, z_vect_gthzv, z_vect_sctb, &
        & z_vect_free, z_vect_ins_a, z_vect_ins_v, z_vect_bld_x, &
-       & z_vect_bld_n, z_vect_get_vect, z_vect_cnv, z_vect_set_scal, &
+       & z_vect_bld_mn, z_vect_bld_en, z_vect_get_vect, &
+       & z_vect_cnv, z_vect_set_scal, &
        & z_vect_set_vect, z_vect_clone, z_vect_sync, z_vect_is_host, &
        & z_vect_is_dev, z_vect_is_sync, z_vect_set_host, &
        & z_vect_set_dev, z_vect_set_sync
@@ -216,8 +218,8 @@ contains
   end subroutine z_vect_bld_x
 
 
-  subroutine z_vect_bld_n(x,n,mold)
-    integer(psb_ipk_), intent(in) :: n
+  subroutine z_vect_bld_mn(x,n,mold)
+    integer(psb_mpk_), intent(in) :: n
     class(psb_z_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
@@ -243,7 +245,37 @@ contains
     endif
     if (info == psb_success_) call x%v%bld(n)
 
-  end subroutine z_vect_bld_n
+  end subroutine z_vect_bld_mn
+
+
+  subroutine z_vect_bld_en(x,n,mold)
+    integer(psb_epk_), intent(in) :: n
+    class(psb_z_vect_type), intent(inout) :: x
+    class(psb_z_base_vect_type), intent(in), optional :: mold
+    integer(psb_ipk_) :: info
+    class(psb_z_base_vect_type), pointer :: mld
+
+
+    if (allocated(x%v)) &
+         & call x%free(info)
+
+    if (present(mold)) then 
+#ifdef HAVE_MOLD
+      allocate(x%v,stat=info,mold=mold)
+#else
+      call mold%mold(x%v,info)
+#endif
+    else
+#ifdef HAVE_MOLD
+      allocate(x%v,stat=info, mold=psb_z_get_base_vect_default())
+#else 
+      mld = psb_z_get_base_vect_default()
+      call mld%mold(x%v,info)
+#endif
+    endif
+    if (info == psb_success_) call x%v%bld(n)
+
+  end subroutine z_vect_bld_en
 
   function  z_vect_get_vect(x) result(res)
     class(psb_z_vect_type), intent(inout)  :: x

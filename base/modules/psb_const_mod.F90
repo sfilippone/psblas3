@@ -33,6 +33,8 @@
 module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
+  ! This is  a 2-byte integer, just in case
+  integer, parameter  :: psb_i2pk_ = int16
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpk_ = int32
   ! This is always an 8-byte  integer.
@@ -45,12 +47,15 @@ module psb_const_mod
   integer, parameter  :: psb_dpk_   = real64
   
 #else
-
-  integer, parameter  :: indig=8
-  integer, parameter  :: lndig=12
+  
+  ! This is  a 2-byte integer, just in case
+  integer, parameter  :: i2ndig=4
+  integer, parameter  :: psb_i2pk_ = selected_int_kind(i2ndig)
   ! This is always a 4-byte integer, for MPI-related stuff
+  integer, parameter  :: indig=8
   integer, parameter  :: psb_mpk_ = selected_int_kind(indig)
   ! This is always an 8-byte  integer.
+  integer, parameter  :: lndig=12
   integer, parameter  :: psb_epk_ = selected_int_kind(lndig)
   !
   ! These must be the kind parameter corresponding to psb_mpi_r_dpk_
@@ -98,6 +103,7 @@ module psb_const_mod
   
   integer(psb_ipk_), save        :: psb_sizeof_sp
   integer(psb_ipk_), save        :: psb_sizeof_dp
+  integer(psb_ipk_), save        :: psb_sizeof_i2p
   integer(psb_ipk_), save        :: psb_sizeof_mp
   integer(psb_ipk_), save        :: psb_sizeof_ep
   integer(psb_ipk_), save        :: psb_sizeof_ip
@@ -105,6 +111,7 @@ module psb_const_mod
   !
   ! Integer type identifiers for MPI operations. 
   !
+  integer(psb_mpk_), save      :: psb_mpi_i2pk_int
   integer(psb_mpk_), save      :: psb_mpi_epk_int
   integer(psb_mpk_), save      :: psb_mpi_mpk_int
   integer(psb_mpk_), save      :: psb_mpi_ipk_int
@@ -124,10 +131,15 @@ module psb_const_mod
   !
   !     Handy & miscellaneous constants
   !
+  integer(psb_epk_), parameter   :: ezero=0, eone=1
+  integer(psb_epk_), parameter   :: etwo=2, ethree=3,emone=-1
+  integer(psb_mpk_), parameter   :: mzero=0, mone=1
+  integer(psb_mpk_), parameter   :: mtwo=2, mthree=3,mmone=-1
   integer(psb_lpk_), parameter   :: lzero=0, lone=1
   integer(psb_lpk_), parameter   :: ltwo=2, lthree=3,lmone=-1
   integer(psb_ipk_), parameter   :: izero=0, ione=1
-  integer(psb_ipk_), parameter   :: itwo=2, ithree=3,mone=-1
+  integer(psb_ipk_), parameter   :: itwo=2, ithree=3,imone=-1
+
   integer(psb_ipk_), parameter   :: psb_root_=0
   real(psb_spk_), parameter      :: szero=0.0_psb_spk_, sone=1.0_psb_spk_
   real(psb_dpk_), parameter      :: dzero=0.0_psb_dpk_, done=1.0_psb_dpk_
@@ -138,6 +150,8 @@ module psb_const_mod
   real(psb_dpk_), parameter      :: d_epstol=1.1e-16_psb_dpk_ ! Unit roundoff.  
   real(psb_spk_), parameter      :: s_epstol=5.e-8_psb_spk_   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
+  logical, parameter             :: psb_m_is_complex_ = .false.
+  logical, parameter             :: psb_e_is_complex_ = .false.
   logical, parameter             :: psb_i_is_complex_ = .false.
   logical, parameter             :: psb_l_is_complex_ = .false.
   logical, parameter             :: psb_s_is_complex_ = .false.

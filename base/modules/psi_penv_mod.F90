@@ -158,14 +158,16 @@ contains
 #if defined(INT_I4_L4)
     psb_mpi_ipk_int = mpi_integer
     psb_mpi_lpk_int = mpi_integer
-#elsif defined(INT_I4_L8)
+#elif defined(INT_I4_L8)
     psb_mpi_ipk_int = mpi_integer
     psb_mpi_lpk_int = mpi_integer8
-#elsif defined(INT_I8_L8)
+#elif defined(INT_I8_L8)
     psb_mpi_ipk_int = mpi_integer8
     psb_mpi_lpk_int = mpi_integer8
 #else
     ! This should never happen
+    write(psb_err_unit,*) 'Warning: an impossible IPK/LPK combination.'
+    write(psb_err_unit,*) 'Something went wrong at configuration time.'
     psb_mpi_ipk_int = -1
     psb_mpi_lpk_int = -1
 #endif

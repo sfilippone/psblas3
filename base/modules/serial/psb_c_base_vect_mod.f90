@@ -69,8 +69,9 @@ module psb_c_base_vect_mod
     !  Constructors/allocators
     !
     procedure, pass(x) :: bld_x    => c_base_bld_x
-    procedure, pass(x) :: bld_n    => c_base_bld_n
-    generic, public    :: bld      => bld_x, bld_n
+    procedure, pass(x) :: bld_mn   => c_base_bld_mn
+    procedure, pass(x) :: bld_en   => c_base_bld_en
+    generic, public    :: bld      => bld_x, bld_mn, bld_en
     procedure, pass(x) :: all      => c_base_all
     procedure, pass(x) :: mold     => c_base_mold
     !
@@ -82,7 +83,9 @@ module psb_c_base_vect_mod
     procedure, pass(x) :: ins_v    => c_base_ins_v
     generic, public    :: ins      => ins_a, ins_v
     procedure, pass(x) :: zero     => c_base_zero
-    procedure, pass(x) :: asb      => c_base_asb
+    procedure, pass(x) :: asb_m    => c_base_asb_m
+    procedure, pass(x) :: asb_e    => c_base_asb_e
+    generic, public    :: asb      => asb_m, asb_e
     procedure, pass(x) :: free     => c_base_free
     !
     ! Sync: centerpiece of handling of external storage.
@@ -239,21 +242,37 @@ contains
   ! Create with size, but no initialization
   !
 
-  !> Function  bld_n:
+  !> Function  bld_mn:
   !! \memberof  psb_c_base_vect_type
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated. 
   !!
-  subroutine c_base_bld_n(x,n)
+  subroutine c_base_bld_mn(x,n)
     use psb_realloc_mod
-    integer(psb_ipk_), intent(in) :: n
+    integer(psb_mpk_), intent(in) :: n
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
 
     call psb_realloc(n,x%v,info)
     call x%asb(n,info)
 
-  end subroutine c_base_bld_n
+  end subroutine c_base_bld_mn
+  
+  !> Function  bld_en:
+  !! \memberof  psb_c_base_vect_type
+  !! \brief     Build method with size (uninitialized data)
+  !!  \param    n    size to be allocated. 
+  !!
+  subroutine c_base_bld_en(x,n)
+    use psb_realloc_mod
+    integer(psb_epk_), intent(in) :: n
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_) :: info
+
+    call psb_realloc(n,x%v,info)
+    call x%asb(n,info)
+
+  end subroutine c_base_bld_en
   
   !> Function  base_all:
   !! \memberof  psb_c_base_vect_type
@@ -435,11 +454,11 @@ contains
   !!
   !
  
-  subroutine c_base_asb(n, x, info)
+  subroutine c_base_asb_m(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
-    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_mpk_), intent(in)              :: n
     class(psb_c_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
@@ -449,7 +468,37 @@ contains
     if (info /= 0) &
          & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
     call x%sync()
-  end subroutine c_base_asb
+  end subroutine c_base_asb_m
+
+  !
+  ! Assembly.
+  ! For derived classes: after this the vector
+  ! storage is supposed to be in sync.
+  !
+  !> Function  base_asb:
+  !! \memberof  psb_c_base_vect_type
+  !! \brief Assemble vector: reallocate as necessary.
+  !!           
+  !!  \param n     final size
+  !!  \param info  return code
+  !!
+  !
+ 
+  subroutine c_base_asb_e(n, x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none 
+    integer(psb_epk_), intent(in)              :: n
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+    
+    info = 0
+    if (x%get_nrows() < n) &
+         & call psb_realloc(n,x%v,info)
+    if (info /= 0) &
+         & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+    call x%sync()
+  end subroutine c_base_asb_e
 
   !
   !> Function  base_free:
