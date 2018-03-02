@@ -1,0 +1,9 @@
+1. Perhaps we should switch completely to external indices being of
+   kind LPK and internal indices being of type IPK, and the two morph
+   independently in int32/int64 (although admittedly LPK=32 and IPK=64
+   does not  make much sense)
+2. Change sizeof_ constant names accordingly to sizeof_ipk and
+   sizeof_lpk.
+
+3. Should we define a psb_l_vect_type? But then, if I==L how can we
+   distinguish?
