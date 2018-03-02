@@ -395,6 +395,65 @@ fi
 ]
 )
 
+dnl @synopsis PAC_ARG_WITH_IPK
+dnl
+dnl Test for --with-ipk 
+dnl 
+dnl 
+dnl
+dnl Example use: --with-ipk=4
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_IPK],
+[
+AC_MSG_CHECKING([what size in bytes we want for local indices and data])
+AC_ARG_WITH(ipk,
+	    AC_HELP_STRING([--with-ipk=<bytes>], 
+			   [Specify the size in bytes for local indices and data, default 4 bytes. ]),
+	    [pac_cv_ipk_size=$withval;],
+	    [pac_cv_ipk_size=4;]
+	   )
+if test x"$pac_cv_ipk_size" == x"4"  || test  x"$pac_cv_ipk_size" == x"8" ; then
+   AC_MSG_RESULT([Size: $pac_cv_ipk_size.])
+else
+  AC_MSG_RESULT([Unsupported value for IPK: $pac_cv_ipk_size, defaulting to 4.])
+  pac_cv_ipk_size=4;
+fi
+]
+)
+
+dnl @synopsis PAC_ARG_WITH_LPK
+dnl
+dnl Test for --with-lpk 
+dnl 
+dnl 
+dnl
+dnl Example use: --with-lpk=8
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_LPK],
+[
+ AC_MSG_CHECKING([what size in bytes we want for global indices and data])
+ AC_ARG_WITH(lpk,
+	     AC_HELP_STRING([--with-lpk=<bytes>], 
+			    [Specify the size in bytes for global indices and data, default 8 bytes. ]),
+	     [pac_cv_lpk_size=$withval;],
+	     [pac_cv_lpk_size=8;]
+	    )
+if test x"$pac_cv_lpk_size" == x"4" || test x"$pac_cv_lpk_size" == x"8"; then
+  AC_MSG_RESULT([Size: $pac_cv_lpk_size.])
+else
+  AC_MSG_RESULT([Unsupported value for LPK: $pac_cv_lpk_size, defaulting to 8.])
+  pac_cv_lpk_size=8;
+fi
+]
+)
+
+
 dnl @synopsis PAC_FORTRAN_HAVE_PSBLAS( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 dnl Will try to compile and link a program using the PSBLAS library

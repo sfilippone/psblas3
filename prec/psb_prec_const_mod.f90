@@ -35,7 +35,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_prec_const_mod
 
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_ipk_, psb_long_int_k_,&
+  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_ipk_, psb_epk_,&
        & psb_err_unit, psb_inp_unit, psb_out_unit
 
   integer(psb_ipk_), parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &

@@ -521,7 +521,7 @@ module psb_c_base_mat_mod
   ! 
   interface 
     subroutine psb_c_base_mold(a,b,info) 
-      import :: psb_ipk_, psb_c_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_epk_
       class(psb_c_base_sparse_mat), intent(in)                 :: a
       class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
@@ -543,7 +543,7 @@ module psb_c_base_mat_mod
   ! 
   interface 
     subroutine psb_c_base_clone(a,b, info)
-      import :: psb_ipk_, psb_c_base_sparse_mat, psb_long_int_k_      
+      import :: psb_ipk_, psb_c_base_sparse_mat, psb_epk_      
       implicit none 
       class(psb_c_base_sparse_mat), intent(inout)              :: a
       class(psb_c_base_sparse_mat), allocatable, intent(inout) :: b
@@ -1290,7 +1290,7 @@ module psb_c_base_mat_mod
   !| \see psb_base_mat_mod::psb_base_mold
   interface 
     subroutine psb_c_coo_mold(a,b,info) 
-      import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat, psb_long_int_k_
+      import :: psb_ipk_, psb_c_coo_sparse_mat, psb_c_base_sparse_mat, psb_epk_
       class(psb_c_coo_sparse_mat), intent(in)                  :: a
       class(psb_c_base_sparse_mat), intent(inout), allocatable :: b
       integer(psb_ipk_), intent(out)                           :: info
@@ -1755,11 +1755,11 @@ contains
   function c_coo_sizeof(a) result(res)
     implicit none 
     class(psb_c_coo_sparse_mat), intent(in) :: a
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 8 + 1
     res = res + (2*psb_sizeof_sp)  * psb_size(a%val)
-    res = res + psb_sizeof_int * psb_size(a%ia)
-    res = res + psb_sizeof_int * psb_size(a%ja)
+    res = res + psb_sizeof_ip * psb_size(a%ia)
+    res = res + psb_sizeof_ip * psb_size(a%ja)
     
   end function c_coo_sizeof
   

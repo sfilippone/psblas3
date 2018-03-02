@@ -67,12 +67,12 @@ contains
   function glist_sizeof(idxmap) result(val)
     implicit none 
     class(psb_glist_map), intent(in) :: idxmap
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = idxmap%psb_list_map%sizeof()
 
     if (allocated(idxmap%vgp)) &
-         & val = val + size(idxmap%vgp)*psb_sizeof_int
+         & val = val + size(idxmap%vgp)*psb_sizeof_ip
 
   end function glist_sizeof
 
@@ -96,11 +96,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_glist_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: ictxt    
+    integer(psb_mpk_), intent(in)  :: ictxt    
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: iam, np
+    integer(psb_mpk_) :: iam, np
     integer(psb_ipk_) :: i, n, nl
     
 
@@ -157,7 +157,7 @@ contains
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_glist_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_mpk_) :: ictxt, iam, np
     integer(psb_ipk_) :: nv, i, ngp
     
     ictxt = idxmap%get_ctxt()

@@ -77,11 +77,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_mpk_), intent(in)      :: ictxt
     integer(psb_ipk_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -91,7 +91,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_ipk_integer,root_,ictxt,info)
+    call mpi_bcast(dat,1,psb_mpi_ipk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcasts
 
@@ -103,11 +103,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     integer(psb_ipk_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional  :: root
+    integer(psb_mpk_), intent(in), optional  :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 #if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
@@ -116,7 +116,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_ipk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcastv
 
@@ -128,11 +128,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     integer(psb_ipk_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -142,7 +142,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_ipk_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_ipk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_ibcastm
 
@@ -155,11 +155,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_mpk_), intent(in)      :: ictxt
     real(psb_spk_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -182,11 +182,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     real(psb_spk_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -209,11 +209,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     real(psb_spk_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -237,11 +237,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_mpk_), intent(in)      :: ictxt
     real(psb_dpk_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -264,11 +264,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     real(psb_dpk_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -290,11 +290,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     real(psb_dpk_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -316,11 +316,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_mpk_), intent(in)      :: ictxt
     complex(psb_spk_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -342,11 +342,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     complex(psb_spk_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -368,11 +368,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     complex(psb_spk_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -394,11 +394,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
+    integer(psb_mpk_), intent(in)      :: ictxt
     complex(psb_dpk_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -420,11 +420,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     complex(psb_dpk_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -446,11 +446,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
+    integer(psb_mpk_), intent(in)    :: ictxt
     complex(psb_dpk_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -473,11 +473,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)             :: ictxt
+    integer(psb_mpk_), intent(in)             :: ictxt
     character(len=*), intent(inout) :: dat
-    integer(psb_mpik_), intent(in), optional   :: root,length
+    integer(psb_mpk_), intent(in), optional   :: root,length
 
-    integer(psb_mpik_) :: iam, np, root_,length_,info
+    integer(psb_mpk_) :: iam, np, root_,length_,info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -506,11 +506,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)             :: ictxt
+    integer(psb_mpk_), intent(in)             :: ictxt
     character(len=*), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional   :: root
+    integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iam, np, root_,length_,info, size_
+    integer(psb_mpk_) :: iam, np, root_,length_,info, size_
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -536,11 +536,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)             :: ictxt
+    integer(psb_mpk_), intent(in)             :: ictxt
     logical, intent(inout)          :: dat
-    integer(psb_mpik_), intent(in), optional   :: root
+    integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iam, np, root_,info
+    integer(psb_mpk_) :: iam, np, root_,info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -564,11 +564,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)             :: ictxt
+    integer(psb_mpk_), intent(in)             :: ictxt
     logical, intent(inout)          :: dat(:)
-    integer(psb_mpik_), intent(in), optional   :: root
+    integer(psb_mpk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iam, np, root_,info
+    integer(psb_mpk_) :: iam, np, root_,info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -594,11 +594,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)      :: ictxt
-    integer(psb_long_int_k_), intent(inout)   :: dat
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in)      :: ictxt
+    integer(psb_epk_), intent(inout)   :: dat
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -608,7 +608,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,1,psb_mpi_lng_integer,root_,ictxt,info)
+    call mpi_bcast(dat,1,psb_mpi_lpk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcasts
 
@@ -620,11 +620,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
-    integer(psb_long_int_k_), intent(inout) :: dat(:)
-    integer(psb_mpik_), intent(in), optional  :: root
+    integer(psb_mpk_), intent(in)    :: ictxt
+    integer(psb_epk_), intent(inout) :: dat(:)
+    integer(psb_mpk_), intent(in), optional  :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 #if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
@@ -633,7 +633,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_lpk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcastv
 
@@ -645,11 +645,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)    :: ictxt
-    integer(psb_long_int_k_), intent(inout) :: dat(:,:)
-    integer(psb_mpik_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in)    :: ictxt
+    integer(psb_epk_), intent(inout) :: dat(:,:)
+    integer(psb_mpk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iam, np, root_,  info
+    integer(psb_mpk_) :: iam, np, root_,  info
 
 #if !defined(SERIAL_MPI)
     if (present(root)) then
@@ -659,7 +659,7 @@ contains
     endif
 
     call psb_info(ictxt,iam,np)
-    call mpi_bcast(dat,size(dat),psb_mpi_lng_integer,root_,ictxt,info)
+    call mpi_bcast(dat,size(dat),psb_mpi_lpk_int,root_,ictxt,info)
 #endif    
   end subroutine psb_i8bcastm
 
@@ -674,7 +674,7 @@ contains
     integer(psb_ipk_), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -691,7 +691,7 @@ contains
     integer(psb_ipk_), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional  :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -708,7 +708,7 @@ contains
     integer(psb_ipk_), intent(inout) :: dat(:,:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -726,7 +726,7 @@ contains
     real(psb_spk_), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -744,7 +744,7 @@ contains
     real(psb_spk_), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -761,7 +761,7 @@ contains
     real(psb_spk_), intent(inout) :: dat(:,:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -779,7 +779,7 @@ contains
     real(psb_dpk_), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -797,7 +797,7 @@ contains
     real(psb_dpk_), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -814,7 +814,7 @@ contains
     real(psb_dpk_), intent(inout) :: dat(:,:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -831,7 +831,7 @@ contains
     complex(psb_spk_), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -848,7 +848,7 @@ contains
     complex(psb_spk_), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -865,7 +865,7 @@ contains
     complex(psb_spk_), intent(inout) :: dat(:,:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -882,7 +882,7 @@ contains
     complex(psb_dpk_), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -899,7 +899,7 @@ contains
     complex(psb_dpk_), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -916,7 +916,7 @@ contains
     complex(psb_dpk_), intent(inout) :: dat(:,:)
     integer(psb_ipk_), intent(in), optional :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -934,7 +934,7 @@ contains
     character(len=*), intent(inout) :: dat
     integer(psb_ipk_), intent(in), optional   :: root,length
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -951,7 +951,7 @@ contains
     character(len=*), intent(inout) :: dat(:)
     integer(psb_ipk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -968,7 +968,7 @@ contains
     logical, intent(inout)          :: dat
     integer(psb_ipk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then
@@ -986,7 +986,7 @@ contains
     logical, intent(inout)          :: dat(:)
     integer(psb_ipk_), intent(in), optional   :: root
 
-    integer(psb_mpik_) :: iictxt, root_
+    integer(psb_mpk_) :: iictxt, root_
 
     iictxt = ictxt 
     if (present(root)) then

@@ -124,13 +124,13 @@ contains
     use psb_desc_mod
     implicit none 
     class(psb_base_linmap_type), intent(in) :: map
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
-    val = psb_sizeof_int
+    val = psb_sizeof_ip
     if (allocated(map%iaggr))   &
-         & val = val + psb_sizeof_int*size(map%iaggr)
+         & val = val + psb_sizeof_ip*size(map%iaggr)
     if (allocated(map%naggr))   &
-         & val = val + psb_sizeof_int*size(map%naggr)
+         & val = val + psb_sizeof_ip*size(map%naggr)
     val = val + map%desc_X%sizeof()
     val = val + map%desc_Y%sizeof()
 

@@ -64,7 +64,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
        & nov(:), ov_idx(:,:), ix(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   logical            :: check_, islarge
   character(len=20)  :: name
 

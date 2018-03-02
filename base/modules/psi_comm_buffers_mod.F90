@@ -33,20 +33,20 @@
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
   use psb_const_mod
-  integer(psb_mpik_), parameter :: mpi_success          = 0
-  integer(psb_mpik_), parameter :: mpi_request_null     = 0
-  integer(psb_mpik_), parameter :: mpi_status_size      = 1
-  integer(psb_mpik_), parameter :: mpi_integer          = 1
-  integer(psb_mpik_), parameter :: mpi_integer8         = 2
-  integer(psb_mpik_), parameter :: mpi_real             = 3
-  integer(psb_mpik_), parameter :: mpi_double_precision = 4
-  integer(psb_mpik_), parameter :: mpi_complex          = 5   
-  integer(psb_mpik_), parameter :: mpi_double_complex   = 6 
-  integer(psb_mpik_), parameter :: mpi_character        = 7
-  integer(psb_mpik_), parameter :: mpi_logical          = 8
-  integer(psb_mpik_), parameter :: mpi_integer2         = 9
-  integer(psb_mpik_), parameter :: mpi_comm_null        = -1
-  integer(psb_mpik_), parameter :: mpi_comm_world       = 1
+  integer(psb_mpk_), parameter :: mpi_success          = 0
+  integer(psb_mpk_), parameter :: mpi_request_null     = 0
+  integer(psb_mpk_), parameter :: mpi_status_size      = 1
+  integer(psb_mpk_), parameter :: mpi_integer          = 1
+  integer(psb_mpk_), parameter :: mpi_integer8         = 2
+  integer(psb_mpk_), parameter :: mpi_real             = 3
+  integer(psb_mpk_), parameter :: mpi_double_precision = 4
+  integer(psb_mpk_), parameter :: mpi_complex          = 5   
+  integer(psb_mpk_), parameter :: mpi_double_complex   = 6 
+  integer(psb_mpk_), parameter :: mpi_character        = 7
+  integer(psb_mpk_), parameter :: mpi_logical          = 8
+  integer(psb_mpk_), parameter :: mpi_integer2         = 9
+  integer(psb_mpk_), parameter :: mpi_comm_null        = -1
+  integer(psb_mpk_), parameter :: mpi_comm_world       = 1
   
   real(psb_dpk_), external :: mpi_wtime
 end module mpi
@@ -55,26 +55,50 @@ end module mpi
 module psi_comm_buffers_mod
   use psb_const_mod
 
-  integer(psb_mpik_), private, parameter:: psb_int_type      = 987543
-  integer(psb_mpik_), private, parameter:: psb_real_type     = psb_int_type      + 1
-  integer(psb_mpik_), private, parameter:: psb_double_type   = psb_real_type     + 1
-  integer(psb_mpik_), private, parameter:: psb_complex_type  = psb_double_type   + 1
-  integer(psb_mpik_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
-  integer(psb_mpik_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
-  integer(psb_mpik_), private, parameter:: psb_char_type     = psb_logical_type  + 1
-  integer(psb_mpik_), private, parameter:: psb_int8_type     = psb_char_type     + 1
-  integer(psb_mpik_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
-  integer(psb_mpik_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
+  integer(psb_mpk_), parameter:: psb_int_tag      = 543987
+  integer(psb_mpk_), parameter:: psb_real_tag     = psb_int_tag      + 1
+  integer(psb_mpk_), parameter:: psb_double_tag   = psb_real_tag     + 1
+  integer(psb_mpk_), parameter:: psb_complex_tag  = psb_double_tag   + 1
+  integer(psb_mpk_), parameter:: psb_dcomplex_tag = psb_complex_tag  + 1
+  integer(psb_mpk_), parameter:: psb_logical_tag  = psb_dcomplex_tag + 1
+  integer(psb_mpk_), parameter:: psb_char_tag     = psb_logical_tag  + 1
+  integer(psb_mpk_), parameter:: psb_int8_tag     = psb_char_tag     + 1
+  integer(psb_mpk_), parameter:: psb_int2_tag     = psb_int8_tag     + 1
+  integer(psb_mpk_), parameter:: psb_int4_tag     = psb_int2_tag     + 1
+
+  integer(psb_mpk_), parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_double_swap_tag   = psb_double_tag   + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_complex_swap_tag  = psb_complex_tag  + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_dcomplex_swap_tag = psb_dcomplex_tag + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_logical_swap_tag  = psb_logical_tag  + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
+  integer(psb_mpk_), parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
+
+
+  
+  integer(psb_mpk_), private, parameter:: psb_int_type      = 987543
+  integer(psb_mpk_), private, parameter:: psb_real_type     = psb_int_type      + 1
+  integer(psb_mpk_), private, parameter:: psb_double_type   = psb_real_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_complex_type  = psb_double_type   + 1
+  integer(psb_mpk_), private, parameter:: psb_dcomplex_type = psb_complex_type  + 1
+  integer(psb_mpk_), private, parameter:: psb_logical_type  = psb_dcomplex_type + 1
+  integer(psb_mpk_), private, parameter:: psb_char_type     = psb_logical_type  + 1
+  integer(psb_mpk_), private, parameter:: psb_int8_type     = psb_char_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_int2_type     = psb_int8_type     + 1
+  integer(psb_mpk_), private, parameter:: psb_int4_type     = psb_int2_type     + 1
 
 
   type psb_buffer_node
-    integer(psb_mpik_) :: request
-    integer(psb_mpik_) :: icontxt 
-    integer(psb_mpik_) :: buffer_type
+    integer(psb_mpk_) :: request
+    integer(psb_mpk_) :: icontxt 
+    integer(psb_mpk_) :: buffer_type
     integer(psb_ipk_), allocatable        :: intbuf(:)
-    integer(psb_long_int_k_), allocatable :: int8buf(:)
+    integer(psb_epk_), allocatable :: int8buf(:)
     integer(2), allocatable               :: int2buf(:)
-    integer(psb_mpik_), allocatable       :: int4buf(:)
+    integer(psb_mpk_), allocatable       :: int4buf(:)
     real(psb_spk_), allocatable           :: realbuf(:)
     real(psb_dpk_), allocatable           :: doublebuf(:)
     complex(psb_spk_), allocatable        :: complexbuf(:)
@@ -148,7 +172,7 @@ contains
 #endif
     type(psb_buffer_node), intent(inout) :: node
     integer(psb_ipk_), intent(out) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size),minfo
+    integer(psb_mpk_) :: status(mpi_status_size),minfo
     minfo = mpi_success
     call mpi_wait(node%request,status,minfo)
     info=minfo
@@ -165,7 +189,7 @@ contains
     type(psb_buffer_node), intent(inout) :: node
     logical, intent(out) :: flag
     integer(psb_ipk_), intent(out) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size), minfo
+    integer(psb_mpk_) :: status(mpi_status_size), minfo
     minfo = mpi_success
 #if defined(SERIAL_MPI)
     flag  = .true.
@@ -178,7 +202,7 @@ contains
 
   subroutine psb_close_context(mesg_queue,icontxt)
     type(psb_buffer_queue), intent(inout) :: mesg_queue
-    integer(psb_mpik_), intent(in) :: icontxt
+    integer(psb_mpk_), intent(in) :: icontxt
     integer(psb_ipk_) :: info
     type(psb_buffer_node), pointer :: node, nextnode
 
@@ -281,12 +305,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     integer(psb_ipk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -300,7 +324,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_ipk_integer,&
+    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_ipk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -318,12 +342,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
-    integer(psb_mpik_), allocatable, intent(inout) :: buffer(:)
+    integer(psb_mpk_) :: icontxt, tag, dest
+    integer(psb_mpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
-    integer(psb_mpik_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: info
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -337,7 +361,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_def_integer,&
+    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -356,12 +380,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
-    integer(psb_long_int_k_), allocatable, intent(inout) :: buffer(:)
+    integer(psb_mpk_) :: icontxt, tag, dest
+    integer(psb_epk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -375,7 +399,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_lng_integer,&
+    call mpi_isend(node%int8buf,size(node%int8buf),psb_mpi_lpk_int,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo 
     call psb_insert_node(mesg_queue,node)
@@ -394,12 +418,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     integer(2), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -413,7 +437,7 @@ contains
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_def_integer2,&
+    call mpi_isend(node%int2buf,size(node%int2buf),psb_mpi_mpk_int2,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
@@ -431,12 +455,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     real(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
 
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -467,12 +491,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     real(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
 
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -503,12 +527,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     complex(psb_spk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
 
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -539,12 +563,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     complex(psb_dpk_), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -576,12 +600,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     logical, allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 
@@ -613,12 +637,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: icontxt, tag, dest
+    integer(psb_mpk_) :: icontxt, tag, dest
     character(len=1), allocatable, intent(inout) :: buffer(:)
     type(psb_buffer_queue) :: mesg_queue
     type(psb_buffer_node), pointer :: node
     integer(psb_ipk_) :: info
-    integer(psb_mpik_) :: minfo
+    integer(psb_mpk_) :: minfo
     
     allocate(node, stat=info)
     if (info /= 0) then 

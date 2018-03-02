@@ -65,7 +65,7 @@ subroutine  psb_ihalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_, ldx
   integer(psb_ipk_),pointer :: iwork(:), xp(:,:)
@@ -272,7 +272,7 @@ subroutine  psb_ihalov(x,desc_a,info,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, ldx, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   integer(psb_ipk_),pointer :: iwork(:)

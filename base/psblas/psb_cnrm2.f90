@@ -101,7 +101,7 @@ function psb_cnrm2(x, desc_a, info, jx)  result(res)
 
   if (desc_a%get_local_rows() > 0) then 
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpik_), x(iix:,jjx), int(ione,kind=psb_mpik_) )
+    res  = scnrm2( int(ndim,kind=psb_mpk_), x(iix:,jjx), int(ione,kind=psb_mpk_) )
 
     ! adjust  because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
@@ -221,7 +221,7 @@ function psb_cnrm2v(x, desc_a, info)  result(res)
 
   if (desc_a%get_local_rows() > 0) then 
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpik_), x, int(ione,kind=psb_mpik_) )
+    res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
     ! adjust  because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx = desc_a%ovrlap_elem(i,1)
@@ -426,7 +426,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info)
 
   if (desc_a%get_local_rows() > 0) then 
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpik_), x, int(ione,kind=psb_mpik_) )
+    res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
 
     ! adjust  because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)

@@ -114,7 +114,7 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
   Real(psb_spk_), Optional, Intent(out) :: err,cond
 ! =   Local data
   complex(psb_spk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
-  integer(psb_mpik_), allocatable :: ibl(:), ispl(:), iwrk(:)
+  integer(psb_mpk_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_c_vect_type), allocatable, target :: wwrk(:)
   type(psb_c_vect_type), pointer  :: q, p, r, z, w
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old

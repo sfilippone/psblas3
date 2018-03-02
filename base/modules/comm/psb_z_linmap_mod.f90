@@ -141,7 +141,7 @@ contains
     use psb_z_mat_mod
     implicit none 
     class(psb_zlinmap_type), intent(in) :: map
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
     val = map%psb_base_linmap_type%sizeof()
     val = val + map%map_X2Y%sizeof()

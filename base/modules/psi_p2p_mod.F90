@@ -108,30 +108,7 @@ module psi_p2p_mod
   end interface
 
 #endif
-
-  integer(psb_mpik_), private, parameter:: psb_int_tag      = 543987
-  integer(psb_mpik_), private, parameter:: psb_real_tag     = psb_int_tag      + 1
-  integer(psb_mpik_), private, parameter:: psb_double_tag   = psb_real_tag     + 1
-  integer(psb_mpik_), private, parameter:: psb_complex_tag  = psb_double_tag   + 1
-  integer(psb_mpik_), private, parameter:: psb_dcomplex_tag = psb_complex_tag  + 1
-  integer(psb_mpik_), private, parameter:: psb_logical_tag  = psb_dcomplex_tag + 1
-  integer(psb_mpik_), private, parameter:: psb_char_tag     = psb_logical_tag  + 1
-  integer(psb_mpik_), private, parameter:: psb_int8_tag     = psb_char_tag     + 1
-  integer(psb_mpik_), private, parameter:: psb_int2_tag     = psb_int8_tag     + 1
-  integer(psb_mpik_), private, parameter:: psb_int4_tag     = psb_int2_tag     + 1
-
-  integer(psb_mpik_),  parameter:: psb_int_swap_tag      = psb_int_tag      + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_real_swap_tag     = psb_real_tag     + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_double_swap_tag   = psb_double_tag   + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_complex_swap_tag  = psb_complex_tag  + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_dcomplex_swap_tag = psb_dcomplex_tag + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_logical_swap_tag  = psb_logical_tag  + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_char_swap_tag     = psb_char_tag     + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_int8_swap_tag     = psb_int8_tag     + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_int2_swap_tag     = psb_int2_tag     + psb_int_tag
-  integer(psb_mpik_),  parameter:: psb_int4_swap_tag     = psb_int4_tag     + psb_int_tag
-
-
+w
 contains
 
 
@@ -150,11 +127,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -174,11 +151,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -199,12 +176,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_) :: info
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -236,11 +213,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -260,11 +237,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -285,13 +262,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     real(psb_spk_), allocatable :: dat_(:)
     integer(psb_ipk_) :: i,j,k,m_,n_
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -323,11 +300,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -347,11 +324,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -372,12 +349,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -410,11 +387,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -434,11 +411,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -459,12 +436,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -497,11 +474,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -521,11 +498,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -546,12 +523,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -584,11 +561,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     logical, allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -608,11 +585,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     logical, allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -633,12 +610,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     logical, allocatable :: dat_(:)
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_) :: info
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -671,11 +648,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     character(len=*), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     character(len=1), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info, l, i
+    integer(psb_mpk_) :: info, l, i
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -698,11 +675,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: dat
+    integer(psb_mpk_), intent(in)  :: dst
+    integer(psb_mpk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -722,11 +699,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: dat(:)
+    integer(psb_mpk_), intent(in)  :: dst
+    integer(psb_mpk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -747,13 +724,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
-    integer(psb_mpik_), intent(in), optional :: m
-    integer(psb_mpik_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: i,j,k,m_,n_
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: dat(:,:)
+    integer(psb_mpk_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in), optional :: m
+    integer(psb_mpk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
 #else
@@ -788,11 +765,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(in)  :: dat
+    integer(psb_mpk_), intent(in)  :: dst
+    integer(psb_epk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -812,11 +789,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(in)  :: dat(:)
+    integer(psb_mpk_), intent(in)  :: dst
+    integer(psb_epk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -837,12 +814,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(in)  :: dat(:,:)
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
-    integer(psb_long_int_k_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_epk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: info 
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -878,11 +855,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(in)  :: dat
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(2), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -902,11 +879,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(in)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(2), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
 
 #if defined(SERIAL_MPI) 
 #else
@@ -927,12 +904,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(in)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: dst
+    integer(psb_mpk_), intent(in)  :: dst
     integer(psb_ipk_), intent(in), optional :: m
     integer(2), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
+    integer(psb_mpk_) :: info 
     integer(psb_ipk_) :: i,j,k,m_,n_
 
 #if defined(SERIAL_MPI) 
@@ -972,15 +949,15 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_ipk_int,src,psb_int_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_ircvs
@@ -995,15 +972,15 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_ipk_int,src,psb_int_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1019,14 +996,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     integer(psb_ipk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info, m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info, m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1034,13 +1011,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,psb_mpi_ipk_integer,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_ipk_int,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_ipk_integer,src,psb_int_tag,ictxt,status,info)
+      call mpi_recv(dat,size(dat),psb_mpi_ipk_int,src,psb_int_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
       write(psb_err_unit,*) 'Error in psb_recv', info
@@ -1059,11 +1036,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1082,12 +1059,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
     call mpi_recv(dat,size(dat),psb_mpi_r_spk_,src,psb_real_tag,ictxt,status,info)
@@ -1106,14 +1083,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_spk_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     real(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
-    integer(psb_mpik_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: i,j,k
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1146,11 +1123,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1169,12 +1146,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
     call mpi_recv(dat,size(dat),psb_mpi_r_dpk_,src,psb_double_tag,ictxt,status,info)
@@ -1193,14 +1170,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     real(psb_dpk_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_), intent(in), optional :: m
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_), intent(in), optional :: m
     real(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1234,11 +1211,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1257,12 +1234,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
     call mpi_recv(dat,size(dat),psb_mpi_c_spk_,src,psb_complex_tag,ictxt,status,info)
@@ -1281,14 +1258,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_spk_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_spk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1322,11 +1299,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1345,12 +1322,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
     call mpi_recv(dat,size(dat),psb_mpi_c_dpk_,src,psb_dcomplex_tag,ictxt,status,info)
@@ -1369,14 +1346,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     complex(psb_dpk_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
     complex(psb_dpk_), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1410,11 +1387,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1433,11 +1410,11 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
     call mpi_recv(dat,size(dat),mpi_logical,src,psb_logical_tag,ictxt,status,info)
@@ -1456,13 +1433,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     logical, intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1496,12 +1473,12 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     character(len=*), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: src
     character(len=1), allocatable :: dat_(:)
-    integer(psb_mpik_) :: info, l, i
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: info, l, i
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
@@ -1528,15 +1505,15 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(out)  :: dat
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_def_integer,src,psb_int4_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_mpk_int,src,psb_int4_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_i4rcvs
@@ -1551,14 +1528,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(out)  :: dat(:)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_def_integer,src,psb_int4_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_mpk_int,src,psb_int4_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1574,13 +1551,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_), intent(in), optional :: m
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
-    integer(psb_mpik_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(out)  :: dat(:,:)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_), intent(in), optional :: m
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: i,j,k
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1588,13 +1565,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,psb_mpi_def_integer,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_mpk_int,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int4_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_def_integer,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_mpk_int,src,&
            & psb_int4_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1617,15 +1594,15 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(out)  :: dat
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_lng_integer,src,psb_int8_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_lpk_int,src,psb_int8_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_i8rcvs
@@ -1640,14 +1617,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(out)  :: dat(:)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_lng_integer,src,psb_int8_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_lpk_int,src,psb_int8_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1663,13 +1640,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_long_int_k_), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(out)  :: dat(:,:)
+    integer(psb_mpk_), intent(in)  :: src
     integer(psb_ipk_), intent(in), optional :: m
-    integer(psb_mpik_) :: info ,m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_) :: info ,m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1677,13 +1654,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,psb_mpi_lng_integer,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_lpk_int,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int8_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_lng_integer,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_lpk_int,src,&
            & psb_int8_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1706,15 +1683,15 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(out)  :: dat
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! do nothing
 #else
-    call mpi_recv(dat,1,psb_mpi_def_integer2,src,psb_int2_tag,ictxt,status,info)
+    call mpi_recv(dat,1,psb_mpi_mpk_int2,src,psb_int2_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
   end subroutine psb_i2rcvs
@@ -1729,14 +1706,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(out)  :: dat(:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_) :: info 
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_) :: info 
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
 #else
-    call mpi_recv(dat,size(dat),psb_mpi_def_integer2,src,psb_int2_tag,ictxt,status,info)
+    call mpi_recv(dat,size(dat),psb_mpi_mpk_int2,src,psb_int2_tag,ictxt,status,info)
     call psb_test_nodes(psb_mesg_queue)
 #endif    
 
@@ -1752,13 +1729,13 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(2), intent(out)  :: dat(:,:)
-    integer(psb_mpik_), intent(in)  :: src
-    integer(psb_mpik_), intent(in), optional :: m
-    integer(psb_mpik_) :: info , m_,n_, ld, mp_rcv_type
+    integer(psb_mpk_), intent(in)  :: src
+    integer(psb_mpk_), intent(in), optional :: m
+    integer(psb_mpk_) :: info , m_,n_, ld, mp_rcv_type
     integer(psb_ipk_) :: i,j,k
-    integer(psb_mpik_) :: status(mpi_status_size)
+    integer(psb_mpk_) :: status(mpi_status_size)
 #if defined(SERIAL_MPI) 
     ! What should we do here?? 
 #else
@@ -1766,13 +1743,13 @@ contains
       m_ = m
       ld = size(dat,1)
       n_ = size(dat,2)
-      call mpi_type_vector(n_,m_,ld,psb_mpi_def_integer2,mp_rcv_type,info)
+      call mpi_type_vector(n_,m_,ld,psb_mpi_mpk_int2,mp_rcv_type,info)
       if (info == mpi_success) call mpi_type_commit(mp_rcv_type,info)
       if (info == mpi_success) call mpi_recv(dat,1,mp_rcv_type,src,&
            & psb_int2_tag,ictxt,status,info)
       if (info == mpi_success) call mpi_type_free(mp_rcv_type,info)
     else
-      call mpi_recv(dat,size(dat),psb_mpi_def_integer2,src,&
+      call mpi_recv(dat,size(dat),psb_mpi_mpk_int2,src,&
            & psb_int2_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
@@ -1802,7 +1779,7 @@ contains
     integer(psb_ipk_), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1816,7 +1793,7 @@ contains
     integer(psb_ipk_), intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1830,7 +1807,7 @@ contains
     integer(psb_ipk_), intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1844,7 +1821,7 @@ contains
     real(psb_spk_), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1858,7 +1835,7 @@ contains
     real(psb_spk_), intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1872,7 +1849,7 @@ contains
     real(psb_spk_), intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1887,7 +1864,7 @@ contains
     real(psb_dpk_), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1901,7 +1878,7 @@ contains
     real(psb_dpk_), intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1915,7 +1892,7 @@ contains
     real(psb_dpk_), intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1930,7 +1907,7 @@ contains
     complex(psb_spk_), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1944,7 +1921,7 @@ contains
     complex(psb_spk_), intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1958,7 +1935,7 @@ contains
     complex(psb_spk_), intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1973,7 +1950,7 @@ contains
     complex(psb_dpk_), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -1987,7 +1964,7 @@ contains
     complex(psb_dpk_), intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2000,7 +1977,7 @@ contains
     complex(psb_dpk_), intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2014,7 +1991,7 @@ contains
     logical, intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2028,7 +2005,7 @@ contains
     logical, intent(in)  :: dat(:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2042,7 +2019,7 @@ contains
     logical, intent(in)  :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2057,7 +2034,7 @@ contains
     character(len=*), intent(in)  :: dat
     integer(psb_ipk_), intent(in)  :: dst
     
-    integer(psb_mpik_) :: iictxt, idst 
+    integer(psb_mpk_) :: iictxt, idst 
 
     iictxt = ictxt
     idst   = dst 
@@ -2078,7 +2055,7 @@ contains
     integer(psb_ipk_), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2092,7 +2069,7 @@ contains
     integer(psb_ipk_), intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2106,7 +2083,7 @@ contains
     integer(psb_ipk_), intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2120,7 +2097,7 @@ contains
     real(psb_spk_), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2134,7 +2111,7 @@ contains
     real(psb_spk_), intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2148,7 +2125,7 @@ contains
     real(psb_spk_), intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2163,7 +2140,7 @@ contains
     real(psb_dpk_), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2177,7 +2154,7 @@ contains
     real(psb_dpk_), intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2191,7 +2168,7 @@ contains
     real(psb_dpk_), intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2206,7 +2183,7 @@ contains
     complex(psb_spk_), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2220,7 +2197,7 @@ contains
     complex(psb_spk_), intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2234,7 +2211,7 @@ contains
     complex(psb_spk_), intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2249,7 +2226,7 @@ contains
     complex(psb_dpk_), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2263,7 +2240,7 @@ contains
     complex(psb_dpk_), intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2276,7 +2253,7 @@ contains
     complex(psb_dpk_), intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2290,7 +2267,7 @@ contains
     logical, intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2304,7 +2281,7 @@ contains
     logical, intent(out) :: dat(:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2318,7 +2295,7 @@ contains
     logical, intent(out) :: dat(:,:)
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 
@@ -2333,7 +2310,7 @@ contains
     character(len=*), intent(out) :: dat
     integer(psb_ipk_), intent(in)  :: src
     
-    integer(psb_mpik_) :: iictxt, isrc 
+    integer(psb_mpk_) :: iictxt, isrc 
 
     iictxt = ictxt
     isrc   = src 

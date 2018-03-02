@@ -63,7 +63,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   character(len=20)  :: name
 
   if(psb_get_errstatus() /= 0) return 

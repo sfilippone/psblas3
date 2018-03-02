@@ -1,4 +1,4 @@
-subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx)
+subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,vll,flag,nl,repl, globalcheck,lidx)
   use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
@@ -9,12 +9,13 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   implicit None
   procedure(psb_parts)               :: parts
   integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl,lidx(:)
+  integer(psb_lpk_), intent(in)               :: vll(:)
   integer(psb_ipk_), intent(in)               :: flag
   logical, intent(in)               :: repl, globalcheck
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
-  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx
+  optional :: mg,ng,parts,vg,vl,vll,flag,nl,repl, globalcheck,lidx
 
   interface 
     subroutine psb_cdals(m, n, parts, ictxt, desc, info)
@@ -40,6 +41,16 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
       logical, intent(in), optional     :: globalcheck
       integer(psb_ipk_), intent(in), optional     :: idx(:)
     end subroutine psb_cd_inloc
+    subroutine psb_cd_inlocl(v, ictxt, desc, info, globalcheck,idx)
+      use psb_desc_mod
+      implicit None
+      integer(psb_ipk_), intent(in)               :: ictxt
+      integer(psb_lpk_), intent(in)               :: v(:)
+      integer(psb_ipk_), intent(out)              :: info
+      type(psb_desc_type), intent(out)  :: desc
+      logical, intent(in), optional     :: globalcheck
+      integer(psb_ipk_), intent(in), optional     :: idx(:)
+    end subroutine psb_cd_inlocl
     subroutine psb_cdrep(m, ictxt, desc,info)
       use psb_desc_mod
       integer(psb_ipk_), intent(in)               :: m,ictxt
@@ -50,7 +61,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   character(len=20)   :: name
   integer(psb_ipk_) :: err_act, n_, flag_, i, me, np, nlp, nnv, lr
   integer(psb_ipk_), allocatable :: itmpsz(:) 
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
  
   
 

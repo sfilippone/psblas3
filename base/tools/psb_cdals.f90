@@ -64,7 +64,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: me, np, nprocs
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 

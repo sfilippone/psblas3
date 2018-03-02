@@ -299,17 +299,17 @@ contains
     !....Parameters...
 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
     val = 0 
-    val = val + psb_sizeof_int*psb_size(desc%halo_index)
-    val = val + psb_sizeof_int*psb_size(desc%ext_index)
-    val = val + psb_sizeof_int*psb_size(desc%bnd_elem)
-    val = val + psb_sizeof_int*psb_size(desc%ovrlap_index)
-    val = val + psb_sizeof_int*psb_size(desc%ovrlap_elem)
-    val = val + psb_sizeof_int*psb_size(desc%ovr_mst_idx)
-    val = val + psb_sizeof_int*psb_size(desc%lprm)
-    val = val + psb_sizeof_int*psb_size(desc%idx_space)
+    val = val + psb_sizeof_ip*psb_size(desc%halo_index)
+    val = val + psb_sizeof_ip*psb_size(desc%ext_index)
+    val = val + psb_sizeof_ip*psb_size(desc%bnd_elem)
+    val = val + psb_sizeof_ip*psb_size(desc%ovrlap_index)
+    val = val + psb_sizeof_ip*psb_size(desc%ovrlap_elem)
+    val = val + psb_sizeof_ip*psb_size(desc%ovr_mst_idx)
+    val = val + psb_sizeof_ip*psb_size(desc%lprm)
+    val = val + psb_sizeof_ip*psb_size(desc%idx_space)
     if (allocated(desc%indxmap))  val = val + desc%indxmap%sizeof()
     val = val + desc%v_halo_index%sizeof()
     val = val + desc%v_ext_index%sizeof()

@@ -76,7 +76,7 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
   integer(psb_ipk_), intent(in), optional             :: update,jx,ik,mode
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork, ldx
   real(psb_spk_),pointer :: iwork(:), xp(:,:)

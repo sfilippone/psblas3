@@ -35,7 +35,7 @@
 !    Auxiliary module for descriptor: constant values. 
 !
 module psb_desc_const_mod
-  use psb_const_mod, only : psb_ipk_, psb_mpik_
+  use psb_const_mod, only : psb_ipk_, psb_mpk_
   !
   !     Communication, prolongation & restriction
   !

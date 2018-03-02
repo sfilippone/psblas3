@@ -253,7 +253,7 @@ contains
   function psb_d_null_sizeof(prec) result(val)
 
     class(psb_d_null_prec_type), intent(in) :: prec
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     
     val = 0
 

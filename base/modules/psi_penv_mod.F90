@@ -82,18 +82,18 @@ module psi_penv_mod
 
 
 #if defined(SERIAL_MPI)
-  integer(psb_mpik_), private, save :: nctxt=0
+  integer(psb_mpk_), private, save :: nctxt=0
 
 #else 
 
-  integer(psb_mpik_), save :: mpi_iamx_op, mpi_iamn_op
-  integer(psb_mpik_), save :: mpi_i4amx_op, mpi_i4amn_op
-  integer(psb_mpik_), save :: mpi_i8amx_op, mpi_i8amn_op
-  integer(psb_mpik_), save :: mpi_samx_op, mpi_samn_op
-  integer(psb_mpik_), save :: mpi_damx_op, mpi_damn_op
-  integer(psb_mpik_), save :: mpi_camx_op, mpi_camn_op
-  integer(psb_mpik_), save :: mpi_zamx_op, mpi_zamn_op
-  integer(psb_mpik_), save :: mpi_snrm2_op, mpi_dnrm2_op
+  integer(psb_mpk_), save :: mpi_iamx_op, mpi_iamn_op
+  integer(psb_mpk_), save :: mpi_i4amx_op, mpi_i4amn_op
+  integer(psb_mpk_), save :: mpi_i8amx_op, mpi_i8amn_op
+  integer(psb_mpk_), save :: mpi_samx_op, mpi_samn_op
+  integer(psb_mpk_), save :: mpi_damx_op, mpi_damn_op
+  integer(psb_mpk_), save :: mpi_camx_op, mpi_camn_op
+  integer(psb_mpk_), save :: mpi_zamx_op, mpi_zamn_op
+  integer(psb_mpk_), save :: mpi_snrm2_op, mpi_dnrm2_op
 
   type(psb_buffer_queue), save :: psb_mesg_queue 
 
@@ -121,13 +121,17 @@ contains
     use psb_const_mod
     real(psb_dpk_) :: dv(2) 
     real(psb_spk_) :: sv(2) 
+    integer(psb_mpk_) :: mv(2)
     integer(psb_ipk_) :: iv(2)
-    integer(psb_long_int_k_) :: ilv(2)
+    integer(psb_lpk_) :: lv(2)
+    integer(psb_epk_) :: ev(2)
 
     call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
     call psi_c_diffadd(dv(1),dv(2),psb_sizeof_dp)
-    call psi_c_diffadd(iv(1),iv(2),psb_sizeof_int)
-    call psi_c_diffadd(ilv(1),ilv(2),psb_sizeof_long_int)
+    call psi_c_diffadd(mv(1),mv(2),psb_sizeof_mp)
+    call psi_c_diffadd(iv(1),iv(2),psb_sizeof_ip)
+    call psi_c_diffadd(lv(1),lv(2),psb_sizeof_lp)
+    call psi_c_diffadd(ev(1),ev(2),psb_sizeof_ep)
 
   end subroutine psi_get_sizes
 
@@ -139,29 +143,38 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_) :: info
     
     info = 0
 #if 0
-    if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_integer ,info)
-    if (info == 0) call mpi_type_create_f90_integer(psb_mpik_, psb_mpi_def_integer ,info)
-    if (info == 0) call mpi_type_create_f90_integer(psb_long_int_k_, psb_mpi_lng_integer ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_int ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_mpk_, psb_mpi_mpk_int ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_epk_, psb_mpi_lpk_int ,info)
     if (info == 0) call mpi_type_create_f90_real(psb_spk_p_,psb_spk_r_, psb_mpi_r_spk_,info)
     if (info == 0) call mpi_type_create_f90_real(psb_dpk_p_,psb_dpk_r_, psb_mpi_r_dpk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
-#if defined(LONG_INTEGERS)
-    psb_mpi_ipk_integer = mpi_integer8
+#if defined(INT_I4_L4)
+    psb_mpi_ipk_int = mpi_integer
+    psb_mpi_lpk_int = mpi_integer
+#elsif defined(INT_I4_L8)
+    psb_mpi_ipk_int = mpi_integer
+    psb_mpi_lpk_int = mpi_integer8
+#elsif defined(INT_I8_L8)
+    psb_mpi_ipk_int = mpi_integer8
+    psb_mpi_lpk_int = mpi_integer8
 #else
-    psb_mpi_ipk_integer = mpi_integer
+    ! This should never happen
+    psb_mpi_ipk_int = -1
+    psb_mpi_lpk_int = -1
 #endif
-    psb_mpi_def_integer = mpi_integer
-    psb_mpi_lng_integer = mpi_integer8
-    psb_mpi_r_spk_      = mpi_real
-    psb_mpi_r_dpk_      = mpi_double_precision
-    psb_mpi_c_spk_      = mpi_complex
-    psb_mpi_c_dpk_      = mpi_double_complex
+    psb_mpi_mpk_int = mpi_integer
+    psb_mpi_epk_int = mpi_integer8
+    psb_mpi_r_spk_  = mpi_real
+    psb_mpi_r_dpk_  = mpi_double_precision
+    psb_mpi_c_spk_  = mpi_complex
+    psb_mpi_c_dpk_  = mpi_double_complex
 #endif
 
 #if defined(SERIAL_MPI)
@@ -191,9 +204,9 @@ contains
     integer(psb_ipk_), intent(out) :: ictxt
     integer(psb_ipk_), intent(in), optional :: np, basectxt, ids(:)
 
-    integer(psb_mpik_) :: iictxt
-    integer(psb_mpik_) :: inp, ibasectxt
-    integer(psb_mpik_), allocatable :: ids_(:)
+    integer(psb_mpk_) :: iictxt
+    integer(psb_mpk_) :: inp, ibasectxt
+    integer(psb_mpk_), allocatable :: ids_(:)
 
     if (present(ids)) then 
       allocate(ids_(size(ids)))
@@ -220,7 +233,7 @@ contains
   subroutine psb_exit_ipk(ictxt,close)
     integer(psb_ipk_), intent(inout) :: ictxt
     logical, intent(in), optional :: close
-    integer(psb_mpik_) :: iictxt
+    integer(psb_mpk_) :: iictxt
     
     iictxt = ictxt
     call psb_exit(iictxt, close)
@@ -228,7 +241,7 @@ contains
 
   subroutine psb_barrier_ipk(ictxt)
     integer(psb_ipk_), intent(in) :: ictxt
-    integer(psb_mpik_) :: iictxt
+    integer(psb_mpk_) :: iictxt
     
     iictxt = ictxt
     call psb_barrier(iictxt)
@@ -237,7 +250,7 @@ contains
   subroutine psb_abort_ipk(ictxt,errc)
     integer(psb_ipk_), intent(in) :: ictxt
     integer(psb_ipk_), intent(in), optional :: errc
-    integer(psb_mpik_) :: iictxt, ierrc
+    integer(psb_mpk_) :: iictxt, ierrc
 
     iictxt = ictxt
     if (present(errc)) then 
@@ -257,7 +270,7 @@ contains
     ! Simple caching scheme, keep track
     ! of the last CTXT encountered. 
     !
-    integer(psb_mpik_), save :: lctxt=-1, lam, lnp
+    integer(psb_mpk_), save :: lctxt=-1, lam, lnp
     if (ictxt /= lctxt) then
       lctxt = ictxt
       call psb_info(lctxt,lam,lnp)
@@ -281,14 +294,14 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(out) :: ictxt
-    integer(psb_mpik_), intent(in), optional :: np, basectxt, ids(:)
+    integer(psb_mpk_), intent(out) :: ictxt
+    integer(psb_mpk_), intent(in), optional :: np, basectxt, ids(:)
 
 
-    integer(psb_mpik_) :: i, isnullcomm
-    integer(psb_mpik_), allocatable :: iids(:) 
+    integer(psb_mpk_) :: i, isnullcomm
+    integer(psb_mpk_), allocatable :: iids(:) 
     logical :: initialized    
-    integer(psb_mpik_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
+    integer(psb_mpk_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
     character(len=20), parameter :: name='psb_init'
     integer(psb_ipk_) :: iinfo
     call psb_set_debug_unit(psb_err_unit)
@@ -406,10 +419,10 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(inout) :: ictxt
+    integer(psb_mpk_), intent(inout) :: ictxt
     logical, intent(in), optional :: close
     logical  :: close_
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_) :: info
     character(len=20), parameter :: name='psb_exit'
 
     info = 0
@@ -457,9 +470,9 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer(psb_mpik_), intent(in) :: ictxt
+    integer(psb_mpk_), intent(in) :: ictxt
 
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_) :: info
 #if !defined(SERIAL_MPI)
     if (ictxt /= mpi_comm_null) then 
       call mpi_barrier(ictxt, info)
@@ -486,10 +499,10 @@ contains
   subroutine psb_abort_mpik(ictxt,errc)
     use psi_comm_buffers_mod 
 
-    integer(psb_mpik_), intent(in) :: ictxt
-    integer(psb_mpik_), intent(in), optional :: errc
+    integer(psb_mpk_), intent(in) :: ictxt
+    integer(psb_mpk_), intent(in), optional :: errc
     
-    integer(psb_mpik_) :: code, info 
+    integer(psb_mpk_) :: code, info 
 
 #if defined(SERIAL_MPI) 
     stop 
@@ -516,14 +529,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpik_), intent(in)  :: ictxt
-    integer(psb_mpik_), intent(out) :: iam, np
-    integer(psb_mpik_) :: info
+    integer(psb_mpk_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(out) :: iam, np
+    integer(psb_mpk_) :: info
     !
     ! Simple caching scheme, keep track
     ! of the last CTXT encountered. 
     !  
-    integer(psb_mpik_), save :: lctxt=-1, lam, lnp
+    integer(psb_mpk_), save :: lctxt=-1, lam, lnp
     
 #if defined(SERIAL_MPI) 
     iam = 0
@@ -551,13 +564,13 @@ contains
 
 
   subroutine psb_get_mpicomm(ictxt,comm)
-    integer(psb_mpik_) :: ictxt, comm
+    integer(psb_mpk_) :: ictxt, comm
 
     comm = ictxt
   end subroutine psb_get_mpicomm
 
   subroutine psb_get_rank(rank,ictxt,id)
-    integer(psb_mpik_) :: rank,ictxt,id
+    integer(psb_mpk_) :: rank,ictxt,id
 
     rank = id
   end subroutine psb_get_rank
@@ -572,8 +585,8 @@ contains
   ! !!!!!!!!!!!!!!!!!!!!!!
   subroutine psi_iamx_op(inv, outv,len,type) 
     integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -582,17 +595,17 @@ contains
 
   subroutine psi_iamn_op(inv, outv,len,type) 
     integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
   end subroutine psi_iamn_op
 
   subroutine psi_i4amx_op(inv, outv,len,type) 
-    integer(psb_mpik_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -600,9 +613,9 @@ contains
   end subroutine psi_i4amx_op
 
   subroutine psi_i4amn_op(inv, outv,len,type) 
-    integer(psb_mpik_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
 
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
@@ -610,9 +623,9 @@ contains
   end subroutine psi_i4amn_op
 
   subroutine psi_i8amx_op(inv, outv,len,type) 
-    integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_epk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
 
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
@@ -620,9 +633,9 @@ contains
   end subroutine psi_i8amx_op
 
   subroutine psi_i8amn_op(inv, outv,len,type) 
-    integer(psb_long_int_k_) :: inv(*),outv(*)
-    integer(psb_mpik_) :: len,type
-    integer(psb_mpik_) :: i
+    integer(psb_epk_) :: inv(*),outv(*)
+    integer(psb_mpk_) :: len,type
+    integer(psb_mpk_) :: i
 
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
@@ -630,88 +643,88 @@ contains
   end subroutine psi_i8amn_op
 
   subroutine psi_samx_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samx_op
 
   subroutine psi_samn_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_samn_op
 
   subroutine psi_damx_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damx_op
 
   subroutine psi_damn_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_damn_op
 
   subroutine psi_camx_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camx_op
 
   subroutine psi_camn_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     complex(psb_spk_), intent(in)    :: vin(len)
     complex(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_camn_op
 
   subroutine psi_zamx_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) < abs(vin(i))) vinout(i) = vin(i)
     end do
   end subroutine psi_zamx_op
 
   subroutine psi_zamn_op(vin,vinout,len,itype)
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     complex(psb_dpk_), intent(in)    :: vin(len)
     complex(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     do i=1, len
       if (abs(vinout(i)) > abs(vin(i))) vinout(i) = vin(i)
     end do
@@ -719,11 +732,11 @@ contains
 
   subroutine psi_snrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_spk_), intent(in)    :: vin(len)
     real(psb_spk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     real(psb_spk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )
@@ -738,11 +751,11 @@ contains
 
   subroutine psi_dnrm2_op(vin,vinout,len,itype)
     implicit none 
-    integer(psb_mpik_), intent(in)           :: len, itype
+    integer(psb_mpk_), intent(in)           :: len, itype
     real(psb_dpk_), intent(in)    :: vin(len)
     real(psb_dpk_), intent(inout) :: vinout(len)
 
-    integer(psb_mpik_) :: i
+    integer(psb_mpk_) :: i
     real(psb_dpk_) :: w, z
     do i=1, len
       w = max( vin(i), vinout(i) )

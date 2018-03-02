@@ -115,7 +115,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   integer(psb_ipk_) :: i,np,me,err,n,err_act
   integer(psb_ipk_) :: int_err(5),exch(2), thalo(1), tovr(1), text(1)
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 

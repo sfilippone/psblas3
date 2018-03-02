@@ -126,16 +126,16 @@ contains
   function hash_sizeof(idxmap) result(val)
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
 
     val = idxmap%psb_indx_map%sizeof() 
-    val = val + 2 * psb_sizeof_int
+    val = val + 2 * psb_sizeof_ip
     if (allocated(idxmap%hashv)) &
-         & val = val + size(idxmap%hashv)*psb_sizeof_int
+         & val = val + size(idxmap%hashv)*psb_sizeof_ip
     if (allocated(idxmap%glb_lc)) &
-         & val = val + size(idxmap%glb_lc)*psb_sizeof_int
+         & val = val + size(idxmap%glb_lc)*psb_sizeof_ip
     if (allocated(idxmap%loc_to_glob)) &
-         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_int
+         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_ip
     val = val + psb_sizeof(idxmap%hash)
 
   end function hash_sizeof
@@ -312,7 +312,7 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
     integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, nrm 
-    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_mpk_) :: ictxt, iam, np
     logical :: owned_
 
     info = 0
@@ -755,11 +755,11 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: iam, np
+    integer(psb_mpk_) :: iam, np
     integer(psb_ipk_) ::  i,  nlu, nl, m, nrt,int_err(5)
     integer(psb_ipk_), allocatable :: vlu(:), ix(:)
     character(len=20), parameter :: name='hash_map_init_vl'
@@ -826,11 +826,11 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: vg(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: iam, np
+    integer(psb_mpk_) :: iam, np
     integer(psb_ipk_) :: i, j, nl, n, int_err(5)
     integer(psb_ipk_), allocatable :: vlu(:)
 
@@ -885,11 +885,11 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_mpik_), intent(in)  :: ictxt
+    integer(psb_mpk_), intent(in)  :: ictxt
     integer(psb_ipk_), intent(in)  :: vlu(:), nl, ntot
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: iam, np
+    integer(psb_mpk_) :: iam, np
     integer(psb_ipk_) :: i, j, lc2, nlu, m, nrt,int_err(5)
     character(len=20), parameter :: name='hash_map_init_vlu'
 
@@ -942,7 +942,7 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
-    integer(psb_mpik_) :: ictxt, iam, np
+    integer(psb_mpk_) :: ictxt, iam, np
     integer(psb_ipk_) :: i, j, m, nl
     integer(psb_ipk_) :: key, ih, nh, idx, nbits, hsize, hmask
     character(len=20), parameter :: name='hash_map_init_vlu'
@@ -1045,7 +1045,7 @@ contains
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
 
-    integer(psb_mpik_) :: ictxt, iam, np 
+    integer(psb_mpk_) :: ictxt, iam, np 
     integer(psb_ipk_) :: nhal
 
     info = 0 
@@ -1461,7 +1461,7 @@ contains
     class(psb_hash_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: err_act, nr,nc,k, nl, ntot
-    integer(psb_mpik_) :: ictxt, me, np
+    integer(psb_mpk_) :: ictxt, me, np
     integer(psb_ipk_), allocatable :: idx(:),lidx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.

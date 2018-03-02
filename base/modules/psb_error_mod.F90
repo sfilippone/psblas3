@@ -72,7 +72,7 @@ module psb_error_mod
       integer(psb_ipk_), intent(inout) ::  err_act
     end subroutine psb_ser_error_handler
     subroutine psb_par_error_handler(ictxt,err_act)
-      import :: psb_ipk_,psb_mpik_
+      import :: psb_ipk_,psb_mpk_
       integer(psb_ipk_), intent(in) ::  ictxt
       integer(psb_ipk_), intent(in) ::  err_act
     end subroutine psb_par_error_handler
@@ -82,8 +82,8 @@ module psb_error_mod
     subroutine psb_serror()
     end subroutine psb_serror
     subroutine psb_perror(ictxt,abrt)
-      import :: psb_mpik_
-      integer(psb_mpik_), intent(in) ::  ictxt
+      import :: psb_mpk_
+      integer(psb_mpk_), intent(in) ::  ictxt
       logical, intent(in), optional  :: abrt
     end subroutine psb_perror
   end interface
@@ -91,8 +91,8 @@ module psb_error_mod
 
   interface psb_error_print_stack
     subroutine psb_par_error_print_stack(ictxt)
-      import :: psb_ipk_,psb_mpik_
-      integer(psb_mpik_), intent(in) ::  ictxt
+      import :: psb_ipk_,psb_mpk_
+      integer(psb_mpk_), intent(in) ::  ictxt
     end subroutine psb_par_error_print_stack
     subroutine psb_ser_error_print_stack()
     end subroutine psb_ser_error_print_stack
@@ -100,8 +100,8 @@ module psb_error_mod
 
   interface psb_errcomm
     subroutine psb_errcomm(ictxt, err)
-      import :: psb_mpik_, psb_ipk_
-      integer(psb_mpik_), intent(in)   :: ictxt
+      import :: psb_mpk_, psb_ipk_
+      integer(psb_mpk_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
     end subroutine psb_errcomm
   end interface psb_errcomm
@@ -190,14 +190,14 @@ contains
   subroutine psb_errcomm_ipk(ictxt, err)
     integer(psb_ipk_), intent(in)   :: ictxt
     integer(psb_ipk_), intent(inout):: err
-    integer(psb_mpik_) :: iictxt
+    integer(psb_mpk_) :: iictxt
     iictxt = ictxt
     call psb_errcomm(iictxt,err)
   end subroutine psb_errcomm_ipk
 
   subroutine psb_perror_ipk(ictxt)
     integer(psb_ipk_), intent(in)   :: ictxt
-    integer(psb_mpik_) :: iictxt
+    integer(psb_mpk_) :: iictxt
     iictxt = ictxt
     call psb_perror(iictxt)
   end subroutine psb_perror_ipk
@@ -486,7 +486,7 @@ contains
     character(len=20), intent(in)    ::  r_name
     character(len=40), intent(in)    ::  a_e_d
     integer(psb_ipk_), intent(in)    ::  i_e_d(5)
-    integer(psb_mpik_), optional     ::  me
+    integer(psb_mpk_), optional     ::  me
 
     character(len=psb_max_errmsg_len_) :: tmpmsg
   
@@ -1057,7 +1057,7 @@ contains
     character(len=20), intent(in)  ::  r_name
     character(len=40), intent(in)  ::  a_e_d
     integer(psb_ipk_), intent(in)  ::  i_e_d(5)
-    integer(psb_mpik_), optional   ::  me
+    integer(psb_mpk_), optional   ::  me
 
     integer(psb_ipk_) :: i
     character(len=psb_max_errmsg_len_), allocatable :: achmsg(:)

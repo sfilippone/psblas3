@@ -54,9 +54,9 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
-  integer(psb_mpik_) :: ictxt,np,me
-  integer(psb_mpik_) :: icomm, minfo, ndx
-  integer(psb_mpik_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_mpk_) :: ictxt,np,me
+  integer(psb_mpk_) :: icomm, minfo, ndx
+  integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -117,13 +117,13 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
          & glob_coo%val,nzbr,idisp,&
          & psb_mpi_c_dpk_,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_integer,&
+         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_int,&
          & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_ipk_integer,icomm,minfo)
+         & psb_mpi_ipk_int,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_integer,&
+         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_int,&
          & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_ipk_integer,icomm,minfo)
+         & psb_mpi_ipk_int,icomm,minfo)
     
     if (minfo /= psb_success_) then 
       info  = minfo

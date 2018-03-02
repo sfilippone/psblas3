@@ -57,7 +57,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, &
        & ilx, i, j, idx
@@ -229,7 +229,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
 
@@ -342,7 +342,7 @@ subroutine  psb_dgather_vect(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
   real(psb_dpk_), allocatable :: llocx(:)
@@ -455,7 +455,7 @@ subroutine  psb_dgather_multivect(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
   real(psb_dpk_), allocatable :: llocx(:,:)

@@ -109,7 +109,7 @@ contains
 
     key_ = key
     val  = ival 
-    do i=1, psb_sizeof_int
+    do i=1, psb_sizeof_ip
       val  = val * 33 + iand(key_,255)
       key_ = ishft(key_,-8)
     end do
@@ -130,7 +130,7 @@ contains
 
     key_ = key
     val  = ival 
-    do i=1, psb_sizeof_long_int
+    do i=1, psb_sizeof_lp
       val  = val * 33 + iand(key_,255)
       key_ = ishft(key_,-8)
     end do
@@ -143,10 +143,10 @@ contains
   
   function psb_Sizeof_hash_type(hash) result(val)
     type(psb_hash_type) :: hash
-    integer(psb_long_int_k_) :: val
-    val = 4*psb_sizeof_int + 2*psb_sizeof_long_int
+    integer(psb_epk_) :: val
+    val = 4*psb_sizeof_ip + 2*psb_sizeof_lp
     if (allocated(hash%table)) &
-         & val = val + psb_sizeof_long_int * size(hash%table)
+         & val = val + psb_sizeof_lp * size(hash%table)
     
   end function psb_Sizeof_hash_type
 

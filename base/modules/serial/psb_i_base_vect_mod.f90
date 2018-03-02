@@ -62,7 +62,7 @@ module psb_i_base_vect_mod
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:)
     integer(psb_ipk_), allocatable :: combuf(:) 
-    integer(psb_mpik_), allocatable :: comid(:,:)
+    integer(psb_mpk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -629,10 +629,10 @@ contains
   function i_base_sizeof(x) result(res)
     implicit none 
     class(psb_i_base_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     
     ! Force 8-byte integers.
-    res = (1_psb_long_int_k_ * psb_sizeof_int) * x%get_nrows()
+    res = (1_psb_epk_ * psb_sizeof_ip) * x%get_nrows()
 
   end function i_base_sizeof
 
@@ -937,7 +937,7 @@ module psb_i_base_multivect_mod
     !> Values. 
     integer(psb_ipk_), allocatable :: v(:,:)
     integer(psb_ipk_), allocatable :: combuf(:) 
-    integer(psb_mpik_), allocatable :: comid(:,:)
+    integer(psb_mpk_), allocatable :: comid(:,:)
   contains
     !
     !  Constructors/allocators
@@ -1422,10 +1422,10 @@ contains
   function i_base_mlv_sizeof(x) result(res)
     implicit none 
     class(psb_i_base_multivect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
 
     ! Force 8-byte integers.
-    res = (1_psb_long_int_k_ * psb_sizeof_int) * x%get_nrows() * x%get_ncols()
+    res = (1_psb_epk_ * psb_sizeof_ip) * x%get_nrows() * x%get_ncols()
 
   end function i_base_mlv_sizeof
 

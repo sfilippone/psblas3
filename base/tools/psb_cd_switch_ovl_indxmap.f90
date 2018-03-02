@@ -50,7 +50,7 @@ Subroutine psb_cd_switch_ovl_indxmap(desc,info)
 
   integer(psb_ipk_), allocatable :: vl(:)
   integer(psb_ipk_)  :: debug_level, debug_unit, ierr(5)
-  integer(psb_mpik_) :: iictxt
+  integer(psb_mpk_) :: iictxt
   character(len=20)  :: name, ch_err
 
   name='cd_switch_ovl_indxmap'

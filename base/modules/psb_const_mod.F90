@@ -33,61 +33,86 @@
 module psb_const_mod
 #if defined(HAVE_ISO_FORTRAN_ENV)
   use iso_fortran_env
-  ! This is the default PSBLAS integer, can be 4 or 8 bytes.
-#if defined(LONG_INTEGERS)
-  integer, parameter  :: psb_ipk_ = int64
-#else  
-  integer, parameter  :: psb_ipk_ = int32
-#endif
-  ! This is always an 8-byte  integer.
-  integer, parameter  :: psb_long_int_k_ = int64
-  integer, parameter  :: psb_lpk_        = psb_long_int_k_
   ! This is always a 4-byte integer, for MPI-related stuff
-  integer, parameter  :: psb_mpik_ = int32
+  integer, parameter  :: psb_mpk_ = int32
+  ! This is always an 8-byte  integer.
+  integer, parameter  :: psb_epk_ = int64
   !
   ! These must be the kind parameter corresponding to psb_mpi_r_dpk_
   ! and psb_mpi_r_spk_
   !
-  integer(psb_mpik_), parameter  :: psb_spk_   = real32
-  integer(psb_mpik_), parameter  :: psb_dpk_   = real64
+  integer, parameter  :: psb_spk_   = real32
+  integer, parameter  :: psb_dpk_   = real64
+  
 #else
-  ! This is the default PSBLAS integer, can be 4 or 8 bytes.
-#if defined(LONG_INTEGERS)
-  integer, parameter  :: ndig=12
-#else  
-  integer, parameter  :: ndig=8
-#endif
-  integer, parameter  :: psb_ipk_ = selected_int_kind(ndig)
-  ! This is always an 8-byte  integer.
-  integer, parameter  :: longndig=12
-  integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
-  integer, parameter  :: psb_lpk_        = psb_long_int_k_
+
+  integer, parameter  :: indig=8
+  integer, parameter  :: lndig=12
   ! This is always a 4-byte integer, for MPI-related stuff
-  integer, parameter  :: psb_mpik_ = kind(1)
+  integer, parameter  :: psb_mpk_ = selected_int_kind(indig)
+  ! This is always an 8-byte  integer.
+  integer, parameter  :: psb_epk_ = selected_int_kind(lndig)
   !
   ! These must be the kind parameter corresponding to psb_mpi_r_dpk_
   ! and psb_mpi_r_spk_
   !
-  integer(psb_mpik_), parameter  :: psb_spk_p_ = 6
-  integer(psb_mpik_), parameter  :: psb_spk_r_ = 37
-  integer(psb_mpik_), parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_,psb_spk_r_)
-  integer(psb_mpik_), parameter  :: psb_dpk_p_ = 15
-  integer(psb_mpik_), parameter  :: psb_dpk_r_ = 307
-  integer(psb_mpik_), parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
+  integer, parameter  :: psb_spk_p_ = 6
+  integer, parameter  :: psb_spk_r_ = 37
+  integer, parameter  :: psb_spk_   = selected_real_kind(psb_spk_p_,psb_spk_r_)
+  integer, parameter  :: psb_dpk_p_ = 15
+  integer, parameter  :: psb_dpk_r_ = 307
+  integer, parameter  :: psb_dpk_   = selected_real_kind(psb_dpk_p_,psb_dpk_r_)
 #endif
 
-  integer(psb_ipk_), save        :: psb_sizeof_dp, psb_sizeof_sp
-  integer(psb_ipk_), save        :: psb_sizeof_int, psb_sizeof_long_int
+  ! Now for the choices:
+  !  IPK = integer kind for "local" indices and sizes.
+  !        Can be 4 or 8 bytes.
+  !  LPK = integer kind for "global" indices and sizes.
+  !        Can be 4 or 8 bytes.
+  !        Size must be >= size of IPK
+  !
+  !  Additional rules:
+  !  1. MPI related stuff is always MPK
+  !  2. ICTXT,IAM,NP: should we have two versions of everything,
+  !                   one with MPK the other with EPK?
+  !  3. INFO, ERR_ACT, IERR etc are always IPK
+  !  4. For the array version of things, where it makes sense
+  !     e.g. realloc, snd/receive, define as MPK,EPK and the
+  !     compiler will later pick up the correct version according
+  !     to what IPK/LPK are mapped onto. 
+  !
+#if defined(INT_I4_L4) 
+  integer, parameter  :: psb_ipk_ = psb_mpk_
+  integer, parameter  :: psb_lpk_ = psb_mpk_
+#elif defined(INT_I4_L8) 
+  integer, parameter  :: psb_ipk_ = psb_mpk_
+  integer, parameter  :: psb_lpk_ = psb_epk_
+#elif defined(INT_I8_L8) 
+  integer, parameter  :: psb_ipk_ = psb_mpk_
+  integer, parameter  :: psb_lpk_ = psb_epk_
+#else
+  ! Unsupported combination, compilation will stop later on
+  integer, parameter  :: psb_ipk_ = -1
+  integer, parameter  :: psb_lpk_ = -1
+#endif 
+  
+  integer(psb_ipk_), save        :: psb_sizeof_sp
+  integer(psb_ipk_), save        :: psb_sizeof_dp
+  integer(psb_ipk_), save        :: psb_sizeof_mp
+  integer(psb_ipk_), save        :: psb_sizeof_ep
+  integer(psb_ipk_), save        :: psb_sizeof_ip
+  integer(psb_ipk_), save        :: psb_sizeof_lp
   !
   ! Integer type identifiers for MPI operations. 
   !
-  integer(psb_mpik_), save      :: psb_mpi_ipk_integer
-  integer(psb_mpik_), save      :: psb_mpi_def_integer
-  integer(psb_mpik_), save      :: psb_mpi_lng_integer
-  integer(psb_mpik_), save      :: psb_mpi_r_spk_
-  integer(psb_mpik_), save      :: psb_mpi_r_dpk_
-  integer(psb_mpik_), save      :: psb_mpi_c_spk_
-  integer(psb_mpik_), save      :: psb_mpi_c_dpk_
+  integer(psb_mpk_), save      :: psb_mpi_epk_int
+  integer(psb_mpk_), save      :: psb_mpi_mpk_int
+  integer(psb_mpk_), save      :: psb_mpi_ipk_int
+  integer(psb_mpk_), save      :: psb_mpi_lpk_int
+  integer(psb_mpk_), save      :: psb_mpi_r_spk_
+  integer(psb_mpk_), save      :: psb_mpi_r_dpk_
+  integer(psb_mpk_), save      :: psb_mpi_c_spk_
+  integer(psb_mpk_), save      :: psb_mpi_c_dpk_
   ! 
   ! Version
   !
@@ -114,6 +139,7 @@ module psb_const_mod
   real(psb_spk_), parameter      :: s_epstol=5.e-8_psb_spk_   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
   logical, parameter             :: psb_i_is_complex_ = .false.
+  logical, parameter             :: psb_l_is_complex_ = .false.
   logical, parameter             :: psb_s_is_complex_ = .false.
   logical, parameter             :: psb_d_is_complex_ = .false.
   logical, parameter             :: psb_c_is_complex_ = .true.

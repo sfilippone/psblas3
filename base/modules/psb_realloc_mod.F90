@@ -1175,7 +1175,7 @@ Contains
 #if !defined(LONG_INTEGERS)  
   function psb_i8size1d(vin)
     integer(psb_ipk_) :: psb_i8size1d
-    integer(psb_long_int_k_), allocatable, intent(in) :: vin(:)
+    integer(psb_epk_), allocatable, intent(in) :: vin(:)
 
     if (.not.allocated(vin)) then 
       psb_i8size1d = 0
@@ -1186,7 +1186,7 @@ Contains
 
   function psb_i8size2d(vin,dim)
     integer(psb_ipk_) :: psb_i8size2d
-    integer(psb_long_int_k_), allocatable, intent(in) :: vin(:,:)
+    integer(psb_epk_), allocatable, intent(in) :: vin(:,:)
     integer(psb_ipk_), optional :: dim
     integer(psb_ipk_) :: dim_
 
@@ -1381,9 +1381,9 @@ Contains
 
     ! ...Subroutine Arguments  
     integer(psb_ipk_),Intent(in)                 :: len
-    Integer(psb_long_int_k_),allocatable, intent(inout) :: v(:)
+    Integer(psb_epk_),allocatable, intent(inout) :: v(:)
     integer(psb_ipk_) :: info
-    integer(psb_long_int_k_), optional, intent(in) :: pad
+    integer(psb_epk_), optional, intent(in) :: pad
     integer(psb_ipk_), optional, intent(in) :: addsz,newsz
     ! ...Local Variables
     character(len=20)  :: name
@@ -2459,12 +2459,12 @@ Contains
 
     ! ...Subroutine Arguments  
     integer(psb_ipk_),Intent(in)                 :: len
-    Integer(psb_long_int_k_),allocatable, intent(inout) :: rrax(:)
+    Integer(psb_epk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
-    integer(psb_long_int_k_), optional, intent(in) :: pad
+    integer(psb_epk_), optional, intent(in) :: pad
     integer(psb_ipk_), optional, intent(in) :: lb
     ! ...Local Variables
-    Integer(psb_long_int_k_),allocatable  :: tmp(:)
+    Integer(psb_epk_),allocatable  :: tmp(:)
     integer(psb_ipk_) :: dim, err_act, err,lb_, lbi, ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -2623,13 +2623,13 @@ Contains
     use psb_error_mod
     ! ...Subroutine Arguments  
     integer(psb_ipk_),Intent(in) :: len1,len2
-    integer(psb_long_int_k_),allocatable :: rrax(:,:)
+    integer(psb_epk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
-    integer(psb_long_int_k_), optional, intent(in) :: pad
+    integer(psb_epk_), optional, intent(in) :: pad
     integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
-    integer(psb_long_int_k_),allocatable  :: tmp(:,:)
+    integer(psb_epk_),allocatable  :: tmp(:,:)
     integer(psb_ipk_) :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
@@ -3042,7 +3042,7 @@ Contains
 #if !defined(LONG_INTEGERS)
   Subroutine psb_i8move_alloc1d(vin,vout,info)
     use psb_error_mod
-    integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer(psb_epk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer(psb_ipk_), intent(out) :: info 
     !
     ! 
@@ -3054,7 +3054,7 @@ Contains
 
   Subroutine psb_i8move_alloc2d(vin,vout,info)
     use psb_error_mod
-    integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer(psb_epk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer(psb_ipk_), intent(out) :: info 
     !
     ! 
@@ -3068,8 +3068,8 @@ Contains
 
   Subroutine psb_i4move_alloc1d(vin,vout,info)
     use psb_error_mod
-    integer(psb_mpik_), allocatable, intent(inout) :: vin(:),vout(:)
-    integer(psb_mpik_), intent(out) :: info 
+    integer(psb_mpk_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer(psb_mpk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3080,7 +3080,7 @@ Contains
 
   Subroutine psb_i4move_alloc1d_i8(vin,vout,info)
     use psb_error_mod
-    integer(psb_mpik_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer(psb_mpk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer(psb_ipk_), intent(out) :: info 
     !
     ! 
@@ -3092,8 +3092,8 @@ Contains
  
   Subroutine psb_i4move_alloc2d(vin,vout,info)
     use psb_error_mod
-    integer(psb_mpik_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
-    integer(psb_mpik_), intent(out) :: info 
+    integer(psb_mpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer(psb_mpk_), intent(out) :: info 
     !
     ! 
     info=psb_success_
@@ -3104,7 +3104,7 @@ Contains
  
   Subroutine psb_i4move_alloc2d_i8(vin,vout,info)
     use psb_error_mod
-    integer(psb_mpik_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer(psb_mpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer(psb_ipk_), intent(out) :: info 
     !
     ! 
@@ -3121,14 +3121,14 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in)                 :: len
-    Integer(psb_mpik_),allocatable, intent(inout) :: rrax(:)
-    integer(psb_mpik_) :: info
-    integer(psb_mpik_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_),Intent(in)                 :: len
+    Integer(psb_mpk_),allocatable, intent(inout) :: rrax(:)
+    integer(psb_mpk_) :: info
+    integer(psb_mpk_), optional, intent(in) :: pad
+    integer(psb_mpk_), optional, intent(in) :: lb
     ! ...Local Variables
-    Integer(psb_mpik_),allocatable  :: tmp(:)
-    integer(psb_mpik_) :: dim, lb_, lbi, ub_
+    Integer(psb_mpk_),allocatable  :: tmp(:)
+    integer(psb_mpk_) :: dim, lb_, lbi, ub_
     integer(psb_ipk_)  :: err, err_act, ierr(5)
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -3200,13 +3200,13 @@ Contains
 
     ! ...Subroutine Arguments  
     integer(psb_ipk_),Intent(in)                 :: len
-    Integer(psb_mpik_),allocatable, intent(inout) :: rrax(:)
+    Integer(psb_mpk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
-    integer(psb_mpik_), optional, intent(in) :: pad
+    integer(psb_mpk_), optional, intent(in) :: pad
     integer(psb_ipk_), optional, intent(in) :: lb
     ! ...Local Variables
-    Integer(psb_mpik_),allocatable  :: tmp(:)
-    integer(psb_mpik_) :: dim, lb_, lbi, ub_, iinfo
+    Integer(psb_mpk_),allocatable  :: tmp(:)
+    integer(psb_mpk_) :: dim, lb_, lbi, ub_, iinfo
     integer(psb_ipk_)  :: err, err_act, ierr(5)
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -3276,15 +3276,15 @@ Contains
   Subroutine psb_reallocate2i4(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1,len2
-    integer(psb_mpik_),allocatable :: rrax(:,:)
-    integer(psb_mpik_) :: info
-    integer(psb_mpik_), optional, intent(in) :: pad
-    integer(psb_mpik_),Intent(in), optional  :: lb1,lb2
+    integer(psb_mpk_),Intent(in) :: len1,len2
+    integer(psb_mpk_),allocatable :: rrax(:,:)
+    integer(psb_mpk_) :: info
+    integer(psb_mpk_), optional, intent(in) :: pad
+    integer(psb_mpk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
-    integer(psb_mpik_),allocatable  :: tmp(:,:)
-    integer(psb_mpik_) :: dim, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_mpk_),allocatable  :: tmp(:,:)
+    integer(psb_mpk_) :: dim, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     integer(psb_ipk_)  :: err,err_act, ierr(5)
     character(len=20)  :: name
@@ -3362,14 +3362,14 @@ Contains
     use psb_error_mod
     ! ...Subroutine Arguments  
     integer(psb_ipk_),Intent(in) :: len1,len2
-    integer(psb_mpik_),allocatable :: rrax(:,:)
+    integer(psb_mpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
-    integer(psb_mpik_), optional, intent(in) :: pad
+    integer(psb_mpk_), optional, intent(in) :: pad
     integer(psb_ipk_),Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
-    integer(psb_mpik_),allocatable  :: tmp(:,:)
-    integer(psb_mpik_) :: dim, dim2,lb1_, lb2_, ub1_, ub2_,&
+    integer(psb_mpk_),allocatable  :: tmp(:,:)
+    integer(psb_mpk_) :: dim, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     integer(psb_ipk_)  :: err,err_act, ierr(5)
     character(len=20)  :: name
@@ -3446,11 +3446,11 @@ Contains
 
   Subroutine psb_rp1i1(len,rrax,info,pad,lb)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len
+    integer(psb_mpk_),Intent(in) :: len
     integer(psb_ipk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_), optional, intent(in) :: lb
 
     integer(psb_ipk_) :: ilen, ilb
 
@@ -3467,7 +3467,7 @@ Contains
 
   subroutine  psb_rp1i2i2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len1
     integer(psb_ipk_),Intent(in) :: len2
     integer(psb_ipk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3481,7 +3481,7 @@ Contains
 
   subroutine  psb_ri1p2i2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),Intent(in) :: len1
     integer(psb_ipk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3495,8 +3495,8 @@ Contains
 
   subroutine  psb_rp1p2i2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional, intent(in) :: pad
@@ -3510,11 +3510,11 @@ Contains
 
   Subroutine psb_rp1s1(len,rrax,info,pad,lb)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len
+    integer(psb_mpk_),Intent(in) :: len
     real(psb_spk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_), optional, intent(in) :: lb
 
     integer(psb_ipk_) :: ilen, ilb
 
@@ -3530,7 +3530,7 @@ Contains
 
   subroutine  psb_rp1i2s2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len1
     integer(psb_ipk_),Intent(in) :: len2
     real(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3544,7 +3544,7 @@ Contains
 
   subroutine  psb_ri1p2s2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),Intent(in) :: len1
     real(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3558,8 +3558,8 @@ Contains
 
   subroutine  psb_rp1p2s2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len2
     real(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
     real(psb_spk_), optional, intent(in) :: pad
@@ -3575,11 +3575,11 @@ Contains
 
   Subroutine psb_rp1d1(len,rrax,info,pad,lb)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len
+    integer(psb_mpk_),Intent(in) :: len
     Real(psb_dpk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     real(psb_dpk_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_), optional, intent(in) :: lb
 
     integer(psb_ipk_) :: ilen, ilb
 
@@ -3596,7 +3596,7 @@ Contains
 
   subroutine  psb_rp1i2d2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len1
     integer(psb_ipk_),Intent(in) :: len2
     Real(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3610,7 +3610,7 @@ Contains
 
   subroutine  psb_ri1p2d2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),Intent(in) :: len1
     Real(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3624,8 +3624,8 @@ Contains
 
   subroutine  psb_rp1p2d2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len2
     Real(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
     real(psb_dpk_), optional, intent(in) :: pad
@@ -3641,11 +3641,11 @@ Contains
 
   Subroutine psb_rp1c1(len,rrax,info,pad,lb)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len
+    integer(psb_mpk_),Intent(in) :: len
     complex(psb_spk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     complex(psb_spk_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_), optional, intent(in) :: lb
 
     integer(psb_ipk_) :: ilen, ilb
 
@@ -3661,7 +3661,7 @@ Contains
 
   subroutine  psb_rp1i2c2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len1
     integer(psb_ipk_),Intent(in) :: len2
     complex(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3675,7 +3675,7 @@ Contains
 
   subroutine  psb_ri1p2c2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),Intent(in) :: len1
     complex(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3689,8 +3689,8 @@ Contains
 
   subroutine  psb_rp1p2c2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len2
     complex(psb_spk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
     complex(psb_spk_), optional, intent(in) :: pad
@@ -3705,11 +3705,11 @@ Contains
 
   Subroutine psb_rp1z1(len,rrax,info,pad,lb)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len
+    integer(psb_mpk_),Intent(in) :: len
     Complex(psb_dpk_),allocatable, intent(inout) :: rrax(:)
     integer(psb_ipk_) :: info
     complex(psb_dpk_), optional, intent(in) :: pad
-    integer(psb_mpik_), optional, intent(in) :: lb
+    integer(psb_mpk_), optional, intent(in) :: lb
 
     integer(psb_ipk_) :: ilen, ilb
 
@@ -3725,7 +3725,7 @@ Contains
 
   subroutine  psb_rp1i2z2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len1
     integer(psb_ipk_),Intent(in) :: len2
     Complex(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3739,7 +3739,7 @@ Contains
 
   subroutine  psb_ri1p2z2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len2
     integer(psb_ipk_),Intent(in) :: len1
     Complex(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
@@ -3753,8 +3753,8 @@ Contains
 
   subroutine  psb_rp1p2z2(len1,len2,rrax,info,pad,lb1,lb2)
     ! ...Subroutine Arguments  
-    integer(psb_mpik_),Intent(in) :: len1
-    integer(psb_mpik_),Intent(in) :: len2
+    integer(psb_mpk_),Intent(in) :: len1
+    integer(psb_mpk_),Intent(in) :: len2
     Complex(psb_dpk_),allocatable :: rrax(:,:)
     integer(psb_ipk_) :: info
     complex(psb_dpk_), optional, intent(in) :: pad

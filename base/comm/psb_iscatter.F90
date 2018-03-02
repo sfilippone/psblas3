@@ -62,7 +62,7 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam 
+  integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam 
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
@@ -157,8 +157,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
     
     call psb_get_rank(rootrank,ictxt,iroot)
 
-    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
-         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_int,all_dim,&
+         & 1,psb_mpi_ipk_int,rootrank,icomm,info)
 
     if (iam == iroot) then
       displ(1)=0
@@ -185,8 +185,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_int,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_int,rootrank,icomm,info)
 
     do col=1, k
       ! prepare vector to scatter
@@ -202,8 +202,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
 
       ! scatter 
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & psb_mpi_ipk_integer,locx(1,col),nrow,&
-           & psb_mpi_ipk_integer,rootrank,icomm,info)
+           & psb_mpi_ipk_int,locx(1,col),nrow,&
+           & psb_mpi_ipk_int,rootrank,icomm,info)
 
     end do
 
@@ -298,7 +298,7 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_ipk_), allocatable  :: scatterv(:)
@@ -384,8 +384,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
   else
     call psb_get_rank(rootrank,ictxt,iroot)
 
-    call mpi_gather(nrow,1,psb_mpi_ipk_integer,all_dim,&
-         & 1,psb_mpi_ipk_integer,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_int,all_dim,&
+         & 1,psb_mpi_ipk_int,rootrank,icomm,info)
 
     if(iam == iroot) then
       displ(1)=0
@@ -417,8 +417,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_integer,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_int,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_int,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (iam == iroot) then
@@ -433,8 +433,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & psb_mpi_ipk_integer,locx,nrow,&
-         & psb_mpi_ipk_integer,rootrank,icomm,info)
+         & psb_mpi_ipk_int,locx,nrow,&
+         & psb_mpi_ipk_int,rootrank,icomm,info)
 
     deallocate(l_t_g_all, scatterv,stat=info)
     if(info /= psb_success_) then
@@ -504,7 +504,7 @@ subroutine  psb_iscatter_vect(globx, locx, desc_a, info, root, mold)
   class(psb_i_base_vect_type), intent(in), optional :: mold
   
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me, icomm, myrank, rootrank
+  integer(psb_mpk_) :: ictxt, np, me, icomm, myrank, rootrank
   integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
   integer(psb_ipk_), allocatable  :: vlocx(:)

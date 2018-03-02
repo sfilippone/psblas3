@@ -179,9 +179,9 @@ subroutine psi_ztranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -677,9 +677,9 @@ subroutine psi_ztranidxv(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -1132,9 +1132,9 @@ subroutine psi_ztran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable :: prcid(:)
+  integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -1486,9 +1486,9 @@ subroutine psi_ztran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable :: prcid(:)
+  integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n

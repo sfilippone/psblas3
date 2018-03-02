@@ -60,7 +60,7 @@ program psb_df_sample
   ! solver paramters
   integer(psb_ipk_) :: iter, itmax, ierr, itrace, ircode,&
        & methd, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize
+  integer(psb_epk_) :: amatsize, precsize, descsize
   real(psb_dpk_)   :: err, eps, cond
 
   character(len=5)   :: afmt

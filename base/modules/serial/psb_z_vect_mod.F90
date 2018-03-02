@@ -308,7 +308,7 @@ contains
   function z_vect_sizeof(x) result(res)
     implicit none 
     class(psb_z_vect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%sizeof()
   end function z_vect_sizeof
@@ -1050,7 +1050,7 @@ contains
   function z_vect_sizeof(x) result(res)
     implicit none 
     class(psb_z_multivect_type), intent(in) :: x
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     res = 0
     if (allocated(x%v)) res = x%v%sizeof()
   end function z_vect_sizeof

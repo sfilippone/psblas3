@@ -479,11 +479,27 @@ dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
  fi
 fi
 
-PAC_ARG_LONG_INTEGERS
-if test x"$pac_cv_long_integers" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
-   CDEFINES="-DLONG_INTEGERS_ $CDEFINES";	
+dnl PAC_ARG_LONG_INTEGERS
+dnl if test x"$pac_cv_long_integers" == x"yes" ; then
+dnl   FDEFINES="$psblas_cv_define_prepend-DLONG_INTEGERS $FDEFINES";
+dnl   CDEFINES="-DLONG_INTEGERS_ $CDEFINES";	
+dnl fi
+PAC_ARG_WITH_IPK
+PAC_ARG_WITH_LPK
+# Defaults for IPK/LPK
+if test x"$pac_cv_ipk_size" == x"" ; then
+  pac_cv_ipk_size=4;
 fi
+if test x"$pac_cv_lpk_size" == x"" ; then
+  pac_cv_lpk_size=8;
+fi
+# Enforce sensible combination
+if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
+   AC_MSG_NOTICE([[Invalid combination of size specs IPK ${pac_cv_ipk_size} LPK ${pac_cv_lpk_size}. ]]);
+   AC_MSG_NOTICE([[Forcing equal values]])	
+   pac_cv_lpk_size=$pac_cv_ipk_size;	
+fi				
+FDEFINES="$psblas_cv_define_prepend-DINT_I${pac_cv_ipk_size}_L${pac_cv_lpk_size} $FDEFINES";
 
 #
 # Tests for support of various Fortran features; some of them are critical,

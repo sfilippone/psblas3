@@ -65,7 +65,7 @@ subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_, ldx
   complex(psb_spk_),pointer :: iwork(:), xp(:,:)
@@ -272,7 +272,7 @@ subroutine  psb_chalov(x,desc_a,info,work,tran,mode,data)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer(psb_mpik_) :: ictxt, np, me
+  integer(psb_mpk_) :: ictxt, np, me
   integer(psb_ipk_) :: err_act, ldx, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   complex(psb_spk_),pointer :: iwork(:)

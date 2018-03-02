@@ -128,7 +128,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer(psb_mpik_) :: incx, incy, n
+    integer(psb_mpk_) :: incx, incy, n
     real(psb_spk_)    c
     complex(psb_spk_)   s
     !     ..
@@ -172,7 +172,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer(psb_mpik_) :: i, ix, iy
+    integer(psb_mpk_) :: i, ix, iy
     complex(psb_spk_)         stemp
     !     ..
     !     .. intrinsic functions ..
@@ -246,7 +246,7 @@ contains
     !     october 31, 1992
     !
     !     .. scalar arguments ..
-    integer(psb_mpik_) :: incx, incy, n
+    integer(psb_mpk_) :: incx, incy, n
     real(psb_dpk_)    c
     complex(psb_dpk_)   s
     !     ..
@@ -290,7 +290,7 @@ contains
     ! == = ==================================================================
     !
     !     .. local scalars ..
-    integer(psb_mpik_) :: i, ix, iy
+    integer(psb_mpk_) :: i, ix, iy
     complex(psb_dpk_)         stemp
     !     ..
     !     .. intrinsic functions ..

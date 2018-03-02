@@ -216,7 +216,7 @@ function psb_sdot(x, y,desc_a, info, jx, jy)  result(res)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = sdot(int(nr,kind=psb_mpik_), x(iix:,jjx),1,y(iiy:,jjy),1)
+    res = sdot(int(nr,kind=psb_mpk_), x(iix:,jjx),1,y(iiy:,jjy),1)
     ! adjust dot_local because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -340,7 +340,7 @@ function psb_sdotv(x, y,desc_a, info)  result(res)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = sdot(int(nr,kind=psb_mpik_), x,1,y,1)
+    res = sdot(int(nr,kind=psb_mpk_), x,1,y,1)
     ! adjust res because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -463,7 +463,7 @@ subroutine psb_sdotvs(res, x, y,desc_a, info)
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = sdot(int(nr,kind=psb_mpik_), x,1,y,1)
+    res = sdot(int(nr,kind=psb_mpk_), x,1,y,1)
     ! adjust res because overlapped elements are computed more than once
     do i=1,size(desc_a%ovrlap_elem,1)
       idx  = desc_a%ovrlap_elem(i,1)
@@ -596,7 +596,7 @@ subroutine psb_smdots(res, x, y, desc_a, info)
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
     do j=1,k
-      res(j) = sdot(int(nr,kind=psb_mpik_),x(1:,j),1,y(1:,j),1)
+      res(j) = sdot(int(nr,kind=psb_mpk_),x(1:,j),1,y(1:,j),1)
       ! adjust res because overlapped elements are computed more than once
     end do
     do i=1,size(desc_a%ovrlap_elem,1)

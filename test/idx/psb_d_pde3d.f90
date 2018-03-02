@@ -78,7 +78,7 @@ module psb_d_pde3d_mod
   end interface psb_gen_pde3d
   
 contains
-
+  
   function d_null_func_3d(x,y,z) result(val)
 
     real(psb_dpk_), intent(in) :: x,y,z
@@ -141,7 +141,8 @@ contains
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: myidx(:)
+    integer(psb_ipk_), allocatable     :: irow(:),icol(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -182,7 +183,7 @@ contains
     
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
-    
+    t0 = psb_wtime()
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
@@ -190,6 +191,7 @@ contains
 
     select case(partition_)
     case(1)
+      write(*,*) 'BLOCK partition '
       ! A BLOCK partition 
       if (present(nrl)) then 
         nr = nrl
@@ -220,6 +222,7 @@ contains
       nlr = size(myidx)
 
     case(2)
+      write(*,*) 'User Defined Partition'
       ! A  partition  defined by the user through IV
       
       if (present(iv)) then 
@@ -247,6 +250,7 @@ contains
       nlr = size(myidx)
 
     case(3)
+      write(*,*) '3D coordinate planes Partition'
       ! A 3-dimensional partition
 
       ! A nifty MPI function will split the process list
@@ -292,7 +296,7 @@ contains
       ! Third example  of use of CDALL: specify for each process
       ! the set of global indices it owns.
       ! 
-      call psb_cdall(ictxt,desc_a,info,vl=myidx)
+      call psb_cdall(ictxt,desc_a,info,vll=myidx)
       
     case default
       write(psb_err_unit,*) iam, 'Initialization error: should not get here'
@@ -302,7 +306,6 @@ contains
       return
     end select
 
-    
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
@@ -330,7 +333,7 @@ contains
       goto 9999
     endif
 
-
+    
     ! loop over rows belonging to current process in a block
     ! distribution.
 
@@ -350,6 +353,8 @@ contains
         y = (iy-1)*deltah
         z = (iz-1)*deltah
         zt(k) = f_(x,y,z)
+!!$        write(*,*) 'idx2ijk ',ix,iy,iz,glob_row,x,y,z,a1(x,y,z)
+!!$        return
         ! internal point: build discretization
         !   
         !  term depending on   (x-1,y,z)
@@ -522,7 +527,7 @@ program psb_d_pde3d
 
   ! solver parameters
   integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size
+  integer(psb_epk_) :: amatsize, precsize, descsize, d2size
   real(psb_dpk_)   :: err, eps
 
   ! other variables
@@ -560,10 +565,11 @@ program psb_d_pde3d
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
+  !write(*,*) 'Check a1:',a1(dzero,dzero,dzero)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_gen_pde3d(ictxt,idim,a,bv,xxv,desc_a,afmt,&
-       & a1,a2,a3,b1,b2,b3,c,g,info)  
+       & a1,a2,a3,b1,b2,b3,c,g,info,partition=1)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -572,6 +578,7 @@ program psb_d_pde3d
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   !
@@ -829,6 +836,7 @@ contains
       g = exp(y**2-z**2)
     end if
   end function g
+
 
 end program psb_d_pde3d
 

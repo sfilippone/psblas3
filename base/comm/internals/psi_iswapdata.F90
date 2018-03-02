@@ -173,9 +173,9 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -297,8 +297,8 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & psb_mpi_ipk_integer,rcvbuf,rvsz,&
-         & brvidx,psb_mpi_ipk_integer,icomm,iret)
+         & psb_mpi_ipk_int,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_ipk_int,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -355,7 +355,7 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -379,11 +379,11 @@ subroutine psi_iswapidxm(iictxt,iicomm,flag,n,beta,y,idx, &
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
-               & psb_mpi_ipk_integer,prcid(i),&
+               & psb_mpi_ipk_int,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),n*nesd,&
-               & psb_mpi_ipk_integer,prcid(i),&
+               & psb_mpi_ipk_int,prcid(i),&
              & p2ptag,icomm,iret)
         end if
 
@@ -662,9 +662,9 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
+  integer(psb_mpk_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
@@ -787,8 +787,8 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx, &
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-         & psb_mpi_ipk_integer,rcvbuf,rvsz,&
-         & brvidx,psb_mpi_ipk_integer,icomm,iret)
+         & psb_mpi_ipk_int,rcvbuf,rvsz,&
+         & brvidx,psb_mpi_ipk_int,icomm,iret)
     if(iret /= mpi_success) then
       ierr(1) = iret
       info=psb_err_mpi_error_
@@ -845,7 +845,7 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = psb_int_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -870,11 +870,11 @@ subroutine psi_iswapidxv(iictxt,iicomm,flag,beta,y,idx, &
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
-               & psb_mpi_ipk_integer,prcid(i),&
+               & psb_mpi_ipk_int,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(sndbuf(snd_pt),nesd,&
-               & psb_mpi_ipk_integer,prcid(i),&
+               & psb_mpi_ipk_int,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
@@ -1113,9 +1113,9 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable :: prcid(:)
+  integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -1181,7 +1181,7 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_int_swap_tag
         call mpi_irecv(y%combuf(rcv_pt),nerv,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag, icomm,y%comid(i,2),iret)
       end if
       pnti   = pnti + nerv + nesd + 3
@@ -1224,7 +1224,7 @@ subroutine psi_iswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         call mpi_isend(y%combuf(snd_pt),nesd,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
       end if
 
@@ -1456,9 +1456,9 @@ subroutine psi_iswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
   integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
   ! locals
-  integer(psb_mpik_) :: ictxt, icomm, np, me,&
+  integer(psb_mpk_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable :: prcid(:)
+  integer(psb_mpk_), allocatable :: prcid(:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -1526,7 +1526,7 @@ subroutine psi_iswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_int_swap_tag
         call mpi_irecv(y%combuf(rcv_pt),n*nerv,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag, icomm,y%comid(i,2),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -1571,7 +1571,7 @@ subroutine psi_iswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx, &
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         call mpi_isend(y%combuf(snd_pt),n*nesd,&
-             & psb_mpi_ipk_integer,prcid(i),&
+             & psb_mpi_ipk_int,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
       end if
 
