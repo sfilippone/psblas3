@@ -201,7 +201,9 @@ subroutine  psb_c_coo_reallocate_nz(nz,a)
   call psb_erractionsave(err_act)
 
   nz_ = max(nz,ione)
-  call psb_realloc(nz_,a%ia,a%ja,a%val,info)
+  call psb_realloc(nz_,a%ia,info)
+  if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
+  if (info == psb_success_) call psb_realloc(nz_,a%val,info)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_alloc_dealloc_,name)
