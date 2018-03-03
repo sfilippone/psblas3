@@ -43,7 +43,7 @@ module psi_p2p_mod
 
 
   !
-  ! Add interfaces for
+  ! Add here interfaces for
   ! LOGICAL scalar/vector/matrix
   ! CHARACTER scalar (use H prefix as in old style Hollerith)
   !

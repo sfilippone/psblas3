@@ -53,28 +53,25 @@ module psi_penv_mod
     module procedure  psb_barrier_mpik
   end interface
   
-#if defined(LONG_INTEGERS)
   interface psb_init
-    module procedure  psb_init_ipk
+    module procedure  psb_init_epk
   end interface
 
   interface psb_exit
-    module procedure  psb_exit_ipk
+    module procedure  psb_exit_epk
   end interface
 
   interface psb_abort
-    module procedure  psb_abort_ipk
+    module procedure  psb_abort_epk
   end interface
 
   interface psb_info
-    module procedure psb_info_ipk
+    module procedure psb_info_epk
   end interface
 
   interface psb_barrier
-    module procedure  psb_barrier_ipk
+    module procedure  psb_barrier_epk
   end interface
-
-#endif
 
   interface psb_wtime
     module procedure  psb_wtime
@@ -87,8 +84,8 @@ module psi_penv_mod
 #else 
 
   integer(psb_mpk_), save :: mpi_iamx_op, mpi_iamn_op
-  integer(psb_mpk_), save :: mpi_i4amx_op, mpi_i4amn_op
-  integer(psb_mpk_), save :: mpi_i8amx_op, mpi_i8amn_op
+  integer(psb_mpk_), save :: mpi_mamx_op, mpi_mamn_op
+  integer(psb_mpk_), save :: mpi_eamx_op, mpi_eamn_op
   integer(psb_mpk_), save :: mpi_samx_op, mpi_samn_op
   integer(psb_mpk_), save :: mpi_damx_op, mpi_damn_op
   integer(psb_mpk_), save :: mpi_camx_op, mpi_camn_op
@@ -101,8 +98,8 @@ module psi_penv_mod
 
   private :: psi_get_sizes,  psi_register_mpi_extras
   private :: psi_iamx_op, psi_iamn_op 
-  private :: psi_i4amx_op, psi_i4amn_op 
-  private :: psi_i8amx_op, psi_i8amn_op 
+  private :: psi_mamx_op, psi_mamn_op 
+  private :: psi_eamx_op, psi_eamn_op 
   private :: psi_samx_op, psi_samn_op 
   private :: psi_damx_op, psi_damn_op 
   private :: psi_camx_op, psi_camn_op 
@@ -121,6 +118,7 @@ contains
     use psb_const_mod
     real(psb_dpk_) :: dv(2) 
     real(psb_spk_) :: sv(2) 
+    integer(psb_i2pk_):: i2v(2)
     integer(psb_mpk_) :: mv(2)
     integer(psb_ipk_) :: iv(2)
     integer(psb_lpk_) :: lv(2)
@@ -128,6 +126,7 @@ contains
 
     call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
     call psi_c_diffadd(dv(1),dv(2),psb_sizeof_dp)
+    call psi_c_diffadd(i2v(1),i2v(2),psb_sizeof_i2p)
     call psi_c_diffadd(mv(1),mv(2),psb_sizeof_mp)
     call psi_c_diffadd(iv(1),iv(2),psb_sizeof_ip)
     call psi_c_diffadd(lv(1),lv(2),psb_sizeof_lp)
@@ -148,6 +147,7 @@ contains
     info = 0
 #if 0
     if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_ ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_lpk_, psb_mpi_lpk_ ,info)
     if (info == 0) call mpi_type_create_f90_integer(psb_mpk_, psb_mpi_mpk_ ,info)
     if (info == 0) call mpi_type_create_f90_integer(psb_epk_, psb_mpi_lpk_ ,info)
     if (info == 0) call mpi_type_create_f90_real(psb_spk_p_,psb_spk_r_, psb_mpi_r_spk_,info)
@@ -156,10 +156,10 @@ contains
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
 #if defined(INT_I4_L4)
-    psb_mpi_ipk_ = mpi_integer
-    psb_mpi_lpk_ = mpi_integer
+    psb_mpi_ipk_ = mpi_integer4
+    psb_mpi_lpk_ = mpi_integer4
 #elif defined(INT_I4_L8)
-    psb_mpi_ipk_ = mpi_integer
+    psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer8
 #elif defined(INT_I8_L8)
     psb_mpi_ipk_ = mpi_integer8
@@ -171,8 +171,9 @@ contains
     psb_mpi_ipk_ = -1
     psb_mpi_lpk_ = -1
 #endif
-    psb_mpi_mpk_ = mpi_integer
-    psb_mpi_epk_ = mpi_integer8
+    psb_mpi_i2pk_ = mpi_integer2
+    psb_mpi_mpk_  = mpi_integer4
+    psb_mpi_epk_  = mpi_integer8
     psb_mpi_r_spk_  = mpi_real
     psb_mpi_r_dpk_  = mpi_double_precision
     psb_mpi_c_spk_  = mpi_complex
@@ -181,12 +182,10 @@ contains
 
 #if defined(SERIAL_MPI)
 #else 
-    if (info == 0) call mpi_op_create(psi_iamx_op,.true.,mpi_iamx_op,info)
-    if (info == 0) call mpi_op_create(psi_iamn_op,.true.,mpi_iamn_op,info)
-    if (info == 0) call mpi_op_create(psi_i4amx_op,.true.,mpi_i4amx_op,info)
-    if (info == 0) call mpi_op_create(psi_i4amn_op,.true.,mpi_i4amn_op,info)
-    if (info == 0) call mpi_op_create(psi_i8amx_op,.true.,mpi_i8amx_op,info)
-    if (info == 0) call mpi_op_create(psi_i8amn_op,.true.,mpi_i8amn_op,info)
+    if (info == 0) call mpi_op_create(psi_mamx_op,.true.,mpi_mamx_op,info)
+    if (info == 0) call mpi_op_create(psi_mamn_op,.true.,mpi_mamn_op,info)
+    if (info == 0) call mpi_op_create(psi_eamx_op,.true.,mpi_eamx_op,info)
+    if (info == 0) call mpi_op_create(psi_eamn_op,.true.,mpi_eamn_op,info)
     if (info == 0) call mpi_op_create(psi_samx_op,.true.,mpi_samx_op,info)
     if (info == 0) call mpi_op_create(psi_samn_op,.true.,mpi_samn_op,info)
     if (info == 0) call mpi_op_create(psi_damx_op,.true.,mpi_damx_op,info)
@@ -201,10 +200,9 @@ contains
 
   end subroutine psi_register_mpi_extras
 
-#if defined(LONG_INTEGERS)
-  subroutine psb_init_ipk(ictxt,np,basectxt,ids)
-    integer(psb_ipk_), intent(out) :: ictxt
-    integer(psb_ipk_), intent(in), optional :: np, basectxt, ids(:)
+  subroutine psb_init_epk(ictxt,np,basectxt,ids)
+    integer(psb_epk_), intent(out) :: ictxt
+    integer(psb_epk_), intent(in), optional :: np, basectxt, ids(:)
 
     integer(psb_mpk_) :: iictxt
     integer(psb_mpk_) :: inp, ibasectxt
@@ -230,28 +228,28 @@ contains
       call psb_init(iictxt,ids=ids_)
     end if
     ictxt = iictxt
-  end subroutine psb_init_ipk
+  end subroutine psb_init_epk
 
-  subroutine psb_exit_ipk(ictxt,close)
-    integer(psb_ipk_), intent(inout) :: ictxt
+  subroutine psb_exit_epk(ictxt,close)
+    integer(psb_epk_), intent(inout) :: ictxt
     logical, intent(in), optional :: close
     integer(psb_mpk_) :: iictxt
     
     iictxt = ictxt
     call psb_exit(iictxt, close)
-  end subroutine psb_exit_ipk
+  end subroutine psb_exit_epk
 
-  subroutine psb_barrier_ipk(ictxt)
-    integer(psb_ipk_), intent(in) :: ictxt
+  subroutine psb_barrier_epk(ictxt)
+    integer(psb_epk_), intent(in) :: ictxt
     integer(psb_mpk_) :: iictxt
     
     iictxt = ictxt
     call psb_barrier(iictxt)
-  end subroutine psb_barrier_ipk
+  end subroutine psb_barrier_epk
 
-  subroutine psb_abort_ipk(ictxt,errc)
-    integer(psb_ipk_), intent(in) :: ictxt
-    integer(psb_ipk_), intent(in), optional :: errc
+  subroutine psb_abort_epk(ictxt,errc)
+    integer(psb_epk_), intent(in) :: ictxt
+    integer(psb_epk_), intent(in), optional :: errc
     integer(psb_mpk_) :: iictxt, ierrc
 
     iictxt = ictxt
@@ -261,12 +259,12 @@ contains
     else
       call psb_abort(iictxt)
     end if
-  end subroutine psb_abort_ipk
+  end subroutine psb_abort_epk
   
-  subroutine psb_info_ipk(ictxt,iam,np)
+  subroutine psb_info_epk(ictxt,iam,np)
 
-    integer(psb_ipk_), intent(in)  :: ictxt
-    integer(psb_ipk_), intent(out) :: iam, np
+    integer(psb_epk_), intent(in)  :: ictxt
+    integer(psb_epk_), intent(out) :: iam, np
 
     !
     ! Simple caching scheme, keep track
@@ -279,11 +277,8 @@ contains
     end if
     iam = lam
     np  = lnp
-  end subroutine psb_info_ipk
+  end subroutine psb_info_epk
   
-
-#endif
-
   subroutine psb_init_mpik(ictxt,np,basectxt,ids)
     use psi_comm_buffers_mod 
     use psb_const_mod
@@ -585,26 +580,7 @@ contains
   ! Note: len & type are always default integer.
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
-  subroutine psi_iamx_op(inv, outv,len,type) 
-    integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_mpk_) :: len,type
-    integer(psb_mpk_) :: i
-
-    do i=1, len
-      if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
-    end do
-  end subroutine psi_iamx_op
-
-  subroutine psi_iamn_op(inv, outv,len,type) 
-    integer(psb_ipk_) :: inv(*),outv(*)
-    integer(psb_mpk_) :: len,type
-    integer(psb_mpk_) :: i
-    do i=1, len
-      if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
-    end do
-  end subroutine psi_iamn_op
-
-  subroutine psi_i4amx_op(inv, outv,len,type) 
+  subroutine psi_mamx_op(inv, outv,len,type) 
     integer(psb_mpk_) :: inv(*),outv(*)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
@@ -612,9 +588,9 @@ contains
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
     end do
-  end subroutine psi_i4amx_op
+  end subroutine psi_mamx_op
 
-  subroutine psi_i4amn_op(inv, outv,len,type) 
+  subroutine psi_mamn_op(inv, outv,len,type) 
     integer(psb_mpk_) :: inv(*),outv(*)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
@@ -622,9 +598,9 @@ contains
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
-  end subroutine psi_i4amn_op
+  end subroutine psi_mamn_op
 
-  subroutine psi_i8amx_op(inv, outv,len,type) 
+  subroutine psi_eamx_op(inv, outv,len,type) 
     integer(psb_epk_) :: inv(*),outv(*)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
@@ -632,9 +608,9 @@ contains
     do i=1, len
       if (abs(inv(i)) > abs(outv(i))) outv(i) = inv(i)
     end do
-  end subroutine psi_i8amx_op
+  end subroutine psi_eamx_op
 
-  subroutine psi_i8amn_op(inv, outv,len,type) 
+  subroutine psi_eamn_op(inv, outv,len,type) 
     integer(psb_epk_) :: inv(*),outv(*)
     integer(psb_mpk_) :: len,type
     integer(psb_mpk_) :: i
@@ -642,7 +618,7 @@ contains
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)
     end do
-  end subroutine psi_i8amn_op
+  end subroutine psi_eamn_op
 
   subroutine psi_samx_op(vin,vinout,len,itype)
     integer(psb_mpk_), intent(in)           :: len, itype
