@@ -157,8 +157,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
     
     call psb_get_rank(rootrank,ictxt,iroot)
 
-    call mpi_gather(nrow,1,psb_mpi_ipk_int,all_dim,&
-         & 1,psb_mpi_ipk_int,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_,all_dim,&
+         & 1,psb_mpi_ipk_,rootrank,icomm,info)
 
     if (iam == iroot) then
       displ(1)=0
@@ -185,8 +185,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_int,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_int,rootrank,icomm,info)
+         & psb_mpi_ipk_,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_,rootrank,icomm,info)
 
     do col=1, k
       ! prepare vector to scatter
@@ -202,8 +202,8 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, root)
 
       ! scatter 
       call mpi_scatterv(scatterv,all_dim,displ,&
-           & psb_mpi_ipk_int,locx(1,col),nrow,&
-           & psb_mpi_ipk_int,rootrank,icomm,info)
+           & psb_mpi_ipk_,locx(1,col),nrow,&
+           & psb_mpi_ipk_,rootrank,icomm,info)
 
     end do
 
@@ -384,8 +384,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
   else
     call psb_get_rank(rootrank,ictxt,iroot)
 
-    call mpi_gather(nrow,1,psb_mpi_ipk_int,all_dim,&
-         & 1,psb_mpi_ipk_int,rootrank,icomm,info)
+    call mpi_gather(nrow,1,psb_mpi_ipk_,all_dim,&
+         & 1,psb_mpi_ipk_,rootrank,icomm,info)
 
     if(iam == iroot) then
       displ(1)=0
@@ -417,8 +417,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_int,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_int,rootrank,icomm,info)
+         & psb_mpi_ipk_,l_t_g_all,all_dim,&
+         & displ,psb_mpi_ipk_,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (iam == iroot) then
@@ -433,8 +433,8 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_scatterv(scatterv,all_dim,displ,&
-         & psb_mpi_ipk_int,locx,nrow,&
-         & psb_mpi_ipk_int,rootrank,icomm,info)
+         & psb_mpi_ipk_,locx,nrow,&
+         & psb_mpi_ipk_,rootrank,icomm,info)
 
     deallocate(l_t_g_all, scatterv,stat=info)
     if(info /= psb_success_) then

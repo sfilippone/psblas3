@@ -147,32 +147,32 @@ contains
     
     info = 0
 #if 0
-    if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_int ,info)
-    if (info == 0) call mpi_type_create_f90_integer(psb_mpk_, psb_mpi_mpk_int ,info)
-    if (info == 0) call mpi_type_create_f90_integer(psb_epk_, psb_mpi_lpk_int ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_ipk_, psb_mpi_ipk_ ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_mpk_, psb_mpi_mpk_ ,info)
+    if (info == 0) call mpi_type_create_f90_integer(psb_epk_, psb_mpi_lpk_ ,info)
     if (info == 0) call mpi_type_create_f90_real(psb_spk_p_,psb_spk_r_, psb_mpi_r_spk_,info)
     if (info == 0) call mpi_type_create_f90_real(psb_dpk_p_,psb_dpk_r_, psb_mpi_r_dpk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
 #if defined(INT_I4_L4)
-    psb_mpi_ipk_int = mpi_integer
-    psb_mpi_lpk_int = mpi_integer
+    psb_mpi_ipk_ = mpi_integer
+    psb_mpi_lpk_ = mpi_integer
 #elif defined(INT_I4_L8)
-    psb_mpi_ipk_int = mpi_integer
-    psb_mpi_lpk_int = mpi_integer8
+    psb_mpi_ipk_ = mpi_integer
+    psb_mpi_lpk_ = mpi_integer8
 #elif defined(INT_I8_L8)
-    psb_mpi_ipk_int = mpi_integer8
-    psb_mpi_lpk_int = mpi_integer8
+    psb_mpi_ipk_ = mpi_integer8
+    psb_mpi_lpk_ = mpi_integer8
 #else
     ! This should never happen
     write(psb_err_unit,*) 'Warning: an impossible IPK/LPK combination.'
     write(psb_err_unit,*) 'Something went wrong at configuration time.'
-    psb_mpi_ipk_int = -1
-    psb_mpi_lpk_int = -1
+    psb_mpi_ipk_ = -1
+    psb_mpi_lpk_ = -1
 #endif
-    psb_mpi_mpk_int = mpi_integer
-    psb_mpi_epk_int = mpi_integer8
+    psb_mpi_mpk_ = mpi_integer
+    psb_mpi_epk_ = mpi_integer8
     psb_mpi_r_spk_  = mpi_real
     psb_mpi_r_dpk_  = mpi_double_precision
     psb_mpi_c_spk_  = mpi_complex

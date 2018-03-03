@@ -272,8 +272,8 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   dl_mpi = dl_lda
-  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_int,&
-       & dep_list,dl_mpi,psb_mpi_ipk_int,icomm,minfo)
+  call mpi_allgather(itmp,dl_mpi,psb_mpi_ipk_,&
+       & dep_list,dl_mpi,psb_mpi_ipk_,icomm,minfo)
   info = minfo
   if (info == 0) deallocate(itmp,stat=info)
   if (info /= psb_success_) then 

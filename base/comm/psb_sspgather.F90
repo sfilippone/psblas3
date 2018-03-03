@@ -117,13 +117,13 @@ subroutine  psb_ssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
          & glob_coo%val,nzbr,idisp,&
          & psb_mpi_r_spk_,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_int,&
+         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_,&
          & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_ipk_int,icomm,minfo)
+         & psb_mpi_ipk_,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_int,&
+         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_,&
          & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_ipk_int,icomm,minfo)
+         & psb_mpi_ipk_,icomm,minfo)
     
     if (minfo /= psb_success_) then 
       info  = minfo

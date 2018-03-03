@@ -195,8 +195,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     counter   = counter+n_el_send+3
   Enddo
 
-  call mpi_alltoall(sdsz,1,psb_mpi_mpk_int,& 
-       & rvsz,1,psb_mpi_mpk_int,icomm,minfo)
+  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,& 
+       & rvsz,1,psb_mpi_mpk_,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'
@@ -281,10 +281,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_dpk_,&
        & acoo%val,rvsz,brvindx,psb_mpi_r_dpk_,icomm,minfo)
-  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_int,&
-       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_int,icomm,minfo)
-  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_int,&
-       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_int,icomm,minfo)
+  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_ipk_,&
+       & acoo%ia,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
+  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_ipk_,&
+       & acoo%ja,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'

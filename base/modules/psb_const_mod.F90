@@ -111,11 +111,11 @@ module psb_const_mod
   !
   ! Integer type identifiers for MPI operations. 
   !
-  integer(psb_mpk_), save      :: psb_mpi_i2pk_int
-  integer(psb_mpk_), save      :: psb_mpi_epk_int
-  integer(psb_mpk_), save      :: psb_mpi_mpk_int
-  integer(psb_mpk_), save      :: psb_mpi_ipk_int
-  integer(psb_mpk_), save      :: psb_mpi_lpk_int
+  integer(psb_mpk_), save      :: psb_mpi_i2pk_
+  integer(psb_mpk_), save      :: psb_mpi_epk_
+  integer(psb_mpk_), save      :: psb_mpi_mpk_
+  integer(psb_mpk_), save      :: psb_mpi_ipk_
+  integer(psb_mpk_), save      :: psb_mpi_lpk_
   integer(psb_mpk_), save      :: psb_mpi_r_spk_
   integer(psb_mpk_), save      :: psb_mpi_r_dpk_
   integer(psb_mpk_), save      :: psb_mpi_c_spk_

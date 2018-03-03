@@ -186,7 +186,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
   ihinsz=i
-  call mpi_alltoall(sdsz,1,psb_mpi_mpk_int,rvsz,1,psb_mpi_mpk_int,icomm,minfo)
+  call mpi_alltoall(sdsz,1,psb_mpi_mpk_,rvsz,1,psb_mpi_mpk_,icomm,minfo)
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
@@ -292,8 +292,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_int,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_int,icomm,minfo)
+  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_,&
+       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999

@@ -8,7 +8,13 @@ BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o \
 	basics/psb_c_realloc_mod.o \
 	basics/psb_z_realloc_mod.o
 
-COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o
+COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o psi_reduce_mod.o\
+	psi_p2p_mod.o basics/psi_m_p2p_mod.o \
+	 basics/psi_e_p2p_mod.o \
+	 basics/psi_s_p2p_mod.o \
+	 basics/psi_d_p2p_mod.o \
+	 basics/psi_c_p2p_mod.o \
+	 basics/psi_z_p2p_mod.o 
 UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
         desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o \
@@ -76,6 +82,16 @@ psb_realloc_mod.o: basics/psb_m_realloc_mod.o \
 	basics/psb_d_realloc_mod.o \
 	basics/psb_c_realloc_mod.o \
 	basics/psb_z_realloc_mod.o
+
+psi_p2p_mod.o: basics/psi_m_p2p_mod.o \
+	 basics/psi_e_p2p_mod.o \
+	 basics/psi_s_p2p_mod.o \
+	 basics/psi_d_p2p_mod.o \
+	 basics/psi_c_p2p_mod.o \
+	 basics/psi_z_p2p_mod.o
+
+basics/psi_m_p2p_mod.o basics/psi_e_p2p_mod.o  basics/psi_s_p2p_mod.o \
+ basics/psi_d_p2p_mod.o basics/psi_c_p2p_mod.o  basics/psi_z_p2p_mod.o: psi_penv_mod.o 
 
 aux/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
 aux/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o

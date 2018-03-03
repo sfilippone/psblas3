@@ -224,10 +224,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_int,mpi_max,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_,mpi_max,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_int,mpi_max,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_,mpi_max,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -263,15 +263,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_max,ictxt,info)
+           & psb_mpi_ipk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -307,15 +307,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_max,ictxt,info)
+           & psb_mpi_ipk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -348,10 +348,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int,mpi_max,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_,mpi_max,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int,mpi_max,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_,mpi_max,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -387,15 +387,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_max,ictxt,info)
+           & psb_mpi_mpk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -431,15 +431,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_max,ictxt,info)
+           & psb_mpi_mpk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -475,10 +475,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_int,mpi_max,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_,mpi_max,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_int,mpi_max,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_,mpi_max,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -514,15 +514,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_max,ictxt,info)
+           & psb_mpi_lpk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -558,15 +558,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_max,ictxt,info)
+           & psb_mpi_lpk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -855,10 +855,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_int,mpi_min,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_,mpi_min,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_int,mpi_min,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_,mpi_min,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -894,15 +894,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_min,ictxt,info)
+           & psb_mpi_ipk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -938,15 +938,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_min,ictxt,info)
+           & psb_mpi_ipk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -979,10 +979,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int,mpi_min,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_,mpi_min,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int,mpi_min,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_,mpi_min,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -1018,15 +1018,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_min,ictxt,info)
+           & psb_mpi_mpk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1062,15 +1062,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_min,ictxt,info)
+           & psb_mpi_mpk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1106,10 +1106,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_int,mpi_min,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_,mpi_min,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_int,mpi_min,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_,mpi_min,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
@@ -1145,15 +1145,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_min,ictxt,info)
+           & psb_mpi_lpk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1189,15 +1189,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_min,ictxt,info)
+           & psb_mpi_lpk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1489,10 +1489,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_int,mpi_iamx_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_,mpi_iamx_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_int,mpi_iamx_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_,mpi_iamx_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -1529,15 +1529,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_iamx_op,ictxt,info)
+           & psb_mpi_ipk_,mpi_iamx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_iamx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_iamx_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_iamx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_iamx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1573,15 +1573,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_iamx_op,ictxt,info)
+           & psb_mpi_ipk_,mpi_iamx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_iamx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_iamx_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_iamx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_iamx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1616,10 +1616,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int,mpi_i4amx_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_,mpi_i4amx_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int,mpi_i4amx_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_,mpi_i4amx_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -1656,15 +1656,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_i4amx_op,ictxt,info)
+           & psb_mpi_mpk_,mpi_i4amx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_i4amx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_i4amx_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_i4amx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_i4amx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1700,15 +1700,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_i4amx_op,ictxt,info)
+           & psb_mpi_mpk_,mpi_i4amx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_i4amx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_i4amx_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_i4amx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_i4amx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1744,10 +1744,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_int,mpi_i8amx_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_,mpi_i8amx_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_int,mpi_i8amx_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_,mpi_i8amx_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -1784,15 +1784,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_i8amx_op,ictxt,info)
+           & psb_mpi_lpk_,mpi_i8amx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_i8amx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_i8amx_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_i8amx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_i8amx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -1828,15 +1828,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_i8amx_op,ictxt,info)
+           & psb_mpi_lpk_,mpi_i8amx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_i8amx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_i8amx_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_i8amx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_i8amx_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2376,10 +2376,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_int,mpi_iamn_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_,mpi_iamn_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_int,mpi_iamn_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_,mpi_iamn_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -2416,15 +2416,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_iamn_op,ictxt,info)
+           & psb_mpi_ipk_,mpi_iamn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_iamn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_iamn_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_iamn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_iamn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2460,15 +2460,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_iamn_op,ictxt,info)
+           & psb_mpi_ipk_,mpi_iamn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_iamn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_iamn_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_iamn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_iamn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2503,10 +2503,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int,mpi_i4amn_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_,mpi_i4amn_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int,mpi_i4amn_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_,mpi_i4amn_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -2543,15 +2543,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_i4amn_op,ictxt,info)
+           & psb_mpi_mpk_,mpi_i4amn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_i4amn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_i4amn_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_i4amn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_i4amn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2587,15 +2587,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_i4amn_op,ictxt,info)
+           & psb_mpi_mpk_,mpi_i4amn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_i4amn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_i4amn_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_i4amn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_i4amn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2631,10 +2631,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_int,mpi_i8amn_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_,mpi_i8amn_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_int,mpi_i8amn_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_,mpi_i8amn_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -2671,15 +2671,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_i8amn_op,ictxt,info)
+           & psb_mpi_lpk_,mpi_i8amn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_i8amn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_i8amn_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_i8amn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_i8amn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -2715,15 +2715,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_i8amn_op,ictxt,info)
+           & psb_mpi_lpk_,mpi_i8amn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_i8amn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_i8amn_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_i8amn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_i8amn_op,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3262,10 +3262,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_int,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_ipk_,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_int,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_ipk_,mpi_sum,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -3303,15 +3303,15 @@ contains
       dat_=dat
       if (iinfo == psb_success_)&
            & call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_sum,ictxt,info)
+           & psb_mpi_ipk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3347,15 +3347,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_ipk_int,mpi_sum,ictxt,info)
+           & psb_mpi_ipk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_ipk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_ipk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3390,10 +3390,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int2,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_2,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int2,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_2,mpi_sum,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -3430,14 +3430,14 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int2,mpi_sum,ictxt,info)
+           & psb_mpi_mpk_2,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int2,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_2,mpi_sum,root_,ictxt,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int2,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_2,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3473,14 +3473,14 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int2,mpi_sum,ictxt,info)
+           & psb_mpi_mpk_2,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int2,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_2,mpi_sum,root_,ictxt,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int2,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_2,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3517,10 +3517,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_int,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_mpk_,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_int,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_mpk_,mpi_sum,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -3556,15 +3556,15 @@ contains
       call psb_realloc(size(dat),dat_,info)
       dat_=dat
       if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_sum,ictxt,info)
+           & psb_mpi_mpk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3598,15 +3598,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_=dat
       if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_mpk_int,mpi_sum,ictxt,info)
+           & psb_mpi_mpk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_mpk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,info)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_mpk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3642,10 +3642,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_int,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_lpk_,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_int,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_lpk_,mpi_sum,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 
@@ -3682,15 +3682,15 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_sum,ictxt,info)
+           & psb_mpi_lpk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
@@ -3726,15 +3726,15 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_=dat
       if (iinfo == psb_success_) call mpi_allreduce(dat_,dat,size(dat),&
-           & psb_mpi_lpk_int,mpi_sum,ictxt,info)
+           & psb_mpi_lpk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_=dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_lpk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_int,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_lpk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
