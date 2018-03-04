@@ -16,4 +16,17 @@
    	     sizes
    psb_lpk_: Can be 32 or 64 bits, always used for "global" indices
    	     and sizes, must be psb_lpk_ >= psb_ipk_
-   psb_8pk_: always 64 bits, used for SIZEOF & friends.    
+   psb_epk_: always 64 bits, used for SIZEOF & friends.    
+
+5. Let's define the SND/RCV/SUM/MAX & friends in terms of M and E, the
+   compiler will remap I and L onto them automatically
+
+6. Similar for sort; except for the inner routines of heap, where we
+   provide heap types I_IDX_HEAP, they have to be written
+   independently beccause the encapsulated types are always
+   different.
+
+7. For communication stuff: let us define psb_i_base_vect and
+   psb_l_base_vect; the communication routines will work in terms of
+   them, then remap onto the array routines, which are going to be
+   written in terms of E and M. 

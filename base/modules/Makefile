@@ -1,32 +1,32 @@
 include ../../Make.inc
 
 BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o \
-	basics/psb_m_realloc_mod.o \
-	basics/psb_e_realloc_mod.o \
-	basics/psb_s_realloc_mod.o \
-	basics/psb_d_realloc_mod.o \
-	basics/psb_c_realloc_mod.o \
-	basics/psb_z_realloc_mod.o
+	auxil/psb_m_realloc_mod.o \
+	auxil/psb_e_realloc_mod.o \
+	auxil/psb_s_realloc_mod.o \
+	auxil/psb_d_realloc_mod.o \
+	auxil/psb_c_realloc_mod.o \
+	auxil/psb_z_realloc_mod.o
 
 COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
-	psi_p2p_mod.o basics/psi_m_p2p_mod.o \
-	 basics/psi_e_p2p_mod.o \
-	 basics/psi_s_p2p_mod.o \
-	 basics/psi_d_p2p_mod.o \
-	 basics/psi_c_p2p_mod.o \
-	 basics/psi_z_p2p_mod.o \
+	psi_p2p_mod.o auxil/psi_m_p2p_mod.o \
+	 auxil/psi_e_p2p_mod.o \
+	 auxil/psi_s_p2p_mod.o \
+	 auxil/psi_d_p2p_mod.o \
+	 auxil/psi_c_p2p_mod.o \
+	 auxil/psi_z_p2p_mod.o \
 	 psi_reduce_mod.o \
-	 basics/psi_e_reduce_mod.o \
-	 basics/psi_m_reduce_mod.o \
-	 basics/psi_s_reduce_mod.o \
-	 basics/psi_d_reduce_mod.o \
-	 basics/psi_c_reduce_mod.o \
-	 basics/psi_z_reduce_mod.o
+	 auxil/psi_e_reduce_mod.o \
+	 auxil/psi_m_reduce_mod.o \
+	 auxil/psi_s_reduce_mod.o \
+	 auxil/psi_d_reduce_mod.o \
+	 auxil/psi_c_reduce_mod.o \
+	 auxil/psi_z_reduce_mod.o
 
-UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
+UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
         desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o \
-	desc/psb_desc_mod.o aux/psb_sort_mod.o \
+	desc/psb_desc_mod.o auxil/psb_sort_mod.o \
 	serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o \
 	serial/psb_serial_mod.o \
 	tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
@@ -44,17 +44,17 @@ UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod
 	serial/psb_vect_mod.o\
 	psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o \
 	psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o psblas/psb_psblas_mod.o \
-	aux/psi_serial_mod.o aux/psi_i_serial_mod.o \
-	aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o \
+	auxil/psi_serial_mod.o auxil/psi_i_serial_mod.o \
+	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
-	aux/psb_ip_reord_mod.o\
-	aux/psb_i_ip_reord_mod.o aux/psb_l_ip_reord_mod.o \
-	aux/psb_s_ip_reord_mod.o aux/psb_d_ip_reord_mod.o \
-	aux/psb_c_ip_reord_mod.o aux/psb_z_ip_reord_mod.o \
-	aux/psb_i_sort_mod.o aux/psb_l_sort_mod.o \
-	aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
-	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
-	psb_check_mod.o aux/psb_hash_mod.o\
+	auxil/psb_ip_reord_mod.o\
+	auxil/psb_i_ip_reord_mod.o auxil/psb_l_ip_reord_mod.o \
+	auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \
+	auxil/psb_c_ip_reord_mod.o auxil/psb_z_ip_reord_mod.o \
+	auxil/psb_i_sort_mod.o auxil/psb_l_sort_mod.o \
+	auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o \
+	auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
+	psb_check_mod.o auxil/psb_hash_mod.o\
 	serial/psb_base_mat_mod.o  serial/psb_mat_mod.o\
 	serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_mat_mod.o \
 	serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_mat_mod.o \
@@ -84,55 +84,55 @@ $(UTIL_MODS): $(BASIC_MODS)
 psi_penv_mod.o: psi_comm_buffers_mod.o 
 psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
 
-psb_realloc_mod.o: basics/psb_m_realloc_mod.o \
-	basics/psb_e_realloc_mod.o \
-	basics/psb_s_realloc_mod.o \
-	basics/psb_d_realloc_mod.o \
-	basics/psb_c_realloc_mod.o \
-	basics/psb_z_realloc_mod.o
+psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
+	auxil/psb_e_realloc_mod.o \
+	auxil/psb_s_realloc_mod.o \
+	auxil/psb_d_realloc_mod.o \
+	auxil/psb_c_realloc_mod.o \
+	auxil/psb_z_realloc_mod.o
 
-psi_p2p_mod.o: basics/psi_m_p2p_mod.o \
-	 basics/psi_e_p2p_mod.o \
-	 basics/psi_s_p2p_mod.o \
-	 basics/psi_d_p2p_mod.o \
-	 basics/psi_c_p2p_mod.o \
-	 basics/psi_z_p2p_mod.o
-psi_reduce_mod.o: basics/psi_e_reduce_mod.o \
-	 basics/psi_m_reduce_mod.o \
-	 basics/psi_s_reduce_mod.o \
-	 basics/psi_d_reduce_mod.o \
-	 basics/psi_c_reduce_mod.o \
-	 basics/psi_z_reduce_mod.o 
+psi_p2p_mod.o: auxil/psi_m_p2p_mod.o \
+	 auxil/psi_e_p2p_mod.o \
+	 auxil/psi_s_p2p_mod.o \
+	 auxil/psi_d_p2p_mod.o \
+	 auxil/psi_c_p2p_mod.o \
+	 auxil/psi_z_p2p_mod.o
+psi_reduce_mod.o: auxil/psi_e_reduce_mod.o \
+	 auxil/psi_m_reduce_mod.o \
+	 auxil/psi_s_reduce_mod.o \
+	 auxil/psi_d_reduce_mod.o \
+	 auxil/psi_c_reduce_mod.o \
+	 auxil/psi_z_reduce_mod.o 
 
-basics/psi_m_p2p_mod.o basics/psi_e_p2p_mod.o  basics/psi_s_p2p_mod.o \
-basics/psi_d_p2p_mod.o basics/psi_c_p2p_mod.o  basics/psi_z_p2p_mod.o\
-basics/psi_e_reduce_mod.o  basics/psi_m_reduce_mod.o basics/psi_s_reduce_mod.o \
-basics/psi_d_reduce_mod.o  basics/psi_c_reduce_mod.o basics/psi_z_reduce_mod.o: psi_penv_mod.o 
+auxil/psi_m_p2p_mod.o auxil/psi_e_p2p_mod.o  auxil/psi_s_p2p_mod.o \
+auxil/psi_d_p2p_mod.o auxil/psi_c_p2p_mod.o  auxil/psi_z_p2p_mod.o\
+auxil/psi_e_reduce_mod.o  auxil/psi_m_reduce_mod.o auxil/psi_s_reduce_mod.o \
+auxil/psi_d_reduce_mod.o  auxil/psi_c_reduce_mod.o auxil/psi_z_reduce_mod.o: psi_penv_mod.o 
 
-aux/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
-aux/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
-aux/psb_i_sort_mod.o aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
-aux/psb_ip_reord_mod.o aux/psi_serial_mod.o aux/psb_sort_mod.o: $(BASIC_MODS)
-aux/psb_sort_mod.o: aux/psb_i_sort_mod.o aux/psb_l_sort_mod.o \
-	aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
-	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
-	aux/psb_ip_reord_mod.o aux/psi_serial_mod.o
-aux/psi_serial_mod.o:  aux/psi_i_serial_mod.o \
-	aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o 
-aux/psi_i_serial_mod.o aux/psi_s_serial_mod.o aux/psi_d_serial_mod.o aux/psi_c_serial_mod.o aux/psi_z_serial_mod.o: psb_const_mod.o
+auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
+auxil/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
+auxil/psb_i_sort_mod.o auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
+auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o auxil/psb_sort_mod.o: $(BASIC_MODS)
+auxil/psb_sort_mod.o: auxil/psb_i_sort_mod.o auxil/psb_l_sort_mod.o \
+	auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o \
+	auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
+	auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o
+auxil/psi_serial_mod.o:  auxil/psi_i_serial_mod.o \
+	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o 
+auxil/psi_i_serial_mod.o auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o: psb_const_mod.o
 
-aux/psb_ip_reord_mod.o: aux/psb_i_ip_reord_mod.o aux/psb_l_ip_reord_mod.o \
-	aux/psb_s_ip_reord_mod.o aux/psb_d_ip_reord_mod.o \
-	aux/psb_c_ip_reord_mod.o aux/psb_z_ip_reord_mod.o 
+auxil/psb_ip_reord_mod.o: auxil/psb_i_ip_reord_mod.o auxil/psb_l_ip_reord_mod.o \
+	auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \
+	auxil/psb_c_ip_reord_mod.o auxil/psb_z_ip_reord_mod.o 
 
-serial/psb_base_mat_mod.o: aux/psi_serial_mod.o
+serial/psb_base_mat_mod.o: auxil/psi_serial_mod.o
 serial/psb_s_base_mat_mod.o serial/psb_d_base_mat_mod.o serial/psb_c_base_mat_mod.o serial/psb_z_base_mat_mod.o: serial/psb_base_mat_mod.o
 serial/psb_s_base_mat_mod.o: serial/psb_s_base_vect_mod.o
 serial/psb_d_base_mat_mod.o: serial/psb_d_base_vect_mod.o 
 serial/psb_c_base_mat_mod.o: serial/psb_c_base_vect_mod.o
 serial/psb_z_base_mat_mod.o: serial/psb_z_base_vect_mod.o
 serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: serial/psb_i_base_vect_mod.o 
-serial/psb_i_base_vect_mod.o serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: aux/psi_serial_mod.o psb_realloc_mod.o
+serial/psb_i_base_vect_mod.o serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: auxil/psi_serial_mod.o psb_realloc_mod.o
 serial/psb_s_mat_mod.o: serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_vect_mod.o
 serial/psb_d_mat_mod.o: serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_c_mat_mod.o: serial/psb_c_base_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_c_csc_mat_mod.o serial/psb_c_vect_mod.o
@@ -148,15 +148,15 @@ serial/psb_s_vect_mod.o: serial/psb_s_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_d_vect_mod.o: serial/psb_d_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_c_vect_mod.o: serial/psb_c_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_z_vect_mod.o: serial/psb_z_base_vect_mod.o serial/psb_i_vect_mod.o
-serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o: serial/psb_mat_mod.o aux/psb_string_mod.o aux/psb_sort_mod.o aux/psi_serial_mod.o
+serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o: serial/psb_mat_mod.o auxil/psb_string_mod.o auxil/psb_sort_mod.o auxil/psi_serial_mod.o
 serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_d_vect_mod.o serial/psb_s_vect_mod.o serial/psb_c_vect_mod.o serial/psb_z_vect_mod.o
 
 error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o
-psb_spmat_type.o: aux/psb_string_mod.o aux/psb_sort_mod.o
+psb_spmat_type.o: auxil/psb_string_mod.o auxil/psb_sort_mod.o
 
 desc/psb_desc_mod.o: psb_penv_mod.o psb_realloc_mod.o\
-	  aux/psb_hash_mod.o desc/psb_hash_map_mod.o desc/psb_list_map_mod.o \
+	  auxil/psb_hash_mod.o desc/psb_hash_map_mod.o desc/psb_list_map_mod.o \
 	  desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o desc/psb_desc_const_mod.o\
 	  desc/psb_indx_map_mod.o serial/psb_i_vect_mod.o
 psi_i_mod.o: desc/psb_desc_mod.o serial/psb_i_vect_mod.o
@@ -164,16 +164,16 @@ psi_s_mod.o: desc/psb_desc_mod.o serial/psb_s_vect_mod.o
 psi_d_mod.o: desc/psb_desc_mod.o serial/psb_d_vect_mod.o
 psi_c_mod.o: desc/psb_desc_mod.o serial/psb_c_vect_mod.o
 psi_z_mod.o: desc/psb_desc_mod.o serial/psb_z_vect_mod.o
-psi_mod.o: psb_penv_mod.o desc/psb_desc_mod.o aux/psi_serial_mod.o serial/psb_serial_mod.o\
+psi_mod.o: psb_penv_mod.o desc/psb_desc_mod.o auxil/psi_serial_mod.o serial/psb_serial_mod.o\
 	psi_i_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o
 
 desc/psb_indx_map_mod.o: desc/psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o
 desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o:\
     desc/psb_indx_map_mod.o desc/psb_desc_const_mod.o  \
-    aux/psb_sort_mod.o psb_penv_mod.o 
+    auxil/psb_sort_mod.o psb_penv_mod.o 
 desc/psb_glist_map_mod.o: desc/psb_list_map_mod.o
-desc/psb_hash_map_mod.o: aux/psb_hash_mod.o aux/psb_sort_mod.o
-desc/psb_gen_block_map_mod.o: aux/psb_hash_mod.o
+desc/psb_hash_map_mod.o: auxil/psb_hash_mod.o auxil/psb_sort_mod.o
+desc/psb_gen_block_map_mod.o: auxil/psb_hash_mod.o
 
 psb_check_mod.o: desc/psb_desc_mod.o
 
