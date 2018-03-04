@@ -42,7 +42,7 @@
   !
 
   subroutine psb_zmsort_u(x,nout,dir)
-    use psb_z_sort_mod, psb_protect_name => psb_zmsort_u
+    use psb_sort_mod, psb_protect_name => psb_zmsort_u
     use psb_error_mod
     implicit none 
     complex(psb_dpk_), intent(inout)           :: x(:) 
@@ -84,7 +84,7 @@
 
 
   subroutine psb_zmsort(x,ix,dir,flag)
-    use psb_z_sort_mod, psb_protect_name => psb_zmsort
+    use psb_sort_mod, psb_protect_name => psb_zmsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 

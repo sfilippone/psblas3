@@ -41,7 +41,7 @@
 !  Addison-Wesley
 !
 subroutine psb_iqsort(x,ix,dir,flag)
-  use psb_i_sort_mod, psb_protect_name => psb_iqsort
+  use psb_sort_mod, psb_protect_name => psb_iqsort
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(inout)  :: x(:) 
@@ -130,7 +130,7 @@ subroutine psb_iqsort(x,ix,dir,flag)
 end subroutine psb_iqsort
 
 subroutine psi_iqsrx_up(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iqsrx_up
+  use psb_sort_mod, psb_protect_name => psi_iqsrx_up
   use psb_error_mod
   implicit none 
 
@@ -284,7 +284,7 @@ subroutine psi_iqsrx_up(n,x,idx)
 end subroutine psi_iqsrx_up
 
 subroutine psi_iqsrx_dw(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iqsrx_dw
+  use psb_sort_mod, psb_protect_name => psi_iqsrx_dw
   use psb_error_mod
   implicit none 
 
@@ -440,7 +440,7 @@ subroutine psi_iqsrx_dw(n,x,idx)
 end subroutine psi_iqsrx_dw
 
 subroutine psi_iqsr_up(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iqsr_up
+  use psb_sort_mod, psb_protect_name => psi_iqsr_up
   use psb_error_mod
   implicit none 
 
@@ -581,7 +581,7 @@ subroutine psi_iqsr_up(n,x)
 end subroutine psi_iqsr_up
 
 subroutine psi_iqsr_dw(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iqsr_dw
+  use psb_sort_mod, psb_protect_name => psi_iqsr_dw
   use psb_error_mod
   implicit none 
 
@@ -722,7 +722,7 @@ subroutine psi_iqsr_dw(n,x)
 end subroutine psi_iqsr_dw
 
 subroutine psi_iaqsrx_up(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iaqsrx_up
+  use psb_sort_mod, psb_protect_name => psi_iaqsrx_up
   use psb_error_mod
   implicit none 
 
@@ -879,7 +879,7 @@ subroutine psi_iaqsrx_up(n,x,idx)
 end subroutine psi_iaqsrx_up
 
 subroutine psi_iaqsrx_dw(n,x,idx)
-  use psb_i_sort_mod, psb_protect_name => psi_iaqsrx_dw
+  use psb_sort_mod, psb_protect_name => psi_iaqsrx_dw
   use psb_error_mod
   implicit none 
 
@@ -1034,7 +1034,7 @@ subroutine psi_iaqsrx_dw(n,x,idx)
 end subroutine psi_iaqsrx_dw
 
 subroutine psi_iaqsr_up(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iaqsr_up
+  use psb_sort_mod, psb_protect_name => psi_iaqsr_up
   use psb_error_mod
   implicit none 
 
@@ -1175,7 +1175,7 @@ subroutine psi_iaqsr_up(n,x)
 end subroutine psi_iaqsr_up
 
 subroutine psi_iaqsr_dw(n,x)
-  use psb_i_sort_mod, psb_protect_name => psi_iaqsr_dw
+  use psb_sort_mod, psb_protect_name => psi_iaqsr_dw
   use psb_error_mod
   implicit none 
 

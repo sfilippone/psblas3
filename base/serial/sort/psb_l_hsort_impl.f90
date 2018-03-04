@@ -42,7 +42,7 @@
 !  Addison-Wesley
 !
 subroutine psb_lhsort(x,ix,dir,flag)
-  use psb_l_sort_mod, psb_protect_name => psb_lhsort
+  use psb_sort_mod, psb_protect_name => psb_lhsort
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)           :: x(:) 
@@ -116,13 +116,13 @@ subroutine psb_lhsort(x,ix,dir,flag)
     do i=1, n 
       key   = x(i)
       index = ix(i)
-      call psi_l_idx_insert_heap(key,index,l,x,ix,dir_,info)
+      call psi_idx_insert_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
         write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
-      call psi_l_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+      call psi_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
         write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
@@ -133,7 +133,7 @@ subroutine psb_lhsort(x,ix,dir,flag)
     l = 0
     do i=1, n 
       key   = x(i)
-      call psi_l_insert_heap(key,l,x,dir_,info)
+      call psi_insert_heap(key,l,x,dir_,info)
       if (l /= i) then 
         write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
@@ -185,7 +185,7 @@ end subroutine psb_lhsort
 !
 
 subroutine psi_l_insert_heap(key,last,heap,dir,info)
-  use psb_l_sort_mod, psb_protect_name => psi_l_insert_heap
+  use psb_sort_mod, psb_protect_name => psi_l_insert_heap
   implicit none 
 
   !  
@@ -291,7 +291,7 @@ end subroutine psi_l_insert_heap
 
 
 subroutine psi_l_heap_get_first(key,last,heap,dir,info)
-  use psb_l_sort_mod, psb_protect_name => psi_l_heap_get_first
+  use psb_sort_mod, psb_protect_name => psi_l_heap_get_first
   implicit none 
 
   integer(psb_lpk_), intent(inout)     :: key
@@ -415,7 +415,7 @@ end subroutine psi_l_heap_get_first
 
 
 subroutine psi_l_idx_insert_heap(key,index,last,heap,idxs,dir,info)
-  use psb_l_sort_mod, psb_protect_name => psi_l_idx_insert_heap
+  use psb_sort_mod, psb_protect_name => psi_l_idx_insert_heap
 
   implicit none 
   !  
@@ -537,7 +537,7 @@ subroutine psi_l_idx_insert_heap(key,index,last,heap,idxs,dir,info)
 end subroutine psi_l_idx_insert_heap
 
 subroutine psi_l_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
-  use psb_l_sort_mod, psb_protect_name => psi_l_idx_heap_get_first
+  use psb_sort_mod, psb_protect_name => psi_l_idx_heap_get_first
   implicit none 
 
   integer(psb_lpk_), intent(inout)    :: heap(:)

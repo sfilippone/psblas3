@@ -11,7 +11,7 @@ DOBJS=psb_d_hsort_impl.o psb_d_isort_impl.o psb_d_msort_impl.o psb_d_qsort_impl.
 COBJS=psb_c_hsort_impl.o psb_c_isort_impl.o psb_c_msort_impl.o psb_c_qsort_impl.o
 ZOBJS=psb_z_hsort_impl.o psb_z_isort_impl.o psb_z_msort_impl.o psb_z_qsort_impl.o
 
-OBJS=$(BOBJS) $(IOBJS) $(LOBJS) $(SOBJS)  $(DOBJS)  $(COBJS)  $(ZOBJS) 
+OBJS=$(BOBJS) $(SOBJS)  $(DOBJS)  $(COBJS)  $(ZOBJS)  $(IOBJS) $(LOBJS) 
 
 #
 # Where the library should go, and how it is called. 

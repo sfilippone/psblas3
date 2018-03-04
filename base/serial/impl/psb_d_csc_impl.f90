@@ -2030,7 +2030,7 @@ contains
               i2 = a%icp(ic+1)
               nr=i2-i1
 
-              ip = psb_ibsrch(ir,nr,a%ia(i1:i2-1))    
+              ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
               if (ip>0) then 
                 a%val(i1+ip-1) = val(i)
               else
@@ -2059,7 +2059,7 @@ contains
               i2 = a%icp(ic+1)
               nr=i2-i1
 
-              ip = psb_ibsrch(ir,nr,a%ia(i1:i2-1))    
+              ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
               if (ip>0) then 
                 a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
               else
@@ -2098,7 +2098,7 @@ contains
             i2 = a%icp(ic+1)
             nr=i2-i1
 
-            ip = psb_ibsrch(ir,nr,a%ia(i1:i2-1))    
+            ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
             if (ip>0) then 
               a%val(i1+ip-1) = val(i)
             else
@@ -2122,7 +2122,7 @@ contains
             i2 = a%icp(ic+1)
             nr=i2-i1
 
-            ip = psb_ibsrch(ir,nr,a%ia(i1:i2-1))    
+            ip = psb_bsrch(ir,nr,a%ia(i1:i2-1))    
             if (ip>0) then 
               a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
             else

@@ -45,11 +45,47 @@
 module psb_sort_mod
   use psb_const_mod
   use psb_ip_reord_mod
-  use psb_i_sort_mod
-  use psb_l_sort_mod
-  use psb_s_sort_mod
-  use psb_c_sort_mod
-  use psb_d_sort_mod
-  use psb_z_sort_mod
+!!$  use psb_i_sort_mod
+!!$  use psb_l_sort_mod
+!!$  use psb_s_sort_mod
+!!$  use psb_c_sort_mod
+!!$  use psb_d_sort_mod
+!!$  use psb_z_sort_mod
+  use psb_m_hsort_mod
+  use psb_m_isort_mod
+  use psb_m_msort_mod
+  use psb_m_qsort_mod
+  
+  use psb_e_hsort_mod
+  use psb_e_isort_mod
+  use psb_e_msort_mod
+  use psb_e_qsort_mod
+  
+  use psb_s_hsort_mod
+  use psb_s_isort_mod
+  use psb_s_msort_mod
+  use psb_s_qsort_mod
+  
+  use psb_d_hsort_mod
+  use psb_d_isort_mod
+  use psb_d_msort_mod
+  use psb_d_qsort_mod
+  
+  use psb_c_hsort_mod
+  use psb_c_isort_mod
+  use psb_c_msort_mod
+  use psb_c_qsort_mod
+  
+  use psb_z_hsort_mod
+  use psb_z_isort_mod
+  use psb_z_msort_mod
+  use psb_z_qsort_mod
 
+  use psb_i_hsort_x_mod
+  use psb_l_hsort_x_mod
+  use psb_s_hsort_x_mod
+  use psb_d_hsort_x_mod
+  use psb_c_hsort_x_mod
+  use psb_z_hsort_x_mod
+  
 end module psb_sort_mod

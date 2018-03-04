@@ -41,7 +41,7 @@
   !  Addison-Wesley
   !
   logical function psb_lisaperm(n,eip)               
-    use psb_l_sort_mod, psb_protect_name => psb_lisaperm
+    use psb_sort_mod, psb_protect_name => psb_lisaperm
     implicit none
 
     integer(psb_lpk_), intent(in) :: n                              
@@ -97,7 +97,7 @@
 
 
   subroutine psb_lmsort_u(x,nout,dir)
-    use psb_l_sort_mod, psb_protect_name => psb_lmsort_u
+    use psb_sort_mod, psb_protect_name => psb_lmsort_u
     use psb_error_mod
     implicit none 
     integer(psb_lpk_), intent(inout)           :: x(:) 
@@ -133,7 +133,7 @@
 
 
   function  psb_lbsrch(key,n,v) result(ipos)
-    use psb_l_sort_mod, psb_protect_name => psb_lbsrch
+    use psb_sort_mod, psb_protect_name => psb_lbsrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     integer(psb_lpk_) :: key
@@ -170,7 +170,7 @@
   end function psb_lbsrch
 
   function psb_lssrch(key,n,v) result(ipos)
-    use psb_l_sort_mod, psb_protect_name => psb_lssrch
+    use psb_sort_mod, psb_protect_name => psb_lssrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     integer(psb_lpk_) :: key
@@ -190,7 +190,7 @@
   end function psb_lssrch
 
   subroutine psb_lmsort(x,ix,dir,flag)
-    use psb_l_sort_mod, psb_protect_name => psb_lmsort
+    use psb_sort_mod, psb_protect_name => psb_lmsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 

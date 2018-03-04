@@ -41,7 +41,7 @@
 !  Addison-Wesley
 !
 subroutine psb_disort(x,ix,dir,flag)
-  use psb_d_sort_mod, psb_protect_name => psb_disort
+  use psb_sort_mod, psb_protect_name => psb_disort
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -131,7 +131,7 @@ subroutine psb_disort(x,ix,dir,flag)
 end subroutine psb_disort
 
 subroutine psi_disrx_up(n,x,idx)
-  use psb_d_sort_mod, psb_protect_name => psi_disrx_up
+  use psb_sort_mod, psb_protect_name => psi_disrx_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -159,7 +159,7 @@ subroutine psi_disrx_up(n,x,idx)
 end subroutine psi_disrx_up
 
 subroutine psi_disrx_dw(n,x,idx)
-  use psb_d_sort_mod, psb_protect_name => psi_disrx_dw
+  use psb_sort_mod, psb_protect_name => psi_disrx_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -188,7 +188,7 @@ end subroutine psi_disrx_dw
 
 
 subroutine psi_disr_up(n,x)
-  use psb_d_sort_mod, psb_protect_name => psi_disr_up
+  use psb_sort_mod, psb_protect_name => psi_disr_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -212,7 +212,7 @@ subroutine psi_disr_up(n,x)
 end subroutine psi_disr_up
 
 subroutine psi_disr_dw(n,x)
-  use psb_d_sort_mod, psb_protect_name => psi_disr_dw
+  use psb_sort_mod, psb_protect_name => psi_disr_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -236,7 +236,7 @@ subroutine psi_disr_dw(n,x)
 end subroutine psi_disr_dw
 
 subroutine psi_daisrx_up(n,x,idx)
-  use psb_d_sort_mod, psb_protect_name => psi_daisrx_up
+  use psb_sort_mod, psb_protect_name => psi_daisrx_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -264,7 +264,7 @@ subroutine psi_daisrx_up(n,x,idx)
 end subroutine psi_daisrx_up
 
 subroutine psi_daisrx_dw(n,x,idx)
-  use psb_d_sort_mod, psb_protect_name => psi_daisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_daisrx_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -292,7 +292,7 @@ subroutine psi_daisrx_dw(n,x,idx)
 end subroutine psi_daisrx_dw
 
 subroutine psi_daisr_up(n,x)
-  use psb_d_sort_mod, psb_protect_name => psi_daisr_up
+  use psb_sort_mod, psb_protect_name => psi_daisr_up
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 
@@ -316,7 +316,7 @@ subroutine psi_daisr_up(n,x)
 end subroutine psi_daisr_up
 
 subroutine psi_daisr_dw(n,x)
-  use psb_d_sort_mod, psb_protect_name => psi_daisr_dw
+  use psb_sort_mod, psb_protect_name => psi_daisr_dw
   use psb_error_mod
   implicit none 
   real(psb_dpk_), intent(inout)  :: x(:) 

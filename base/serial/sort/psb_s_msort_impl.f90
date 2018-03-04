@@ -42,7 +42,7 @@
   !
 
   subroutine psb_smsort_u(x,nout,dir)
-    use psb_s_sort_mod, psb_protect_name => psb_smsort_u
+    use psb_sort_mod, psb_protect_name => psb_smsort_u
     use psb_error_mod
     implicit none 
     real(psb_spk_), intent(inout)           :: x(:) 
@@ -78,7 +78,7 @@
 
 
   function  psb_sbsrch(key,n,v) result(ipos)
-    use psb_s_sort_mod, psb_protect_name => psb_sbsrch
+    use psb_sort_mod, psb_protect_name => psb_sbsrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     real(psb_spk_) :: key
@@ -115,7 +115,7 @@
   end function psb_sbsrch
 
   function psb_sssrch(key,n,v) result(ipos)
-    use psb_s_sort_mod, psb_protect_name => psb_sssrch
+    use psb_sort_mod, psb_protect_name => psb_sssrch
     implicit none
     integer(psb_ipk_) :: ipos, n
     real(psb_spk_) :: key
@@ -135,7 +135,7 @@
   end function psb_sssrch
 
   subroutine psb_smsort(x,ix,dir,flag)
-    use psb_s_sort_mod, psb_protect_name => psb_smsort
+    use psb_sort_mod, psb_protect_name => psb_smsort
     use psb_error_mod
     use psb_ip_reord_mod
     implicit none 

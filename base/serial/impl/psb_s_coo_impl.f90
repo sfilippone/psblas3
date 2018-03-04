@@ -509,7 +509,7 @@ function  psb_s_coo_get_nz_row(idx,a) result(res)
   nza = a%get_nzeros()
   if (a%is_by_rows()) then 
     ! In this case we can do a binary search. 
-    ip = psb_ibsrch(idx,nza,a%ia)
+    ip = psb_bsrch(idx,nza,a%ia)
     if (ip /= -1) return
     jp = ip 
     do 
@@ -2123,7 +2123,7 @@ contains
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
       do
-        ip = psb_ibsrch(irw,nza,a%ia)
+        ip = psb_bsrch(irw,nza,a%ia)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > imax) then
@@ -2148,7 +2148,7 @@ contains
       end if
 
       do
-        jp = psb_ibsrch(lrw,nza,a%ia)
+        jp = psb_bsrch(lrw,nza,a%ia)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -2401,7 +2401,7 @@ contains
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
       do
-        ip = psb_ibsrch(irw,nza,a%ia)
+        ip = psb_bsrch(irw,nza,a%ia)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > imax) then
@@ -2426,7 +2426,7 @@ contains
       end if
 
       do
-        jp = psb_ibsrch(lrw,nza,a%ia)
+        jp = psb_bsrch(lrw,nza,a%ia)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -2750,7 +2750,7 @@ contains
             if ((ir > 0).and.(ir <= nr)) then 
               ic = gtl(ic) 
               if (ir /= ilr) then 
-                i1 = psb_ibsrch(ir,nnz,a%ia)
+                i1 = psb_bsrch(ir,nnz,a%ia)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -2768,7 +2768,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              ip = psb_issrch(ic,nc,a%ja(i1:i2))
+              ip = psb_ssrch(ic,nc,a%ja(i1:i2))
               if (ip>0) then 
                 a%val(i1+ip-1) = val(i)
               else
@@ -2792,7 +2792,7 @@ contains
             if ((ir > 0).and.(ir <= nr)) then 
 
               if (ir /= ilr) then 
-                i1 = psb_ibsrch(ir,nnz,a%ia)
+                i1 = psb_bsrch(ir,nnz,a%ia)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -2810,7 +2810,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              ip = psb_issrch(ic,nc,a%ja(i1:i2))
+              ip = psb_ssrch(ic,nc,a%ja(i1:i2))
               if (ip>0) then 
                 a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
               else
@@ -2843,7 +2843,7 @@ contains
           if ((ir > 0).and.(ir <= nr)) then 
 
             if (ir /= ilr) then 
-              i1 = psb_ibsrch(ir,nnz,a%ia)
+              i1 = psb_bsrch(ir,nnz,a%ia)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -2861,7 +2861,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            ip = psb_issrch(ic,nc,a%ja(i1:i2))
+            ip = psb_ssrch(ic,nc,a%ja(i1:i2))
             if (ip>0) then 
               a%val(i1+ip-1) = val(i)
             else
@@ -2880,7 +2880,7 @@ contains
           if ((ir > 0).and.(ir <= nr)) then 
 
             if (ir /= ilr) then 
-              i1 = psb_ibsrch(ir,nnz,a%ia)
+              i1 = psb_bsrch(ir,nnz,a%ia)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -2898,7 +2898,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            ip = psb_issrch(ic,nc,a%ja(i1:i2))
+            ip = psb_ssrch(ic,nc,a%ja(i1:i2))
             if (ip>0) then 
               a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
             else

@@ -41,7 +41,7 @@
 !  Addison-Wesley
 !
 subroutine psb_lisort(x,ix,dir,flag)
-  use psb_l_sort_mod, psb_protect_name => psb_lisort
+  use psb_sort_mod, psb_protect_name => psb_lisort
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -131,7 +131,7 @@ subroutine psb_lisort(x,ix,dir,flag)
 end subroutine psb_lisort
 
 subroutine psi_lisrx_up(n,x,idx)
-  use psb_l_sort_mod, psb_protect_name => psi_lisrx_up
+  use psb_sort_mod, psb_protect_name => psi_lisrx_up
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -159,7 +159,7 @@ subroutine psi_lisrx_up(n,x,idx)
 end subroutine psi_lisrx_up
 
 subroutine psi_lisrx_dw(n,x,idx)
-  use psb_l_sort_mod, psb_protect_name => psi_lisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_lisrx_dw
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -188,7 +188,7 @@ end subroutine psi_lisrx_dw
 
 
 subroutine psi_lisr_up(n,x)
-  use psb_l_sort_mod, psb_protect_name => psi_lisr_up
+  use psb_sort_mod, psb_protect_name => psi_lisr_up
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -212,7 +212,7 @@ subroutine psi_lisr_up(n,x)
 end subroutine psi_lisr_up
 
 subroutine psi_lisr_dw(n,x)
-  use psb_l_sort_mod, psb_protect_name => psi_lisr_dw
+  use psb_sort_mod, psb_protect_name => psi_lisr_dw
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -236,7 +236,7 @@ subroutine psi_lisr_dw(n,x)
 end subroutine psi_lisr_dw
 
 subroutine psi_laisrx_up(n,x,idx)
-  use psb_l_sort_mod, psb_protect_name => psi_laisrx_up
+  use psb_sort_mod, psb_protect_name => psi_laisrx_up
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -264,7 +264,7 @@ subroutine psi_laisrx_up(n,x,idx)
 end subroutine psi_laisrx_up
 
 subroutine psi_laisrx_dw(n,x,idx)
-  use psb_l_sort_mod, psb_protect_name => psi_laisrx_dw
+  use psb_sort_mod, psb_protect_name => psi_laisrx_dw
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -292,7 +292,7 @@ subroutine psi_laisrx_dw(n,x,idx)
 end subroutine psi_laisrx_dw
 
 subroutine psi_laisr_up(n,x)
-  use psb_l_sort_mod, psb_protect_name => psi_laisr_up
+  use psb_sort_mod, psb_protect_name => psi_laisr_up
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
@@ -316,7 +316,7 @@ subroutine psi_laisr_up(n,x)
 end subroutine psi_laisr_up
 
 subroutine psi_laisr_dw(n,x)
-  use psb_l_sort_mod, psb_protect_name => psi_laisr_dw
+  use psb_sort_mod, psb_protect_name => psi_laisr_dw
   use psb_error_mod
   implicit none 
   integer(psb_lpk_), intent(inout)  :: x(:) 
