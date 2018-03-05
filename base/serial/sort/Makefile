@@ -4,8 +4,8 @@ include ../../../Make.inc
 # The object files
 #
 BOBJS=psi_lcx_mod.o psi_alcx_mod.o psi_acx_mod.o
-IOBJS=psb_i_hsort_impl.o psb_i_isort_impl.o psb_i_msort_impl.o psb_i_qsort_impl.o
-LOBJS=psb_l_hsort_impl.o psb_l_isort_impl.o psb_l_msort_impl.o psb_l_qsort_impl.o
+IOBJS=psb_m_hsort_impl.o psb_m_isort_impl.o psb_m_msort_impl.o psb_m_qsort_impl.o
+LOBJS=psb_e_hsort_impl.o psb_e_isort_impl.o psb_e_msort_impl.o psb_e_qsort_impl.o
 SOBJS=psb_s_hsort_impl.o psb_s_isort_impl.o psb_s_msort_impl.o psb_s_qsort_impl.o
 DOBJS=psb_d_hsort_impl.o psb_d_isort_impl.o psb_d_msort_impl.o psb_d_qsort_impl.o
 COBJS=psb_c_hsort_impl.o psb_c_isort_impl.o psb_c_msort_impl.o psb_c_qsort_impl.o

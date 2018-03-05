@@ -63,7 +63,7 @@ module psb_c_msort_mod
     end subroutine psb_cmsort
   end interface psb_msort
 
-  interface 
+  interface psi_lmsort_up
     subroutine psi_c_lmsort_up(n,k,l,iret)
       import
       implicit none
@@ -71,6 +71,8 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_lmsort_up
+  end interface psi_lmsort_up
+  interface psi_lmsort_dw
     subroutine psi_c_lmsort_dw(n,k,l,iret)
       import
       implicit none
@@ -78,6 +80,8 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_lmsort_dw
+  end interface psi_lmsort_dw
+  interface psi_almsort_up
     subroutine psi_c_almsort_up(n,k,l,iret)
       import
       implicit none
@@ -85,6 +89,8 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_almsort_up
+  end interface psi_almsort_up
+  interface psi_almsort_dw
     subroutine psi_c_almsort_dw(n,k,l,iret)
       import
       implicit none
@@ -92,8 +98,8 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_almsort_dw
-  end interface
-  interface 
+  end interface psi_almsort_dw
+  interface psi_amsort_up
     subroutine psi_c_amsort_up(n,k,l,iret)
       import
       implicit none
@@ -101,6 +107,8 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_amsort_up
+  end interface psi_amsort_up
+  interface psi_amsort_dw
     subroutine psi_c_amsort_dw(n,k,l,iret)
       import
       implicit none
@@ -108,6 +116,6 @@ module psb_c_msort_mod
       complex(psb_spk_)  ::  k(n)
       integer(psb_ipk_) :: l(0:n+1)
     end subroutine psi_c_amsort_dw
-  end interface
+  end interface psi_amsort_dw
   
 end module psb_c_msort_mod
