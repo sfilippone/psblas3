@@ -53,10 +53,9 @@ contains
     integer(psb_ipk_), intent(in) :: n
     integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)   :: x(*)
-    
     integer(psb_ipk_) :: lswap, lp, k
     real(psb_dpk_) :: swap
-
+    
     lp = iaux(0)
     k  = 1
     do 
@@ -82,9 +81,10 @@ contains
     integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)   :: x(*)
     integer(psb_ipk_) :: indx(*) 
-    
     integer(psb_ipk_) :: lswap, lp, k, ixswap
     real(psb_dpk_) :: swap
+
+
 
     lp = iaux(0)
     k  = 1
@@ -150,7 +150,6 @@ contains
     integer(psb_ipk_) :: iaux(0:*) 
     real(psb_dpk_)   :: x(*)
     integer(psb_ipk_) :: i1(*), i2(*), i3(*) 
-
     
     integer(psb_ipk_) :: lswap, lp, k, isw1, isw2, isw3
     real(psb_dpk_)  :: swap

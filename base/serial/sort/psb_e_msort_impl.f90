@@ -285,8 +285,7 @@
 
     return
 
-
-  end subroutine psb_emsort
+end subroutine psb_emsort
 
   subroutine psi_e_msort_up(n,k,l,iret)
     use psb_const_mod

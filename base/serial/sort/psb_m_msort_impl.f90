@@ -285,7 +285,6 @@
 
     return
 
-
   end subroutine psb_mmsort
 
   subroutine psi_m_msort_up(n,k,l,iret)
