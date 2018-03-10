@@ -110,8 +110,8 @@ psb_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o:   psb_error_mod.o
 $(UTIL_MODS): $(BASIC_MODS)
 
-psi_penv_mod.o: psi_comm_buffers_mod.o 
-psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
+penv/psi_penv_mod.o: penv/psi_comm_buffers_mod.o 
+penv/psi_bcast_mod.o penv/psi_reduce_mod.o penv/psi_p2p_mod.o: penv/psi_penv_mod.o	
 
 psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
 	auxil/psb_e_realloc_mod.o \
