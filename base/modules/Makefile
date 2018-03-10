@@ -8,20 +8,20 @@ BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o \
 	auxil/psb_c_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o
 
-COMMINT=psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
-	psi_p2p_mod.o auxil/psi_m_p2p_mod.o \
-	 auxil/psi_e_p2p_mod.o \
-	 auxil/psi_s_p2p_mod.o \
-	 auxil/psi_d_p2p_mod.o \
-	 auxil/psi_c_p2p_mod.o \
-	 auxil/psi_z_p2p_mod.o \
-	 psi_reduce_mod.o \
-	 auxil/psi_e_reduce_mod.o \
-	 auxil/psi_m_reduce_mod.o \
-	 auxil/psi_s_reduce_mod.o \
-	 auxil/psi_d_reduce_mod.o \
-	 auxil/psi_c_reduce_mod.o \
-	 auxil/psi_z_reduce_mod.o
+COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o penv/psi_bcast_mod.o \
+	penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o \
+	 penv/psi_e_p2p_mod.o \
+	 penv/psi_s_p2p_mod.o \
+	 penv/psi_d_p2p_mod.o \
+	 penv/psi_c_p2p_mod.o \
+	 penv/psi_z_p2p_mod.o \
+	 penv/psi_reduce_mod.o \
+	 penv/psi_e_reduce_mod.o \
+	 penv/psi_m_reduce_mod.o \
+	 penv/psi_s_reduce_mod.o \
+	 penv/psi_d_reduce_mod.o \
+	 penv/psi_c_reduce_mod.o \
+	 penv/psi_z_reduce_mod.o
 
 UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
@@ -120,23 +120,23 @@ psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
 	auxil/psb_c_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o
 
-psi_p2p_mod.o: auxil/psi_m_p2p_mod.o \
-	 auxil/psi_e_p2p_mod.o \
-	 auxil/psi_s_p2p_mod.o \
-	 auxil/psi_d_p2p_mod.o \
-	 auxil/psi_c_p2p_mod.o \
-	 auxil/psi_z_p2p_mod.o
-psi_reduce_mod.o: auxil/psi_e_reduce_mod.o \
-	 auxil/psi_m_reduce_mod.o \
-	 auxil/psi_s_reduce_mod.o \
-	 auxil/psi_d_reduce_mod.o \
-	 auxil/psi_c_reduce_mod.o \
-	 auxil/psi_z_reduce_mod.o 
+penv/psi_p2p_mod.o: penv/psi_m_p2p_mod.o \
+	 penv/psi_e_p2p_mod.o \
+	 penv/psi_s_p2p_mod.o \
+	 penv/psi_d_p2p_mod.o \
+	 penv/psi_c_p2p_mod.o \
+	 penv/psi_z_p2p_mod.o
+penv/psi_reduce_mod.o: penv/psi_e_reduce_mod.o \
+	 penv/psi_m_reduce_mod.o \
+	 penv/psi_s_reduce_mod.o \
+	 penv/psi_d_reduce_mod.o \
+	 penv/psi_c_reduce_mod.o \
+	 penv/psi_z_reduce_mod.o 
 
-auxil/psi_m_p2p_mod.o auxil/psi_e_p2p_mod.o  auxil/psi_s_p2p_mod.o \
-auxil/psi_d_p2p_mod.o auxil/psi_c_p2p_mod.o  auxil/psi_z_p2p_mod.o\
-auxil/psi_e_reduce_mod.o  auxil/psi_m_reduce_mod.o auxil/psi_s_reduce_mod.o \
-auxil/psi_d_reduce_mod.o  auxil/psi_c_reduce_mod.o auxil/psi_z_reduce_mod.o: psi_penv_mod.o 
+penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
+penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o\
+penv/psi_e_reduce_mod.o  penv/psi_m_reduce_mod.o penv/psi_s_reduce_mod.o \
+penv/psi_d_reduce_mod.o  penv/psi_c_reduce_mod.o penv/psi_z_reduce_mod.o: penv/psi_penv_mod.o 
 
 auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
 auxil/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
@@ -264,22 +264,22 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 psb_base_mod.o: $(MODULES)
 
-psi_penv_mod.o: psi_penv_mod.F90 $(BASIC_MODS) 
+penv/psi_penv_mod.o: penv/psi_penv_mod.F90 $(BASIC_MODS) 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-psi_comm_buffers_mod.o: psi_comm_buffers_mod.F90 $(BASIC_MODS)
+penv/psi_comm_buffers_mod.o: penv/psi_comm_buffers_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-psi_p2p_mod.o: psi_p2p_mod.F90 $(BASIC_MODS) 
+penv/psi_p2p_mod.o: penv/psi_p2p_mod.F90 $(BASIC_MODS) 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-psi_bcast_mod.o: psi_bcast_mod.F90 $(BASIC_MODS) 
+penv/psi_bcast_mod.o: penv/psi_bcast_mod.F90 $(BASIC_MODS) 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-psi_reduce_mod.o: psi_reduce_mod.F90 $(BASIC_MODS)
+penv/psi_reduce_mod.o: penv/psi_reduce_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:
