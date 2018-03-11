@@ -29,35 +29,44 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psi_e_reduce_mod
+module psi_s_collective_mod
   use psi_penv_mod
 
   interface psb_max
-    module procedure psb_emaxs, psb_emaxv, psb_emaxm, &
-         & psb_emaxs_ec, psb_emaxv_ec, psb_emaxm_ec
+    module procedure psb_smaxs, psb_smaxv, psb_smaxm, &
+         & psb_smaxs_ec, psb_smaxv_ec, psb_smaxm_ec
   end interface
 
   interface psb_min
-    module procedure psb_emins, psb_eminv, psb_eminm, &
-         & psb_emins_ec, psb_eminv_ec, psb_eminm_ec
+    module procedure psb_smins, psb_sminv, psb_sminm, &
+         & psb_smins_ec, psb_sminv_ec, psb_sminm_ec
   end interface psb_min
 
+  interface psb_nrm2
+    module procedure psb_s_nrm2s, psb_s_nrm2v, &
+         & psb_s_nrm2s_ec, psb_s_nrm2v_ec
+  end interface psb_nrm2
 
   interface psb_sum
-    module procedure psb_esums, psb_esumv, psb_esumm, &
-         & psb_esums_ec, psb_esumv_ec, psb_esumm_ec
+    module procedure psb_ssums, psb_ssumv, psb_ssumm, &
+         & psb_ssums_ec, psb_ssumv_ec, psb_ssumm_ec
   end interface
 
   interface psb_amx
-    module procedure psb_eamxs, psb_eamxv, psb_eamxm, &
-         & psb_eamxs_ec, psb_eamxv_ec, psb_eamxm_ec
+    module procedure psb_samxs, psb_samxv, psb_samxm, &
+         & psb_samxs_ec, psb_samxv_ec, psb_samxm_ec
   end interface
 
   interface psb_amn
-    module procedure psb_eamns, psb_eamnv, psb_eamnm, &
-         & psb_eamns_ec, psb_eamnv_ec, psb_eamnm_ec
+    module procedure psb_samns, psb_samnv, psb_samnm, &
+         & psb_samns_ec, psb_samnv_ec, psb_samnm_ec
   end interface
 
+
+  interface psb_bcast
+    module procedure psb_sbcasts, psb_sbcastv, psb_sbcastm, &
+         & psb_sbcasts_ec, psb_sbcastv_ec, psb_sbcastm_ec
+  end interface
 
 
 contains 
@@ -75,7 +84,7 @@ contains
   !
   ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine psb_emaxs(ictxt,dat,root)
+  subroutine psb_smaxs(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -84,10 +93,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_) :: dat_
+    real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info
     integer(psb_ipk_) :: iinfo
 
@@ -101,16 +110,16 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_epk_,mpi_max,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_epk_,mpi_max,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
-  end subroutine psb_emaxs
+  end subroutine psb_smaxs
 
-  subroutine psb_emaxv(ictxt,dat,root)
+  subroutine psb_smaxv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -120,10 +129,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -140,21 +149,21 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_max,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_emaxv
+  end subroutine psb_smaxv
 
-  subroutine psb_emaxm(ictxt,dat,root)
+  subroutine psb_smaxm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -164,10 +173,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -184,25 +193,25 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_max,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_max,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_max,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_emaxm
+  end subroutine psb_smaxm
 
 
-  subroutine psb_emaxs_ec(ictxt,dat,root)
+  subroutine psb_smaxs_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -213,12 +222,12 @@ contains
     else
       call psb_max(ictxt_,dat)
     end if
-  end subroutine psb_emaxs_ec
+  end subroutine psb_smaxs_ec
 
-  subroutine psb_emaxv_ec(ictxt,dat,root)
+  subroutine psb_smaxv_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -229,12 +238,12 @@ contains
     else
       call psb_max(ictxt_,dat)
     end if
-  end subroutine psb_emaxv_ec
+  end subroutine psb_smaxv_ec
 
-  subroutine psb_emaxm_ec(ictxt,dat,root)
+  subroutine psb_smaxm_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -245,7 +254,7 @@ contains
     else
       call psb_max(ictxt_,dat)
     end if
-  end subroutine psb_emaxm_ec
+  end subroutine psb_smaxm_ec
 
 
   !
@@ -253,7 +262,7 @@ contains
   !
 
 
-  subroutine psb_emins(ictxt,dat,root)
+  subroutine psb_smins(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -262,10 +271,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_) :: dat_
+    real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info
     integer(psb_ipk_) :: iinfo
 
@@ -279,16 +288,16 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_epk_,mpi_min,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_epk_,mpi_min,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
-  end subroutine psb_emins
+  end subroutine psb_smins
 
-  subroutine psb_eminv(ictxt,dat,root)
+  subroutine psb_sminv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -298,10 +307,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -318,21 +327,21 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_min,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eminv
+  end subroutine psb_sminv
 
-  subroutine psb_eminm(ictxt,dat,root)
+  subroutine psb_sminm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -342,10 +351,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -362,25 +371,25 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_min,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_min,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_min,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eminm
+  end subroutine psb_sminm
 
 
-  subroutine psb_emins_ec(ictxt,dat,root)
+  subroutine psb_smins_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -391,12 +400,12 @@ contains
     else
       call psb_min(ictxt_,dat)
     end if
-  end subroutine psb_emins_ec
+  end subroutine psb_smins_ec
 
-  subroutine psb_eminv_ec(ictxt,dat,root)
+  subroutine psb_sminv_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -407,12 +416,12 @@ contains
     else
       call psb_min(ictxt_,dat)
     end if
-  end subroutine psb_eminv_ec
+  end subroutine psb_sminv_ec
 
-  subroutine psb_eminm_ec(ictxt,dat,root)
+  subroutine psb_sminm_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -423,16 +432,135 @@ contains
     else
       call psb_min(ictxt_,dat)
     end if
-  end subroutine psb_eminm_ec
+  end subroutine psb_sminm_ec
 
 
+
+  ! !!!!!!!!!!!!
+  !
+  ! Norm 2, only for reals
+  !
+  ! !!!!!!!!!!!!
+  subroutine psb_s_nrm2s(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)            :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer(psb_mpk_), intent(in), optional  :: root
+    integer(psb_mpk_) :: root_
+    real(psb_spk_) :: dat_
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,ictxt,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_snrm2_op,root_,ictxt,info)
+      if (iam == root_) dat = dat_
+    endif
+#endif    
+  end subroutine psb_s_nrm2s
+
+  subroutine psb_s_nrm2v(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+    real(psb_spk_), allocatable :: dat_(:)
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,iinfo)
+      dat_ = dat
+      if (iinfo == psb_success_) &
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
+           & mpi_snrm2_op,ictxt,info)
+    else
+      if (iam == root_) then 
+        call psb_realloc(size(dat),dat_,iinfo)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,&
+             & mpi_snrm2_op,root_,ictxt,info)
+      else
+        call psb_realloc(1,dat_,iinfo)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,&
+             & mpi_snrm2_op,root_,ictxt,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_s_nrm2v
+
+  subroutine psb_s_nrm2s_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)            :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer(psb_epk_), intent(in), optional  :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_nrm2(ictxt_,dat,root_)
+    else
+      call psb_nrm2(ictxt_,dat)
+    end if
+  end subroutine psb_s_nrm2s_ec
+  
+  subroutine psb_s_nrm2v_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_nrm2(ictxt_,dat,root_)
+    else
+      call psb_nrm2(ictxt_,dat)
+    end if
+  end subroutine psb_s_nrm2v_ec
 
 
   !
   ! SUM
   !
 
-  subroutine psb_esums(ictxt,dat,root)
+  subroutine psb_ssums(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -441,10 +569,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_) :: dat_
+    real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info
     integer(psb_ipk_) :: iinfo
 
@@ -458,16 +586,16 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_epk_,mpi_sum,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_epk_,mpi_sum,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
-  end subroutine psb_esums
+  end subroutine psb_ssums
 
-  subroutine psb_esumv(ictxt,dat,root)
+  subroutine psb_ssumv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -477,10 +605,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -497,21 +625,21 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_sum,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_esumv
+  end subroutine psb_ssumv
 
-  subroutine psb_esumm(ictxt,dat,root)
+  subroutine psb_ssumm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -521,10 +649,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -541,24 +669,24 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_sum,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_sum,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_sum,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_esumm
+  end subroutine psb_ssumm
 
-  subroutine psb_esums_ec(ictxt,dat,root)
+  subroutine psb_ssums_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -569,12 +697,12 @@ contains
     else
       call psb_sum(ictxt_,dat)
     end if
-  end subroutine psb_esums_ec
+  end subroutine psb_ssums_ec
 
-  subroutine psb_esumv_ec(ictxt,dat,root)
+  subroutine psb_ssumv_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -585,12 +713,12 @@ contains
     else
       call psb_sum(ictxt_,dat)
     end if
-  end subroutine psb_esumv_ec
+  end subroutine psb_ssumv_ec
   
-  subroutine psb_esumm_ec(ictxt,dat,root)
+  subroutine psb_ssumm_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -601,14 +729,14 @@ contains
     else
       call psb_sum(ictxt_,dat)
     end if
-  end subroutine psb_esumm_ec
+  end subroutine psb_ssumm_ec
 
 
   !
   ! AMX: Maximum Absolute Value
   !
   
-  subroutine psb_eamxs(ictxt,dat,root)
+  subroutine psb_samxs(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -617,10 +745,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_) :: dat_
+    real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info
     integer(psb_ipk_) :: iinfo
 
@@ -634,16 +762,16 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_epk_,mpi_eamx_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_epk_,mpi_eamx_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
-  end subroutine psb_eamxs
+  end subroutine psb_samxs
 
-  subroutine psb_eamxv(ictxt,dat,root)
+  subroutine psb_samxv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -653,10 +781,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -673,21 +801,21 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamx_op,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_eamx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eamxv
+  end subroutine psb_samxv
 
-  subroutine psb_eamxm(ictxt,dat,root)
+  subroutine psb_samxm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -697,10 +825,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -717,25 +845,25 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamx_op,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamx_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_eamx_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samx_op,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eamxm
+  end subroutine psb_samxm
 
 
-  subroutine psb_eamxs_ec(ictxt,dat,root)
+  subroutine psb_samxs_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -746,12 +874,12 @@ contains
     else
       call psb_amx(ictxt_,dat)
     end if
-  end subroutine psb_eamxs_ec
+  end subroutine psb_samxs_ec
 
-  subroutine psb_eamxv_ec(ictxt,dat,root)
+  subroutine psb_samxv_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -762,12 +890,12 @@ contains
     else
       call psb_amx(ictxt_,dat)
     end if
-  end subroutine psb_eamxv_ec
+  end subroutine psb_samxv_ec
 
-  subroutine psb_eamxm_ec(ictxt,dat,root)
+  subroutine psb_samxm_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -778,14 +906,14 @@ contains
     else
       call psb_amx(ictxt_,dat)
     end if
-  end subroutine psb_eamxm_ec
+  end subroutine psb_samxm_ec
 
 
   !
   ! AMN: Minimum Absolute Value
   !
   
-  subroutine psb_eamns(ictxt,dat,root)
+  subroutine psb_samns(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -794,10 +922,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_) :: dat_
+    real(psb_spk_) :: dat_
     integer(psb_mpk_) :: iam, np, info
     integer(psb_ipk_) :: iinfo
 
@@ -811,16 +939,16 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,psb_mpi_epk_,mpi_eamn_op,ictxt,info)
+      call mpi_allreduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,psb_mpi_epk_,mpi_eamn_op,root_,ictxt,info)
+      call mpi_reduce(dat,dat_,1,psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
       if (iam == root_) dat = dat_
     endif
 #endif    
-  end subroutine psb_eamns
+  end subroutine psb_samns
 
-  subroutine psb_eamnv(ictxt,dat,root)
+  subroutine psb_samnv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -830,10 +958,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:)
+    real(psb_spk_), allocatable :: dat_(:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -850,21 +978,21 @@ contains
       call psb_realloc(size(dat),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_) &
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamn_op,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
       else
         call psb_realloc(1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_eamn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eamnv
+  end subroutine psb_samnv
 
-  subroutine psb_eamnm(ictxt,dat,root)
+  subroutine psb_samnm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
     use mpi
@@ -874,10 +1002,10 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_mpk_), intent(in), optional    :: root
     integer(psb_mpk_) :: root_
-    integer(psb_epk_), allocatable :: dat_(:,:)
+    real(psb_spk_), allocatable :: dat_(:,:)
     integer(psb_mpk_) :: iam, np,  info
     integer(psb_ipk_) :: iinfo
 
@@ -894,25 +1022,25 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
       dat_ = dat
       if (iinfo == psb_success_)&
-           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamn_op,ictxt,info)
+           & call mpi_allreduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,ictxt,info)
     else
       if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,iinfo)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),psb_mpi_epk_,mpi_eamn_op,root_,ictxt,info)
+        call mpi_reduce(dat_,dat,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
       else
         call psb_realloc(1,1,dat_,iinfo)
-        call mpi_reduce(dat,dat_,size(dat),psb_mpi_epk_,mpi_eamn_op,root_,ictxt,info)
+        call mpi_reduce(dat,dat_,size(dat),psb_mpi_r_spk_,mpi_samn_op,root_,ictxt,info)
       end if
     endif
 #endif    
-  end subroutine psb_eamnm
+  end subroutine psb_samnm
 
 
-  subroutine psb_eamns_ec(ictxt,dat,root)
+  subroutine psb_samns_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat
+    real(psb_spk_), intent(inout)  :: dat
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -923,12 +1051,12 @@ contains
     else
       call psb_amn(ictxt_,dat)
     end if
-  end subroutine psb_eamns_ec
+  end subroutine psb_samns_ec
 
-  subroutine psb_eamnv_ec(ictxt,dat,root)
+  subroutine psb_samnv_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:)
+    real(psb_spk_), intent(inout)  :: dat(:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -939,12 +1067,12 @@ contains
     else
       call psb_amn(ictxt_,dat)
     end if
-  end subroutine psb_eamnv_ec
+  end subroutine psb_samnv_ec
 
-  subroutine psb_eamnm_ec(ictxt,dat,root)
+  subroutine psb_samnm_ec(ictxt,dat,root)
     implicit none 
     integer(psb_epk_), intent(in)              :: ictxt
-    integer(psb_epk_), intent(inout)  :: dat(:,:)
+    real(psb_spk_), intent(inout)  :: dat(:,:)
     integer(psb_epk_), intent(in), optional    :: root
     integer(psb_mpk_) :: ictxt_, root_
 
@@ -955,6 +1083,153 @@ contains
     else
       call psb_amn(ictxt_,dat)
     end if
-  end subroutine psb_eamnm_ec
+  end subroutine psb_samnm_ec
 
-end module psi_e_reduce_mod
+
+  !
+  ! BCAST Broadcast
+  !
+  
+  subroutine psb_sbcasts(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call mpi_bcast(dat,1,psb_mpi_r_spk_,root_,ictxt,info)
+
+#endif    
+  end subroutine psb_sbcasts
+
+  subroutine psb_sbcastv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    
+    call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
+#endif    
+  end subroutine psb_sbcastv
+
+  subroutine psb_sbcastm(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call mpi_bcast(dat,size(dat),psb_mpi_r_spk_,root_,ictxt,info)
+#endif    
+  end subroutine psb_sbcastm
+
+
+  subroutine psb_sbcasts_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_sbcasts_ec
+
+  subroutine psb_sbcastv_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_sbcastv_ec
+
+  subroutine psb_sbcastm_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_sbcastm_ec
+
+
+  
+end module psi_s_collective_mod

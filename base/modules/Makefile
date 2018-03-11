@@ -8,20 +8,20 @@ BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o \
 	auxil/psb_c_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o
 
-COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o penv/psi_bcast_mod.o \
+COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o \
 	penv/psi_p2p_mod.o penv/psi_m_p2p_mod.o \
 	 penv/psi_e_p2p_mod.o \
 	 penv/psi_s_p2p_mod.o \
 	 penv/psi_d_p2p_mod.o \
 	 penv/psi_c_p2p_mod.o \
 	 penv/psi_z_p2p_mod.o \
-	 penv/psi_reduce_mod.o \
-	 penv/psi_e_reduce_mod.o \
-	 penv/psi_m_reduce_mod.o \
-	 penv/psi_s_reduce_mod.o \
-	 penv/psi_d_reduce_mod.o \
-	 penv/psi_c_reduce_mod.o \
-	 penv/psi_z_reduce_mod.o
+	 penv/psi_collective_mod.o \
+	 penv/psi_e_collective_mod.o \
+	 penv/psi_m_collective_mod.o \
+	 penv/psi_s_collective_mod.o \
+	 penv/psi_d_collective_mod.o \
+	 penv/psi_c_collective_mod.o \
+	 penv/psi_z_collective_mod.o
 
 UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
@@ -119,7 +119,7 @@ psb_realloc_mod.o \
 $(UTIL_MODS): $(BASIC_MODS)
 
 penv/psi_penv_mod.o: penv/psi_comm_buffers_mod.o 
-penv/psi_bcast_mod.o penv/psi_reduce_mod.o penv/psi_p2p_mod.o: penv/psi_penv_mod.o	
+penv/psi_collective_mod.o penv/psi_p2p_mod.o: penv/psi_penv_mod.o	
 
 psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
 	auxil/psb_e_realloc_mod.o \
@@ -134,17 +134,17 @@ penv/psi_p2p_mod.o: penv/psi_m_p2p_mod.o \
 	 penv/psi_d_p2p_mod.o \
 	 penv/psi_c_p2p_mod.o \
 	 penv/psi_z_p2p_mod.o
-penv/psi_reduce_mod.o: penv/psi_e_reduce_mod.o \
-	 penv/psi_m_reduce_mod.o \
-	 penv/psi_s_reduce_mod.o \
-	 penv/psi_d_reduce_mod.o \
-	 penv/psi_c_reduce_mod.o \
-	 penv/psi_z_reduce_mod.o 
+penv/psi_collective_mod.o: penv/psi_e_collective_mod.o \
+	 penv/psi_m_collective_mod.o \
+	 penv/psi_s_collective_mod.o \
+	 penv/psi_d_collective_mod.o \
+	 penv/psi_c_collective_mod.o \
+	 penv/psi_z_collective_mod.o 
 
 penv/psi_m_p2p_mod.o penv/psi_e_p2p_mod.o  penv/psi_s_p2p_mod.o \
 penv/psi_d_p2p_mod.o penv/psi_c_p2p_mod.o  penv/psi_z_p2p_mod.o\
-penv/psi_e_reduce_mod.o  penv/psi_m_reduce_mod.o penv/psi_s_reduce_mod.o \
-penv/psi_d_reduce_mod.o  penv/psi_c_reduce_mod.o penv/psi_z_reduce_mod.o: penv/psi_penv_mod.o 
+penv/psi_e_collective_mod.o  penv/psi_m_collective_mod.o penv/psi_s_collective_mod.o \
+penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_mod.o: penv/psi_penv_mod.o 
 
 auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
 auxil/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
@@ -212,7 +212,7 @@ serial/psb_d_vect_mod.o: serial/psb_d_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_c_vect_mod.o: serial/psb_c_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_z_vect_mod.o: serial/psb_z_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o: serial/psb_mat_mod.o auxil/psb_string_mod.o auxil/psb_sort_mod.o auxil/psi_serial_mod.o
-serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_d_vect_mod.o serial/psb_s_vect_mod.o serial/psb_c_vect_mod.o serial/psb_z_vect_mod.o
+serial/psb_vect_mod.o: serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o serial/psb_d_vect_mod.o serial/psb_s_vect_mod.o serial/psb_c_vect_mod.o serial/psb_z_vect_mod.o
 
 error.o psb_realloc_mod.o: psb_error_mod.o 
 psb_error_impl.o: psb_penv_mod.o
@@ -310,10 +310,7 @@ penv/psi_comm_buffers_mod.o: penv/psi_comm_buffers_mod.F90 $(BASIC_MODS)
 penv/psi_p2p_mod.o: penv/psi_p2p_mod.F90 $(BASIC_MODS) 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
-penv/psi_bcast_mod.o: penv/psi_bcast_mod.F90 $(BASIC_MODS) 
-	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
-
-penv/psi_reduce_mod.o: penv/psi_reduce_mod.F90 $(BASIC_MODS)
+penv/psi_collective_mod.o: penv/psi_collective_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:

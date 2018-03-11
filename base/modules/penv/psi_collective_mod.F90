@@ -29,23 +29,221 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psi_reduce_mod
+module psi_collective_mod
   use psi_penv_mod
-  use psi_m_reduce_mod
-  use psi_e_reduce_mod
-  use psi_s_reduce_mod
-  use psi_d_reduce_mod
-  use psi_c_reduce_mod
-  use psi_z_reduce_mod
+  use psi_m_collective_mod
+  use psi_e_collective_mod
+  use psi_s_collective_mod
+  use psi_d_collective_mod
+  use psi_c_collective_mod
+  use psi_z_collective_mod
 
+  interface psb_bcast
+    module procedure  psb_hbcasts, psb_hbcastv,&
+         & psb_hbcasts_ec, psb_hbcastv_ec,&
+         & psb_lbcasts, psb_lbcastv, &
+         & psb_lbcasts_ec, psb_lbcastv_ec 
+  end interface psb_bcast
+
+  
 #if defined(SHORT_INTEGERS)
   interface psb_sum
     module procedure psb_i2sums, psb_i2sumv, psb_i2summ, &
          & psb_i2sums_ec, psb_i2sumv_ec, psb_i2summ_ec
   end interface psb_sum
+#endif
 
 contains
+
   
+  subroutine psb_hbcasts(ictxt,dat,root,length)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)             :: ictxt
+    character(len=*), intent(inout) :: dat
+    integer(psb_mpk_), intent(in), optional   :: root,length
+
+    integer(psb_mpk_) :: iam, np, root_,length_,info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    if (present(length)) then
+      length_ = length
+    else
+      length_ = len(dat)
+    endif
+
+    call psb_info(ictxt,iam,np)
+
+    call mpi_bcast(dat,length_,MPI_CHARACTER,root_,ictxt,info)
+#endif    
+
+  end subroutine psb_hbcasts
+
+  subroutine psb_hbcastv(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)             :: ictxt
+    character(len=*), intent(inout) :: dat(:)
+    integer(psb_mpk_), intent(in), optional   :: root
+
+    integer(psb_mpk_) :: iam, np, root_,length_,info, size_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ =  psb_root_
+    endif
+    length_ = len(dat)
+    size_   = size(dat) 
+
+    call psb_info(ictxt,iam,np)
+
+    call mpi_bcast(dat,length_*size_,MPI_CHARACTER,root_,ictxt,info)
+#endif    
+
+  end subroutine psb_hbcastv
+
+  subroutine psb_hbcasts_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    character(len=*), intent(inout)  :: dat
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_hbcasts_ec
+
+  subroutine psb_hbcastv_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    character(len=*), intent(inout)  :: dat(:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_hbcastv_ec
+
+
+  
+  subroutine psb_lbcasts(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)             :: ictxt
+    logical, intent(inout)          :: dat
+    integer(psb_mpk_), intent(in), optional   :: root
+
+    integer(psb_mpk_) :: iam, np, root_,info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call mpi_bcast(dat,1,MPI_LOGICAL,root_,ictxt,info)
+#endif    
+
+  end subroutine psb_lbcasts
+
+
+  subroutine psb_lbcastv(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)             :: ictxt
+    logical, intent(inout)          :: dat(:)
+    integer(psb_mpk_), intent(in), optional   :: root
+
+    integer(psb_mpk_) :: iam, np, root_,info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,ictxt,info)
+#endif    
+
+  end subroutine psb_lbcastv
+
+
+  subroutine psb_lbcasts_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    logical, intent(inout)  :: dat
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_lbcasts_ec
+
+  subroutine psb_lbcastv_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    logical, intent(inout)  :: dat(:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_lbcastv_ec
+
+
+  
+#if defined(SHORT_INTEGERS)
   subroutine psb_i2sums(ictxt,dat,root)
 
 #ifdef MPI_MOD
@@ -219,4 +417,4 @@ contains
 
 #endif
 
-end module psi_reduce_mod
+end module psi_collective_mod

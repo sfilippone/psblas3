@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psi_d_reduce_mod
+module psi_d_collective_mod
   use psi_penv_mod
 
   interface psb_max
@@ -62,6 +62,11 @@ module psi_d_reduce_mod
          & psb_damns_ec, psb_damnv_ec, psb_damnm_ec
   end interface
 
+
+  interface psb_bcast
+    module procedure psb_dbcasts, psb_dbcastv, psb_dbcastm, &
+         & psb_dbcasts_ec, psb_dbcastv_ec, psb_dbcastm_ec
+  end interface
 
 
 contains 
@@ -1080,4 +1085,151 @@ contains
     end if
   end subroutine psb_damnm_ec
 
-end module psi_d_reduce_mod
+
+  !
+  ! BCAST Broadcast
+  !
+  
+  subroutine psb_dbcasts(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+
+    integer(psb_mpk_) :: iam, np, info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    call mpi_bcast(dat,1,psb_mpi_r_dpk_,root_,ictxt,info)
+
+#endif    
+  end subroutine psb_dbcasts
+
+  subroutine psb_dbcastv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat(:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+    
+    call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+#endif    
+  end subroutine psb_dbcastv
+
+  subroutine psb_dbcastm(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+    implicit none 
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
+    integer(psb_mpk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: root_
+
+    integer(psb_mpk_) :: iam, np,  info
+    integer(psb_ipk_) :: iinfo
+
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call mpi_bcast(dat,size(dat),psb_mpi_r_dpk_,root_,ictxt,info)
+#endif    
+  end subroutine psb_dbcastm
+
+
+  subroutine psb_dbcasts_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_dbcasts_ec
+
+  subroutine psb_dbcastv_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat(:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_dbcastv_ec
+
+  subroutine psb_dbcastm_ec(ictxt,dat,root)
+    implicit none 
+    integer(psb_epk_), intent(in)              :: ictxt
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
+    integer(psb_epk_), intent(in), optional    :: root
+    integer(psb_mpk_) :: ictxt_, root_
+
+    ictxt_ = ictxt
+    if (present(root)) then 
+      root_ = root
+      call psb_bcast(ictxt_,dat,root_)
+    else
+      call psb_bcast(ictxt_,dat)
+    end if
+  end subroutine psb_dbcastm_ec
+
+
+  
+end module psi_d_collective_mod
