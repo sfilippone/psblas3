@@ -37,24 +37,6 @@ module psb_s_comm_mod
   use psb_s_multivect_mod, only : psb_s_multivect_type, psb_s_base_multivect_type
 
   interface psb_ovrl
-    subroutine psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
-      import
-      implicit none
-      real(psb_spk_), intent(inout), target   :: x(:,:)
-      type(psb_desc_type), intent(in)            :: desc_a
-      integer(psb_ipk_), intent(out)                       :: info
-      real(psb_spk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
-    end subroutine psb_sovrlm
-    subroutine psb_sovrlv(x,desc_a,info,work,update,mode)
-      import
-      implicit none
-      real(psb_spk_), intent(inout), target   :: x(:)
-      type(psb_desc_type), intent(in)            :: desc_a
-      integer(psb_ipk_), intent(out)                       :: info
-      real(psb_spk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional              :: update,mode
-    end subroutine psb_sovrlv
     subroutine psb_sovrl_vect(x,desc_a,info,work,update,mode)
       import
       implicit none
@@ -76,26 +58,6 @@ module psb_s_comm_mod
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_shalom(x,desc_a,info,jx,ik,work,tran,mode,data)
-      import
-      implicit none
-      real(psb_spk_), intent(inout), target :: x(:,:)
-      type(psb_desc_type), intent(in)          :: desc_a
-      integer(psb_ipk_), intent(out)                     :: info
-      real(psb_spk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
-      character, intent(in), optional         :: tran
-    end subroutine psb_shalom
-    subroutine psb_shalov(x,desc_a,info,work,tran,mode,data)
-      import
-      implicit none
-      real(psb_spk_), intent(inout)        :: x(:)
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      real(psb_spk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
-      character, intent(in), optional         :: tran
-    end subroutine psb_shalov
     subroutine psb_shalo_vect(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
@@ -120,24 +82,6 @@ module psb_s_comm_mod
 
 
   interface psb_scatter
-    subroutine  psb_sscatterm(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      real(psb_spk_), intent(out), allocatable :: locx(:,:)
-      real(psb_spk_), intent(in)  :: globx(:,:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_sscatterm
-    subroutine  psb_sscatterv(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      real(psb_spk_), intent(out), allocatable :: locx(:)
-      real(psb_spk_), intent(in)  :: globx(:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_sscatterv
     subroutine  psb_sscatter_vect(globx, locx, desc_a, info, root, mold)
       import
       implicit none
@@ -161,24 +105,6 @@ module psb_s_comm_mod
       integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_ssp_allgather
-    subroutine psb_sgatherm(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      real(psb_spk_), intent(in)  :: locx(:,:)
-      real(psb_spk_), intent(out), allocatable  :: globx(:,:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_sgatherm
-    subroutine psb_sgatherv(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      real(psb_spk_), intent(in)  :: locx(:)
-      real(psb_spk_), intent(out), allocatable  :: globx(:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_sgatherv
     subroutine psb_sgather_vect(globx, locx, desc_a, info, root)
       import
       implicit none

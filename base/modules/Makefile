@@ -39,9 +39,13 @@ UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_m
 	comm/psb_base_linmap_mod.o comm/psb_linmap_mod.o \
 	comm/psb_s_linmap_mod.o comm/psb_d_linmap_mod.o \
 	comm/psb_c_linmap_mod.o comm/psb_z_linmap_mod.o \
-	comm/psb_comm_mod.o comm/psb_i_comm_mod.o \
+	comm/psb_comm_mod.o \
+	comm/psb_i_comm_mod.o comm/psb_l_comm_mod.o \
 	comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o\
 	comm/psb_c_comm_mod.o comm/psb_z_comm_mod.o \
+	comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
+	comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
+	comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o \
 	comm/psi_e_comm_a_mod.o comm/psi_m_comm_a_mod.o \
 	comm/psi_s_comm_a_mod.o comm/psi_d_comm_a_mod.o \
 	comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o \
@@ -255,8 +259,19 @@ comm/psb_c_linmap_mod.o: comm/psb_base_linmap_mod.o serial/psb_c_mat_mod.o seria
 comm/psb_z_linmap_mod.o: comm/psb_base_linmap_mod.o serial/psb_z_mat_mod.o serial/psb_z_vect_mod.o
 comm/psb_base_linmap_mod.o: desc/psb_desc_mod.o serial/psb_serial_mod.o comm/psb_comm_mod.o 
 comm/psb_comm_mod.o: desc/psb_desc_mod.o serial/psb_mat_mod.o 
-comm/psb_comm_mod.o: comm/psb_i_comm_mod.o comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o comm/psb_c_comm_mod.o comm/psb_z_comm_mod.o 
+comm/psb_comm_mod.o: comm/psb_i_comm_mod.o  comm/psb_l_comm_mod.o \
+	comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o \
+	comm/psb_c_comm_mod.o comm/psb_z_comm_mod.o \
+	comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
+	comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
+	comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o 
+
+comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
+comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
+comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o:  desc/psb_desc_mod.o
+
 comm/psb_i_comm_mod.o: serial/psb_i_vect_mod.o desc/psb_desc_mod.o
+comm/psb_l_comm_mod.o: serial/psb_l_vect_mod.o desc/psb_desc_mod.o	
 comm/psb_s_comm_mod.o: serial/psb_s_vect_mod.o desc/psb_desc_mod.o serial/psb_mat_mod.o 
 comm/psb_d_comm_mod.o: serial/psb_d_vect_mod.o desc/psb_desc_mod.o serial/psb_mat_mod.o 
 comm/psb_c_comm_mod.o: serial/psb_c_vect_mod.o desc/psb_desc_mod.o serial/psb_mat_mod.o 
@@ -280,7 +295,11 @@ comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o:  desc/psb_desc_mod.o
 tools/psb_tools_mod.o: tools/psb_cd_tools_mod.o tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
 	tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
 	tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o  
-tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o: desc/psb_desc_mod.o psi_mod.o  serial/psb_mat_mod.o
+
+tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
+tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o \
+tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o: desc/psb_desc_mod.o psi_mod.o  serial/psb_mat_mod.o
+
 tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o
 tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o 	
 tools/psb_s_tools_mod.o: serial/psb_s_vect_mod.o 

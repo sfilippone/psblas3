@@ -30,30 +30,12 @@
 !   
 !    
 module psb_l_comm_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_epk_, psb_mpk_
   
   use psb_l_vect_mod, only : psb_l_vect_type, psb_l_base_vect_type
   use psb_l_multivect_mod, only : psb_l_multivect_type, psb_l_base_multivect_type
 
   interface psb_ovrl
-    subroutine psb_lovrlm(x,desc_a,info,jx,ik,work,update,mode)
-      import
-      implicit none
-      integer(psb_lpk_), intent(inout), target   :: x(:,:)
-      type(psb_desc_type), intent(in)            :: desc_a
-      integer(psb_ipk_), intent(out)                       :: info
-      integer(psb_lpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
-    end subroutine psb_lovrlm
-    subroutine psb_lovrlv(x,desc_a,info,work,update,mode)
-      import
-      implicit none
-      integer(psb_lpk_), intent(inout), target   :: x(:)
-      type(psb_desc_type), intent(in)            :: desc_a
-      integer(psb_ipk_), intent(out)                       :: info
-      integer(psb_lpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional              :: update,mode
-    end subroutine psb_lovrlv
     subroutine psb_lovrl_vect(x,desc_a,info,work,update,mode)
       import
       implicit none
@@ -75,26 +57,6 @@ module psb_l_comm_mod
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_lhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
-      import
-      implicit none
-      integer(psb_lpk_), intent(inout), target :: x(:,:)
-      type(psb_desc_type), intent(in)          :: desc_a
-      integer(psb_ipk_), intent(out)                     :: info
-      integer(psb_lpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
-      character, intent(in), optional         :: tran
-    end subroutine psb_lhalom
-    subroutine psb_lhalov(x,desc_a,info,work,tran,mode,data)
-      import
-      implicit none
-      integer(psb_lpk_), intent(inout)        :: x(:)
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_lpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
-      character, intent(in), optional         :: tran
-    end subroutine psb_lhalov
     subroutine psb_lhalo_vect(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
@@ -119,24 +81,6 @@ module psb_l_comm_mod
 
 
   interface psb_scatter
-    subroutine  psb_lscatterm(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      integer(psb_lpk_), intent(out), allocatable :: locx(:,:)
-      integer(psb_lpk_), intent(in)  :: globx(:,:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_lscatterm
-    subroutine  psb_lscatterv(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      integer(psb_lpk_), intent(out), allocatable :: locx(:)
-      integer(psb_lpk_), intent(in)  :: globx(:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_lscatterv
     subroutine  psb_lscatter_vect(globx, locx, desc_a, info, root, mold)
       import
       implicit none
@@ -150,24 +94,6 @@ module psb_l_comm_mod
   end interface psb_scatter
 
   interface psb_gather
-    subroutine psb_lgatherm(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      integer(psb_lpk_), intent(in)  :: locx(:,:)
-      integer(psb_lpk_), intent(out), allocatable  :: globx(:,:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_lgatherm
-    subroutine psb_lgatherv(globx, locx, desc_a, info, root)
-      import
-      implicit none
-      integer(psb_lpk_), intent(in)  :: locx(:)
-      integer(psb_lpk_), intent(out), allocatable  :: globx(:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: root
-    end subroutine psb_lgatherv
     subroutine psb_lgather_vect(globx, locx, desc_a, info, root)
       import
       implicit none
