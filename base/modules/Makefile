@@ -30,9 +30,10 @@ UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_m
 	serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o \
 	serial/psb_serial_mod.o \
-	tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o \
-	tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
-	tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o \
+	tools/psb_cd_tools_mod.o \
+	tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
+	tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o\
+	tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o \
 	tools/psb_tools_mod.o \
 	psb_penv_mod.o $(COMMINT) psb_error_impl.o \
 	comm/psb_base_linmap_mod.o comm/psb_linmap_mod.o \
@@ -277,9 +278,11 @@ comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o:  desc/psb_desc_mod.o
 
 
 tools/psb_tools_mod.o: tools/psb_cd_tools_mod.o tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
-	tools/psb_i_tools_mod.o tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o  
+	tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
+	tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o  
 tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o: desc/psb_desc_mod.o psi_mod.o  serial/psb_mat_mod.o
-tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o 
+tools/psb_i_tools_mod.o: serial/psb_i_vect_mod.o
+tools/psb_l_tools_mod.o: serial/psb_l_vect_mod.o 	
 tools/psb_s_tools_mod.o: serial/psb_s_vect_mod.o 
 tools/psb_d_tools_mod.o: serial/psb_d_vect_mod.o 
 tools/psb_c_tools_mod.o: serial/psb_c_vect_mod.o 

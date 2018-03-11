@@ -30,7 +30,7 @@
 !   
 !    
 Module psb_i_tools_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_success_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
   use psb_i_multivect_mod, only : psb_i_base_multivect_type, psb_i_multivect_type
 
@@ -423,5 +423,4 @@ contains
 
     res = (lx>0)
   end subroutine psb_local_index_v
-
 end module psb_i_tools_mod
