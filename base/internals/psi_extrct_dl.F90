@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
+subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
      & length_dl,np,dl_lda,mode,info)
 
   !    internal routine
@@ -118,7 +118,7 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   !            desc_str list.
   !   length_dl  integer array(0:np)
   !             length_dl(i) is the length of dep_list(*,i) list
-  use psi_mod, psb_protect_name => psi_extract_dep_list
+  use psi_mod, psb_protect_name => psi_i_extract_dep_list
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -292,4 +292,4 @@ subroutine psi_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
 
   return
 
-end subroutine psi_extract_dep_list
+end subroutine psi_i_extract_dep_list

@@ -98,7 +98,7 @@
 !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
 !
 !
-subroutine psi_desc_index(desc,index_in,dep_list,&
+subroutine psi_i_desc_index(desc,index_in,dep_list,&
      & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
   use psb_desc_mod
   use psb_realloc_mod
@@ -108,7 +108,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   use mpi
 #endif
   use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_desc_index
+  use psi_mod, psb_protect_name => psi_i_desc_index
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -341,4 +341,4 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   
   return
 
-end subroutine psi_desc_index
+end subroutine psi_i_desc_index

@@ -37,6 +37,7 @@ module psi_mod
   use psb_error_mod
   use psb_penv_mod
   use psi_i_mod
+  use psi_l_mod
   use psi_s_mod
   use psi_d_mod
   use psi_c_mod

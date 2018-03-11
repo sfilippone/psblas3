@@ -29,11 +29,8 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psi_c_mod
+module psi_c_comm_a_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_spk_, psb_i_base_vect_type
-  use psb_c_base_vect_mod, only : psb_c_base_vect_type 
-  use psb_c_base_multivect_mod, only : psb_c_base_multivect_type 
-
 
   interface psi_swapdata
     subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
@@ -54,27 +51,7 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswapdatav
-    subroutine psi_cswapdata_vect(flag,beta,y,desc_a,work,info,data)
-      import 
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_c_base_vect_type) :: y
-      complex(psb_spk_)           :: beta 
-      complex(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
-    end subroutine psi_cswapdata_vect
-    subroutine psi_cswapdata_multivect(flag,beta,y,desc_a,work,info,data)
-      import 
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_c_base_multivect_type)    :: y
-      complex(psb_spk_)           :: beta 
-      complex(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
-    end subroutine psi_cswapdata_multivect
-    subroutine psi_cswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
+      subroutine psi_cswapidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
       integer(psb_ipk_), intent(in)      :: ictxt,icomm,flag, n
@@ -92,28 +69,6 @@ module psi_c_mod
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_cswapidxv
-    subroutine psi_cswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_c_base_vect_type)             :: y
-      complex(psb_spk_)                       :: beta
-      complex(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_cswap_vidx_vect
-    subroutine psi_cswap_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_c_base_multivect_type)      :: y
-      complex(psb_spk_)                       :: beta
-      complex(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_cswap_vidx_multivect
   end interface psi_swapdata
 
 
@@ -136,26 +91,6 @@ module psi_c_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_cswaptranv
-    subroutine psi_cswaptran_vect(flag,beta,y,desc_a,work,info,data)
-      import 
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_c_base_vect_type) :: y
-      complex(psb_spk_)           :: beta
-      complex(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
-    end subroutine psi_cswaptran_vect
-    subroutine psi_cswaptran_multivect(flag,beta,y,desc_a,work,info,data)
-      import 
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_c_base_multivect_type) :: y
-      complex(psb_spk_)           :: beta
-      complex(psb_spk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
-    end subroutine psi_cswaptran_multivect
     subroutine psi_ctranidxm(ictxt,icomm,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       import 
@@ -174,28 +109,6 @@ module psi_c_mod
       complex(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ctranidxv
-    subroutine psi_ctran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_c_base_vect_type)             :: y
-      complex(psb_spk_)                       :: beta
-      complex(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_ctran_vidx_vect
-    subroutine psi_ctran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      import 
-      integer(psb_ipk_), intent(in)           :: iictxt,iicomm,flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_c_base_multivect_type)      :: y
-      complex(psb_spk_)                       :: beta
-      complex(psb_spk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
-    end subroutine psi_ctran_vidx_multivect
   end interface psi_swaptran
 
   interface psi_ovrl_upd
@@ -213,20 +126,6 @@ module psi_c_mod
       integer(psb_ipk_), intent(in)                      :: update
       integer(psb_ipk_), intent(out)                     :: info
     end subroutine psi_covrl_updr2
-    subroutine  psi_covrl_upd_vect(x,desc_a,update,info)
-      import 
-      class(psb_c_base_vect_type)       :: x
-      type(psb_desc_type), intent(in)   :: desc_a
-      integer(psb_ipk_), intent(in)               :: update
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psi_covrl_upd_vect
-    subroutine  psi_covrl_upd_multivect(x,desc_a,update,info)
-      import 
-      class(psb_c_base_multivect_type)   :: x
-      type(psb_desc_type), intent(in)      :: desc_a
-      integer(psb_ipk_), intent(in)        :: update
-      integer(psb_ipk_), intent(out)       :: info
-    end subroutine psi_covrl_upd_multivect
   end interface psi_ovrl_upd
 
   interface psi_ovrl_save
@@ -244,20 +143,6 @@ module psi_c_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_saver2
-    subroutine  psi_covrl_save_vect(x,xs,desc_a,info)
-      import 
-      class(psb_c_base_vect_type)     :: x
-      complex(psb_spk_), allocatable  :: xs(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psi_covrl_save_vect
-    subroutine  psi_covrl_save_multivect(x,xs,desc_a,info)
-      import 
-      class(psb_c_base_multivect_type)     :: x
-      complex(psb_spk_), allocatable  :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psi_covrl_save_multivect
   end interface psi_ovrl_save
 
   interface psi_ovrl_restore
@@ -275,21 +160,7 @@ module psi_c_mod
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psi_covrl_restrr2
-    subroutine  psi_covrl_restr_vect(x,xs,desc_a,info)
-      import 
-      class(psb_c_base_vect_type)     :: x
-      complex(psb_spk_)               :: xs(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psi_covrl_restr_vect
-    subroutine  psi_covrl_restr_multivect(x,xs,desc_a,info)
-      import 
-      class(psb_c_base_multivect_type)     :: x
-      complex(psb_spk_)               :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psi_covrl_restr_multivect
   end interface psi_ovrl_restore
 
-end module psi_c_mod
+end module psi_c_comm_a_mod
 

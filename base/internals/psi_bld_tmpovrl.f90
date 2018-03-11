@@ -50,14 +50,14 @@
 !    desc     - type(psb_desc_type).  The communication descriptor.        
 !    info     - integer.              return code.
 !
-subroutine psi_bld_tmpovrl(iv,desc,info)
+subroutine psi_i_bld_tmpovrl(iv,desc,info)
   use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_bld_tmpovrl
+  use psi_mod, psb_protect_name => psi_i_bld_tmpovrl
   implicit none
   integer(psb_ipk_), intent(in)  :: iv(:)
   type(psb_desc_type), intent(inout) :: desc
@@ -145,6 +145,6 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
 
 9999 call psb_error_handler(ictxt,err_act)
 
-    return
+  return
 
-end subroutine psi_bld_tmpovrl
+end subroutine psi_i_bld_tmpovrl
