@@ -9,7 +9,6 @@ FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt
 	psb_sspfree.o psb_sspins.o psb_ssprn.o\
 	psb_glob_to_loc.o psb_loc_to_glob.o\
 	psb_iallc.o psb_iasb.o psb_ifree.o psb_iins.o \
-	psb_lallc.o psb_lasb.o psb_lfree.o psb_lins.o \
 	psb_sallc.o psb_sasb.o psb_sfree.o psb_sins.o \
 	psb_dallc.o psb_dasb.o psb_dfree.o psb_dins.o \
 	psb_zallc.o psb_zasb.o psb_zfree.o psb_zins.o \
@@ -19,6 +18,7 @@ FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt
 	psb_callc.o psb_casb.o psb_cfree.o psb_cins.o \
 	psb_cspins.o psb_csprn.o psb_cd_set_bld.o \
 	psb_s_map.o psb_d_map.o psb_c_map.o psb_z_map.o 
+#	psb_lallc.o psb_lasb.o psb_lfree.o psb_lins.o \
 
 MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o  \
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
