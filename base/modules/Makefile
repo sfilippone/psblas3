@@ -262,9 +262,9 @@ comm/psb_c_comm_mod.o: serial/psb_c_vect_mod.o desc/psb_desc_mod.o serial/psb_ma
 comm/psb_z_comm_mod.o: serial/psb_z_vect_mod.o desc/psb_desc_mod.o serial/psb_mat_mod.o 
 
 comm/psi_i_comm_v_mod.o:  serial/psb_i_vect_mod.o comm/psi_e_comm_a_mod.o \
-	comm/psi_m_comm_a_mod.o comm/psi_m_comm_v_mod.o comm/psi_e_comm_v_mod.o 
+	comm/psi_m_comm_a_mod.o 
 comm/psi_l_comm_v_mod.o:  serial/psb_l_vect_mod.o comm/psi_e_comm_a_mod.o \
-	comm/psi_m_comm_a_mod.o  comm/psi_m_comm_v_mod.o comm/psi_e_comm_v_mod.o 
+	comm/psi_m_comm_a_mod.o 
 comm/psi_s_comm_v_mod.o:  serial/psb_s_vect_mod.o comm/psi_s_comm_a_mod.o \
 	comm/psi_s_comm_v_mod.o 
 comm/psi_d_comm_v_mod.o:  serial/psb_d_vect_mod.o comm/psi_d_comm_a_mod.o \
