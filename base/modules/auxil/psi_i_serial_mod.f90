@@ -30,12 +30,12 @@
 !   
 !    
 module psi_i_serial_mod
-  use psb_const_mod, only : psb_ipk_
+  use psb_const_mod, only : psb_ipk_, psb_lpk_
 
   interface psb_gelp
     ! 2-D version
     subroutine psb_igelp(trans,iperm,x,info)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_ipk_), intent(inout)     ::  x(:,:)
       integer(psb_ipk_), intent(in)      ::  iperm(:)
@@ -43,7 +43,7 @@ module psi_i_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_igelp
     subroutine psb_igelpv(trans,iperm,x,info)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_ipk_), intent(inout)     ::  x(:)
       integer(psb_ipk_), intent(in)      ::  iperm(:)
@@ -54,7 +54,7 @@ module psi_i_serial_mod
   
   interface psb_geaxpby 
     subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_ipk_), intent(in)      :: m, n
       integer(psb_ipk_), intent (in)       ::  x(:,:)
@@ -63,7 +63,7 @@ module psi_i_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_iaxpby
     subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_ipk_), intent (in)       ::  x(:)
@@ -75,33 +75,33 @@ module psi_i_serial_mod
 
   interface psi_gth
     subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_ipk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_igthmv
     subroutine psi_igthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_ipk_) :: x(:), y(:),alpha,beta
     end subroutine psi_igthv
     subroutine psi_igthzmv(n,k,idx,x,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_ipk_) :: x(:,:), y(:)
       
     end subroutine psi_igthzmv
     subroutine psi_igthzmm(n,k,idx,x,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_ipk_) :: x(:,:), y(:,:)
       
     end subroutine psi_igthzmm
     subroutine psi_igthzv(n,idx,x,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none 
       integer(psb_ipk_) :: n, idx(:)
       integer(psb_ipk_) :: x(:), y(:)
@@ -110,19 +110,19 @@ module psi_i_serial_mod
 
   interface psi_sct
     subroutine psi_isctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_ipk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_isctmm
     subroutine psi_isctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       integer(psb_ipk_) :: n, k, idx(:)
       integer(psb_ipk_) :: beta, x(:), y(:,:)
     end subroutine psi_isctmv
     subroutine psi_isctv(n,idx,x,beta,y)
-      import :: psb_ipk_
+      import :: psb_ipk_, psb_lpk_
       implicit none
       
       integer(psb_ipk_) :: n, idx(:)
