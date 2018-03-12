@@ -29,55 +29,124 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File: psb_cfree.f90
+! File: psb_zfree.f90
 !
-! Subroutine: psb_cfree
+! Subroutine: psb_zfree
 !    frees a dense matrix structure
 ! 
 ! Arguments: 
 !    x(:,:)   - complex, allocatable          The dense matrix to be freed.
 !    desc_a   - type(psb_desc_type).        The communication descriptor.
 !    info     - integer.                      Return code
-subroutine psb_cfree_vect(x, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_cfree_vect
+subroutine psb_zfree(x, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_zfree
   implicit none
+
   !....parameters...
-  type(psb_c_vect_type), intent(inout) :: x
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info 
+  complex(psb_dpk_),allocatable, intent(inout)    :: x(:,:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+
   !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
+  integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
+  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
-  if (psb_errstatus_fatal()) return 
   call psb_erractionsave(err_act)
-  name='psb_cfreev'
-
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
+  name='psb_zfree'
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info=psb_err_forgot_spall_
     call psb_errpush(info,name)
-    goto 9999
+    return
   end if
-  ictxt = desc_a%get_context()
+
+  ictxt=desc_a%get_context()
 
   call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
-    info = psb_err_invalid_vect_state_
+  if (.not.allocated(x)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  !deallocate x
+  deallocate(x,stat=info)
+  if (info /= psb_no_err_) then
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
-  call x%free(info)
+  call psb_erractionrestore(err_act)
+  return
 
+9999 call psb_error_handler(ictxt,err_act)
+
+  return
+
+end subroutine psb_zfree
+
+
+
+! Subroutine: psb_zfreev
+!    frees a dense matrix structure
+! 
+! Arguments: 
+!    x(:)     - complex, allocatable        The dense matrix to be freed.
+!    desc_a   - type(psb_desc_type).      The communication descriptor.
+!    info     - integer.                    Return code
+subroutine psb_zfreev(x, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_zfreev
+  implicit none
+  !....parameters...
+  complex(psb_dpk_),allocatable, intent(inout)    :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+
+  !...locals....
+  integer(psb_ipk_) :: ictxt,np,me, err_act
+  character(len=20)   :: name
+
+
+  if(psb_get_errstatus() /= 0) return 
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  name='psb_zfreev'
+
+
+  if (.not.psb_is_ok_desc(desc_a)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  ictxt=desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name)
+    goto 9999
+
+  endif
+
+  if (.not.allocated(x)) then
+    info=psb_err_forgot_spall_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  !deallocate x
+  deallocate(x,stat=info)
   if (info /= psb_no_err_) then
     info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
@@ -90,110 +159,4 @@ subroutine psb_cfree_vect(x, desc_a, info)
 
   return
 
-end subroutine psb_cfree_vect
-
-subroutine psb_cfree_vect_r2(x, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_cfree_vect_r2
-  implicit none
-  !....parameters...
-  type(psb_c_vect_type), allocatable, intent(inout) :: x(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info 
-  !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act, i
-  character(len=20)   :: name
-
-
-  info=psb_success_
-  if (psb_errstatus_fatal()) return 
-  call psb_erractionsave(err_act)
-  name='psb_cfreev'
-
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  ictxt = desc_a%get_context()
-
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  do i=lbound(x,1),ubound(x,1)
-    call x(i)%free(info)
-    if (info /= 0) exit
-  end do
-  if (info == 0) deallocate(x,stat=info)
-  if (info /= psb_no_err_) then
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-  endif
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(ictxt,err_act)
-
-  return
-
-end subroutine psb_cfree_vect_r2
-
-
-subroutine psb_cfree_multivect(x, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_cfree_multivect
-  implicit none
-  !....parameters...
-  type(psb_c_multivect_type), intent(inout) :: x
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info 
-  !...locals....
-  integer(psb_ipk_) :: ictxt,np,me,err_act
-  character(len=20)   :: name
-
-
-  info=psb_success_
-  if (psb_errstatus_fatal()) return 
-  call psb_erractionsave(err_act)
-  name='psb_cfree'
-
-  if (.not.desc_a%is_ok()) then
-    info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  ictxt = desc_a%get_context()
-
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (.not.allocated(x%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  call x%free(info)
-
-  if (info /= psb_no_err_) then
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-  endif
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(ictxt,err_act)
-
-  return
-
-end subroutine psb_cfree_multivect
+end subroutine psb_zfreev
