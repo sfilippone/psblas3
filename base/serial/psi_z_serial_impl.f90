@@ -425,12 +425,11 @@ subroutine psi_zsctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_zsctv
+
 subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  complex(psb_dpk_), parameter :: one=(1.0d0,0.0d0)
-  complex(psb_dpk_), parameter :: zero=(0.0d0,0.0d0)
   integer(psb_ipk_) :: n, m, lldx, lldy, info
   complex(psb_dpk_) X(lldx,*), Y(lldy,*)
   complex(psb_dpk_) alpha, beta
@@ -474,19 +473,19 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
     goto 9999
   endif
 
-  if (alpha.eq.zero) then 
-    if (beta.eq.zero) then 
+  if (alpha.eq.zzero) then 
+    if (beta.eq.zzero) then 
       do j=1, n 
         do i=1,m 
-          y(i,j) = zero
+          y(i,j) = zzero
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.zone) then
       !   
       !        Do nothing! 
       !               
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-zone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = - y(i,j)
@@ -500,22 +499,22 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.one) then
+  else if (alpha.eq.zone) then
 
-    if (beta.eq.zero) then 
+    if (beta.eq.zzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.zone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-zone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) - y(i,j)
@@ -529,22 +528,22 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.-one) then 
+  else if (alpha.eq.-zone) then 
 
-    if (beta.eq.zero) then 
+    if (beta.eq.zzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.zone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-zone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) - y(i,j)
@@ -560,20 +559,20 @@ subroutine  zaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
   else  
 
-    if (beta.eq.zero) then 
+    if (beta.eq.zzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.zone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-zone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) - y(i,j)

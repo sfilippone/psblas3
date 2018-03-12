@@ -29,15 +29,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
+subroutine psi_laxpby(m,n,alpha, x, beta, y, info)
   
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(in)      :: m, n
-  complex(psb_spk_), intent (in)       ::  x(:,:)
-  complex(psb_spk_), intent (inout)    ::  y(:,:)
-  complex(psb_spk_), intent (in)       ::  alpha, beta
+  integer(psb_lpk_), intent (in)       ::  x(:,:)
+  integer(psb_lpk_), intent (inout)    ::  y(:,:)
+  integer(psb_lpk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
@@ -76,7 +76,7 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call caxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  if ((m>0).and.(n>0)) call laxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -84,17 +84,17 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine psi_caxpby
+end subroutine psi_laxpby
 
-subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
+subroutine psi_laxpbyv(m,alpha, x, beta, y, info)
   
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(in)      :: m
-  complex(psb_spk_), intent (in)       ::  x(:)
-  complex(psb_spk_), intent (inout)    ::  y(:)
-  complex(psb_spk_), intent (in)       :: alpha, beta
+  integer(psb_lpk_), intent (in)       ::  x(:)
+  integer(psb_lpk_), intent (inout)    ::  y(:)
+  integer(psb_lpk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
@@ -127,7 +127,7 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if (m>0) call caxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  if (m>0) call laxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -136,30 +136,30 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
 
   return
 
-end subroutine psi_caxpbyv
+end subroutine psi_laxpbyv
 
 
-subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
+subroutine psi_lgthmv(n,k,idx,alpha,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  complex(psb_spk_) :: x(:,:), y(:),alpha,beta
+  integer(psb_lpk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == czero) then 
-    if (alpha == czero) then 
+  if (beta == lzero) then 
+    if (alpha == lzero) then 
       pt=0
       do j=1,k
         do i=1,n
           pt=pt+1
-          y(pt) = czero
+          y(pt) = lzero
         end do
       end do
-    else if (alpha == cone) then
+    else if (alpha == lone) then
       pt=0
       do j=1,k
         do i=1,n
@@ -167,7 +167,7 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
           y(pt) = x(idx(i),j)
         end do
       end do
-    else if (alpha == -cone) then 
+    else if (alpha == -lone) then 
       pt=0
       do j=1,k
         do i=1,n
@@ -185,17 +185,17 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
       end do
     end if
   else 
-    if (beta == cone) then 
+    if (beta == lone) then 
       ! Do nothing
-    else if (beta == -cone) then 
+    else if (beta == -lone) then 
       y(1:n*k) = -y(1:n*k) 
     else
       y(1:n*k) = beta*y(1:n*k) 
     end if
 
-    if (alpha == czero) then 
+    if (alpha == lzero) then 
       ! do nothing
-    else if (alpha == cone) then 
+    else if (alpha == lone) then 
       pt=0
       do j=1,k
         do i=1,n
@@ -203,7 +203,7 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
           y(pt) = y(pt) + x(idx(i),j)
         end do
       end do
-    else if (alpha == -cone) then
+    else if (alpha == -lone) then
       pt=0
       do j=1,k
         do i=1,n
@@ -222,28 +222,28 @@ subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
     end if
   end if
 
-end subroutine psi_cgthmv
+end subroutine psi_lgthmv
 
-subroutine psi_cgthv(n,idx,alpha,x,beta,y)
+subroutine psi_lgthv(n,idx,alpha,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  complex(psb_spk_) :: x(:), y(:),alpha,beta
+  integer(psb_lpk_) :: x(:), y(:),alpha,beta
 
   ! Locals
   integer(psb_ipk_) :: i
-  if (beta == czero) then 
-    if (alpha == czero) then 
+  if (beta == lzero) then 
+    if (alpha == lzero) then 
       do i=1,n
-        y(i) = czero
+        y(i) = lzero
       end do
-    else if (alpha == cone) then 
+    else if (alpha == lone) then 
       do i=1,n
         y(i) = x(idx(i))
       end do
-    else if (alpha == -cone) then 
+    else if (alpha == -lone) then 
       do i=1,n
         y(i) = -x(idx(i))
       end do
@@ -253,21 +253,21 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
       end do
     end if
   else 
-    if (beta == cone) then 
+    if (beta == lone) then 
       ! Do nothing
-    else if (beta == -cone) then 
+    else if (beta == -lone) then 
       y(1:n) = -y(1:n) 
     else
       y(1:n) = beta*y(1:n) 
     end if
 
-    if (alpha == czero) then 
+    if (alpha == lzero) then 
       ! do nothing
-    else if (alpha == cone) then 
+    else if (alpha == lone) then 
       do i=1,n
         y(i) = y(i) + x(idx(i))
       end do
-    else if (alpha == -cone) then 
+    else if (alpha == -lone) then 
       do i=1,n
         y(i) = y(i) - x(idx(i))
       end do
@@ -278,15 +278,15 @@ subroutine psi_cgthv(n,idx,alpha,x,beta,y)
     end if
   end if
 
-end subroutine psi_cgthv
+end subroutine psi_lgthv
 
-subroutine psi_cgthzmm(n,k,idx,x,y)
+subroutine psi_lgthzmm(n,k,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  complex(psb_spk_) :: x(:,:), y(:,:)
+  integer(psb_lpk_) :: x(:,:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i
@@ -296,15 +296,15 @@ subroutine psi_cgthzmm(n,k,idx,x,y)
     y(i,1:k)=x(idx(i),1:k)
   end do
 
-end subroutine psi_cgthzmm
+end subroutine psi_lgthzmm
 
-subroutine psi_cgthzmv(n,k,idx,x,y)
+subroutine psi_lgthzmv(n,k,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  complex(psb_spk_) :: x(:,:), y(:)
+  integer(psb_lpk_) :: x(:,:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
@@ -317,15 +317,15 @@ subroutine psi_cgthzmv(n,k,idx,x,y)
     end do
   end do
 
-end subroutine psi_cgthzmv
+end subroutine psi_lgthzmv
 
-subroutine psi_cgthzv(n,idx,x,y)
+subroutine psi_lgthzv(n,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  complex(psb_spk_) :: x(:), y(:)
+  integer(psb_lpk_) :: x(:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
@@ -334,24 +334,24 @@ subroutine psi_cgthzv(n,idx,x,y)
     y(i)=x(idx(i))
   end do
 
-end subroutine psi_cgthzv
+end subroutine psi_lgthzv
 
-subroutine psi_csctmm(n,k,idx,x,beta,y)
+subroutine psi_lsctmm(n,k,idx,x,beta,y)
   
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  complex(psb_spk_) :: beta, x(:,:), y(:,:)
+  integer(psb_lpk_) :: beta, x(:,:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i, j
 
-  if (beta == czero) then
+  if (beta == lzero) then
     do i=1,n
       y(idx(i),1:k) = x(i,1:k)
     end do
-  else if (beta == cone) then
+  else if (beta == lone) then
     do i=1,n
       y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
     end do
@@ -360,20 +360,20 @@ subroutine psi_csctmm(n,k,idx,x,beta,y)
       y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
     end do
   end if
-end subroutine psi_csctmm
+end subroutine psi_lsctmm
 
-subroutine psi_csctmv(n,k,idx,x,beta,y)
+subroutine psi_lsctmv(n,k,idx,x,beta,y)
   
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  complex(psb_spk_) :: beta, x(:), y(:,:)
+  integer(psb_lpk_) :: beta, x(:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == czero) then
+  if (beta == lzero) then
     pt=0
     do j=1,k
       do i=1,n
@@ -381,7 +381,7 @@ subroutine psi_csctmv(n,k,idx,x,beta,y)
         y(idx(i),j) = x(pt)
       end do
     end do
-  else if (beta == cone) then
+  else if (beta == lone) then
     pt=0
     do j=1,k
       do i=1,n
@@ -398,24 +398,24 @@ subroutine psi_csctmv(n,k,idx,x,beta,y)
       end do
     end do
   end if
-end subroutine psi_csctmv
+end subroutine psi_lsctmv
 
-subroutine psi_csctv(n,idx,x,beta,y)
+subroutine psi_lsctv(n,idx,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  complex(psb_spk_) :: beta, x(:), y(:)
+  integer(psb_lpk_) :: beta, x(:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
 
-  if (beta == czero) then
+  if (beta == lzero) then
     do i=1,n
       y(idx(i)) = x(i)
     end do
-  else if (beta == cone) then
+  else if (beta == lone) then
     do i=1,n
       y(idx(i)) = y(idx(i))+x(i)
     end do
@@ -424,19 +424,19 @@ subroutine psi_csctv(n,idx,x,beta,y)
       y(idx(i)) = beta*y(idx(i))+x(i)
     end do
   end if
-end subroutine psi_csctv
+end subroutine psi_lsctv
 
-subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
+subroutine  laxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_) :: n, m, lldx, lldy, info
-  complex(psb_spk_) X(lldx,*), Y(lldy,*)
-  complex(psb_spk_) alpha, beta
+  integer(psb_lpk_) X(lldx,*), Y(lldy,*)
+  integer(psb_lpk_) alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
   character  name*20
-  name='caxpby'
+  name='laxpby'
 
 
   !
@@ -473,19 +473,19 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
     goto 9999
   endif
 
-  if (alpha.eq.czero) then 
-    if (beta.eq.czero) then 
+  if (alpha.eq.lzero) then 
+    if (beta.eq.lzero) then 
       do j=1, n 
         do i=1,m 
-          y(i,j) = czero
+          y(i,j) = lzero
         enddo
       enddo
-    else if (beta.eq.cone) then
+    else if (beta.eq.lone) then
       !   
       !        Do nothing! 
       !               
 
-    else if (beta.eq.-cone) then 
+    else if (beta.eq.-lone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = - y(i,j)
@@ -499,22 +499,22 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.cone) then
+  else if (alpha.eq.lone) then
 
-    if (beta.eq.czero) then 
+    if (beta.eq.lzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j)
         enddo
       enddo
-    else if (beta.eq.cone) then
+    else if (beta.eq.lone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-cone) then 
+    else if (beta.eq.-lone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) - y(i,j)
@@ -528,22 +528,22 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.-cone) then 
+  else if (alpha.eq.-lone) then 
 
-    if (beta.eq.czero) then 
+    if (beta.eq.lzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j)
         enddo
       enddo
-    else if (beta.eq.cone) then
+    else if (beta.eq.lone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-cone) then 
+    else if (beta.eq.-lone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) - y(i,j)
@@ -559,20 +559,20 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
   else  
 
-    if (beta.eq.czero) then 
+    if (beta.eq.lzero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
-    else if (beta.eq.cone) then
+    else if (beta.eq.lone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-cone) then 
+    else if (beta.eq.-lone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) - y(i,j)
@@ -594,4 +594,4 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   call fcpsb_serror()
   return
 
-end subroutine caxpby
+end subroutine laxpby
