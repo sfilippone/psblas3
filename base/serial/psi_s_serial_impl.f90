@@ -425,9 +425,12 @@ subroutine psi_ssctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_ssctv
+
 subroutine  saxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
-  integer n, m, lldx, lldy, info
+  use psb_error_mod
+  implicit none 
+  integer(psb_ipk_) :: n, m, lldx, lldy, info
   real(psb_spk_) X(lldx,*), Y(lldy,*)
   real(psb_spk_) alpha, beta
   integer(psb_ipk_) :: i, j

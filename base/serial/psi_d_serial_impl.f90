@@ -425,6 +425,7 @@ subroutine psi_dsctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_dsctv
+
 subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
@@ -480,9 +481,9 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
         enddo
       enddo
     else if (beta.eq.done) then
-      !
-      !     Do nothing! 
-      !            
+      !   
+      !        Do nothing! 
+      !               
 
     else if (beta.eq.-done) then 
       do j=1,n 
