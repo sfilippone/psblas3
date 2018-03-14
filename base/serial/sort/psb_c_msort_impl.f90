@@ -41,6 +41,41 @@
   !  Addison-Wesley
   !
 
+  subroutine psb_cmsort_u(x,nout,dir)
+    use psb_c_sort_mod, psb_protect_name => psb_cmsort_u
+    use psb_error_mod
+    implicit none 
+    complex(psb_spk_), intent(inout)           :: x(:) 
+    integer(psb_ipk_), intent(out)             :: nout
+    integer(psb_ipk_), optional, intent(in)    :: dir
+
+    integer(psb_ipk_) :: n, k
+    integer(psb_ipk_) :: err_act
+
+    integer(psb_ipk_)  :: ierr(5)
+    character(len=20)  :: name
+
+    name='psb_msort_u'
+    call psb_erractionsave(err_act)
+
+    n = size(x)
+
+    call psb_msort(x,dir=dir)
+    nout = min(1,n)
+    do k=2,n
+      if (x(k) /= x(nout)) then 
+        nout = nout + 1
+        x(nout) = x(k)
+      endif
+    enddo
+
+    return
+
+9999 call psb_error_handler(err_act)
+
+    return
+  end subroutine psb_cmsort_u
+
 
 
 

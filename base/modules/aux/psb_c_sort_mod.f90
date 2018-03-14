@@ -44,6 +44,15 @@ module psb_c_sort_mod
   use psb_const_mod
 
 
+  interface psb_msort_unique
+    subroutine psb_cmsort_u(x,nout,dir)
+      import 
+      complex(psb_spk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), intent(out)             :: nout
+      integer(psb_ipk_), optional, intent(in)    :: dir
+    end subroutine psb_cmsort_u
+  end interface psb_msort_unique
+
   type psb_c_heap
     integer(psb_ipk_) :: last, dir
     complex(psb_spk_), allocatable    :: keys(:)

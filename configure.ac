@@ -393,7 +393,7 @@ if test "X$FCOPT" == "X" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
  elif test "X$psblas_cv_fc" == X"cray" ; then
-     FCOPT="-O3 -em $FCOPT"
+     FCOPT="-O3 -em -J. $FCOPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG  compiler ..
      FCOPT="-O2 "
