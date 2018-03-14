@@ -187,7 +187,7 @@ contains
     n   = m
     nnz = ((n*9)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
-
+    t0 = psb_wtime()
     select case(partition_)
     case(1)
       ! A BLOCK partition 
