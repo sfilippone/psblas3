@@ -2056,7 +2056,7 @@ contains
     real(psb_dpk_), intent(in)    :: y(:,:)
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), allocatable     :: res(:)
-    integer(psb_ipk_), external      :: ddot
+    real(psb_dpk_), external      :: ddot
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
@@ -2394,7 +2394,7 @@ contains
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), allocatable    :: res(:)
-    integer(psb_ipk_), external      :: dnrm2
+    real(psb_dpk_), external      :: dnrm2
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
