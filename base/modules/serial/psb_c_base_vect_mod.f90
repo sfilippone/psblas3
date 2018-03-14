@@ -2105,7 +2105,7 @@ contains
     complex(psb_spk_), intent(in)    :: y(:,:)
     integer(psb_ipk_), intent(in)           :: n
     complex(psb_spk_), allocatable     :: res(:)
-    integer(psb_ipk_), external      :: cdotc
+    complex(psb_spk_), external      :: cdotc
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
@@ -2443,7 +2443,7 @@ contains
     class(psb_c_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_spk_), allocatable    :: res(:)
-    integer(psb_ipk_), external      :: scnrm2
+    real(psb_spk_), external      :: scnrm2
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()
