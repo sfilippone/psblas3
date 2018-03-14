@@ -77,7 +77,7 @@ module psb_z_prec_type
       implicit none
       type(psb_zspmat_type), intent(in), target  :: a
       type(psb_desc_type), intent(inout), target    :: desc_a
-      class(psb_zprec_type), intent(inout), target :: prec
+      class(psb_zprec_type), intent(inout) :: prec
       integer(psb_ipk_), intent(out)               :: info
       class(psb_z_base_sparse_mat), intent(in), optional :: amold
       class(psb_z_base_vect_type), intent(in), optional  :: vmold
