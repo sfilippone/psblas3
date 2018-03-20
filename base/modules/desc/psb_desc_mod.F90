@@ -501,7 +501,7 @@ contains
 
   function psb_cd_get_global_indices(desc,owned) result(val)
     implicit none 
-    integer(psb_ipk_), allocatable   :: val(:)
+    integer(psb_lpk_), allocatable   :: val(:)
     class(psb_desc_type), intent(in) :: desc
     logical, intent(in), optional    :: owned
 
@@ -1078,7 +1078,7 @@ contains
     use psb_penv_mod
     use psb_realloc_mod
     Implicit None
-    integer(psb_ipk_), allocatable, intent(out)       :: tmp(:)
+    integer(psb_lpk_), allocatable, intent(out)       :: tmp(:)
     integer(psb_ipk_), intent(in)                     :: data
     Type(psb_desc_type), Intent(in), target :: desc
     integer(psb_ipk_), intent(out)                    :: info
@@ -1086,8 +1086,9 @@ contains
 
     !     .. Local Scalars ..
     integer(psb_ipk_) ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
-         & idx, gidx, proc, n_elem_send, n_elem_recv
-    integer(psb_ipk_), pointer   :: idxlist(:) 
+         & idx, proc, n_elem_send, n_elem_recv
+    integer(psb_ipk_), pointer   :: idxlist(:)
+    integer(psb_lpk_) :: gidx
     integer(psb_ipk_) :: debug_level, debug_unit, err_act
     character(len=20)    :: name
 
@@ -1135,7 +1136,7 @@ contains
 
       Do j=0,n_elem_recv-1
         idx = idxlist(incnt+psb_elem_recv_+j)
-        call psb_ensure_size((outcnt+3),tmp,info,pad=-ione)
+        call psb_ensure_size((outcnt+3),tmp,info,pad=-1_psb_lpk_)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
@@ -1188,7 +1189,7 @@ contains
     use psb_error_mod 
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
@@ -1199,7 +1200,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%l2gs1(idx,info,mask=mask,owned=owned)
+      call desc%indxmap%l2gip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1223,7 +1224,7 @@ contains
     implicit none 
     class(psb_desc_type), intent(in) :: desc
     integer(psb_ipk_), intent(in)    :: idxin
-    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_lpk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
@@ -1236,7 +1237,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%l2gs2(idxin,idxout,info,mask=mask,owned=owned)
+      call desc%indxmap%l2g(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1259,7 +1260,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
@@ -1271,7 +1272,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%l2gv1(idx,info,mask=mask,owned=owned)
+      call desc%indxmap%l2gip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1294,7 +1295,7 @@ contains
     implicit none 
     class(psb_desc_type), intent(in) :: desc
     integer(psb_ipk_), intent(in)    :: idxin(:)
-    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_lpk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
@@ -1306,7 +1307,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%l2gv2(idxin,idxout,info,mask=mask,owned=owned)
+      call desc%indxmap%l2g(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1329,7 +1330,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
@@ -1341,7 +1342,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2ls1(idx,info,mask=mask,owned=owned)
+      call desc%indxmap%g2lip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1363,7 +1364,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
@@ -1377,7 +1378,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2ls2(idxin,idxout,info,mask=mask,owned=owned)
+      call desc%indxmap%g2l(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1400,7 +1401,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
@@ -1412,7 +1413,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2lv1(idx,info,mask=mask,owned=owned)
+      call desc%indxmap%g2lip(idx,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1434,7 +1435,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
@@ -1449,7 +1450,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2lv2(idxin,idxout,info,mask=mask,owned=owned)
+      call desc%indxmap%g2l(idxin,idxout,info,mask=mask,owned=owned)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1473,7 +1474,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
@@ -1485,7 +1486,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2ls1_ins(idx,info,mask=mask,lidx=lidx)
+      call desc%indxmap%g2lip_ins(idx,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1507,7 +1508,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
@@ -1522,7 +1523,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2ls2_ins(idxin,idxout,info,mask=mask,lidx=lidx)
+      call desc%indxmap%g2l_ins(idxin,idxout,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1545,7 +1546,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
@@ -1559,7 +1560,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2lv1_ins(idx,info,mask=mask,lidx=lidx)
+      call desc%indxmap%g2lip_ins(idx,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1581,7 +1582,7 @@ contains
     use psb_error_mod
     implicit none 
     class(psb_desc_type), intent(inout) :: desc
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
@@ -1596,7 +1597,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (allocated(desc%indxmap)) then 
-      call desc%indxmap%g2lv2_ins(idxin,idxout,info,mask=mask,lidx=lidx)
+      call desc%indxmap%g2l_ins(idxin,idxout,info,mask=mask,lidx=lidx)
     else
       info = psb_err_invalid_cd_state_
     end if
@@ -1618,7 +1619,7 @@ contains
   subroutine cd_fnd_owner(idx,iprc,desc,info)
     use psb_error_mod
     implicit none 
-    integer(psb_ipk_), intent(in) :: idx(:)
+    integer(psb_lpk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
     class(psb_desc_type), intent(in) :: desc
     integer(psb_ipk_), intent(out) :: info
