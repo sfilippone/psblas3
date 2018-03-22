@@ -116,7 +116,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   !    ...array parameters.....
   type(psb_desc_type) :: desc
-  integer(psb_ipk_) :: index_in(:),dep_list(:)
+  integer(psb_lpk_) :: index_in(:)
+  integer(psb_ipk_) :: dep_list(:)
   integer(psb_ipk_),allocatable  :: desc_index(:)
   integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
   logical         :: isglob_in

@@ -83,7 +83,8 @@ module psi_i_mod
          & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
       import 
       type(psb_desc_type) :: desc
-      integer(psb_ipk_) :: index_in(:),dep_list(:)
+      integer(psb_lpk_) :: index_in(:)
+      integer(psb_ipk_) :: dep_list(:)
       integer(psb_ipk_),allocatable  :: desc_index(:)
       integer(psb_ipk_) :: length_dl,nsnd,nrcv
       logical         :: isglob_in
