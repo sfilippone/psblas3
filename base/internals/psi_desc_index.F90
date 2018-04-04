@@ -127,7 +127,7 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
   integer(psb_ipk_) :: ictxt
   integer(psb_ipk_), parameter  :: no_comm=-1
   !     ...local arrays..
-  integer(psb_ipk_),allocatable  :: sndbuf(:), rcvbuf(:)
+  integer(psb_lpk_),allocatable  :: sndbuf(:), rcvbuf(:)
 
   integer(psb_mpk_),allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:)
@@ -261,10 +261,12 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
         sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
       end do
     else
-      
-      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
-           & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+      sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv) = index_in(i+1:i+nerv)      
+      call desc%indxmap%l2gip(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
            & info) 
+!!$      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
+!!$           & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+!!$           & info) 
 
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
@@ -293,8 +295,8 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     idxr = idxr + rvsz(proc+1)
   end do
 
-  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_ipk_,&
-       & rcvbuf,rvsz,brvindx,psb_mpi_ipk_,icomm,minfo)
+  call mpi_alltoallv(sndbuf,sdsz,bsdindx,psb_mpi_lpk_,&
+       & rcvbuf,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
   if (minfo /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999

@@ -60,19 +60,21 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  integer(psb_ipk_), intent(in) :: idx(:)
+  integer(psb_lpk_), intent(in) :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(in) :: idxmap
   integer(psb_ipk_), intent(out) :: info
 
 
-  integer(psb_ipk_), allocatable :: helem(:),hproc(:),&
+  integer(psb_lpk_), allocatable :: hproc(:)
+  integer(psb_ipk_), allocatable :: helem(:),&
        & answers(:,:),idxsrch(:,:), hhidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
   integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,hsize,ip,isz,k,j,&
-       & last_ih, last_j, nv, mglob
+       & last_ih, last_j, nv
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
