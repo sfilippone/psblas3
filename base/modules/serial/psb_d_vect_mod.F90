@@ -235,25 +235,16 @@ contains
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-    class(psb_d_base_vect_type), pointer :: mld
 
+    info = psb_success_
 
     if (allocated(x%v)) &
          & call x%free(info)
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
-#else 
-      mld = psb_d_get_base_vect_default()
-      call mld%mold(x%v,info)
-#endif
     endif
     if (info == psb_success_) call x%v%bld(n)
 
