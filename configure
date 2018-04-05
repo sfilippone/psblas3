@@ -7174,6 +7174,151 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran SAME_TYPE_AS" >&5
+$as_echo_n "checking support for Fortran SAME_TYPE_AS... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+program stt
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: new_foo
+    integer :: j
+  end type new_foo
+  type(foo) :: foov
+  type(new_foo) :: nfv1, nfv2
+
+
+  write(*,*) 'foov == nfv1? ', same_type_as(foov,nfv1)
+  write(*,*) 'nfv2 == nfv1? ', same_type_as(nfv2,nfv1)
+end program stt
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		     :
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build PSBLAS without support for SAME_TYPE_AS.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran EXTENDS_TYPE_OF" >&5
+$as_echo_n "checking support for Fortran EXTENDS_TYPE_OF... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+program xtt
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: new_foo
+    integer :: j
+  end type new_foo
+  type(foo) :: foov
+  type(new_foo) :: nfv1, nfv2
+
+  write(*,*) 'nfv1 extends foov? ', extends_type_of(nfv1,foov)
+end program xtt
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		     :
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran MOLD= allocation" >&5
+$as_echo_n "checking support for Fortran MOLD= allocation... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+program xtt
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: new_foo
+    integer :: j
+  end type new_foo
+  class(foo), allocatable  :: fooab
+  type(new_foo) :: nfv
+  integer :: info
+
+  allocate(fooab, mold=nfv, stat=info)
+
+end program xtt
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		     :
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build PSBLAS without support for MOLD= allocation.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 #
 # Optional features
 #
@@ -7386,144 +7531,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran SAME_TYPE_AS" >&5
-$as_echo_n "checking support for Fortran SAME_TYPE_AS... " >&6; }
- ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
- ac_exeext=''
- ac_ext='f90'
-  ac_fc=${MPIFC-$FC};
- cat > conftest.$ac_ext <<_ACEOF
-
-program stt
-  type foo
-    integer :: i
-  end type foo
-  type, extends(foo) :: new_foo
-    integer :: j
-  end type new_foo
-  type(foo) :: foov
-  type(new_foo) :: nfv1, nfv2
-
-
-  write(*,*) 'foov == nfv1? ', same_type_as(foov,nfv1)
-  write(*,*) 'nfv2 == nfv1? ', same_type_as(nfv2,nfv1)
-end program stt
-_ACEOF
-if ac_fn_fc_try_compile "$LINENO"; then :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		      FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"
-else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		     echo "configure: failed program was:" >&5
-		     cat conftest.$ac_ext >&5
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran EXTENDS_TYPE_OF" >&5
-$as_echo_n "checking support for Fortran EXTENDS_TYPE_OF... " >&6; }
- ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
- ac_exeext=''
- ac_ext='f90'
-  ac_fc=${MPIFC-$FC};
- cat > conftest.$ac_ext <<_ACEOF
-
-program xtt
-  type foo
-    integer :: i
-  end type foo
-  type, extends(foo) :: new_foo
-    integer :: j
-  end type new_foo
-  type(foo) :: foov
-  type(new_foo) :: nfv1, nfv2
-
-  write(*,*) 'nfv1 extends foov? ', extends_type_of(nfv1,foov)
-end program xtt
-_ACEOF
-if ac_fn_fc_try_compile "$LINENO"; then :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		      FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"
-else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		     echo "configure: failed program was:" >&5
-		     cat conftest.$ac_ext >&5
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran MOLD= allocation" >&5
-$as_echo_n "checking support for Fortran MOLD= allocation... " >&6; }
- ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
- ac_exeext=''
- ac_ext='f90'
-  ac_fc=${MPIFC-$FC};
- cat > conftest.$ac_ext <<_ACEOF
-
-program xtt
-  type foo
-    integer :: i
-  end type foo
-  type, extends(foo) :: new_foo
-    integer :: j
-  end type new_foo
-  class(foo), allocatable  :: fooab
-  type(new_foo) :: nfv
-  integer :: info
-
-  allocate(fooab, mold=nfv, stat=info)
-
-end program xtt
-_ACEOF
-if ac_fn_fc_try_compile "$LINENO"; then :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		      FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"
-else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		     echo "configure: failed program was:" >&5
-		     cat conftest.$ac_ext >&5
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
