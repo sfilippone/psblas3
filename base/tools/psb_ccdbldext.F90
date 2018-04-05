@@ -84,15 +84,18 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer(psb_ipk_) ::  i, j, err_act,m,&
        &  lovr, lworks,lworkr, n_row,n_col, n_col_prev, &
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
-  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
+  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e, &
+       & idx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
+  integer(psb_lpk_) :: gidx, lnz
   integer(psb_mpk_) :: icomm, ictxt, me, np, minfo
 
   integer(psb_ipk_), allocatable :: irow(:), icol(:)
   integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
-  integer(psb_ipk_), allocatable :: halo(:),ovrlap(:),works(:),workr(:),&
+  integer(psb_lpk_), allocatable :: works(:),workr(:)
+  integer(psb_ipk_), allocatable :: halo(:),ovrlap(:),&
        & t_halo_in(:), t_halo_out(:),temp(:),maskr(:)
   integer(psb_mpk_),allocatable :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -448,8 +451,8 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
       if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
-          call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
-          tot_elem=i
+          call psb_msort_unique(works(idxs+1:idxs+tot_elem),lnz)
+          tot_elem = lnz
         endif
 
         sdsz(proc+1) = tot_elem
@@ -536,7 +539,8 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         end if
       end do
       ! Eliminate duplicates from request
-      call psb_msort_unique(works(1:j),iszs)
+      call psb_msort_unique(works(1:j),lnz)
+      iszs = lnz
 
       !
       ! fnd_owner on desc_a because we want the procs who
@@ -553,9 +557,9 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
            & ': Done fnd_owner', desc_ov%indxmap%get_state()
 
       do i=1,iszs
-        idx = works(i)
+        gidx = works(i)
         n_col   = desc_ov%get_local_cols()
-        call desc_ov%indxmap%g2l_ins(idx,lidx,info)
+        call desc_ov%indxmap%g2l_ins(gidx,lidx,info)
         if (desc_ov%get_local_cols() >  n_col ) then
           !
           ! This is a new index. Assigning a local index as
