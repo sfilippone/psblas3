@@ -273,6 +273,8 @@ contains
     use psi_comm_buffers_mod 
     use psb_const_mod
     use psb_error_mod
+    use psb_mat_mod
+    use psb_vect_mod
 ! !$    use psb_rsb_mod
 #ifdef MPI_MOD
     use mpi
@@ -282,8 +284,7 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpik_), intent(out) :: ictxt
-    integer(psb_mpik_), intent(in), optional :: np, basectxt, ids(:)
-
+    integer(psb_mpik_), intent(in), optional :: np, basectxt, ids(:)    
 
     integer(psb_mpik_) :: i, isnullcomm
     integer(psb_mpik_), allocatable :: iids(:) 
@@ -291,6 +292,21 @@ contains
     integer(psb_mpik_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
     character(len=20), parameter :: name='psb_init'
     integer(psb_ipk_) :: iinfo
+    !
+    ! Defaults for vectors and matrices
+    !
+    type(psb_s_csr_sparse_mat) :: smatdef
+    type(psb_d_csr_sparse_mat) :: dmatdef
+    type(psb_c_csr_sparse_mat) :: cmatdef
+    type(psb_z_csr_sparse_mat) :: zmatdef
+
+    type(psb_i_base_vect_type)  :: ivetdef
+    type(psb_s_base_vect_type)  :: svetdef
+    type(psb_d_base_vect_type)  :: dvetdef
+    type(psb_c_base_vect_type)  :: cvetdef
+    type(psb_z_base_vect_type)  :: zvetdef
+
+    !    
     call psb_set_debug_unit(psb_err_unit)
 
 #if defined(SERIAL_MPI) 
@@ -381,6 +397,17 @@ contains
     if (ictxt == mpi_comm_null) return 
 #endif
 
+    call psb_set_vect_default(ivetdef)
+    call psb_set_vect_default(svetdef)
+    call psb_set_vect_default(dvetdef)
+    call psb_set_vect_default(cvetdef)
+    call psb_set_vect_default(zvetdef)
+
+    call psb_set_mat_default(smatdef)
+    call psb_set_mat_default(dmatdef)
+    call psb_set_mat_default(cmatdef)
+    call psb_set_mat_default(zmatdef)
+    
 ! !$    call psb_rsb_init(info)
 ! !$    if (info.ne.psb_rsb_const_success) then 
 ! !$      if (info.eq.psb_rsb_const_not_available) then 

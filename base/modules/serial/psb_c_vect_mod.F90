@@ -193,6 +193,7 @@ contains
     integer(psb_ipk_) :: info
     class(psb_c_base_vect_type), pointer :: mld
 
+    info = psb_success_
     if (allocated(x%v)) &
          & call x%free(info)
 
@@ -206,7 +207,7 @@ contains
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_c_get_base_vect_default())
 #else 
-      mld = psb_c_get_base_vect_default()
+      mld => psb_c_get_base_vect_default()
       call mld%mold(x%v,info)
 #endif
     endif
@@ -223,7 +224,7 @@ contains
     integer(psb_ipk_) :: info
     class(psb_c_base_vect_type), pointer :: mld
 
-
+    info = psb_success_
     if (allocated(x%v)) &
          & call x%free(info)
 
@@ -237,7 +238,7 @@ contains
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_c_get_base_vect_default())
 #else 
-      mld = psb_c_get_base_vect_default()
+      mld => psb_c_get_base_vect_default()
       call mld%mold(x%v,info)
 #endif
     endif
@@ -480,21 +481,31 @@ contains
     class(psb_c_vect_type), intent(inout) :: x
     class(psb_c_base_vect_type), intent(in), optional :: mold
     class(psb_c_base_vect_type), allocatable :: tmp
+    class(psb_c_base_vect_type), pointer :: mld
     integer(psb_ipk_) :: info
 
+    info = psb_success_
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(tmp,stat=info,mold=mold)
 #else
       call mold%mold(tmp,info)
 #endif
-      if (allocated(x%v)) then 
-        call x%v%sync()
-        if (info == psb_success_) call tmp%bld(x%v%v)
-        call x%v%free(info)
-      end if
-      call move_alloc(tmp,x%v)
+    else
+#ifdef HAVE_MOLD
+      allocate(tmp,stat=info,mold=psb_c_get_base_vect_default())
+#else
+      mld => psb_c_get_base_vect_default()
+      call mld%mold(tmp,info)
+#endif
     end if
+    if (allocated(x%v)) then 
+      call x%v%sync()
+      if (info == psb_success_) call tmp%bld(x%v%v)
+      call x%v%free(info)
+    end if
+    call move_alloc(tmp,x%v)
+
   end subroutine c_vect_cnv
 
 
@@ -936,6 +947,7 @@ contains
     integer(psb_ipk_) :: info
     class(psb_c_base_multivect_type), pointer :: mld
 
+    info = psb_success_
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
@@ -946,7 +958,7 @@ contains
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_c_get_base_multivect_default())
 #else 
-      mld = psb_c_get_base_multivect_default()
+      mld => psb_c_get_base_multivect_default()
       call mld%mold(x%v,info)
 #endif
     endif
@@ -963,6 +975,7 @@ contains
     integer(psb_ipk_) :: info
     class(psb_c_base_multivect_type), pointer :: mld
 
+    info = psb_success_
     if (present(mold)) then 
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
@@ -973,7 +986,7 @@ contains
 #ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_c_get_base_multivect_default())
 #else 
-      mld = psb_c_get_base_multivect_default()
+      mld => psb_c_get_base_multivect_default()
       call mld%mold(x%v,info)
 #endif
     endif

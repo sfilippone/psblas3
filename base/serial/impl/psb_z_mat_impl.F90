@@ -1179,7 +1179,7 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
 #if defined(HAVE_MOLD)
     allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
 #else
-    mld = psb_get_mat_default(a)
+    mld => psb_get_mat_default(a)
     call mld%mold(altmp,info)
 #endif
   end if
@@ -1290,7 +1290,7 @@ subroutine psb_z_cscnv_ip(a,info,type,mold,dupl)
 #if defined(HAVE_MOLD)
     allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
 #else
-    mld = psb_get_mat_default(a)
+    mld => psb_get_mat_default(a)
     call mld%mold(altmp,info)
 #endif
   end if
@@ -1811,6 +1811,7 @@ subroutine psb_z_asb(a,mold)
   class(psb_zspmat_type), intent(inout) :: a   
   class(psb_z_base_sparse_mat), optional, intent(in) :: mold
   class(psb_z_base_sparse_mat), allocatable :: tmp
+  class(psb_z_base_sparse_mat), pointer :: mld
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='z_asb'
 
@@ -1829,6 +1830,10 @@ subroutine psb_z_asb(a,mold)
       call a%a%free()
       call move_alloc(tmp,a%a)
     end if
+  else
+    mld => psb_z_get_base_mat_default()
+    if (.not.same_type_as(a%a,mld)) &
+         & call a%cscnv(info)
   end if
   
 

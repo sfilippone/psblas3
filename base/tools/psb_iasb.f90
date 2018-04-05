@@ -313,9 +313,7 @@ subroutine psb_iasb_vect(x, desc_a, info, mold, scratch)
       call psb_errpush(info,name,a_err='psb_halo')
       goto 9999
     end if
-    if (present(mold)) then 
-      call x%cnv(mold)
-    end if
+    call x%cnv(mold)
   end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
@@ -391,9 +389,7 @@ subroutine psb_iasb_vect_r2(x, desc_a, info, mold, scratch)
       ! ..update halo elements..
       call psb_halo(x(i),desc_a,info)
       if (info /= 0) exit
-      if (present(mold)) then 
-        call x(i)%cnv(mold)
-      end if
+      call x(i)%cnv(mold)
     end do
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
