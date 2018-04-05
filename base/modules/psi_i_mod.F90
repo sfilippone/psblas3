@@ -116,7 +116,8 @@ module psi_i_mod
       logical :: is_bld, is_upd
       integer(psb_ipk_) :: ictxt
       integer(psb_ipk_) :: dl_lda,mode
-      integer(psb_ipk_) :: desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
+      integer(psb_lpk_) :: desc_str(*)
+      integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
       integer(psb_mpk_) :: np
       integer(psb_ipk_) :: info
     end subroutine psi_i_extract_dep_list

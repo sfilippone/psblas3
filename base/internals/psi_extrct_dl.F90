@@ -136,7 +136,8 @@ subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
   integer(psb_ipk_) :: np,dl_lda,mode, info
 
   !     ....array parameters....
-  integer(psb_ipk_) ::  desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
+  integer(psb_lpk_) :: desc_str(*)
+  integer(psb_ipk_) :: dep_list(dl_lda,0:np),length_dl(0:np)
   integer(psb_ipk_), allocatable :: itmp(:)
   !     .....local arrays....
   integer(psb_ipk_) :: int_err(5)

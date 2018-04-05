@@ -63,7 +63,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,in
 
   type(psb_desc_type), intent(in)     :: desc_a
   integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
-  integer(psb_ipk_), intent(in)                 :: index_in(:)
+  integer(psb_lpk_), intent(in)                 :: index_in(:)
   integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
   logical                             :: glob_idx
 
