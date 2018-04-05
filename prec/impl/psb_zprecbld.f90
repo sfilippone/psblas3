@@ -35,10 +35,10 @@ subroutine psb_zprecbld(a,desc_a,p,info,amold,vmold,imold)
   use psb_z_prec_type, psb_protect_name => psb_zprecbld
   Implicit None
 
-  type(psb_zspmat_type), intent(in), target  :: a
-  type(psb_desc_type), intent(inout), target      :: desc_a
-  class(psb_zprec_type),intent(inout)         :: p
-  integer(psb_ipk_), intent(out)               :: info
+  type(psb_zspmat_type), intent(in), target   :: a
+  type(psb_desc_type), intent(inout), target    :: desc_a
+  class(psb_zprec_type),intent(inout), target :: p
+  integer(psb_ipk_), intent(out)                :: info
   class(psb_z_base_sparse_mat), intent(in), optional :: amold
   class(psb_z_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold

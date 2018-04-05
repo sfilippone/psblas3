@@ -44,6 +44,8 @@ module psb_z_sort_mod
   use psb_const_mod
 
 
+  @INTE@
+
   interface psb_msort_unique
     subroutine psb_zmsort_u(x,nout,dir)
       import 

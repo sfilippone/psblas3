@@ -393,7 +393,7 @@ if test "X$FCOPT" == "X" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
  elif test "X$psblas_cv_fc" == X"cray" ; then
-     FCOPT="-O3 -em $FCOPT"
+     FCOPT="-O3 -em -J. $FCOPT"
  elif test "X$psblas_cv_fc" == X"nag" ; then
    # NAG  compiler ..
      FCOPT="-O2 "
@@ -545,6 +545,24 @@ PAC_FORTRAN_TEST_ISO_C_BIND(
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
+PAC_FORTRAN_TEST_SAME_TYPE( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SAME_TYPE_AS. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+)
+
+PAC_FORTRAN_TEST_EXTENDS_TYPE( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+)
+
+PAC_FORTRAN_TEST_MOLD( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOLD= allocation. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+)
+
 #
 # Optional features
 #
@@ -570,17 +588,6 @@ PAC_FORTRAN_TEST_FINAL(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
 )
 
-PAC_FORTRAN_TEST_SAME_TYPE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"],
-)
-
-PAC_FORTRAN_TEST_EXTENDS_TYPE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"],
-)
-
-PAC_FORTRAN_TEST_MOLD( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"],
-)
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)

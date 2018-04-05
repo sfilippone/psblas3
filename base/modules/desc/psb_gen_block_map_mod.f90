@@ -2132,7 +2132,6 @@ contains
     return
   end subroutine block_reinit
 
-
   !
   ! This is a purely internal version of "binary" search
   ! specialized for gen_block usage.
@@ -2218,6 +2217,5 @@ contains
     endif
     return
   end function l_gen_block_search
-
 
 end module psb_gen_block_map_mod
