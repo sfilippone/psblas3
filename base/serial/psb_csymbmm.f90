@@ -153,15 +153,6 @@ contains
     type(psb_c_csr_sparse_mat), intent(out) :: c
     integer(psb_ipk_) :: itemp(:) 
     integer(psb_ipk_), intent(out)                    :: info
-    interface 
-      subroutine symbmm (n, m, l, ia, ja, diaga, &
-           & ib, jb, diagb, ic, jc, diagc, index)
-        import :: psb_ipk_
-        integer(psb_ipk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
-             & diagc,  index(*)
-        integer(psb_ipk_), allocatable :: ic(:),jc(:)
-      end subroutine symbmm
-    end interface
     integer(psb_ipk_) :: nze, ma,na,mb,nb
 
     info = psb_success_

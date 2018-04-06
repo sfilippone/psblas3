@@ -68,6 +68,16 @@ module psb_serial_mod
     end subroutine psb_d_nspaxpby
   end interface psb_nspaxpby
 
+  interface symbmm
+    subroutine symbmm (n, m, l, ia, ja, diaga, &
+         & ib, jb, diagb, ic, jc, diagc, index)
+      import :: psb_ipk_
+      integer(psb_ipk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+           & diagc,  index(*)
+      integer(psb_ipk_), allocatable :: ic(:),jc(:)
+    end subroutine symbmm
+  end interface
+  
 
 contains
 
