@@ -52,15 +52,18 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   implicit None
   procedure(psb_parts)               :: parts
   !....Parameters...
-  integer(psb_ipk_), intent(in)      :: M,N,ictxt
+  integer(psb_lpk_), intent(in)      :: M,N
+  integer(psb_ipk_), intent(in)      :: ictxt
   Type(psb_desc_type), intent(out)   :: desc
   integer(psb_ipk_), intent(out)     :: info
 
   !locals
   integer(psb_ipk_) :: counter,i,j,loc_row,err,loc_col,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx 
+       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx
+  integer(psb_lpk_) :: iglob
   integer(psb_ipk_) :: int_err(5),exch(3)
-  integer(psb_ipk_), allocatable   :: temp_ovrlap(:), loc_idx(:) 
+  integer(psb_lpk_), allocatable  :: loc_idx(:)
+  integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: me, np, nprocs
@@ -174,15 +177,15 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%lprm(1) = 0
 
   k = 0
-  do i=1,m
+  do iglob=1,m
     if (info == psb_success_) then
-      call parts(i,m,np,prc_v,nprocs)
+      call parts(iglob,m,np,prc_v,nprocs)
       if (nprocs > np) then
         info=psb_err_partfunc_toomuchprocs_
         int_err(1)=3
         int_err(2)=np
         int_err(3)=nprocs
-        int_err(4)=i
+        int_err(4)=iglob
         err=info
         call psb_errpush(err,name,int_err)
         goto 9999
@@ -190,7 +193,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         info=psb_err_partfunc_toofewprocs_
         int_err(1)=3
         int_err(2)=nprocs
-        int_err(3)=i
+        int_err(3)=iglob
         err=info
         call psb_errpush(err,name,int_err)
         goto 9999
@@ -200,7 +203,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             info=psb_err_partfunc_wrong_pid_
             int_err(1)=3
             int_err(2)=prc_v(j)
-            int_err(3)=i
+            int_err(3)=iglob
             err=info
             call psb_errpush(err,name,int_err)
             goto 9999
@@ -218,7 +221,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         if (prc_v(j) == me) then
           ! this point belongs to me
           k = k + 1 
-          call psb_ensure_size((k+1),loc_idx,info,pad=-ione)
+          call psb_ensure_size((k+1),loc_idx,info,pad=-1_psb_lpk_)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')

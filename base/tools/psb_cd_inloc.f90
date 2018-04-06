@@ -49,7 +49,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   use psb_hash_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: ictxt, v(:)
+  integer(psb_ipk_), intent(in)               :: ictxt
+  integer(psb_lpk_), intent(in)               :: v(:)
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
   logical, intent(in), optional     :: globalcheck
@@ -57,9 +58,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
 
   !locals
   integer(psb_ipk_) :: i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,n, k,glx,nlu,&
-       & flag_, err_act,m, novrl, norphan,&
-       & npr_ov, itmpov, i_pnt, nrt
+       & loc_col,nprocs,k,glx,nlu,&
+       & flag_, err_act, novrl, norphan,&
+       & npr_ov, itmpov, i_pnt
+  integer(psb_lpk) :: m, n, nrt
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
        & nov(:), ov_idx(:,:), ix(:)
