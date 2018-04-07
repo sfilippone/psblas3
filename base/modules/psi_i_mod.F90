@@ -146,7 +146,7 @@ module psi_i_mod
   interface psi_bld_tmpovrl
     subroutine psi_i_bld_tmpovrl(iv,desc,info)
       import 
-      integer(psb_ipk_), intent(in)  :: iv(:)
+      integer(psb_lpk_), intent(in)  :: iv(:)
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_i_bld_tmpovrl

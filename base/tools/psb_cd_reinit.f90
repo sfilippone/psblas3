@@ -45,7 +45,8 @@ Subroutine psb_cd_reinit(desc,info)
 
   !     .. Local Scalars ..
   integer(psb_ipk_) ::  np, me, ictxt
-  integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
+  integer(psb_ipk_), allocatable :: tmp_halo(:),tmp_ext(:)
+  integer(psb_lpk_), allocatable :: tmp_ovr(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name, ch_err
 
@@ -61,11 +62,11 @@ Subroutine psb_cd_reinit(desc,info)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': start'
   if (desc%is_asb()) then 
-    call psb_cd_get_recv_idx(tmp_ovr,desc,psb_comm_ovr_,info,toglob=.true.)
-    call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
-    call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
+    call psb_cd_get_recv_idx_glob(tmp_ovr,desc,psb_comm_ovr_,info)
+    call psb_cd_get_recv_idx_loc(tmp_halo,desc,psb_comm_halo_,info)    
+    call psb_cd_get_recv_idx_loc(tmp_ext,desc,psb_comm_ext_,info)        
     
-    call psb_move_alloc(tmp_ovr,desc%ovrlap_index,info)
+    call psb_move_alloc(tmp_ovr,desc%tmp_ovrlap_index,info)
     call psb_move_alloc(tmp_halo,desc%halo_index,info)
     call psb_move_alloc(tmp_ext,desc%ext_index,info)
     call desc%indxmap%reinit(info)

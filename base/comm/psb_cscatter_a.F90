@@ -63,11 +63,13 @@ subroutine  psb_cscatterm(globx, locx, desc_a, info, root)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam 
-  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+  integer(psb_ipk_) :: ierr(5), err_act, idx, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
+  integer(psb_lpk_) :: m, n, i, j, iglobx, jglobx
   complex(psb_spk_),allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable           :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable           :: displ(:), all_dim(:)
+  integer(psb_lpk_), allocatable           :: l_t_g_all(:), ltg(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -185,8 +187,8 @@ subroutine  psb_cscatterm(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_,rootrank,icomm,info)
+         & psb_mpi_lpk_,l_t_g_all,all_dim,&
+         & displ,psb_mpi_lpk_,rootrank,icomm,info)
 
     do col=1, k
       ! prepare vector to scatter
@@ -299,10 +301,12 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, root)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
+  integer(psb_ipk_) :: ierr(5), err_act, idx, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
+  integer(psb_lpk_) :: m, n, i, j, iglobx, jglobx
   complex(psb_spk_), allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable            :: displ(:), l_t_g_all(:), all_dim(:), ltg(:)
+  integer(psb_ipk_), allocatable            :: displ(:), all_dim(:)
+  integer(psb_lpk_), allocatable            :: l_t_g_all(:), ltg(:)
   character(len=20)        :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
 
@@ -417,8 +421,8 @@ subroutine  psb_cscatterv(globx, locx, desc_a, info, root)
     end if
 
     call mpi_gatherv(ltg,nrow,&
-         & psb_mpi_ipk_,l_t_g_all,all_dim,&
-         & displ,psb_mpi_ipk_,rootrank,icomm,info)
+         & psb_mpi_lpk_,l_t_g_all,all_dim,&
+         & displ,psb_mpi_lpk_,rootrank,icomm,info)
 
     ! prepare vector to scatter
     if (iam == iroot) then

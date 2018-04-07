@@ -63,7 +63,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   integer(psb_lpk_) :: iglob
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_lpk_), allocatable  :: loc_idx(:)
-  integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
+  integer(psb_lpk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: me, np, nprocs
@@ -227,17 +227,17 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-          loc_idx(k) = i 
+          loc_idx(k) = iglob
 
           if (nprocs > 1)  then
-            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
+            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1_psb_lpk_)
             if (info /= psb_success_) then
               info=psb_err_from_subroutine_
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
             itmpov = itmpov + 1
-            temp_ovrlap(itmpov) = i
+            temp_ovrlap(itmpov) = iglob
             itmpov = itmpov + 1
             temp_ovrlap(itmpov) = nprocs
             temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)

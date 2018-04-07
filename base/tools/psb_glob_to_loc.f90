@@ -53,7 +53,7 @@ subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
 
   !...parameters....
   type(psb_desc_type), intent(in) ::  desc_a
-  integer(psb_ipk_), intent(in)                ::  x(:)  
+  integer(psb_lpk_), intent(in)                ::  x(:)  
   integer(psb_ipk_), intent(out)               ::  y(:), info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
@@ -174,7 +174,7 @@ subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
 
   !...parameters....
   type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(inout)           :: x(:)  
+  integer(psb_lpk_), intent(inout)           :: x(:)  
   integer(psb_ipk_), intent(out)             :: info
   logical, intent(in),  optional     :: owned
   character, intent(in), optional  :: iact
@@ -241,13 +241,14 @@ subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
   use psb_base_mod, psb_protect_name => psb_glob_to_loc2s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer(psb_ipk_),intent(in)                 ::  x
+  integer(psb_lpk_),intent(in)                 ::  x
   integer(psb_ipk_),intent(out)                ::  y  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
 
-  integer(psb_ipk_) :: iv1(1), iv2(1)
+  integer(psb_lpk_) :: iv1(1)
+  integer(psb_ipk_) :: iv2(1)
 
   iv1(1) = x
   call psb_glob_to_loc(iv1,iv2,desc_a,info,iact,owned)
@@ -258,11 +259,11 @@ subroutine psb_glob_to_loc1s(x,desc_a,info,iact,owned)
   use psb_base_mod, psb_protect_name => psb_glob_to_loc1s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
-  integer(psb_ipk_),intent(inout)              ::  x  
+  integer(psb_lpk_),intent(inout)              ::  x  
   integer(psb_ipk_), intent(out)               ::  info
   character, intent(in), optional    ::  iact
   logical, intent(in),  optional     :: owned
-  integer(psb_ipk_) :: iv1(1)
+  integer(psb_lpk_) :: iv1(1)
 
   iv1(1) = x
   call psb_glob_to_loc(iv1,desc_a,info,iact,owned)

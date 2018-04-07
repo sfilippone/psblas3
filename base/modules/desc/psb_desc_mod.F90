@@ -211,6 +211,7 @@ module psb_desc_mod
     type(psb_i_vect_type)            :: v_ovrlap_index
     type(psb_i_vect_type)            :: v_ovr_mst_idx 
 
+    integer(psb_lpk_), allocatable   :: tmp_ovrlap_index(:)
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
     integer(psb_ipk_), allocatable   :: lprm(:)
@@ -475,7 +476,7 @@ contains
 
   function psb_cd_get_global_rows(desc) result(val)
     implicit none 
-    integer(psb_ipk_) :: val 
+    integer(psb_lpk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then 
@@ -488,7 +489,7 @@ contains
 
   function psb_cd_get_global_cols(desc) result(val)
     implicit none 
-    integer(psb_ipk_) :: val 
+    integer(psb_lpk_) :: val 
     class(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%indxmap)) then 
@@ -1072,7 +1073,93 @@ contains
   end subroutine psb_cd_clone
 
   
-  Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
+  Subroutine psb_cd_get_recv_idx_loc(tmp,desc,data,info)
+
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    Implicit None
+    integer(psb_ipk_), allocatable, intent(out)       :: tmp(:)
+    integer(psb_ipk_), intent(in)                     :: data
+    Type(psb_desc_type), Intent(in), target :: desc
+    integer(psb_ipk_), intent(out)                    :: info
+
+    !     .. Local Scalars ..
+    integer(psb_ipk_) ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
+         & idx, proc, n_elem_send, n_elem_recv
+    integer(psb_ipk_), pointer   :: idxlist(:)
+    integer(psb_ipk_) :: debug_level, debug_unit, err_act
+    character(len=20)    :: name
+
+    name  = 'psb_cd_get_recv_idx'
+    info  = psb_success_
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ictxt = psb_cd_get_context(desc)
+    call psb_info(ictxt, me, np)
+
+    select case(data)
+    case(psb_comm_halo_)
+      idxlist => desc%halo_index
+    case(psb_comm_ovr_)
+      idxlist => desc%ovrlap_index
+    case(psb_comm_ext_)
+      idxlist => desc%ext_index
+    case(psb_comm_mov_)
+      idxlist => desc%ovr_mst_idx
+      write(psb_err_unit,*) 'Warning: unusual request getidx on ovr_mst_idx'
+    case default
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='wrong Data selector')
+      goto 9999
+    end select
+
+    l_tmp = 3*size(idxlist)
+
+    allocate(tmp(l_tmp),stat=info)
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+      goto 9999      
+    end if
+
+    incnt  = 1
+    outcnt = 1
+    tmp(:) = -1
+    Do While (idxlist(incnt) /= -1)
+      proc        = idxlist(incnt+psb_proc_id_)
+      n_elem_recv = idxlist(incnt+psb_n_elem_recv_)
+      n_elem_send = idxlist(incnt+n_elem_recv+psb_n_elem_send_)
+
+      Do j=0,n_elem_recv-1
+        idx = idxlist(incnt+psb_elem_recv_+j)
+        call psb_ensure_size((outcnt+3),tmp,info,pad=-1_psb_ipk_)
+        if (info /= psb_success_) then
+          info=psb_err_from_subroutine_
+          call psb_errpush(info,name,a_err='psb_ensure_size')
+          goto 9999
+        end if
+        tmp(outcnt)   = proc
+        tmp(outcnt+1) = 1
+        tmp(outcnt+2) = idx
+        tmp(outcnt+3) = -1
+        outcnt          = outcnt+3
+      end Do
+      incnt = incnt+n_elem_recv+n_elem_send+3
+    end Do
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ictxt,err_act)
+
+    return
+
+  end Subroutine psb_cd_get_recv_idx_loc
+  
+  Subroutine psb_cd_get_recv_idx_glob(tmp,desc,data,info)
 
     use psb_error_mod
     use psb_penv_mod
@@ -1082,7 +1169,6 @@ contains
     integer(psb_ipk_), intent(in)                     :: data
     Type(psb_desc_type), Intent(in), target :: desc
     integer(psb_ipk_), intent(out)                    :: info
-    logical, intent(in)                     :: toglob
 
     !     .. Local Scalars ..
     integer(psb_ipk_) ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
@@ -1142,23 +1228,17 @@ contains
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
-        if (toglob) then
-          call desc%indxmap%l2g(idx,gidx,info)
-          If (gidx < 0) then 
-            info=-3
-            call psb_errpush(info,name)
-            goto 9999
-          endif
-          tmp(outcnt)   = proc
-          tmp(outcnt+1) = 1
-          tmp(outcnt+2) = gidx
-          tmp(outcnt+3) = -1
-        else
-          tmp(outcnt)   = proc
-          tmp(outcnt+1) = 1
-          tmp(outcnt+2) = idx
-          tmp(outcnt+3) = -1
-        end if
+        call desc%indxmap%l2g(idx,gidx,info)
+        If (gidx < 0) then 
+          info=-3
+          call psb_errpush(info,name)
+          goto 9999
+        endif
+        tmp(outcnt)   = proc
+        tmp(outcnt+1) = 1
+        tmp(outcnt+2) = gidx
+        tmp(outcnt+3) = -1
+
         outcnt          = outcnt+3
       end Do
       incnt = incnt+n_elem_recv+n_elem_send+3
@@ -1171,7 +1251,7 @@ contains
 
     return
 
-  end Subroutine psb_cd_get_recv_idx
+  end Subroutine psb_cd_get_recv_idx_glob
 
   subroutine psb_cd_cnv(desc, mold)
     class(psb_desc_type), intent(inout), target :: desc

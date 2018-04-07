@@ -61,11 +61,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
        & loc_col,nprocs,k,glx,nlu,&
        & flag_, err_act, novrl, norphan,&
        & npr_ov, itmpov, i_pnt
-  integer(psb_lpk_) :: m, n, nrt
+  integer(psb_lpk_) :: m, n, nrt, il
   integer(psb_ipk_) :: int_err(5),exch(3)
-  integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), &
+  integer(psb_ipk_), allocatable :: tmpgidx(:,:), &
        & nov(:), ov_idx(:,:)
-  integer(psb_lpk_), allocatable :: vl(:), ix(:)
+  integer(psb_lpk_), allocatable :: vl(:), ix(:), temp_ovrlap(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt
   logical            :: check_, islarge
@@ -253,7 +253,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   call psb_nullify_desc(desc)
 
   !
-  ! Figure out overlap in the input
+  ! Figure out overlap in the input.
+  ! Note: the code above guarantees that if mpgidx was not allocated,
+  !       then novrl = 0, hence all accesses to tmpgidx
+  !       are safe. 
   ! 
   if (novrl > 0) then 
     if (debug_level >= psb_debug_ext_) &
@@ -323,8 +326,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   itmpov = 0
   if (check_) then 
     do k=1, loc_row
-      i = v(k)
-      nprocs = tmpgidx(i,2) 
+      il = v(k)
+      nprocs = tmpgidx(il,2) 
       if (nprocs > 1) then 
         do 
           if (j > size(ov_idx,dim=1)) then 
@@ -335,14 +338,14 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
           if (ov_idx(j,1) == i) exit
           j = j + 1 
         end do
-        call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
+        call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1_psb_lpk_)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
         itmpov = itmpov + 1
-        temp_ovrlap(itmpov) = i
+        temp_ovrlap(itmpov) = il
         itmpov = itmpov + 1
         temp_ovrlap(itmpov) = nprocs
         temp_ovrlap(itmpov+1:itmpov+nprocs) = ov_idx(j:j+nprocs-1,2)
