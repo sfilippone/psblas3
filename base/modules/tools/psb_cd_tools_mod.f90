@@ -93,16 +93,18 @@ module psb_cd_tools_mod
 
   interface psb_cdins
     subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
-      import :: psb_ipk_, psb_desc_type
+      import :: psb_ipk_, psb_lpk_, psb_desc_type
       type(psb_desc_type), intent(inout) :: desc_a
-      integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
+      integer(psb_ipk_), intent(in)                :: nz
+      integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
       integer(psb_ipk_), intent(out)               :: info
       integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
     end subroutine psb_cdinsrc
     subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
-      import :: psb_ipk_, psb_desc_type
+      import :: psb_ipk_, psb_lpk_, psb_desc_type
       type(psb_desc_type), intent(inout)         :: desc
-      integer(psb_ipk_), intent(in)              :: nz,ja(:)
+      integer(psb_ipk_), intent(in)              :: nz
+      integer(psb_lpk_), intent(in)              :: ja(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(out)   :: jla(:)
       logical, optional, target, intent(in)      :: mask(:)
@@ -112,10 +114,10 @@ module psb_cd_tools_mod
 
   interface psb_cdbldext
     Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
-      import :: psb_ipk_, psb_desc_type
+      import :: psb_ipk_, psb_lpk_, psb_desc_type
       Implicit None
       Type(psb_desc_type), Intent(inout), target :: desc_a
-      integer(psb_ipk_), intent(in)                     :: in_list(:)
+      integer(psb_lpk_), intent(in)                     :: in_list(:)
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer(psb_ipk_), intent(out)                    :: info
       logical, intent(in), optional, target   :: mask(:)

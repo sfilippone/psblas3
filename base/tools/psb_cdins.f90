@@ -52,7 +52,8 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout) :: desc_a
-  integer(psb_ipk_), intent(in)                :: nz,ia(:),ja(:)
+  integer(psb_ipk_), intent(in)                :: nz
+  integer(psb_lpk_), intent(in)                :: ia(:),ja(:)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), optional, intent(out)     :: ila(:), jla(:)
   !LOCALS.....
@@ -133,8 +134,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
     end if
     call desc_a%indxmap%g2l(ia(1:nz),ila_(1:nz),info,owned=.true.)
     if (info == psb_success_) then 
-      jla_(1:nz) = ja(1:nz)
-      call desc_a%indxmap%g2lip_ins(jla_(1:nz),info,mask=(ila_(1:nz)>0))
+      call desc_a%indxmap%g2l_ins(ja(1:nz),jla_(1:nz),info,mask=(ila_(1:nz)>0))
     end if
     deallocate(ila_,jla_,stat=info)
   end if
@@ -170,7 +170,8 @@ subroutine psb_cdinsc(nz,ja,desc,info,jla,mask,lidx)
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout)       :: desc
-  integer(psb_ipk_), intent(in)            :: nz,ja(:)
+  integer(psb_ipk_), intent(in)            :: nz
+  integer(psb_lpk_), intent(in)            :: ja(:)
   integer(psb_ipk_), intent(out)           :: info
   integer(psb_ipk_), optional, intent(out) :: jla(:)
   logical, optional, target, intent(in)    :: mask(:) 

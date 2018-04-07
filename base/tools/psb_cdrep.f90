@@ -107,12 +107,14 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   use psb_repl_map_mod
   implicit None
   !....Parameters...
-  integer(psb_ipk_), intent(in)               :: m,ictxt
+  integer(psb_lpk_), intent(in)               :: m
+  integer(psb_ipk_), intent(in)               :: ictxt
   integer(psb_ipk_), intent(out)              :: info
   Type(psb_desc_type), intent(out)  :: desc
 
   !locals
-  integer(psb_ipk_) :: i,np,me,err,n,err_act
+  integer(psb_ipk_) :: i,np,me,err,err_act
+  integer(psb_lpk_) :: n
   integer(psb_ipk_) :: int_err(5),exch(2), thalo(1), tovr(1), text(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt

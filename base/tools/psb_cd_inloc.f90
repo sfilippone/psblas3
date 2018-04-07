@@ -61,10 +61,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
        & loc_col,nprocs,k,glx,nlu,&
        & flag_, err_act, novrl, norphan,&
        & npr_ov, itmpov, i_pnt
-  integer(psb_lpk) :: m, n, nrt
+  integer(psb_lpk_) :: m, n, nrt
   integer(psb_ipk_) :: int_err(5),exch(3)
-  integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), vl(:),&
-       & nov(:), ov_idx(:,:), ix(:)
+  integer(psb_ipk_), allocatable :: temp_ovrlap(:), tmpgidx(:,:), &
+       & nov(:), ov_idx(:,:)
+  integer(psb_lpk_), allocatable :: vl(:), ix(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt
   logical            :: check_, islarge
@@ -84,15 +85,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   iictxt = ictxt
 
   loc_row = size(v)
-  if (.false.) then 
-    m = loc_row
-    call psb_sum(ictxt,m)
-  else
-    m = maxval(v)
-    nrt = loc_row
-    call psb_sum(ictxt,nrt)
-    call psb_max(ictxt,m)
-  end if
+  m = maxval(v)
+  nrt = loc_row
+  call psb_sum(ictxt,nrt)
+  call psb_max(ictxt,m)
+  
   if (present(globalcheck)) then 
     check_ = globalcheck
   else

@@ -57,9 +57,10 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   type(psb_desc_type), intent(out)  :: desc
 
   !locals
-  integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,m,n,itmpov, k,glx,&
+  integer(psb_ipk_) :: counter,j,np,me,loc_row,err,&
+       & loc_col,nprocs,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
+  integer(psb_lpk_) :: m,n,i
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_ipk_) :: debug_level, debug_unit

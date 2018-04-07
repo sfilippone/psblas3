@@ -282,7 +282,6 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
-
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&
@@ -334,11 +333,13 @@ contains
     val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
-  logical  function  psb_cd_choose_large_state(ictxt,m)
+  function  psb_cd_choose_large_state(ictxt,m) result(val)
     use psb_penv_mod
 
     implicit none
-    integer(psb_ipk_), intent(in) :: ictxt,m
+    integer(psb_ipk_), intent(in) :: ictxt
+    integer(psb_lpk_), intent(in) :: m
+    logical :: val
     !locals
     integer(psb_ipk_) :: np,me
 
@@ -348,8 +349,7 @@ contains
     ! it makes no sense to use them if you don't have at least 
     ! 3 processes, no matter what the size of the process. 
     !
-    psb_cd_choose_large_state = &
-         & (m > psb_cd_get_large_threshold()) .and. &
+    val = (m > psb_cd_get_large_threshold()) .and. &
          & (np > 2)
   end function psb_cd_choose_large_state
 
