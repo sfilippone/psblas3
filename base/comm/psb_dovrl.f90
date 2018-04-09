@@ -75,9 +75,9 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
-       & mode_, err, liwork,ldx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+       & nrow, imode, err, liwork,data_, update_, mode_, ncol
+  integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
@@ -127,7 +127,7 @@ subroutine  psb_dovrl_vect(x,desc_a,info,work,update,mode)
   do_swap = (mode_ /= 0)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -200,9 +200,9 @@ subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional          :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
-       & mode_, err, liwork,ldx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, k, iix, jjx, &
+       & nrow, imode, err, liwork,data_, update_, mode_, ncol
+  integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
@@ -252,7 +252,7 @@ subroutine  psb_dovrl_multivect(x,desc_a,info,work,update,mode)
   do_swap = (mode_ /= 0)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

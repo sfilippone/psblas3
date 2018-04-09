@@ -66,9 +66,9 @@ subroutine  psb_ihalo_vect(x,desc_a,info,work,tran,mode,data)
   character, intent(in), optional         :: tran
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork,data_
+  integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, &
+       & nrow, imode, err, liwork,data_
+  integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_ipk_),pointer :: iwork(:)
   character                 :: tran_
   character(len=20)         :: name, ch_err
@@ -119,7 +119,7 @@ subroutine  psb_ihalo_vect(x,desc_a,info,work,tran,mode,data)
   endif
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -205,9 +205,9 @@ subroutine  psb_ihalo_multivect(x,desc_a,info,work,tran,mode,data)
   character, intent(in), optional         :: tran
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork,data_
+  integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, &
+       & nrow, imode, err, liwork,data_
+  integer(psb_lpk_) :: m, n, ix, ijx
   integer(psb_ipk_),pointer :: iwork(:)
   character                 :: tran_
   character(len=20)         :: name, ch_err
@@ -258,7 +258,7 @@ subroutine  psb_ihalo_multivect(x,desc_a,info,work,tran,mode,data)
   endif
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

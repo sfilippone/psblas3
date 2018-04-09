@@ -58,9 +58,9 @@ subroutine  psb_mgatherm(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, &
-       & ilx, i, j, idx
+  integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
+       & maxk, k, jlx, ilx, i, j
+  integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
 
   character(len=20)        :: name, ch_err
 
@@ -230,8 +230,9 @@ subroutine  psb_mgatherv(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
+  integer(psb_ipk_) :: ierr(5), err_act, lda_locx, lda_globx, lock, globk,&
+       & maxk, k, jlx, ilx, i, j
+  integer(psb_lpk_) :: m, n, ilocx,  jlocx, idx, iglobx, jglobx
 
   character(len=20)        :: name, ch_err
 

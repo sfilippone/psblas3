@@ -77,8 +77,9 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me
-  integer(psb_ipk_) :: err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
+  integer(psb_ipk_) :: err_act, iix, jjx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork, ldx
+  integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:), xp(:,:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
@@ -137,7 +138,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   do_swap = (mode_ /= 0)
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -271,9 +272,9 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   integer(psb_ipk_), intent(in), optional             :: update,mode
 
   ! locals
-  integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
-       & mode_, err, liwork, ldx
+  integer(psb_ipk_) :: ictxt, np, me, err_act, iix, jjx, nrow, ncol, &
+       & k, update_, mode_, err, liwork, ldx
+  integer(psb_lpk_) :: m, n, ix, ijx
   real(psb_dpk_),pointer :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
@@ -318,7 +319,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   do_swap = (mode_ /= 0)
   ldx = size(x,1) 
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

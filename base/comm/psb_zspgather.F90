@@ -51,6 +51,7 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   logical, intent(in), optional   :: keepnum,keeploc
 
   type(psb_z_coo_sparse_mat)      :: loc_coo, glob_coo
+  integer(psb_lpk_), allocatable :: locia(:), locja(:), glbia(:), glbja(:)
   integer(psb_ipk_) :: err_act, dupl_, nrg, ncg, nzg
   integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
@@ -101,14 +102,19 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
       call loca%mv_to(loc_coo)
     end if
     nzl = loc_coo%get_nzeros()
-    call psb_loc_to_glob(loc_coo%ia(1:nzl),desc_a,info,iact='I')
-    call psb_loc_to_glob(loc_coo%ja(1:nzl),desc_a,info,iact='I')
+    call psb_realloc(nzl,locia,info)
+    call psb_realloc(nzl,locja,info)    
+    call psb_loc_to_glob(loc_coo%ia(1:nzl),locia(1:nzl),desc_a,info,iact='I')
+    call psb_loc_to_glob(loc_coo%ja(1:nzl),locja(1:nzl),desc_a,info,iact='I')
     nzbr(:) = 0
     nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
+    if (info == psb_success_) call psb_realloc(nzg,glbia,info)
+    if (info == psb_success_) call psb_realloc(nzg,glbja,info)    
     if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     if (info /= psb_success_) goto 9999
+
     do ip=1,np
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
@@ -117,24 +123,33 @@ subroutine  psb_zsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
          & glob_coo%val,nzbr,idisp,&
          & psb_mpi_c_dpk_,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ia,ndx,psb_mpi_ipk_,&
-         & glob_coo%ia,nzbr,idisp,&
-         & psb_mpi_ipk_,icomm,minfo)
+         & mpi_allgatherv(locia,ndx,psb_mpi_lpk_,&
+         & glbia,nzbr,idisp,&
+         & psb_mpi_lpk_,icomm,minfo)
     if (minfo == psb_success_) call &
-         & mpi_allgatherv(loc_coo%ja,ndx,psb_mpi_ipk_,&
-         & glob_coo%ja,nzbr,idisp,&
-         & psb_mpi_ipk_,icomm,minfo)
+         & mpi_allgatherv(locja,ndx,psb_mpi_lpk_,&
+         & glbja,nzbr,idisp,&
+         & psb_mpi_lpk_,icomm,minfo)
     
     if (minfo /= psb_success_) then 
       info  = minfo
       call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')
       goto 9999
-    end if
-    
+    end if    
     call loc_coo%free()
+    deallocate(locia,locja, stat=info)
+    !
+    ! Is the code below safe? For very large cases
+    ! the indices in glob_coo will overflow. But then,
+    ! for very large cases it does not make sense to
+    ! gather the matrix on a single procecss anyway...
+    !
+    glob_coo%ia(1:nzg) = glbia(1:nzg)
+    glob_coo%ja(1:nzg) = glbja(1:nzg)
     call glob_coo%set_nzeros(nzg)
     if (present(dupl)) call glob_coo%set_dupl(dupl)
     call globa%mv_from(glob_coo)
+    deallocate(glbia,glbja, stat=info)
 
   else
     write(psb_err_unit,*) 'SP_ALLGATHER: Not implemented yet with keepnum ',keepnum_
