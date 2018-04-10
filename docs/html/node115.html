@@ -1,343 +1,188 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>Error handling</TITLE>
-<META NAME="description" CONTENT="Error handling">
+<TITLE>psb_rcv -- Receive data</TITLE>
+<META NAME="description" CONTENT="psb_rcv -- Receive data">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node116.html">
-<LINK REL="previous" HREF="node98.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node114.html">
+<LINK REL="up" HREF="node99.html">
 <LINK REL="next" HREF="node116.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1690"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1693"
   HREF="node116.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1686"
-  HREF="userhtml.html">
+<A NAME="tex2html1689"
+  HREF="node99.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1680"
+<A NAME="tex2html1685"
   HREF="node114.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1688"
+<A NAME="tex2html1691"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1691"
-  HREF="node116.html">Utilities</A>
-<B> Up:</B> <A NAME="tex2html1687"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1681"
-  HREF="node114.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1689"
+<B> Next:</B> <A NAME="tex2html1694"
+  HREF="node116.html">Error handling</A>
+<B> Up:</B> <A NAME="tex2html1690"
+  HREF="node99.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1686"
+  HREF="node114.html">psb_snd   Send</A>
+ &nbsp; <B>  <A NAME="tex2html1692"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION00090000000000000000">
-Error handling</A>
-</H1>
+<H2><A NAME="SECTION000816000000000000000">
+psb_rcv -- Receive data</A>
+</H2>
 
 <P>
-The PSBLAS library error handling policy has been completely rewritten
-in version 2.0. The idea behind the design of this new error handling
-strategy is to keep error messages on a stack allowing the user to
-trace back up to the point where the first error message has been
-generated. Every routine in the PSBLAS-2.0 library has, as last
-non-optional argument, an integer <code>info</code> variable; whenever,
-inside the routine, an error is detected, this variable is set to a
-value corresponding to a specific error code. Then this error code is
-also pushed on the error stack and then either control is returned to
-the caller routine or the execution is aborted, depending on the users
-choice. At the time when the execution is aborted, an error message is
-printed on standard output with a level of verbosity than can be
-chosen by the user. If the execution is not aborted, then, the caller
-routine checks the value returned in the <code>info</code> variable and, if
-not zero, an error condition is raised. This process continues on all the
-levels of nested calls until the level where the user decides to abort
-the program execution.
+<PRE>
+call psb_rcv(icontxt, dat, src, m)
+</PRE>
 
 <P>
-Figure&nbsp;<A HREF="#fig:routerr">9</A> shows the layout of a generic <code>psb_foo</code>
-routine with respect to the PSBLAS-2.0 error handling policy. It is
-possible to see how, whenever an error condition is detected, the
-<code>info</code> variable is set to the corresponding error code which is,
-then, pushed on top of the stack by means of the
-<code>psb_errpush</code>. An error condition may be directly detected inside
-a routine or indirectly checking the error code returned returned by a
-called routine. Whenever an error is encountered, after it has been
-pushed on stack, the program execution skips to a point where the
-error condition is handled; the error condition is handled either by
-returning control to the caller routine or by calling the
-<code>psb\_error</code> routine which prints the content of the error stack
-and aborts the program execution, according to the choice made by the
-user with <code>psb_set_erraction</code>. The default is to print the error
-and terminate the program, but the user may choose to handle the error
-explicitly. 
-
-<P>
-
-<DIV ALIGN="CENTER"><A NAME="fig:routerr"></A><A NAME="7222"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
-The layout of a generic <TT>psb_foo</TT>
-  routine with respect to PSBLAS-2.0 error handling policy.</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
- SRC="img142.png"
- ALT="\fbox{\TheSbox}">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
-Figure&nbsp;<A HREF="#fig:errormsg">10</A> reports a sample error message generated by
-the PSBLAS-2.0 library. This error has been generated by the fact that
-the user has chosen the invalid ``FOO'' storage format to represent
-the sparse matrix. From this error message it is possible to see that
-the error has been detected inside the <code>psb_cest</code> subroutine
-called by <code>psb_spasb</code> ... by process 0 (i.e. the root process).
-
-<P>
-
-<DIV ALIGN="CENTER"><A NAME="fig:errormsg"></A><A NAME="7223"></A>
-<TABLE>
-<CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
-A sample PSBLAS-2.0 error
-    message. Process 0 detected an error condition inside the  psb_cest subroutine</CAPTION>
-<TR><TD>
-<BR>
-   
-  <DIV ALIGN="CENTER">
-<!-- MATH
- $\fbox{\TheSbox}$
- -->
-<IMG
- WIDTH="562" HEIGHT="482" ALIGN="MIDDLE" BORDER="0"
- SRC="img142.png"
- ALT="\fbox{\TheSbox}">
-</DIV></TD></TR>
-</TABLE>
-</DIV>
-
-<P>
-ifstarsubroutinesubroutinepsb_errpushPushes an error code onto the error
-  stack
-
-<P>
-<BR>
-<IMG
- WIDTH="423" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img144.png"
- ALT="\begin{lstlisting}
-call psb_errpush(err_c, r_name, i_err, a_err)
-\end{lstlisting}">
-<BR>
-
-<P>
+This subroutine receives a packet of data to a destination.
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous: see usage notes.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>err_c</STRONG></DT>
-<DD>the error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer.
-</DD>
-<DT><STRONG>r_name</STRONG></DT>
-<DD>the soutine where the error has been caught.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a string.
-<BR></DD>
-<DT><STRONG>i_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: an integer array
-<BR></DD>
-<DT><STRONG>a_err</STRONG></DT>
-<DD>addional info for error code
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Specified as: a string.
-<BR></DD>
-</DL>
-
-<P>
-ifstarsubroutinesubroutinepsb_errorPrints the error stack content and aborts
-  execution
-
-<P>
-<BR>
-<IMG
- WIDTH="214" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img145.png"
- ALT="\begin{lstlisting}
-call psb_error(icontxt)
-\end{lstlisting}">
-<BR>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>icontxt</STRONG></DT>
-<DD>the communication context.
+<DD>the communication context identifying the virtual
+  parallel machine.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B>.
 <BR>
-Type: <B>optional</B>
+Type: <B>required</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer.
+Specified as: an integer variable.
+</DD>
+<DT><STRONG>src</STRONG></DT>
+<DD>Source process.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $0<= src <= np-1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="147" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img139.png"
+ ALT="$0&lt;= src &lt;= np-1$"></SPAN>. 
+<BR></DD>
+<DT><STRONG>m</STRONG></DT>
+<DD>Number of rows.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>Optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value <!-- MATH
+ $0<= m <= size(dat,1)$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="172" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img135.png"
+ ALT="$0&lt;= m &lt;= size(dat,1)$"></SPAN>. 
+<BR>
+When <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img136.png"
+ ALT="$dat$"></SPAN> is a rank 2 array, specifies the number of rows to be sent
+independently of the leading dimension <SPAN CLASS="MATH"><IMG
+ WIDTH="83" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img137.png"
+ ALT="$size(dat,1)$"></SPAN>; must have the
+same value on sending and receiving processes.
 </DD>
 </DL>
-
-<P>
-ifstarsubroutinesubroutinepsb_set_errverbositySets the verbosity of error
-  messages.
-
-<P>
-<BR>
-<IMG
- WIDTH="261" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img146.png"
- ALT="\begin{lstlisting}
-call psb_set_errverbosity(v)
-\end{lstlisting}">
-<BR>
 
 <P>
 <DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the verbosity level
+<DT><STRONG>dat</STRONG></DT>
+<DD>The data to be received.
 <BR>
-Scope: <B>global</B>
+Scope: <B>local</B>.
 <BR>
-Type: <B>required</B>
+Type: <B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer.
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array, or a character or logical scalar.  Type, kind and  rank must agree on sender and receiver process; if <SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img133.png"
+ ALT="$m$"></SPAN> is
+not specified, size must agree as well. 
 </DD>
 </DL>
 
 <P>
-ifstarsubroutinesubroutinepsb_set_erractionSet the type of action to be
-  taken  upon error condition.
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>This subroutine implies a synchronization, but only between the
+  calling process and the source  process <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img140.png"
+ ALT="$src$"></SPAN>.
+</LI>
+</OL>
 
 <P>
-<BR>
-<IMG
- WIDTH="291" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img147.png"
- ALT="\begin{lstlisting}
-call psb_set_erraction(err_act)
-\end{lstlisting}">
-<BR>
 
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>err_act</STRONG></DT>
-<DD>the type of action.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer. Possible values: <code>psb_act_ret</code>,
-<code>psb_act_abort</code>. 
-</DD>
-</DL>
-
-<P>
-<HR>
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1690"
+<A NAME="tex2html1693"
   HREF="node116.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1686"
-  HREF="userhtml.html">
+<A NAME="tex2html1689"
+  HREF="node99.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1680"
+<A NAME="tex2html1685"
   HREF="node114.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1688"
+<A NAME="tex2html1691"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1691"
-  HREF="node116.html">Utilities</A>
-<B> Up:</B> <A NAME="tex2html1687"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1681"
-  HREF="node114.html">psb_rcv   Receive</A>
- &nbsp; <B>  <A NAME="tex2html1689"
-  HREF="node1.html">Contents</A></B> 
+<B> Next:</B> <A NAME="tex2html1694"
+  HREF="node116.html">Error handling</A>
+<B> Up:</B> <A NAME="tex2html1690"
+  HREF="node99.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1686"
+  HREF="node114.html">psb_snd   Send</A>
+ &nbsp; <B>  <A NAME="tex2html1692"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

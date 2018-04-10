@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -50,20 +50,35 @@ contains
     real(psb_dpk_) :: eps
     character    :: afmt*5
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: inparms(40), ip 
+    integer(psb_ipk_) :: inparms(40), ip, inp_unit
+    character(len=1024)   :: filename 
 
     call psb_info(ictxt,iam,np)
     if (iam == 0) then
+      if (command_argument_count()>0) then
+        call get_command_argument(1,filename)
+        inp_unit = 30
+        open(inp_unit,file=filename,action='read',iostat=info)
+        if (info /= 0) then
+          write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+          call psb_abort(ictxt)
+          stop
+        else
+          write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+        end if
+      else
+        inp_unit=psb_inp_unit
+      end if
       ! Read Input Parameters
-      read(psb_inp_unit,*) ip
+      read(inp_unit,*) ip
       if (ip >= 5) then
-        read(psb_inp_unit,*) mtrx_file
-        read(psb_inp_unit,*) rhs_file
-        read(psb_inp_unit,*) filefmt
-        read(psb_inp_unit,*) kmethd
-        read(psb_inp_unit,*) ptype
-        read(psb_inp_unit,*) afmt
-        read(psb_inp_unit,*) part
+        read(inp_unit,*) mtrx_file
+        read(inp_unit,*) rhs_file
+        read(inp_unit,*) filefmt
+        read(inp_unit,*) kmethd
+        read(inp_unit,*) ptype
+        read(inp_unit,*) afmt
+        read(inp_unit,*) part
 
 
         call psb_bcast(ictxt,mtrx_file)
@@ -75,27 +90,27 @@ contains
         call psb_bcast(ictxt,part)
 
         if (ip >= 7) then
-          read(psb_inp_unit,*) istopc
+          read(inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 8) then
-          read(psb_inp_unit,*) itmax
+          read(inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 9) then
-          read(psb_inp_unit,*) itrace
+          read(inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 10) then
-          read(psb_inp_unit,*) irst
+          read(inp_unit,*) irst
         else
           irst  = 1
         endif
         if (ip >= 11) then
-          read(psb_inp_unit,*) eps
+          read(inp_unit,*) eps
         else
           eps=1.d-6
         endif
@@ -118,6 +133,9 @@ contains
         write(psb_err_unit,*) 'Wrong format for input file'
         call psb_abort(ictxt)
         stop 1
+      end if
+      if (inp_unit /= psb_inp_unit) then
+        close(inp_unit)
       end if
     else
       ! Receive Parameters
@@ -152,20 +170,35 @@ contains
     real(psb_spk_) :: eps
     character    :: afmt*5
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: inparms(40), ip 
+    integer(psb_ipk_) :: inparms(40), ip, inp_unit
+    character(len=1024)   :: filename
 
     call psb_info(ictxt,iam,np)
     if (iam == 0) then
+      if (command_argument_count()>0) then
+        call get_command_argument(1,filename)
+        inp_unit = 30
+        open(inp_unit,file=filename,action='read',iostat=info)
+        if (info /= 0) then
+          write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+          call psb_abort(ictxt)
+          stop
+        else
+          write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+        end if
+      else
+        inp_unit=inp_unit
+      end if
       ! Read Input Parameters
-      read(psb_inp_unit,*) ip
+      read(inp_unit,*) ip
       if (ip >= 5) then
-        read(psb_inp_unit,*) mtrx_file
-        read(psb_inp_unit,*) rhs_file
-        read(psb_inp_unit,*) filefmt
-        read(psb_inp_unit,*) kmethd
-        read(psb_inp_unit,*) ptype
-        read(psb_inp_unit,*) afmt
-        read(psb_inp_unit,*) ipart
+        read(inp_unit,*) mtrx_file
+        read(inp_unit,*) rhs_file
+        read(inp_unit,*) filefmt
+        read(inp_unit,*) kmethd
+        read(inp_unit,*) ptype
+        read(inp_unit,*) afmt
+        read(inp_unit,*) ipart
 
 
         call psb_bcast(ictxt,mtrx_file)
@@ -177,27 +210,27 @@ contains
         call psb_bcast(ictxt,part)
 
         if (ip >= 7) then
-          read(psb_inp_unit,*) istopc
+          read(inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 8) then
-          read(psb_inp_unit,*) itmax
+          read(inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 9) then
-          read(psb_inp_unit,*) itrace
+          read(inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 10) then
-          read(psb_inp_unit,*) irst
+          read(inp_unit,*) irst
         else
           irst  = 1
         endif
         if (ip >= 11) then
-          read(psb_inp_unit,*) eps
+          read(inp_unit,*) eps
         else
           eps=1.d-6
         endif
@@ -220,6 +253,9 @@ contains
         write(psb_err_unit,*) 'Wrong format for input file'
         call psb_abort(ictxt)
         stop 1
+      end if
+      if (inp_unit /= psb_inp_unit) then
+        close(inp_unit)
       end if
     else
       ! Receive Parameters

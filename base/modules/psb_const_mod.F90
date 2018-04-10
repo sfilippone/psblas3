@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -41,6 +41,7 @@ module psb_const_mod
 #endif
   ! This is always an 8-byte  integer.
   integer, parameter  :: psb_long_int_k_ = int64
+  integer, parameter  :: psb_lpk_        = psb_long_int_k_
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpik_ = int32
   !
@@ -60,6 +61,7 @@ module psb_const_mod
   ! This is always an 8-byte  integer.
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
+  integer, parameter  :: psb_lpk_        = psb_long_int_k_
   ! This is always a 4-byte integer, for MPI-related stuff
   integer, parameter  :: psb_mpik_ = kind(1)
   !

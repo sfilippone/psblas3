@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -199,9 +199,9 @@ subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
 end subroutine psb_iovrlm
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
-!!$    (C) Copyright 2006, 2010, 2015, 2017
+!!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$                       Alfredo Buttari      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions

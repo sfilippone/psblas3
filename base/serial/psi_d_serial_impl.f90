@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -425,6 +425,7 @@ subroutine psi_dsctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_dsctv
+
 subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
@@ -480,9 +481,9 @@ subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
         enddo
       enddo
     else if (beta.eq.done) then
-      !
-      !     Do nothing! 
-      !            
+      !   
+      !        Do nothing! 
+      !               
 
     else if (beta.eq.-done) then 
       do j=1,n 

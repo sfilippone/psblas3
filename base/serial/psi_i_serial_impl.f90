@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -425,11 +425,12 @@ subroutine psi_isctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_isctv
+
 subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  integer n, m, lldx, lldy, info
+  integer(psb_ipk_) :: n, m, lldx, lldy, info
   integer(psb_ipk_) X(lldx,*), Y(lldy,*)
   integer(psb_ipk_) alpha, beta
   integer(psb_ipk_) :: i, j
@@ -480,9 +481,9 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
         enddo
       enddo
     else if (beta.eq.ione) then
-      !
-      !     Do nothing! 
-      !           
+      !   
+      !        Do nothing! 
+      !               
 
     else if (beta.eq.-ione) then 
       do j=1,n 

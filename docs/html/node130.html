@@ -1,78 +1,106 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>Iterative Methods</TITLE>
-<META NAME="description" CONTENT="Iterative Methods">
+<TITLE>free -- Free a preconditioner</TITLE>
+<META NAME="description" CONTENT="free -- Free a preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node132.html">
-<LINK REL="previous" HREF="node123.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node129.html">
+<LINK REL="up" HREF="node124.html">
 <LINK REL="next" HREF="node131.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1878"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1881"
   HREF="node131.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1874"
-  HREF="userhtml.html">
+<A NAME="tex2html1877"
+  HREF="node124.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1868"
+<A NAME="tex2html1873"
   HREF="node129.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1876"
+<A NAME="tex2html1879"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1879"
-  HREF="node131.html">psb_krylov   Krylov</A>
-<B> Up:</B> <A NAME="tex2html1875"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1869"
-  HREF="node129.html">free   Free</A>
- &nbsp; <B>  <A NAME="tex2html1877"
+<B> Next:</B> <A NAME="tex2html1882"
+  HREF="node131.html">Iterative Methods</A>
+<B> Up:</B> <A NAME="tex2html1878"
+  HREF="node124.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1874"
+  HREF="node129.html">clone   clone</A>
+ &nbsp; <B>  <A NAME="tex2html1880"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000120000000000000000"></A>
-<A NAME="sec:methods"></A>
+<H2><A NAME="SECTION000116000000000000000">
+free -- Free a  preconditioner</A>
+</H2>
+
+<P>
+<PRE>
+call prec%free(info)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
 <BR>
-Iterative Methods
-</H1>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG><B>On Exit</B></STRONG></DT>
+<DD><P>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Error code: if no error, 0 is returned.
+</DD>
+</DL>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+Releases all internal storage.
 
 <P>
-In this chapter we provide routines for preconditioners and iterative
-methods. The interfaces for Krylov subspace methods are available in
-the module <code>psb_krylov_mod</code>.
-
-<P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html1880"
-  HREF="node131.html">psb_krylov  -- Krylov Methods Driver
-      Routine</A>
-</UL>
-<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -43,6 +43,15 @@
 module psb_c_sort_mod
   use psb_const_mod
 
+
+  interface psb_msort_unique
+    subroutine psb_cmsort_u(x,nout,dir)
+      import 
+      complex(psb_spk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), intent(out)             :: nout
+      integer(psb_ipk_), optional, intent(in)    :: dir
+    end subroutine psb_cmsort_u
+  end interface psb_msort_unique
 
   type psb_c_heap
     integer(psb_ipk_) :: last, dir

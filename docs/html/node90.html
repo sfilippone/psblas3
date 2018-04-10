@@ -1,63 +1,60 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_owned_index -- </TITLE>
-<META NAME="description" CONTENT="psb_owned_index -- ">
+<TITLE>psb_is_owned -- </TITLE>
+<META NAME="description" CONTENT="psb_is_owned -- ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node91.html">
 <LINK REL="previous" HREF="node89.html">
-<LINK REL="up" HREF="node70.html">
+<LINK REL="up" HREF="node71.html">
 <LINK REL="next" HREF="node91.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1378"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1381"
   HREF="node91.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1374"
-  HREF="node70.html">
+<A NAME="tex2html1377"
+  HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1368"
+<A NAME="tex2html1371"
   HREF="node89.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1376"
+<A NAME="tex2html1379"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1379"
-  HREF="node91.html">psb_is_local</A>
-<B> Up:</B> <A NAME="tex2html1375"
-  HREF="node70.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1369"
-  HREF="node89.html">psb_is_owned</A>
- &nbsp; <B>  <A NAME="tex2html1377"
+<B> Next:</B> <A NAME="tex2html1382"
+  HREF="node91.html">psb_owned_index</A>
+<B> Up:</B> <A NAME="tex2html1378"
+  HREF="node71.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1372"
+  HREF="node89.html">psb_loc_to_glob   Local</A>
+ &nbsp; <B>  <A NAME="tex2html1380"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000720000000000000000">
-psb_owned_index  -- </A>
+<H2><A NAME="SECTION000719000000000000000">
+psb_is_owned  -- </A>
 </H2>
 
 <P>
 <PRE>
-call psb_owned_index(y, x, desc_a, info)
+call psb_is_owned(x, desc_a)
 </PRE>
 
 <P>
@@ -69,15 +66,15 @@ call psb_owned_index(y, x, desc_a, info)
 <DD>
 </DD>
 <DT><STRONG>x</STRONG></DT>
-<DD>Integer indices.
+<DD>Integer index.
 <BR>
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
-Intent: <B>in, inout</B>.
+Intent: <B>in</B>.
 <BR>
-Specified as: a scalar or a rank one integer array.
+Specified as: a scalar integer.
 <BR></DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
@@ -90,17 +87,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
-<DT><STRONG>iact</STRONG></DT>
-<DD>specifies action to be taken in case of range errors. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>optional</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
-<code>A</code>bort, default <code>I</code>gnore.
-</DD>
 </DL>
 
 <P>
@@ -108,39 +94,26 @@ Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>A logical mask which is true for all corresponding entries of
-  <IMG
+<DT><STRONG>Function value</STRONG></DT>
+<DD>A logical mask which is true if 
+  <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> that are owned by the current process
+ ALT="$x$"></SPAN> is  owned by the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
-<BR>
-Specified as: a scalar or rank one logical array.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
+<BR></DD>
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>This routine returns a <code>.true.</code> value for those indices
-  that are strictly owned by the current process, excluding the halo
+<LI>This routine returns a <code>.true.</code> value for an index
+  that is strictly owned by the current process, excluding the halo
   indices
 </LI>
 </OL>

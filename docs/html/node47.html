@@ -1,63 +1,62 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
-<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
+<TITLE>set -- Set contents of the vector</TITLE>
+<META NAME="description" CONTENT="set -- Set contents of the vector">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node48.html">
 <LINK REL="previous" HREF="node46.html">
-<LINK REL="up" HREF="node42.html">
+<LINK REL="up" HREF="node43.html">
 <LINK REL="next" HREF="node48.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html826"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html829"
   HREF="node48.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html822"
-  HREF="node42.html">
+<A NAME="tex2html825"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html816"
+<A NAME="tex2html819"
   HREF="node46.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html824"
+<A NAME="tex2html827"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html827"
-  HREF="node48.html">clone   Clone</A>
-<B> Up:</B> <A NAME="tex2html823"
-  HREF="node42.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html817"
-  HREF="node46.html">set   Set</A>
- &nbsp; <B>  <A NAME="tex2html825"
+<B> Next:</B> <A NAME="tex2html830"
+  HREF="node48.html">get_vect   Get</A>
+<B> Up:</B> <A NAME="tex2html826"
+  HREF="node43.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html820"
+  HREF="node46.html">sizeof   Get</A>
+ &nbsp; <B>  <A NAME="tex2html828"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043500000000000000">
-get_vect  -- Get a copy of the vector contents</A>
+<H3><A NAME="SECTION00043400000000000000">
+set  -- Set contents of the vector</A>
 </H3>
 
 <P>
 <PRE>
-extv = v%get_vect()
+ call  v%set(alpha[,first,last])
+ call  v%set(vect[,first,last])
+ call  v%zero()
 </PRE>
 
 <P>
@@ -73,17 +72,59 @@ extv = v%get_vect()
 <BR>
 Scope: <B>local</B>
 <BR></DD>
+<DT><STRONG>alpha</STRONG></DT>
+<DD>A scalar value. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data
+type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
+
+<P>
+</DD>
+<DT><STRONG>first,last</STRONG></DT>
+<DD>Boundaries for setting in the vector.
+<BR>
+Scope: <B>    local</B> 
+<BR>
+Type: <B>optional</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified
+  as: integers.
+</DD>
+<DT><STRONG>vect</STRONG></DT>
+<DD>An  array 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a number of the data
+type indicated in Table&nbsp;<A HREF="#tab:f90axpby">1</A>.
+</DD>
 </DL>
+Note that a call to <code>v%zero()</code> is provided as a shorthand, but
+is equivalent to a call to <code>v%set(zero)</code> with  the <code>zero</code>
+constant having the appropriate type and kind.
 
 <P>
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>An allocatable array holding a copy of the dense
-  vector contents.
-</DD>
+<DT><STRONG>v</STRONG></DT>
+<DD>the dense vector, with updated entries
+<BR>
+Scope: <B>local</B>
+<BR></DD>
 </DL>
 
 <P>

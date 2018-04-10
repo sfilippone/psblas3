@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -67,7 +67,7 @@ function psb_ddot_vect(x, y, desc_a,info) result(res)
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   character(len=20)      :: name, ch_err
 
-  name='psb_sdot'
+  name='psb_ddot_vect'
   res = dzero
   if (psb_errstatus_fatal()) return 
   info=psb_success_
@@ -243,9 +243,9 @@ end function psb_ddot
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
-!!$    (C) Copyright 2006, 2010, 2015, 2017
+!!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$                       Alfredo Buttari      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -367,9 +367,9 @@ end function psb_ddotv
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
-!!$    (C) Copyright 2006, 2010, 2015, 2017
+!!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$                       Alfredo Buttari      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -490,9 +490,9 @@ end subroutine psb_ddotvs
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
-!!$    (C) Copyright 2006, 2010, 2015, 2017
+!!$    (C) Copyright 2006-2018
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$                       Alfredo Buttari      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions

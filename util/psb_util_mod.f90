@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -34,11 +34,10 @@
 module psb_util_mod
   use psb_blockpart_mod
   use psb_metispart_mod
+  use psb_partidx_mod
   use psb_hbio_mod
   use psb_mmio_mod
   use psb_mat_dist_mod
   use psb_renum_mod
-!!$  use psb_d_genpde_mod
-!!$  use psb_s_genpde_mod
 end module psb_util_mod
 

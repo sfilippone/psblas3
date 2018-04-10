@@ -1,145 +1,133 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_normi -- Infinity-Norm of Vector</TITLE>
-<META NAME="description" CONTENT="psb_normi -- Infinity-Norm of Vector">
+<TITLE>psb_gedots -- Generalized Dot Product</TITLE>
+<META NAME="description" CONTENT="psb_gedots -- Generalized Dot Product">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node56.html">
 <LINK REL="previous" HREF="node54.html">
-<LINK REL="up" HREF="node51.html">
+<LINK REL="up" HREF="node52.html">
 <LINK REL="next" HREF="node56.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html931"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html934"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html927"
-  HREF="node51.html">
+<A NAME="tex2html930"
+  HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html921"
+<A NAME="tex2html924"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html929"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html932"
-  HREF="node56.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html928"
-  HREF="node51.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html922"
-  HREF="node54.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html930"
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node56.html">psb_normi   Infinity-Norm</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node52.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node54.html">psb_gedot   Dot</A>
+ &nbsp; <B>  <A NAME="tex2html933"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00054000000000000000">
-psb_normi -- Infinity-Norm of Vector</A>
+<H2><A NAME="SECTION00053000000000000000">
+psb_gedots -- Generalized Dot Product</A>
 </H2>
 
 <P>
-This function computes 
- the infinity-norm of a vector <IMG
+This subroutine computes a series of  dot products among the columns of
+two dense matrices  <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$">.
-<BR>
-If <IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img20.png"
- ALT="$x$"> is a real  vector
-it computes infinity norm as:
+ ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN>: 
 <BR><P></P>
-<DIV ALIGN="CENTER">
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
 <!-- MATH
  \begin{displaymath}
-amax \leftarrow \max_i |x_i|
+res(i) \leftarrow x(:,i)^T y(:,i)
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="118" HEIGHT="36" BORDER="0"
- SRC="img29.png"
- ALT="\begin{displaymath}amax \leftarrow \max_i \vert x_i\vert\end{displaymath}">
+ WIDTH="150" HEIGHT="28" BORDER="0"
+ SRC="img27.png"
+ ALT="\begin{displaymath}res(i) \leftarrow x(:,i)^T y(:,i)\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
-else if <IMG
+If the matrices are complex, then the
+usual convention applies, i.e. the conjugate transpose of <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"> is a complex vector then it computes the infinity-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}
-\end{displaymath}
- -->
+ ALT="$x$"></SPAN> is
+used. If <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN> are of rank one, then <SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$res$"></SPAN> is a scalar, else it
+is a rank one array. 
 
-<IMG
- WIDTH="233" HEIGHT="36" BORDER="0"
- SRC="img30.png"
- ALT="\begin{displaymath}amax \leftarrow \max_i {(\vert re(x_i)\vert + \vert im(x_i)\vert)}\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
 <P>
 <PRE>
-psb_geamax(x, desc_a, info)
-psb_normi(x, desc_a, info)
+call psb_gedots(res, x, y, desc_a, info)
 </PRE>
-<P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1951"></A>
+<DIV ALIGN="CENTER"><A NAME="1979"></A>
 <TABLE>
-<CAPTION><STRONG>Table 4:</STRONG>
+<CAPTION><STRONG>Table 3:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="44" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img31.png"
- ALT="$amax$"></TD>
-<TD ALIGN="LEFT"><IMG
+<TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
+ WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$res$"></SPAN>, <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
+ ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_geamax</TD>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_gedots</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -158,10 +146,10 @@ Data types</CAPTION>
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$">. 
+ ALT="$x$"></SPAN>. 
 <BR>
 Scope: <B>local</B> 
 <BR>
@@ -169,9 +157,38 @@ Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT>  
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90amax">4</A>.
+Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN>. 
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the local portion of global dense matrix
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN>. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+containing numbers of type specified in
+Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN>. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -183,20 +200,25 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
-<P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>Function value</STRONG></DT>
-<DD>is the infinity norm of subvector <IMG
+<DT><STRONG>res</STRONG></DT>
+<DD>is the dot product of subvectors <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
- ALT="$x$">.
+ ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$y$"></SPAN>.
 <BR>
 Scope: <B>global</B> 
 <BR>
-Specified as: a long precision real number.
+Intent: <B>out</B>.
+<BR>
+Specified as: a number or a rank-one array  of the data type indicated
+in Table&nbsp;<A HREF="#tab:f90dot">2</A>. 
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -210,30 +232,32 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+
 <P>
-<HR>
+
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html931"
+<A NAME="tex2html934"
   HREF="node56.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html927"
-  HREF="node51.html">
+<A NAME="tex2html930"
+  HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html921"
+<A NAME="tex2html924"
   HREF="node54.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html929"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html932"
-  HREF="node56.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html928"
-  HREF="node51.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html922"
-  HREF="node54.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html930"
-  HREF="node1.html">Contents</A></B> 
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node56.html">psb_normi   Infinity-Norm</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node52.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node54.html">psb_gedot   Dot</A>
+ &nbsp; <B>  <A NAME="tex2html933"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

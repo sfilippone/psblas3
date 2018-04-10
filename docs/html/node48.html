@@ -1,61 +1,60 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>clone -- Clone current object</TITLE>
-<META NAME="description" CONTENT="clone -- Clone current object">
+<TITLE>get_vect -- Get a copy of the vector contents</TITLE>
+<META NAME="description" CONTENT="get_vect -- Get a copy of the vector contents">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node49.html">
 <LINK REL="previous" HREF="node47.html">
-<LINK REL="up" HREF="node42.html">
+<LINK REL="up" HREF="node43.html">
 <LINK REL="next" HREF="node49.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html836"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html841"
   HREF="node49.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html832"
-  HREF="node42.html">
+<A NAME="tex2html837"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html828"
+<A NAME="tex2html831"
   HREF="node47.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html834"
+<A NAME="tex2html839"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html837"
-  HREF="node49.html">Preconditioner data structure</A>
-<B> Up:</B> <A NAME="tex2html833"
-  HREF="node42.html">Dense Vector Data Structure</A>
-<B> Previous:</B> <A NAME="tex2html829"
-  HREF="node47.html">get_vect   Get</A>
- &nbsp; <B>  <A NAME="tex2html835"
+<B> Next:</B> <A NAME="tex2html842"
+  HREF="node49.html">clone   Clone</A>
+<B> Up:</B> <A NAME="tex2html838"
+  HREF="node43.html">Dense Vector Data Structure</A>
+<B> Previous:</B> <A NAME="tex2html832"
+  HREF="node47.html">set   Set</A>
+ &nbsp; <B>  <A NAME="tex2html840"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00043600000000000000">
-clone -- Clone current object</A>
+<H3><A NAME="SECTION00043500000000000000">
+get_vect  -- Get a copy of the vector contents</A>
 </H3>
 
+<P>
 <PRE>
-call  x%clone(y,info)
+extv = v%get_vect()
 </PRE>
 
 <P>
@@ -66,10 +65,10 @@ call  x%clone(y,info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the dense vector.
+<DT><STRONG>v</STRONG></DT>
+<DD>the dense vector
 <BR>
-Scope: <B>local</B>.
+Scope: <B>local</B>
 <BR></DD>
 </DL>
 
@@ -78,11 +77,9 @@ Scope: <B>local</B>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>y</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>Function value</STRONG></DT>
+<DD>An allocatable array holding a copy of the dense
+  vector contents.
 </DD>
 </DL>
 

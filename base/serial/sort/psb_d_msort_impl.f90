@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -40,6 +40,99 @@
   !  Data Structures and Algorithms
   !  Addison-Wesley
   !
+
+  subroutine psb_dmsort_u(x,nout,dir)
+    use psb_d_sort_mod, psb_protect_name => psb_dmsort_u
+    use psb_error_mod
+    implicit none 
+    real(psb_dpk_), intent(inout)           :: x(:) 
+    integer(psb_ipk_), intent(out)             :: nout
+    integer(psb_ipk_), optional, intent(in)    :: dir
+
+    integer(psb_ipk_) :: n, k
+    integer(psb_ipk_) :: err_act
+
+    integer(psb_ipk_)  :: ierr(5)
+    character(len=20)  :: name
+
+    name='psb_msort_u'
+    call psb_erractionsave(err_act)
+
+    n = size(x)
+
+    call psb_msort(x,dir=dir)
+    nout = min(1,n)
+    do k=2,n
+      if (x(k) /= x(nout)) then 
+        nout = nout + 1
+        x(nout) = x(k)
+      endif
+    enddo
+
+    return
+
+9999 call psb_error_handler(err_act)
+
+    return
+  end subroutine psb_dmsort_u
+
+
+  function  psb_dbsrch(key,n,v) result(ipos)
+    use psb_d_sort_mod, psb_protect_name => psb_dbsrch
+    implicit none
+    integer(psb_ipk_) :: ipos, n
+    real(psb_dpk_) :: key
+    real(psb_dpk_) :: v(:)
+
+    integer(psb_ipk_) :: lb, ub, m, i
+
+    ipos = -1 
+    if (n<5) then
+      do i=1,n
+        if (key.eq.v(i))  then
+          ipos = i
+          return
+        end if
+      enddo
+      return
+    end if
+    
+    lb = 1 
+    ub = n
+
+    do while (lb.le.ub) 
+      m = (lb+ub)/2
+      if (key.eq.v(m))  then
+        ipos = m 
+        lb   = ub + 1
+      else if (key < v(m))  then
+        ub = m-1
+      else 
+        lb = m + 1
+      end if
+    enddo
+    return
+  end function psb_dbsrch
+
+  function psb_dssrch(key,n,v) result(ipos)
+    use psb_d_sort_mod, psb_protect_name => psb_dssrch
+    implicit none
+    integer(psb_ipk_) :: ipos, n
+    real(psb_dpk_) :: key
+    real(psb_dpk_) :: v(:)
+
+    integer(psb_ipk_) :: i
+
+    ipos = -1 
+    do i=1,n
+      if (key.eq.v(i))  then
+        ipos = i
+        return
+      end if
+    enddo
+
+    return
+  end function psb_dssrch
 
   subroutine psb_dmsort(x,ix,dir,flag)
     use psb_d_sort_mod, psb_protect_name => psb_dmsort

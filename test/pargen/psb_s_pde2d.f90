@@ -1,8 +1,8 @@
 !    
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -50,10 +50,12 @@
 !
 ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
 !
-! In this sample program the index space of the discretized
-! computational domain is first numbered sequentially in a standard way, 
-! then the corresponding vector is distributed according to a BLOCK
-! data distribution.
+! There are three choices available for data distribution:
+! 1. A simple BLOCK distribution
+! 2. A ditribution based on arbitrary assignment of indices to processes,
+!    typically from a graph partitioner
+! 3. A 2D distribution in which the unit square is partitioned
+!    into rectangles, each one assigned to a process.
 !
 module psb_s_pde2d_mod
 
@@ -61,29 +63,29 @@ module psb_s_pde2d_mod
        &  psb_sspmat_type, psb_s_vect_type, szero,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
-
   interface 
     function s_func_2d(x,y) result(val)
       import :: psb_spk_
       real(psb_spk_), intent(in) :: x,y
       real(psb_spk_) :: val
     end function s_func_2d
-  end interface
+  end interface 
 
-  interface psb_gen_pde2d 
-    module procedure psb_s_gen_pde2d
+  interface psb_gen_pde2d
+    module procedure  psb_s_gen_pde2d
   end interface psb_gen_pde2d
-
+  
 contains
-
+  
   function s_null_func_2d(x,y) result(val)
 
     real(psb_spk_), intent(in) :: x,y
     real(psb_spk_) :: val
-
+    
     val = szero
 
   end function s_null_func_2d
+
 
 
   !
@@ -91,8 +93,9 @@ contains
   !  the rhs. 
   !
   subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,nrl)
+       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
+    use psb_util_mod
     !
     !   Discretizes the partial differential equation
     ! 
@@ -120,7 +123,7 @@ contains
     class(psb_s_base_sparse_mat), optional :: amold
     class(psb_s_base_vect_type), optional :: vmold
     class(psb_i_base_vect_type), optional :: imold
-    integer(psb_ipk_), optional :: nrl
+    integer(psb_ipk_), optional :: partition, nrl,iv(:)
 
     ! Local variables.
 
@@ -129,16 +132,20 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,glob_row,nlr,i,ii,ib,k
+    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
-    integer(psb_ipk_) :: np, iam, nr, nt
+    ! For 2D partition
+    integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
+    integer(psb_ipk_), allocatable :: bndx(:),bndy(:)
+    ! Process grid
+    integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
     integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_spk_)            :: deltah, sqdeltah, deltah2
-    real(psb_spk_), parameter :: rhs=0.e0,one=1.e0,zero=0.e0
+    real(psb_spk_), parameter :: rhs=szero,one=sone,zero=szero
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
     procedure(s_func_2d), pointer :: f_
@@ -157,10 +164,21 @@ contains
       f_ => s_null_func_2d
     end if
 
-    deltah   = 1.e0/(idim+2)
+    deltah   = sone/(idim+2)
     sqdeltah = deltah*deltah
-    deltah2  = 2.e0* deltah
+    deltah2  = (2*sone)* deltah
 
+    if (present(partition)) then
+      if ((1<= partition).and.(partition <= 3)) then
+        partition_ = partition
+      else
+        write(*,*) 'Invalid partition choice ',partition,' defaulting to 3'
+        partition_ = 3
+      end if
+    else
+      partition_ = 3
+    end if
+    
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
 
@@ -168,33 +186,122 @@ contains
     n   = m
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
+    t0 = psb_wtime()
+    select case(partition_)
+    case(1)
+      ! A BLOCK partition 
+      if (present(nrl)) then 
+        nr = nrl
+      else
+        !
+        ! Using a simple BLOCK distribution.
+        !
+        nt = (m+np-1)/np
+        nr = max(0,min(nt,m-(iam*nt)))
+      end if
 
-    if (present(nrl)) then 
-      nr = nrl
-    else
-      !
-      ! Using a simple BLOCK distribution.
-      !
-      nt = (m+np-1)/np
-      nr = max(0,min(nt,m-(iam*nt)))
-    end if
+      nt = nr
+      call psb_sum(ictxt,nt) 
+      if (nt /= m) then 
+        write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+        return    
+      end if
 
-    nt = nr
-    call psb_sum(ictxt,nt) 
-    if (nt /= m) then 
-      write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+      !
+      ! First example  of use of CDALL: specify for each process a number of
+      ! contiguous rows
+      ! 
+      call psb_cdall(ictxt,desc_a,info,nl=nr)
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(2)
+      ! A  partition  defined by the user through IV
+      
+      if (present(iv)) then 
+        if (size(iv) /= m) then
+          write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
+          info = -1
+          call psb_barrier(ictxt)
+          call psb_abort(ictxt)
+          return    
+        end if
+      else
+        write(psb_err_unit,*) iam, 'Initialization error: IV not present'
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+        return    
+      end if
+
+      !
+      ! Second example  of use of CDALL: specify for each row the
+      ! process that owns it 
+      ! 
+      call psb_cdall(ictxt,desc_a,info,vg=iv)
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(3)
+      ! A 2-dimensional partition
+
+      ! A nifty MPI function will split the process list
+      npdims = 0
+      call mpi_dims_create(np,2,npdims,info)
+      npx = npdims(1)
+      npy = npdims(2)
+
+      allocate(bndx(0:npx),bndy(0:npy))
+      ! We can reuse idx2ijk for process indices as well. 
+      call idx2ijk(iamx,iamy,iam,npx,npy,base=0)
+      ! Now let's split the 2D square in rectangles
+      call dist1Didx(bndx,idim,npx)
+      mynx = bndx(iamx+1)-bndx(iamx)
+      call dist1Didx(bndy,idim,npy)
+      myny = bndy(iamy+1)-bndy(iamy)
+
+      ! How many indices do I own? 
+      nlr = mynx*myny
+      allocate(myidx(nlr))
+      ! Now, let's generate the list of indices I own
+      nr = 0
+      do i=bndx(iamx),bndx(iamx+1)-1
+        do j=bndy(iamy),bndy(iamy+1)-1
+          nr = nr + 1
+          call ijk2idx(myidx(nr),i,j,idim,idim)
+        end do
+      end do
+      if (nr /= nlr) then
+        write(psb_err_unit,*) iam,iamx,iamy, 'Initialization error: NR vs NLR ',&
+             & nr,nlr,mynx,myny
+        info = -1
+        call psb_barrier(ictxt)
+        call psb_abort(ictxt)
+      end if
+
+      !
+      ! Third example  of use of CDALL: specify for each process
+      ! the set of global indices it owns.
+      ! 
+      call psb_cdall(ictxt,desc_a,info,vl=myidx)
+      
+    case default
+      write(psb_err_unit,*) iam, 'Initialization error: should not get here'
       info = -1
       call psb_barrier(ictxt)
       call psb_abort(ictxt)
-      return    
-    end if
-    call psb_barrier(ictxt)
-    t0 = psb_wtime()
-    call psb_cdall(ictxt,desc_a,info,nl=nr)
+      return
+    end select
+
+    
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info)
+
     call psb_barrier(ictxt)
     talc = psb_wtime()-t0
 
@@ -218,9 +325,6 @@ contains
     endif
 
 
-    myidx = desc_a%get_global_indices()
-    nlr = size(myidx)
-
     ! loop over rows belonging to current process in a block
     ! distribution.
 
@@ -234,13 +338,8 @@ contains
         ! local matrix pointer 
         glob_row=myidx(i)
         ! compute gridpoint coordinates
-        if (mod(glob_row,(idim)) == 0) then
-          ix = glob_row/(idim)
-        else
-          ix = glob_row/(idim)+1
-        endif
-        iy = (glob_row-(ix-1)*idim)
-        ! x, y
+        call idx2ijk(ix,iy,glob_row,idim,idim)
+        ! x, y coordinates
         x = (ix-1)*deltah
         y = (iy-1)*deltah
 
@@ -268,7 +367,7 @@ contains
         endif
 
         !  term depending on     (x,y)
-        val(icoeff)=2.e0*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
+        val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
         icol(icoeff) = (ix-1)*idim+iy
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
@@ -296,7 +395,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.e0
+      zt(:)=0.d0
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -382,7 +481,7 @@ program psb_s_pde2d
   integer(psb_ipk_) :: idim
 
   ! miscellaneous 
-  real(psb_spk_), parameter :: one = 1.e0
+  real(psb_spk_), parameter :: one = sone
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
@@ -505,10 +604,11 @@ program psb_s_pde2d
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
     write(psb_out_unit,'("Info  on exit                 : ",i0)')info
-    write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
-    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize    
+    write(psb_out_unit,'("Total memory occupation for      A: ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for   PREC: ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
+    write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
+    write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
 
@@ -543,35 +643,50 @@ contains
     character(len=*) :: kmethd, ptype, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
     integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: ip
+    integer(psb_ipk_) :: ip, inp_unit
+    character(len=1024)   :: filename
 
     call psb_info(ictxt, iam, np)
 
     if (iam == 0) then
-      read(psb_inp_unit,*) ip
+      if (command_argument_count()>0) then
+        call get_command_argument(1,filename)
+        inp_unit = 30
+        open(inp_unit,file=filename,action='read',iostat=info)
+        if (info /= 0) then
+          write(psb_err_unit,*) 'Could not open file ',filename,' for input'
+          call psb_abort(ictxt)
+          stop
+        else
+          write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
+        end if
+      else
+        inp_unit=psb_inp_unit
+      end if
+      read(inp_unit,*) ip
       if (ip >= 3) then
-        read(psb_inp_unit,*) kmethd
-        read(psb_inp_unit,*) ptype
-        read(psb_inp_unit,*) afmt
+        read(inp_unit,*) kmethd
+        read(inp_unit,*) ptype
+        read(inp_unit,*) afmt
 
-        read(psb_inp_unit,*) idim
+        read(inp_unit,*) idim
         if (ip >= 4) then
-          read(psb_inp_unit,*) istopc
+          read(inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 5) then
-          read(psb_inp_unit,*) itmax
+          read(inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 6) then
-          read(psb_inp_unit,*) itrace
+          read(inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 7) then
-          read(psb_inp_unit,*) irst
+          read(inp_unit,*) irst
         else
           irst=1
         endif
@@ -589,6 +704,10 @@ contains
         call psb_abort(ictxt)
         stop 1
       endif
+      if (inp_unit /= psb_inp_unit) then
+        close(inp_unit)
+      end if
+
     end if
     ! broadcast parameters to all processors
     call psb_bcast(ictxt,kmethd)
@@ -599,7 +718,6 @@ contains
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)
     call psb_bcast(ictxt,irst)
-
 
     return
 
@@ -624,6 +742,7 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
+
   !
   ! functions parametrizing the differential equation 
   !  
@@ -631,31 +750,31 @@ contains
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y
-    b1=1.e0/sqrt(2.e0)
+    b1=sone/sqrt((2*sone))
   end function b1
   function b2(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y
-    b2=1.e0/sqrt(2.e0)
+    b2=sone/sqrt((2*sone))
   end function b2
   function c(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  c
     real(psb_spk_), intent(in) :: x,y
-    c=0.e0
+    c=0.d0
   end function c
   function a1(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a1   
     real(psb_spk_), intent(in) :: x,y
-    a1=1.e0/80
+    a1=sone/80
   end function a1
   function a2(x,y)
     use psb_base_mod, only : psb_spk_
     real(psb_spk_) ::  a2
     real(psb_spk_), intent(in) :: x,y
-    a2=1.e0/80
+    a2=sone/80
   end function a2
   function g(x,y)
     use psb_base_mod, only : psb_spk_, sone, szero
@@ -668,7 +787,6 @@ contains
       g = exp(-y**2)
     end if
   end function g
-
 end program psb_s_pde2d
 
 

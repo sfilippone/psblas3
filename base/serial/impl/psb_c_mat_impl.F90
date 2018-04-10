@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -1133,7 +1133,6 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
 
 
   class(psb_c_base_sparse_mat), allocatable  :: altmp
-  class(psb_c_base_sparse_mat), pointer      :: mld
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='cscnv'
   logical, parameter :: debug=.false.
@@ -1155,11 +1154,7 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
 
   if (present(mold)) then 
 
-#if defined(HAVE_MOLD)
     allocate(altmp, mold=mold,stat=info) 
-#else
-    call mold%mold(altmp,info)
-#endif
 
   else if (present(type)) then 
 
@@ -1176,12 +1171,7 @@ subroutine psb_c_cscnv(a,b,info,type,mold,upd,dupl)
       goto 9999
     end select
   else
-#if defined(HAVE_MOLD)
     allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
-#else
-    mld = psb_get_mat_default(a)
-    call mld%mold(altmp,info)
-#endif
   end if
 
   if (info /= psb_success_) then 
@@ -1238,7 +1228,6 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
 
 
   class(psb_c_base_sparse_mat), allocatable  :: altmp
-  class(psb_c_base_sparse_mat), pointer      :: mld
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='cscnv_ip'
   logical, parameter :: debug=.false.
@@ -1266,11 +1255,7 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
 
   if (present(mold)) then 
 
-#if defined(HAVE_MOLD)
     allocate(altmp, mold=mold,stat=info) 
-#else
-    call mold%mold(altmp,info)
-#endif
 
   else if (present(type)) then 
 
@@ -1287,12 +1272,7 @@ subroutine psb_c_cscnv_ip(a,info,type,mold,dupl)
       goto 9999
     end select
   else
-#if defined(HAVE_MOLD)
     allocate(altmp, mold=psb_get_mat_default(a),stat=info) 
-#else
-    mld = psb_get_mat_default(a)
-    call mld%mold(altmp,info)
-#endif
   end if
 
   if (info /= psb_success_) then 
@@ -1507,11 +1487,7 @@ subroutine psb_c_mv_from(a,b)
   integer(psb_ipk_) :: info
 
   call a%free()
-#if defined(HAVE_MOLD)
   allocate(a%a,mold=b, stat=info)
-#else
-  call b%mold(a%a,info)
-#endif
   call a%a%mv_from_fmt(b,info)
   call b%free()
 
@@ -1539,11 +1515,7 @@ subroutine psb_c_cp_from(a,b)
   ! however this would run the risk of messing up with data
   ! allocated externally (e.g. GPU-side data).
   !
-#if defined(HAVE_MOLD)
   allocate(a%a,mold=b,stat=info)
-#else
-  call b%mold(a%a,info)
-#endif
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
   if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
   if (info /= psb_success_) goto 9999 
@@ -1592,11 +1564,8 @@ subroutine psb_c_mold(a,b)
   class(psb_cspmat_type), intent(inout)     :: a
   class(psb_c_base_sparse_mat), allocatable, intent(out) :: b
   integer(psb_ipk_) :: info
-#if defined(HAVE_MOLD) 
+
   allocate(b,mold=a%a, stat=info)
-#else
-  call a%a%mold(b,info)
-#endif
   
 end subroutine psb_c_mold
 
@@ -1706,11 +1675,7 @@ subroutine psb_c_transp_2mat(a,b)
     goto 9999
   endif
   call b%free()
-#if defined(HAVE_MOLD)
   allocate(b%a,mold=a%a,stat=info)
-#else
-  call a%a%mold(b%a,info)
-#endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
     goto 9999
@@ -1781,11 +1746,7 @@ subroutine psb_c_transc_2mat(a,b)
     goto 9999
   endif
   call b%free()
-#if defined(HAVE_MOLD)
   allocate(b%a,mold=a%a,stat=info)
-#else
-  call a%a%mold(b%a,info)
-#endif
   if (info /= psb_success_) then 
     info = psb_err_alloc_dealloc_
     goto 9999
@@ -1811,6 +1772,7 @@ subroutine psb_c_asb(a,mold)
   class(psb_cspmat_type), intent(inout) :: a   
   class(psb_c_base_sparse_mat), optional, intent(in) :: mold
   class(psb_c_base_sparse_mat), allocatable :: tmp
+  class(psb_c_base_sparse_mat), pointer :: mld
   integer(psb_ipk_) :: err_act, info
   character(len=20)  :: name='c_asb'
 
@@ -1829,6 +1791,10 @@ subroutine psb_c_asb(a,mold)
       call a%a%free()
       call move_alloc(tmp,a%a)
     end if
+  else
+    mld => psb_c_get_base_mat_default()
+    if (.not.same_type_as(a%a,mld)) &
+         & call a%cscnv(info)
   end if
   
 

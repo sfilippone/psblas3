@@ -24,23 +24,13 @@ CMOD=psb_base_cbind.h psb_c_base.h psb_c_sbase.h  psb_c_dbase.h  psb_c_cbase.h  
 	psb_c_scomm.h psb_c_dcomm.h psb_c_ccomm.h psb_c_zcomm.h
 OBJS=$(FOBJS) $(COBJS)
 
-LIBMOD=psb_base_cbind_mod$(.mod) psb_cpenv_mod$(.mod)  psb_objhandle_mod$(.mod)\
-       psb_base_tools_cbind_mod$(.mod) psb_base_string_cbind_mod$(.mod) psb_base_psblas_cbind_mod$(.mod)\
-       psb_s_tools_cbind_mod$(.mod) psb_s_serial_cbind_mod$(.mod) psb_s_psblas_cbind_mod$(.mod) \
-       psb_d_tools_cbind_mod$(.mod) psb_d_serial_cbind_mod$(.mod) psb_d_psblas_cbind_mod$(.mod) \
-       psb_c_tools_cbind_mod$(.mod) psb_c_serial_cbind_mod$(.mod) psb_c_psblas_cbind_mod$(.mod) \
-       psb_z_tools_cbind_mod$(.mod) psb_z_serial_cbind_mod$(.mod) psb_z_psblas_cbind_mod$(.mod) \
-       psb_s_comm_cbind_mod$(.mod) psb_d_comm_cbind_mod$(.mod) \
-       psb_c_comm_cbind_mod$(.mod) psb_z_comm_cbind_mod$(.mod) 
-
-LOCAL_MODS=$(LIBMOD) 
 LIBNAME=$(CBINDLIBNAME)	
 
 
 lib:  $(OBJS) $(CMOD)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-	/bin/cp -p $(LIBMOD) $(CMOD) $(HERE)
+	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
 
 $(COBJS): $(CMOD)
 
@@ -71,6 +61,6 @@ veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 
 clean:
-	/bin/rm -f $(OBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) *$(.mod)
 
 veryclean: clean

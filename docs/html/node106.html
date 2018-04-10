@@ -1,70 +1,69 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_abort -- Abort a computation</TITLE>
-<META NAME="description" CONTENT="psb_abort -- Abort a computation">
+<TITLE>psb_barrier -- Sinchronization point parallel environment</TITLE>
+<META NAME="description" CONTENT="psb_barrier -- Sinchronization point parallel environment">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node107.html">
 <LINK REL="previous" HREF="node105.html">
-<LINK REL="up" HREF="node98.html">
+<LINK REL="up" HREF="node99.html">
 <LINK REL="next" HREF="node107.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1584"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1587"
   HREF="node107.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1580"
-  HREF="node98.html">
+<A NAME="tex2html1583"
+  HREF="node99.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1574"
+<A NAME="tex2html1577"
   HREF="node105.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1582"
+<A NAME="tex2html1585"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1585"
-  HREF="node107.html">psb_bcast   Broadcast</A>
-<B> Up:</B> <A NAME="tex2html1581"
-  HREF="node98.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1575"
-  HREF="node105.html">psb_barrier   Sinchronization</A>
- &nbsp; <B>  <A NAME="tex2html1583"
+<B> Next:</B> <A NAME="tex2html1588"
+  HREF="node107.html">psb_abort   Abort</A>
+<B> Up:</B> <A NAME="tex2html1584"
+  HREF="node99.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1578"
+  HREF="node105.html">psb_wtime   Wall</A>
+ &nbsp; <B>  <A NAME="tex2html1586"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00088000000000000000">
-psb_abort -- Abort a computation</A>
+<H2><A NAME="SECTION00087000000000000000">
+psb_barrier -- Sinchronization point  parallel
+  environment</A>
 </H2>
 
 <P>
 <PRE>
-call psb_abort(icontxt)
+call psb_barrier(icontxt)
 </PRE>
 
 <P>
-This subroutine aborts computation on the parallel virtual machine. 
+This subroutine acts as an explicit synchronization point for  the  PSBLAS
+parallel virtual  machine. 
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry </B></STRONG></DT>
 <DD>

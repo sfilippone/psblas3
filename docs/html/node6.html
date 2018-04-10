@@ -1,10 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
 <TITLE>Application structure</TITLE>
@@ -13,7 +9,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -25,30 +21,31 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html264"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html265"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html260"
+<A NAME="tex2html261"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html254"
+<A NAME="tex2html255"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html262"
+<A NAME="tex2html263"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html265"
+<B> Next:</B> <A NAME="tex2html266"
   HREF="node7.html">User-defined index mappings</A>
-<B> Up:</B> <A NAME="tex2html261"
+<B> Up:</B> <A NAME="tex2html262"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html255"
+<B> Previous:</B> <A NAME="tex2html256"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html263"
+ &nbsp; <B>  <A NAME="tex2html264"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00033000000000000000"></A>
@@ -63,10 +60,10 @@ library objects are created and exist with reference to a discretized
 space to which there corresponds an index space and a matrix sparsity
 pattern. As an example, consider a cell-centered finite-volume
 discretization of  the Navier-Stokes equations on a simulation domain;
-the index space <IMG
+the index space <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
- ALT="$1\dots n$"> is isomorphic to the set of cell centers,
+ ALT="$1\dots n$"></SPAN> is isomorphic to the set of cell centers,
 whereas the pattern of the associated linear system matrix is
 isomorphic to the adjacency graph imposed on the discretization mesh
 by the discretization stencil. 
@@ -74,70 +71,70 @@ by the discretization stencil.
 <P>
 Thus the first order of business is to establish an index space, and
 this is done with a call to  <code>psb_cdall</code> in which we specify the
-size of the index space <IMG
+size of the index space <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img16.png"
- ALT="$n$"> and the allocation of the elements of the
+ ALT="$n$"></SPAN> and the allocation of the elements of the
 index space to the various processes making up the MPI (virtual)
 parallel machine. 
 
 <P>
 The index space is partitioned among processes, and this creates a
-mapping from the ``global'' numbering <IMG
+mapping from the &ldquo;global&rdquo; numbering <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
- ALT="$1\dots n$"> to a numbering
-``local'' to each process; each process <IMG
+ ALT="$1\dots n$"></SPAN> to a numbering
+&ldquo;local&rdquo; to each process; each process <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$"> will own a certain subset
+ ALT="$i$"></SPAN> will own a certain subset
 <!-- MATH
  $1\dots n_{\hbox{row}_i}$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="77" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img17.png"
- ALT="$1\dots n_{\hbox{row}_i}$">, each element of which corresponds to a certain
-element of <IMG
+ ALT="$1\dots n_{\hbox{row}_i}$"></SPAN>, each element of which corresponds to a certain
+element of <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
- ALT="$1\dots n$">. The user does not set explicitly this mapping;
+ ALT="$1\dots n$"></SPAN>. The user does not set explicitly this mapping;
 when the application needs to indicate to which element of the index
 space a certain item is related, such as the row and column index of a
-matrix coefficient, it does so in the ``global'' numbering, and the
-library will translate into the appropriate ``local'' numbering. 
+matrix coefficient, it does so in the &ldquo;global&rdquo; numbering, and the
+library will translate into the appropriate &ldquo;local&rdquo; numbering. 
 
 <P>
-For  a given index space <IMG
+For  a given index space <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img15.png"
- ALT="$1\dots n$"> there are many possible associated
+ ALT="$1\dots n$"></SPAN> there are many possible associated
 topologies, i.e. many different discretization stencils; thus the
 description of the index space is not completed until the user has
 defined a sparsity pattern, either explicitly through <code>psb_cdins</code>
 or implicitly through <code>psb_spins</code>. The descriptor is finalized
 with a call to <code>psb_cdasb</code> and a sparse matrix with a call to
-<code>psb_spasb</code>. After <code>psb_cdasb</code> each process <IMG
+<code>psb_spasb</code>. After <code>psb_cdasb</code> each process <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$"> will have
-defined a set of ``halo'' (or ``ghost'') indices
+ ALT="$i$"></SPAN> will have
+defined a set of &ldquo;halo&rdquo; (or &ldquo;ghost&rdquo;) indices
 <!-- MATH
  $n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="130" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img18.png"
- ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$">, denoting elements of the index
-space that are <I>not</I> assigned to process <IMG
+ ALT="$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$"></SPAN>, denoting elements of the index
+space that are <SPAN  CLASS="textit">not</SPAN> assigned to process <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$">; however the
+ ALT="$i$"></SPAN>; however the
 variables associated with them are needed to complete computations
-associated with the sparse matrix <IMG
+associated with the sparse matrix <SPAN CLASS="MATH"><IMG
  WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img1.png"
- ALT="$A$">, and thus they have to be
+ ALT="$A$"></SPAN>, and thus they have to be
 fetched from (neighbouring) processes. The descriptor of the index
 space is built exactly for the purpose of properly sequencing the
 communication steps required to achieve this objective. 
@@ -171,7 +168,7 @@ follows:
 </LI>
 <LI>Choose the preconditioner to be used with <code>prec%init</code> and
   build it with <code>prec%build</code><A NAME="tex2html5"
-  HREF="footnode.html#foot278"><SUP>3</SUP></A>. 
+  HREF="footnode.html#foot278"><SUP><SPAN CLASS="arabic">3</SPAN></SUP></A>. 
 </LI>
 <LI>Call the iterative method of choice, e.g. <code>psb_bicgstab</code>
 </LI>
@@ -249,34 +246,35 @@ from optimal.
 <!--Table of Child-Links-->
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<UL>
-<LI><A NAME="tex2html266"
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html267"
   HREF="node7.html">User-defined index mappings</A>
 </UL>
 <!--End of Table of Child-Links-->
-<HR>
+
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html264"
+<A NAME="tex2html265"
   HREF="node7.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html260"
+<A NAME="tex2html261"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html254"
+<A NAME="tex2html255"
   HREF="node5.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html262"
+<A NAME="tex2html263"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html265"
+<B> Next:</B> <A NAME="tex2html266"
   HREF="node7.html">User-defined index mappings</A>
-<B> Up:</B> <A NAME="tex2html261"
+<B> Up:</B> <A NAME="tex2html262"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html255"
+<B> Previous:</B> <A NAME="tex2html256"
   HREF="node5.html">Library contents</A>
- &nbsp; <B>  <A NAME="tex2html263"
-  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html264"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

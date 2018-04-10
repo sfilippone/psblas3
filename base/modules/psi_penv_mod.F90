@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -273,6 +273,8 @@ contains
     use psi_comm_buffers_mod 
     use psb_const_mod
     use psb_error_mod
+    use psb_mat_mod
+    use psb_vect_mod
 ! !$    use psb_rsb_mod
 #ifdef MPI_MOD
     use mpi
@@ -282,8 +284,7 @@ contains
     include 'mpif.h'
 #endif
     integer(psb_mpik_), intent(out) :: ictxt
-    integer(psb_mpik_), intent(in), optional :: np, basectxt, ids(:)
-
+    integer(psb_mpik_), intent(in), optional :: np, basectxt, ids(:)    
 
     integer(psb_mpik_) :: i, isnullcomm
     integer(psb_mpik_), allocatable :: iids(:) 
@@ -291,6 +292,7 @@ contains
     integer(psb_mpik_) :: np_, npavail, iam, info, basecomm, basegroup, newgroup
     character(len=20), parameter :: name='psb_init'
     integer(psb_ipk_) :: iinfo
+    !    
     call psb_set_debug_unit(psb_err_unit)
 
 #if defined(SERIAL_MPI) 
@@ -380,19 +382,20 @@ contains
     call psi_get_sizes()
     if (ictxt == mpi_comm_null) return 
 #endif
-
-! !$    call psb_rsb_init(info)
-! !$    if (info.ne.psb_rsb_const_success) then 
-! !$      if (info.eq.psb_rsb_const_not_available) then 
-! !$        info=psb_success_ ! rsb is not present
-! !$      else
-! !$        ! rsb failed to initialize, and we issue an internal error.
-! !$        ! or shall we tolerate this ?
-! !$        info=psb_err_internal_error_
-! !$        call psb_errpush(info,name)
-! !$        call psb_error(ictxt)
-! !$      endif
-! !$    endif
+    call psb_init_vect_defaults()
+    call psb_init_mat_defaults()
+    ! !$    call psb_rsb_init(info)
+    ! !$    if (info.ne.psb_rsb_const_success) then 
+    ! !$      if (info.eq.psb_rsb_const_not_available) then 
+    ! !$        info=psb_success_ ! rsb is not present
+    ! !$      else
+    ! !$        ! rsb failed to initialize, and we issue an internal error.
+    ! !$        ! or shall we tolerate this ?
+    ! !$        info=psb_err_internal_error_
+    ! !$        call psb_errpush(info,name)
+    ! !$        call psb_error(ictxt)
+    ! !$      endif
+    ! !$    endif
 
   end subroutine psb_init_mpik
 

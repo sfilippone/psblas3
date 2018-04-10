@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -90,7 +90,8 @@ module psb_gen_block_map_mod
        & block_get_fmt, block_l2gs1, block_l2gs2, block_l2gv1,&
        & block_l2gv2, block_g2ls1, block_g2ls2, block_g2lv1,&
        & block_g2lv2, block_g2ls1_ins, block_g2ls2_ins,&
-       & block_g2lv1_ins, block_g2lv2_ins, block_clone, block_reinit
+       & block_g2lv1_ins, block_g2lv2_ins, block_clone, block_reinit,&
+       & gen_block_search
 
   integer(psb_ipk_), private :: laddsz=500
 
@@ -992,7 +993,6 @@ contains
 
   subroutine block_fnd_owner(idx,iprc,idxmap,info)
     use psb_penv_mod
-    use psb_sort_mod
     implicit none 
     integer(psb_ipk_), intent(in) :: idx(:)
     integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
@@ -1009,7 +1009,7 @@ contains
       return
     end if
     do i=1, nv 
-      ip = psb_iblsrch(idx(i)-1,np+1,idxmap%vnl)
+      ip = gen_block_search(idx(i)-1,np+1,idxmap%vnl)
       iprc(i) = ip - 1
     end do
 
@@ -1226,52 +1226,49 @@ contains
     return
   end subroutine block_reinit
 
-!!$
-!!$  subroutine block_reinit(idxmap,info)
-!!$    use psb_penv_mod
-!!$    use psb_error_mod
-!!$    use psb_realloc_mod
-!!$    implicit none 
-!!$    class(psb_gen_block_map), intent(inout)    :: idxmap
-!!$    integer(psb_ipk_), intent(out) :: info
-!!$    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ictxt
-!!$    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
-!!$    character(len=20)  :: name='block_reinit'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    info = psb_success_
-!!$    call psb_get_erraction(err_act)
-!!$    ictxt = idxmap%get_ctxt()
-!!$    nr = idxmap%get_lr()
-!!$    nc = idxmap%get_lc()
-!!$    if (nc>nr) then 
-!!$      lidx = (/(k,k=nr+1,nc)/)
-!!$      idx  = (/(k,k=nr+1,nc)/)
-!!$      call idxmap%l2gip(idx,info)
-!!$    end if
-!!$    if (info /= 0) &
-!!$         & write(0,*) 'From l2gip',info
-!!$    
-!!$    call idxmap%init(ictxt,nr,info)
-!!$    if (nc>nr) then 
-!!$      call idxmap%g2lip_ins(idx,info,lidx=lidx)
-!!$    end if
-!!$
-!!$      
-!!$    if (info /= psb_success_) then 
-!!$      info = psb_err_from_subroutine_
-!!$      call psb_errpush(info,name)
-!!$      goto 9999
-!!$    end if
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$
-!!$9999 call psb_error_handler(err_act)
-!!$
-!!$    return
-!!$  end subroutine block_reinit
-!!$
+  
+  !
+  ! This is a purely internal version of "binary" search
+  ! specialized for gen_block usage.
+  !
+  function  gen_block_search(key,n,v) result(ipos)
+    implicit none
+    integer(psb_ipk_) :: ipos, key, n
+    integer(psb_ipk_) :: v(:)
 
+    integer(psb_ipk_) :: lb, ub, m
+
+    if (n < 5) then 
+      ! don't bother with binary search for very
+      ! small vectors
+      ipos = 0
+      do
+        if (ipos == n) return
+        if (key < v(ipos+1)) return 
+        ipos = ipos + 1 
+      end do
+    else
+      lb = 1 
+      ub = n
+      ipos = -1 
+
+      do while (lb <= ub) 
+        m = (lb+ub)/2
+        if (key==v(m))  then
+          ipos = m 
+          return
+        else if (key < v(m))  then
+          ub = m-1
+        else 
+          lb = m + 1
+        end if
+      enddo
+      if (v(ub) > key) then
+        ub = ub - 1 
+      end if
+      ipos = ub 
+    endif
+    return
+  end function gen_block_search
 
 end module psb_gen_block_map_mod
