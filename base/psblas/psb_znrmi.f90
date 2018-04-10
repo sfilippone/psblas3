@@ -52,7 +52,8 @@ function psb_znrmi(a,desc_a,info)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
+       & err_act, iia, jja, mdim, ndim
+  integer(psb_lpk_) :: m, n, ia, ja
   character(len=20)        :: name, ch_err
 
   name='psb_znrmi'

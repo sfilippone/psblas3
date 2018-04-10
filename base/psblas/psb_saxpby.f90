@@ -43,7 +43,8 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, m, iiy, jjy
+       & err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_sgeaxpby'
@@ -77,14 +78,14 @@ subroutine psb_saxpby_vect(alpha, x, beta, y,&
   m = desc_a%get_global_rows()
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ione,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,lone,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,y%get_nrows(),iy,ione,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,lone,y%get_nrows(),iy,lone,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'
@@ -145,8 +146,8 @@ subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, in, jjy, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
@@ -197,9 +198,9 @@ subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -291,8 +292,8 @@ subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, m, iiy, jjy, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 
@@ -317,14 +318,14 @@ subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ione,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,lone,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,lldy,iy,ione,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,lone,lldy,iy,lone,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect 2'

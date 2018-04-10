@@ -57,7 +57,8 @@ function psb_dasum (x,desc_a, info, jx) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
-       & err_act, iix, jjx, ix, ijx, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_dasum'
@@ -85,7 +86,7 @@ function psb_dasum (x,desc_a, info, jx) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -136,7 +137,8 @@ function psb_dasum_vect(x, desc_a, info) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, imax
+       & err_act, iix, jjx, imax
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_dasumv'
@@ -165,7 +167,7 @@ function psb_dasum_vect(x, desc_a, info) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -254,7 +256,8 @@ function psb_dasumv(x,desc_a, info) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_dasumv'
@@ -277,7 +280,7 @@ function psb_dasumv(x,desc_a, info) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -374,7 +377,8 @@ subroutine psb_dasumvs(res,x,desc_a, info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, jx, m, i, idx, ndm, ldx
+       & err_act, iix, jjx, i, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_dasumvs'
@@ -397,7 +401,7 @@ subroutine psb_dasumvs(res,x,desc_a, info)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

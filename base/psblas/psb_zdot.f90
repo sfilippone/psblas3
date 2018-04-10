@@ -64,7 +64,8 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
+       & err_act, iix, jjx, iiy, jjy, i, nr
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)      :: name, ch_err
 
   name='psb_zdot_vect'
@@ -101,9 +102,9 @@ function psb_zdot_vect(x, y, desc_a,info) result(res)
   m = desc_a%get_global_rows()
 
   ! check vector correctness
-  call psb_chkvect(m,ione,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -155,8 +156,8 @@ function psb_zdot(x, y,desc_a, info, jx, jy)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
@@ -198,9 +199,9 @@ function psb_zdot(x, y,desc_a, info, jx, jy)  result(res)
   lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ijx,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,lldy,iy,ijy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,ijy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -295,8 +296,8 @@ function psb_zdotv(x, y,desc_a, info)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, jx, iy, jy, m
   complex(psb_dpk_)         :: zdotc
   character(len=20)        :: name, ch_err
 
@@ -322,9 +323,9 @@ function psb_zdotv(x, y,desc_a, info)  result(res)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,jx,desc_a,info,iix,jjx)
   if (info == psb_success_)&
-       & call psb_chkvect(m,ione,lldy,iy,jy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,jy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -420,8 +421,8 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m,nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
+  integer(psb_lpk_) :: ix, jx, iy, jy, m
   complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
@@ -445,9 +446,9 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   lldx = size(x,1)
   lldy = size(y,1)
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
   if (info == psb_success_) &
-       & call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
+       & call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -543,8 +544,8 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k, nr, &
-       & lldx, lldy
+       & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   complex(psb_dpk_)        :: zdotc
   character(len=20)        :: name, ch_err
 
@@ -570,14 +571,14 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   lldy = size(y,1)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,lldx,ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,lldy,iy,iy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

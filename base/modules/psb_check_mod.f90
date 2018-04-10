@@ -313,7 +313,7 @@ contains
     use psb_error_mod
     implicit none
 
-    integer(psb_ipk_), intent(in)    ::  m,n,ia,ja
+    integer(psb_lpk_), intent(in)    ::  m,n,ia,ja
     type(psb_desc_type), intent(in)    ::  desc_dec
     integer(psb_ipk_), intent(out)   ::  info
     integer(psb_ipk_), optional      ::  iia, jja

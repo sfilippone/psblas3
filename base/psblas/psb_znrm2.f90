@@ -59,7 +59,8 @@ function psb_znrm2(x, desc_a, info, jx)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm, ldx
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   real(psb_dpk_)         :: dznrm2, dd
   character(len=20)      :: name, ch_err
 
@@ -86,7 +87,7 @@ function psb_znrm2(x, desc_a, info, jx)  result(res)
 
   m = desc_a%get_global_rows()
   ldx = size(x,1)
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -182,10 +183,10 @@ function psb_znrm2v(x, desc_a, info)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   real(psb_dpk_)         :: dznrm2, dd
 
-!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_znrm2v'
@@ -206,7 +207,7 @@ function psb_znrm2v(x, desc_a, info)  result(res)
   jx=1
   m = desc_a%get_global_rows()
   ldx = size(x,1) 
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -261,9 +262,9 @@ function psb_znrm2_vect(x, desc_a, info)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   real(psb_dpk_)         :: snrm2, dd
-!!$  external dcombnrm2
   character(len=20)      :: name, ch_err
 
   name='psb_znrm2v'
@@ -288,10 +289,10 @@ function psb_znrm2_vect(x, desc_a, info)  result(res)
 
 
   ix = 1
-  jx=1
-  m = desc_a%get_global_rows()
+  jx = 1
+  m  = desc_a%get_global_rows()
   ldx = x%get_nrows()
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -387,10 +388,9 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   real(psb_dpk_)         :: nrm2, dznrm2, dd
-
-!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_znrm2'
@@ -411,7 +411,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
   jx = 1
   m = desc_a%get_global_rows()
   ldx = size(x,1) 
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
