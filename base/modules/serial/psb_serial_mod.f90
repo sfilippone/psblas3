@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -68,6 +68,16 @@ module psb_serial_mod
     end subroutine psb_d_nspaxpby
   end interface psb_nspaxpby
 
+  interface symbmm
+    subroutine symbmm (n, m, l, ia, ja, diaga, &
+         & ib, jb, diagb, ic, jc, diagc, index)
+      import :: psb_ipk_
+      integer(psb_ipk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+           & diagc,  index(*)
+      integer(psb_ipk_), allocatable :: ic(:),jc(:)
+    end subroutine symbmm
+  end interface
+  
 
 contains
 

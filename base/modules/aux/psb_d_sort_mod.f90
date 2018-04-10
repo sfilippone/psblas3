@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -44,6 +44,15 @@ module psb_d_sort_mod
   use psb_const_mod
 
 
+  interface psb_msort_unique
+    subroutine psb_dmsort_u(x,nout,dir)
+      import 
+      real(psb_dpk_), intent(inout)           :: x(:) 
+      integer(psb_ipk_), intent(out)             :: nout
+      integer(psb_ipk_), optional, intent(in)    :: dir
+    end subroutine psb_dmsort_u
+  end interface psb_msort_unique
+
   type psb_d_heap
     integer(psb_ipk_) :: last, dir
     real(psb_dpk_), allocatable    :: keys(:)
@@ -78,6 +87,26 @@ module psb_d_sort_mod
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_dmsort
   end interface psb_msort
+
+
+  interface psb_bsrch
+    function  psb_dbsrch(key,n,v) result(ipos)
+      import 
+      integer(psb_ipk_) :: ipos, n
+      real(psb_dpk_) :: key
+      real(psb_dpk_) :: v(:)
+    end function psb_dbsrch
+  end interface psb_bsrch
+
+  interface psb_ssrch
+    function psb_dssrch(key,n,v) result(ipos)
+      import 
+      implicit none
+      integer(psb_ipk_) :: ipos, n
+      real(psb_dpk_) :: key
+      real(psb_dpk_) :: v(:)
+    end function psb_dssrch
+  end interface psb_ssrch
 
   interface 
     subroutine psi_d_msort_up(n,k,l,iret)

@@ -1,63 +1,60 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_gefree -- Frees a dense matrix</TITLE>
-<META NAME="description" CONTENT="psb_gefree -- Frees a dense matrix">
+<TITLE>psb_geasb -- Assembly a dense matrix</TITLE>
+<META NAME="description" CONTENT="psb_geasb -- Assembly a dense matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node86.html">
 <LINK REL="previous" HREF="node84.html">
-<LINK REL="up" HREF="node70.html">
+<LINK REL="up" HREF="node71.html">
 <LINK REL="next" HREF="node86.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1318"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1321"
   HREF="node86.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1314"
-  HREF="node70.html">
+<A NAME="tex2html1317"
+  HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1308"
+<A NAME="tex2html1311"
   HREF="node84.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1316"
+<A NAME="tex2html1319"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1319"
-  HREF="node86.html">psb_gelp   Applies</A>
-<B> Up:</B> <A NAME="tex2html1315"
-  HREF="node70.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1309"
-  HREF="node84.html">psb_geasb   Assembly</A>
- &nbsp; <B>  <A NAME="tex2html1317"
+<B> Next:</B> <A NAME="tex2html1322"
+  HREF="node86.html">psb_gefree   Frees</A>
+<B> Up:</B> <A NAME="tex2html1318"
+  HREF="node71.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1312"
+  HREF="node84.html">psb_geins   Dense</A>
+ &nbsp; <B>  <A NAME="tex2html1320"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000715000000000000000">
-psb_gefree -- Frees a dense matrix</A>
+<H2><A NAME="SECTION000714000000000000000">
+psb_geasb -- Assembly a dense matrix</A>
 </H2>
 
 <P>
 <PRE>
-call psb_gefree(x, desc_a, info)
+call psb_geasb(x, desc_a, info, mold)
 </PRE>
 
 <P>
@@ -67,21 +64,6 @@ call psb_gefree(x, desc_a, info)
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>The dense matrix to
-  be freed.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a rank one or two array with the ALLOCATABLE or an
-object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
-<BR>
-<P>
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>The communication descriptor.
@@ -94,6 +76,21 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <BR></DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal vector storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
+only allowed when <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$x$"></SPAN> is of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
 </DL>
 
 <P>
@@ -101,6 +98,18 @@ Specified as: a variable of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>The dense matrix to be assembled.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a rank one or two array with the ALLOCATABLE or an
+object of type vdata<TT>psb_T_vect_type</TT>, of type real, complex or integer.
+<BR></DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -113,8 +122,6 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
-
-<P>
 <BR><HR>
 
 </BODY>

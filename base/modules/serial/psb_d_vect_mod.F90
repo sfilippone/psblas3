@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -191,24 +191,15 @@ contains
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-    class(psb_d_base_vect_type), pointer :: mld
 
+    info = psb_success_
     if (allocated(x%v)) &
          & call x%free(info)
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
-#else 
-      mld = psb_d_get_base_vect_default()
-      call mld%mold(x%v,info)
-#endif
     endif
 
     if (info == psb_success_) call x%v%bld(invect)
@@ -223,23 +214,14 @@ contains
     integer(psb_ipk_) :: info
     class(psb_d_base_vect_type), pointer :: mld
 
-
+    info = psb_success_
     if (allocated(x%v)) &
          & call x%free(info)
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_d_get_base_vect_default())
-#else 
-      mld = psb_d_get_base_vect_default()
-      call mld%mold(x%v,info)
-#endif
     endif
     if (info == psb_success_) call x%v%bld(n)
 
@@ -320,6 +302,7 @@ contains
     res = 'NULL'
     if (allocated(x%v)) res = x%v%get_fmt()
   end function d_vect_get_fmt
+
   subroutine d_vect_all(n, x, info, mold)
 
     implicit none 
@@ -332,11 +315,7 @@ contains
          & call x%free(info)
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
       allocate(psb_d_base_vect_type :: x%v,stat=info)
     endif
@@ -480,21 +459,22 @@ contains
     class(psb_d_vect_type), intent(inout) :: x
     class(psb_d_base_vect_type), intent(in), optional :: mold
     class(psb_d_base_vect_type), allocatable :: tmp
+
     integer(psb_ipk_) :: info
 
+    info = psb_success_
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(tmp,stat=info,mold=mold)
-#else
-      call mold%mold(tmp,info)
-#endif
-      if (allocated(x%v)) then 
-        call x%v%sync()
-        if (info == psb_success_) call tmp%bld(x%v%v)
-        call x%v%free(info)
-      end if
-      call move_alloc(tmp,x%v)
+    else
+      allocate(tmp,stat=info,mold=psb_d_get_base_vect_default())
     end if
+    if (allocated(x%v)) then 
+      call x%v%sync()
+      if (info == psb_success_) call tmp%bld(x%v%v)
+      call x%v%free(info)
+    end if
+    call move_alloc(tmp,x%v)
+
   end subroutine d_vect_cnv
 
 
@@ -936,19 +916,11 @@ contains
     integer(psb_ipk_) :: info
     class(psb_d_base_multivect_type), pointer :: mld
 
+    info = psb_success_
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_d_get_base_multivect_default())
-#else 
-      mld = psb_d_get_base_multivect_default()
-      call mld%mold(x%v,info)
-#endif
     endif
 
     if (info == psb_success_) call x%v%bld(invect)
@@ -961,21 +933,12 @@ contains
     class(psb_d_multivect_type), intent(out) :: x
     class(psb_d_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-    class(psb_d_base_multivect_type), pointer :: mld
 
+    info = psb_success_
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info, mold=psb_d_get_base_multivect_default())
-#else 
-      mld = psb_d_get_base_multivect_default()
-      call mld%mold(x%v,info)
-#endif
     endif
     if (info == psb_success_) call x%v%bld(m,n)
 
@@ -1072,11 +1035,7 @@ contains
     integer(psb_ipk_), intent(out)      :: info
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(x%v,stat=info,mold=mold)
-#else
-      call mold%mold(x%v,info)
-#endif
     else
       allocate(psb_d_base_multivect_type :: x%v,stat=info)
     endif
@@ -1235,18 +1194,16 @@ contains
     integer(psb_ipk_) :: info
 
     if (present(mold)) then 
-#ifdef HAVE_MOLD
       allocate(tmp,stat=info,mold=mold)
-#else
-      call mold%mold(tmp,info)
-#endif
-      if (allocated(x%v)) then 
-        call x%v%sync()
-        if (info == psb_success_) call tmp%bld(x%v%v)
-        call x%v%free(info)
-      end if
-      call move_alloc(tmp,x%v)
+    else
+      allocate(tmp,stat=info, mold=psb_d_get_base_multivect_default())
+    endif    
+    if (allocated(x%v)) then 
+      call x%v%sync()
+      if (info == psb_success_) call tmp%bld(x%v%v)
+      call x%v%free(info)
     end if
+    call move_alloc(tmp,x%v)
   end subroutine d_vect_cnv
 
 

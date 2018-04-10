@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -122,7 +122,8 @@ module psb_desc_const_mod
   interface 
     subroutine psb_parts(glob_index,nrow,np,pv,nv)
       import :: psb_ipk_
-      integer(psb_ipk_), intent (in)  :: glob_index,nrow, np
+      integer(psb_ipk_), intent (in)  :: glob_index, nrow
+      integer(psb_ipk_), intent (in)  :: np
       integer(psb_ipk_), intent (out) :: nv, pv(*)
     end subroutine psb_parts
   end interface

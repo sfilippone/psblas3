@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -591,13 +591,13 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   m   = a%get_nrows()
   if (size(x,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = m; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -941,13 +941,13 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   m = a%get_nrows()
   if (size(x,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = m; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -1295,13 +1295,13 @@ subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
   end if
   if (size(x,1) < n) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = n; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
@@ -1492,13 +1492,13 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
   end if
   if (size(x,1) < n) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = n; 
+    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m; 
+    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   end if

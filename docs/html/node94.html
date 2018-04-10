@@ -1,64 +1,61 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_overlap -- Extract list of overlap elements</TITLE>
-<META NAME="description" CONTENT="psb_get_overlap -- Extract list of overlap elements">
+<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
+<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node95.html">
 <LINK REL="previous" HREF="node93.html">
-<LINK REL="up" HREF="node70.html">
+<LINK REL="up" HREF="node71.html">
 <LINK REL="next" HREF="node95.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1426"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1429"
   HREF="node95.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1422"
-  HREF="node70.html">
+<A NAME="tex2html1425"
+  HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1416"
+<A NAME="tex2html1419"
   HREF="node93.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1424"
+<A NAME="tex2html1427"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1427"
-  HREF="node95.html">psb_sp_getrow   Extract</A>
-<B> Up:</B> <A NAME="tex2html1423"
-  HREF="node70.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1417"
-  HREF="node93.html">psb_get_boundary   Extract</A>
- &nbsp; <B>  <A NAME="tex2html1425"
+<B> Next:</B> <A NAME="tex2html1430"
+  HREF="node95.html">psb_get_overlap   Extract</A>
+<B> Up:</B> <A NAME="tex2html1426"
+  HREF="node71.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1420"
+  HREF="node93.html">psb_local_index</A>
+ &nbsp; <B>  <A NAME="tex2html1428"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000724000000000000000">
-psb_get_overlap -- Extract list of overlap
+<H2><A NAME="SECTION000723000000000000000">
+psb_get_boundary -- Extract list of boundary
   elements</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_overlap(ovrel, desc, info)
+call psb_get_boundary(bndel, desc, info)
 </PRE>
 
 <P>
@@ -87,8 +84,8 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ovrel</STRONG></DT>
-<DD>The list of overlap elements on the calling process, in
+<DT><STRONG>bndel</STRONG></DT>
+<DD>The list of boundary elements on the calling process, in
   local numbering.
 <BR>
 Scope: <B>local</B> 
@@ -114,14 +111,15 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<FONT SIZE="+1"><B>Notes</B></FONT>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
 
 <OL>
-<LI>If there are no overlap elements the output vector is set
-  to the ``not allocated'' state.  
+<LI>If there are no boundary elements (i.e., if the local part of
+  the connectivity graph is self-contained) the output vector is set
+  to the &ldquo;not allocated&rdquo; state. 
 </LI>
-<LI>Otherwise the size of <code>ovrel</code> will be exactly equal to the
-  number of overlap elements. 
+<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
+  number of boundary elements. 
 </LI>
 </OL>
 

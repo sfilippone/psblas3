@@ -1,10 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
 <TITLE>Descriptor data structure</TITLE>
@@ -13,42 +9,43 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node22.html">
+<LINK REL="next" HREF="node23.html">
 <LINK REL="previous" HREF="node9.html">
 <LINK REL="up" HREF="node9.html">
 <LINK REL="next" HREF="node11.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html350"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html352"
   HREF="node11.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html346"
+<A NAME="tex2html348"
   HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html340"
+<A NAME="tex2html342"
   HREF="node9.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html348"
+<A NAME="tex2html350"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html351"
+<B> Next:</B> <A NAME="tex2html353"
   HREF="node11.html">Descriptor Methods</A>
-<B> Up:</B> <A NAME="tex2html347"
+<B> Up:</B> <A NAME="tex2html349"
   HREF="node9.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html341"
+<B> Previous:</B> <A NAME="tex2html343"
   HREF="node9.html">Data Structures and Classes</A>
- &nbsp; <B>  <A NAME="tex2html349"
+ &nbsp; <B>  <A NAME="tex2html351"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00041000000000000000"></A>
@@ -66,7 +63,7 @@ necessary for implementing the various algorithms of interest to us.
 <P>
 The data structure itself <code>psb_desc_type</code> can be treated as an
 opaque object handled via the   tools routines of
-Sec.&nbsp;<A HREF="node70.html#sec:toolsrout">6</A> or the query routines detailed below;
+Sec.&nbsp;<A HREF="node71.html#sec:toolsrout">6</A> or the query routines detailed below;
 nevertheless we include here a  description for the curious 
 reader. 
 
@@ -117,7 +114,7 @@ All methods but the last are purely local; the last method potentially
 requires communication among processes, and thus is a synchronous
 method. The choice of a specific dynamic type for the index map is
 made at the time the descriptor is initially allocated, according to
-the mode of initialization (see also&nbsp;<A HREF="node70.html#sec:toolsrout">6</A>).
+the mode of initialization (see also&nbsp;<A HREF="node71.html#sec:toolsrout">6</A>).
 
 <P>
 The descriptor contents are as follows:
@@ -143,15 +140,14 @@ processes with which it is necessary to communicate:
 <LI>Indices of points to be sent;
 </LI>
 </OL>
-The list may contain an arbitrary number of groups; its end is marked
-by a -1.
-<BR>
-Specified as: an allocatable integer array of rank one.
+Specified as: a vector of integer type, see&nbsp;<A HREF="node43.html#sec:vecttype">3.3</A>.
 </DD>
 <DT><STRONG><B>ext_index</B></STRONG></DT>
 <DD>A list of element indices to be exchanged to
   implement the mapping between a base descriptor and a descriptor
   with overlap. 
+<BR>
+Specified as: a vector of integer type, see&nbsp;<A HREF="node43.html#sec:vecttype">3.3</A>.
 </DD>
 <DT><STRONG><B>ovrlap_index</B></STRONG></DT>
 <DD>A list of the overlap elements for the
@@ -169,16 +165,13 @@ current process, organized in groups like the previous vector:
 <LI>Indices of points to be sent;
 </LI>
 </OL>
-The list may contain an arbitrary number of groups; its end is marked
-by a -1.
-<BR>
-Specified as: an allocatable integer array  of rank one.
+Specified as: a vector of integer type, see&nbsp;<A HREF="node43.html#sec:vecttype">3.3</A>.
 </DD>
 <DT><STRONG><B>ovr_mst_idx</B></STRONG></DT>
 <DD>A list to retrieve the value of each
   overlap element from the respective master process.
 <BR>
-Specified as: an allocatable integer array of rank one.
+Specified as: a vector of integer type, see&nbsp;<A HREF="node43.html#sec:vecttype">3.3</A>.
 </DD>
 <DT><STRONG><B>ovrlap_elem</B></STRONG></DT>
 <DD>For all overlap points belonging to th
@@ -189,7 +182,7 @@ ecurrent process:
 </LI>
 <LI>Number of processes sharing that overlap points;
 </LI>
-<LI>Index of a ``master'' process: 
+<LI>Index of a &ldquo;master&rdquo; process: 
 </LI>
 </OL>
 Specified as: an allocatable integer array of rank two.
@@ -202,7 +195,7 @@ Specified as: an allocatable integer array of rank two.
 The Fortran&nbsp;2003 declaration  for <code>psb_desc_type</code> structures is 
 as follows:
 
-<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="917"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="931"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3:</STRONG>
 The PSBLAS defined data type that
@@ -214,11 +207,11 @@ The PSBLAS defined data type that
 <PRE> 
 type psb_desc_type 
     class(psb_indx_map), allocatable :: indxmap
-    integer, allocatable  :: halo_index(:)
-    integer, allocatable  :: ext_index(:)
-    integer, allocatable  :: ovrlap_index(:)
+    type(psb_i_vect_type) :: v_halo_index
+    type(psb_i_vect_type) :: v_ext_index
+    type(psb_i_vect_type) :: v_ovrlap_index
+    type(psb_i_vect_type) :: v_ovr_mst_idx 
     integer, allocatable  :: ovrlap_elem(:,:)
-    integer, allocatable  :: ovr_mst_idx(:)
     integer, allocatable  :: bnd_elem(:)
 end type psb_desc_type
 </PRE></TD></TR>
@@ -227,8 +220,6 @@ end type psb_desc_type
 </DIV></TD></TR>
 </TABLE>
 </DIV>
-
-<P>
 A communication descriptor associated with a sparse  matrix has a
 state, which can take the following values:
 <DL>
@@ -249,56 +240,59 @@ state, which can take the following values:
 <!--Table of Child-Links-->
 <A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<UL>
-<LI><A NAME="tex2html352"
-  HREF="node11.html">Descriptor Methods</A>
-<LI><A NAME="tex2html353"
-  HREF="node12.html">get_local_rows -- Get number of local rows</A>
+<UL CLASS="ChildLinks">
 <LI><A NAME="tex2html354"
-  HREF="node13.html">get_local_cols -- Get number of local cols</A>
+  HREF="node11.html">Descriptor Methods</A>
 <LI><A NAME="tex2html355"
-  HREF="node14.html">get_global_rows -- Get number of global rows</A>
+  HREF="node12.html">get_local_rows -- Get number of local rows</A>
 <LI><A NAME="tex2html356"
-  HREF="node15.html">get_global_cols -- Get number of global cols</A>
+  HREF="node13.html">get_local_cols -- Get number of local cols</A>
 <LI><A NAME="tex2html357"
-  HREF="node16.html">get_global_indices -- Get vector of global indices</A>
+  HREF="node14.html">get_global_rows -- Get number of global rows</A>
 <LI><A NAME="tex2html358"
-  HREF="node17.html">get_context -- Get communication context</A>
+  HREF="node15.html">get_global_cols -- Get number of global cols</A>
 <LI><A NAME="tex2html359"
-  HREF="node18.html">Clone -- clone current object</A>
+  HREF="node16.html">get_global_indices -- Get vector of global indices</A>
 <LI><A NAME="tex2html360"
-  HREF="node19.html">psb_cd_get_large_threshold -- Get threshold for
-  index mapping switch</A>
+  HREF="node17.html">get_context -- Get communication context</A>
 <LI><A NAME="tex2html361"
-  HREF="node20.html">psb_cd_set_large_threshold -- Set threshold for
-  index mapping switch</A>
+  HREF="node18.html">Clone -- clone current object</A>
 <LI><A NAME="tex2html362"
-  HREF="node21.html">Named Constants</A>
+  HREF="node19.html">CNV -- convert internal storage format</A>
+<LI><A NAME="tex2html363"
+  HREF="node20.html">psb_cd_get_large_threshold -- Get threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html364"
+  HREF="node21.html">psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html365"
+  HREF="node22.html">Named Constants</A>
 </UL>
 <!--End of Table of Child-Links-->
-<HR>
+
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html350"
+<A NAME="tex2html352"
   HREF="node11.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html346"
+<A NAME="tex2html348"
   HREF="node9.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html340"
+<A NAME="tex2html342"
   HREF="node9.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html348"
+<A NAME="tex2html350"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html351"
+<B> Next:</B> <A NAME="tex2html353"
   HREF="node11.html">Descriptor Methods</A>
-<B> Up:</B> <A NAME="tex2html347"
+<B> Up:</B> <A NAME="tex2html349"
   HREF="node9.html">Data Structures and Classes</A>
-<B> Previous:</B> <A NAME="tex2html341"
+<B> Previous:</B> <A NAME="tex2html343"
   HREF="node9.html">Data Structures and Classes</A>
- &nbsp; <B>  <A NAME="tex2html349"
-  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html351"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

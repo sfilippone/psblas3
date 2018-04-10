@@ -1,140 +1,139 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_scatter -- Scatter Global Dense Matrix</TITLE>
-<META NAME="description" CONTENT="psb_scatter -- Scatter Global Dense Matrix">
+<TITLE>psb_gather -- Gather Global Dense Matrix</TITLE>
+<META NAME="description" CONTENT="psb_gather -- Gather Global Dense Matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node70.html">
 <LINK REL="previous" HREF="node68.html">
-<LINK REL="up" HREF="node65.html">
+<LINK REL="up" HREF="node66.html">
 <LINK REL="next" HREF="node70.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1099"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1104"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1095"
-  HREF="node65.html">
+<A NAME="tex2html1100"
+  HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1091"
+<A NAME="tex2html1094"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1097"
+<A NAME="tex2html1102"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1100"
-  HREF="node70.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html1096"
-  HREF="node65.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1092"
-  HREF="node68.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html1098"
+<B> Next:</B> <A NAME="tex2html1105"
+  HREF="node70.html">psb_scatter   Scatter</A>
+<B> Up:</B> <A NAME="tex2html1101"
+  HREF="node66.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1095"
+  HREF="node68.html">psb_ovrl   Overlap</A>
+ &nbsp; <B>  <A NAME="tex2html1103"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00064000000000000000">
-psb_scatter -- Scatter Global Dense Matrix</A>
+<H2><A NAME="SECTION00063000000000000000">
+psb_gather -- Gather Global Dense Matrix</A>
 </H2>
 
 <P>
-These subroutines scatters the portions of global dense matrix owned
-by a process to all the processes in the processes grid.
+These subroutines collect the portions of global dense matrix
+distributed over all process into one single array stored on one
+process.
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER">
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
 <!-- MATH
  \begin{displaymath}
-loc\_x_i \leftarrow scatter(glob\_x)
+glob\_x \leftarrow collect(loc\_x_i)
 \end{displaymath}
  -->
 
 <IMG
- WIDTH="168" HEIGHT="28" BORDER="0"
- SRC="img79.png"
- ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
+ WIDTH="163" HEIGHT="28" BORDER="0"
+ SRC="img69.png"
+ ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 where:
 <DL>
-<DT><STRONG><IMG
+<DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img70.png"
- ALT="$glob\_x$"></STRONG></DT>
-<DD>is the global matrix <!-- MATH
+ ALT="$glob\_x$"></SPAN></STRONG></DT>
+<DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img71.png"
- ALT="$glob\_x_{1:m,1:n}$">
+ ALT="$glob\_x_{1:m,1:n}$"></SPAN>
 </DD>
-<DT><STRONG><IMG
+<DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img72.png"
- ALT="$loc\_x_i$"></STRONG></DT>
+ ALT="$loc\_x_i$"></SPAN></STRONG></DT>
 <DD>is the local portion of global dense matrix on
-process <IMG
+process <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$">.
+ ALT="$i$"></SPAN>.
 </DD>
-<DT><STRONG><IMG
- WIDTH="53" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img80.png"
- ALT="$scatter$"></STRONG></DT>
-<DD>is the scatter function.
+<DT><STRONG><SPAN CLASS="MATH"><IMG
+ WIDTH="49" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img73.png"
+ ALT="$collect$"></SPAN></STRONG></DT>
+<DD>is the collect function.
 </DD>
 </DL>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3347"></A>
+<DIV ALIGN="CENTER"><A NAME="3372"></A>
 <TABLE>
-<CAPTION><STRONG>Table 17:</STRONG>
+<CAPTION><STRONG>Table 16:</STRONG>
 Data types</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
+<TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img74.png"
- ALT="$x_i, y$"></TD>
+ ALT="$x_i, y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
 <TR><TD ALIGN="LEFT">Integer</TD>
-<TD ALIGN="LEFT">psb_scatter</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_scatter</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_scatter</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_scatter</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
 </TR>
 <TR><TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_scatter</TD>
+<TD ALIGN="LEFT">psb_gather</TD>
 </TR>
 </TABLE>
 </DIV>
@@ -146,10 +145,11 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="539" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img81.png"
+ WIDTH="472" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img75.png"
  ALT="\begin{lstlisting}
-call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
+call psb_gather(glob_x, loc_x, desc_a, info, root)
+call psb_gather(glob_x, loc_x, desc_a, info, root)
 \end{lstlisting}">
 <BR>
 
@@ -161,16 +161,21 @@ call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>glob_x</STRONG></DT>
-<DD>The array that must be scattered into local pieces.
+<DT><STRONG>loc_x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<SPAN CLASS="MATH"><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img70.png"
+ ALT="$glob\_x$"></SPAN>. 
 <BR>
-Scope: <B>global</B> 
+Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a rank one or two array.
+Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
+indicated in Table&nbsp;<A HREF="#tab:gather">16</A>.
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
 <DD>contains data structures for communications.
@@ -184,11 +189,11 @@ Intent: <B>in</B>.
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>root</STRONG></DT>
-<DD>The process that holds the global copy. If <IMG
+<DD>The process that holds the global copy. If <SPAN CLASS="MATH"><IMG
  WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img76.png"
- ALT="$root=-1$"> all
-  the processes have a copy of the global vector.
+ ALT="$root=-1$"></SPAN> all
+  the processes will have a copy of the global vector.
 <BR>
 Scope: <B>global</B> 
 <BR>
@@ -199,42 +204,27 @@ Intent: <B>in</B>.
 Specified as: an integer variable <!-- MATH
  $-1\le root\le np-1$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img77.png"
- ALT="$-1\le root\le np-1$">, default
-<code>psb_root_</code>, i.e. process 0. 
-</DD>
-<DT><STRONG>mold</STRONG></DT>
-<DD>The desired dynamic type for the internal vector storage.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>optional</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an object of a class derived from vbasedata<TT>psb_T_base_vect_type</TT>; this is
-only allowed when loc_x is of type vdata<TT>psb_T_vect_type</TT>.
+ ALT="$-1\le root\le np-1$"></SPAN>, default <SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1$"></SPAN>. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>loc_x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
- ALT="$glob\_x$">. 
+<DT><STRONG>glob_x</STRONG></DT>
+<DD>The array where the local parts must be gathered.
 <BR>
-Scope: <B>local</B> 
+Scope: <B>global</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one or two ALLOCATABLE array  or an object of type vdata<TT>psb_T_vect_type</TT> containing numbers of the type
-indicated in Table&nbsp;<A HREF="#tab:scatter">17</A>.
+Specified as: a rank one or two array with the <code>ALLOCATABLE</code> attribute.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
@@ -250,29 +240,30 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-<HR>
+
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1099"
+<A NAME="tex2html1104"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1095"
-  HREF="node65.html">
+<A NAME="tex2html1100"
+  HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1091"
+<A NAME="tex2html1094"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1097"
+<A NAME="tex2html1102"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1100"
-  HREF="node70.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html1096"
-  HREF="node65.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1092"
-  HREF="node68.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html1098"
-  HREF="node1.html">Contents</A></B> 
+<B> Next:</B> <A NAME="tex2html1105"
+  HREF="node70.html">psb_scatter   Scatter</A>
+<B> Up:</B> <A NAME="tex2html1101"
+  HREF="node66.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html1095"
+  HREF="node68.html">psb_ovrl   Overlap</A>
+ &nbsp; <B>  <A NAME="tex2html1103"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

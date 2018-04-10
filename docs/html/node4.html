@@ -1,10 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
 <TITLE>Basic Nomenclature</TITLE>
@@ -13,7 +9,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -25,30 +21,31 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html240"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html241"
   HREF="node5.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html236"
+<A NAME="tex2html237"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html230"
+<A NAME="tex2html231"
   HREF="node3.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html238"
+<A NAME="tex2html239"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html241"
+<B> Next:</B> <A NAME="tex2html242"
   HREF="node5.html">Library contents</A>
-<B> Up:</B> <A NAME="tex2html237"
+<B> Up:</B> <A NAME="tex2html238"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html231"
+<B> Previous:</B> <A NAME="tex2html232"
   HREF="node3.html">General overview</A>
- &nbsp; <B>  <A NAME="tex2html239"
+ &nbsp; <B>  <A NAME="tex2html240"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
 <H2><A NAME="SECTION00031000000000000000">
@@ -64,24 +61,24 @@ PDE.
 <P>
 Each point of the discretization mesh will have (at least) one
 associated equation/variable, and therefore one index. We say that
-point  <IMG
+point  <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$"> <EM>depends</EM> on point <IMG
+ ALT="$i$"></SPAN> <EM>depends</EM> on point <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img5.png"
- ALT="$j$"> if the  equation for a
-variable associated with <IMG
+ ALT="$j$"></SPAN> if the  equation for a
+variable associated with <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$"> contains a term in <IMG
+ ALT="$i$"></SPAN> contains a term in <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img5.png"
- ALT="$j$">,  or equivalently
-if <IMG
+ ALT="$j$"></SPAN>,  or equivalently
+if <SPAN CLASS="MATH"><IMG
  WIDTH="52" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img6.png"
- ALT="$a_{ij} \ne0$">.  
+ ALT="$a_{ij} \ne0$"></SPAN>.  
 After the partition of the discretization mesh into <EM>sub-domains</EM>
 assigned to the parallel processes,
 we classify the  points of a given sub-domain as following.
@@ -112,7 +109,7 @@ on it. Whenever performing a computational step, such as a
 matrix-vector product, the values associated with halo points are
 requested from other domains. A boundary point of a given 
 domain is usually a halo point for some other domain<A NAME="tex2html3"
-  HREF="footnode.html#foot210"><SUP>2</SUP></A>; therefore
+  HREF="footnode.html#foot210"><SUP><SPAN CLASS="arabic">2</SPAN></SUP></A>; therefore
 the cardinality of the boundary points set denotes the amount of data
  sent to other domains. 
 </DD>
@@ -126,43 +123,43 @@ Overlap points do not usually exist in the basic data
 distributions; however they are a feature of Domain Decomposition
 Schwarz preconditioners which are the subject of related research
 work&nbsp;[<A
- HREF="node132.html#2007c">4</A>,<A
- HREF="node132.html#2007d">3</A>].
+ HREF="node133.html#2007c">4</A>,<A
+ HREF="node133.html#2007d">3</A>].
 
 <P>
 We denote the sets of  internal, boundary and halo points for a given
-subdomain  by <IMG
+subdomain  by <SPAN CLASS="MATH"><IMG
  WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img7.png"
- ALT="$\cal I$">, <IMG
+ ALT="$\cal I$"></SPAN>, <SPAN CLASS="MATH"><IMG
  WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img8.png"
- ALT="$\cal B$"> and <IMG
+ ALT="$\cal B$"></SPAN> and <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img9.png"
- ALT="$\cal H$">.
+ ALT="$\cal H$"></SPAN>.
 Each subdomain is assigned to one process; each process usually
 owns one subdomain, although the user may choose to assign more than
-one subdomain to a process.  If each process <IMG
+one subdomain to a process.  If each process <SPAN CLASS="MATH"><IMG
  WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
- ALT="$i$"> owns one
+ ALT="$i$"></SPAN> owns one
 subdomain, the number of rows in the local sparse matrix is
 <!-- MATH
  $|{\cal I}_i| + |{\cal B}_i|$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img10.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">, and the number of local columns
+ ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$"></SPAN>, and the number of local columns
 (i.e. those for which there exists at least one non-zero entry in the
 local rows)  is <!-- MATH
  $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$
  -->
-<IMG
+<SPAN CLASS="MATH"><IMG
  WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img11.png"
- ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert +\vert{\cal H}_i\vert$">.
+ ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert +\vert{\cal H}_i\vert$"></SPAN>.
 
 <P>
 
@@ -191,33 +188,34 @@ Point classfication.</CAPTION>
 <P>
 This classification of mesh points guides the naming scheme that we
 adopted in the library internals and in the data structures. We
-explicitly note that ``Halo'' points are also often called ``ghost''
+explicitly note that &ldquo;Halo&rdquo; points are also often called &ldquo;ghost&rdquo;
 points in the literature. 
 
 <P>
-<HR>
+
+<DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html240"
+<A NAME="tex2html241"
   HREF="node5.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html236"
+<A NAME="tex2html237"
   HREF="node3.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html230"
+<A NAME="tex2html231"
   HREF="node3.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html238"
+<A NAME="tex2html239"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html241"
+<B> Next:</B> <A NAME="tex2html242"
   HREF="node5.html">Library contents</A>
-<B> Up:</B> <A NAME="tex2html237"
+<B> Up:</B> <A NAME="tex2html238"
   HREF="node3.html">General overview</A>
-<B> Previous:</B> <A NAME="tex2html231"
+<B> Previous:</B> <A NAME="tex2html232"
   HREF="node3.html">General overview</A>
- &nbsp; <B>  <A NAME="tex2html239"
-  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html240"
+  HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
 </BODY>

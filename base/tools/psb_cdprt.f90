@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -40,211 +40,183 @@
 !    glob          - logical(otpional).      Wheter to print out global or local data.
 !    short         - logical(optional).      Used to choose a verbose output.
 !
-subroutine psb_cdprt(iout,desc_p,glob,short)
+subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
   use psb_base_mod, psb_protect_name => psb_cdprt
   implicit none 
-  type(psb_desc_type), intent(in)    :: desc_p
+  type(psb_desc_type), intent(in)  :: desc_p
   integer(psb_ipk_), intent(in)                :: iout
+  integer(psb_ipk_), intent(in), optional     :: verbosity
   logical, intent(in), optional      :: glob,short
-  logical :: lshort, lglob
+  logical :: short_, glob_
 
-  integer(psb_ipk_) :: m, n_row, n_col,counter,idx,n_elem_recv,n_elem_send,&
-       & proc,i
-
+  integer(psb_ipk_) :: m, n_row, n_col,counter,idx,&
+       & n_elem_recv,n_elem_send,proc,i, verb_
+  integer(psb_ipk_) :: ictxt, me, np
+  integer(psb_ipk_) :: total_snd, total_rcv, total_xhcg, global_halo, global_points
+  integer(psb_ipk_) :: local_snd, local_rcv, local_xhcg, local_halo, local_points
+  
   if (present(glob)) then 
-    lglob = glob
+    glob_ = glob
   else
-    lglob = .false.
+    glob_ = .false.
   endif
   if (present(short)) then 
-    lshort = short
+    short_ = short
   else
-    lshort = .true.
+    short_ = .true.
   endif
-  write(0,*) 'To be reimplemented ye'
+  if (present(verbosity)) then 
+    verb_ = verbosity
+  else
+    verb_ = 1
+  endif
+
+  ictxt = desc_p%get_ctxt()
+  call psb_info(ictxt, me,np)
+  
+  !
+  ! Level 1: Print global info
+  !
+  global_points = desc_p%get_global_rows()
+  local_points  = desc_p%get_local_rows()
+  local_halo    = desc_p%get_local_cols() - desc_p%get_local_rows()
+  global_halo   = local_halo
+  call psb_sum(ictxt, global_halo)
+  if (me == psb_root_) then
+    write(iout,*) ' Communication descriptor details '
+    write(iout,*) '               Descriptor format:       ',desc_p%get_fmt()    
+    write(iout,*) ' Global descriptor data: points:',global_points,' halo:',global_halo
+    write(iout,*)
+  end if
+  call psb_barrier(ictxt)
+  do i=0, np-1
+    if (me == i)  then
+      write(iout,*) me,': Local descriptor data: points:',local_points,&
+           & ' halo:',local_halo
+      write(iout,*) me,': Volume to surface ratio:',real(local_points,psb_dpk_)/real(local_halo,psb_dpk_)
+    end if
+    call psb_barrier(ictxt)
+  end do
+
+  
+  !
+  ! Level 2: Statistics at process level
+  !
+  if (me==psb_root_) write(iout,*) 'Communication data for : comm_halo'
+  do i=0, np-1
+    if (me == i)  &
+       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_halo_,glob=glob_)
+    call psb_barrier(ictxt)
+  end do
+  
+  if (me==psb_root_) write(iout,*) 'Communication data for : comm_ext'
+  do i=0, np-1
+    if (me == i)  &
+       &  call  print_my_xchg(iout,desc_p,verbosity=verb_,data=psb_comm_ext_,glob=glob_)
+    call psb_barrier(ictxt)
+  end do
+  
   return
 
-  if (.not.lglob) then
-!!$    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
-!!$    m=desc_p%matrix_data(psb_m_)
-!!$    n_row=desc_p%matrix_data(psb_n_row_)
-!!$    n_col=desc_p%matrix_data(psb_n_col_)
+contains
+  subroutine print_my_xchg(iout,desc_p,data,glob,short, verbosity)
+    implicit none 
+    type(psb_desc_type), intent(in), target   :: desc_p
+    integer(psb_ipk_), intent(in)             :: iout
+    integer(psb_ipk_), intent(in), optional   :: verbosity, data
+    logical, intent(in), optional      :: glob,short
+    logical :: short_, glob_
+    
+    integer(psb_ipk_) :: ip, nerv, nesd, totxch,idxr,idxs
+    integer(psb_ipk_) :: ictxt, me, np, data_, info, verb_
+    integer(psb_ipk_), allocatable :: gidx(:)
+    class(psb_i_base_vect_type), pointer :: vpnt
+    
+    ictxt = desc_p%get_ctxt()
+    call psb_info(ictxt, me,np)
+    if (present(data)) then
+      data_ = data
+    else
+      data_ = psb_comm_halo_
+    end if
+    if (present(verbosity)) then
+      verb_ = verbosity
+    else
+      verb_ = 1
+    end if
+    
+    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    if (glob) &
+         &   call psb_realloc(max(idxr,idxs,1),gidx,info)
 
-!!$    if (.not.lshort) &
-!!$         & write(iout,*) 'Loc_to_glob ',desc_p%idxmap%loc_to_glob(1:n_row), ': ',&
-!!$         & desc_p%idxmap%loc_to_glob(n_row+1:n_col)
+    select case(verb_)
+    case (1) 
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
+    case (2)
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
+      if (totxch == 0) return
+      if (.not.associated(vpnt)) return
+      if (.not.allocated(vpnt%v)) return
+      associate(idx => vpnt%v)
+        ip     = 1        
+        do 
+          if (ip > size(idx)) then 
+            write(psb_err_unit,*) ': Warning: out of size of input vector '
+            exit
+          end if
+          if (idx(ip) == -1) exit
+          totxch = totxch+1
+          nerv   = idx(ip+psb_n_elem_recv_)
+          nesd   = idx(ip+nerv+psb_n_elem_send_)
+          write(iout,*) '   ',me,': Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
+          idxs = idxs + nesd
+          idxr = idxr + nerv
+          ip   = ip+nerv+nesd+3
+        end do
+      end associate
+    case (3)
+      write(iout,*) me,': Total exchanges  :',totxch
+      write(iout,*) me,':      Total sends    :',idxs
+      write(iout,*) me,':      Total receives :', idxr
+      if (totxch == 0) return
+      if (.not.associated(vpnt)) return
+      if (.not.allocated(vpnt%v)) return
+      associate(idx => vpnt%v)
+        ip     = 1        
+        do 
+          if (ip > size(idx)) then 
+            write(psb_err_unit,*) ': Warning: out of size of input vector '
+            exit
+          end if
+          if (idx(ip) == -1) exit
+          totxch = totxch+1
+          nerv   = idx(ip+psb_n_elem_recv_)
+          nesd   = idx(ip+nerv+psb_n_elem_send_)
+          write(iout,*) '   ',me,': Exchanging with:',idx(ip),' Sends:',nesd,' Receives:', nerv
+          if (glob) then
+            call desc_p%l2g(idx(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd),gidx,info)
+            write(iout,*) '   ',me,': sending to:',idx(ip),' :',gidx(1:nesd)
+            call desc_p%l2g(idx(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv),gidx,info)
+            write(iout,*) '   ',me,': rcvng from:',idx(ip),' :',gidx(1:nerv)
+          else
+            write(iout,*) '   ',me,': sending to:',idx(ip),' :',&
+                 & idx(ip+nerv+psb_n_elem_send_+1:ip+nerv+psb_n_elem_send_+nesd)
+            write(iout,*) '   ',me,': rcvng from:',idx(ip),' :',&
+                 & idx(ip+psb_n_elem_recv_+1:ip+psb_n_elem_recv_+nerv)
+          end if
+          idxs = idxs + nesd
+          idxr = idxr + nerv
+          ip   = ip+nerv+nesd+3
+        end do
+      end associate
+    case default
+      ! Do nothing
+    end select
+    flush(iout)
+  end subroutine print_my_xchg
 
-!!$    if (.not.lshort) write(iout,*) 'glob_to_loc ',desc_p%idxmap%glob_to_loc(1:m) 
-    write(iout,*) 'Halo_index'
-    counter      = 1
-    Do
-      proc=desc_p%halo_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%halo_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%halo_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Halo_index Receive',proc,n_elem_recv
-      if (.not.lshort) write(iout,*) &
-           & desc_p%halo_index(counter+psb_n_elem_recv_+1:counter+psb_n_elem_recv_+n_elem_recv)
-      write(iout,*) 'Halo_index Send',proc,n_elem_send
-      if (.not.lshort) write(iout,*) &
-           & desc_p%halo_index(counter+n_elem_recv+psb_n_elem_send_+1: &
-           &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send)
-
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-    write(iout,*) 'Ext_index'
-    counter      = 1
-    Do
-      proc=desc_p%ext_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%ext_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Ext_index Receive',proc,n_elem_recv
-      if (.not.lshort) write(iout,*) &
-           & desc_p%ext_index(counter+psb_n_elem_recv_+1:counter+psb_n_elem_recv_+n_elem_recv)
-      write(iout,*) 'Ext_index Send',proc,n_elem_send
-      if (.not.lshort) write(iout,*) &
-           & desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_+1: &
-           &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send)
-
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-
-    write(iout,*) 'Ovrlap_index'
-    counter      = 1
-    Do
-      proc=desc_p%ovrlap_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%ovrlap_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%ovrlap_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Ovrlap_index Receive',proc,n_elem_recv
-      if (.not.lshort) write(iout,*) &
-           & desc_p%ovrlap_index(counter+psb_n_elem_recv_+1:&
-           &    counter+psb_n_elem_recv_+n_elem_recv)
-      write(iout,*) 'Ovrlap_index Send',proc,n_elem_send
-      if (.not.lshort) write(iout,*) &
-           & desc_p%ovrlap_index(counter+n_elem_recv+psb_n_elem_send_+1: &
-           &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send)
-
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-    write(iout,*) 'Ovrlap_elem'
-
-    Do  counter = 1,size(desc_p%ovrlap_elem,1)
-      idx         = desc_p%ovrlap_elem(counter,1)
-      n_elem_recv = desc_p%ovrlap_elem(counter,2)
-      proc        = desc_p%ovrlap_elem(counter,3)
-      if (.not.lshort) write(iout,*) idx,n_elem_Recv,proc
-    enddo
-
-  else if (lglob) then 
-
-!!$    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
-!!$    m=desc_p%matrix_data(psb_m_)
-!!$    n_row=desc_p%matrix_data(psb_n_row_)
-!!$    n_col=desc_p%matrix_data(psb_n_col_)
-    if (.not.lshort) then 
-!!$      write(iout,*) 'Loc_to_glob '
-!!$      do i=1, n_row
-!!$        write(iout,*) i, desc_p%idxmap%loc_to_glob(i)
-!!$      enddo
-!!$      write(iout,*) '........'
-!!$      do i=n_row+1,n_col
-!!$        write(iout,*) i, desc_p%idxmap%loc_to_glob(i)
-!!$      enddo
-!!$
-!!$      write(iout,*) 'glob_to_loc '
-!!$      do i=1,m
-!!$        write(iout,*) i,desc_p%idxmap%glob_to_loc(i)
-!!$      enddo
-    endif
-    write(iout,*) 'Halo_index'
-    counter      = 1
-    Do
-      proc=desc_p%halo_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%halo_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%halo_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Halo_index Receive',proc,n_elem_recv
-      if (.not.lshort) then 
-        do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
-!!$          write(iout,*) &
-!!$               & desc_p%idxmap%loc_to_glob(desc_p%halo_index(i)),desc_p%halo_index(i)
-        enddo
-      endif
-      write(iout,*) 'Halo_index Send',proc,n_elem_send
-      if (.not.lshort) then 
-        do i=counter+n_elem_recv+psb_n_elem_send_+1, &
-             & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
-!!$          write(iout,*) &
-!!$               & desc_p%idxmap%loc_to_glob(desc_p%halo_index(i)),  desc_p%halo_index(i)
-        enddo
-      endif
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-    write(iout,*) 'Ext_index'
-    counter      = 1
-    Do
-      proc=desc_p%ext_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%ext_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Ext_index Receive',proc,n_elem_recv
-      if (.not.lshort) then 
-        do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
-!!$          write(iout,*) &
-!!$               & desc_p%idxmap%loc_to_glob(desc_p%ext_index(i)),desc_p%ext_index(i)
-        enddo
-      endif
-      write(iout,*) 'Ext_index Send',proc,n_elem_send
-      if (.not.lshort) then 
-        do i=counter+n_elem_recv+psb_n_elem_send_+1, &
-             & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
-!!$          write(iout,*) &
-!!$               & desc_p%idxmap%loc_to_glob(desc_p%ext_index(i)),  desc_p%ext_index(i)
-        enddo
-      endif
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-
-    write(iout,*) 'Ovrlap_index'
-    counter      = 1
-    Do
-      proc=desc_p%ovrlap_index(counter+psb_proc_id_)
-      if (proc == -1) exit
-      n_elem_recv=desc_p%ovrlap_index(counter+psb_n_elem_recv_)
-      n_elem_send=desc_p%ovrlap_index(counter+n_elem_recv+psb_n_elem_send_)
-      write(iout,*) 'Ovrlap_index Receive',proc,n_elem_recv
-      if (.not.lshort) then 
-        do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
-!!$          write(iout,*) desc_p%idxmap%loc_to_glob(desc_p%ovrlap_index(i)),&
-!!$               & desc_p%ovrlap_index(i)
-        enddo
-      endif
-      write(iout,*) 'Ovrlap_index Send',proc,n_elem_send
-      if (.not.lshort) then 
-        do i=counter+n_elem_recv+psb_n_elem_send_+1, &
-             &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send
-!!$          write(iout,*) desc_p%idxmap%loc_to_glob(desc_p%ovrlap_index(i)),&
-!!$               &   desc_p%ovrlap_index(i)
-        enddo
-      endif
-      counter   = counter+n_elem_recv+n_elem_send+3
-    enddo
-
-    write(iout,*) 'Ovrlap_elem'
-
-    Do  counter = 1,size(desc_p%ovrlap_elem,1)
-      idx         = desc_p%ovrlap_elem(counter,1)
-      n_elem_recv = desc_p%ovrlap_elem(counter,2)
-      proc        = desc_p%ovrlap_elem(counter,3)
-!!$      if (.not.lshort) write(iout,*) idx,desc_p%idxmap%loc_to_glob(idx),n_elem_Recv,proc
-    enddo
-
-  end if
 end subroutine psb_cdprt

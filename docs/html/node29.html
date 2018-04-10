@@ -1,63 +1,63 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>get_fmt -- Short description of the dynamic type</TITLE>
-<META NAME="description" CONTENT="get_fmt -- Short description of the dynamic type">
+<TITLE>sizeof -- Get memory occupation in bytes
+of a sparse matrix</TITLE>
+<META NAME="description" CONTENT="sizeof -- Get memory occupation in bytes
+of a sparse matrix">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node30.html">
 <LINK REL="previous" HREF="node28.html">
-<LINK REL="up" HREF="node22.html">
+<LINK REL="up" HREF="node23.html">
 <LINK REL="next" HREF="node30.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html606"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html609"
   HREF="node30.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html602"
-  HREF="node22.html">
+<A NAME="tex2html605"
+  HREF="node23.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html596"
+<A NAME="tex2html599"
   HREF="node28.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html604"
+<A NAME="tex2html607"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html607"
-  HREF="node30.html">is_bld, is_upd, is_asb </A>
-<B> Up:</B> <A NAME="tex2html603"
-  HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html597"
-  HREF="node28.html">sizeof   Get</A>
- &nbsp; <B>  <A NAME="tex2html605"
+<B> Next:</B> <A NAME="tex2html610"
+  HREF="node30.html">get_fmt   Short</A>
+<B> Up:</B> <A NAME="tex2html606"
+  HREF="node23.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html600"
+  HREF="node28.html">get_size   Get</A>
+ &nbsp; <B>  <A NAME="tex2html608"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION00042700000000000000">
-get_fmt  -- Short description of the dynamic type</A>
+<H3><A NAME="SECTION00042600000000000000">
+sizeof  -- Get memory occupation in bytes
+of  a sparse matrix</A>
 </H3>
 
 <P>
 <PRE>
-write(*,*) a%get_fmt()
+memory_size = a%sizeof()
 </PRE>
 
 <P>
@@ -81,9 +81,7 @@ Scope: <B>local</B>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>A short string describing the dynamic type of
-  the matrix. Predefined values include <code>NULL</code>, <code>COO</code>,
-  <code>CSR</code> and <code>CSC</code>. 
+<DD>The memory occupation in bytes.
 </DD>
 </DL>
 

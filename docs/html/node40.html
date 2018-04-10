@@ -1,63 +1,60 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>clone -- Clone current object</TITLE>
-<META NAME="description" CONTENT="clone -- Clone current object">
+<TITLE>psb_set_mat_default -- Set default storage format</TITLE>
+<META NAME="description" CONTENT="psb_set_mat_default -- Set default storage format">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node41.html">
 <LINK REL="previous" HREF="node39.html">
-<LINK REL="up" HREF="node22.html">
+<LINK REL="up" HREF="node23.html">
 <LINK REL="next" HREF="node41.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html738"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html741"
   HREF="node41.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html734"
-  HREF="node22.html">
+<A NAME="tex2html737"
+  HREF="node23.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html728"
+<A NAME="tex2html731"
   HREF="node39.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html736"
+<A NAME="tex2html739"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html739"
-  HREF="node41.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html735"
-  HREF="node22.html">Sparse Matrix class</A>
-<B> Previous:</B> <A NAME="tex2html729"
-  HREF="node39.html">psb_set_mat_default   Set</A>
- &nbsp; <B>  <A NAME="tex2html737"
+<B> Next:</B> <A NAME="tex2html742"
+  HREF="node41.html">clone   Clone</A>
+<B> Up:</B> <A NAME="tex2html738"
+  HREF="node23.html">Sparse Matrix class</A>
+<B> Previous:</B> <A NAME="tex2html732"
+  HREF="node39.html">triu   Return</A>
+ &nbsp; <B>  <A NAME="tex2html740"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION000421800000000000000">
-clone -- Clone current object</A>
+<H3><A NAME="SECTION000421700000000000000">
+psb_set_mat_default -- Set default  storage format</A>
 </H3>
 
 <P>
 <PRE>
-call  a%clone(b,info)
+call  psb_set_mat_default(a)
 </PRE>
 
 <P>
@@ -69,22 +66,10 @@ call  a%clone(b,info)
 <DD>
 </DD>
 <DT><STRONG>a</STRONG></DT>
-<DD>the sparse matrix.
+<DD>a variable of <code>class(psb_T_base_sparse_mat)</code>  requesting
+  a new default storage format.
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>b</STRONG></DT>
-<DD>A copy of the input object.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+Type: required.
 </DD>
 </DL>
 

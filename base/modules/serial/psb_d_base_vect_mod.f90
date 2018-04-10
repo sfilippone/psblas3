@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -2056,7 +2056,7 @@ contains
     real(psb_dpk_), intent(in)    :: y(:,:)
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), allocatable     :: res(:)
-    integer(psb_ipk_), external      :: ddot
+    real(psb_dpk_), external      :: ddot
     integer(psb_ipk_) :: j,nc
 
     if (x%is_dev()) call x%sync()
@@ -2394,7 +2394,7 @@ contains
     class(psb_d_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_), allocatable    :: res(:)
-    integer(psb_ipk_), external      :: dnrm2
+    real(psb_dpk_), external      :: dnrm2
     integer(psb_ipk_) :: j, nc
 
     if (x%is_dev()) call x%sync()

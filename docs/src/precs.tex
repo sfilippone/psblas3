@@ -85,7 +85,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \addcontentsline{toc}{subsection}{prec\%build}
 
 \begin{verbatim}
-call prec%build(a, desc_a, info,amold,vmold)
+call prec%build(a, desc_a, info[,amold,vmold,imold])
 \end{verbatim}
 
 \begin{description}
@@ -121,7 +121,11 @@ Scope: {\bf local}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an object of a class derived from \vbasedata. 
-
+\item[imold] The desired dynamic type for the internal integer vector storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an object of a class derived from (integer) \vbasedata. 
 \end{description}
 
 \begin{description}
@@ -137,6 +141,9 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
+The \verb|amold|, \verb|vmold| and \verb|imold|  arguments may be
+employed to interface with special devices, such as GPUs and other
+accelerators. 
 
 
 

@@ -1,71 +1,68 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>descr -- Prints a description of current preconditioner</TITLE>
-<META NAME="description" CONTENT="descr -- Prints a description of current preconditioner">
+<TITLE>apply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="apply -- Preconditioner application routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node128.html">
 <LINK REL="previous" HREF="node126.html">
-<LINK REL="up" HREF="node123.html">
+<LINK REL="up" HREF="node124.html">
 <LINK REL="next" HREF="node128.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1844"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1847"
   HREF="node128.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1840"
-  HREF="node123.html">
+<A NAME="tex2html1843"
+  HREF="node124.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1834"
+<A NAME="tex2html1837"
   HREF="node126.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1842"
+<A NAME="tex2html1845"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1845"
-  HREF="node128.html">clone   clone</A>
-<B> Up:</B> <A NAME="tex2html1841"
-  HREF="node123.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1835"
-  HREF="node126.html">apply   Preconditioner</A>
- &nbsp; <B>  <A NAME="tex2html1843"
+<B> Next:</B> <A NAME="tex2html1848"
+  HREF="node128.html">descr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1844"
+  HREF="node124.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1838"
+  HREF="node126.html">build   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1846"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000114000000000000000">
-descr -- Prints a description of current
-  preconditioner</A>
+<H2><A NAME="SECTION000113000000000000000">
+apply -- Preconditioner application
+  routine</A>
 </H2>
 
 <P>
 <PRE>
-call prec%descr()
-call prec%descr(iout, root)
+call prec%apply(x,y,desc_a,info,trans,work)
+call prec%apply(x,desc_a,info,trans)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
@@ -80,33 +77,72 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>iout</STRONG></DT>
-<DD>output unit.
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
 Scope: <B>local</B> 
 <BR>
-Type: <B>optional</B>
+Type: <B>required</B>
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
-Specified as: an integer number. Default: default output unit.
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>. 
 </DD>
-<DT><STRONG>root</STRONG></DT>
-<DD>Process from which to print
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor.
 Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
 <BR>
 Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer number between 0 and <IMG
- WIDTH="49" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img156.png"
- ALT="$np-1$">, in which case
-the specified process will print the description, or <IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
- ALT="$-1$">, in which case
-all processes will print. Default: 0. 
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as:  a rank one array or an object of type vdata<TT>psb_T_vect_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
 

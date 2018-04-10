@@ -1,19 +1,15 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_cd_set_large_threshold -- Set threshold for index mapping switch</TITLE>
-<META NAME="description" CONTENT="psb_cd_set_large_threshold -- Set threshold for index mapping switch">
+<TITLE>psb_cd_get_large_threshold -- Get threshold for index mapping switch</TITLE>
+<META NAME="description" CONTENT="psb_cd_get_large_threshold -- Get threshold for index mapping switch">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -25,67 +21,57 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html481"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html484"
   HREF="node21.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html477"
+<A NAME="tex2html480"
   HREF="node10.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html471"
+<A NAME="tex2html474"
   HREF="node19.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html479"
+<A NAME="tex2html482"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html482"
-  HREF="node21.html">Named Constants</A>
-<B> Up:</B> <A NAME="tex2html478"
+<B> Next:</B> <A NAME="tex2html485"
+  HREF="node21.html">psb_cd_set_large_threshold   Set</A>
+<B> Up:</B> <A NAME="tex2html481"
   HREF="node10.html">Descriptor data structure</A>
-<B> Previous:</B> <A NAME="tex2html472"
-  HREF="node19.html">psb_cd_get_large_threshold   Get</A>
- &nbsp; <B>  <A NAME="tex2html480"
+<B> Previous:</B> <A NAME="tex2html475"
+  HREF="node19.html">CNV   convert</A>
+ &nbsp; <B>  <A NAME="tex2html483"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
 <H3><A NAME="SECTION000411000000000000000">
-psb_cd_set_large_threshold -- Set threshold for
+psb_cd_get_large_threshold -- Get threshold for
   index mapping switch</A>
 </H3>
 
 <P>
 <PRE>
-call psb_cd_set_large_threshold(ith)
+ith = psb_cd_get_large_threshold()
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>ith</STRONG></DT>
-<DD>the new threshold for communication descriptors.
-<BR>
-Scope: <B>global</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value greater than zero.
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The current value for the size threshold. 
+
+<P>
 </DD>
 </DL>
-Note: the threshold value is only queried by the library at the time a
-call to <code>psb_cdall</code> is executed, therefore changing the threshold
-has no effect on communication descriptors that have already been
-initialized. Moreover the threshold must have the same value on all
-processes. 
 
 <P>
 <BR><HR>

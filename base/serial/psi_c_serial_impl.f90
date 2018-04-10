@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -425,12 +425,11 @@ subroutine psi_csctv(n,idx,x,beta,y)
     end do
   end if
 end subroutine psi_csctv
+
 subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
-  complex(psb_spk_), parameter :: one=(1.0,0.0)
-  complex(psb_spk_), parameter :: zero=(0.0,0.0)
   integer(psb_ipk_) :: n, m, lldx, lldy, info
   complex(psb_spk_) X(lldx,*), Y(lldy,*)
   complex(psb_spk_) alpha, beta
@@ -474,19 +473,19 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
     goto 9999
   endif
 
-  if (alpha.eq.zero) then 
-    if (beta.eq.zero) then 
+  if (alpha.eq.czero) then 
+    if (beta.eq.czero) then 
       do j=1, n 
         do i=1,m 
-          y(i,j) = zero
+          y(i,j) = czero
         enddo
       enddo
-    else if (beta.eq.one) then
-      !$$$
-      !$$$     Do nothing! 
-      !$$$            
+    else if (beta.eq.cone) then
+      !   
+      !        Do nothing! 
+      !               
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-cone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = - y(i,j)
@@ -500,22 +499,22 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.one) then
+  else if (alpha.eq.cone) then
 
-    if (beta.eq.zero) then 
+    if (beta.eq.czero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.cone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-cone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) - y(i,j)
@@ -529,22 +528,22 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.-one) then 
+  else if (alpha.eq.-cone) then 
 
-    if (beta.eq.zero) then 
+    if (beta.eq.czero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.cone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-cone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) - y(i,j)
@@ -560,20 +559,20 @@ subroutine  caxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
   else  
 
-    if (beta.eq.zero) then 
+    if (beta.eq.czero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
-    else if (beta.eq.one) then
+    else if (beta.eq.cone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-one) then 
+    else if (beta.eq.-cone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) - y(i,j)

@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------------*/
 /*              Parallel Sparse BLAS  v 3.5.0					    */
-/*    (C) Copyright 2017 Salvatore Filippone   Cranfield University                 */
+/*    (C) Copyright 2017 Salvatore Filippone                    */
 /* 										    */
 /*  Redistribution and use in source and binary forms, with or without		    */
 /*  modification, are permitted provided that the following conditions		    */

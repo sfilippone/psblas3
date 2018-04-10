@@ -1,85 +1,92 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2012 (1.2)
-original version by:  Nikos Drakos, CBLU, University of Leeds
-* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
-* with significant contributions from:
-  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
+<TITLE>psb_cdasb -- Communication descriptor assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_cdasb -- Communication descriptor assembly routine">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2012">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
 <LINK REL="next" HREF="node75.html">
 <LINK REL="previous" HREF="node73.html">
-<LINK REL="up" HREF="node70.html">
+<LINK REL="up" HREF="node71.html">
 <LINK REL="next" HREF="node75.html">
 </HEAD>
 
 <BODY >
-<!--Navigation Panel-->
-<A NAME="tex2html1186"
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1189"
   HREF="node75.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1182"
-  HREF="node70.html">
+<A NAME="tex2html1185"
+  HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1176"
+<A NAME="tex2html1179"
   HREF="node73.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1184"
+<A NAME="tex2html1187"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1187"
-  HREF="node75.html">psb_cdfree   Frees</A>
-<B> Up:</B> <A NAME="tex2html1183"
-  HREF="node70.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1177"
-  HREF="node73.html">psb_cdasb   Communication</A>
- &nbsp; <B>  <A NAME="tex2html1185"
+<B> Next:</B> <A NAME="tex2html1190"
+  HREF="node75.html">psb_cdcpy   Copies</A>
+<B> Up:</B> <A NAME="tex2html1186"
+  HREF="node71.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html1180"
+  HREF="node73.html">psb_cdins   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html1188"
   HREF="node1.html">Contents</A></B> 
 <BR>
-<BR>
+<BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00074000000000000000">
-psb_cdcpy -- Copies a communication descriptor</A>
+<H2><A NAME="SECTION00073000000000000000">
+psb_cdasb -- Communication descriptor assembly
+  routine</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdcpy(desc_in, desc_out, info)
+call psb_cdasb(desc_a, info [, mold])
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
+<DD>Synchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_in</STRONG></DT>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>in</B>.
+Intent: <B>inout</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
+</DD>
+<DT><STRONG>mold</STRONG></DT>
+<DD>The desired dynamic type for the internal index storage.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a object of type derived from (integer) vbasedata<TT>psb_T_base_vect_type</TT>.
 </DD>
 </DL>
 
@@ -88,14 +95,14 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_out</STRONG></DT>
-<DD>the communication descriptor copy.
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>out</B>.
+Intent: <B>inout</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
@@ -111,6 +118,13 @@ Intent: <B>out</B>.
 An integer value; 0 means no error has been detected. 
 </DD>
 </DL>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>On exit from this routine the descriptor is in the assembled
+  state. 
+</LI>
+</OL>
 
 <P>
 <BR><HR>

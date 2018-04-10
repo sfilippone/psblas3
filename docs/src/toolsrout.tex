@@ -297,7 +297,7 @@ nor the end vertex belong to the current process.
 \addcontentsline{toc}{subsection}{psb\_cdasb}
 
 \begin{verbatim}
-call psb_cdasb(desc_a, info)
+call psb_cdasb(desc_a, info [, mold])
 \end{verbatim}
 
 \begin{description}
@@ -308,6 +308,11 @@ Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: a structured data of type \descdata.
+\item[mold] The desired dynamic type for the internal index storage.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a object of type derived from (integer) \vbasedata.
 \end{description}
 
 \begin{description}

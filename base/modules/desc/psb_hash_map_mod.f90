@@ -1,8 +1,8 @@
 !   
 !                Parallel Sparse BLAS  version 3.5
-!      (C) Copyright 2006, 2010, 2015, 2017
-!        Salvatore Filippone    Cranfield University
-!        Alfredo Buttari        CNRS-IRIT, Toulouse
+!      (C) Copyright 2006-2018
+!        Salvatore Filippone    
+!        Alfredo Buttari      
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -134,6 +134,8 @@ contains
          & val = val + size(idxmap%hashv)*psb_sizeof_int
     if (allocated(idxmap%glb_lc)) &
          & val = val + size(idxmap%glb_lc)*psb_sizeof_int
+    if (allocated(idxmap%loc_to_glob)) &
+         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_int
     val = val + psb_sizeof(idxmap%hash)
 
   end function hash_sizeof
@@ -743,6 +745,9 @@ contains
 
   end subroutine hash_g2lv2_ins
 
+  !
+  ! init from VL, with checks on input.
+  !
   subroutine hash_init_vl(idxmap,ictxt,vl,info)
     use psb_penv_mod
     use psb_error_mod
@@ -870,7 +875,9 @@ contains
 
   end subroutine hash_init_vg
 
-
+  !
+  ! init from VL, with no checks on input
+  !
   subroutine hash_init_vlu(idxmap,ictxt,ntot,nl,vlu,info)
     use psb_penv_mod
     use psb_error_mod
