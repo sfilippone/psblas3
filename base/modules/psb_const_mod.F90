@@ -92,7 +92,7 @@ module psb_const_mod
   character(len=*), parameter    :: psb_version_string_ = "3.5.0"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
   integer(psb_ipk_), parameter   :: psb_version_minor_  = 5
-  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 1
 
   !
   !     Handy & miscellaneous constants
