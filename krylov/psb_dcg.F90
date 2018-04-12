@@ -118,8 +118,9 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: q, p, r, z, w
   real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
-  integer(psb_ipk_) :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, naux, it, itx, itrace_,&
        &  n_col, n_row,err_act, int_err(5), ieg,nspl, istebz
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   real(psb_dpk_)     :: derr  
@@ -160,9 +161,9 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
     istop_ = 2
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if (info == psb_success_)&
-       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+       & call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
