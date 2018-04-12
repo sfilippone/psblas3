@@ -32,6 +32,7 @@
 Module psb_i_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
+  use psb_l_vect_mod, only : psb_l_vect_type
   use psb_i_multivect_mod, only : psb_i_base_multivect_type, psb_i_multivect_type
 
   interface  psb_geall
@@ -125,7 +126,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -137,7 +138,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x
-      type(psb_i_vect_type), intent(inout)       :: irw
+      type(psb_l_vect_type), intent(inout)       :: irw
       type(psb_i_vect_type), intent(inout)    :: val
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -149,7 +150,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x(:)
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -161,7 +162,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_multivect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl

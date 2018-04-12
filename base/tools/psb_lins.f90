@@ -56,7 +56,7 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
-  integer(psb_ipk_), intent(in)                  :: irw(:)
+  integer(psb_lpk_), intent(in)                  :: irw(:)
   integer(psb_lpk_), intent(in)        :: val(:)
   type(psb_l_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
@@ -66,7 +66,8 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
@@ -170,7 +171,7 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
-  type(psb_i_vect_type), intent(inout)           :: irw
+  type(psb_l_vect_type), intent(inout)           :: irw
   type(psb_l_vect_type), intent(inout)        :: val
   type(psb_l_vect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
@@ -180,7 +181,8 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   integer(psb_lpk_), allocatable   :: lval(:)
@@ -246,15 +248,14 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
     local_ = .false.
   endif
 
+  if (irw%is_dev()) call irw%sync()
   if (local_) then 
-    call x%ins(m,irw,val,dupl_,info) 
+    irl(1:m) = irw%v%v(1:m)
   else
-    irl  = irw%get_vect()
-    lval = val%get_vect()
-    call desc_a%indxmap%g2lip(irl(1:m),info,owned=.true.)
-    call x%ins(m,irl,lval,dupl_,info) 
-
+    call desc_a%indxmap%g2l(irw%v%v(1:m),irl(1:m),info,owned=.true.)
   end if
+
+  call x%ins(m,irl,lval,dupl_,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -280,7 +281,7 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
-  integer(psb_ipk_), intent(in)                  :: irw(:)
+  integer(psb_lpk_), intent(in)                  :: irw(:)
   integer(psb_lpk_), intent(in)        :: val(:,:)
   type(psb_l_vect_type), intent(inout) :: x(:)
   type(psb_desc_type), intent(in)      :: desc_a
@@ -290,7 +291,8 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5), n
+       & loc_rows,loc_cols,err_act, int_err(5), n
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
@@ -401,7 +403,7 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)                  :: m
-  integer(psb_ipk_), intent(in)                  :: irw(:)
+  integer(psb_lpk_), intent(in)                  :: irw(:)
   integer(psb_lpk_), intent(in)        :: val(:,:)
   type(psb_l_multivect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)      :: desc_a
@@ -411,7 +413,8 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_

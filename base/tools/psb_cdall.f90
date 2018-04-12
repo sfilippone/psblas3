@@ -54,7 +54,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
   character(len=20)   :: name
   integer(psb_ipk_) :: err_act, flag_, i, me, np, nlp, nnv, lr
   integer(psb_lpk_) :: n_
-  integer(psb_ipk_), allocatable :: itmpsz(:) 
+  integer(psb_lpk_), allocatable :: itmpsz(:) 
   integer(psb_mpk_) :: iictxt
  
   
