@@ -440,6 +440,7 @@ contains
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)
@@ -769,6 +770,7 @@ contains
   end subroutine hash_g2lv1_ins
 
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_lpk_), intent(in)    :: idxin(:)

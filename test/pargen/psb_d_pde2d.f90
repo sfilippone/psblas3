@@ -132,7 +132,8 @@ contains
     type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nt,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 2D partition
     integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
@@ -140,7 +141,7 @@ contains
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -182,7 +183,7 @@ contains
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
 
-    m   = idim*idim
+    m   = (1_psb_lpk_)*idim*idim
     n   = m
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n

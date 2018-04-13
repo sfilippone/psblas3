@@ -61,9 +61,10 @@
 module psb_d_pde3d_mod
 
  
-  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
+  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
        &  psb_dspmat_type, psb_d_vect_type, dzero,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+       &  psb_d_base_sparse_mat, psb_d_base_vect_type, &
+       &  psb_i_base_vect_type, psb_l_base_vect_type
 
   interface 
     function d_func_3d(x,y,z) result(val)
@@ -133,7 +134,8 @@ contains
     type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nt,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
     integer(psb_ipk_) :: npx,npy,npz, npdims(3),iamx,iamy,iamz,mynx,myny,mynz
@@ -141,7 +143,7 @@ contains
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -183,7 +185,7 @@ contains
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
     
-    m   = idim*idim*idim
+    m   = (1_psb_lpk_*idim)*idim*idim
     n   = m
     nnz = ((n*9)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
