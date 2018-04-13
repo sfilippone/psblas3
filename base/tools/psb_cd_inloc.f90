@@ -183,12 +183,12 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
       novrl   = 0
       npr_ov  = 0
       norphan = 0
-      do i=1, m
-        if (tmpgidx(i,2) < 1) then 
+      do il=1, m
+        if (tmpgidx(il,2) < 1) then 
           norphan = norphan + 1 
-        else if (tmpgidx(i,2) > 1) then 
+        else if (tmpgidx(il,2) > 1) then 
           novrl  = novrl + 1 
-          npr_ov = npr_ov + tmpgidx(i,2)
+          npr_ov = npr_ov + tmpgidx(il,2)
         end if
       end do
       if (norphan > 0) then 

@@ -92,8 +92,8 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,partition,nrl,iv)
+  subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,info,&
+       & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
     !
@@ -112,7 +112,6 @@ contains
     ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-    procedure(s_func_2d)  :: b1,b2,c,a1,a2,g
     integer(psb_ipk_)     :: idim
     type(psb_sspmat_type) :: a
     type(psb_s_vect_type) :: xv,bv
@@ -466,6 +465,51 @@ contains
     return
   end subroutine psb_s_gen_pde2d
 
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y)
+    use psb_base_mod, only : psb_spk_
+    real(psb_spk_) :: b1
+    real(psb_spk_), intent(in) :: x,y
+    b1=sone/sqrt((2*sone))
+  end function b1
+  function b2(x,y)
+    use psb_base_mod, only : psb_spk_
+    real(psb_spk_) ::  b2
+    real(psb_spk_), intent(in) :: x,y
+    b2=sone/sqrt((2*sone))
+  end function b2
+  function c(x,y)
+    use psb_base_mod, only : psb_spk_
+    real(psb_spk_) ::  c
+    real(psb_spk_), intent(in) :: x,y
+    c=0.d0
+  end function c
+  function a1(x,y)
+    use psb_base_mod, only : psb_spk_
+    real(psb_spk_) ::  a1   
+    real(psb_spk_), intent(in) :: x,y
+    a1=sone/80
+  end function a1
+  function a2(x,y)
+    use psb_base_mod, only : psb_spk_
+    real(psb_spk_) ::  a2
+    real(psb_spk_), intent(in) :: x,y
+    a2=sone/80
+  end function a2
+  function g(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    real(psb_spk_) ::  g
+    real(psb_spk_), intent(in) :: x,y
+    g = szero
+    if (x == sone) then
+      g = sone
+    else if (x == szero) then 
+      g = exp(-y**2)
+    end if
+  end function g
+
 end module psb_s_pde2d_mod
 
 program psb_s_pde2d
@@ -536,7 +580,7 @@ program psb_s_pde2d
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,a1,a2,b1,b2,c,g,info)  
+  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -743,51 +787,6 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
-
-  !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) :: b1
-    real(psb_spk_), intent(in) :: x,y
-    b1=sone/sqrt((2*sone))
-  end function b1
-  function b2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  b2
-    real(psb_spk_), intent(in) :: x,y
-    b2=sone/sqrt((2*sone))
-  end function b2
-  function c(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  c
-    real(psb_spk_), intent(in) :: x,y
-    c=0.d0
-  end function c
-  function a1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a1   
-    real(psb_spk_), intent(in) :: x,y
-    a1=sone/80
-  end function a1
-  function a2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a2
-    real(psb_spk_), intent(in) :: x,y
-    a2=sone/80
-  end function a2
-  function g(x,y)
-    use psb_base_mod, only : psb_spk_, sone, szero
-    real(psb_spk_) ::  g
-    real(psb_spk_), intent(in) :: x,y
-    g = szero
-    if (x == sone) then
-      g = sone
-    else if (x == szero) then 
-      g = exp(-y**2)
-    end if
-  end function g
 end program psb_s_pde2d
 
 
