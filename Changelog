@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2018/04/15: Fixed pargen benchmark programs. Made MOLD mandatory.
 2018/01/10: Updated docs.	
 2017/12/15: Fixed preconditioner build.
 2017/10/31: Updated target install directories.
