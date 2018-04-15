@@ -42,12 +42,9 @@
 !                                       mapping parts are used.
 ! index_in(:)  - integer               The index list, build format  
 ! index_out(:) - integer(psb_ipk_), allocatable  The index list, assembled format
-! glob_idx     - logical               Whether the input indices are in local or global
-!                                      numbering; the global numbering is used when 
-!                                      converting the overlap exchange lists.
-! nxch         - integer               The number of data exchanges on the calling process
-! nsnd         - integer               Total send buffer size       on the calling process
-! nrcv         - integer               Total receive buffer size    on the calling process
+! nxch         - integer             The number of data exchanges on the calling process
+! nsnd         - integer             Total send buffer size       on the calling process
+! nrcv         - integer             Total receive buffer size    on the calling process
 !
 ! The format of the index lists. Copied from base/modules/psb_desc_type
 !
@@ -99,7 +96,7 @@
 !
 !
 subroutine psi_i_desc_index(desc,index_in,dep_list,&
-     & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+     & length_dl,nsnd,nrcv,desc_index,info)
   use psb_desc_mod
   use psb_realloc_mod
   use psb_error_mod
@@ -116,11 +113,10 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
 
   !    ...array parameters.....
   type(psb_desc_type) :: desc
-  integer(psb_lpk_) :: index_in(:)
+  integer(psb_ipk_) :: index_in(:)
   integer(psb_ipk_) :: dep_list(:)
   integer(psb_ipk_),allocatable  :: desc_index(:)
   integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
-  logical         :: isglob_in
   !    ....local scalars...        
   integer(psb_ipk_) :: j,me,np,i,proc
   !    ...parameters...
@@ -256,24 +252,15 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     !  
     !   note that here bsdinx is zero-based, hence the following loop
     !          
-    if (isglob_in) then 
-      do j=1, nerv
-        sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
-      end do
-    else
-      sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv) = index_in(i+1:i+nerv)      
-      call desc%indxmap%l2gip(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-           & info) 
-!!$      call desc%indxmap%l2g(index_in(i+1:i+nerv),&
-!!$           & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
-!!$           & info) 
-
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
-        goto 9999
-      end if
-
-    endif
+    call desc%indxmap%l2g(index_in(i+1:i+nerv),&
+         & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+         & info) 
+    
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='l2g')
+      goto 9999
+    end if
+    
     bsdindx(proc+1) = bsdindx(proc+1) + nerv
     i = i + nerv + 1 
   end do

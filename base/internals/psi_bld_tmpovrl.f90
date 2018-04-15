@@ -65,7 +65,8 @@ subroutine psi_i_bld_tmpovrl(iv,desc,info)
 
   !locals
   integer(psb_ipk_) :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, icomm
+       & l_ov_ix,l_ov_el, err_act, itmpov, k, glx, icomm
+  integer(psb_ipk_) :: idx
   integer(psb_ipk_), allocatable  :: ov_idx(:),ov_el(:,:)
 
   integer(psb_ipk_) :: ictxt,n_row, debug_unit, debug_level

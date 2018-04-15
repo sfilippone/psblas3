@@ -66,15 +66,15 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
   integer(psb_ipk_), intent(out) :: info
 
 
-  integer(psb_lpk_), allocatable :: hproc(:)
+  integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
   integer(psb_ipk_), allocatable :: helem(:),&
-       & answers(:,:),idxsrch(:,:), hhidx(:)
+       & hhidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
-  integer(psb_ipk_) :: i,n_row,n_col,err_act,ih,hsize,ip,isz,k,j,&
+  integer(psb_ipk_) :: i,n_row,n_col,err_act,hsize,ip,isz,j, k,&
        & last_ih, last_j, nv
-  integer(psb_lpk_) :: mglob
+  integer(psb_lpk_) :: mglob, ih
   integer(psb_ipk_) :: ictxt,np,me, nresp
   logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
@@ -230,8 +230,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       rvidx(ip) = j
       j         = j + rvsz(ip)
     end do
-    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_ipk_,&
-         & answers(:,1),rvsz,rvidx,psb_mpi_ipk_,&
+    call mpi_alltoallv(hproc,sdsz,sdidx,psb_mpi_lpk_,&
+         & answers(:,1),rvsz,rvidx,psb_mpi_lpk_,&
          & icomm,minfo)
     if (gettime) then 
       tamx = psb_wtime() - t3 + tamx

@@ -30,12 +30,12 @@
 !   
 !    
 module psi_d_mod
+
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_, psb_i_base_vect_type
   use psi_d_comm_a_mod
   use psb_d_base_vect_mod, only : psb_d_base_vect_type 
   use psb_d_base_multivect_mod, only : psb_d_base_multivect_type 
   use psi_d_comm_v_mod
-
   
 end module psi_d_mod
 

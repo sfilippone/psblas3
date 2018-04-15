@@ -142,9 +142,9 @@ module psb_desc_mod
   !     psb_ovrl subroutine. 
   !  
   !  8. When the descriptor is in the BLD state the INDEX vectors contains only 
-  !     the indices to be received, organized as  a sequence 
-  !     of entries of the form (proc,N,(lx1,lx2,...,lxn)) with owning process,
-  !     number of indices (most often but not necessarily N=1), list of local indices.  
+  !     the indices to be received, organized as  a sequence of entries of
+  !     the form (proc,N,(lx1,lx2,...,lxn)) with owning process, number of indices
+  !     (most often but not necessarily N=1), list of local indices.  
   !     This is because we only know the list of halo indices to be received 
   !     as we go about building the sparse matrix pattern, and we want the build 
   !     phase to be loosely synchronized. Thus we record the indices we have to ask 
@@ -211,7 +211,6 @@ module psb_desc_mod
     type(psb_i_vect_type)            :: v_ovrlap_index
     type(psb_i_vect_type)            :: v_ovr_mst_idx 
 
-    integer(psb_lpk_), allocatable   :: tmp_ovrlap_index(:)
     integer(psb_ipk_), allocatable   :: ovrlap_elem(:,:)
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
     integer(psb_ipk_), allocatable   :: lprm(:)
@@ -282,6 +281,7 @@ module psb_desc_mod
   interface psb_free
     module procedure psb_cdfree
   end interface psb_free
+
 
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
@@ -1073,8 +1073,7 @@ contains
   end subroutine psb_cd_clone
 
   
-  Subroutine psb_cd_get_recv_idx_loc(tmp,desc,data,info)
-
+  Subroutine psb_cd_get_recv_idx(tmp,desc,data,info)
     use psb_error_mod
     use psb_penv_mod
     use psb_realloc_mod
@@ -1157,7 +1156,7 @@ contains
 
     return
 
-  end Subroutine psb_cd_get_recv_idx_loc
+  end Subroutine psb_cd_get_recv_idx
   
   Subroutine psb_cd_get_recv_idx_glob(tmp,desc,data,info)
 

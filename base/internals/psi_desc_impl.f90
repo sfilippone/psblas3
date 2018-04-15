@@ -67,9 +67,9 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   implicit none
 
   !     ....scalars parameters....
-  integer(psb_ipk_), intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
+  integer(psb_ipk_), intent(in)      :: halo_in(:), ovrlap_in(:),ext_in(:)
   type(psb_desc_type), intent(inout) :: cdesc
-  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(out)     :: info
   class(psb_i_base_vect_type), optional, intent(in) :: mold
 
   !     ....local scalars....      
@@ -102,7 +102,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   ! first the halo index
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo',&
        & size(halo_in)
-  call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
+  call psi_crea_index(cdesc,halo_in, idx_out,nxch,nsnd,nrcv,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
     goto 9999
@@ -115,7 +115,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
 
   ! then ext index
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
-  call psi_crea_index(cdesc,ext_in, idx_out,.false.,nxch,nsnd,nrcv,info)
+  call psi_crea_index(cdesc,ext_in, idx_out,nxch,nsnd,nrcv,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
     goto 9999
@@ -126,7 +126,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
 
   ! then the overlap index
-  call psi_crea_index(cdesc,ovrlap_in, idx_out,.true.,nxch,nsnd,nrcv,info)
+  call psi_crea_index(cdesc,ovrlap_in, idx_out,nxch,nsnd,nrcv,info)
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
     goto 9999
@@ -150,7 +150,7 @@ subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
   if (debug_level>0) write(debug_unit,*) me,'Calling bld_ovr_mst'
   call psi_bld_ovr_mst(me,cdesc%ovrlap_elem,tmp_mst_idx,info)
   if (info == psb_success_) call psi_crea_index(cdesc,&
-       & tmp_mst_idx,idx_out,.false.,nxch,nsnd,nrcv,info)
+       & tmp_mst_idx,idx_out,nxch,nsnd,nrcv,info)
   if (debug_level>0) write(debug_unit,*) me,'Done crea_indx'
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_bld_ovr_mst')

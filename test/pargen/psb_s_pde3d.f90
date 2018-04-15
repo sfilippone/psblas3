@@ -88,6 +88,70 @@ contains
     val = szero
 
   end function s_null_func_3d
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) :: b1
+    real(psb_spk_), intent(in) :: x,y,z
+    b1=sone/sqrt((3*sone))
+  end function b1
+  function b2(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  b2
+    real(psb_spk_), intent(in) :: x,y,z
+    b2=sone/sqrt((3*sone))
+  end function b2
+  function b3(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  b3
+    real(psb_spk_), intent(in) :: x,y,z      
+    b3=sone/sqrt((3*sone))
+  end function b3
+  function c(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  c
+    real(psb_spk_), intent(in) :: x,y,z      
+    c=szero
+  end function c
+  function a1(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  a1   
+    real(psb_spk_), intent(in) :: x,y,z
+    a1=sone/80
+  end function a1
+  function a2(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  a2
+    real(psb_spk_), intent(in) :: x,y,z
+    a2=sone/80
+  end function a2
+  function a3(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  a3
+    real(psb_spk_), intent(in) :: x,y,z
+    a3=sone/80
+  end function a3
+  function g(x,y,z)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  g
+    real(psb_spk_), intent(in) :: x,y,z
+    g = szero
+    if (x == sone) then
+      g = sone
+    else if (x == szero) then 
+      g = exp(y**2-z**2)
+    end if
+  end function g
 
   
   !
@@ -114,7 +178,6 @@ contains
     ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-!    procedure(s_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
     integer(psb_ipk_)     :: idim
     type(psb_sspmat_type) :: a
     type(psb_s_vect_type) :: xv,bv
@@ -491,62 +554,7 @@ contains
 
     return
   end subroutine psb_s_gen_pde3d
-    !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) :: b1
-    real(psb_spk_), intent(in) :: x,y,z
-    b1=sone/sqrt((3*sone))
-  end function b1
-  function b2(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  b2
-    real(psb_spk_), intent(in) :: x,y,z
-    b2=sone/sqrt((3*sone))
-  end function b2
-  function b3(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  b3
-    real(psb_spk_), intent(in) :: x,y,z      
-    b3=sone/sqrt((3*sone))
-  end function b3
-  function c(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  c
-    real(psb_spk_), intent(in) :: x,y,z      
-    c=szero
-  end function c
-  function a1(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a1   
-    real(psb_spk_), intent(in) :: x,y,z
-    a1=sone/80
-  end function a1
-  function a2(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a2
-    real(psb_spk_), intent(in) :: x,y,z
-    a2=sone/80
-  end function a2
-  function a3(x,y,z)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a3
-    real(psb_spk_), intent(in) :: x,y,z
-    a3=sone/80
-  end function a3
-  function g(x,y,z)
-    use psb_base_mod, only : psb_spk_, sone, szero
-    real(psb_spk_) ::  g
-    real(psb_spk_), intent(in) :: x,y,z
-    g = szero
-    if (x == sone) then
-      g = sone
-    else if (x == szero) then 
-      g = exp(y**2-z**2)
-    end if
-  end function g
+
 
 end module psb_s_pde3d_mod
 

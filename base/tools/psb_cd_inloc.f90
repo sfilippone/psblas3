@@ -64,8 +64,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   integer(psb_lpk_) :: m, n, nrt, il
   integer(psb_ipk_) :: int_err(5),exch(3)
   integer(psb_ipk_), allocatable :: tmpgidx(:,:), &
-       & nov(:), ov_idx(:,:)
-  integer(psb_lpk_), allocatable :: vl(:), ix(:), temp_ovrlap(:)
+       & nov(:), ov_idx(:,:), temp_ovrlap(:)
+  integer(psb_lpk_), allocatable :: vl(:), ix(:), l_temp_ovrlap(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt
   logical            :: check_, islarge
@@ -304,7 +304,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   end if
 
   ! allocate work vector
-  allocate(temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
+  allocate(l_temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
        & stat=info)
   if (info == psb_success_) then 
     desc%lprm(1)        = 0   
@@ -316,8 +316,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     goto 9999
   endif
 
-  temp_ovrlap(:) = -1
-
+  l_temp_ovrlap(:) = -1
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
@@ -338,17 +337,17 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
           if (ov_idx(j,1) == i) exit
           j = j + 1 
         end do
-        call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1_psb_lpk_)
+        call psb_ensure_size((itmpov+3+nprocs),l_temp_ovrlap,info,pad=-1_psb_lpk_)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
         itmpov = itmpov + 1
-        temp_ovrlap(itmpov) = il
+        l_temp_ovrlap(itmpov) = il
         itmpov = itmpov + 1
-        temp_ovrlap(itmpov) = nprocs
-        temp_ovrlap(itmpov+1:itmpov+nprocs) = ov_idx(j:j+nprocs-1,2)
+        l_temp_ovrlap(itmpov) = nprocs
+        l_temp_ovrlap(itmpov+1:itmpov+nprocs) = ov_idx(j:j+nprocs-1,2)
         itmpov = itmpov + nprocs
       end if
 
@@ -371,7 +370,29 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call aa%init(iictxt,vl(1:nlu),info)
   end select
 
-  call psi_bld_tmpovrl(temp_ovrlap,desc,info)
+
+  !
+  ! Now that we have initialized indxmap we can convert the
+  ! indices to local numbering.
+  !
+  block
+    integer(psb_ipk_) :: i,nprocs
+    allocate(temp_ovrlap(size(l_temp_ovrlap)),stat=info)
+    if (info == psb_success_) then
+      temp_ovrlap = -1
+      i = 1
+      do while (l_temp_ovrlap(i) /= -1) 
+        call desc%indxmap%g2l(l_temp_ovrlap(i),temp_ovrlap(i),info)
+        i              = i + 1
+        temp_ovrlap(i) = l_temp_ovrlap(i)
+        nprocs         = temp_ovrlap(i)
+        temp_ovrlap(i+1:i+nprocs) = l_temp_ovrlap(i+1:i+nprocs)
+        i       = i + 1
+        i       = i + nprocs     
+      enddo
+    end if
+  end block
+  if (info == psb_success_) call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&

@@ -88,6 +88,70 @@ contains
     val = dzero
 
   end function d_null_func_3d
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) :: b1
+    real(psb_dpk_), intent(in) :: x,y,z
+    b1=done/sqrt((3*done))
+  end function b1
+  function b2(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  b2
+    real(psb_dpk_), intent(in) :: x,y,z
+    b2=done/sqrt((3*done))
+  end function b2
+  function b3(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  b3
+    real(psb_dpk_), intent(in) :: x,y,z      
+    b3=done/sqrt((3*done))
+  end function b3
+  function c(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  c
+    real(psb_dpk_), intent(in) :: x,y,z      
+    c=dzero
+  end function c
+  function a1(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  a1   
+    real(psb_dpk_), intent(in) :: x,y,z
+    a1=done/80
+  end function a1
+  function a2(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  a2
+    real(psb_dpk_), intent(in) :: x,y,z
+    a2=done/80
+  end function a2
+  function a3(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  a3
+    real(psb_dpk_), intent(in) :: x,y,z
+    a3=done/80
+  end function a3
+  function g(x,y,z)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  g
+    real(psb_dpk_), intent(in) :: x,y,z
+    g = dzero
+    if (x == done) then
+      g = done
+    else if (x == dzero) then 
+      g = exp(y**2-z**2)
+    end if
+  end function g
 
   
   !
@@ -114,7 +178,6 @@ contains
     ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-!    procedure(d_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
     integer(psb_ipk_)     :: idim
     type(psb_dspmat_type) :: a
     type(psb_d_vect_type) :: xv,bv
@@ -491,62 +554,7 @@ contains
 
     return
   end subroutine psb_d_gen_pde3d
-    !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) :: b1
-    real(psb_dpk_), intent(in) :: x,y,z
-    b1=done/sqrt((3*done))
-  end function b1
-  function b2(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  b2
-    real(psb_dpk_), intent(in) :: x,y,z
-    b2=done/sqrt((3*done))
-  end function b2
-  function b3(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  b3
-    real(psb_dpk_), intent(in) :: x,y,z      
-    b3=done/sqrt((3*done))
-  end function b3
-  function c(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  c
-    real(psb_dpk_), intent(in) :: x,y,z      
-    c=dzero
-  end function c
-  function a1(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a1   
-    real(psb_dpk_), intent(in) :: x,y,z
-    a1=done/80
-  end function a1
-  function a2(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a2
-    real(psb_dpk_), intent(in) :: x,y,z
-    a2=done/80
-  end function a2
-  function a3(x,y,z)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a3
-    real(psb_dpk_), intent(in) :: x,y,z
-    a3=done/80
-  end function a3
-  function g(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    real(psb_dpk_) ::  g
-    real(psb_dpk_), intent(in) :: x,y,z
-    g = dzero
-    if (x == done) then
-      g = done
-    else if (x == dzero) then 
-      g = exp(y**2-z**2)
-    end if
-  end function g
+
 
 end module psb_d_pde3d_mod
 

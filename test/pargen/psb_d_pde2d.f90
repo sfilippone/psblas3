@@ -86,6 +86,56 @@ contains
 
   end function d_null_func_2d
 
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) :: b1
+    real(psb_dpk_), intent(in) :: x,y
+    b1=done/sqrt((2*done))
+  end function b1
+  function b2(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  b2
+    real(psb_dpk_), intent(in) :: x,y
+    b2=done/sqrt((2*done))
+  end function b2
+  function c(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  c
+    real(psb_dpk_), intent(in) :: x,y
+    c=0.d0
+  end function c
+  function a1(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  a1   
+    real(psb_dpk_), intent(in) :: x,y
+    a1=done/80
+  end function a1
+  function a2(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  a2
+    real(psb_dpk_), intent(in) :: x,y
+    a2=done/80
+  end function a2
+  function g(x,y)
+    use psb_base_mod, only : psb_dpk_, done, dzero
+    implicit none 
+    real(psb_dpk_) ::  g
+    real(psb_dpk_), intent(in) :: x,y
+    g = dzero
+    if (x == done) then
+      g = done
+    else if (x == dzero) then 
+      g = exp(-y**2)
+    end if
+  end function g
 
 
   !
@@ -465,51 +515,6 @@ contains
     return
   end subroutine psb_d_gen_pde2d
 
-  !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) :: b1
-    real(psb_dpk_), intent(in) :: x,y
-    b1=done/sqrt((2*done))
-  end function b1
-  function b2(x,y)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  b2
-    real(psb_dpk_), intent(in) :: x,y
-    b2=done/sqrt((2*done))
-  end function b2
-  function c(x,y)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  c
-    real(psb_dpk_), intent(in) :: x,y
-    c=0.d0
-  end function c
-  function a1(x,y)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a1   
-    real(psb_dpk_), intent(in) :: x,y
-    a1=done/80
-  end function a1
-  function a2(x,y)
-    use psb_base_mod, only : psb_dpk_
-    real(psb_dpk_) ::  a2
-    real(psb_dpk_), intent(in) :: x,y
-    a2=done/80
-  end function a2
-  function g(x,y)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    real(psb_dpk_) ::  g
-    real(psb_dpk_), intent(in) :: x,y
-    g = dzero
-    if (x == done) then
-      g = done
-    else if (x == dzero) then 
-      g = exp(-y**2)
-    end if
-  end function g
-
 end module psb_d_pde2d_mod
 
 program psb_d_pde2d
@@ -787,6 +792,7 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
+
 end program psb_d_pde2d
 
 
