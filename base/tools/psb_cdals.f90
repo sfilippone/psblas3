@@ -267,7 +267,21 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
-
+  !
+  ! Now that we have initialized indxmap we can convert the
+  ! indices to local numbering.
+  !
+  block
+    integer(psb_ipk_) :: i,nprocs
+    i = 1
+    do while (temp_ovrlap(i) /= -1) 
+      call desc%indxmap%g2lip(temp_ovrlap(i),info)
+      i       = i + 1
+      nprocs  = temp_ovrlap(i)
+      i       = i + 1
+      i       = i + nprocs     
+    enddo
+  end block
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   if (info == psb_success_) deallocate(prc_v,temp_ovrlap,stat=info)

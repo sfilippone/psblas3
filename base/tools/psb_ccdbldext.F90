@@ -84,7 +84,8 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer(psb_ipk_) ::  i, j, err_act,m,&
        &  lovr, lworks,lworkr, n_row,n_col, n_col_prev, &
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
-  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
+  integer(psb_ipk_) :: counter,counter_h, counter_o, counter_e,&
+       & idx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
@@ -255,12 +256,6 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
     Do j=0,n_elem_recv-1
 
       idx = ovrlap(counter+psb_elem_recv_+j)
-      call desc_ov%indxmap%l2g(idx,gidx,info) 
-      If (gidx < 0) then 
-        info=-3
-        call psb_errpush(info,name)
-        goto 9999
-      endif
       call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-ione)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -269,7 +264,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       end if
       orig_ovr(cntov_o)=proc
       orig_ovr(cntov_o+1)=1
-      orig_ovr(cntov_o+2)=gidx
+      orig_ovr(cntov_o+2)=idx
       orig_ovr(cntov_o+3)=-1
       cntov_o=cntov_o+3
     end Do
@@ -356,12 +351,6 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         end If
 
         idx = halo(counter+psb_elem_recv_+j)
-        call desc_ov%l2g(idx,gidx,info) 
-        If (gidx < 0) then 
-          info=-3
-          call psb_errpush(info,name)
-          goto 9999
-        endif
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
@@ -371,7 +360,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
         tmp_ovr_idx(counter_o)   = proc
         tmp_ovr_idx(counter_o+1) = 1
-        tmp_ovr_idx(counter_o+2) = gidx
+        tmp_ovr_idx(counter_o+2) = idx
         tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
         call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-ione)
@@ -400,12 +389,6 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
       Do j=0,n_elem_send-1
 
         idx = halo(counter+psb_elem_send_+j)
-        call desc_ov%l2g(idx,gidx,info) 
-        If (gidx < 0) then 
-          info=-3
-          call psb_errpush(info,name)
-          goto 9999
-        endif
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-ione)
         if (info /= psb_success_) then
           info=psb_err_from_subroutine_
@@ -415,7 +398,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
         tmp_ovr_idx(counter_o)   = proc
         tmp_ovr_idx(counter_o+1) = 1
-        tmp_ovr_idx(counter_o+2) = gidx
+        tmp_ovr_idx(counter_o+2) = idx
         tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
 
@@ -599,7 +582,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
         write(debug_unit,*) me,' ',trim(name),':Calling Crea_index'
       end if
 
-      call psi_crea_index(desc_ov,t_halo_in,t_halo_out,.false.,&
+      call psi_crea_index(desc_ov,t_halo_in,t_halo_out,&
            & nxch,nsnd,nrcv,info)
 
       if (debug_level >= psb_debug_outer_) then 

@@ -1,4 +1,4 @@
-!   
+   
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
 !        Salvatore Filippone    
@@ -142,9 +142,9 @@ module psb_desc_mod
   !     psb_ovrl subroutine. 
   !  
   !  8. When the descriptor is in the BLD state the INDEX vectors contains only 
-  !     the indices to be received, organized as  a sequence 
-  !     of entries of the form (proc,N,(lx1,lx2,...,lxn)) with owning process,
-  !     number of indices (most often but not necessarily N=1), list of local indices.  
+  !     the indices to be received, organized as  a sequence of entries of
+  !     the form (proc,N,(lx1,lx2,...,lxn)) with owning process, number of indices
+  !     (most often but not necessarily N=1), list of local indices.  
   !     This is because we only know the list of halo indices to be received 
   !     as we go about building the sparse matrix pattern, and we want the build 
   !     phase to be loosely synchronized. Thus we record the indices we have to ask 
@@ -1072,7 +1072,7 @@ contains
   end subroutine psb_cd_clone
 
   
-  Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
+  Subroutine psb_cd_get_recv_idx(tmp,desc,data,info)
 
     use psb_error_mod
     use psb_penv_mod
@@ -1082,7 +1082,6 @@ contains
     integer(psb_ipk_), intent(in)                     :: data
     Type(psb_desc_type), Intent(in), target :: desc
     integer(psb_ipk_), intent(out)                    :: info
-    logical, intent(in)                     :: toglob
 
     !     .. Local Scalars ..
     integer(psb_ipk_) ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
@@ -1141,23 +1140,10 @@ contains
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
-        if (toglob) then
-          call desc%indxmap%l2g(idx,gidx,info)
-          If (gidx < 0) then 
-            info=-3
-            call psb_errpush(info,name)
-            goto 9999
-          endif
-          tmp(outcnt)   = proc
-          tmp(outcnt+1) = 1
-          tmp(outcnt+2) = gidx
-          tmp(outcnt+3) = -1
-        else
-          tmp(outcnt)   = proc
-          tmp(outcnt+1) = 1
-          tmp(outcnt+2) = idx
-          tmp(outcnt+3) = -1
-        end if
+        tmp(outcnt)   = proc
+        tmp(outcnt+1) = 1
+        tmp(outcnt+2) = idx
+        tmp(outcnt+3) = -1
         outcnt          = outcnt+3
       end Do
       incnt = incnt+n_elem_recv+n_elem_send+3

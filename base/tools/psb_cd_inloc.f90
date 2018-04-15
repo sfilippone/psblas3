@@ -369,6 +369,22 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call aa%init(iictxt,vl(1:nlu),info)
   end select
 
+
+  !
+  ! Now that we have initialized indxmap we can convert the
+  ! indices to local numbering.
+  !
+  block
+    integer(psb_ipk_) :: i,nprocs
+    i = 1
+    do while (temp_ovrlap(i) /= -1) 
+      call desc%indxmap%g2lip(temp_ovrlap(i),info)
+      i       = i + 1
+      nprocs  = temp_ovrlap(i)
+      i       = i + 1
+      i       = i + nprocs     
+    enddo
+  end block
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)
