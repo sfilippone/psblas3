@@ -67,8 +67,7 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
 
 
   integer(psb_lpk_), allocatable :: answers(:,:), idxsrch(:,:), hproc(:)
-  integer(psb_ipk_), allocatable :: helem(:),&
-       & hhidx(:)
+  integer(psb_ipk_), allocatable :: helem(:), hhidx(:)
   integer(psb_mpk_), allocatable :: hsz(:),hidx(:), &
        & sdsz(:),sdidx(:), rvsz(:), rvidx(:)
   integer(psb_mpk_) :: icomm, minfo, iictxt
@@ -171,8 +170,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
       t3 = psb_wtime()
     end if
 
-    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_ipk_,&
-         & hproc,hsz,hidx,psb_mpi_ipk_,&
+    call mpi_allgatherv(idx,hsz(me+1),psb_mpi_lpk_,&
+         & hproc,hsz,hidx,psb_mpi_lpk_,&
          & icomm,minfo)
     if (gettime) then 
       tamx = psb_wtime() - t3
@@ -268,7 +267,8 @@ subroutine psb_indx_map_fnd_owner(idx,iprc,idxmap,info)
               write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
                    & 'not found : ',size(answers,1),':',answers(:,1)
               info = psb_err_internal_error_
-              call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
+              call psb_errpush(psb_err_internal_error_,&
+                   & name,a_err='out bounds srch ih') 
               goto 9999      
             end if
           end if
