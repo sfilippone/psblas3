@@ -61,7 +61,8 @@ module psb_hash_map_mod
   type, extends(psb_indx_map) :: psb_hash_map
 
     integer(psb_ipk_) :: hashvsize, hashvmask
-    integer(psb_ipk_), allocatable :: hashv(:), glb_lc(:,:), loc_to_glob(:)
+    integer(psb_ipk_), allocatable :: hashv(:)
+    integer(psb_lpk_), allocatable :: glb_lc(:,:), loc_to_glob(:)
     type(psb_hash_type)  :: hash
 
   contains
@@ -78,20 +79,20 @@ module psb_hash_map_mod
 
     procedure, nopass        :: row_extendable => hash_row_extendable
 
-    procedure, pass(idxmap)  :: l2gs1     => hash_l2gs1
-    procedure, pass(idxmap)  :: l2gs2     => hash_l2gs2
-    procedure, pass(idxmap)  :: l2gv1     => hash_l2gv1
-    procedure, pass(idxmap)  :: l2gv2     => hash_l2gv2
+    procedure, pass(idxmap)  :: ll2gs1     => hash_l2gs1
+    procedure, pass(idxmap)  :: ll2gs2     => hash_l2gs2
+    procedure, pass(idxmap)  :: ll2gv1     => hash_l2gv1
+    procedure, pass(idxmap)  :: ll2gv2     => hash_l2gv2
 
-    procedure, pass(idxmap)  :: g2ls1     => hash_g2ls1
-    procedure, pass(idxmap)  :: g2ls2     => hash_g2ls2
-    procedure, pass(idxmap)  :: g2lv1     => hash_g2lv1
-    procedure, pass(idxmap)  :: g2lv2     => hash_g2lv2
+    procedure, pass(idxmap)  :: lg2ls1     => hash_g2ls1
+    procedure, pass(idxmap)  :: lg2ls2     => hash_g2ls2
+    procedure, pass(idxmap)  :: lg2lv1     => hash_g2lv1
+    procedure, pass(idxmap)  :: lg2lv2     => hash_g2lv2
 
-    procedure, pass(idxmap)  :: g2ls1_ins => hash_g2ls1_ins
-    procedure, pass(idxmap)  :: g2ls2_ins => hash_g2ls2_ins
-    procedure, pass(idxmap)  :: g2lv1_ins => hash_g2lv1_ins
-    procedure, pass(idxmap)  :: g2lv2_ins => hash_g2lv2_ins
+    procedure, pass(idxmap)  :: lg2ls1_ins => hash_g2ls1_ins
+    procedure, pass(idxmap)  :: lg2ls2_ins => hash_g2ls2_ins
+    procedure, pass(idxmap)  :: lg2lv1_ins => hash_g2lv1_ins
+    procedure, pass(idxmap)  :: lg2lv2_ins => hash_g2lv2_ins
 
     procedure, pass(idxmap)  :: hash_cpy
     generic, public          :: assignment(=) => hash_cpy
@@ -159,11 +160,11 @@ contains
   subroutine hash_l2gs1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
     if (present(mask)) then 
       if (.not.mask) return
@@ -179,13 +180,21 @@ contains
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin
-    integer(psb_ipk_), intent(out)   :: idxout
+    integer(psb_lpk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
 
-    idxout = idxin
-    call idxmap%l2gip(idxout,info,mask,owned)
+    integer(psb_lpk_) :: idxv(1)
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+
+    idxv(1) = idxin
+    call idxmap%l2gip(idxv,info,owned=owned)
+    idxout = idxv(1)
+
 
   end subroutine hash_l2gs2
 
@@ -193,7 +202,7 @@ contains
   subroutine hash_l2gv1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
@@ -249,7 +258,7 @@ contains
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     integer(psb_ipk_), intent(in)    :: idxin(:)
-    integer(psb_ipk_), intent(out)   :: idxout(:)
+    integer(psb_lpk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
@@ -270,11 +279,11 @@ contains
   subroutine hash_g2ls1(idx,idxmap,info,mask,owned)
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: idxv(1)
+    integer(psb_lpk_) :: idxv(1)
     info = 0
 
     if (present(mask)) then 
@@ -290,14 +299,21 @@ contains
   subroutine hash_g2ls2(idxin,idxout,idxmap,info,mask,owned)
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     logical, intent(in), optional :: owned
+    integer(psb_lpk_) :: idxv(1)
+    info = 0
 
-    idxout = idxin
-    call idxmap%g2lip(idxout,info,mask,owned)
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+
+    idxv(1) = idxin
+    call idxmap%g2lip(idxv,info,owned=owned)
+    idxout = idxv(1) 
 
   end subroutine hash_g2ls2
 
@@ -307,11 +323,12 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, nrm 
+    integer(psb_ipk_) :: i, is, mglob, lip, nrow, nrm
+    integer(psb_lpk_) :: ncol, ip, tlip
     integer(psb_mpk_) :: ictxt, iam, np
     logical :: owned_
 
@@ -358,8 +375,10 @@ contains
               cycle
             endif
             call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,nrm)
-            if (lip < 0) &
-                 &  call psb_hash_searchkey(ip,lip,idxmap%hash,info)
+            if (lip < 0) then 
+              call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+              lip = tlip
+            end if
             if (owned_) then 
               if (lip<=nrow) then 
                 idx(i) = lip
@@ -394,8 +413,10 @@ contains
             cycle
           endif
           call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,nrm)
-          if (lip < 0) &
-               &  call psb_hash_searchkey(ip,lip,idxmap%hash,info)
+          if (lip < 0) then
+            call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
+            lip = tlip
+          end if
           if (owned_) then 
             if (lip<=nrow) then 
               idx(i) = lip
@@ -419,20 +440,23 @@ contains
   end subroutine hash_g2lv1
 
   subroutine hash_g2lv2(idxin,idxout,idxmap,info,mask,owned)
+    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(in) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
     integer(psb_ipk_) :: is, im
-
+    integer(psb_lpk_), allocatable :: tidx(:)
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip(idxout(1:im),info,mask,owned)
+    call psb_realloc(im,tidx,info)
+    tidx(1:im) = idxin(1:im)
+    call idxmap%g2lip(tidx(1:im),info,mask,owned)
+    idxout(1:im) = tidx(1:im)
     if (is > im) then 
       write(0,*) 'g2lv2 err -3'
       info = -3 
@@ -447,12 +471,13 @@ contains
     use psb_sort_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx
+    integer(psb_lpk_), intent(inout) :: idx
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
-    integer(psb_ipk_) :: idxv(1), lidxv(1)
+    integer(psb_lpk_) :: idxv(1)  
+    integer(psb_ipk_) :: lidxv(1)
 
     info = 0
     if (present(mask)) then 
@@ -473,15 +498,28 @@ contains
   subroutine hash_g2ls2_ins(idxin,idxout,idxmap,info,mask,lidx)
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin
+    integer(psb_lpk_), intent(in)    :: idxin
     integer(psb_ipk_), intent(out)   :: idxout
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask
     integer(psb_ipk_), intent(in), optional :: lidx
 
+    integer(psb_lpk_) :: idxv(1)  
+    integer(psb_ipk_) :: lidxv(1)
 
-    idxout = idxin
-    call idxmap%g2lip_ins(idxout,info,mask=mask,lidx=lidx)
+    info = 0
+    if (present(mask)) then 
+      if (.not.mask) return
+    end if
+
+    idxv(1) = idxin
+    if (present(lidx)) then 
+      lidxv(1) = lidx
+      call idxmap%g2lip_ins(idxv,info,lidx=lidxv)
+    else
+      call idxmap%g2lip_ins(idxv,info)
+    end if
+    idxout = idxv(1) 
 
   end subroutine hash_g2ls2_ins
 
@@ -493,13 +531,14 @@ contains
     use psb_penv_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(inout) :: idx(:)
+    integer(psb_lpk_), intent(inout) :: idx(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional    :: mask(:)
     integer(psb_ipk_), intent(in), optional    :: lidx(:)
 
-    integer(psb_ipk_) :: i, is, mglob, ip, lip, nrow, ncol, &
-         & nxt, err_act
+    integer(psb_ipk_) :: i, is, lip, nrow, ncol, &
+         & err_act
+    integer(psb_lpk_) :: mglob, ip, nxt, tlip
     integer(psb_ipk_) :: ictxt, me, np
     character(len=20)  :: name,ch_err
 
@@ -540,18 +579,20 @@ contains
                 idx(i) = -1
                 cycle
               endif
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
-              if (lip < 0) then 
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+                   & idxmap%hashv,idxmap%glb_lc,ncol)
+              if (lip < 0) then
+                tlip  = lip
                 nxt = lidx(i)
                 if (nxt <= nrow) then 
                   idx(i) = -1
                   cycle
                 endif
-                call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 if (info >=0) then 
-                  if (nxt == lip) then 
+                  if (nxt == tlip) then 
                     ncol = max(ncol,nxt)
-                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
                       info=1
                       ch_err='psb_ensure_size'
@@ -593,12 +634,13 @@ contains
                 idx(i) = -1
                 cycle
               endif
-              call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
-
+              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+              lip = tlip
+              
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
                     ch_err='psb_ensure_size'
@@ -636,13 +678,15 @@ contains
               endif
               nxt = ncol + 1 
               call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
-              if (lip < 0) &
-                   &  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+              if (lip < 0) then
+                call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+                lip = tlip
+              end if
 
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = nxt
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
                     ch_err='psb_ensure_size'
@@ -678,13 +722,15 @@ contains
             endif
             nxt = ncol + 1 
             call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
-            if (lip < 0) &
-                 &  call psb_hash_searchinskey(ip,lip,nxt,idxmap%hash,info)
+            if (lip < 0) then
+              call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
+              lip = tlip
+            end if
 
             if (info >=0) then 
               if (nxt == lip) then 
                 ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                 if (info /= psb_success_) then
                   info=1
                   ch_err='psb_ensure_size'
@@ -724,20 +770,23 @@ contains
   end subroutine hash_g2lv1_ins
 
   subroutine hash_g2lv2_ins(idxin,idxout,idxmap,info,mask,lidx)
+    use psb_realloc_mod
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
-    integer(psb_ipk_), intent(in)    :: idxin(:)
+    integer(psb_lpk_), intent(in)    :: idxin(:)
     integer(psb_ipk_), intent(out)   :: idxout(:)
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: lidx(:)
-
+    integer(psb_lpk_), allocatable   :: tidx(:)
     integer(psb_ipk_) :: is, im
 
     is = size(idxin)
     im = min(is,size(idxout))
-    idxout(1:im) = idxin(1:im)
-    call idxmap%g2lip_ins(idxout(1:im),info,mask=mask,lidx=lidx)
+    call psb_realloc(im,tidx,info)
+    tidx(1:im) = idxin(1:im)
+    call idxmap%g2lip_ins(tidx(1:im),info,mask=mask,lidx=lidx)
+    idxout(1:im) = tidx(1:im)
     if (is > im) then 
       write(0,*) 'g2lv2_ins err -3'
       info = -3 
@@ -756,12 +805,14 @@ contains
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_mpk_), intent(in)  :: ictxt
-    integer(psb_ipk_), intent(in)  :: vl(:)
+    integer(psb_lpk_), intent(in)  :: vl(:)
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
-    integer(psb_ipk_) ::  i,  nlu, nl, m, nrt,int_err(5)
-    integer(psb_ipk_), allocatable :: vlu(:), ix(:)
+    integer(psb_ipk_) ::  i,  nlu, nl, nrt,int_err(5)
+    integer(psb_lpk_) ::  m
+    integer(psb_lpk_), allocatable :: vlu(:)
+    integer(psb_lpk_), allocatable :: ix(:)
     character(len=20), parameter :: name='hash_map_init_vl'
 
     info = 0
@@ -831,8 +882,9 @@ contains
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
-    integer(psb_ipk_) :: i, j, nl, n, int_err(5)
-    integer(psb_ipk_), allocatable :: vlu(:)
+    integer(psb_ipk_) :: i, j, nl, int_err(5)
+    integer(psb_lpk_) :: n
+    integer(psb_lpk_), allocatable :: vlu(:)
 
     info = 0
     call psb_info(ictxt,iam,np) 
@@ -886,7 +938,8 @@ contains
     implicit none 
     class(psb_hash_map), intent(inout) :: idxmap
     integer(psb_mpk_), intent(in)  :: ictxt
-    integer(psb_ipk_), intent(in)  :: vlu(:), nl, ntot
+    integer(psb_lpk_), intent(in)  :: vlu(:), ntot
+    integer(psb_ipk_), intent(in)  :: nl
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
@@ -1127,8 +1180,8 @@ contains
   end subroutine hash_inner_cnvs1
 
   subroutine hash_inner_cnvs2(x,y,hashmask,hashv,glb_lc,nrm)
-    integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
-    integer(psb_ipk_), intent(in)  :: x
+    integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:)
+    integer(psb_lpk_), intent(in)  :: x, glb_lc(:,:)
     integer(psb_ipk_), intent(out) :: y
     integer(psb_ipk_), intent(in)  :: nrm
     integer(psb_ipk_) :: ih, key, idx,nh,tmp,lb,ub,lm
@@ -1175,10 +1228,11 @@ contains
 
 
   subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
-    integer(psb_ipk_), intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
+    integer(psb_ipk_), intent(in)  :: n,hashmask,hashv(0:)
+    integer(psb_lpk_), intent(in)  :: glb_lc(:,:)
     logical, intent(in), optional  :: mask(:)
     integer(psb_ipk_), intent(in), optional  :: nrm
-    integer(psb_ipk_), intent(inout) :: x(:)
+    integer(psb_lpk_), intent(inout) :: x(:)
 
     integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
     !
@@ -1460,9 +1514,11 @@ contains
     implicit none 
     class(psb_hash_map), intent(inout)    :: idxmap
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: err_act, nr,nc,k, nl, ntot
+    integer(psb_ipk_) :: err_act, nr,nc,k, nl
+    integer(psb_lpk_) :: ntot
     integer(psb_mpk_) :: ictxt, me, np
-    integer(psb_ipk_), allocatable :: idx(:),lidx(:)
+    integer(psb_ipk_), allocatable :: lidx(:)
+    integer(psb_lpk_), allocatable :: idx(:)
     character(len=20)  :: name='hash_reinit'
     logical, parameter :: debug=.false.
 

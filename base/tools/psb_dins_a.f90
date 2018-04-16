@@ -57,7 +57,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)              ::  m
-  integer(psb_ipk_), intent(in)              ::  irw(:)
+  integer(psb_lpk_), intent(in)              ::  irw(:)
   real(psb_dpk_), intent(in)  ::  val(:)
   real(psb_dpk_),intent(inout)      ::  x(:)
   type(psb_desc_type), intent(in)  ::  desc_a
@@ -67,7 +67,8 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
@@ -239,7 +240,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl,local)
 
   !....parameters...
   integer(psb_ipk_), intent(in)             ::  m
-  integer(psb_ipk_), intent(in)             ::  irw(:)
+  integer(psb_lpk_), intent(in)             ::  irw(:)
   real(psb_dpk_), intent(in) ::  val(:,:)
   real(psb_dpk_),intent(inout)     ::  x(:,:)
   type(psb_desc_type), intent(in) ::  desc_a
@@ -249,7 +250,8 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl,local)
 
   !locals.....
   integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
-       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_

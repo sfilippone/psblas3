@@ -1,4 +1,4 @@
-subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,vll,flag,nl,repl, globalcheck,lidx)
+subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx)
   use psb_desc_mod
   use psb_serial_mod
   use psb_const_mod
@@ -8,22 +8,23 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,vll,flag,nl,repl, globa
   use psi_mod
   implicit None
   procedure(psb_parts)               :: parts
-  integer(psb_ipk_), intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl,lidx(:)
-  integer(psb_lpk_), intent(in)               :: vll(:)
-  integer(psb_ipk_), intent(in)               :: flag
+  integer(psb_lpk_), intent(in)       :: mg,ng, vl(:)
+  integer(psb_ipk_), intent(in)       :: ictxt, vg(:), lidx(:),nl
+  integer(psb_ipk_), intent(in)       :: flag
   logical, intent(in)               :: repl, globalcheck
   integer(psb_ipk_), intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc
 
-  optional :: mg,ng,parts,vg,vl,vll,flag,nl,repl, globalcheck,lidx
+  optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck,lidx
 
   interface 
     subroutine psb_cdals(m, n, parts, ictxt, desc, info)
       use psb_desc_mod
       procedure(psb_parts)               :: parts
-      integer(psb_ipk_), intent(in)                 :: m,n,ictxt
-      Type(psb_desc_type), intent(out)    :: desc
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_lpk_), intent(in)      :: m,n
+      integer(psb_ipk_), intent(in)      :: ictxt
+      Type(psb_desc_type), intent(out)   :: desc
+      integer(psb_ipk_), intent(out)     :: info
     end subroutine psb_cdals
     subroutine psb_cdalv(v, ictxt, desc, info, flag)
       use psb_desc_mod
@@ -35,31 +36,24 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,vll,flag,nl,repl, globa
     subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
       use psb_desc_mod
       implicit None
-      integer(psb_ipk_), intent(in)               :: ictxt, v(:)
-      integer(psb_ipk_), intent(out)              :: info
-      type(psb_desc_type), intent(out)  :: desc
-      logical, intent(in), optional     :: globalcheck
-      integer(psb_ipk_), intent(in), optional     :: idx(:)
-    end subroutine psb_cd_inloc
-    subroutine psb_cd_inlocl(v, ictxt, desc, info, globalcheck,idx)
-      use psb_desc_mod
-      implicit None
       integer(psb_ipk_), intent(in)               :: ictxt
       integer(psb_lpk_), intent(in)               :: v(:)
       integer(psb_ipk_), intent(out)              :: info
       type(psb_desc_type), intent(out)  :: desc
       logical, intent(in), optional     :: globalcheck
       integer(psb_ipk_), intent(in), optional     :: idx(:)
-    end subroutine psb_cd_inlocl
+    end subroutine psb_cd_inloc
     subroutine psb_cdrep(m, ictxt, desc,info)
       use psb_desc_mod
-      integer(psb_ipk_), intent(in)               :: m,ictxt
+      integer(psb_lpk_), intent(in)     :: m
+      integer(psb_ipk_), intent(in)     :: ictxt
       Type(psb_desc_type), intent(out)  :: desc
-      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psb_cdrep
   end interface
   character(len=20)   :: name
-  integer(psb_ipk_) :: err_act, n_, flag_, i, me, np, nlp, nnv, lr
+  integer(psb_ipk_) :: err_act, flag_, i, me, np, nlp, nnv, lr
+  integer(psb_lpk_) :: n_
   integer(psb_ipk_), allocatable :: itmpsz(:) 
   integer(psb_mpk_) :: iictxt
  
@@ -149,8 +143,9 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,vll,flag,nl,repl, globa
     end if
     if (info == psb_success_) then 
       select type(aa => desc%indxmap) 
-      type is (psb_repl_map) 
-        call aa%repl_map_init(iictxt,nl,info)
+      type is (psb_repl_map)
+        n_ = nl
+        call aa%repl_map_init(iictxt,n_,info)
       type is (psb_gen_block_map) 
         call aa%gen_block_map_init(iictxt,nl,info)
       class default 

@@ -126,7 +126,8 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
   real(psb_spk_) :: alpha, tau, tau1, beta, delta
   real(psb_dpk_) :: derr
   integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
-  integer(psb_ipk_) :: n_col, mglob, naux, err_act
+  integer(psb_ipk_) :: n_col, naux, err_act
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   real(psb_spk_), allocatable, target   :: aux(:)
@@ -165,9 +166,9 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
   endif
 
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if (info == psb_success_)&
-       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+       & call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')

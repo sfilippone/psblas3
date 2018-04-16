@@ -52,7 +52,8 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
-       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
+       & err_act, iia, jja, mdim, ndim
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   character(len=20)      :: name, ch_err
   real(psb_spk_), allocatable :: v(:)
 

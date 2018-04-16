@@ -29,10 +29,10 @@
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 !    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!   
+!    
 !   CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !   C                                                                      C
 !   C  References:                                                         C
@@ -130,8 +130,9 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
   real(psb_spk_) :: scal, gm, rti, rti1
-  integer(psb_ipk_) ::litmax, naux, mglob, it,k, itrace_,&
+  integer(psb_ipk_) ::litmax, naux, it, k, itrace_,&
        & n_row, n_col, nl, int_err(5)
+  integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_, err_act
@@ -216,13 +217,13 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
-  call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')

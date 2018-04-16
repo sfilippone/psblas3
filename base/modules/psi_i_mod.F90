@@ -30,13 +30,13 @@
 !   
 !    
 module psi_i_mod
+
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_epk_, psb_lpk_
   use psi_m_comm_a_mod
   use psi_e_comm_a_mod
   use psb_i_base_vect_mod, only : psb_i_base_vect_type 
   use psb_i_base_multivect_mod, only : psb_i_base_multivect_type 
   use psi_i_comm_v_mod
-
   
   interface psi_compute_size
     subroutine psi_i_compute_size(desc_data,&
@@ -58,13 +58,12 @@ module psi_i_mod
   end interface
 
   interface psi_crea_index
-    subroutine psi_i_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
+    subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
       import 
       type(psb_desc_type), intent(in)     :: desc_a
       integer(psb_ipk_), intent(out)                :: nxch,nsnd,nrcv
       integer(psb_ipk_), intent(in)                 :: index_in(:)
       integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
-      logical                             :: glob_idx
       integer(psb_ipk_), intent(out)      :: info
     end subroutine psi_i_crea_index
   end interface
@@ -80,13 +79,12 @@ module psi_i_mod
 
   interface psi_desc_index
     subroutine psi_i_desc_index(desc,index_in,dep_list,&
-         & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+         & length_dl,nsnd,nrcv,desc_index,info)
       import 
       type(psb_desc_type) :: desc
       integer(psb_ipk_) :: index_in(:),dep_list(:)
       integer(psb_ipk_),allocatable  :: desc_index(:)
       integer(psb_ipk_) :: length_dl,nsnd,nrcv
-      logical         :: isglob_in
       integer(psb_ipk_) :: info
     end subroutine psi_i_desc_index
   end interface
@@ -204,5 +202,6 @@ module psi_i_mod
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_i_bld_ovr_mst
   end interface
+
 end module psi_i_mod
 

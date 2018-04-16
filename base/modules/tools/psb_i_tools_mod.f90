@@ -32,6 +32,7 @@
 Module psb_i_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_success_
   use psb_i_vect_mod, only : psb_i_base_vect_type, psb_i_vect_type
+  use psb_l_vect_mod, only : psb_l_vect_type
   use psb_i_multivect_mod, only : psb_i_base_multivect_type, psb_i_multivect_type
 
   interface  psb_geall
@@ -125,7 +126,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -137,7 +138,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x
-      type(psb_i_vect_type), intent(inout)       :: irw
+      type(psb_l_vect_type), intent(inout)       :: irw
       type(psb_i_vect_type), intent(inout)    :: val
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -149,7 +150,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_vect_type), intent(inout) :: x(:)
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -161,7 +162,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(in)              :: m
       type(psb_desc_type), intent(in)  :: desc_a
       type(psb_i_multivect_type), intent(inout) :: x
-      integer(psb_ipk_), intent(in)              :: irw(:)
+      integer(psb_lpk_), intent(in)              :: irw(:)
       integer(psb_ipk_), intent(in)    :: val(:,:)
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), optional, intent(in)    :: dupl
@@ -170,187 +171,4 @@ Module psb_i_tools_mod
   end interface
 
   
-  interface psb_glob_to_loc
-    subroutine psb_glob_to_loc2v(x,y,desc_a,info,iact,owned)
-      import
-      implicit none
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(in)                 ::  x(:)  
-      integer(psb_ipk_),intent(out)                ::  y(:)  
-      integer(psb_ipk_), intent(out)               ::  info
-      logical, intent(in),  optional     :: owned
-      character, intent(in), optional    ::  iact
-    end subroutine psb_glob_to_loc2v
-    subroutine psb_glob_to_loc1v(x,desc_a,info,iact,owned)
-      import
-      implicit none
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(inout)              ::  x(:)  
-      integer(psb_ipk_), intent(out)               ::  info
-      logical, intent(in),  optional     :: owned
-      character, intent(in), optional    ::  iact
-    end subroutine psb_glob_to_loc1v
-    subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
-      import
-      implicit none 
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(in)                 ::  x
-      integer(psb_ipk_),intent(out)                ::  y  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-      logical, intent(in),  optional     :: owned
-    end subroutine psb_glob_to_loc2s
-    subroutine psb_glob_to_loc1s(x,desc_a,info,iact,owned)
-      import
-      implicit none 
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(inout)              ::  x  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-      logical, intent(in),  optional     :: owned
-    end subroutine psb_glob_to_loc1s
-  end interface
-
-  interface psb_loc_to_glob
-    subroutine psb_loc_to_glob2v(x,y,desc_a,info,iact)
-      import
-      implicit none
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(in)                 ::  x(:)  
-      integer(psb_ipk_),intent(out)                ::  y(:)  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob2v
-    subroutine psb_loc_to_glob1v(x,desc_a,info,iact)
-      import
-      implicit none
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(inout)              ::  x(:)  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob1v
-    subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
-      import
-      implicit none 
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(in)                 ::  x
-      integer(psb_ipk_),intent(out)                ::  y  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob2s
-    subroutine psb_loc_to_glob1s(x,desc_a,info,iact)
-      import
-      implicit none
-      type(psb_desc_type), intent(in)    ::  desc_a
-      integer(psb_ipk_),intent(inout)              ::  x  
-      integer(psb_ipk_), intent(out)               ::  info
-      character, intent(in), optional    ::  iact
-    end subroutine psb_loc_to_glob1s
-
-  end interface
-
-
-  interface psb_is_owned
-    module procedure psb_is_owned
-  end interface
-
-  interface psb_is_local
-    module procedure psb_is_local
-  end interface
-
-  interface psb_owned_index
-    module procedure psb_owned_index, psb_owned_index_v
-  end interface
-
-  interface psb_local_index
-    module procedure psb_local_index, psb_local_index_v
-  end interface
-
-contains
-
-  function psb_is_owned(idx,desc)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx
-    type(psb_desc_type), intent(in) :: desc
-    logical :: psb_is_owned
-    logical :: res
-    integer(psb_ipk_) :: info
-
-    call psb_owned_index(res,idx,desc,info)
-    if (info /= psb_success_) res=.false.
-    psb_is_owned = res
-  end function psb_is_owned
-
-  function psb_is_local(idx,desc)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx
-    type(psb_desc_type), intent(in) :: desc
-    logical :: psb_is_local
-    logical :: res
-    integer(psb_ipk_) :: info
-
-    call psb_local_index(res,idx,desc,info)
-    if (info /= psb_success_) res=.false.
-    psb_is_local = res
-  end function psb_is_local
-
-  subroutine psb_owned_index(res,idx,desc,info)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx
-    type(psb_desc_type), intent(in) :: desc
-    logical, intent(out) :: res
-    integer(psb_ipk_), intent(out) :: info
-
-    integer(psb_ipk_) :: lx
-
-    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
-
-    res = (lx>0)
-  end subroutine psb_owned_index
-
-  subroutine psb_owned_index_v(res,idx,desc,info)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx(:)
-    type(psb_desc_type), intent(in) :: desc
-    logical, intent(out) :: res(:)
-    integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_), allocatable  :: lx(:)
-
-    allocate(lx(size(idx)),stat=info)
-    res=.false.
-    if (info /= psb_success_) return
-    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
-
-    res = (lx>0)
-  end subroutine psb_owned_index_v
-
-  subroutine psb_local_index(res,idx,desc,info)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx
-    type(psb_desc_type), intent(in) :: desc
-    logical, intent(out) :: res
-    integer(psb_ipk_), intent(out) :: info
-
-    integer(psb_ipk_) :: lx
-
-    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
-
-    res = (lx>0)
-  end subroutine psb_local_index
-
-  subroutine psb_local_index_v(res,idx,desc,info)
-    implicit none 
-    integer(psb_ipk_), intent(in) :: idx(:)
-    type(psb_desc_type), intent(in) :: desc
-    logical, intent(out) :: res(:)
-    integer(psb_ipk_), intent(out) :: info    
-    integer(psb_ipk_), allocatable  :: lx(:)
-
-    allocate(lx(size(idx)),stat=info)
-    res=.false.
-    if (info /= psb_success_) return
-    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
-
-    res = (lx>0)
-  end subroutine psb_local_index_v
 end module psb_i_tools_mod

@@ -942,6 +942,7 @@ subroutine psb_z_base_clone(a,b,info)
   class(psb_z_base_sparse_mat), allocatable, intent(inout) :: b
   integer(psb_ipk_), intent(out) :: info 
 
+  info = 0 
   if (allocated(b)) then
     call b%free()
     deallocate(b, stat=info)
@@ -953,12 +954,8 @@ subroutine psb_z_base_clone(a,b,info)
 
   ! Do not use SOURCE allocation: this makes sure that
   ! memory allocated elsewhere is treated properly. 
-#if defined(HAVE_MOLD)
   allocate(b,mold=a,stat=info)
   if (info /= psb_success_) info = psb_err_alloc_dealloc_
-#else
-  call a%mold(b,info)
-#endif
   if (info == psb_success_) call b%cp_from_fmt(a, info)    
     
 end subroutine psb_z_base_clone
@@ -1954,11 +1951,7 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
         call psb_errpush(info,name,i_err=ierr)
         goto 9999
       end if
-#ifdef HAVE_MOLD
       allocate(tmpv, mold=y,stat=info)
-#else
-      call y%mold(tmpv,info)
-#endif
       if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
       if (info == psb_success_) call tmpv%mlt(zone,d%v(1:nac),x,zzero,info) 
       if (info == psb_success_)&
@@ -1983,11 +1976,7 @@ subroutine psb_z_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
         if (info == psb_success_)  call y%mlt(d%v(1:nar),info)
 
       else
-#ifdef HAVE_MOLD
         allocate(tmpv, mold=y,stat=info)
-#else 
-        call y%mold(tmpv,info)
-#endif
         if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
         if (info == psb_success_)&
              & call a%inner_spsm(alpha,x,zzero,tmpv,info,trans)

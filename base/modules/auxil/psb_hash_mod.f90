@@ -83,6 +83,10 @@ module psb_hash_mod
     module procedure psb_hash_searchinskey, psb_hash_lsearchinskey
   end interface psb_hash_searchinskey
   
+  interface psb_hash_searchkey
+    module procedure psb_hash_searchkey, psb_hash_lsearchkey
+  end interface psb_hash_searchkey
+  
   interface psb_move_alloc
     module procedure HashTransfer
   end interface
@@ -534,5 +538,45 @@ contains
       if (hk < 0) hk = hk + hsize
     end do
   end subroutine psb_hash_searchkey
+
+  subroutine psb_hash_lsearchkey(key,val,hash,info)
+    integer(psb_lpk_), intent(in)   :: key
+    type(psb_hash_type)   :: hash
+    integer(psb_lpk_), intent(out)  :: val
+    integer(psb_ipk_), intent(out)  :: info 
+
+    integer(psb_ipk_) :: hsize,hmask, hk, hd
+
+    info  = HashOK
+    if (.not.allocated(hash%table) ) then 
+      val  = HashFreeEntry
+      return
+    end if
+    hsize = hash%hsize
+    hmask = hash%hmask
+    hk = iand(hashval(key),hmask)
+    if (hk == 0) then 
+      hd = 1
+    else 
+      hd = hsize - hk 
+      hd = ior(hd,1)
+    end if
+    
+    hash%nsrch = hash%nsrch + 1
+    do 
+      hash%nacc = hash%nacc + 1
+      if (hash%table(hk,1) == key) then 
+        val  = hash%table(hk,2)
+        return
+      end if
+      if (hash%table(hk,1) == HashFreeEntry) then 
+        val  = HashFreeEntry
+!  !$        info = HashNotFound
+        return
+      end if
+      hk = hk - hd 
+      if (hk < 0) hk = hk + hsize
+    end do
+  end subroutine psb_hash_lsearchkey
 
 end module psb_hash_mod

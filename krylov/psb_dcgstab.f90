@@ -113,8 +113,9 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
   type(psb_d_vect_type) :: q, r, p, v, s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, naux, mglob, it,itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, it,itrace_,&
        & n_row, n_col
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   integer(psb_ipk_), Parameter :: irmax = 8
@@ -165,13 +166,13 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   ! =    write(0,*) 'Warning: different dynamic types for X and B '
   ! =  end if
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
-  call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if (psb_errstatus_fatal()) then
     info=psb_err_from_subroutine_     
     call psb_errpush(info,name,a_err='psb_chkvect on B')

@@ -129,7 +129,7 @@ contains
     
     integer(psb_ipk_) :: ip, nerv, nesd, totxch,idxr,idxs
     integer(psb_ipk_) :: ictxt, me, np, data_, info, verb_
-    integer(psb_ipk_), allocatable :: gidx(:)
+    integer(psb_lpk_), allocatable :: gidx(:)
     class(psb_i_base_vect_type), pointer :: vpnt
     
     ictxt = desc_p%get_ctxt()

@@ -52,8 +52,7 @@
 ! nrcv         - integer               Total receive buffer size    on the calling process
 !
 !  
-subroutine psi_i_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
-
+subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
   use psb_realloc_mod
   use psb_desc_mod
   use psb_error_mod
@@ -65,7 +64,6 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,in
   integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
   integer(psb_ipk_), intent(in)                 :: index_in(:)
   integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
-  logical                             :: glob_idx
 
   !         ....local scalars...      
   integer(psb_ipk_) :: ictxt, me, np, mode, err_act, dl_lda
@@ -135,7 +133,7 @@ subroutine psi_i_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,in
        & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index'
   ! Do the actual format conversion. 
   call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
-       & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
+       & length_dl(me),nsnd,nrcv, index_out,info)
   if(debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
        & size(index_out)

@@ -58,8 +58,8 @@ subroutine  psb_zgather_vect(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
+  integer(psb_ipk_) :: ierr(5), err_act, jlx, ilx, lda_locx, lda_globx, i
+  integer(psb_lpk_) :: m, n, k, ilocx,  jlocx, idx, iglobx, jglobx
   complex(psb_dpk_), allocatable :: llocx(:)
   character(len=20)        :: name, ch_err
 
@@ -171,8 +171,8 @@ subroutine  psb_zgather_multivect(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer(psb_mpk_) :: ictxt, np, me, root, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, n, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
+  integer(psb_ipk_) :: ierr(5), err_act, jlx, ilx, lda_locx, lda_globx, i 
+  integer(psb_lpk_) :: m, n, k, ilocx, jlocx, idx, iglobx, jglobx
   complex(psb_dpk_), allocatable :: llocx(:,:)
   character(len=20)        :: name, ch_err
 

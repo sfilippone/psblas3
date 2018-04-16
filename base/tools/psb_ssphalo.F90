@@ -83,7 +83,13 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
+#if defined(INT_I4_L8)
+  ! If globals are 8 bytes but locals are not, things get tricky
+  integer(psb_ipk_), allocatable  :: liasnd(:), ljasnd(:)
+  integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:), iarcv(:), jarcv(:)
+#else
   integer(psb_ipk_), allocatable  :: iasnd(:), jasnd(:)
+#endif  
   real(psb_spk_), allocatable :: valsnd(:)
   type(psb_s_coo_sparse_mat), allocatable :: acoo
   integer(psb_ipk_), pointer  :: idxv(:)
@@ -152,6 +158,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   If (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Data selector',data_
+
   select case(data_) 
   case(psb_comm_halo_,psb_comm_ext_ ) 
     ! Do not accept OVRLAP_INDEX any longer. 
@@ -226,17 +233,103 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
+  mat_recv = iszr
+  iszs=sum(sdsz)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),iasnd,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
+#if defined(INT_I4_L8)
+  ! If globals are 8 bytes but locals are not, things get tricky
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),liasnd,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),ljasnd,info)
+  
+  if (info == psb_success_) call psb_ensure_size(max(iszr,1),iarcv,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszr,1),jarcv,info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_;    ch_err='psb_sp_reall'
+    call psb_errpush(info,name,a_err=ch_err);  goto 9999
+  end if
+    
+  l1  = 0
+  ipx = 1
+  counter=1
+  idx = 0
+
+  tot_elem=0
+  Do 
+    proc=ipdxv(counter)
+    if (proc == -1) exit 
+    n_el_recv=ipdxv(counter+psb_n_elem_recv_)
+    counter=counter+n_el_recv
+    n_el_send=ipdxv(counter+psb_n_elem_send_)
+
+    Do j=0,n_el_send-1
+      idx = ipdxv(counter+psb_elem_send_+j)
+      n_elem = a%get_nz_row(idx)
+      call a%csget(idx,idx,ngtz,liasnd,ljasnd,valsnd,info,&
+           &  append=.true.,nzin=tot_elem)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        ch_err='psb_sp_getrow'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+      tot_elem=tot_elem+n_elem
+    Enddo
+    ipx = ipx + 1 
+    counter   = counter+n_el_send+3
+  Enddo
+  nz = tot_elem
+
+  if (rowcnv_) then
+    call psb_loc_to_glob(liasnd(1:nz),iasnd(1:nz),desc_a,info,iact='I')
+  else
+    iasnd(1:nz) = liasnd(1:nz)
+  end if
+  if (colcnv_) then
+    call psb_loc_to_glob(ljasnd(1:nz),jasnd(1:nz),desc_a,info,iact='I')
+  else
+    jasnd(1:nz) = ljasnd(1:nz)
+  end if
+  
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_;    ch_err='psb_loc_to_glob'
+    call psb_errpush(info,name,a_err=ch_err);  goto 9999
+  end if
+
+
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,psb_mpi_r_spk_,&
+       & acoo%val,rvsz,brvindx,psb_mpi_r_spk_,icomm,minfo)
+  call mpi_alltoallv(iasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & iarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
+  call mpi_alltoallv(jasnd,sdsz,bsdindx,psb_mpi_lpk_,&
+       & jarcv,rvsz,brvindx,psb_mpi_lpk_,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_sp_reall'
+    ch_err='mpi_alltoallv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  mat_recv = iszr
-  iszs=sum(sdsz)
-  call psb_ensure_size(max(iszs,1),iasnd,info)
-  if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
-  if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
+
+  !
+  ! Convert into local numbering 
+  !
+  if (rowcnv_) then
+    call psb_glob_to_loc(iarcv(1:iszr),acoo%ia(1:iszr),desc_a,info,iact='I')
+  else
+    acoo%ia(1:iszr) = iarcv(1:iszr)
+  end if
+  if (colcnv_) then
+    call psb_glob_to_loc(jarcv(1:iszr),acoo%ja(1:iszr),desc_a,info,iact='I')
+  else
+    acoo%ja(1:iszr) = jarcv(1:iszr)
+  end if
+
+#else
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_;    ch_err='psb_sp_reall'
+    call psb_errpush(info,name,a_err=ch_err);  goto 9999
+  end if
 
   l1  = 0
   ipx = 1
@@ -297,7 +390,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   !
   if (rowcnv_) call psb_glob_to_loc(acoo%ia(1:iszr),desc_a,info,iact='I')
   if (colcnv_) call psb_glob_to_loc(acoo%ja(1:iszr),desc_a,info,iact='I')
-
+#endif
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psbglob_to_loc'

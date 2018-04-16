@@ -93,7 +93,7 @@ module psb_const_mod
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_epk_
 #elif defined(INT_I8_L8) 
-  integer, parameter  :: psb_ipk_ = psb_mpk_
+  integer, parameter  :: psb_ipk_ = psb_epk_
   integer, parameter  :: psb_lpk_ = psb_epk_
 #else
   ! Unsupported combination, compilation will stop later on
@@ -101,13 +101,13 @@ module psb_const_mod
   integer, parameter  :: psb_lpk_ = -1
 #endif 
   
-  integer(psb_ipk_), save        :: psb_sizeof_sp
-  integer(psb_ipk_), save        :: psb_sizeof_dp
-  integer(psb_ipk_), save        :: psb_sizeof_i2p
-  integer(psb_ipk_), save        :: psb_sizeof_mp
-  integer(psb_ipk_), save        :: psb_sizeof_ep
-  integer(psb_ipk_), save        :: psb_sizeof_ip
-  integer(psb_ipk_), save        :: psb_sizeof_lp
+  integer(psb_ipk_), save      :: psb_sizeof_sp
+  integer(psb_ipk_), save      :: psb_sizeof_dp
+  integer(psb_ipk_), save      :: psb_sizeof_i2p
+  integer(psb_ipk_), save      :: psb_sizeof_mp
+  integer(psb_ipk_), save      :: psb_sizeof_ep
+  integer(psb_ipk_), save      :: psb_sizeof_ip
+  integer(psb_ipk_), save      :: psb_sizeof_lp
   !
   ! Integer type identifiers for MPI operations. 
   !

@@ -96,7 +96,7 @@ Module psb_m_tools_a_mod
       integer(psb_ipk_), intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
       integer(psb_mpk_),intent(inout)      ::  x(:,:)
-      integer(psb_ipk_), intent(in)              ::  irw(:)
+      integer(psb_lpk_), intent(in)              ::  irw(:)
       integer(psb_mpk_), intent(in)  ::  val(:,:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl
@@ -108,7 +108,7 @@ Module psb_m_tools_a_mod
       integer(psb_ipk_), intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
       integer(psb_mpk_),intent(inout)      ::  x(:)
-      integer(psb_ipk_), intent(in)              ::  irw(:)
+      integer(psb_lpk_), intent(in)              ::  irw(:)
       integer(psb_mpk_), intent(in)  ::  val(:)
       integer(psb_ipk_), intent(out)             ::  info
       integer(psb_ipk_), optional, intent(in)    ::  dupl

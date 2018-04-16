@@ -225,7 +225,7 @@ subroutine psb_salloc_multivect(x, desc_a,info,n)
   implicit none
 
   !....parameters...
-  type(psb_s_multivect_type), allocatable, intent(out)  :: x
+  type(psb_s_multivect_type), intent(out)  :: x
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_),intent(out)             :: info
   integer(psb_ipk_), optional, intent(in)   :: n

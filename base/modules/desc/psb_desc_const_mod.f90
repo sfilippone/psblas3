@@ -35,7 +35,7 @@
 !    Auxiliary module for descriptor: constant values. 
 !
 module psb_desc_const_mod
-  use psb_const_mod, only : psb_ipk_, psb_mpk_
+  use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
   !
   !     Communication, prolongation & restriction
   !
@@ -121,8 +121,9 @@ module psb_desc_const_mod
 
   interface 
     subroutine psb_parts(glob_index,nrow,np,pv,nv)
-      import :: psb_ipk_
-      integer(psb_ipk_), intent (in)  :: glob_index,nrow, np
+      import :: psb_ipk_, psb_lpk_
+      integer(psb_lpk_), intent (in)  :: glob_index,nrow
+      integer(psb_ipk_), intent (in)  :: np
       integer(psb_ipk_), intent (out) :: nv, pv(*)
     end subroutine psb_parts
   end interface

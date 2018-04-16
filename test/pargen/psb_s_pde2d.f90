@@ -86,14 +86,64 @@ contains
 
   end function s_null_func_2d
 
+  !
+  ! functions parametrizing the differential equation 
+  !  
+  function b1(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) :: b1
+    real(psb_spk_), intent(in) :: x,y
+    b1=sone/sqrt((2*sone))
+  end function b1
+  function b2(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  b2
+    real(psb_spk_), intent(in) :: x,y
+    b2=sone/sqrt((2*sone))
+  end function b2
+  function c(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  c
+    real(psb_spk_), intent(in) :: x,y
+    c=0.d0
+  end function c
+  function a1(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  a1   
+    real(psb_spk_), intent(in) :: x,y
+    a1=sone/80
+  end function a1
+  function a2(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  a2
+    real(psb_spk_), intent(in) :: x,y
+    a2=sone/80
+  end function a2
+  function g(x,y)
+    use psb_base_mod, only : psb_spk_, sone, szero
+    implicit none 
+    real(psb_spk_) ::  g
+    real(psb_spk_), intent(in) :: x,y
+    g = szero
+    if (x == sone) then
+      g = sone
+    else if (x == szero) then 
+      g = exp(-y**2)
+    end if
+  end function g
 
 
   !
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,&
-       & a1,a2,b1,b2,c,g,info,f,amold,vmold,imold,partition,nrl,iv)
+  subroutine psb_s_gen_pde2d(ictxt,idim,a,bv,xv,desc_a,afmt,info,&
+       & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
     !
@@ -112,7 +162,6 @@ contains
     ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-    procedure(s_func_2d)  :: b1,b2,c,a1,a2,g
     integer(psb_ipk_)     :: idim
     type(psb_sspmat_type) :: a
     type(psb_s_vect_type) :: xv,bv
@@ -132,7 +181,8 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    integer(psb_ipk_) :: nnz,nr,nt,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 2D partition
     integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
@@ -140,7 +190,7 @@ contains
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -182,7 +232,7 @@ contains
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
 
-    m   = idim*idim
+    m   = (1_psb_lpk_)*idim*idim
     n   = m
     nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
@@ -535,7 +585,7 @@ program psb_s_pde2d
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,a1,a2,b1,b2,c,g,info)  
+  call psb_gen_pde2d(ictxt,idim,a,bv,xxv,desc_a,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -604,10 +654,11 @@ program psb_s_pde2d
     write(psb_out_unit,'("Number of iterations          : ",i0)')iter
     write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
     write(psb_out_unit,'("Info  on exit                 : ",i0)')info
-    write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
-    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize    
+    write(psb_out_unit,'("Total memory occupation for      A: ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for   PREC: ",i12)')precsize    
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%get_fmt()
+    write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
+    write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
 
@@ -742,50 +793,6 @@ contains
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
 
-  !
-  ! functions parametrizing the differential equation 
-  !  
-  function b1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) :: b1
-    real(psb_spk_), intent(in) :: x,y
-    b1=sone/sqrt((2*sone))
-  end function b1
-  function b2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  b2
-    real(psb_spk_), intent(in) :: x,y
-    b2=sone/sqrt((2*sone))
-  end function b2
-  function c(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  c
-    real(psb_spk_), intent(in) :: x,y
-    c=0.d0
-  end function c
-  function a1(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a1   
-    real(psb_spk_), intent(in) :: x,y
-    a1=sone/80
-  end function a1
-  function a2(x,y)
-    use psb_base_mod, only : psb_spk_
-    real(psb_spk_) ::  a2
-    real(psb_spk_), intent(in) :: x,y
-    a2=sone/80
-  end function a2
-  function g(x,y)
-    use psb_base_mod, only : psb_spk_, sone, szero
-    real(psb_spk_) ::  g
-    real(psb_spk_), intent(in) :: x,y
-    g = szero
-    if (x == sone) then
-      g = sone
-    else if (x == szero) then 
-      g = exp(-y**2)
-    end if
-  end function g
 end program psb_s_pde2d
 
 

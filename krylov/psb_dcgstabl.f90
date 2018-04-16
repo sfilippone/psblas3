@@ -127,8 +127,9 @@ Subroutine psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), Pointer  :: ww, q, r, rt0, p, v, &
        & s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, naux, mglob, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
        & n_row, n_col, nl, err_act
+  integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_,j, k, int_err(5)
@@ -204,8 +205,8 @@ Subroutine psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
-  if (info == psb_success_) call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
+  if (info == psb_success_) call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')

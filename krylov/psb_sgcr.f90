@@ -130,7 +130,8 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type)   ::  r
   
   real(psb_dpk_) :: r_norm, b_norm, a_norm, derr
-  integer(psb_ipk_) :: n_col, mglob, naux, err_act
+  integer(psb_ipk_) :: n_col, naux, err_act
+  integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   integer(psb_ipk_) ::  i, j, it, itx, istop_, itmax_, itrace_, nl, m, nrst
@@ -183,9 +184,9 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   
   
-  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if (info == psb_success_)&
-       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+       & call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')

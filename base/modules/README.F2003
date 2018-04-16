@@ -98,6 +98,82 @@ Design principles for this directory.
       AND IT'S DONE! Nothing else in the library requires the explicit
       knowledge of type of  MOLD. 
 
-
     
   
+3. Data precisoin (aka KIND / aka byte size)
+   Data precision is a bit of a thorny issue here, because it is used
+   by the Fortran language to disambiguate generic interfaces. This
+   means that we must be careful when choosing precision for data
+   structures. On the other hand, we want to have some freedom of
+   choice. The sticky point here is how to deal with integers, because
+   real and complex are already standardized on S/D/C/Z.
+   Integers are tricky because we do not want to use large integer
+   sizes (read: 8 bytes) unless they are really necessary; moreover,
+   the GPU code currently use 4 byte integers (and with good
+   reason). However if we want to tackle large index spaces, we will
+   need at some point 8-byte integers.
+
+   So, here is the plan.
+   A. We have two basic integer kinds, 4-byte PSB_MPK_ which takes its
+      name from being the kind that is going to be passed to MPI for
+      all arguments other than data buffers, and 8-byte PSB_EPK_, to
+      be used as necessary;  the PSB_SIZEOF functions which return
+      data structure sizes (sometimes summed over all processes) are
+      always 8-byte.   
+
+   B. At all levels where a function/subroutine is supposed to be
+      interfaced with an array of integers, there should be two
+      versions, distinguished by an M or an E in the specific name,
+      all adding to a generic set. This applies to the internal
+      utilities, such as sorting and reallocation.
+      
+   C. For computation we have I and L, as in psb_ipk_ and
+      psb_lpk_. The idea is that I<=L, and I is used for almost
+      everything, e.g. for the integer parts of the sparse matrix data
+      structures. L is only used for a very small subset of data, and
+      specifically for the indices in *GLOBAL* numbering mode, hence
+      the I<=L constraint. 
+      
+   D. The values for I and L can be remapped independently at
+      configure time over M and E; thus, if a sparse matrix routine is
+      reallocating integer data through the generic names of the
+      utilities, the PSB_IPK_ is remapped at compile time onto
+      PSB_MPK_ or PSB_EPK_ as needed.
+      
+   E. Because we must have I<=L, this means that supported
+      configurations are (I=4,L=4), (I=4,L=8), (I=8,L=8). Default
+      is (I=4,L=8), because it allows us to go to multi-billion linear
+      systems while still keeping all local data structures on 4-byte
+      integers.
+      
+   F. Thus, care must be taken in defining specific interfaces: to
+      reiterate, if we are dealing with an interface which accepts an
+      integer array, it should be defined with M and E (which are
+      always distinct) and not I/L (which might be
+      indistinguishable). Example in case:
+      interface  psb_realloc
+        Subroutine psb_r_m_m_rk1(len,rrax,info,pad,lb)               
+            integer(psb_mpk_),Intent(in) :: len
+            integer(psb_mpk_), allocatable, intent(inout) :: rrax(:)
+            integer(psb_ipk_) :: info
+            integer(psb_mpk_), optional, intent(in) :: pad
+            integer(psb_mpk_), optional, intent(in) :: lb
+	    
+   G. The INFO argument and others related to error handling should
+      always be PSB_IPK_;
+      
+   H. Arguments related to MPI interfacing should always be PSB_MPK_
+   
+   I. Encapsulated types such as psb_i_base_vect_mod can still be I
+      and L, because if the name of the type is different, the types
+      are interpreted as distinguishable even when the contents are
+      identical.
+      
+   L. This means that most user-level interfaces will deal in I and L,
+      not M and E, which are going to be used mostly in the
+      internals.
+
+   M. Actually, the user will probably never see M, but will (for
+      sizeof & friends) see E. 
+      
+      

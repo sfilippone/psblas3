@@ -88,11 +88,11 @@ subroutine psb_smatdist(a_glob, a, ictxt, desc_a,&
   ! local variables
   logical           :: use_parts, use_v
   integer(psb_ipk_) :: np, iam, np_sharing
-  integer(psb_ipk_) :: i_count, j_count,&
-       & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
+  integer(psb_ipk_) :: k_count, root, liwork,  nnzero, nrhs,&
        & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+  integer(psb_lpk_) :: i_count, j_count, nrow, ncol, ig
   integer(psb_ipk_), allocatable  :: iwork(:), iwrk2(:)
-  integer(psb_ipk_), allocatable  :: irow(:),icol(:)
+  integer(psb_lpk_), allocatable  :: irow(:),icol(:)
   real(psb_spk_), allocatable    :: val(:)
   integer(psb_ipk_), parameter    :: nb=30
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5

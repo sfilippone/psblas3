@@ -52,15 +52,18 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   implicit None
   procedure(psb_parts)               :: parts
   !....Parameters...
-  integer(psb_ipk_), intent(in)      :: M,N,ictxt
+  integer(psb_lpk_), intent(in)      :: M,N
+  integer(psb_ipk_), intent(in)      :: ictxt
   Type(psb_desc_type), intent(out)   :: desc
   integer(psb_ipk_), intent(out)     :: info
 
   !locals
   integer(psb_ipk_) :: counter,i,j,loc_row,err,loc_col,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx 
+       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx
+  integer(psb_lpk_) :: iglob
   integer(psb_ipk_) :: int_err(5),exch(3)
-  integer(psb_ipk_), allocatable   :: temp_ovrlap(:), loc_idx(:) 
+  integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
+  integer(psb_lpk_), allocatable  :: l_temp_ovrlap(:), loc_idx(:)
   integer(psb_ipk_), allocatable  :: prc_v(:)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: me, np, nprocs
@@ -122,7 +125,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   ! count local rows number
   loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
-  allocate(temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
+  allocate(l_temp_ovrlap(max(1,2*loc_row)), prc_v(np),stat=info)
 
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
@@ -136,7 +139,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
        & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
   counter = 0
   itmpov  = 0
-  temp_ovrlap(:) = -1
+  l_temp_ovrlap(:) = -1
   !
   ! We have to decide whether we have a "large" index space.
   !
@@ -174,15 +177,15 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%lprm(1) = 0
 
   k = 0
-  do i=1,m
+  do iglob=1,m
     if (info == psb_success_) then
-      call parts(i,m,np,prc_v,nprocs)
+      call parts(iglob,m,np,prc_v,nprocs)
       if (nprocs > np) then
         info=psb_err_partfunc_toomuchprocs_
         int_err(1)=3
         int_err(2)=np
         int_err(3)=nprocs
-        int_err(4)=i
+        int_err(4)=iglob
         err=info
         call psb_errpush(err,name,int_err)
         goto 9999
@@ -190,7 +193,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         info=psb_err_partfunc_toofewprocs_
         int_err(1)=3
         int_err(2)=nprocs
-        int_err(3)=i
+        int_err(3)=iglob
         err=info
         call psb_errpush(err,name,int_err)
         goto 9999
@@ -200,7 +203,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             info=psb_err_partfunc_wrong_pid_
             int_err(1)=3
             int_err(2)=prc_v(j)
-            int_err(3)=i
+            int_err(3)=iglob
             err=info
             call psb_errpush(err,name,int_err)
             goto 9999
@@ -218,26 +221,26 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         if (prc_v(j) == me) then
           ! this point belongs to me
           k = k + 1 
-          call psb_ensure_size((k+1),loc_idx,info,pad=-ione)
+          call psb_ensure_size((k+1),loc_idx,info,pad=-1_psb_lpk_)
           if (info /= psb_success_) then
             info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-          loc_idx(k) = i 
+          loc_idx(k) = iglob
 
           if (nprocs > 1)  then
-            call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-ione)
+            call psb_ensure_size((itmpov+3+nprocs),l_temp_ovrlap,info,pad=-1_psb_lpk_)
             if (info /= psb_success_) then
               info=psb_err_from_subroutine_
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
             itmpov = itmpov + 1
-            temp_ovrlap(itmpov) = i
+            l_temp_ovrlap(itmpov) = iglob
             itmpov = itmpov + 1
-            temp_ovrlap(itmpov) = nprocs
-            temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
+            l_temp_ovrlap(itmpov) = nprocs
+            l_temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
             itmpov = itmpov + nprocs
           endif
         end if
@@ -266,9 +269,28 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
-
-
-  call psi_bld_tmpovrl(temp_ovrlap,desc,info)
+  !
+  ! Now that we have initialized indxmap we can convert the
+  ! indices to local numbering.
+  !
+  block
+    integer(psb_ipk_) :: i,nprocs
+    allocate(temp_ovrlap(size(l_temp_ovrlap)),stat=info)
+    if (info == psb_success_) then 
+      temp_ovrlap = -1
+      i = 1
+      do while (l_temp_ovrlap(i) /= -1) 
+        call desc%indxmap%g2l(l_temp_ovrlap(i),temp_ovrlap(i),info)
+        i              = i + 1
+        temp_ovrlap(i) = l_temp_ovrlap(i)
+        nprocs         = temp_ovrlap(i)
+        temp_ovrlap(i+1:i+nprocs) = l_temp_ovrlap(i+1:i+nprocs)
+        i       = i + 1
+        i       = i + nprocs     
+      enddo
+    end if
+  end block
+  if (info == psb_success_) call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   if (info == psb_success_) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= psb_no_err_) then 

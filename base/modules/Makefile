@@ -125,7 +125,7 @@ psb_realloc_mod.o \
 	auxil/psb_z_realloc_mod.o:   psb_error_mod.o
 $(UTIL_MODS): $(BASIC_MODS)
 
-penv/psi_penv_mod.o: penv/psi_comm_buffers_mod.o 
+penv/psi_penv_mod.o: penv/psi_comm_buffers_mod.o serial/psb_vect_mod.o  serial/psb_mat_mod.o 
 penv/psi_collective_mod.o penv/psi_p2p_mod.o: penv/psi_penv_mod.o	
 
 psb_realloc_mod.o: auxil/psb_m_realloc_mod.o \
@@ -213,7 +213,7 @@ serial/psb_z_csc_mat_mod.o serial/psb_z_csr_mat_mod.o: serial/psb_z_base_mat_mod
 serial/psb_mat_mod.o: serial/psb_vect_mod.o serial/psb_s_mat_mod.o serial/psb_d_mat_mod.o serial/psb_c_mat_mod.o serial/psb_z_mat_mod.o
 serial/psb_serial_mod.o: serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o 
 serial/psb_i_vect_mod.o: serial/psb_i_base_vect_mod.o
-serial/psb_l_vect_mod.o: serial/psb_l_base_vect_mod.o serial/psb_i_vect_mod.o
+serial/psb_l_vect_mod.o: serial/psb_l_base_vect_mod.o serial/psb_i_vect_mod.o 
 serial/psb_s_vect_mod.o: serial/psb_s_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_d_vect_mod.o: serial/psb_d_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_c_vect_mod.o: serial/psb_c_base_vect_mod.o serial/psb_i_vect_mod.o
@@ -245,7 +245,7 @@ psi_z_mod.o: desc/psb_desc_mod.o serial/psb_z_vect_mod.o comm/psi_z_comm_a_mod.o
 psi_mod.o: psb_penv_mod.o desc/psb_desc_mod.o auxil/psi_serial_mod.o serial/psb_serial_mod.o\
 	psi_i_mod.o psi_l_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o
 
-desc/psb_indx_map_mod.o: desc/psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o
+desc/psb_indx_map_mod.o: desc/psb_desc_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o
 desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o:\
     desc/psb_indx_map_mod.o desc/psb_desc_const_mod.o  \
     auxil/psb_sort_mod.o psb_penv_mod.o 
@@ -326,7 +326,7 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 
 psb_base_mod.o: $(MODULES)
 
-penv/psi_penv_mod.o: penv/psi_penv_mod.F90 $(BASIC_MODS) 
+penv/psi_penv_mod.o: penv/psi_penv_mod.F90 $(BASIC_MODS) serial/psb_vect_mod.o  serial/psb_mat_mod.o 
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 psb_penv_mod.o: psb_penv_mod.F90 $(COMMINT) $(BASIC_MODS)

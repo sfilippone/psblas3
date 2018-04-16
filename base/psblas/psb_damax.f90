@@ -57,7 +57,8 @@ function psb_damax(x,desc_a, info, jx) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, ldx
+       & err_act, iix, jjx, ldx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)      :: name, ch_err
 
   name='psb_damax'
@@ -85,7 +86,7 @@ function psb_damax(x,desc_a, info, jx) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
 
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -174,7 +175,8 @@ function psb_damaxv (x,desc_a, info) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, ldx
+       & err_act, iix, jjx, ldx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
 
   character(len=20)        :: name, ch_err
 
@@ -199,7 +201,7 @@ function psb_damaxv (x,desc_a, info) result(res)
   m = desc_a%get_global_rows()
   ldx = size(x,1)
 
-  call psb_chkvect(m,ione,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -248,7 +250,8 @@ function psb_damax_vect(x, desc_a, info) result(res)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m
+       & err_act, iix, jjx
+  integer(psb_lpk_) :: ix, jx, iy, ijy, m
   character(len=20)      :: name, ch_err
 
   name='psb_damaxv'
@@ -275,7 +278,7 @@ function psb_damax_vect(x, desc_a, info) result(res)
   jx = 1
 
   m = desc_a%get_global_rows()
-  call psb_chkvect(m,ione,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,x%get_nrows(),ix,jx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -367,7 +370,8 @@ subroutine psb_damaxvs(res,x,desc_a, info)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, ldx
+       & err_act, iix, jjx, ldx
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)      :: name, ch_err
 
   name='psb_damaxvs'
@@ -390,7 +394,7 @@ subroutine psb_damaxvs(res,x,desc_a, info)
 
   m = desc_a%get_global_rows()
   ldx=size(x,1)
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
@@ -479,7 +483,8 @@ subroutine psb_dmamaxs(res,x,desc_a, info,jx)
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, ijx, m, ldx, i, k
+       & err_act, iix, jjx, ldx, i, k
+  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'
@@ -506,7 +511,7 @@ subroutine psb_dmamaxs(res,x,desc_a, info,jx)
   m = desc_a%get_global_rows()
   k  = min(size(x,2),size(res,1))
   ldx = size(x,1)
-  call psb_chkvect(m,ione,ldx,ix,ijx,desc_a,info,iix,jjx)
+  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_chkvect'

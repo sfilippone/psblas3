@@ -127,7 +127,12 @@ module psb_z_mat_mod
     procedure, pass(a) :: csgetptn    => psb_z_csgetptn
     procedure, pass(a) :: csgetrow    => psb_z_csgetrow
     procedure, pass(a) :: csgetblk    => psb_z_csgetblk
-    generic, public    :: csget       => csgetptn, csgetrow, csgetblk 
+    generic, public    :: csget       => csgetptn, csgetrow, csgetblk
+#if defined(INT_I4_L8)
+    procedure, pass(a) :: lcsgetptn    => psb_z_lcsgetptn
+    procedure, pass(a) :: lcsgetrow    => psb_z_lcsgetrow
+    generic, public    :: csget        => lcsgetptn, lcsgetrow
+#endif    
     procedure, pass(a) :: tril        => psb_z_tril
     procedure, pass(a) :: triu        => psb_z_triu
     procedure, pass(a) :: m_csclip    => psb_z_csclip
@@ -1292,5 +1297,63 @@ contains
 
   end subroutine psb_z_clean_zeros
 
+#if defined(INT_I4_L8)
+  subroutine psb_z_lcsgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    integer(psb_ipk_), intent(in)                  :: imin,imax
+    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+    integer(psb_ipk_),intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer(psb_ipk_), intent(in), optional        :: iren(:)
+    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
 
+    ! Local
+    integer(psb_ipk_), allocatable :: lia(:), lja(:)
+
+    if (allocated(ia)) then
+      lia = ia
+    end if
+    if (allocated(ja)) then
+      lja = ja
+    end if
+    call a%csget(imin,imax,nz,lia,lja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ia = lia
+    ja = lja
+    
+  end subroutine psb_z_lcsgetptn
+  
+  subroutine psb_z_lcsgetrow(imin,imax,a,nz,ia,ja,val,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    implicit none 
+    class(psb_zspmat_type), intent(in) :: a
+    integer(psb_ipk_), intent(in)                  :: imin,imax
+    integer(psb_ipk_), intent(out)                 :: nz
+    integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    integer(psb_ipk_),intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer(psb_ipk_), intent(in), optional        :: iren(:)
+    integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+    ! Local
+    integer(psb_ipk_), allocatable :: lia(:), lja(:)
+
+    if (allocated(ia)) then
+      lia = ia
+    end if
+    if (allocated(ja)) then
+      lja = ja
+    end if
+    call a%csget(imin,imax,nz,lia,lja,val,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ia = lia
+    ja = lja
+        
+  end subroutine psb_z_lcsgetrow
+#endif
 end module psb_z_mat_mod
