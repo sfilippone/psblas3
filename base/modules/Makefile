@@ -65,7 +65,7 @@ UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_m
 	psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o \
 	psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o \
 	psblas/psb_psblas_mod.o \
-	auxil/psi_serial_mod.o auxil/psi_i_serial_mod.o auxil/psi_l_serial_mod.o \
+	auxil/psi_serial_mod.o auxil/psi_m_serial_mod.o auxil/psi_e_serial_mod.o \
 	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o \
 	auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o \
 	psi_mod.o psi_i_mod.o psi_l_mod.o psi_s_mod.o psi_d_mod.o psi_c_mod.o psi_z_mod.o\
@@ -185,9 +185,9 @@ auxil/psb_d_hsort_x_mod.o: auxil/psb_d_hsort_mod.o
 auxil/psb_c_hsort_x_mod.o: auxil/psb_c_hsort_mod.o
 auxil/psb_z_hsort_x_mod.o: auxil/psb_z_hsort_mod.o 
 
-auxil/psi_serial_mod.o:  auxil/psi_i_serial_mod.o auxil/psi_l_serial_mod.o \
+auxil/psi_serial_mod.o:  auxil/psi_m_serial_mod.o auxil/psi_e_serial_mod.o \
 	auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o 
-auxil/psi_i_serial_mod.o auxil/psi_l_serial_mod.o auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o: psb_const_mod.o
+auxil/psi_m_serial_mod.o auxil/psi_e_serial_mod.o auxil/psi_s_serial_mod.o auxil/psi_d_serial_mod.o auxil/psi_c_serial_mod.o auxil/psi_z_serial_mod.o: psb_const_mod.o
 
 auxil/psb_ip_reord_mod.o:  auxil/psb_m_ip_reord_mod.o auxil/psb_e_ip_reord_mod.o \
 	auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \

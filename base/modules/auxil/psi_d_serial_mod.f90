@@ -30,7 +30,7 @@
 !   
 !    
 module psi_d_serial_mod
-  use psb_const_mod, only : psb_ipk_, psb_dpk_
+  use psb_const_mod, only :  psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, psb_dpk_
 
   interface psb_gelp
     ! 2-D version

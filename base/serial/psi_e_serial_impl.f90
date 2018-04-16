@@ -29,15 +29,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
+subroutine psi_eaxpby(m,n,alpha, x, beta, y, info)
   
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(in)      :: m, n
-  integer(psb_ipk_), intent (in)       ::  x(:,:)
-  integer(psb_ipk_), intent (inout)    ::  y(:,:)
-  integer(psb_ipk_), intent (in)       ::  alpha, beta
+  integer(psb_epk_), intent (in)       ::  x(:,:)
+  integer(psb_epk_), intent (inout)    ::  y(:,:)
+  integer(psb_epk_), intent (in)       ::  alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
@@ -76,7 +76,7 @@ subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if ((m>0).and.(n>0)) call iaxpby(m,n,alpha,x,lx,beta,y,ly,info)
+  if ((m>0).and.(n>0)) call eaxpby(m,n,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -84,17 +84,17 @@ subroutine psi_iaxpby(m,n,alpha, x, beta, y, info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine psi_iaxpby
+end subroutine psi_eaxpby
 
-subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
+subroutine psi_eaxpbyv(m,alpha, x, beta, y, info)
   
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_), intent(in)      :: m
-  integer(psb_ipk_), intent (in)       ::  x(:)
-  integer(psb_ipk_), intent (inout)    ::  y(:)
-  integer(psb_ipk_), intent (in)       :: alpha, beta
+  integer(psb_epk_), intent (in)       ::  x(:)
+  integer(psb_epk_), intent (inout)    ::  y(:)
+  integer(psb_epk_), intent (in)       :: alpha, beta
   integer(psb_ipk_), intent(out)     :: info
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: lx, ly
@@ -127,7 +127,7 @@ subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
     goto 9999 
   end if
 
-  if (m>0) call iaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  if (m>0) call eaxpby(m,ione,alpha,x,lx,beta,y,ly,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -136,30 +136,30 @@ subroutine psi_iaxpbyv(m,alpha, x, beta, y, info)
 
   return
 
-end subroutine psi_iaxpbyv
+end subroutine psi_eaxpbyv
 
 
-subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
+subroutine psi_egthmv(n,k,idx,alpha,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  integer(psb_ipk_) :: x(:,:), y(:),alpha,beta
+  integer(psb_epk_) :: x(:,:), y(:),alpha,beta
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == izero) then 
-    if (alpha == izero) then 
+  if (beta == ezero) then 
+    if (alpha == ezero) then 
       pt=0
       do j=1,k
         do i=1,n
           pt=pt+1
-          y(pt) = izero
+          y(pt) = ezero
         end do
       end do
-    else if (alpha == ione) then
+    else if (alpha == eone) then
       pt=0
       do j=1,k
         do i=1,n
@@ -167,7 +167,7 @@ subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
           y(pt) = x(idx(i),j)
         end do
       end do
-    else if (alpha == -ione) then 
+    else if (alpha == -eone) then 
       pt=0
       do j=1,k
         do i=1,n
@@ -185,17 +185,17 @@ subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
       end do
     end if
   else 
-    if (beta == ione) then 
+    if (beta == eone) then 
       ! Do nothing
-    else if (beta == -ione) then 
+    else if (beta == -eone) then 
       y(1:n*k) = -y(1:n*k) 
     else
       y(1:n*k) = beta*y(1:n*k) 
     end if
 
-    if (alpha == izero) then 
+    if (alpha == ezero) then 
       ! do nothing
-    else if (alpha == ione) then 
+    else if (alpha == eone) then 
       pt=0
       do j=1,k
         do i=1,n
@@ -203,7 +203,7 @@ subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
           y(pt) = y(pt) + x(idx(i),j)
         end do
       end do
-    else if (alpha == -ione) then
+    else if (alpha == -eone) then
       pt=0
       do j=1,k
         do i=1,n
@@ -222,28 +222,28 @@ subroutine psi_igthmv(n,k,idx,alpha,x,beta,y)
     end if
   end if
 
-end subroutine psi_igthmv
+end subroutine psi_egthmv
 
-subroutine psi_igthv(n,idx,alpha,x,beta,y)
+subroutine psi_egthv(n,idx,alpha,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  integer(psb_ipk_) :: x(:), y(:),alpha,beta
+  integer(psb_epk_) :: x(:), y(:),alpha,beta
 
   ! Locals
   integer(psb_ipk_) :: i
-  if (beta == izero) then 
-    if (alpha == izero) then 
+  if (beta == ezero) then 
+    if (alpha == ezero) then 
       do i=1,n
-        y(i) = izero
+        y(i) = ezero
       end do
-    else if (alpha == ione) then 
+    else if (alpha == eone) then 
       do i=1,n
         y(i) = x(idx(i))
       end do
-    else if (alpha == -ione) then 
+    else if (alpha == -eone) then 
       do i=1,n
         y(i) = -x(idx(i))
       end do
@@ -253,21 +253,21 @@ subroutine psi_igthv(n,idx,alpha,x,beta,y)
       end do
     end if
   else 
-    if (beta == ione) then 
+    if (beta == eone) then 
       ! Do nothing
-    else if (beta == -ione) then 
+    else if (beta == -eone) then 
       y(1:n) = -y(1:n) 
     else
       y(1:n) = beta*y(1:n) 
     end if
 
-    if (alpha == izero) then 
+    if (alpha == ezero) then 
       ! do nothing
-    else if (alpha == ione) then 
+    else if (alpha == eone) then 
       do i=1,n
         y(i) = y(i) + x(idx(i))
       end do
-    else if (alpha == -ione) then 
+    else if (alpha == -eone) then 
       do i=1,n
         y(i) = y(i) - x(idx(i))
       end do
@@ -278,15 +278,15 @@ subroutine psi_igthv(n,idx,alpha,x,beta,y)
     end if
   end if
 
-end subroutine psi_igthv
+end subroutine psi_egthv
 
-subroutine psi_igthzmm(n,k,idx,x,y)
+subroutine psi_egthzmm(n,k,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  integer(psb_ipk_) :: x(:,:), y(:,:)
+  integer(psb_epk_) :: x(:,:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i
@@ -296,15 +296,15 @@ subroutine psi_igthzmm(n,k,idx,x,y)
     y(i,1:k)=x(idx(i),1:k)
   end do
 
-end subroutine psi_igthzmm
+end subroutine psi_egthzmm
 
-subroutine psi_igthzmv(n,k,idx,x,y)
+subroutine psi_egthzmv(n,k,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  integer(psb_ipk_) :: x(:,:), y(:)
+  integer(psb_epk_) :: x(:,:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
@@ -317,15 +317,15 @@ subroutine psi_igthzmv(n,k,idx,x,y)
     end do
   end do
 
-end subroutine psi_igthzmv
+end subroutine psi_egthzmv
 
-subroutine psi_igthzv(n,idx,x,y)
+subroutine psi_egthzv(n,idx,x,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  integer(psb_ipk_) :: x(:), y(:)
+  integer(psb_epk_) :: x(:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
@@ -334,24 +334,24 @@ subroutine psi_igthzv(n,idx,x,y)
     y(i)=x(idx(i))
   end do
 
-end subroutine psi_igthzv
+end subroutine psi_egthzv
 
-subroutine psi_isctmm(n,k,idx,x,beta,y)
+subroutine psi_esctmm(n,k,idx,x,beta,y)
   
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  integer(psb_ipk_) :: beta, x(:,:), y(:,:)
+  integer(psb_epk_) :: beta, x(:,:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i, j
 
-  if (beta == izero) then
+  if (beta == ezero) then
     do i=1,n
       y(idx(i),1:k) = x(i,1:k)
     end do
-  else if (beta == ione) then
+  else if (beta == eone) then
     do i=1,n
       y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
     end do
@@ -360,20 +360,20 @@ subroutine psi_isctmm(n,k,idx,x,beta,y)
       y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
     end do
   end if
-end subroutine psi_isctmm
+end subroutine psi_esctmm
 
-subroutine psi_isctmv(n,k,idx,x,beta,y)
+subroutine psi_esctmv(n,k,idx,x,beta,y)
   
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, k, idx(:)
-  integer(psb_ipk_) :: beta, x(:), y(:,:)
+  integer(psb_epk_) :: beta, x(:), y(:,:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == izero) then
+  if (beta == ezero) then
     pt=0
     do j=1,k
       do i=1,n
@@ -381,7 +381,7 @@ subroutine psi_isctmv(n,k,idx,x,beta,y)
         y(idx(i),j) = x(pt)
       end do
     end do
-  else if (beta == ione) then
+  else if (beta == eone) then
     pt=0
     do j=1,k
       do i=1,n
@@ -398,24 +398,24 @@ subroutine psi_isctmv(n,k,idx,x,beta,y)
       end do
     end do
   end if
-end subroutine psi_isctmv
+end subroutine psi_esctmv
 
-subroutine psi_isctv(n,idx,x,beta,y)
+subroutine psi_esctv(n,idx,x,beta,y)
 
   use psb_const_mod
   implicit none
 
   integer(psb_ipk_) :: n, idx(:)
-  integer(psb_ipk_) :: beta, x(:), y(:)
+  integer(psb_epk_) :: beta, x(:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
 
-  if (beta == izero) then
+  if (beta == ezero) then
     do i=1,n
       y(idx(i)) = x(i)
     end do
-  else if (beta == ione) then
+  else if (beta == eone) then
     do i=1,n
       y(idx(i)) = y(idx(i))+x(i)
     end do
@@ -424,19 +424,19 @@ subroutine psi_isctv(n,idx,x,beta,y)
       y(idx(i)) = beta*y(idx(i))+x(i)
     end do
   end if
-end subroutine psi_isctv
+end subroutine psi_esctv
 
-subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
+subroutine  eaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_const_mod
   use psb_error_mod
   implicit none 
   integer(psb_ipk_) :: n, m, lldx, lldy, info
-  integer(psb_ipk_) X(lldx,*), Y(lldy,*)
-  integer(psb_ipk_) alpha, beta
+  integer(psb_epk_) X(lldx,*), Y(lldy,*)
+  integer(psb_epk_) alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
   character  name*20
-  name='iaxpby'
+  name='eaxpby'
 
 
   !
@@ -473,19 +473,19 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
     goto 9999
   endif
 
-  if (alpha.eq.izero) then 
-    if (beta.eq.izero) then 
+  if (alpha.eq.ezero) then 
+    if (beta.eq.ezero) then 
       do j=1, n 
         do i=1,m 
-          y(i,j) = izero
+          y(i,j) = ezero
         enddo
       enddo
-    else if (beta.eq.ione) then
+    else if (beta.eq.eone) then
       !   
       !        Do nothing! 
       !               
 
-    else if (beta.eq.-ione) then 
+    else if (beta.eq.-eone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = - y(i,j)
@@ -499,22 +499,22 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.ione) then
+  else if (alpha.eq.eone) then
 
-    if (beta.eq.izero) then 
+    if (beta.eq.ezero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j)
         enddo
       enddo
-    else if (beta.eq.ione) then
+    else if (beta.eq.eone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-ione) then 
+    else if (beta.eq.-eone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = x(i,j) - y(i,j)
@@ -528,22 +528,22 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       enddo
     endif
 
-  else if (alpha.eq.-ione) then 
+  else if (alpha.eq.-eone) then 
 
-    if (beta.eq.izero) then 
+    if (beta.eq.ezero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j)
         enddo
       enddo
-    else if (beta.eq.ione) then
+    else if (beta.eq.eone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-ione) then 
+    else if (beta.eq.-eone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = -x(i,j) - y(i,j)
@@ -559,20 +559,20 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
 
   else  
 
-    if (beta.eq.izero) then 
+    if (beta.eq.ezero) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j)
         enddo
       enddo
-    else if (beta.eq.ione) then
+    else if (beta.eq.eone) then
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) + y(i,j)
         enddo
       enddo
 
-    else if (beta.eq.-ione) then 
+    else if (beta.eq.-eone) then 
       do j=1,n 
         do i=1,m 
           y(i,j) = alpha*x(i,j) - y(i,j)
@@ -594,4 +594,4 @@ subroutine  iaxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   call fcpsb_serror()
   return
 
-end subroutine iaxpby
+end subroutine eaxpby

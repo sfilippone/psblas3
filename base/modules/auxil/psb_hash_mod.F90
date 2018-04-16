@@ -67,25 +67,42 @@ module psb_hash_mod
        & HashFreeEntry = -1, HashNotFound = -256
 
   interface psb_hash_init
-    module procedure psb_hash_init_v, psb_hash_init_n, &
-         & psb_hash_init_lv, psb_hash_init_ln
-  end interface
-
+    module procedure psb_hash_init_lv, psb_hash_init_ln
+  end interface psb_hash_init
+  
   interface psb_sizeof
     module procedure psb_sizeof_hash_type
   end interface
 
   interface hashval
-    module procedure ihashval, lhashval
+    module procedure lhashval
   end interface hashval
   
   interface psb_hash_searchinskey
-    module procedure psb_hash_searchinskey, psb_hash_lsearchinskey
+    module procedure psb_hash_lsearchinskey
   end interface psb_hash_searchinskey
   
   interface psb_hash_searchkey
-    module procedure psb_hash_searchkey, psb_hash_lsearchkey
+    module procedure psb_hash_lsearchkey
   end interface psb_hash_searchkey
+
+#if defined (INT_I4_L8)
+  interface psb_hash_init
+    module procedure psb_hash_init_v, psb_hash_init_n
+  end interface
+
+  interface hashval
+    module procedure ihashval
+  end interface hashval
+  
+  interface psb_hash_searchinskey
+    module procedure psb_hash_searchinskey
+  end interface psb_hash_searchinskey
+  
+  interface psb_hash_searchkey
+    module procedure psb_hash_searchkey
+  end interface psb_hash_searchkey
+#endif
   
   interface psb_move_alloc
     module procedure HashTransfer

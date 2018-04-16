@@ -111,7 +111,8 @@ module psb_gen_block_map_mod
        & block_get_fmt, gen_block_search, l_gen_block_search
 
   interface gen_block_search
-    module procedure gen_block_search, l_gen_block_search
+    module procedure l_gen_block_search
+!    module procedure gen_block_search, l_gen_block_search
   end interface gen_block_search
 
   integer(psb_ipk_), private :: laddsz=500

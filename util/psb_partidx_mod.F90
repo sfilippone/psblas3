@@ -38,20 +38,24 @@
 !  See test/pargen/psb_X_pdeNd for examples of usage
 !
 module psb_partidx_mod
-  use psb_base_mod, only : psb_ipk_
+  use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
 
   interface idx2ijk
-    module procedure idx2ijk3d, idx2ijkv, idx2ijk2d,&
-         & lidx2ijk3d, lidx2ijkv, lidx2ijk2d,&
+    module procedure idx2ijk3d, idx2ijkv, idx2ijk2d
+  end interface idx2ijk
+
+  interface ijk2idx
+    module procedure ijk2idx3d, ijk2idxv, ijk2idx2d
+  end interface ijk2idx
+  interface idx2ijk
+    module procedure lidx2ijk3d, lidx2ijkv, lidx2ijk2d,&
          & lidx2lijk3d, lidx2lijkv, lidx2lijk2d
   end interface idx2ijk
 
   interface ijk2idx
-    module procedure ijk2idx3d, ijk2idxv, ijk2idx2d,&
-         & ijk2lidx3d, ijk2lidxv, ijk2lidx2d,&
+    module procedure ijk2lidx3d, ijk2lidxv, ijk2lidx2d,&
          & lijk2lidx3d, lijk2lidxv, lijk2lidx2d
   end interface ijk2idx
-
 
 contains
   !
@@ -67,13 +71,13 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  idx2ijk3d(i,j,k,idx,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: i,j,k
-    integer(psb_ipk_), intent(in)  :: idx,nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: i,j,k
+    integer(psb_mpk_), intent(in)  :: idx,nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: coords(3)
+    integer(psb_mpk_) :: coords(3)
 
     call idx2ijk(coords,idx,[nx,ny,nz],base)
     
@@ -84,13 +88,13 @@ contains
   end subroutine idx2ijk3d
   
   subroutine  idx2ijk2d(i,j,idx,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: i,j
-    integer(psb_ipk_), intent(in)  :: idx,nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: i,j
+    integer(psb_mpk_), intent(in)  :: idx,nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: coords(2)
+    integer(psb_mpk_) :: coords(2)
 
     call idx2ijk(coords,idx,[nx,ny],base)
     
@@ -112,13 +116,13 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  idx2ijkv(coords,idx,dims,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: coords(:)
-    integer(psb_ipk_), intent(in)  :: idx,dims(:)
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: coords(:)
+    integer(psb_mpk_), intent(in)  :: idx,dims(:)
+    integer(psb_mpk_), intent(in), optional :: base
 
-    integer(psb_ipk_) :: base_, idx_, i, sz
+    integer(psb_mpk_) :: base_, idx_, i, sz
     if (present(base)) then
       base_  = base
     else
@@ -147,14 +151,14 @@ contains
   end subroutine idx2ijkv
 
   subroutine  lidx2ijk3d(i,j,k,idx,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: i,j,k
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_ipk_), intent(in)  :: nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: i,j,k
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_mpk_), intent(in)  :: nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: coords(3)
+    integer(psb_mpk_) :: coords(3)
 
     call idx2ijk(coords,idx,[nx,ny,nz],base)
     
@@ -165,14 +169,14 @@ contains
   end subroutine lidx2ijk3d
   
   subroutine  lidx2ijk2d(i,j,idx,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: i,j
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_ipk_), intent(in)  :: nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: i,j
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_mpk_), intent(in)  :: nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: coords(2)
+    integer(psb_mpk_) :: coords(2)
 
     call idx2ijk(coords,idx,[nx,ny],base)
     
@@ -194,15 +198,15 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  lidx2ijkv(coords,idx,dims,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: coords(:)
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_ipk_), intent(in)  :: dims(:)
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: coords(:)
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_mpk_), intent(in)  :: dims(:)
+    integer(psb_mpk_), intent(in), optional :: base
 
-    integer(psb_lpk_) :: base_, idx_
-    integer(psb_ipk_) :: i, sz
+    integer(psb_epk_) :: base_, idx_
+    integer(psb_mpk_) :: i, sz
     if (present(base)) then
       base_  = base
     else
@@ -231,14 +235,14 @@ contains
   end subroutine lidx2ijkv
 
   subroutine  lidx2lijk3d(i,j,k,idx,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: i,j,k
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_lpk_), intent(in)  :: nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: i,j,k
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_epk_), intent(in)  :: nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_lpk_) :: coords(3)
+    integer(psb_epk_) :: coords(3)
 
     call idx2ijk(coords,idx,[nx,ny,nz],base)
     
@@ -249,14 +253,14 @@ contains
   end subroutine lidx2lijk3d
   
   subroutine  lidx2lijk2d(i,j,idx,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: i,j
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_lpk_), intent(in)  :: nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: i,j
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_epk_), intent(in)  :: nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_lpk_) :: coords(2)
+    integer(psb_epk_) :: coords(2)
 
     call idx2ijk(coords,idx,[nx,ny],base)
     
@@ -278,15 +282,15 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  lidx2lijkv(coords,idx,dims,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: coords(:)
-    integer(psb_lpk_), intent(in)  :: idx
-    integer(psb_lpk_), intent(in)  :: dims(:)
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: coords(:)
+    integer(psb_epk_), intent(in)  :: idx
+    integer(psb_epk_), intent(in)  :: dims(:)
+    integer(psb_mpk_), intent(in), optional :: base
 
-    integer(psb_lpk_) :: base_, idx_
-    integer(psb_lpk_) :: i, sz
+    integer(psb_epk_) :: base_, idx_
+    integer(psb_epk_) :: i, sz
     if (present(base)) then
       base_  = base
     else
@@ -313,7 +317,6 @@ contains
     end do
 
   end subroutine lidx2lijkv
-  
   !
   ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)
   ! compute the global index IDX 
@@ -327,13 +330,13 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  ijk2idxv(idx,coords,dims,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(in)  :: coords(:),dims(:)
-    integer(psb_ipk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(in)  :: coords(:),dims(:)
+    integer(psb_mpk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: base_, i, sz
+    integer(psb_mpk_) :: base_, i, sz
     if (present(base)) then
       base_  = base
     else
@@ -366,35 +369,35 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  ijk2idx3d(idx,i,j,k,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in)  :: i,j,k,nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*nz*ny + (j-base_)*nz + k - base_) + base_
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine ijk2idx3d
 
   subroutine  ijk2idx2d(idx,i,j,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in)  :: i,j,nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in)  :: i,j,nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*ny + (j-base_) + base_
     call ijk2idx(idx,[i,j],[nx,ny],base)
   end subroutine ijk2idx2d
 
   subroutine  ijk2lidxv(idx,coords,dims,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_ipk_), intent(in)  :: coords(:),dims(:)
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_mpk_), intent(in)  :: coords(:),dims(:)
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_ipk_) :: base_, i, sz
+    integer(psb_mpk_) :: base_, i, sz
     if (present(base)) then
       base_  = base
     else
@@ -427,22 +430,22 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  ijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in)  :: i,j,k,nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*nz*ny + (j-base_)*nz + k - base_) + base_
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine ijk2lidx3d
 
   subroutine  ijk2lidx2d(idx,i,j,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in)  :: i,j,nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in)  :: i,j,nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*ny + (j-base_) + base_
     call ijk2idx(idx,[i,j],[nx,ny],base)
@@ -450,13 +453,13 @@ contains
 
 
   subroutine  lijk2lidxv(idx,coords,dims,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(in)  :: coords(:),dims(:)
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(in)  :: coords(:),dims(:)
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_mpk_), intent(in), optional :: base
     
-    integer(psb_lpk_) :: base_, i, sz
+    integer(psb_epk_) :: base_, i, sz
     if (present(base)) then
       base_  = base
     else
@@ -489,27 +492,26 @@ contains
   !         ijk2idx(i,j,k) = idx
   !         idx = idx + 1
   subroutine  lijk2lidx3d(idx,i,j,k,nx,ny,nz,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_lpk_), intent(in)  :: i,j,k,nx,ny,nz
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_epk_), intent(in)  :: i,j,k,nx,ny,nz
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*nz*ny + (j-base_)*nz + k - base_) + base_
     call ijk2idx(idx,[i,j,k],[nx,ny,nz],base)
   end subroutine lijk2lidx3d
 
   subroutine  lijk2lidx2d(idx,i,j,nx,ny,base)
-    use psb_base_mod, only : psb_ipk_, psb_lpk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
-    integer(psb_lpk_), intent(out) :: idx
-    integer(psb_lpk_), intent(in)  :: i,j,nx,ny
-    integer(psb_ipk_), intent(in), optional :: base
+    integer(psb_epk_), intent(out) :: idx
+    integer(psb_epk_), intent(in)  :: i,j,nx,ny
+    integer(psb_mpk_), intent(in), optional :: base
     
     !    idx = ((i-base_)*ny + (j-base_) + base_
     call ijk2idx(idx,[i,j],[nx,ny],base)
   end subroutine lijk2lidx2d
-
   
   !
   ! dist1Didx
@@ -523,7 +525,7 @@ contains
   !     V(P+1) : first index owned by process P+1
   !
   subroutine dist1Didx(v,n,np,base)
-    use psb_base_mod, only : psb_ipk_
+    use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
     implicit none 
     integer(psb_ipk_), intent(out) :: v(:)
     integer(psb_ipk_), intent(in)  :: n, np

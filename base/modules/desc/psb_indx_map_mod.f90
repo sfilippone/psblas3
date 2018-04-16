@@ -142,12 +142,13 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: get_lr    => base_get_lr
     procedure, pass(idxmap)  :: get_lc    => base_get_lc
 
+
     procedure, pass(idxmap)  :: set_gri   => base_set_gri
     procedure, pass(idxmap)  :: set_gci   => base_set_gci
     procedure, pass(idxmap)  :: set_grl   => base_set_grl
     procedure, pass(idxmap)  :: set_gcl   => base_set_gcl
-    generic, public          :: set_gr => set_gri, set_grl
-    generic, public          :: set_gc => set_gci, set_gcl
+    generic, public          :: set_gr => set_grl
+    generic, public          :: set_gc => set_gcl
     
     procedure, pass(idxmap)  :: set_lr    => base_set_lr
     procedure, pass(idxmap)  :: set_lc    => base_set_lc
@@ -216,7 +217,7 @@ module psb_indx_map_mod
        & base_is_upd, base_is_asb, base_is_valid, base_is_ovl,&
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
        & base_get_mpic, base_sizeof, base_set_null, &
-       & base_set_gri, base_set_gci, base_set_grl, base_set_gcl, &
+       & base_set_grl, base_set_gcl, &
        & base_set_lr, base_set_lc, base_set_ctxt,&
        & base_set_mpic, base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
