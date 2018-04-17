@@ -282,6 +282,16 @@ module psb_desc_mod
     module procedure psb_cdfree
   end interface psb_free
 
+  interface psb_cd_set_large_threshold    
+    module procedure  psb_i_cd_set_large_threshold
+  end interface psb_cd_set_large_threshold
+
+#if defined(INT_I4_L8) 
+  interface psb_cd_set_large_threshold    
+    module procedure  psb_l_cd_set_large_threshold
+  end interface psb_cd_set_large_threshold
+#endif
+  
 
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
@@ -289,7 +299,7 @@ module psb_desc_mod
        & cd_g2ls2_ins, cd_g2lv1_ins, cd_g2lv2_ins, cd_fnd_owner
 
 
-  integer(psb_ipk_), private, save :: cd_large_threshold=psb_default_large_threshold 
+  integer(psb_lpk_), private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
 contains 
@@ -320,13 +330,21 @@ contains
 
 
 
-  subroutine psb_cd_set_large_threshold(ith)
+  subroutine psb_i_cd_set_large_threshold(ith)
     implicit none 
     integer(psb_ipk_), intent(in) :: ith
     if (ith > 0) then 
       cd_large_threshold = ith
     end if
-  end subroutine psb_cd_set_large_threshold
+  end subroutine psb_i_cd_set_large_threshold
+
+  subroutine psb_l_cd_set_large_threshold(ith)
+    implicit none 
+    integer(psb_lpk_), intent(in) :: ith
+    if (ith > 0) then 
+      cd_large_threshold = ith
+    end if
+  end subroutine psb_l_cd_set_large_threshold
 
   function  psb_cd_get_large_threshold() result(val)
     implicit none 

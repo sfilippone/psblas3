@@ -30,13 +30,13 @@ subroutine psb_par_error_handler(ictxt,err_act)
   implicit none 
   integer(psb_ipk_), intent(in) ::  ictxt
   integer(psb_ipk_), intent(in) ::  err_act
-  integer(psb_mpk_) ::  iictxt
+
   call psb_erractionrestore(err_act)
-  iictxt = ictxt 
+
   if (err_act == psb_act_print_)     &
-       &  call psb_error(iictxt, abrt=.false.)
+       &  call psb_error(ictxt, abrt=.false.)
   if (err_act == psb_act_abort_)      &
-       &  call psb_error(iictxt, abrt=.true.)
+       &  call psb_error(ictxt, abrt=.true.)
 
   return 
 
@@ -110,12 +110,13 @@ subroutine psb_perror(ictxt,abrt)
   character(len=20)  :: r_name
   character(len=40)  :: a_e_d
   integer(psb_epk_)  :: e_e_d(5)
-  integer(psb_mpk_) :: iam, np
+  integer(psb_mpk_) :: iictxt, iam, np
   logical :: abrt_
 
   abrt_=.true.
   if (present(abrt)) abrt_=abrt
-  call psb_info(ictxt,iam,np)
+  iictxt = ictxt 
+  call psb_info(iictxt,iam,np)
   
   if (psb_errstatus_fatal()) then
     if (psb_get_errverbosity() > 1) then
@@ -130,7 +131,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
       
-      if (abrt_) call psb_abort(ictxt,-1)
+      if (abrt_) call psb_abort(iictxt,-1)
       
     else
 
@@ -143,7 +144,7 @@ subroutine psb_perror(ictxt,abrt)
       flush(psb_err_unit) 
 #endif
 
-      if (abrt_) call psb_abort(ictxt,-1)
+      if (abrt_) call psb_abort(iictxt,-1)
 
     end if
   end if

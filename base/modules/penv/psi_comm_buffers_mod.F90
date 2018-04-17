@@ -98,7 +98,6 @@ module psi_comm_buffers_mod
     integer(psb_mpk_) :: request
     integer(psb_mpk_) :: icontxt 
     integer(psb_mpk_) :: buffer_type
-    integer(psb_ipk_), allocatable     :: intbuf(:)
     integer(psb_epk_), allocatable     :: int8buf(:)
     integer(psb_i2pk_), allocatable    :: int2buf(:)
     integer(psb_mpk_), allocatable     :: int4buf(:)
@@ -307,12 +306,12 @@ contains
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_int_type
-    call move_alloc(buffer,node%intbuf)
+    call move_alloc(buffer,node%int4buf)
     if (info /= 0) then 
       write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
-    call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_mpk_,&
+    call mpi_isend(node%int4buf,size(node%int4buf),psb_mpi_mpk_,&
          & dest,tag,icontxt,node%request,minfo)
     info = minfo
     call psb_insert_node(mesg_queue,node)
