@@ -54,16 +54,15 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
   integer(psb_ipk_), optional, intent(in)         :: n, lb
 
   !locals
-  integer(psb_ipk_) :: np,me,err,nr,i,j,err_act
-  integer(psb_ipk_) :: ictxt,n_
-  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_ipk_) :: err,nr,i,j,n_,err_act
+  integer(psb_ipk_) :: ictxt,np,me
+  integer(psb_ipk_) :: exch(3)
   character(len=20)   :: name
 
   name='psb_geall'
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
-  err=0
-  int_err(1)=0
+  info = psb_success_
+  err  = 0
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%get_context()
@@ -95,8 +94,7 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
     call psb_bcast(ictxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
       info=psb_err_parm_differs_among_procs_
-      int_err(1)=1
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/ione/))
       goto 9999
     endif
   endif
@@ -108,15 +106,14 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
-    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    call psb_errpush(info,name,a_err='Invalid desc_a')
     goto 9999
   endif
 
   call psb_realloc(nr,n_,x,info,lb2=lb)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
-    int_err(1)=nr*n_
-    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    call psb_errpush(info,name,i_err=(/nr*n_/),a_err='real(psb_spk_)')
     goto 9999
   endif
 
@@ -183,8 +180,8 @@ subroutine psb_sallocv(x, desc_a,info,n)
   integer(psb_ipk_), optional, intent(in)   :: n
 
   !locals
-  integer(psb_ipk_) :: np,me,nr,i,err_act
-  integer(psb_ipk_) :: ictxt, int_err(5)
+  integer(psb_ipk_) :: nr,i,err_act
+  integer(psb_ipk_) :: ictxt, np,me
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -221,15 +218,14 @@ subroutine psb_sallocv(x, desc_a,info,n)
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
-    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    call psb_errpush(info,name,a_err='Invalid desc_a')
     goto 9999
   endif
 
   call psb_realloc(nr,x,info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
-    int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
 

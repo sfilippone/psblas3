@@ -62,7 +62,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
        & flag_, err_act, novrl, norphan,&
        & npr_ov, itmpov, i_pnt
   integer(psb_lpk_) :: m, n, nrt, il
-  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_lpk_) :: l_err(5),exch(3)
   integer(psb_ipk_), allocatable :: tmpgidx(:,:), &
        & nov(:), ov_idx(:,:), temp_ovrlap(:)
   integer(psb_lpk_), allocatable :: vl(:), ix(:), l_temp_ovrlap(:)
@@ -101,16 +101,16 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   !... check m and n parameters....
   if (m < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
+    l_err(1) = 1
+    l_err(2) = m
   else if (n < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 2
-    int_err(2) = n
+    l_err(1) = 2
+    l_err(2) = n
   endif
 
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
   if (me == psb_root_) then
@@ -122,13 +122,13 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
-      int_err(1)=1
-      call psb_errpush(err,name,int_err)
+      l_err(1)=1
+      call psb_errpush(err,name,l_err=l_err)
       goto 9999
     else if (exch(2) /= n) then
       err=550
-      int_err(1)=2
-      call psb_errpush(err,name,int_err)
+      l_err(1)=2
+      call psb_errpush(err,name,l_err=l_err)
       goto 9999
     endif
     call psb_cd_set_large_threshold(exch(3))
@@ -142,7 +142,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
     info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
 
@@ -158,7 +158,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     allocate(tmpgidx(m,2),stat=info) 
     if (info /= psb_success_) then 
       info=psb_err_alloc_dealloc_
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,l_err=l_err)
       goto 9999
     end if
     tmpgidx = 0
@@ -166,10 +166,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     do i=1,loc_row
       if ((v(i)<1).or.(v(i)>m)) then 
         info = psb_err_entry_out_of_bounds_
-        int_err(1) = i
-        int_err(2) = v(i)
-        int_err(3) = loc_row
-        int_err(4) = m
+        l_err(1) = i
+        l_err(2) = v(i)
+        l_err(3) = loc_row
+        l_err(4) = m
       else
         tmpgidx(v(i),1) = me+flag_
         tmpgidx(v(i),2) = 1
@@ -192,11 +192,12 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
         end if
       end do
       if (norphan > 0) then 
-        int_err(1) = norphan
-        int_err(2) = m
+        l_err(1) = norphan
+        l_err(2) = m
         info = psb_err_inconsistent_index_lists_
       end if
     end if
+    
   else
     novrl   = 0
     norphan = 0
@@ -204,10 +205,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     do i=1,loc_row
       if ((v(i)<1).or.(v(i)>m)) then 
         info = psb_err_entry_out_of_bounds_
-        int_err(1) = i
-        int_err(2) = v(i)
-        int_err(3) = loc_row
-        int_err(4) = m
+        l_err(1) = i
+        l_err(2) = v(i)
+        l_err(3) = loc_row
+        l_err(4) = m
         exit
       endif
       vl(i) = v(i) 
@@ -220,7 +221,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   end if
 
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
 
@@ -265,8 +266,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     allocate(nov(0:np),ov_idx(npr_ov,2),stat=info)
     if (info /= psb_success_) then 
       info=psb_err_alloc_request_
-      int_err(1)=np + 2*npr_ov
-      call psb_errpush(info,name,i_err=int_err,a_err='integer')
+      l_err(1)=np + 2*npr_ov
+      call psb_errpush(info,name,l_err=l_err,a_err='integer')
       goto 9999
     endif
     nov=0
@@ -311,8 +312,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   end if
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
-    int_err(1)=2*m+psb_mdata_size_
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
+    l_err(1)=2*m+psb_mdata_size_
+    call psb_errpush(info,name,l_err=l_err,a_err='integer')
     goto 9999
   endif
 

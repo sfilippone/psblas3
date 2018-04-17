@@ -65,10 +65,9 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: ictxt, np, me, dupl_,err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -96,15 +95,11 @@ subroutine psb_lins_vect(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (x%get_nrows() < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
 
@@ -180,10 +175,9 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: ictxt, np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   integer(psb_lpk_), allocatable   :: lval(:)
   logical :: local_
@@ -212,15 +206,11 @@ subroutine psb_lins_vect_v(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (x%get_nrows() < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
 
@@ -290,10 +280,9 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,err_act, int_err(5), n
+  integer(psb_ipk_) :: i, loc_rows,loc_cols, n
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: ictxt, np, me, dupl_, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -326,15 +315,11 @@ subroutine psb_lins_vect_r2(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (x(1)%get_nrows() < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
 
@@ -412,10 +397,9 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_ipk_) :: i, loc_rows,loc_cols
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: ictxt, np, me, dupl_, err_act
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -443,15 +427,11 @@ subroutine psb_lins_multivect(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (x%get_nrows() < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
 

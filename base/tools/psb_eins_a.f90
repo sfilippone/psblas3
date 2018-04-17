@@ -66,10 +66,9 @@ subroutine psb_einsvi(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,&
-       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np, me, dupl_
+  integer(psb_ipk_) :: ictxt,np, me, dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)      :: name
@@ -97,15 +96,11 @@ subroutine psb_einsvi(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (size(x, dim=1) < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
 
@@ -249,16 +244,15 @@ subroutine psb_einsi(m, irw, val, x, desc_a, info, dupl,local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: ictxt,i,loc_row,j,n,&
-       & loc_rows,loc_cols,err_act, int_err(5)
+  integer(psb_ipk_) :: i,loc_row,j,n, loc_rows,loc_cols,err_act
   integer(psb_lpk_) :: mglob
-  integer(psb_ipk_) :: np,me,dupl_
+  integer(psb_ipk_) :: ictxt,np,me,dupl_
   integer(psb_ipk_), allocatable   :: irl(:)
   logical :: local_
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_einsi'
 
@@ -280,15 +274,11 @@ subroutine psb_einsi(m, irw, val, x, desc_a, info, dupl,local)
   !... check parameters....
   if (m < 0) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/ione,m/))
     goto 9999
   else if (size(x, dim=1) < desc_a%get_local_rows()) then
     info = 310
-    int_err(1) = 5
-    int_err(2) = 4
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,4_psb_ipk_/))
     goto 9999
   endif
   if (m == 0) return 

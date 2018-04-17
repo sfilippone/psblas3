@@ -55,9 +55,8 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_) :: ictxt, dectype
   integer(psb_ipk_) :: np,me,loc_row,loc_col,&
        &  length_ia1,length_ia2, err_act,m,n
-  integer(psb_ipk_) :: int_err(5)
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
@@ -87,9 +86,7 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   if (present(nnz))then 
     if (nnz < 0) then
       info=45
-      int_err(1)=7
-      int_err(2)=nnz
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/7_psb_ipk_,nnz/))
       goto 9999
     endif
     length_ia1=nnz
@@ -105,8 +102,7 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='sp_all'
-    call psb_errpush(info,name,int_err)
+    call psb_errpush(info,name,a_err='sp_all')
     goto 9999
   end if
 

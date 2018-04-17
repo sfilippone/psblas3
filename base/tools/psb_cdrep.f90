@@ -115,7 +115,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   !locals
   integer(psb_ipk_) :: i,np,me,err,err_act
   integer(psb_lpk_) :: n
-  integer(psb_ipk_) :: int_err(5),exch(2)
+  integer(psb_lpk_) :: l_err(5),exch(2)
   integer(psb_ipk_) :: thalo(1), tovr(1), text(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_mpk_) :: iictxt
@@ -136,16 +136,16 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   !... check m and n parameters....
   if (m < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 1
-    int_err(2) = m
+    l_err(1) = 1
+    l_err(2) = m
   else if (n < 1) then
     info = psb_err_iarg_neg_
-    int_err(1) = 2
-    int_err(2) = n
+    l_err(1) = 2
+    l_err(2) = n
   endif
 
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
 
@@ -160,15 +160,15 @@ subroutine psb_cdrep(m, ictxt, desc, info)
     call psb_bcast(ictxt,exch(1:2),root=psb_root_)
     if (exch(1) /= m) then
       info=psb_err_parm_differs_among_procs_
-      int_err(1)=1
+      l_err(1)=1
     else if (exch(2) /= n) then
       info=psb_err_parm_differs_among_procs_
-      int_err(1)=2
+      l_err(1)=2
     endif
   endif
 
   if (info /= psb_success_) then 
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,l_err=l_err)
     goto 9999
   end if
 

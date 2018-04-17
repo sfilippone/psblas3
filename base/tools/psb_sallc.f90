@@ -55,7 +55,7 @@ subroutine psb_salloc_vect(x, desc_a,info,n)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act
-  integer(psb_ipk_) :: ictxt, int_err(5)
+  integer(psb_ipk_) :: ictxt
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -92,7 +92,7 @@ subroutine psb_salloc_vect(x, desc_a,info,n)
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
-    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    call psb_errpush(info,name,a_err='Invalid desc_a')
     goto 9999
   endif
 
@@ -100,8 +100,7 @@ subroutine psb_salloc_vect(x, desc_a,info,n)
   if (info == 0) call x%all(nr,info)
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
-    int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
   call x%zero()
@@ -128,7 +127,7 @@ subroutine psb_salloc_vect_r2(x, desc_a,info,n,lb)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
-  integer(psb_ipk_) :: ictxt, int_err(5), exch(1)
+  integer(psb_ipk_) :: ictxt, exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
 
@@ -175,8 +174,7 @@ subroutine psb_salloc_vect_r2(x, desc_a,info,n,lb)
     call psb_bcast(ictxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
       info=psb_err_parm_differs_among_procs_
-      int_err(1)=1
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/ione/))
       goto 9999
     endif
   endif
@@ -189,7 +187,7 @@ subroutine psb_salloc_vect_r2(x, desc_a,info,n,lb)
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
-    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    call psb_errpush(info,name,a_err='Invalid desc_a')
     goto 9999
   endif
 
@@ -204,8 +202,7 @@ subroutine psb_salloc_vect_r2(x, desc_a,info,n,lb)
   end if
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
-    int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
 
@@ -232,7 +229,7 @@ subroutine psb_salloc_multivect(x, desc_a,info,n)
 
   !locals
   integer(psb_ipk_) :: np,me,nr,i,err_act, n_, lb_
-  integer(psb_ipk_) :: ictxt, int_err(5), exch(1)
+  integer(psb_ipk_) :: ictxt, exch(1)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)  :: name
 
@@ -274,8 +271,7 @@ subroutine psb_salloc_multivect(x, desc_a,info,n)
     call psb_bcast(ictxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
       info=psb_err_parm_differs_among_procs_
-      int_err(1)=1
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,i_err=(/ione/))
       goto 9999
     endif
   endif
@@ -288,7 +284,7 @@ subroutine psb_salloc_multivect(x, desc_a,info,n)
     nr = max(1,desc_a%get_local_rows())
   else
     info = psb_err_internal_error_
-    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    call psb_errpush(info,name,a_err='Invalid desc_a')
     goto 9999
   endif
 
@@ -298,8 +294,7 @@ subroutine psb_salloc_multivect(x, desc_a,info,n)
   
   if (psb_errstatus_fatal()) then 
     info=psb_err_alloc_request_
-    int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
+    call psb_errpush(info,name,i_err=(/nr/),a_err='real(psb_spk_)')
     goto 9999
   endif
 
