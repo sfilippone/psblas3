@@ -223,7 +223,7 @@ subroutine psb_cfcg_vect(a,prec,b,x,eps,desc_a,info,&
       if (psb_errstatus_fatal()) then 
         nc2l = desc_a%get_local_cols()
         info=psb_err_alloc_request_
-        call psb_errpush(info,name,i_err=(/2*nc2l,izero,izero,izero,izero/),&
+        call psb_errpush(info,name,i_err=(/2*nc2l/),&
              & a_err='complex(psb_spk_)')
         goto 9999      
       end if

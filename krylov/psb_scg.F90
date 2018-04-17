@@ -299,7 +299,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
            & ieg,nspl,eig,ibl,ispl,ewrk,iwrk,info)
       if (info < 0) then 
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err='sstebz',i_err=(/info,izero,izero,izero,izero/))
+             & a_err='sstebz',i_err=(/info/))
         info=psb_err_from_subroutine_ai_
         goto 9999
       end if
