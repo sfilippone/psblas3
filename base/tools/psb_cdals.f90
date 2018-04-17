@@ -61,7 +61,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   integer(psb_ipk_) :: counter,i,j,loc_row,err,loc_col,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx, nlx
   integer(psb_lpk_) :: iglob
-  integer(psb_ipk_) :: int_err(5),exch(3)
+  integer(psb_ipk_) :: exch(3)
   integer(psb_ipk_), allocatable  :: temp_ovrlap(:)
   integer(psb_lpk_), allocatable  :: l_temp_ovrlap(:), loc_idx(:)
   integer(psb_ipk_), allocatable  :: prc_v(:)
@@ -87,14 +87,12 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (m < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 1; int_err(2) = m;
-    call psb_errpush(err,name,int_err)
+    call psb_errpush(err,name,l_err=(/lone,m/))
     goto 9999
   else if (n < 1) then
     info = psb_err_iarg_neg_
     err=info
-    int_err(1) = 2 ;     int_err(2) = n;
-    call psb_errpush(err,name,int_err)
+    call psb_errpush(err,name,l_err=(/lone*2,n/))
     goto 9999
   endif
 
@@ -108,13 +106,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     call psb_bcast(ictxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
-      int_err(1)=1
-      call psb_errpush(err,name,int_err)
+      call psb_errpush(err,name,m_err=(/1/))
       goto 9999
     else if (exch(2) /= n) then
       err=550
-      int_err(1)=2
-      call psb_errpush(err,name,int_err)
+      call psb_errpush(err,name,m_err=(/2/))
       goto 9999
     endif
     call psb_cd_set_large_threshold(exch(3))
@@ -130,8 +126,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (info /= psb_success_) then     
     info=psb_err_alloc_request_
     err=info
-    int_err(1)=2*m+psb_mdata_size_+np
-    call psb_errpush(err,name,int_err,a_err='integer')
+    call psb_errpush(err,name,a_err='integer',l_err=(/2*m+psb_mdata_size_+np/))
     goto 9999
   endif
 
@@ -168,8 +163,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
-    int_err(1)=loc_col
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
+    call psb_errpush(info,name,i_err=(/loc_col/),a_err='integer')
     goto 9999
   end if
 
@@ -182,30 +176,17 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
       call parts(iglob,m,np,prc_v,nprocs)
       if (nprocs > np) then
         info=psb_err_partfunc_toomuchprocs_
-        int_err(1)=3
-        int_err(2)=np
-        int_err(3)=nprocs
-        int_err(4)=iglob
-        err=info
-        call psb_errpush(err,name,int_err)
+        call psb_errpush(info,name,l_err=(/3_psb_lpk_,np*lone,nprocs*lone,iglob/))
         goto 9999
       else if (nprocs <= 0) then
         info=psb_err_partfunc_toofewprocs_
-        int_err(1)=3
-        int_err(2)=nprocs
-        int_err(3)=iglob
-        err=info
-        call psb_errpush(err,name,int_err)
+        call psb_errpush(info,name,l_err=(/3_psb_lpk_,nprocs*lone,iglob/))
         goto 9999
       else
         do j=1,nprocs
           if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
             info=psb_err_partfunc_wrong_pid_
-            int_err(1)=3
-            int_err(2)=prc_v(j)
-            int_err(3)=iglob
-            err=info
-            call psb_errpush(err,name,int_err)
+            call psb_errpush(info,name,l_err=(/3_psb_lpk_,prc_v(j)*lone,iglob/))
             goto 9999
           end if
         end do

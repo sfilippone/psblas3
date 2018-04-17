@@ -2,7 +2,7 @@
 subroutine psb_errcomm(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
-  integer(psb_mpk_), intent(in)   :: ictxt
+  integer(psb_ipk_), intent(in)   :: ictxt
   integer(psb_ipk_), intent(inout):: err
   
   if (psb_get_global_checks()) call psb_amx(ictxt, err)
@@ -45,7 +45,7 @@ end subroutine psb_par_error_handler
 subroutine psb_par_error_print_stack(ictxt)
   use psb_error_mod, psb_protect_name => psb_par_error_print_stack
   use psb_penv_mod
-  integer(psb_mpk_), intent(in) ::  ictxt
+  integer(psb_ipk_), intent(in) ::  ictxt
 
   call psb_error(ictxt, abrt=.false.)
   
@@ -68,24 +68,24 @@ subroutine psb_serror()
   integer(psb_ipk_) ::  err_c
   character(len=20)       ::  r_name
   character(len=40)       ::  a_e_d
-  integer(psb_ipk_) ::  i_e_d(5)
+  integer(psb_epk_) ::  e_e_d(5)
 
   if (psb_errstatus_fatal()) then
     if(psb_get_errverbosity() > 1) then
 
       do while (psb_get_numerr() > izero)
         write(psb_err_unit,'(50("="))')
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d)
+        call psb_errpop(err_c, r_name, e_e_d, a_e_d)
+        call psb_errmsg(psb_err_unit,err_c, r_name, e_e_d, a_e_d)
         !            write(psb_err_unit,'(50("="))')
       end do
 
     else
 
-      call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d)
+      call psb_errpop(err_c, r_name, e_e_d, a_e_d)
+      call psb_errmsg(psb_err_unit,err_c, r_name, e_e_d, a_e_d)
       do while (psb_get_numerr() > 0)
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
+        call psb_errpop(err_c, r_name, e_e_d, a_e_d)
       end do
     end if
   end if
@@ -103,13 +103,13 @@ subroutine psb_perror(ictxt,abrt)
   use psb_error_mod
   use psb_penv_mod
   implicit none 
-  integer(psb_mpk_), intent(in) :: ictxt
+  integer(psb_ipk_), intent(in) :: ictxt
   logical, intent(in), optional  :: abrt
 
   integer(psb_ipk_)  :: err_c
   character(len=20)  :: r_name
   character(len=40)  :: a_e_d
-  integer(psb_ipk_)  :: i_e_d(5)
+  integer(psb_epk_)  :: e_e_d(5)
   integer(psb_mpk_) :: iam, np
   logical :: abrt_
 
@@ -122,8 +122,8 @@ subroutine psb_perror(ictxt,abrt)
 
       do while (psb_get_numerr() > izero)
         write(psb_err_unit,'(50("="))')
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d,iam)
+        call psb_errpop(err_c, r_name, e_e_d, a_e_d)
+        call psb_errmsg(psb_err_unit,err_c, r_name, e_e_d, a_e_d,iam)
         !            write(psb_err_unit,'(50("="))')
       end do
 #if defined(HAVE_FLUSH_STMT)
@@ -134,10 +134,10 @@ subroutine psb_perror(ictxt,abrt)
       
     else
 
-      call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      call psb_errmsg(psb_err_unit,err_c, r_name, i_e_d, a_e_d,iam)
+      call psb_errpop(err_c, r_name, e_e_d, a_e_d)
+      call psb_errmsg(psb_err_unit,err_c, r_name, e_e_d, a_e_d,iam)
       do while (psb_get_numerr() > 0)
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
+        call psb_errpop(err_c, r_name, e_e_d, a_e_d)
       end do
 #if defined(HAVE_FLUSH_STMT)
       flush(psb_err_unit) 

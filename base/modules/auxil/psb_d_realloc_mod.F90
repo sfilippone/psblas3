@@ -111,8 +111,8 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name, &
-           & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -124,8 +124,8 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name, &
-               & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -136,8 +136,8 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name, &
-             & i_err=(/len,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, l_err=(/len*1_psb_lpk_/), &
+             & a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -188,14 +188,14 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      call psb_errpush(err,name, &
-           & i_err=(/len1,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name, &
-           & i_err=(/len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, l_err=(/len2*1_psb_lpk_/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -210,8 +210,8 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= psb_success_) then
           err=4025
-          call psb_errpush(err,name, &
-               & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_*len2/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -224,8 +224,8 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= psb_success_) then
         err=4025
-        call psb_errpush(err,name, &
-             & i_err=(/len1*len2,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, l_err=(/len1*1_psb_lpk_*len2/), &
+             & a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -275,8 +275,8 @@ Contains
     if ((len<0)) then 
       err=4025
       iplen = len 
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -289,8 +289,8 @@ Contains
         if (info /= psb_success_) then
           err=4025
           iplen = len 
-          call psb_errpush(err,name, &
-               & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, i_err=(/iplen/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -302,8 +302,8 @@ Contains
       if (info /= psb_success_) then
         err=4025
         iplen = len 
-        call psb_errpush(err,name, &
-             & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, i_err=(/iplen/), &
+             & a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -355,15 +355,15 @@ Contains
     if (len1 < 0) then
       err=4025
       iplen = len1             
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
       iplen = len2 
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -379,8 +379,8 @@ Contains
         if (info /= psb_success_) then
           err=4025
           iplen = len1*len2
-          call psb_errpush(err,name, &
-               & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, i_err=(/iplen/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -394,8 +394,8 @@ Contains
       if (info /= psb_success_) then
         err=4025
         iplen = len1*len2
-        call psb_errpush(err,name, &
-             & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, i_err=(/iplen/), &
+             & a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -450,15 +450,15 @@ Contains
     if (len1 < 0) then
       err=4025 
       iplen = len1
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
       iplen = len2
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -474,8 +474,8 @@ Contains
         if (info /= psb_success_) then
           err=4025
           iplen = len1*len2
-          call psb_errpush(err,name, &
-               & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, i_err=(/iplen/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -489,8 +489,8 @@ Contains
       if (info /= psb_success_) then
         err=4025
         iplen = len1*len2
-        call psb_errpush(err,name, &
-             & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name,i_err=(/iplen/),&
+             &  a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -545,15 +545,15 @@ Contains
     if (len1 < 0) then
       err=4025 
       iplen = len1
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
       iplen = len2
-      call psb_errpush(err,name, &
-           & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+      call psb_errpush(err,name, i_err=(/iplen/), &
+           & a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -569,8 +569,8 @@ Contains
         if (info /= psb_success_) then
           err=4025
           iplen = len1*len2
-          call psb_errpush(err,name, &
-               & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+          call psb_errpush(err,name, i_err=(/iplen/), &
+               & a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -584,8 +584,8 @@ Contains
       if (info /= psb_success_) then
         err=4025
         iplen = len1*len2              
-        call psb_errpush(err,name, &
-             & i_err=(/iplen,izero,izero,izero,izero/),a_err='real(psb_dpk_)')
+        call psb_errpush(err,name, i_err=(/iplen/), &
+             & a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif

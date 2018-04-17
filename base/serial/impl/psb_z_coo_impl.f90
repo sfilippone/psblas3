@@ -39,8 +39,7 @@ subroutine psb_z_coo_get_diag(a,d,info)
   complex(psb_dpk_), intent(out)     :: d(:)
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act,mnm, i, j
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act,mnm, i, j
   character(len=20)  :: name='get_diag'
   logical, parameter :: debug=.false.
 
@@ -51,8 +50,7 @@ subroutine psb_z_coo_get_diag(a,d,info)
   mnm = min(a%get_nrows(),a%get_ncols())
   if (size(d) < mnm) then 
     info=psb_err_input_asize_invalid_i_
-    ierr(1) = 2; ierr(2) = size(d); 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/2_psb_ipk_,size(d,kind=psb_ipk_)/))
     goto 9999
   end if
 
@@ -88,8 +86,7 @@ subroutine psb_z_coo_scal(d,a,info,side)
   integer(psb_ipk_), intent(out)            :: info
   character, intent(in), optional :: side
 
-  integer(psb_ipk_) :: err_act,mnm, i, j, m
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act,mnm, i, j, m
   character(len=20)  :: name='scal'
   character :: side_
   logical   :: left 
@@ -114,8 +111,7 @@ subroutine psb_z_coo_scal(d,a,info,side)
     m = a%get_nrows()
     if (size(d) < m) then 
       info=psb_err_input_asize_invalid_i_
-      ierr(1) = 2; ierr(2) = size(d); 
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,i_err=(/2_psb_ipk_,size(d,kind=psb_ipk_)/))
       goto 9999
     end if
     
@@ -127,8 +123,7 @@ subroutine psb_z_coo_scal(d,a,info,side)
     m = a%get_ncols()
     if (size(d) < m) then 
       info=psb_err_input_asize_invalid_i_
-      ierr(1) = 2; ierr(2) = size(d); 
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,i_err=(/2_psb_ipk_,size(d,kind=psb_ipk_)/))
       goto 9999
     end if
     
@@ -158,8 +153,7 @@ subroutine psb_z_coo_scals(d,a,info)
   complex(psb_dpk_), intent(in)      :: d
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act,mnm, i, j, m
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act,mnm, i, j, m
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -193,8 +187,7 @@ subroutine  psb_z_coo_reallocate_nz(nz,a)
   implicit none 
   integer(psb_ipk_), intent(in) :: nz
   class(psb_z_coo_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act, info, nz_
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info, nz_
   character(len=20)  :: name='z_coo_reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -226,8 +219,7 @@ subroutine psb_z_coo_mold(a,b,info)
   class(psb_z_coo_sparse_mat), intent(in)                  :: a
   class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='coo_mold'
   logical, parameter :: debug=.false.
 
@@ -261,8 +253,7 @@ subroutine psb_z_coo_reinit(a,clear)
   class(psb_z_coo_sparse_mat), intent(inout) :: a   
   logical, intent(in), optional :: clear
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='reinit'
   logical  :: clear_
   logical, parameter :: debug=.false.
@@ -308,8 +299,7 @@ subroutine  psb_z_coo_trim(a)
   use psb_error_mod
   implicit none 
   class(psb_z_coo_sparse_mat), intent(inout) :: a
-  integer(psb_ipk_) :: err_act, info, nz
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info, nz
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -365,8 +355,7 @@ subroutine  psb_z_coo_allocate_mnnz(m,n,a,nz)
   integer(psb_ipk_), intent(in) :: m,n
   class(psb_z_coo_sparse_mat), intent(inout) :: a
   integer(psb_ipk_), intent(in), optional :: nz
-  integer(psb_ipk_) :: err_act, info, nz_
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info, nz_
   character(len=20)  :: name='allocate_mnz'
   logical, parameter :: debug=.false.
 
@@ -374,14 +363,12 @@ subroutine  psb_z_coo_allocate_mnnz(m,n,a,nz)
   info = psb_success_
   if (m < 0) then 
     info = psb_err_iarg_neg_
-    ierr(1) = ione; ierr(2) = izero; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/ione,izero/))
     goto 9999
   endif
   if (n < 0) then 
     info = psb_err_iarg_neg_
-    ierr(1) = 2; ierr(2) = izero; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/2_psb_ipk_,izero/))
     goto 9999
   endif
   if (present(nz)) then 
@@ -391,8 +378,7 @@ subroutine  psb_z_coo_allocate_mnnz(m,n,a,nz)
   end if
   if (nz_ < 0) then 
     info = psb_err_iarg_neg_
-    ierr(1) = 3; ierr(2) = izero; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,izero/))
     goto 9999
   endif
   if (info == psb_success_) call psb_realloc(nz_,a%ia,info)
@@ -433,13 +419,12 @@ subroutine psb_z_coo_print(iout,a,iv,head,ivr,ivc)
   character(len=*), optional        :: head
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_coo_print'
   logical, parameter :: debug=.false.
 
   character(len=*), parameter  :: datatype='complex'
-  character(len=80)                 :: frmtv 
+  character(len=80)            :: frmtv 
   integer(psb_ipk_) :: i,j, nmx, ni, nr, nc, nz
 
   write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
@@ -562,8 +547,7 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   complex(psb_dpk_) :: acc
   complex(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra, ctra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_base_csmm'
   logical, parameter :: debug=.false.
 
@@ -593,14 +577,12 @@ subroutine psb_z_coo_cssm(alpha,a,x,beta,y,info,trans)
   m   = a%get_nrows()
   if (size(x,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,size(x,1,kind=psb_ipk_),m/))
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,size(y,1,kind=psb_ipk_),m/))
     goto 9999
   end if
 
@@ -918,8 +900,7 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   complex(psb_dpk_) :: acc
   complex(psb_dpk_), allocatable :: tmp(:)
   logical   :: tra, ctra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_coo_cssv_impl'
   logical, parameter :: debug=.false.
 
@@ -943,14 +924,12 @@ subroutine psb_z_coo_cssv(alpha,a,x,beta,y,info,trans)
   m = a%get_nrows()
   if (size(x,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = m; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,size(x,1,kind=psb_ipk_),m/))
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,size(y,1,kind=psb_ipk_),m/))
     goto 9999
   end if
   if (.not. (a%is_triangle())) then 
@@ -1262,8 +1241,7 @@ subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc
   complex(psb_dpk_) :: acc
   logical   :: tra, ctra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_coo_csmv_impl'
   logical, parameter :: debug=.false.
 
@@ -1297,16 +1275,15 @@ subroutine psb_z_coo_csmv(alpha,a,x,beta,y,info,trans)
   end if
   if (size(x,1) < n) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,size(x,1,kind=psb_ipk_),n/))
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,size(y,1,kind=psb_ipk_),m/))
     goto 9999
   end if
+
   nnz = a%get_nzeros()
 
   if (alpha == zzero) then
@@ -1450,15 +1427,14 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
   class(psb_z_coo_sparse_mat), intent(in) :: a
   complex(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
   complex(psb_dpk_), intent(inout)       :: y(:,:)
-  integer(psb_ipk_), intent(out)                :: info
+  integer(psb_ipk_), intent(out)       :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
   complex(psb_dpk_), allocatable  :: acc(:)
   logical   :: tra, ctra
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_coo_csmm_impl'
   logical, parameter :: debug=.false.
 
@@ -1494,14 +1470,12 @@ subroutine psb_z_coo_csmm(alpha,a,x,beta,y,info,trans)
   end if
   if (size(x,1) < n) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 3; ierr(2) = size(x,1); ierr(3) = n; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_,size(x,1,kind=psb_ipk_),n/))
     goto 9999
   end if
   if (size(y,1) < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = size(y,1); ierr(3) =m; 
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/5_psb_ipk_,size(y,1,kind=psb_ipk_),m/))
     goto 9999
   end if
 
@@ -1654,8 +1628,7 @@ function psb_z_coo_maxval(a) result(res)
   class(psb_z_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_)         :: res
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
   character(len=20)  :: name='z_coo_maxval'
   logical, parameter :: debug=.false.
 
@@ -1686,7 +1659,6 @@ function psb_z_coo_csnmi(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical            :: tra, is_unit
   integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name='z_coo_csnmi'
   logical, parameter :: debug=.false.
 
@@ -1748,7 +1720,6 @@ function psb_z_coo_csnm1(a) result(res)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='z_coo_csnm1'
   logical, parameter :: debug=.false.
 
@@ -1787,7 +1758,6 @@ subroutine psb_z_coo_rowsum(d,a)
   complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1795,10 +1765,10 @@ subroutine psb_z_coo_rowsum(d,a)
   if (a%is_dev())   call a%sync()
 
   m = a%get_nrows()
+
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/1_psb_ipk_,size(d,kind=psb_ipk_),m/))
     goto 9999
   end if
 
@@ -1836,7 +1806,6 @@ subroutine psb_z_coo_arwsum(d,a)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='rowsum'
   logical, parameter :: debug=.false.
 
@@ -1846,8 +1815,7 @@ subroutine psb_z_coo_arwsum(d,a)
   m = a%get_nrows()
   if (size(d) < m) then 
     info=psb_err_input_asize_small_i_
-    ierr(1) = 1; ierr(2) = size(d); ierr(3) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/1_psb_ipk_,size(d,kind=psb_ipk_),m/))
     goto 9999
   end if
 
@@ -1884,7 +1852,6 @@ subroutine psb_z_coo_colsum(d,a)
   complex(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='colsum'
   logical, parameter :: debug=.false.
 
@@ -1894,8 +1861,7 @@ subroutine psb_z_coo_colsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    ierr(1) = 1; ierr(2) = size(d);  ierr(3) = n
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/1_psb_ipk_,size(d,kind=psb_ipk_),n/))
     goto 9999
   end if
 
@@ -1933,7 +1899,6 @@ subroutine psb_z_coo_aclsum(d,a)
   real(psb_dpk_), allocatable :: vt(:)
   logical   :: tra
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='aclsum'
   logical, parameter :: debug=.false.
 
@@ -1943,10 +1908,10 @@ subroutine psb_z_coo_aclsum(d,a)
   n = a%get_ncols()
   if (size(d) < n) then 
     info=psb_err_input_asize_small_i_
-    ierr(1) = 1; ierr(2) = size(d); ierr(3) = n
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/1_psb_ipk_,size(d,kind=psb_ipk_),n/))
     goto 9999
   end if
+
 
   if (a%is_unit()) then 
     d = done
@@ -2006,8 +1971,7 @@ subroutine psb_z_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
   logical, intent(in), optional                 :: rscale,cscale
 
   logical :: append_, rscale_, cscale_ 
-  integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -2282,7 +2246,6 @@ subroutine psb_z_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -2556,12 +2519,11 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   integer(psb_ipk_), intent(in), optional   :: gtl(:)
 
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='z_coo_csput_a_impl'
   logical, parameter :: debug=.false.
-  integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
-
+  integer(psb_ipk_)  :: nza, i,j,k, nzl, isza, debug_level, debug_unit
+ 
   info = psb_success_
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -2570,27 +2532,23 @@ subroutine psb_z_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (nz < 0) then 
     info = psb_err_iarg_neg_
-    ierr(1)=1
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/1_psb_ipk_/))
     goto 9999
   end if
   if (size(ia) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    ierr(1)=2
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/2_psb_ipk_/))
     goto 9999
   end if
 
   if (size(ja) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    ierr(1)=3
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/3_psb_ipk_/))
     goto 9999
   end if
   if (size(val) < nz) then 
     info = psb_err_input_asize_invalid_i_
-    ierr(1)=4
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info,name,i_err=(/4_psb_ipk_/))
     goto 9999
   end if
 
@@ -2931,8 +2889,7 @@ subroutine psb_z_cp_coo_to_coo(a,b,info)
   class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act, nz
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, nz
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -2974,8 +2931,7 @@ subroutine psb_z_cp_coo_from_coo(a,b,info)
   class(psb_z_coo_sparse_mat), intent(in)    :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
@@ -3021,8 +2977,7 @@ subroutine psb_z_cp_coo_to_fmt(a,b,info)
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -3054,8 +3009,7 @@ subroutine psb_z_cp_coo_from_fmt(a,b,info)
   class(psb_z_base_sparse_mat), intent(in) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
@@ -3089,8 +3043,7 @@ subroutine psb_z_mv_coo_to_coo(a,b,info)
   class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -3132,8 +3085,7 @@ subroutine psb_z_mv_coo_from_coo(a,b,info)
   class(psb_z_coo_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
@@ -3177,8 +3129,7 @@ subroutine psb_z_mv_coo_to_fmt(a,b,info)
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -3210,8 +3161,7 @@ subroutine psb_z_mv_coo_from_fmt(a,b,info)
   class(psb_z_base_sparse_mat), intent(inout) :: b
   integer(psb_ipk_), intent(out)            :: info
 
-  integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
@@ -3245,8 +3195,7 @@ subroutine psb_z_coo_cp_from(a,b)
   type(psb_z_coo_sparse_mat), intent(in)   :: b
 
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='cp_from'
   logical, parameter :: debug=.false.
 
@@ -3276,8 +3225,7 @@ subroutine psb_z_coo_mv_from(a,b)
   type(psb_z_coo_sparse_mat), intent(inout) :: b
 
 
-  integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
+  integer(psb_ipk_)  :: err_act, info
   character(len=20)  :: name='mv_from'
   logical, parameter :: debug=.false.
 
@@ -3314,7 +3262,6 @@ subroutine psb_z_fix_coo(a,info,idir)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_, nra, nca
   integer(psb_ipk_) :: i,j, irw, icl, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)    :: name = 'psb_fixcoo'
 
   info  = psb_success_
@@ -3379,7 +3326,6 @@ subroutine psb_z_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   integer(psb_ipk_) :: nza, nzl,iret,idir_, dupl_
   integer(psb_ipk_) :: i,j, irw, icl, err_act, ip,is, imx, k, ii
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)    :: name = 'psb_fixcoo'
   logical :: srt_inp, use_buffers
 
