@@ -268,7 +268,7 @@ contains
     name = 'mat_renum_amd'
     call psb_erractionsave(err_act)
 
-#if defined(HAVE_AMD) 
+#if defined(HAVE_AMD)  && !defined(INT_I8_L8)
 
     info = psb_success_
     nr   = a%get_nrows()
