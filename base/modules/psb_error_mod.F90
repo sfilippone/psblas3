@@ -99,11 +99,18 @@ module psb_error_mod
   end interface
 
   interface psb_errcomm
-    subroutine psb_errcomm(ictxt, err)
+#if defined(INT_I8_L8)
+    subroutine psb_errcomm_m(ictxt, err)
+      import :: psb_ipk_, psb_mpk_
+      integer(psb_mpk_), intent(in)   :: ictxt
+      integer(psb_ipk_), intent(inout):: err
+    end subroutine psb_errcomm_m
+#endif    
+    subroutine psb_errcomm_i(ictxt, err)
       import :: psb_ipk_
       integer(psb_ipk_), intent(in)   :: ictxt
       integer(psb_ipk_), intent(inout):: err
-    end subroutine psb_errcomm
+    end subroutine psb_errcomm_i
   end interface psb_errcomm
 
   interface psb_errpop
@@ -177,22 +184,6 @@ contains
   end function psb_get_global_checks
     
   
-#if defined(LONG_INTEGERS)
-  subroutine psb_errcomm_ipk(ictxt, err)
-    integer(psb_ipk_), intent(in)   :: ictxt
-    integer(psb_ipk_), intent(inout):: err
-    integer(psb_mpk_) :: iictxt
-    iictxt = ictxt
-    call psb_errcomm(iictxt,err)
-  end subroutine psb_errcomm_ipk
-
-  subroutine psb_perror_ipk(ictxt)
-    integer(psb_ipk_), intent(in)   :: ictxt
-    integer(psb_mpk_) :: iictxt
-    iictxt = ictxt
-    call psb_perror(iictxt)
-  end subroutine psb_perror_ipk
-#endif
   ! saves action to support error traceback
   ! also changes error action to "return"
   subroutine psb_erractionsave(err_act)

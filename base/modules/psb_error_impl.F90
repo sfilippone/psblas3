@@ -1,14 +1,27 @@
 ! checks wether an error has occurred on one of the porecesses in the execution pool
-subroutine psb_errcomm(ictxt, err)
+subroutine psb_errcomm_i(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm
   use psb_penv_mod
   integer(psb_ipk_), intent(in)   :: ictxt
   integer(psb_ipk_), intent(inout):: err
+  integer(psb_mpk_)  :: iictxt
+
+  iictxt = ictxt
+  call psb_errcomm(iictxt,err)
+
+end subroutine psb_errcomm_i
+#if defined(INT_I8_L8)
+
+subroutine psb_errcomm_m(ictxt, err)
+  use psb_error_mod, psb_protect_name => psb_errcomm
+  use psb_penv_mod
+  integer(psb_mpk_), intent(in)   :: ictxt
+  integer(psb_ipk_), intent(inout):: err
   
   if (psb_get_global_checks()) call psb_amx(ictxt, err)
 
-end subroutine psb_errcomm
-
+end subroutine psb_errcomm_m
+#endif
 subroutine psb_ser_error_handler(err_act)
   use psb_error_mod, psb_protect_name => psb_ser_error_handler
   use psb_penv_mod
