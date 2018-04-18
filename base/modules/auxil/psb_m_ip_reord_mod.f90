@@ -51,9 +51,9 @@ contains
   
   subroutine psb_ip_reord_m1(n,x,iaux)
     integer(psb_ipk_), intent(in) :: n
-    integer(psb_mpk_) :: iaux(0:*) 
+    integer(psb_ipk_) :: iaux(0:*) 
     integer(psb_mpk_)   :: x(*)
-    integer(psb_mpk_) :: lswap, lp, k
+    integer(psb_ipk_) :: lswap, lp, k
     integer(psb_mpk_) :: swap
     
     lp = iaux(0)
@@ -78,13 +78,11 @@ contains
   
   subroutine psb_ip_reord_m1i1(n,x,indx,iaux)
     integer(psb_ipk_), intent(in) :: n
-    integer(psb_mpk_) :: iaux(0:*) 
+    integer(psb_ipk_) :: iaux(0:*) 
     integer(psb_mpk_)   :: x(*)
-    integer(psb_mpk_) :: indx(*) 
-    integer(psb_mpk_) :: lswap, lp, k, ixswap
+    integer(psb_ipk_) :: indx(*) 
+    integer(psb_ipk_) :: lswap, lp, k, ixswap
     integer(psb_mpk_) :: swap
-
-
 
     lp = iaux(0)
     k  = 1

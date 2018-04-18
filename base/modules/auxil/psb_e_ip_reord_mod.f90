@@ -84,8 +84,6 @@ contains
     integer(psb_epk_) :: lswap, lp, k, ixswap
     integer(psb_epk_) :: swap
 
-
-
     lp = iaux(0)
     k  = 1
     do 

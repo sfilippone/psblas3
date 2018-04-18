@@ -41,7 +41,8 @@ module psi_i_mod
   interface psi_compute_size
     subroutine psi_i_compute_size(desc_data,&
          & index_in, dl_lda, info)
-      import 
+      import
+      implicit none 
       integer(psb_ipk_) :: info
       integer(psb_ipk_) :: dl_lda
       integer(psb_ipk_) :: desc_data(:), index_in(:)
@@ -50,7 +51,8 @@ module psi_i_mod
 
   interface psi_crea_bnd_elem
     subroutine psi_i_crea_bnd_elem(bndel,desc_a,info)
-      import 
+      import
+      implicit none 
       integer(psb_ipk_), allocatable            :: bndel(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
@@ -59,7 +61,8 @@ module psi_i_mod
 
   interface psi_crea_index
     subroutine psi_i_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
-      import 
+      import
+      implicit none 
       type(psb_desc_type), intent(in)     :: desc_a
       integer(psb_ipk_), intent(out)                :: nxch,nsnd,nrcv
       integer(psb_ipk_), intent(in)                 :: index_in(:)
@@ -70,7 +73,8 @@ module psi_i_mod
 
   interface psi_crea_ovr_elem
     subroutine psi_i_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
-      import 
+      import
+      implicit none 
       integer(psb_ipk_), intent(in)               :: me, desc_overlap(:)
       integer(psb_ipk_), allocatable, intent(out) :: ovr_elem(:,:)
       integer(psb_ipk_), intent(out)              :: info
@@ -80,7 +84,8 @@ module psi_i_mod
   interface psi_desc_index
     subroutine psi_i_desc_index(desc,index_in,dep_list,&
          & length_dl,nsnd,nrcv,desc_index,info)
-      import 
+      import
+      implicit none 
       type(psb_desc_type) :: desc
       integer(psb_ipk_) :: index_in(:),dep_list(:)
       integer(psb_ipk_),allocatable  :: desc_index(:)
@@ -91,7 +96,8 @@ module psi_i_mod
 
   interface psi_dl_check
     subroutine psi_i_dl_check(dep_list,dl_lda,np,length_dl)
-      import 
+      import
+      implicit none 
       integer(psb_ipk_) :: np,dl_lda,length_dl(0:np)
       integer(psb_ipk_) :: dep_list(dl_lda,0:np)
     end subroutine psi_i_dl_check
@@ -99,9 +105,10 @@ module psi_i_mod
 
   interface psi_sort_dl
     subroutine psi_i_sort_dl(dep_list,l_dep_list,np,info)
-      import 
+      import
+      implicit none 
       integer(psb_ipk_) :: dep_list(:,:), l_dep_list(:)
-      integer(psb_mpk_) :: np
+      integer(psb_ipk_) :: np
       integer(psb_ipk_) :: info
     end subroutine psi_i_sort_dl
   end interface
@@ -109,19 +116,21 @@ module psi_i_mod
   interface psi_extract_dep_list
     subroutine psi_i_extract_dep_list(ictxt,is_bld,is_upd,desc_str,dep_list,&
          & length_dl,np,dl_lda,mode,info)
-      import 
+      import
+      implicit none 
       logical :: is_bld, is_upd
       integer(psb_ipk_) :: ictxt
       integer(psb_ipk_) :: dl_lda,mode
       integer(psb_ipk_) :: desc_str(*),dep_list(dl_lda,0:np),length_dl(0:np)
-      integer(psb_mpk_) :: np
+      integer(psb_ipk_) :: np
       integer(psb_ipk_) :: info
     end subroutine psi_i_extract_dep_list
   end interface
 
   interface psi_fnd_owner
     subroutine psi_i_fnd_owner(nv,idx,iprc,desc,info)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in) :: nv
       integer(psb_ipk_), intent(in) ::  idx(:)
       integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
@@ -132,7 +141,8 @@ module psi_i_mod
 
   interface psi_bld_tmphalo
     subroutine psi_bld_tmphalo(desc,info)
-      import 
+      import
+      implicit none       
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
     end subroutine psi_bld_tmphalo
@@ -141,7 +151,8 @@ module psi_i_mod
 
   interface psi_bld_tmpovrl
     subroutine psi_i_bld_tmpovrl(iv,desc,info)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)  :: iv(:)
       type(psb_desc_type), intent(inout) :: desc
       integer(psb_ipk_), intent(out) :: info
@@ -150,7 +161,8 @@ module psi_i_mod
 
   interface psi_cnv_dsc
     subroutine psi_i_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info, mold)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)        :: halo_in(:), ovrlap_in(:),ext_in(:)
       type(psb_desc_type), intent(inout) :: cdesc
       integer(psb_ipk_), intent(out)               :: info
@@ -160,7 +172,8 @@ module psi_i_mod
 
   interface psi_renum_index
     subroutine psi_i_renum_index(iperm,idx,info)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(out)   :: info
       integer(psb_ipk_), intent(in)    :: iperm(:)
       integer(psb_ipk_), intent(inout) :: idx(:)
@@ -169,24 +182,28 @@ module psi_i_mod
 
   interface psi_inner_cnv
     subroutine psi_i_inner_cnvs(x,hashmask,hashv,glb_lc)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
       integer(psb_ipk_), intent(inout) :: x
     end subroutine psi_i_inner_cnvs
     subroutine psi_i_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
       integer(psb_ipk_), intent(in)  :: x
       integer(psb_ipk_), intent(out) :: y
     end subroutine psi_i_inner_cnvs2
     subroutine psi_i_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
       logical, intent(in), optional    :: mask(:)
       integer(psb_ipk_), intent(inout) :: x(:)
     end subroutine psi_i_inner_cnv1
     subroutine psi_i_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
       logical, intent(in),optional  :: mask(:)
       integer(psb_ipk_), intent(in)  :: x(:)
@@ -196,7 +213,8 @@ module psi_i_mod
 
   interface psi_bld_ovr_mst
     subroutine psi_i_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
-      import 
+      import
+      implicit none       
       integer(psb_ipk_), intent(in)               :: me, ovrlap_elem(:,:)
       integer(psb_ipk_), allocatable, intent(out) :: mst_idx(:) 
       integer(psb_ipk_), intent(out)              :: info
