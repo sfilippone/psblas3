@@ -184,8 +184,11 @@ contains
     integer(psb_ipk_) :: nnz,nr,nt,nlr,i,j,ii,ib,k, partition_
     integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
-    ! For 2D partition
-    integer(psb_ipk_) :: npx,npy,npdims(2),iamx,iamy,mynx,myny
+    ! For 3D partition
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(2), npp, minfo
+    integer(psb_ipk_) :: npx,npy,iamx,iamy,mynx,myny
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam

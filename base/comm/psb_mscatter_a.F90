@@ -62,13 +62,13 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam 
-  integer(psb_ipk_) :: ierr(5), err_act, idx, nrow,&
+  integer(psb_mpk_) :: ictxt, np, me, iroot, icomm, myrank, rootrank, iam, nlr
+  integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, k, maxk, &
        & col,pos
-  integer(psb_lpk_) :: m, n, i, j, iglobx, jglobx
+  integer(psb_lpk_) :: m, n, i, j, idx, iglobx, jglobx
   integer(psb_mpk_),allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable           :: displ(:), all_dim(:)
+  integer(psb_mpk_), allocatable           :: displ(:), all_dim(:)
   integer(psb_lpk_), allocatable           :: l_t_g_all(:), ltg(:)
   character(len=20)        :: name, ch_err
 
@@ -158,9 +158,13 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
   else
     
     call psb_get_rank(rootrank,ictxt,iroot)
-
-    call mpi_gather(nrow,1,psb_mpi_ipk_,all_dim,&
-         & 1,psb_mpi_ipk_,rootrank,icomm,info)
+    !
+    ! This is potentially unsafe when IPK=8
+    ! But then, IPK=8 is highly experimental anyway.
+    !
+    nlr = nrow
+    call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&
+         & 1,psb_mpi_mpk_,rootrank,icomm,info)
 
     if (iam == iroot) then
       displ(1)=0
@@ -186,7 +190,7 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
       goto 9999
     end if
 
-    call mpi_gatherv(ltg,nrow,&
+    call mpi_gatherv(ltg,nlr,&
          & psb_mpi_lpk_,l_t_g_all,all_dim,&
          & displ,psb_mpi_lpk_,rootrank,icomm,info)
 
@@ -300,12 +304,12 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
 
 
   ! locals
-  integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank
-  integer(psb_ipk_) :: ierr(5), err_act, idx, nrow,&
+  integer(psb_mpk_) :: ictxt, np, iam, iroot, iiroot, icomm, myrank, rootrank, nlr
+  integer(psb_ipk_) :: ierr(5), err_act, nrow,&
        & ilocx, jlocx, lda_locx, lda_globx, k, pos, ilx, jlx
-  integer(psb_lpk_) :: m, n, i, j, iglobx, jglobx
+  integer(psb_lpk_) :: m, n, i, j, idx, iglobx, jglobx
   integer(psb_mpk_), allocatable  :: scatterv(:)
-  integer(psb_ipk_), allocatable            :: displ(:), all_dim(:)
+  integer(psb_mpk_), allocatable            :: displ(:), all_dim(:)
   integer(psb_lpk_), allocatable            :: l_t_g_all(:), ltg(:)
   character(len=20)        :: name, ch_err
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -387,9 +391,13 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
     end do
   else
     call psb_get_rank(rootrank,ictxt,iroot)
-
-    call mpi_gather(nrow,1,psb_mpi_ipk_,all_dim,&
-         & 1,psb_mpi_ipk_,rootrank,icomm,info)
+    !
+    ! This is potentially unsafe when IPK=8
+    ! But then, IPK=8 is highly experimental anyway.
+    !
+    nlr = nrow
+    call mpi_gather(nlr,1,psb_mpi_mpk_,all_dim,&
+         & 1,psb_mpi_mpk_,rootrank,icomm,info)
 
     if(iam == iroot) then
       displ(1)=0
@@ -420,7 +428,7 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
       goto 9999
     end if
 
-    call mpi_gatherv(ltg,nrow,&
+    call mpi_gatherv(ltg,nlr,&
          & psb_mpi_lpk_,l_t_g_all,all_dim,&
          & displ,psb_mpi_lpk_,rootrank,icomm,info)
 

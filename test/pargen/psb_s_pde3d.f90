@@ -201,7 +201,10 @@ contains
     integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
-    integer(psb_ipk_) :: npx,npy,npz, npdims(3),iamx,iamy,iamz,mynx,myny,mynz
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(3), npp, minfo
+    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam
