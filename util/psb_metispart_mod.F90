@@ -54,8 +54,9 @@
 !      uses information prepared by the previous two subroutines.
 !
 module psb_metispart_mod
-  use psb_base_mod, only : psb_ipk_, psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, psb_mpk_,&
+  use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
+       & psb_dspmat_type, psb_zspmat_type, psb_err_unit, &
+       & psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, &
        & psb_s_csr_sparse_mat, psb_d_csr_sparse_mat, &
        & psb_c_csr_sparse_mat, psb_z_csr_sparse_mat
   public part_graph, build_mtpart, distr_mtpart,&
@@ -75,7 +76,7 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    integer(psb_ipk_), intent(in)  :: global_indx, n
+    integer(psb_lpk_), intent(in)  :: global_indx, n
     integer(psb_ipk_), intent(in)  :: np
     integer(psb_ipk_), intent(out) :: nv
     integer(psb_ipk_), intent(out) :: pv(*)
@@ -99,7 +100,8 @@ contains
   subroutine distr_mtpart(root, ictxt)
     use psb_base_mod
     integer(psb_ipk_) :: root, ictxt
-    integer(psb_ipk_) :: n, me, np
+    integer(psb_ipk_) :: me, np
+    integer(psb_lpk_) :: n
 
     call psb_info(ictxt,me,np)
 
