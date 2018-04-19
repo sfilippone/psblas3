@@ -500,6 +500,8 @@ if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
 FDEFINES="$psblas_cv_define_prepend-DINT_I${pac_cv_ipk_size}_L${pac_cv_lpk_size} $FDEFINES";
+CDEFINES="-DINT_I${pac_cv_ipk_size}_L${pac_cv_lpk_size} $CDEFINES"
+
 
 #
 # Tests for support of various Fortran features; some of them are critical,
