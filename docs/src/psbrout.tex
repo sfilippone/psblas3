@@ -123,8 +123,8 @@ Else if $x$ and $y$ are complex vectors then it computes dot-product as:
 \[dot \leftarrow x^H y\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
-%% \item[$y$] represents the global subvector $y_{:,jy}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
+%% \item[$y$] represents the global vector $y_{:,jy}$
 %% \end{description}
 
 \begin{verbatim}
@@ -183,21 +183,21 @@ Intent: {\bf in}.\\
 Specified as: a logical scalar.
 Default: \verb|global=.true.|\\
 %% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
 %% Default: $jx = 1$.\\
 
 %% \item[jy]  the column index of global dense matrix $y$,
-%% identifying the column of subvector $y$.\\
+%% identifying the column of vector $y$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
 %% Default: $jy = 1$.\\
 %% Specified as: an integer variable $jy\ge 1$. 
 \item[\bf On Return] 
-\item[Function value] is the dot product of subvectors $x$ and $y$.\\
+\item[Function value] is the dot product of vectors $x$ and $y$.\\
 Scope: {\bf global}  unless the optional variable
-\verb|global=.false.| as been specified\\
+\verb|global=.false.| has been specified\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90dot}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -284,7 +284,7 @@ Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
 \item[\bf On Return] 
-\item[res] is the dot product of subvectors $x$ and $y$.\\
+\item[res] is the dot product of vectors $x$ and $y$.\\
 Scope: {\bf global} \\
 Intent: {\bf out}.\\
 Specified as: a number or a rank-one array  of the data type indicated
@@ -315,7 +315,7 @@ else if $x$ is a complex vector then it computes the infinity-norm  as:
 \[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
 %% \end{description}
 
 \begin{verbatim}
@@ -366,16 +366,16 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: a logical scalar.
 Default: \verb|global=.true.|\\%% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $jx = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
-\item[Function value] is the infinity norm of subvector $x$.\\
+\item[Function value] is the infinity norm of vector $x$.\\
 Scope: {\bf global} unless the optional variable
-\verb|global=.false.| as been specified\\
+\verb|global=.false.| has been specified\\
 Specified as: a long precision real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -530,7 +530,7 @@ Default: \verb|global=.true.|\\
 \item[\bf On Return] 
 \item[Function value] is the 1-norm of vector $x$.\\
 Scope: {\bf global} unless the optional variable
-\verb|global=.false.| as been specified\\
+\verb|global=.false.| has been specified\\
 Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -642,7 +642,7 @@ else if $x$ is a complex vector then it computes 2-norm  as:
 \[ nrm2 \leftarrow \sqrt{x^H x}\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
 %% \end{description}
 
 \begin{table}[h]
@@ -692,16 +692,16 @@ Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: a logical scalar.
 Default: \verb|global=.true.|\\%% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $jx = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
-\item[Function Value] is the 2-norm of subvector $x$.\\
+\item[Function Value] is the 2-norm of vector $x$.\\
 Scope: {\bf global} unless the optional variable
-\verb|global=.false.| as been specified\\
+\verb|global=.false.| has been specified\\
 Type: {\bf required} \\
 Specified as: a long precision real number.
 \item[info] Error code.\\
@@ -1040,13 +1040,13 @@ Specified as: a character variable.
 %% Default: \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
 %% Specified as: an integer variable $ k \ge 1$.
 %% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $iy = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 %% \item[jy]  the column index of global dense matrix $y$,
-%% identifying the column of subvector $y$.\\
+%% identifying the column of vector $y$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
 %% Default: $jy = 1$\\	
