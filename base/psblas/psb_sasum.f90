@@ -44,7 +44,7 @@
 !    info   -  integer.               Return code
 !    jx     -  integer(optional).     The column offset.
 !
-function psb_sasum (x,desc_a, info, jx) result(res)
+function psb_sasum (x,desc_a, info, jx,global) result(res)
   use psb_base_mod, psb_protect_name => psb_sasum
 
   implicit none
@@ -54,11 +54,13 @@ function psb_sasum (x,desc_a, info, jx) result(res)
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), optional, intent(in)     :: jx
   real(psb_spk_)                  :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, &
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasum'
@@ -82,6 +84,12 @@ function psb_sasum (x,desc_a, info, jx) result(res)
   else
     ijx = 1
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   m = desc_a%get_global_rows()
   ldx = size(x,1)
@@ -115,7 +123,7 @@ function psb_sasum (x,desc_a, info, jx) result(res)
     res = szero
   end if
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -126,7 +134,7 @@ function psb_sasum (x,desc_a, info, jx) result(res)
 end function psb_sasum
 
 
-function psb_sasum_vect(x, desc_a, info) result(res)
+function psb_sasum_vect(x, desc_a, info,global) result(res)
   use psb_base_mod, psb_protect_name => psb_sasum_vect
   implicit none
 
@@ -134,11 +142,13 @@ function psb_sasum_vect(x, desc_a, info) result(res)
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
   integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
-       & err_act, iix, jjx, imax
+       & err_act, iix, jjx, imax, i, idx, ndm
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumv'
@@ -162,6 +172,11 @@ function psb_sasum_vect(x, desc_a, info) result(res)
     goto 9999
   endif
 
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx = 1
@@ -184,12 +199,21 @@ function psb_sasum_vect(x, desc_a, info) result(res)
   ! compute local max
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = x%asum(desc_a%get_local_rows())
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      ! adjust res because overlapped elements are computed more than once
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        res = res - (real(ndm-1)/real(ndm))*abs(x%v%v(idx))
+      end do
+    end if
   else 
     res = szero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -244,7 +268,7 @@ end function psb_sasum_vect
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_sasumv(x,desc_a, info) result(res)
+function psb_sasumv(x,desc_a, info,global) result(res)
   use psb_base_mod, psb_protect_name => psb_sasumv
 
   implicit none
@@ -253,11 +277,13 @@ function psb_sasumv(x,desc_a, info) result(res)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)  :: info
   real(psb_spk_)                  :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumv'
@@ -273,6 +299,12 @@ function psb_sasumv(x,desc_a, info) result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx=1
@@ -310,7 +342,7 @@ function psb_sasumv(x,desc_a, info) result(res)
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -365,7 +397,7 @@ end function psb_sasumv
 !    info   -  integer.              Return code
 !    jx     -  integer(optional).    The column offset.
 !
-subroutine psb_sasumvs(res,x,desc_a, info)
+subroutine psb_sasumvs(res,x,desc_a, info,global)
   use psb_base_mod, psb_protect_name => psb_sasumvs
 
   implicit none
@@ -374,11 +406,13 @@ subroutine psb_sasumvs(res,x,desc_a, info)
   real(psb_spk_), intent(out)      :: res
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)   :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, i, idx, ndm, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_sasumvs'
@@ -394,6 +428,12 @@ subroutine psb_sasumvs(res,x,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx = 1
@@ -431,7 +471,7 @@ subroutine psb_sasumvs(res,x,desc_a, info)
   end if
 
   ! compute global sum
-  call psb_sum(ictxt,res)
+  if (global_) call psb_sum(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  

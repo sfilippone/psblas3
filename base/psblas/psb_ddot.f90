@@ -48,7 +48,7 @@
 !    jx     -  integer(optional).    The column offset for sub( X ).
 !    jy     -  integer(optional).    The column offset for sub( Y ).
 !
-function psb_ddot_vect(x, y, desc_a,info) result(res)
+function psb_ddot_vect(x, y, desc_a,info,global) result(res)
   use psb_desc_mod
   use psb_d_base_mat_mod
   use psb_check_mod
@@ -61,11 +61,13 @@ function psb_ddot_vect(x, y, desc_a,info) result(res)
   type(psb_d_vect_type), intent(inout) :: x, y
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)       :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   character(len=20)      :: name, ch_err
 
   name='psb_ddot_vect'
@@ -92,6 +94,11 @@ function psb_ddot_vect(x, y, desc_a,info) result(res)
     goto 9999
   endif
 
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = ione
   ijx = ione
@@ -123,17 +130,21 @@ function psb_ddot_vect(x, y, desc_a,info) result(res)
     res = x%dot(nr,y)
     ! FIXME
     ! adjust dot_local because overlapped elements are computed more than once
-!!$      do i=1,size(desc_a%ovrlap_elem,1)
-!!$        idx  = desc_a%ovrlap_elem(i,1)
-!!$        ndm  = desc_a%ovrlap_elem(i,2)
-!!$        dot_local = dot_local - (real(ndm-1)/real(ndm))*(x(idx)*y(idx))
-!!$      end do
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      if (y%is_dev()) call y%sync()
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        res = res - (real(ndm-1)/real(ndm))*(x%v%v(idx)*y%v%v(idx))
+      end do
+    end if
   else
     res = dzero
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -144,7 +155,7 @@ function psb_ddot_vect(x, y, desc_a,info) result(res)
 
 end function psb_ddot_vect
 
-function psb_ddot(x, y,desc_a, info, jx, jy)  result(res)
+function psb_ddot(x, y,desc_a, info, jx, jy,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_ddot
   implicit none
 
@@ -153,12 +164,14 @@ function psb_ddot(x, y,desc_a, info, jx, jy)  result(res)
   integer(psb_ipk_), intent(in), optional    :: jx, jy
   integer(psb_ipk_), intent(out)   :: info
   real(psb_dpk_)              :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   real(psb_dpk_)        :: ddot
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
@@ -192,6 +205,12 @@ function psb_ddot(x, y,desc_a, info, jx, jy)  result(res)
     info=3050
     call psb_errpush(info,name)
     goto 9999
+  end if
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
   end if
 
   m = desc_a%get_global_rows()
@@ -229,7 +248,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)  result(res)
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -285,7 +304,7 @@ end function psb_ddot
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_ddotv(x, y,desc_a, info)  result(res)
+function psb_ddotv(x, y,desc_a, info,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_ddotv
   implicit none
 
@@ -293,11 +312,13 @@ function psb_ddotv(x, y,desc_a, info)  result(res)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)  :: info
   real(psb_dpk_)              :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
+  logical :: global_
   real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
 
@@ -314,6 +335,12 @@ function psb_ddotv(x, y,desc_a, info)  result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = ione
   iy = ione
@@ -353,7 +380,7 @@ function psb_ddotv(x, y,desc_a, info)  result(res)
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
 
   call psb_erractionrestore(err_act)
@@ -410,7 +437,7 @@ end function psb_ddotv
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
 !
-subroutine psb_ddotvs(res, x, y,desc_a, info)  
+subroutine psb_ddotvs(res, x, y,desc_a, info,global)  
   use psb_base_mod, psb_protect_name => psb_ddotvs
   implicit none
 
@@ -418,11 +445,13 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   real(psb_dpk_), intent(out)   :: res
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)   :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
   integer(psb_lpk_) :: ix, jx, iy, jy, m
+  logical :: global_
   real(psb_dpk_)        :: ddot
   character(len=20)        :: name, ch_err
 
@@ -439,6 +468,12 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = ione
   iy = ione
@@ -476,7 +511,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call psb_sum(ictxt, res)
+  if (global_) call psb_sum(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -533,7 +568,7 @@ end subroutine psb_ddotvs
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
 !
-subroutine psb_dmdots(res, x, y, desc_a, info)  
+subroutine psb_dmdots(res, x, y, desc_a, info,global)  
   use psb_base_mod, psb_protect_name => psb_dmdots
   implicit none
 
@@ -541,11 +576,13 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   real(psb_dpk_), intent(out)   :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)   :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   real(psb_dpk_)        :: ddot
   character(len=20)        :: name, ch_err
 
@@ -563,6 +600,11 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
     goto 9999
   endif
 
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
   ix = ione
   iy = ione
 
@@ -612,7 +654,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 
 
   ! compute global sum
-  call psb_sum(ictxt, res(1:k))
+  if (global_) call psb_sum(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  

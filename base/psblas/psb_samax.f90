@@ -44,7 +44,7 @@
 !    info   -  integer.              Return code
 !    jx     -  integer(optional).    The column offset.
 !
-function psb_samax(x,desc_a, info, jx) result(res)
+function psb_samax(x,desc_a, info, jx,global) result(res)
   use psb_base_mod, psb_protect_name => psb_samax
 
   implicit none
@@ -54,11 +54,13 @@ function psb_samax(x,desc_a, info, jx) result(res)
   integer(psb_ipk_), intent(out)             :: info
   integer(psb_ipk_), optional, intent(in)    :: jx
   real(psb_spk_)                   :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   character(len=20)      :: name, ch_err
 
   name='psb_samax'
@@ -82,6 +84,12 @@ function psb_samax(x,desc_a, info, jx) result(res)
   else
     ijx = 1
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   m = desc_a%get_global_rows()
   ldx = size(x,1)
@@ -108,7 +116,7 @@ function psb_samax(x,desc_a, info, jx) result(res)
   end if
 
   ! compute global max
-  call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -163,7 +171,7 @@ end function psb_samax
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_samaxv (x,desc_a, info) result(res)
+function psb_samaxv (x,desc_a, info,global) result(res)
   use psb_base_mod, psb_protect_name => psb_samaxv
 
   implicit none
@@ -172,12 +180,13 @@ function psb_samaxv (x,desc_a, info) result(res)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)  :: info
   real(psb_spk_)                  :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
-
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_samaxv'
@@ -194,6 +203,12 @@ function psb_samaxv (x,desc_a, info) result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx = 1
@@ -223,7 +238,7 @@ function psb_samaxv (x,desc_a, info) result(res)
   end if
 
   ! compute global max
-  call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -234,7 +249,7 @@ function psb_samaxv (x,desc_a, info) result(res)
 end function psb_samaxv
 
 
-function psb_samax_vect(x, desc_a, info) result(res)
+function psb_samax_vect(x, desc_a, info,global) result(res)
   use psb_penv_mod
   use psb_serial_mod
   use psb_desc_mod
@@ -247,11 +262,13 @@ function psb_samax_vect(x, desc_a, info) result(res)
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_desc_type), intent (in)      :: desc_a
   integer(psb_ipk_), intent(out)         :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx
   integer(psb_lpk_) :: ix, jx, iy, ijy, m
+  logical :: global_
   character(len=20)      :: name, ch_err
 
   name='psb_samaxv'
@@ -273,6 +290,12 @@ function psb_samax_vect(x, desc_a, info) result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx = 1
@@ -300,7 +323,7 @@ function psb_samax_vect(x, desc_a, info) result(res)
   end if
 
   ! compute global max
-  call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -358,7 +381,7 @@ end function psb_samax_vect
 !    info   -  integer.             Return code
 !    jx     -  integer(optional).   The column offset.
 !
-subroutine psb_samaxvs(res,x,desc_a, info)
+subroutine psb_samaxvs(res,x,desc_a, info,global)
   use psb_base_mod, psb_protect_name => psb_samaxvs
 
   implicit none
@@ -367,11 +390,13 @@ subroutine psb_samaxvs(res,x,desc_a, info)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)  :: info
   real(psb_spk_), intent(out)      :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ldx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   character(len=20)      :: name, ch_err
 
   name='psb_samaxvs'
@@ -388,6 +413,12 @@ subroutine psb_samaxvs(res,x,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   ijx=1
@@ -416,7 +447,7 @@ subroutine psb_samaxvs(res,x,desc_a, info)
   end if
 
   ! compute global max
-  call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -470,7 +501,7 @@ end subroutine psb_samaxvs
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
 !
-subroutine psb_smamaxs(res,x,desc_a, info,jx)
+subroutine psb_smamaxs(res,x,desc_a, info,jx,global)
   use psb_base_mod, psb_protect_name => psb_smamaxs
 
   implicit none
@@ -480,11 +511,13 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), optional, intent(in)   :: jx
   real(psb_spk_), intent(out)     :: res(:)
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ldx, i, k
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
+  logical :: global_
   character(len=20)        :: name, ch_err
 
   name='psb_smamaxs'
@@ -507,6 +540,12 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
   else
     ijx = 1
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   m = desc_a%get_global_rows()
   k  = min(size(x,2),size(res,1))
@@ -534,7 +573,7 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx)
   end if
 
   ! compute global max
-  call psb_amx(ictxt, res(1:k))
+  if (global_) call psb_amx(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  

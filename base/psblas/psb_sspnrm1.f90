@@ -41,7 +41,7 @@
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
-function psb_sspnrm1(a,desc_a,info)  result(res)
+function psb_sspnrm1(a,desc_a,info,global)  result(res)
   use psb_base_mod, psb_protect_name => psb_sspnrm1
   implicit none
 
@@ -49,11 +49,13 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
   integer(psb_ipk_), intent(out)      :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_spk_)                      :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, nr,nc,&
        & err_act, iia, jja, mdim, ndim
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
+  logical :: global_
   character(len=20)      :: name, ch_err
   real(psb_spk_), allocatable :: v(:)
 
@@ -70,6 +72,12 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ia = 1
   ja = 1
@@ -120,7 +128,7 @@ function psb_sspnrm1(a,desc_a,info)  result(res)
     res = szero 
   end if
   ! compute global max
-  call psb_amx(ictxt, res)
+  if (global_) call psb_amx(ictxt, res)
 
   call psb_erractionrestore(err_act)
   return  
