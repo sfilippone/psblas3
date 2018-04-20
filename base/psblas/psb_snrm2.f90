@@ -44,7 +44,7 @@
 !    info   -  integer.             Return code
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !
-function psb_snrm2(x, desc_a, info, jx)  result(res)
+function psb_snrm2(x, desc_a, info, jx,global)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -56,10 +56,12 @@ function psb_snrm2(x, desc_a, info, jx)  result(res)
   integer(psb_ipk_), intent(in), optional     :: jx
   integer(psb_ipk_), intent(out)              :: info
   real(psb_spk_)                  :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm, ldx
+  logical :: global_
   real(psb_spk_)         :: snrm2, dd
   character(len=20)      :: name, ch_err
 
@@ -83,6 +85,12 @@ function psb_snrm2(x, desc_a, info, jx)  result(res)
   else
     ijx = 1
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   m = desc_a%get_global_rows()
   ldx = size(x,1)
@@ -114,7 +122,7 @@ function psb_snrm2(x, desc_a, info, jx)  result(res)
     res = szero
   end if
 
-  call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -168,7 +176,7 @@ end function psb_snrm2
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-function psb_snrm2v(x, desc_a, info)  result(res)
+function psb_snrm2v(x, desc_a, info,global)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -179,13 +187,13 @@ function psb_snrm2v(x, desc_a, info)  result(res)
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)   :: info
   real(psb_spk_)                   :: res
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+  logical :: global_
   real(psb_spk_)         :: snrm2, dd
-
-!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_snrm2v'
@@ -202,6 +210,11 @@ function psb_snrm2v(x, desc_a, info)  result(res)
     goto 9999
   endif
 
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
   ix = 1
   jx=1
   m = desc_a%get_global_rows()
@@ -233,8 +246,7 @@ function psb_snrm2v(x, desc_a, info)  result(res)
     res = szero
   end if
 
-  call psb_nrm2(ictxt,res)
-
+  if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -246,7 +258,7 @@ end function psb_snrm2v
 
 
 
-function psb_snrm2_vect(x, desc_a, info)  result(res)
+function psb_snrm2_vect(x, desc_a, info,global)  result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -258,12 +270,13 @@ function psb_snrm2_vect(x, desc_a, info)  result(res)
   type(psb_s_vect_type), intent (inout) :: x
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+  logical :: global_
   real(psb_spk_)         :: snrm2, dd
-!!$  external dcombnrm2
   character(len=20)      :: name, ch_err
 
   name='psb_snrm2v'
@@ -286,6 +299,11 @@ function psb_snrm2_vect(x, desc_a, info)  result(res)
     goto 9999
   endif
 
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx=1
@@ -307,18 +325,21 @@ function psb_snrm2_vect(x, desc_a, info)  result(res)
   if (desc_a%get_local_rows() > 0) then 
     ndim = desc_a%get_local_rows()
     res  = x%nrm2(ndim)
-!!$      ! adjust  because overlapped elements are computed more than once
-!!$      do i=1,size(desc_a%ovrlap_elem,1)
-!!$        idx = desc_a%ovrlap_elem(i,1)
-!!$        ndm = desc_a%ovrlap_elem(i,2)
-!!$        dd  = dble(ndm-1)/dble(ndm)
-!!$        nrm2 = nrm2 * sqrt(done - dd*(abs(x(idx))/nrm2)**2) 
-!!$      end do
-  else 	    
+    ! adjust  because overlapped elements are computed more than once
+    if (size(desc_a%ovrlap_elem,1)>0) then
+      if (x%is_dev()) call x%sync()
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        dd  = dble(ndm-1)/dble(ndm)
+        res = res - sqrt(sone - dd*(abs(x%v%v(idx))/res)**2)
+      end do
+    end if
+    else 	    
     res = szero
   end if
 
-  call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ictxt,res)
 
   call psb_erractionrestore(err_act)
   return  
@@ -327,7 +348,6 @@ function psb_snrm2_vect(x, desc_a, info)  result(res)
 
   return
 end function psb_snrm2_vect
-
 
 
 !!$ 
@@ -373,7 +393,7 @@ end function psb_snrm2_vect
 !    desc_a -  type(psb_desc_type).  The communication descriptor.
 !    info   -  integer.              Return code
 !
-subroutine psb_snrm2vs(res, x, desc_a, info)
+subroutine psb_snrm2vs(res, x, desc_a, info,global)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
@@ -384,13 +404,13 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
   real(psb_spk_), intent(out)      :: res
   type(psb_desc_type), intent(in)  :: desc_a
   integer(psb_ipk_), intent(out)   :: info
+  logical, intent(in), optional        :: global
 
   ! locals
   integer(psb_ipk_) :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm, ldx
+  logical :: global_
   real(psb_spk_)         :: nrm2, snrm2, dd
-
-!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_snrm2'
@@ -406,6 +426,12 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (present(global)) then
+    global_ = global
+  else
+    global_ = .true.
+  end if
 
   ix = 1
   jx = 1
@@ -439,7 +465,7 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
     res = szero
   end if
 
-  call psb_nrm2(ictxt,res)
+  if (global_) call psb_nrm2(ictxt,res)
 
 
   call psb_erractionrestore(err_act)
