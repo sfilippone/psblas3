@@ -75,8 +75,9 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=5), optional          :: outfmt 
   integer(psb_ipk_), intent(in), optional       :: data
   !     ...local scalars....
-  integer(psb_ipk_) :: np,me,counter,proc,i, &
-       &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
+  integer(psb_ipk_) :: ictxt, np,me
+  integer(psb_ipk_) :: counter,proc,i, &
+       &     n_el_send,k,n_el_recv,idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
        &     irmin,icmin,irmax,icmax,data_,ngtz,totxch,nxs, nxr,&
        &     l1, err_act

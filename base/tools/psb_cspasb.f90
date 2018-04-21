@@ -63,9 +63,8 @@ subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl, mold)
   class(psb_c_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   integer(psb_ipk_) :: int_err(5)
-  integer(psb_ipk_) :: np,me,n_col, err_act
-  integer(psb_ipk_) :: spstate
-  integer(psb_ipk_) :: ictxt,n_row
+  integer(psb_ipk_) :: ictxt,np,me, err_act
+  integer(psb_ipk_) :: n_row,n_col
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 

@@ -52,9 +52,9 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   integer(psb_ipk_), optional, intent(in)      :: nnz
 
   !locals
-  integer(psb_ipk_) :: ictxt, dectype
-  integer(psb_ipk_) :: np,me,loc_row,loc_col,&
-       &  length_ia1,length_ia2, err_act,m,n
+  integer(psb_ipk_) :: ictxt, np, me, err_act
+  integer(psb_ipk_) :: loc_row,loc_col, nnz_
+  integer(psb_lpk_) :: m, n
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -89,17 +89,16 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
       call psb_errpush(info,name,i_err=(/7_psb_ipk_,nnz/))
       goto 9999
     endif
-    length_ia1=nnz
-    length_ia2=nnz
+    nnz_ = nnz
   else 
-    length_ia1=max(1,5*loc_row)
+    nnz_ = max(1,5*loc_row)
   endif
 
   if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
+       & write(debug_unit,*) me,' ',trim(name),':allocating size:',nnz_
   call a%free()
   !....allocate aspk, ia1, ia2.....
-  call a%csall(loc_row,loc_col,info,nz=length_ia1)
+  call a%csall(loc_row,loc_col,info,nz=nnz_)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='sp_all')
