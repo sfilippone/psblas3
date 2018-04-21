@@ -95,7 +95,8 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   endif
 
   if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),':allocating size:',nnz_
+       & write(debug_unit,*) me,' ',trim(name), &
+       & ':allocating size:',loc_row,loc_col,nnz_
   call a%free()
   !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=nnz_)
