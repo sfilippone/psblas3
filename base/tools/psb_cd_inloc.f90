@@ -67,7 +67,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
        & nov(:), ov_idx(:,:), temp_ovrlap(:)
   integer(psb_lpk_), allocatable :: vl(:), ix(:), l_temp_ovrlap(:)
   integer(psb_ipk_)  :: debug_level, debug_unit
-  integer(psb_mpk_) :: iictxt
+  integer(psb_mpk_)  :: iictxt
+  real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5 
+  logical            :: do_timings=.true.
   logical            :: check_, islarge
   character(len=20)  :: name
 
@@ -83,7 +85,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': start',np
   iictxt = ictxt
-
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t0 = psb_wtime()
+  end if
+  
   loc_row = size(v)
   m = maxval(v)
   nrt = loc_row
@@ -93,7 +99,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   if (present(globalcheck)) then 
     check_ = globalcheck
   else
-    check_ = .true.
+    check_ = .false.
   end if
 
   n = m
@@ -133,11 +139,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     endif
     call psb_cd_set_large_threshold(exch(3))
   endif
-
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
 
-  islarge = psb_cd_choose_large_state(ictxt,m)
+  islarge = psb_cd_is_large_size(m)
+  write(0,*) exch(3),m,islarge,check_
 
   allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
@@ -154,7 +160,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   ! Checks 2 and 3 are controlled by globalcheck
   !  
 
-  if (check_.or.(.not.islarge)) then 
+  if (check_.or.(.not.islarge)) then
+    write(0,*) 'Doing globalchecks '
     allocate(tmpgidx(m,2),stat=info) 
     if (info /= psb_success_) then 
       info=psb_err_alloc_dealloc_
@@ -199,6 +206,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     end if
     
   else
+    write(0,*) 'No  globalchecks '
     novrl   = 0
     norphan = 0
     npr_ov  = 0
@@ -218,6 +226,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
       write(psb_err_unit,*) trim(name),' Warning: globalcheck=.false., but there is a mismatch'
       write(psb_err_unit,*) trim(name),'        : in the global sizes!',m,nrt
     end if
+  end if
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()
   end if
 
   if (info /= psb_success_) then 
@@ -252,6 +264,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   call psb_msort(ix(1:nlu),vl(1:nlu),flag=psb_sort_keep_idx_)
 
   call psb_nullify_desc(desc)
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t2 = psb_wtime()
+  end if
 
   !
   ! Figure out overlap in the input.
@@ -354,6 +370,11 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
 
     end do
   end if
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t3 = psb_wtime()
+  end if
+
   if (np == 1) then 
     allocate(psb_repl_map :: desc%indxmap, stat=info)
   else
@@ -371,6 +392,10 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call aa%init(iictxt,vl(1:nlu),info)
   end select
 
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t4 = psb_wtime()
+  end if
 
   !
   ! Now that we have initialized indxmap we can convert the
@@ -405,6 +430,30 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call psb_errpush(info,name)
     goto 9999
   endif
+
+  if (do_timings) then 
+    call psb_barrier(ictxt)
+    t5 = psb_wtime()
+
+    t5 = t5 - t4
+    t4 = t4 - t3
+    t3 = t3 - t2
+    t2 = t2 - t1
+    t1 = t1 - t0
+    call psb_amx(ictxt,t1)
+    call psb_amx(ictxt,t2)
+    call psb_amx(ictxt,t3)
+    call psb_amx(ictxt,t4)
+    call psb_amx(ictxt,t5)
+    if (me==0) then
+      write(0,*) 'CD_INLOC Timings: '
+      write(0,*) '    Phase 1     : ', t1
+      write(0,*) '    Phase 2     : ', t2
+      write(0,*) '    Phase 3     : ', t3
+      write(0,*) '    Phase 4     : ', t4
+      write(0,*) '    Phase 5     : ', t5
+    end if
+  end if
 
   call psb_erractionrestore(err_act)
   return

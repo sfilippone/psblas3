@@ -352,6 +352,16 @@ contains
     val  = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
+  function  psb_cd_is_large_size(m) result(val)
+    use psb_penv_mod
+
+    implicit none
+    integer(psb_lpk_), intent(in) :: m
+    logical :: val
+    !locals
+    val = (m > psb_cd_get_large_threshold()) 
+  end function psb_cd_is_large_size
+
   function  psb_cd_choose_large_state(ictxt,m) result(val)
     use psb_penv_mod
 
@@ -368,8 +378,7 @@ contains
     ! it makes no sense to use them if you don't have at least 
     ! 3 processes, no matter what the size of the process. 
     !
-    val = (m > psb_cd_get_large_threshold()) .and. &
-         & (np > 2)
+    val = psb_cd_is_large_size(m) .and. (np > 2)
   end function psb_cd_choose_large_state
 
   subroutine psb_nullify_desc(desc)
