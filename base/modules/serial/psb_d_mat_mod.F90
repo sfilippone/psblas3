@@ -1314,16 +1314,26 @@ contains
     ! Local
     integer(psb_ipk_), allocatable :: lia(:), lja(:)
 
+    info = psb_success_
+    !
+    ! Note: in principle we could use reallocate on assignment,
+    ! but GCC bug 52162 forces us to take defensive programming.
+    !
     if (allocated(ia)) then
-      lia = ia
+      call psb_realloc(size(ia),lia,info)
+      if (info == psb_success_) lia(:) = ia(:)
     end if
     if (allocated(ja)) then
-      lja = ja
+      call psb_realloc(size(ja),lja,info)
+      if (info == psb_success_) lja(:) = ja(:)
     end if
     call a%csget(imin,imax,nz,lia,lja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-    ia = lia
-    ja = lja
+   
+    call psb_ensure_size(size(lia),ia,info)
+    if (info == psb_success_) ia(:) = lia(:)
+    call psb_ensure_size(size(lja),ja,info)
+    if (info == psb_success_) ja(:) = lja(:)
     
   end subroutine psb_d_lcsgetptn
   
@@ -1343,16 +1353,26 @@ contains
     ! Local
     integer(psb_ipk_), allocatable :: lia(:), lja(:)
 
+    !
+    ! Note: in principle we could use reallocate on assignment,
+    ! but GCC bug 52162 forces us to take defensive programming.
+    !
     if (allocated(ia)) then
-      lia = ia
+      call psb_realloc(size(ia),lia,info)
+      if (info == psb_success_) lia(:) = ia(:)
     end if
     if (allocated(ja)) then
-      lja = ja
+      call psb_realloc(size(ja),lja,info)
+      if (info == psb_success_) lja(:) = ja(:)
     end if
+
     call a%csget(imin,imax,nz,lia,lja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-    ia = lia
-    ja = lja
+   
+    call psb_ensure_size(size(lia),ia,info)
+    if (info == psb_success_) ia(:) = lia(:)
+    call psb_ensure_size(size(lja),ja,info)
+    if (info == psb_success_) ja(:) = lja(:)
         
   end subroutine psb_d_lcsgetrow
 #endif
