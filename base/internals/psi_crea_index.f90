@@ -44,9 +44,6 @@
 !                                       mapping parts are used.
 ! index_in(:)  - integer               The index list, build format  
 ! index_out(:) - integer(psb_ipk_), allocatable  The index list, assembled format
-! glob_idx     - logical               Whether the input indices are in local or global
-!                                      numbering; the global numbering is used when 
-!                                      converting the overlap exchange lists.
 ! nxch         - integer               The number of data exchanges on the calling process
 ! nsnd         - integer               Total send buffer size       on the calling process
 ! nrcv         - integer               Total receive buffer size    on the calling process

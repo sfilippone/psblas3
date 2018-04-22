@@ -69,7 +69,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   integer(psb_ipk_)  :: debug_level, debug_unit
   integer(psb_mpk_)  :: iictxt
   real(psb_dpk_)     :: t0, t1, t2, t3, t4, t5 
-  logical            :: do_timings=.true.
+  logical            :: do_timings=.false.
   logical            :: check_, islarge
   character(len=20)  :: name
 
@@ -143,7 +143,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
 
   islarge = psb_cd_is_large_size(m)
-  write(0,*) exch(3),m,islarge,check_
 
   allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
@@ -161,7 +160,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   !  
 
   if (check_.or.(.not.islarge)) then
-    write(0,*) 'Doing globalchecks '
     allocate(tmpgidx(m,2),stat=info) 
     if (info /= psb_success_) then 
       info=psb_err_alloc_dealloc_
@@ -206,7 +204,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     end if
     
   else
-    write(0,*) 'No  globalchecks '
     novrl   = 0
     norphan = 0
     npr_ov  = 0

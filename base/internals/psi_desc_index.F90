@@ -302,7 +302,6 @@ subroutine psi_i_desc_index(desc,index_in,dep_list,&
     desc_index(i) = nerv
     call desc%indxmap%g2l(sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          &  desc_index(i+1:i+nerv),info)
-      
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd

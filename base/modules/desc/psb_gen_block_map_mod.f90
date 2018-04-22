@@ -784,8 +784,8 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, nv, is, ip, lip 
-    integer(psb_lpk_) :: tidx
+    integer(psb_ipk_) :: i, nv, is
+    integer(psb_lpk_) :: tidx, ip, lip 
     integer(psb_mpk_) :: ictxt, iam, np
     logical :: owned_
 
@@ -795,7 +795,7 @@ contains
 
     if (present(mask)) then 
       if (size(mask) < size(idx)) then 
-!!$        write(0,*) 'Block g2l: size of mask', size(mask),size(idx)
+        !write(0,*) 'Block g2l: size of mask', size(mask),size(idx)
         info = -1
         return
       end if
@@ -812,7 +812,8 @@ contains
       if (idxmap%is_asb()) then 
         do i=1, is
           if (mask(i)) then 
-            if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idx(i)).and. &
+                 & (idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
@@ -828,7 +829,8 @@ contains
       else if (idxmap%is_valid()) then 
         do i=1,is
           if (mask(i)) then 
-            if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idx(i)).and.&
+                 & (idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
@@ -850,7 +852,8 @@ contains
 
       if (idxmap%is_asb()) then 
         do i=1, is
-          if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+          if ((idxmap%min_glob_row <= idx(i)).and.&
+               & (idx(i) <= idxmap%max_glob_row)) then
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
@@ -865,7 +868,8 @@ contains
 
       else if (idxmap%is_valid()) then 
         do i=1,is
-          if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+          if ((idxmap%min_glob_row <= idx(i)).and.&
+               & (idx(i) <= idxmap%max_glob_row)) then
             idx(i) = idx(i) - idxmap%min_glob_row + 1
           else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
@@ -877,7 +881,6 @@ contains
           end if
         end do
       else 
-!!$        write(0,*) 'Block status: invalid ',idxmap%get_state()
         idx(1:is) = -1
         info = -1
       end if
@@ -897,8 +900,8 @@ contains
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
 
-    integer(psb_ipk_) :: i, nv, is, ip, lip, im
-    integer(psb_lpk_) :: tidx
+    integer(psb_ipk_) :: i, nv, is, im
+    integer(psb_lpk_) :: tidx, ip, lip
     integer(psb_mpk_) :: ictxt, iam, np
     logical :: owned_
 
@@ -926,14 +929,16 @@ contains
       if (idxmap%is_asb()) then 
         do i=1, im
           if (mask(i)) then 
-            if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idxin(i)).and.&
+                 & (idxin(i) <= idxmap%max_glob_row)) then
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
               nv  = size(idxmap%srt_l2g,1)
               tidx = idxin(i)
               idxout(i) = psb_bsrch(tidx,nv,idxmap%srt_l2g(:,1))
-              if (idxout(i) > 0) idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
+              if (idxout(i) > 0) &
+                   & idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
             else 
               idxout(i) = -1
             end if
@@ -942,7 +947,8 @@ contains
       else if (idxmap%is_valid()) then 
         do i=1,im
           if (mask(i)) then 
-            if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idxin(i)).and.&
+                 & (idxin(i) <= idxmap%max_glob_row)) then
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                  &.and.(.not.owned_)) then
@@ -964,14 +970,16 @@ contains
 
       if (idxmap%is_asb()) then 
         do i=1, im
-          if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+          if ((idxmap%min_glob_row <= idxin(i)).and.&
+               & (idxin(i) <= idxmap%max_glob_row)) then
             idxout(i) = idxin(i) - idxmap%min_glob_row + 1
           else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
             nv  = size(idxmap%srt_l2g,1)
             tidx = idxin(i)
             idxout(i) = psb_bsrch(tidx,nv,idxmap%srt_l2g(:,1))
-            if (idxout(i) > 0) idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
+            if (idxout(i) > 0) &
+                 & idxout(i) = idxmap%srt_l2g(idxout(i),2)+idxmap%local_rows
           else 
             idxout(i) = -1
           end if
@@ -979,7 +987,8 @@ contains
 
       else if (idxmap%is_valid()) then 
         do i=1,im
-          if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+          if ((idxmap%min_glob_row <= idxin(i)).and.&
+               & (idxin(i) <= idxmap%max_glob_row)) then
             idxout(i) = idxin(i) - idxmap%min_glob_row + 1
           else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)&
                &.and.(.not.owned_)) then
@@ -1532,7 +1541,8 @@ contains
 
           do i=1, is
             if (mask(i)) then 
-              if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+              if ((idxmap%min_glob_row <= idx(i)).and.&
+                   & (idx(i) <= idxmap%max_glob_row)) then
                 idx(i) = idx(i) - idxmap%min_glob_row + 1
               else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
 
@@ -1572,7 +1582,8 @@ contains
 
           do i=1, is
 
-            if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idx(i)).and.&
+                 & (idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               if (lidx(i) <= idxmap%local_rows) then 
@@ -1612,7 +1623,8 @@ contains
         if (present(mask)) then 
           do i=1, is
             if (mask(i)) then 
-              if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+              if ((idxmap%min_glob_row <= idx(i)).and.&
+                   & (idx(i) <= idxmap%max_glob_row)) then
                 idx(i) = idx(i) - idxmap%min_glob_row + 1
               else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
                 nv   = idxmap%local_cols-idxmap%local_rows
@@ -1648,7 +1660,8 @@ contains
 
           do i=1, is
 
-            if ((idxmap%min_glob_row <= idx(i)).and.(idx(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idx(i)).and.&
+                 & (idx(i) <= idxmap%max_glob_row)) then
               idx(i) = idx(i) - idxmap%min_glob_row + 1
             else if ((1<= idx(i)).and.(idx(i) <= idxmap%global_rows)) then
               nv   = idxmap%local_cols-idxmap%local_rows
@@ -1705,7 +1718,7 @@ contains
 
 
     info = 0
-    
+
     is = size(idxin)
     im = min(is,size(idxout))
 
@@ -1734,7 +1747,8 @@ contains
 
           do i=1, im
             if (mask(i)) then 
-              if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+              if ((idxmap%min_glob_row <= idxin(i)).and.&
+                   & (idxin(i) <= idxmap%max_glob_row)) then
                 idxout(i) = idxin(i) - idxmap%min_glob_row + 1
               else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
 
@@ -1774,7 +1788,8 @@ contains
 
           do i=1, im
 
-            if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idxin(i)).and.&
+                 & (idxin(i) <= idxmap%max_glob_row)) then
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               if (lidx(i) <= idxmap%local_rows) then 
@@ -1814,7 +1829,8 @@ contains
         if (present(mask)) then 
           do i=1, im
             if (mask(i)) then 
-              if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+              if ((idxmap%min_glob_row <= idxin(i)).and.&
+                   & (idxin(i) <= idxmap%max_glob_row)) then
                 idxout(i) = idxin(i) - idxmap%min_glob_row + 1
               else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
                 nv  = idxmap%local_cols-idxmap%local_rows
@@ -1850,7 +1866,8 @@ contains
 
           do i=1, im
 
-            if ((idxmap%min_glob_row <= idxin(i)).and.(idxin(i) <= idxmap%max_glob_row)) then
+            if ((idxmap%min_glob_row <= idxin(i)).and.&
+                 & (idxin(i) <= idxmap%max_glob_row)) then
               idxout(i) = idxin(i) - idxmap%min_glob_row + 1
             else if ((1<= idxin(i)).and.(idxin(i) <= idxmap%global_rows)) then
               nv  = idxmap%local_cols-idxmap%local_rows
@@ -1889,7 +1906,6 @@ contains
     end if
 
     if (is > im) then 
-!!$      write(0,*) 'g2lv2_ins err -3'
       info = -3 
     end if
 
@@ -1910,7 +1926,6 @@ contains
     nv = size(idx)
     allocate(iprc(nv),stat=info) 
     if (info /= 0) then 
-!!$      write(0,*) 'Memory allocation failure in repl_map_fnd-owner'
       return
     end if
     do i=1, nv
@@ -1993,9 +2008,9 @@ contains
     class(psb_gen_block_map), intent(inout) :: idxmap
     integer(psb_ipk_), intent(out) :: info
     
-    integer(psb_ipk_) :: nhal
+    integer(psb_ipk_) :: nhal, i
     integer(psb_mpk_) :: ictxt, iam, np 
-    
+    logical :: debug=.false.
     info = 0 
     ictxt = idxmap%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -2008,7 +2023,12 @@ contains
 
     call psb_msort(idxmap%srt_l2g(:,1),&
          & ix=idxmap%srt_l2g(:,2),dir=psb_sort_up_)
-
+    if (debug) then
+      do i=1, nhal
+        write(0,*) iam,' block_l2g:',idxmap%srt_l2g(i,1:2)
+      end do
+    end if
+    
     call psb_free(idxmap%hash,info)
     call idxmap%set_state(psb_desc_asb_)
   end subroutine block_asb

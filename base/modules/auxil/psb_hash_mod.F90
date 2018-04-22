@@ -96,11 +96,11 @@ module psb_hash_mod
   end interface hashval
   
   interface psb_hash_searchinskey
-    module procedure psb_hash_searchinskey
+    module procedure psb_hash_isearchinskey
   end interface psb_hash_searchinskey
   
   interface psb_hash_searchkey
-    module procedure psb_hash_searchkey
+    module procedure psb_hash_isearchkey
   end interface psb_hash_searchkey
 #endif
   
@@ -372,7 +372,7 @@ contains
     type(psb_hash_type), intent(inout) :: hash
     integer(psb_ipk_), intent(out)   :: info 
     type(psb_hash_type)    :: nhash
-    integer(psb_ipk_) :: key, val, nextval,i
+    integer(psb_lpk_) :: key, val, nextval,i
 
     info = HashOk
     
@@ -457,7 +457,7 @@ contains
     end do
   end subroutine psb_hash_lsearchinskey
     
-  recursive subroutine psb_hash_searchinskey(key,val,nextval,hash,info)
+  recursive subroutine psb_hash_isearchinskey(key,val,nextval,hash,info)
     integer(psb_ipk_), intent(in)   :: key,nextval
     type(psb_hash_type)   :: hash
     integer(psb_ipk_), intent(out)  :: val, info 
@@ -515,9 +515,9 @@ contains
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
-  end subroutine psb_hash_searchinskey
+  end subroutine psb_hash_isearchinskey
 
-  subroutine psb_hash_searchkey(key,val,hash,info)
+  subroutine psb_hash_isearchkey(key,val,hash,info)
     integer(psb_ipk_), intent(in)   :: key
     type(psb_hash_type)   :: hash
     integer(psb_ipk_), intent(out)  :: val, info 
@@ -554,7 +554,7 @@ contains
       hk = hk - hd 
       if (hk < 0) hk = hk + hsize
     end do
-  end subroutine psb_hash_searchkey
+  end subroutine psb_hash_isearchkey
 
   subroutine psb_hash_lsearchkey(key,val,hash,info)
     integer(psb_lpk_), intent(in)   :: key
