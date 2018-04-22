@@ -56,7 +56,7 @@ psb_cdall -- Allocates a communication descriptor</A>
 <PRE>
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 </PRE>
@@ -199,7 +199,7 @@ Type:<B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a logical value, default: <code>.true.</code>
+Specified as: a logical value, default: <code>.false.</code>
 </DD>
 <DT><STRONG>lidx</STRONG></DT>
 <DD>Data allocation: the set of local  indices 
