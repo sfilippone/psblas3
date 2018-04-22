@@ -809,8 +809,8 @@ contains
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
-    integer(psb_ipk_) ::  i,  nlu, nl, nrt,int_err(5)
-    integer(psb_lpk_) ::  m
+    integer(psb_ipk_) ::  i,  nlu, nl, int_err(5)
+    integer(psb_lpk_) ::  m, nrt 
     integer(psb_lpk_), allocatable :: vlu(:)
     integer(psb_lpk_), allocatable :: ix(:)
     character(len=20), parameter :: name='hash_map_init_vl'
