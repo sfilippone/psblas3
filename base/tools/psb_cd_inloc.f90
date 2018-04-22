@@ -82,19 +82,15 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   iictxt = ictxt
 
   loc_row = size(v)
-  if (.false.) then 
-    m = loc_row
-    call psb_sum(ictxt,m)
-  else
-    m = maxval(v)
-    nrt = loc_row
-    call psb_sum(ictxt,nrt)
-    call psb_max(ictxt,m)
-  end if
+  m = maxval(v)
+  nrt = loc_row
+  call psb_sum(ictxt,nrt)
+  call psb_max(ictxt,m)
+  
   if (present(globalcheck)) then 
     check_ = globalcheck
   else
-    check_ = .true.
+    check_ = .false.
   end if
 
   n = m
@@ -138,7 +134,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
 
-  islarge = psb_cd_choose_large_state(ictxt,m)
+  islarge = psb_cd_is_large_size(m)
 
   allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
