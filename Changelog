@@ -1,5 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2018/04/23: Change default for CDALL with VL. New GLOBAL argument for
+	reductions. 	
 2018/04/15: Fixed pargen benchmark programs. Made MOLD mandatory.
 2018/01/10: Updated docs.	
 2017/12/15: Fixed preconditioner build.
