@@ -401,7 +401,7 @@ contains
         if (ix == 1) then 
           zt(k) = g(szero,y)*(-val(icoeff)) + zt(k)
         else
-          icol(icoeff) = (ix-2)*idim+iy
+          call ijk2idx(icol(icoeff),ix-1,iy,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -410,14 +410,14 @@ contains
         if (iy == 1) then 
           zt(k) = g(x,szero)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim+(iy-1)
+          call ijk2idx(icol(icoeff),ix,iy-1,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
 
         !  term depending on     (x,y)
         val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
-        icol(icoeff) = (ix-1)*idim+iy
+        call ijk2idx(icol(icoeff),ix,iy,idim,idim)
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
         !  term depending on     (x,y+1)
@@ -425,7 +425,7 @@ contains
         if (iy == idim) then 
           zt(k) = g(x,sone)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim+(iy+1)
+          call ijk2idx(icol(icoeff),ix,iy+1,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -434,7 +434,7 @@ contains
         if (ix==idim) then 
           zt(k) = g(sone,y)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix)*idim+(iy)
+          call ijk2idx(icol(icoeff),ix+1,iy,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
