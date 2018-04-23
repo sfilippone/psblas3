@@ -1949,7 +1949,8 @@ contains
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
-    integer(psb_ipk_) :: i, ntot
+    integer(psb_ipk_) :: i
+    integer(psb_lpk_) :: ntot
     integer(psb_lpk_), allocatable :: vnl(:)
 
     info = 0

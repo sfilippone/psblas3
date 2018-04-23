@@ -60,7 +60,7 @@ module psb_hash_map_mod
   
   type, extends(psb_indx_map) :: psb_hash_map
 
-    integer(psb_ipk_) :: hashvsize, hashvmask
+    integer(psb_lpk_) :: hashvsize, hashvmask
     integer(psb_ipk_), allocatable :: hashv(:)
     integer(psb_lpk_), allocatable :: glb_lc(:,:), loc_to_glob(:)
     type(psb_hash_type)  :: hash
@@ -105,14 +105,14 @@ module psb_hash_map_mod
        & hash_l2gv1, hash_l2gv2, hash_g2ls1, hash_g2ls2, &
        & hash_g2lv1, hash_g2lv2, hash_g2ls1_ins, hash_g2ls2_ins, &
        & hash_g2lv1_ins, hash_g2lv2_ins, hash_init_vlu, &
-       & hash_bld_g2l_map,  hash_inner_cnvs1, hash_inner_cnvs2,&
-       & hash_inner_cnv1, hash_inner_cnv2, hash_row_extendable 
+       & hash_bld_g2l_map, hash_inner_cnvs2, hash_inner_cnvs1, &
+       & hash_inner_cnv2, hash_inner_cnv1, hash_row_extendable 
 
   integer(psb_ipk_), private :: laddsz=500
 
   interface hash_inner_cnv 
-    module procedure  hash_inner_cnvs1, hash_inner_cnvs2,&
-         & hash_inner_cnv1, hash_inner_cnv2 
+    module procedure  hash_inner_cnvs2, hash_inner_cnv2,&
+         &  hash_inner_cnvs1,  hash_inner_cnv1
   end interface hash_inner_cnv
   private :: hash_inner_cnv
 
@@ -134,9 +134,9 @@ contains
     if (allocated(idxmap%hashv)) &
          & val = val + size(idxmap%hashv)*psb_sizeof_ip
     if (allocated(idxmap%glb_lc)) &
-         & val = val + size(idxmap%glb_lc)*psb_sizeof_ip
+         & val = val + size(idxmap%glb_lc)*psb_sizeof_lp
     if (allocated(idxmap%loc_to_glob)) &
-         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_ip
+         & val = val + size(idxmap%loc_to_glob)*psb_sizeof_lp
     val = val + psb_sizeof(idxmap%hash)
 
   end function hash_sizeof
@@ -327,8 +327,8 @@ contains
     integer(psb_ipk_), intent(out)   :: info 
     logical, intent(in), optional :: mask(:)
     logical, intent(in), optional :: owned
-    integer(psb_ipk_) :: i, is, mglob, lip, nrow, nrm
-    integer(psb_lpk_) :: ncol, ip, tlip
+    integer(psb_ipk_) :: i, lip, nrow, nrm, is
+    integer(psb_lpk_) :: ncol, ip, tlip, mglob
     integer(psb_mpk_) :: ictxt, iam, np
     logical :: owned_
 
@@ -374,7 +374,8 @@ contains
               idx(i) = -1
               cycle
             endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,nrm)
+            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                 & idxmap%glb_lc,nrm)
             if (lip < 0) then 
               call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
               lip = tlip
@@ -412,7 +413,8 @@ contains
             idx(i) = -1
             cycle
           endif
-          call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,nrm)
+          call hash_inner_cnv(ip,lip,idxmap%hashvmask,&
+               & idxmap%hashv,idxmap%glb_lc,nrm)
           if (lip < 0) then
             call psb_hash_searchkey(ip,tlip,idxmap%hash,info)
             lip = tlip
@@ -592,12 +594,11 @@ contains
                 if (info >=0) then 
                   if (nxt == tlip) then 
                     ncol = max(ncol,nxt)
-                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
+                    call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                         & pad=-1_psb_lpk_,addsz=laddsz)
                     if (info /= psb_success_) then
-                      info=1
-                      ch_err='psb_ensure_size'
                       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                           &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                           &a_err='psb_ensure_size',i_err=(/info/))
                       goto 9999
                     end if
                     idxmap%loc_to_glob(nxt)  = ip
@@ -605,9 +606,8 @@ contains
                   endif
                   info = psb_success_
                 else
-                  ch_err='SearchInsKeyVal'
                   call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                       & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                       & a_err='SearchInsKeyVal',i_err=(/info/))
                   goto 9999
                 end if
               end if
@@ -627,7 +627,8 @@ contains
               idx(i) = -1
               cycle
             endif
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                 & idxmap%glb_lc,ncol)
             if (lip < 0) then 
               nxt = lidx(i)
               if (nxt <= nrow) then 
@@ -643,9 +644,8 @@ contains
                   call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
-                    ch_err='psb_ensure_size'
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                         &a_err='psb_ensure_size',i_err=(/info/))
                     goto 9999
                   end if
                   idxmap%loc_to_glob(nxt)  = ip
@@ -653,9 +653,8 @@ contains
                 endif
                 info = psb_success_
               else
-                ch_err='SearchInsKeyVal'
                 call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                     & a_err='SearchInsKeyVal',i_err=(/info/))
                 goto 9999
               end if
             end if
@@ -677,7 +676,8 @@ contains
                 cycle
               endif
               nxt = ncol + 1 
-              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+              call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                   & idxmap%glb_lc,ncol)
               if (lip < 0) then
                 call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
                 lip = tlip
@@ -686,12 +686,12 @@ contains
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = nxt
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-1_psb_lpk_,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
-                    ch_err='psb_ensure_size'
                     call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                         &a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                         & a_err='psb_ensure_size',i_err=(/info/))
                     goto 9999
                   end if
                   idxmap%loc_to_glob(nxt)  = ip
@@ -699,9 +699,8 @@ contains
                 endif
                 info = psb_success_
               else
-                ch_err='SearchInsKeyVal'
                 call psb_errpush(psb_err_from_subroutine_ai_,name,&
-                     & a_err=ch_err,i_err=(/info,izero,izero,izero,izero/))
+                     & a_err='SearchInsKeyVal',i_err=(/info/))
                 goto 9999
               end if
               idx(i) = lip
@@ -721,7 +720,8 @@ contains
               cycle
             endif
             nxt = ncol + 1 
-            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,idxmap%glb_lc,ncol)
+            call hash_inner_cnv(ip,lip,idxmap%hashvmask,idxmap%hashv,&
+                 & idxmap%glb_lc,ncol)
             if (lip < 0) then
               call psb_hash_searchinskey(ip,tlip,nxt,idxmap%hash,info)
               lip = tlip
@@ -730,7 +730,8 @@ contains
             if (info >=0) then 
               if (nxt == lip) then 
                 ncol = nxt
-                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-1_psb_lpk_,addsz=laddsz)
+                call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                     & pad=-1_psb_lpk_,addsz=laddsz)
                 if (info /= psb_success_) then
                   info=1
                   ch_err='psb_ensure_size'
@@ -997,7 +998,8 @@ contains
     !  To be implemented
     integer(psb_mpk_) :: ictxt, iam, np
     integer(psb_ipk_) :: i, j, m, nl
-    integer(psb_ipk_) :: key, ih, nh, idx, nbits, hsize, hmask
+    integer(psb_ipk_) :: ih, nh, idx, nbits
+    integer(psb_lpk_) :: key, hsize, hmask
     character(len=20), parameter :: name='hash_map_init_vlu'
 
     info = 0
@@ -1036,7 +1038,7 @@ contains
     idxmap%hashvmask = hmask
 
     if (info == psb_success_) &
-         & call psb_realloc(hsize+1,idxmap%hashv,info,lb=0_psb_ipk_)
+         & call psb_realloc(hsize+1,idxmap%hashv,info,lb=0_psb_lpk_)
     if (info /= psb_success_) then 
       ! !$      ch_err='psb_realloc'
       ! !$      call psb_errpush(info,name,a_err=ch_err)
@@ -1133,11 +1135,13 @@ contains
 
 
   subroutine hash_inner_cnvs1(x,hashmask,hashv,glb_lc,nrm)
-
-    integer(psb_ipk_), intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
-    integer(psb_ipk_), intent(inout) :: x
+    implicit none 
+    integer(psb_lpk_), intent(in)    :: hashmask,glb_lc(:,:)
+    integer(psb_ipk_), intent(in)    :: hashv(0:)
+    integer(psb_lpk_), intent(inout) :: x
     integer(psb_ipk_), intent(in)    :: nrm
-    integer(psb_ipk_) :: ih, key, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_lpk_) :: key, ih
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
@@ -1180,11 +1184,13 @@ contains
   end subroutine hash_inner_cnvs1
 
   subroutine hash_inner_cnvs2(x,y,hashmask,hashv,glb_lc,nrm)
-    integer(psb_ipk_), intent(in)  :: hashmask,hashv(0:)
-    integer(psb_lpk_), intent(in)  :: x, glb_lc(:,:)
+    implicit none 
+    integer(psb_ipk_), intent(in)  :: hashv(0:)
+    integer(psb_lpk_), intent(in)  :: hashmask, x, glb_lc(:,:)
     integer(psb_ipk_), intent(out) :: y
     integer(psb_ipk_), intent(in)  :: nrm
-    integer(psb_ipk_) :: ih, key, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: idx,nh,tmp,lb,ub,lm
+    integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
@@ -1228,13 +1234,15 @@ contains
 
 
   subroutine hash_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask,nrm)
-    integer(psb_ipk_), intent(in)  :: n,hashmask,hashv(0:)
-    integer(psb_lpk_), intent(in)  :: glb_lc(:,:)
+    implicit none 
+    integer(psb_ipk_), intent(in)  :: n, hashv(0:)
+    integer(psb_lpk_), intent(in)  :: glb_lc(:,:),hashmask
     logical, intent(in), optional  :: mask(:)
     integer(psb_ipk_), intent(in), optional  :: nrm
     integer(psb_lpk_), intent(inout) :: x(:)
 
-    integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, nh,tmp,lb,ub,lm
+    integer(psb_lpk_) :: ih, key, idx
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
@@ -1320,13 +1328,16 @@ contains
   end subroutine hash_inner_cnv1
 
   subroutine hash_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask,nrm)
-    integer(psb_ipk_), intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
+    implicit none 
+    integer(psb_ipk_), intent(in)  :: n, hashv(0:)
+    integer(psb_lpk_), intent(in)  :: hashmask,glb_lc(:,:)
     logical, intent(in), optional :: mask(:)
     integer(psb_ipk_), intent(in), optional :: nrm
-    integer(psb_ipk_), intent(in)  :: x(:)
+    integer(psb_lpk_), intent(in)  :: x(:)
     integer(psb_ipk_), intent(out) :: y(:)
 
-    integer(psb_ipk_) :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    integer(psb_ipk_) :: i, idx,nh,tmp,lb,ub,lm
+    integer(psb_lpk_) :: ih, key
     !
     ! When a large descriptor is assembled the indices 
     ! are kept in a (hashed) list of ordered lists. 
@@ -1487,6 +1498,7 @@ contains
     use psb_penv_mod
     use psb_error_mod
     use psb_realloc_mod
+    implicit none 
     class(psb_hash_map), intent(in) :: idxmap
     type(psb_hash_map), intent(out) :: outmap
     integer(psb_ipk_) :: info

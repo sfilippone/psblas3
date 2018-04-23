@@ -426,7 +426,7 @@ contains
         if (ix == 1) then 
           zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
         else
-          icol(icoeff) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -435,7 +435,7 @@ contains
         if (iy == 1) then 
           zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -444,7 +444,7 @@ contains
         if (iz == 1) then 
           zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
+          call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -452,7 +452,7 @@ contains
         !  term depending on     (x,y,z)
         val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
              & + c(x,y,z)
-        icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
+        call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)          
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
         !  term depending on     (x,y,z+1)
@@ -460,7 +460,7 @@ contains
         if (iz == idim) then 
           zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
+          call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -469,7 +469,7 @@ contains
         if (iy == idim) then 
           zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -478,7 +478,7 @@ contains
         if (ix==idim) then 
           zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif

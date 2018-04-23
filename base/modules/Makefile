@@ -91,7 +91,7 @@ UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_m
 	auxil/psb_d_hsort_x_mod.o \
 	auxil/psb_c_hsort_x_mod.o \
 	auxil/psb_z_hsort_x_mod.o \
-	psb_check_mod.o auxil/psb_hash_mod.o\
+	psb_check_mod.o desc/psb_hash_mod.o\
 	serial/psb_base_mat_mod.o  serial/psb_mat_mod.o\
 	serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_mat_mod.o \
 	serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_mat_mod.o \
@@ -154,7 +154,7 @@ penv/psi_e_collective_mod.o  penv/psi_m_collective_mod.o penv/psi_s_collective_m
 penv/psi_d_collective_mod.o  penv/psi_c_collective_mod.o penv/psi_z_collective_mod.o: penv/psi_penv_mod.o 
 
 auxil/psb_string_mod.o desc/psb_desc_const_mod.o psi_comm_buffers_mod.o: psb_const_mod.o
-auxil/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o
+desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o
 auxil/psb_i_sort_mod.o auxil/psb_s_sort_mod.o auxil/psb_d_sort_mod.o auxil/psb_c_sort_mod.o auxil/psb_z_sort_mod.o \
 auxil/psb_ip_reord_mod.o auxil/psi_serial_mod.o auxil/psb_sort_mod.o: $(BASIC_MODS)
 auxil/psb_sort_mod.o: 	auxil/psb_m_hsort_mod.o auxil/psb_m_isort_mod.o \
@@ -226,7 +226,7 @@ psb_error_impl.o: psb_penv_mod.o
 psb_spmat_type.o: auxil/psb_string_mod.o auxil/psb_sort_mod.o
 
 desc/psb_desc_mod.o: psb_penv_mod.o psb_realloc_mod.o\
-	  auxil/psb_hash_mod.o desc/psb_hash_map_mod.o desc/psb_list_map_mod.o \
+	  desc/psb_hash_mod.o desc/psb_hash_map_mod.o desc/psb_list_map_mod.o \
 	  desc/psb_repl_map_mod.o desc/psb_gen_block_map_mod.o desc/psb_desc_const_mod.o\
 	  desc/psb_indx_map_mod.o serial/psb_i_vect_mod.o
 
@@ -250,8 +250,8 @@ desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb
     desc/psb_indx_map_mod.o desc/psb_desc_const_mod.o  \
     auxil/psb_sort_mod.o psb_penv_mod.o 
 desc/psb_glist_map_mod.o: desc/psb_list_map_mod.o
-desc/psb_hash_map_mod.o: auxil/psb_hash_mod.o auxil/psb_sort_mod.o
-desc/psb_gen_block_map_mod.o: auxil/psb_hash_mod.o
+desc/psb_hash_map_mod.o: desc/psb_hash_mod.o auxil/psb_sort_mod.o
+desc/psb_gen_block_map_mod.o: desc/psb_hash_mod.o
 
 psb_check_mod.o: desc/psb_desc_mod.o
 

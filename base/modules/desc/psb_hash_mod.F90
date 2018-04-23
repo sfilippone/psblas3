@@ -33,7 +33,7 @@
 !
 module psb_hash_mod
   use psb_const_mod
-  
+  use psb_desc_const_mod
   !> \class psb_hash_mod
   !! \brief Simple hash module for storing integer keys. 
   !! 
@@ -295,7 +295,7 @@ contains
     integer(psb_ipk_) :: hsize,nbits
 
     info  = psb_success_
-    nbits = 14
+    nbits = psb_hash_bits
     hsize = 2**nbits
     !
     ! Figure out the smallest power of 2 bigger than NV
@@ -335,7 +335,7 @@ contains
     integer(psb_ipk_) :: hsize,nbits
 
     info  = psb_success_
-    nbits = 12
+    nbits = psb_hash_bits
     hsize = 2**nbits
     !
     ! Figure out the smallest power of 2 bigger than NV

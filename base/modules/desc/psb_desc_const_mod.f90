@@ -101,11 +101,11 @@ module psb_desc_const_mod
   !
   ! Constants for hashing into desc%hashv(:) and desc%glb_lc(:,:)
   !
-  integer(psb_ipk_), parameter :: psb_hash_bits=16
-  integer(psb_ipk_), parameter :: psb_max_hash_bits=22
-  integer(psb_ipk_), parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
+  integer(psb_ipk_), parameter :: psb_hash_bits     = 16
+  integer(psb_ipk_), parameter :: psb_max_hash_bits = 22
+  integer(psb_ipk_), parameter :: psb_hash_size     = 2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
   integer(psb_ipk_), parameter :: psb_default_large_threshold=1*1024*1024   
-  integer(psb_ipk_), parameter :: psb_hpnt_nentries_=7
+  integer(psb_ipk_), parameter :: psb_hpnt_nentries_ = 7
 
   !
   !     Constants for desc_a handling
