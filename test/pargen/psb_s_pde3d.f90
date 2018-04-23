@@ -197,8 +197,8 @@ contains
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
     real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: nnz,nr,nt,nlr,i,j,ii,ib,k, partition_
-    integer(psb_lpk_) :: m,n,glob_row
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
     ! Note: integer control variables going directly into an MPI call
