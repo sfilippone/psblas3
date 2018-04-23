@@ -35,50 +35,55 @@ module psb_z_psblas_mod
   use psb_z_mat_mod, only : psb_zspmat_type
 
   interface psb_gedot
-    function psb_zdot_vect(x, y, desc_a,info) result(res)
+    function psb_zdot_vect(x, y, desc_a,info,global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                    :: res
       type(psb_z_vect_type), intent(inout) :: x, y
       type(psb_desc_type), intent(in)      :: desc_a
-      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
     end function psb_zdot_vect
-    function psb_zdotv(x, y, desc_a,info) 
+    function psb_zdotv(x, y, desc_a,info,global) 
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdotv
       complex(psb_dpk_), intent(in)    :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: global
     end function psb_zdotv
-    function psb_zdot(x, y, desc_a, info, jx, jy) 
+    function psb_zdot(x, y, desc_a, info, jx, jy,global) 
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       complex(psb_dpk_)                :: psb_zdot
       complex(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer(psb_ipk_), optional, intent(in)      :: jx, jy
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: global
     end function psb_zdot
   end interface
 
 
   interface psb_gedots
-    subroutine  psb_zdotvs(res,x, y, desc_a, info)
+    subroutine  psb_zdotvs(res,x, y, desc_a, info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type 
       complex(psb_dpk_), intent(out)      :: res
       complex(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: global
     end subroutine psb_zdotvs
-    subroutine  psb_zmdots(res,x, y, desc_a,info)
+    subroutine  psb_zmdots(res,x, y, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type 
       complex(psb_dpk_), intent(out)      :: res(:)
       complex(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: global
     end subroutine psb_zmdots
   end interface
 
@@ -91,7 +96,7 @@ module psb_z_psblas_mod
       type(psb_z_vect_type), intent (inout) :: y
       complex(psb_dpk_), intent (in)        :: alpha, beta
       type(psb_desc_type), intent (in)      :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_zaxpby_vect
     subroutine psb_zaxpbyv(alpha, x, beta, y,&
          & desc_a, info)
@@ -112,35 +117,38 @@ module psb_z_psblas_mod
       complex(psb_dpk_), intent (in)       ::  alpha, beta
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), optional, intent(in) :: n, jx, jy
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine psb_zaxpby
   end interface
 
   interface psb_geamax
-    function psb_zamax(x, desc_a, info, jx)
+    function psb_zamax(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_zamax
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), optional, intent (in)      :: jx
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end function psb_zamax
-    function psb_zamaxv(x, desc_a,info)
+    function psb_zamaxv(x, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_zamaxv
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end function psb_zamaxv
-    function psb_zamax_vect(x, desc_a, info) result(res)
+    function psb_zamax_vect(x, desc_a, info,global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                        :: res
       type(psb_z_vect_type), intent (inout) :: x
-      type(psb_desc_type), intent (in)      :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      type(psb_desc_type), intent (in)     :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
     end function psb_zamax_vect
   end interface
 
@@ -154,69 +162,76 @@ module psb_z_psblas_mod
 #endif
 
   interface psb_geamaxs
-    subroutine  psb_zamaxvs(res,x,desc_a,info)
+    subroutine  psb_zamaxvs(res,x,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)    :: x(:)
       type(psb_desc_type), intent (in)  :: desc_a
-      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(out)    :: info
+      logical, intent(in), optional     :: global
     end subroutine psb_zamaxvs
-    subroutine  psb_zmamaxs(res,x,desc_a,info,jx)
+    subroutine  psb_zmamaxs(res,x,desc_a,info,jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)       :: res(:)
       complex(psb_dpk_), intent (in)     :: x(:,:)
       type(psb_desc_type), intent (in)   :: desc_a
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
       integer(psb_ipk_), optional, intent(in)      :: jx
+      logical, intent(in), optional      :: global
     end subroutine psb_zmamaxs
   end interface
 
   interface psb_geasum
-    function psb_zasum_vect(x, desc_a, info) result(res)
+    function psb_zasum_vect(x, desc_a, info,global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                        :: res
       type(psb_z_vect_type), intent (inout) :: x
-      type(psb_desc_type), intent (in)      :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      type(psb_desc_type), intent (in)     :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
     end function psb_zasum_vect
-    function psb_zasum(x, desc_a, info, jx)
+    function psb_zasum(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_zasum
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), optional, intent (in)      :: jx
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end function psb_zasum
-    function psb_zasumv(x, desc_a, info)
+    function psb_zasumv(x, desc_a, info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_zasumv
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end function psb_zasumv
   end interface
 
   interface psb_geasums
-    subroutine  psb_zasumvs(res,x,desc_a,info)
+    subroutine  psb_zasumvs(res,x,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end subroutine psb_zasumvs
-    subroutine  psb_zmasum(res,x,desc_a,info)
+    subroutine  psb_zmasum(res,x,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res(:)
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end subroutine psb_zmasum
   end interface
 
@@ -230,30 +245,33 @@ module psb_z_psblas_mod
 #endif
 
   interface psb_genrm2
-    function psb_znrm2(x, desc_a, info, jx)
+    function psb_znrm2(x, desc_a, info, jx,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)   psb_znrm2
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), optional, intent (in)      :: jx
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
     end function psb_znrm2
-    function psb_znrm2v(x, desc_a, info)
+    function psb_znrm2v(x, desc_a, info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_) psb_znrm2v
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer(psb_ipk_), intent(out)                :: info
+      logical, intent(in), optional        :: global
     end function psb_znrm2v
-    function psb_znrm2_vect(x, desc_a, info) result(res)
+    function psb_znrm2_vect(x, desc_a, info,global) result(res)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                      :: res
       type(psb_z_vect_type), intent (inout)   :: x
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end function psb_znrm2_vect
   end interface
 
@@ -264,25 +282,27 @@ module psb_z_psblas_mod
 #endif
 
   interface psb_genrm2s
-    subroutine  psb_znrm2vs(res,x,desc_a,info)
+    subroutine  psb_znrm2vs(res,x,desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_), intent (out)      :: res
       complex(psb_dpk_), intent (in)       :: x(:)
       type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)      :: info
+      logical, intent(in), optional       :: global
     end subroutine psb_znrm2vs
   end interface
 
 
   interface psb_spnrmi
-    function psb_znrmi(a, desc_a,info)
+    function psb_znrmi(a, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
       real(psb_dpk_)                    :: psb_znrmi
       type(psb_zspmat_type), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)     :: info
+      logical, intent(in), optional      :: global
     end function psb_znrmi
   end interface
 
@@ -293,13 +313,14 @@ module psb_z_psblas_mod
 #endif
 
   interface psb_spnrm1
-    function psb_zspnrm1(a, desc_a,info)
+    function psb_zspnrm1(a, desc_a,info,global)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_z_vect_type, psb_zspmat_type
-      real(psb_dpk_)                      :: psb_zspnrm1
+      real(psb_dpk_)                     :: psb_zspnrm1
       type(psb_zspmat_type), intent (in) :: a
-      type(psb_desc_type), intent (in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
+      type(psb_desc_type), intent (in)     :: desc_a
+      integer(psb_ipk_), intent(out)       :: info
+      logical, intent(in), optional        :: global
     end function psb_zspnrm1
   end interface
   

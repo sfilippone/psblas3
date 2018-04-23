@@ -53,13 +53,12 @@ module psi_i_mod
   end interface
 
   interface
-    subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
+    subroutine psi_crea_index(desc_a,index_in,index_out,nxch,nsnd,nrcv,info)
       import 
       type(psb_desc_type), intent(in)     :: desc_a
       integer(psb_ipk_), intent(out)                :: info,nxch,nsnd,nrcv
       integer(psb_ipk_), intent(in)                 :: index_in(:)
       integer(psb_ipk_), allocatable, intent(inout) :: index_out(:)
-      logical                             :: glob_idx
     end subroutine psi_crea_index
   end interface
 
@@ -74,13 +73,12 @@ module psi_i_mod
 
   interface
     subroutine psi_desc_index(desc,index_in,dep_list,&
-         & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+         & length_dl,nsnd,nrcv,desc_index,info)
       import 
       type(psb_desc_type) :: desc
       integer(psb_ipk_) :: index_in(:),dep_list(:)
       integer(psb_ipk_),allocatable  :: desc_index(:)
       integer(psb_ipk_) :: length_dl,nsnd,nrcv,info
-      logical         :: isglob_in
     end subroutine psi_desc_index
   end interface
 

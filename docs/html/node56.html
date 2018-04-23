@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html946"
+<A NAME="tex2html947"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html942"
+<A NAME="tex2html943"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html936"
+<A NAME="tex2html937"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html944"
+<A NAME="tex2html945"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html947"
+<B> Next:</B> <A NAME="tex2html948"
   HREF="node57.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html943"
+<B> Up:</B> <A NAME="tex2html944"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html937"
+<B> Previous:</B> <A NAME="tex2html938"
   HREF="node55.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html945"
+ &nbsp; <B>  <A NAME="tex2html946"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -74,7 +74,7 @@ amax \leftarrow \max_i |x_i|
 
 <IMG
  WIDTH="118" HEIGHT="36" BORDER="0"
- SRC="img29.png"
+ SRC="img30.png"
  ALT="\begin{displaymath}amax \leftarrow \max_i \vert x_i\vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -93,7 +93,7 @@ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}
 
 <IMG
  WIDTH="233" HEIGHT="36" BORDER="0"
- SRC="img30.png"
+ SRC="img31.png"
  ALT="\begin{displaymath}amax \leftarrow \max_i {(\vert re(x_i)\vert + \vert im(x_i)\vert)}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -101,13 +101,13 @@ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}
 
 <P>
 <PRE>
-psb_geamax(x, desc_a, info)
-psb_normi(x, desc_a, info)
+psb_geamax(x, desc_a, info [,global])
+psb_normi(x, desc_a, info [,global])
 </PRE>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1980"></A>
+<DIV ALIGN="CENTER"><A NAME="2012"></A>
 <TABLE>
 <CAPTION><STRONG>Table 4:</STRONG>
 Data types</CAPTION>
@@ -116,7 +116,7 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="44" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img31.png"
+ SRC="img32.png"
  ALT="$amax$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
@@ -183,6 +183,20 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>global</STRONG></DT>
+<DD>Specifies whether the computation should include the
+  global reduction across all processes.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical scalar.
+Default: <code>global=.true.</code>
+<BR>
 
 <P>
 </DD>
@@ -190,12 +204,13 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>is the infinity norm of subvector <SPAN CLASS="MATH"><IMG
+<DD>is the infinity norm of vector <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B> unless the optional variable
+<code>global=.false.</code> has been specified
 <BR>
 Specified as: a long precision real number.
 </DD>
@@ -213,29 +228,54 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  <BR>
+<IMG
+ WIDTH="481" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ SRC="img33.png"
+ ALT="\begin{lstlisting}
+vres(1) = psb_geamax(x1,desc_a,info,global=.false.)
+vres(2)...
+...(x3,desc_a,info,global=.false.)
+call psb_amx(ictxt,vres(1:3))
+\end{lstlisting}">
+<BR>
+In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+</LI>
+</OL>
+
+<P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html946"
+<A NAME="tex2html947"
   HREF="node57.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html942"
+<A NAME="tex2html943"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html936"
+<A NAME="tex2html937"
   HREF="node55.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html944"
+<A NAME="tex2html945"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html947"
+<B> Next:</B> <A NAME="tex2html948"
   HREF="node57.html">psb_geamaxs   Generalized</A>
-<B> Up:</B> <A NAME="tex2html943"
+<B> Up:</B> <A NAME="tex2html944"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html937"
+<B> Previous:</B> <A NAME="tex2html938"
   HREF="node55.html">psb_gedots   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html945"
+ &nbsp; <B>  <A NAME="tex2html946"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

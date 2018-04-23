@@ -11,7 +11,7 @@
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
@@ -75,7 +75,7 @@ Specified as: the logical value \verb|.true.|
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: a logical value, default: \verb|.true.|
+Specified as: a logical value, default: \verb|.false.|
 \item[lidx] Data allocation: the set of local  indices 
   $lidx(1:nl)$ to be assigned to the global indices $vl$. \\
 Scope:{\bf local}.\\

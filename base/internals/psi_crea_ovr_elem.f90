@@ -61,10 +61,6 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
   integer(psb_ipk_) :: dim_ovr_elem
   integer(psb_ipk_) :: pairtree(2)
 
-  !     ...external function...
-  integer(psb_ipk_) :: psi_exist_ovr_elem
-  external :: psi_exist_ovr_elem
-
   integer(psb_ipk_) :: nel, ip, ix, iel, insize, err_act, iproc
   integer(psb_ipk_), allocatable :: telem(:,:)
 

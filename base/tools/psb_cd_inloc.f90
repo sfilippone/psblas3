@@ -82,19 +82,15 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   iictxt = ictxt
 
   loc_row = size(v)
-  if (.false.) then 
-    m = loc_row
-    call psb_sum(ictxt,m)
-  else
-    m = maxval(v)
-    nrt = loc_row
-    call psb_sum(ictxt,nrt)
-    call psb_max(ictxt,m)
-  end if
+  m = maxval(v)
+  nrt = loc_row
+  call psb_sum(ictxt,nrt)
+  call psb_max(ictxt,m)
+  
   if (present(globalcheck)) then 
     check_ = globalcheck
   else
-    check_ = .true.
+    check_ = .false.
   end if
 
   n = m
@@ -138,7 +134,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
 
-  islarge = psb_cd_choose_large_state(ictxt,m)
+  islarge = psb_cd_is_large_size(m)
 
   allocate(vl(loc_row),ix(loc_row),stat=info) 
   if (info /= psb_success_) then 
@@ -369,6 +365,22 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call aa%init(iictxt,vl(1:nlu),info)
   end select
 
+
+  !
+  ! Now that we have initialized indxmap we can convert the
+  ! indices to local numbering.
+  !
+  block
+    integer(psb_ipk_) :: i,nprocs
+    i = 1
+    do while (temp_ovrlap(i) /= -1) 
+      call desc%indxmap%g2lip(temp_ovrlap(i),info)
+      i       = i + 1
+      nprocs  = temp_ovrlap(i)
+      i       = i + 1
+      i       = i + nprocs     
+    enddo
+  end block
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   if (info == psb_success_) deallocate(temp_ovrlap,vl,ix,stat=info)

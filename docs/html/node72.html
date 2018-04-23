@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1165"
+<A NAME="tex2html1166"
   HREF="node73.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1161"
+<A NAME="tex2html1162"
   HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1155"
+<A NAME="tex2html1156"
   HREF="node71.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1163"
+<A NAME="tex2html1164"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1166"
+<B> Next:</B> <A NAME="tex2html1167"
   HREF="node73.html">psb_cdins   Communication</A>
-<B> Up:</B> <A NAME="tex2html1162"
+<B> Up:</B> <A NAME="tex2html1163"
   HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1156"
+<B> Previous:</B> <A NAME="tex2html1157"
   HREF="node71.html">Data management routines</A>
- &nbsp; <B>  <A NAME="tex2html1164"
+ &nbsp; <B>  <A NAME="tex2html1165"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -56,7 +56,7 @@ psb_cdall -- Allocates a communication descriptor</A>
 <PRE>
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
-call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.,lidx=lidx])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.false.,lidx=lidx])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 </PRE>
@@ -91,11 +91,11 @@ Specified as: an integer value.
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img82.png"
+ SRC="img86.png"
  ALT="$i\in \{1\dots mg\}$"></SPAN> is allocated
   to process <SPAN CLASS="MATH"><IMG
  WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
+ SRC="img87.png"
  ALT="$vg(i)$"></SPAN>.
 <BR>
 Scope:<B>global</B>.
@@ -109,7 +109,7 @@ Specified as: an integer array.
 <DT><STRONG>flag</STRONG></DT>
 <DD>Specifies whether entries in <SPAN CLASS="MATH"><IMG
  WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img84.png"
+ SRC="img88.png"
  ALT="$vg$"></SPAN> are zero- or one-based.
 <BR>
 Scope:<B>global</B>.
@@ -120,10 +120,10 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer value <SPAN CLASS="MATH"><IMG
  WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img85.png"
+ SRC="img89.png"
  ALT="$0,1$"></SPAN>, default <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img86.png"
+ SRC="img90.png"
  ALT="$0$"></SPAN>.
 
 <P>
@@ -153,7 +153,7 @@ Specified as: a subroutine.
 <DD>Data allocation: the set of global indices 
   <SPAN CLASS="MATH"><IMG
  WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img87.png"
+ SRC="img91.png"
  ALT="$vl(1:nl)$"></SPAN> belonging to the calling process. 
 <BR>
 Scope:<B>local</B>.
@@ -199,16 +199,16 @@ Type:<B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: a logical value, default: <code>.true.</code>
+Specified as: a logical value, default: <code>.false.</code>
 </DD>
 <DT><STRONG>lidx</STRONG></DT>
 <DD>Data allocation: the set of local  indices 
   <SPAN CLASS="MATH"><IMG
  WIDTH="80" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img88.png"
+ SRC="img92.png"
  ALT="$lidx(1:nl)$"></SPAN> to be assigned to the global indices <SPAN CLASS="MATH"><IMG
  WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img89.png"
+ SRC="img93.png"
  ALT="$vl$"></SPAN>. 
 <BR>
 Scope:<B>local</B>.
@@ -301,10 +301,10 @@ An integer value; 0 means no error has been detected.
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="106" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img90.png"
+ SRC="img94.png"
  ALT="$0\le pv(i) &lt; np$"></SPAN>; if <SPAN CLASS="MATH"><IMG
  WIDTH="51" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img91.png"
+ SRC="img95.png"
  ALT="$nv&gt;1$"></SPAN> we have an index assigned to multiple
     processes, i.e. we have an overlap among the subdomains.
   
@@ -319,23 +319,23 @@ An integer value; 0 means no error has been detected.
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img82.png"
+ SRC="img86.png"
  ALT="$i\in \{1\dots mg\}$"></SPAN> is assigned to process <SPAN CLASS="MATH"><IMG
  WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img83.png"
+ SRC="img87.png"
  ALT="$vg(i)$"></SPAN>. 
   The vector <code>vg</code> must be identical on all
   calling processes; its entries may have the ranges <SPAN CLASS="MATH"><IMG
  WIDTH="93" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img92.png"
+ SRC="img96.png"
  ALT="$(0\dots np-1)$"></SPAN>
   or <SPAN CLASS="MATH"><IMG
  WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img93.png"
+ SRC="img97.png"
  ALT="$(1\dots np)$"></SPAN> according to the value of <code>flag</code>.  
   The size <SPAN CLASS="MATH"><IMG
  WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img94.png"
+ SRC="img98.png"
  ALT="$mg$"></SPAN> may be  specified via the optional argument <code>mg</code>;
   the default is to use the entire vector <code>vg</code>, thus having
   <code>mg=size(vg)</code>. 
@@ -345,7 +345,7 @@ An integer value; 0 means no error has been detected.
   <code>vl(1:nl)</code> assigned   to the current process; thus, the global
   problem size <SPAN CLASS="MATH"><IMG
  WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img94.png"
+ SRC="img98.png"
  ALT="$mg$"></SPAN> is given by 
   the range of the aggregate of the individual vectors <code>vl</code> specified
   in the calling processes. The size may be specified via the optional
@@ -354,7 +354,7 @@ An integer value; 0 means no error has been detected.
   If <code>globalcheck=.true.</code>   the subroutine will check how many
   times  each entry in the global   index   space <SPAN CLASS="MATH"><IMG
  WIDTH="71" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img95.png"
+ SRC="img99.png"
  ALT="$(1\dots mg)$"></SPAN> is
   specified in the input lists   <code>vl</code>, thus allowing for the
   presence of overlap in the input,   and checking for &ldquo;orphan&rdquo;
@@ -378,10 +378,10 @@ An integer value; 0 means no error has been detected.
   the  result is  a generalized row-block   distribution in which each
   process <SPAN CLASS="MATH"><IMG
  WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img96.png"
+ SRC="img100.png"
  ALT="$I$"></SPAN> gets assigned a consecutive   chunk of <SPAN CLASS="MATH"><IMG
  WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img97.png"
+ SRC="img101.png"
  ALT="$N_I=nl$"></SPAN> global
   indices. 
 </DD>
@@ -423,26 +423,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1165"
+<A NAME="tex2html1166"
   HREF="node73.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1161"
+<A NAME="tex2html1162"
   HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1155"
+<A NAME="tex2html1156"
   HREF="node71.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1163"
+<A NAME="tex2html1164"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1166"
+<B> Next:</B> <A NAME="tex2html1167"
   HREF="node73.html">psb_cdins   Communication</A>
-<B> Up:</B> <A NAME="tex2html1162"
+<B> Up:</B> <A NAME="tex2html1163"
   HREF="node71.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html1156"
+<B> Previous:</B> <A NAME="tex2html1157"
   HREF="node71.html">Data management routines</A>
- &nbsp; <B>  <A NAME="tex2html1164"
+ &nbsp; <B>  <A NAME="tex2html1165"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

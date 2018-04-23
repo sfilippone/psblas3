@@ -105,7 +105,6 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %       F90DOT PRODUCT
@@ -124,12 +123,12 @@ Else if $x$ and $y$ are complex vectors then it computes dot-product as:
 \[dot \leftarrow x^H y\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
-%% \item[$y$] represents the global subvector $y_{:,jy}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
+%% \item[$y$] represents the global vector $y_{:,jy}$
 %% \end{description}
 
 \begin{verbatim}
-psb_gedot(x, y, desc_a, info)
+psb_gedot(x, y, desc_a, info [,global])
 \end{verbatim}
 %% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
 \begin{table}[h]
@@ -176,21 +175,29 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
+\item[global]  Specifies whether the computation should include the
+  global reduction across all processes.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical scalar.
+Default: \verb|global=.true.|\\
 %% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
 %% Default: $jx = 1$.\\
 
 %% \item[jy]  the column index of global dense matrix $y$,
-%% identifying the column of subvector $y$.\\
+%% identifying the column of vector $y$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
 %% Default: $jy = 1$.\\
 %% Specified as: an integer variable $jy\ge 1$. 
 \item[\bf On Return] 
-\item[Function value] is the dot product of subvectors $x$ and $y$.\\
-Scope: {\bf global} \\
+\item[Function value] is the dot product of vectors $x$ and $y$.\\
+Scope: {\bf global}  unless the optional variable
+\verb|global=.false.| has been specified\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90dot}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -198,7 +205,25 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple dot products at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  \begin{lstlisting}
+    vres(1) = psb_gedot(x1,y1,desc_a,info,global=.false.)
+    vres(2) = psb_gedot(x2,y2,desc_a,info,global=.false.)
+    vres(3) = psb_gedot(x3,y3,desc_a,info,global=.false.)
+    call psb_sum(ictxt,vres(1:3))
+  \end{lstlisting}
+  In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %
 %       F90DOT PRODUCT
 %
@@ -259,7 +284,7 @@ Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
 \item[\bf On Return] 
-\item[res] is the dot product of subvectors $x$ and $y$.\\
+\item[res] is the dot product of vectors $x$ and $y$.\\
 Scope: {\bf global} \\
 Intent: {\bf out}.\\
 Specified as: a number or a rank-one array  of the data type indicated
@@ -290,12 +315,12 @@ else if $x$ is a complex vector then it computes the infinity-norm  as:
 \[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
 %% \end{description}
 
 \begin{verbatim}
-psb_geamax(x, desc_a, info)
-psb_normi(x, desc_a, info)
+psb_geamax(x, desc_a, info [,global])
+psb_normi(x, desc_a, info [,global])
 \end{verbatim}
 %% \syntax*{psb\_geamax}{x, desc\_a, info, jx}
 
@@ -334,16 +359,23 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
-%% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+\item[global]  Specifies whether the computation should include the
+  global reduction across all processes.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical scalar.
+Default: \verb|global=.true.|\\%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $jx = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
-\item[Function value] is the infinity norm of subvector $x$.\\
-Scope: {\bf global} \\
+\item[Function value] is the infinity norm of vector $x$.\\
+Scope: {\bf global} unless the optional variable
+\verb|global=.false.| has been specified\\
 Specified as: a long precision real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -351,7 +383,25 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  \begin{lstlisting}
+    vres(1) = psb_geamax(x1,desc_a,info,global=.false.)
+    vres(2) = psb_geamax(x2,desc_a,info,global=.false.)
+    vres(3) = psb_geamax(x3,desc_a,info,global=.false.)
+    call psb_amx(ictxt,vres(1:3))
+  \end{lstlisting}
+  In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %
 %       Infinity norm
 %
@@ -431,8 +481,8 @@ else if $x$ is a complex vector then it computes 1-norm  as:
 
 
 \begin{verbatim}
-psb_geasum(x, desc_a, info)
-psb_norm1(x, desc_a, info)
+psb_geasum(x, desc_a, info [,global])
+psb_norm1(x, desc_a, info [,global])
 \end{verbatim}
 
 \begin{table}[h]
@@ -469,10 +519,18 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
+\item[global]  Specifies whether the computation should include the
+  global reduction across all processes.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical scalar.
+Default: \verb|global=.true.|\\
 
 \item[\bf On Return] 
 \item[Function value] is the 1-norm of vector $x$.\\
-Scope: {\bf global} \\
+Scope: {\bf global} unless the optional variable
+\verb|global=.false.| has been specified\\
 Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -480,6 +538,23 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  \begin{lstlisting}
+    vres(1) = psb_geasum(x1,desc_a,info,global=.false.)
+    vres(2) = psb_geasum(x2,desc_a,info,global=.false.)
+    vres(3) = psb_geasum(x3,desc_a,info,global=.false.)
+    call psb_sum(ictxt,vres(1:3))
+  \end{lstlisting}
+  In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+\end{enumerate}
 
 
 \clearpage\subsection*{psb\_geasums --- Generalized 1-Norm of Vector}
@@ -567,7 +642,7 @@ else if $x$ is a complex vector then it computes 2-norm  as:
 \[ nrm2 \leftarrow \sqrt{x^H x}\]
 %% where:
 %% \begin{description}
-%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$x$] represents the global vector $x_{:,jx}$
 %% \end{description}
 
 \begin{table}[h]
@@ -587,8 +662,8 @@ Long Precision Real&Long Precision Complex & psb\_genrm2 \\
 \end{table}
 
 \begin{verbatim}
-psb_genrm2(x, desc_a, info)
-psb_norm2(x, desc_a, info)
+psb_genrm2(x, desc_a, info [,global])
+psb_norm2(x, desc_a, info [,global])
 \end{verbatim}
 %% \syntax*{psb\_genrm2}{x, desc\_a, info, jx}
 
@@ -610,16 +685,23 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: an object of type \descdata.
-%% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+\item[global]  Specifies whether the computation should include the
+  global reduction across all processes.\\
+Scope: {\bf global} \\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical scalar.
+Default: \verb|global=.true.|\\%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $jx = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
-\item[Function Value] is the 2-norm of subvector $x$.\\
-Scope: {\bf global} \\
+\item[Function Value] is the 2-norm of vector $x$.\\
+Scope: {\bf global} unless the optional variable
+\verb|global=.false.| has been specified\\
 Type: {\bf required} \\
 Specified as: a long precision real number.
 \item[info] Error code.\\
@@ -628,6 +710,23 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  \begin{lstlisting}
+    vres(1) = psb_genrm2(x1,desc_a,info,global=.false.)
+    vres(2) = psb_genrm2(x2,desc_a,info,global=.false.)
+    vres(3) = psb_genrm2(x3,desc_a,info,global=.false.)
+    call psb_nrm2(ictxt,vres(1:3))
+  \end{lstlisting}
+  In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+\end{enumerate}
 
 
 
@@ -941,13 +1040,13 @@ Specified as: a character variable.
 %% Default: \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
 %% Specified as: an integer variable $ k \ge 1$.
 %% \item[jx]  the column index of global dense matrix $x$,
-%% identifying the column of subvector $x$.\\
+%% identifying the column of vector $x$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
 %% Default: $iy = 1$\\	
 %% Specified as: an integer variable $jx\ge 1$. 
 %% \item[jy]  the column index of global dense matrix $y$,
-%% identifying the column of subvector $y$.\\
+%% identifying the column of vector $y$.\\
 %% Scope: {\bf global} \\
 %% Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
 %% Default: $jy = 1$\\	

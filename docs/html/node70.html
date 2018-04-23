@@ -22,26 +22,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1114"
+<A NAME="tex2html1115"
   HREF="node71.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1110"
+<A NAME="tex2html1111"
   HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1106"
+<A NAME="tex2html1107"
   HREF="node69.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1112"
+<A NAME="tex2html1113"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1115"
+<B> Next:</B> <A NAME="tex2html1116"
   HREF="node71.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html1111"
+<B> Up:</B> <A NAME="tex2html1112"
   HREF="node66.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1107"
+<B> Previous:</B> <A NAME="tex2html1108"
   HREF="node69.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html1113"
+ &nbsp; <B>  <A NAME="tex2html1114"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -66,7 +66,7 @@ loc\_x_i \leftarrow scatter(glob\_x)
 
 <IMG
  WIDTH="168" HEIGHT="28" BORDER="0"
- SRC="img79.png"
+ SRC="img83.png"
  ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -75,19 +75,19 @@ where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ SRC="img74.png"
  ALT="$glob\_x$"></SPAN></STRONG></DT>
 <DD>is the global matrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img71.png"
+ SRC="img75.png"
  ALT="$glob\_x_{1:m,1:n}$"></SPAN>
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img72.png"
+ SRC="img76.png"
  ALT="$loc\_x_i$"></SPAN></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <SPAN CLASS="MATH"><IMG
@@ -97,7 +97,7 @@ process <SPAN CLASS="MATH"><IMG
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="53" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img80.png"
+ SRC="img84.png"
  ALT="$scatter$"></SPAN></STRONG></DT>
 <DD>is the scatter function.
 </DD>
@@ -105,7 +105,7 @@ process <SPAN CLASS="MATH"><IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3373"></A>
+<DIV ALIGN="CENTER"><A NAME="3461"></A>
 <TABLE>
 <CAPTION><STRONG>Table 17:</STRONG>
 Data types</CAPTION>
@@ -114,7 +114,7 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ SRC="img78.png"
  ALT="$x_i, y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -144,7 +144,7 @@ Data types</CAPTION>
 <BR>
 <IMG
  WIDTH="539" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
- SRC="img81.png"
+ SRC="img85.png"
  ALT="\begin{lstlisting}
 call psb_scatter(glob_x, loc_x, desc_a, info, root, mold)
 \end{lstlisting}">
@@ -183,7 +183,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <SPAN CLASS="MATH"><IMG
  WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
+ SRC="img80.png"
  ALT="$root=-1$"></SPAN> all
   the processes have a copy of the global vector.
 <BR>
@@ -198,7 +198,7 @@ Specified as: an integer variable <!-- MATH
  -->
 <SPAN CLASS="MATH"><IMG
  WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img77.png"
+ SRC="img81.png"
  ALT="$-1\le root\le np-1$"></SPAN>, default
 <code>psb_root_</code>, i.e. process 0. 
 </DD>
@@ -221,7 +221,7 @@ only allowed when loc_x is of type vdata<TT>psb_T_vect_type</TT>.
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ SRC="img74.png"
  ALT="$glob\_x$"></SPAN>. 
 <BR>
 Scope: <B>local</B> 
@@ -250,26 +250,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1114"
+<A NAME="tex2html1115"
   HREF="node71.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1110"
+<A NAME="tex2html1111"
   HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1106"
+<A NAME="tex2html1107"
   HREF="node69.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1112"
+<A NAME="tex2html1113"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1115"
+<B> Next:</B> <A NAME="tex2html1116"
   HREF="node71.html">Data management routines</A>
-<B> Up:</B> <A NAME="tex2html1111"
+<B> Up:</B> <A NAME="tex2html1112"
   HREF="node66.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1107"
+<B> Previous:</B> <A NAME="tex2html1108"
   HREF="node69.html">psb_gather   Gather</A>
- &nbsp; <B>  <A NAME="tex2html1113"
+ &nbsp; <B>  <A NAME="tex2html1114"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

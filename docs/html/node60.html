@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html994"
+<A NAME="tex2html995"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html990"
+<A NAME="tex2html991"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html984"
+<A NAME="tex2html985"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html992"
+<A NAME="tex2html993"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html995"
+<B> Next:</B> <A NAME="tex2html996"
   HREF="node61.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html991"
+<B> Up:</B> <A NAME="tex2html992"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html985"
+<B> Previous:</B> <A NAME="tex2html986"
   HREF="node59.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html993"
+ &nbsp; <B>  <A NAME="tex2html994"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -73,7 +73,7 @@ nrm2 \leftarrow \sqrt{x^T x}
 
 <IMG
  WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img38.png"
+ SRC="img41.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -92,7 +92,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <IMG
  WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img39.png"
+ SRC="img42.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -100,7 +100,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1984"></A>
+<DIV ALIGN="CENTER"><A NAME="2016"></A>
 <TABLE>
 <CAPTION><STRONG>Table 8:</STRONG>
 Data types</CAPTION>
@@ -109,7 +109,7 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="43" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img40.png"
+ SRC="img43.png"
  ALT="$nrm2$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
@@ -142,8 +142,8 @@ Data types</CAPTION>
 
 <P>
 <PRE>
-psb_genrm2(x, desc_a, info)
-psb_norm2(x, desc_a, info)
+psb_genrm2(x, desc_a, info [,global])
+psb_norm2(x, desc_a, info [,global])
 </PRE>
 
 <P>
@@ -182,6 +182,20 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>global</STRONG></DT>
+<DD>Specifies whether the computation should include the
+  global reduction across all processes.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical scalar.
+Default: <code>global=.true.</code>
+<BR>
 
 <P>
 </DD>
@@ -189,12 +203,13 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 <DD>
 </DD>
 <DT><STRONG>Function Value</STRONG></DT>
-<DD>is the 2-norm of subvector <SPAN CLASS="MATH"><IMG
+<DD>is the 2-norm of vector <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B> unless the optional variable
+<code>global=.false.</code> has been specified
 <BR>
 Type: <B>required</B> 
 <BR>
@@ -214,29 +229,54 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  <BR>
+<IMG
+ WIDTH="481" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ SRC="img44.png"
+ ALT="\begin{lstlisting}
+vres(1) = psb_genrm2(x1,desc_a,info,global=.false.)
+vres(2)...
+...x3,desc_a,info,global=.false.)
+call psb_nrm2(ictxt,vres(1:3))
+\end{lstlisting}">
+<BR>
+In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+</LI>
+</OL>
+
+<P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html994"
+<A NAME="tex2html995"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html990"
+<A NAME="tex2html991"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html984"
+<A NAME="tex2html985"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html992"
+<A NAME="tex2html993"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html995"
+<B> Next:</B> <A NAME="tex2html996"
   HREF="node61.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html991"
+<B> Up:</B> <A NAME="tex2html992"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html985"
+<B> Previous:</B> <A NAME="tex2html986"
   HREF="node59.html">psb_geasums   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html993"
+ &nbsp; <B>  <A NAME="tex2html994"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
