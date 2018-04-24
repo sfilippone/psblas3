@@ -120,7 +120,6 @@ subroutine psi_lswaptran_vect(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   class(psb_i_base_vect_type), pointer :: d_vidx
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -212,7 +211,6 @@ subroutine psi_ltran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
-  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false., debug=.false.
@@ -252,8 +250,7 @@ subroutine psi_ltran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
         ! Unfinished communication? Something is wrong....
         !
         info=psb_err_mpi_error_
-        ierr(1) = -2
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
     end if
@@ -328,9 +325,8 @@ subroutine psi_ltran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
       end if
 
       if(iret /= mpi_success) then
-        ierr(1) = iret
         info=psb_err_mpi_error_
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,m_err=(/iret/))
         goto 9999
       end if
 
@@ -345,8 +341,7 @@ subroutine psi_ltran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
       ! No matching send? Something is wrong....
       !
       info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,m_err=(/-2/))
       goto 9999
     end if
     call psb_realloc(totxch,prcid,info)
@@ -365,18 +360,16 @@ subroutine psi_ltran_vidx_vect(iictxt,iicomm,flag,beta,y,idx,&
         if (nerv>0) then 
           call mpi_wait(y%comid(i,1),p2pstat,iret)
           if(iret /= mpi_success) then
-            ierr(1) = iret
             info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
+            call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
         end if
         if (nesd>0) then 
           call mpi_wait(y%comid(i,2),p2pstat,iret)
           if(iret /= mpi_success) then
-            ierr(1) = iret
             info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
+            call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
         end if
@@ -475,7 +468,6 @@ subroutine psi_lswaptran_multivect(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   class(psb_i_base_vect_type), pointer :: d_vidx
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -566,7 +558,6 @@ subroutine psi_ltran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
-  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false., debug=.false.
@@ -607,8 +598,7 @@ subroutine psi_ltran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
         ! Unfinished communication? Something is wrong....
         !
         info=psb_err_mpi_error_
-        ierr(1) = -2
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
     end if
@@ -682,9 +672,8 @@ subroutine psi_ltran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
       end if
 
       if(iret /= mpi_success) then
-        ierr(1) = iret
         info=psb_err_mpi_error_
-        call psb_errpush(info,name,i_err=ierr)
+        call psb_errpush(info,name,m_err=(/iret/))
         goto 9999
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -700,8 +689,7 @@ subroutine psi_ltran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
       ! No matching send? Something is wrong....
       !
       info=psb_err_mpi_error_
-      ierr(1) = -2
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,m_err=(/-2/))
       goto 9999
     end if
     call psb_realloc(totxch,prcid,info)
@@ -719,18 +707,16 @@ subroutine psi_ltran_vidx_multivect(iictxt,iicomm,flag,beta,y,idx,&
         if (nerv>0) then 
           call mpi_wait(y%comid(i,1),p2pstat,iret)
           if(iret /= mpi_success) then
-            ierr(1) = iret
             info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
+            call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
         end if
         if (nesd>0) then 
           call mpi_wait(y%comid(i,2),p2pstat,iret)
           if(iret /= mpi_success) then
-            ierr(1) = iret
             info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
+            call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
         end if

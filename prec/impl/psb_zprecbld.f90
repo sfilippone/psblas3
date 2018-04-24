@@ -46,8 +46,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,amold,vmold,imold)
   ! Local scalars
   integer(psb_ipk_) :: ictxt, me,np
   integer(psb_ipk_) :: err, n_row, n_col,mglob, err_act
-  integer(psb_ipk_) :: int_err(5)
-
   integer(psb_ipk_),parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
@@ -58,7 +56,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,amold,vmold,imold)
   name = 'psb_precbld'
 
   info = psb_success_
-  int_err(1) = 0
   ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)

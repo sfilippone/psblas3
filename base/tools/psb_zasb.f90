@@ -54,7 +54,7 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, scratch)
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me
-  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
@@ -62,7 +62,6 @@ subroutine psb_zasb_vect(x, desc_a, info, mold, scratch)
   info = psb_success_
   if (psb_errstatus_fatal()) return 
 
-  int_err(1) = 0
   name = 'psb_zgeasb_v'
 
   ictxt       = desc_a%get_context()
@@ -128,7 +127,7 @@ subroutine psb_zasb_vect_r2(x, desc_a, info, mold, scratch)
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me, i, n 
-  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   logical :: scratch_
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
@@ -136,7 +135,6 @@ subroutine psb_zasb_vect_r2(x, desc_a, info, mold, scratch)
   info = psb_success_
   if (psb_errstatus_fatal()) return 
 
-  int_err(1) = 0
   name = 'psb_zgeasb_v'
 
   ictxt       = desc_a%get_context()
@@ -211,7 +209,7 @@ subroutine psb_zasb_multivect(x, desc_a, info, mold, scratch,n)
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me
-  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act, n_
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_
   logical :: scratch_
   
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -220,7 +218,6 @@ subroutine psb_zasb_multivect(x, desc_a, info, mold, scratch,n)
   info = psb_success_
   if (psb_errstatus_fatal()) return 
 
-  int_err(1) = 0
   name = 'psb_zgeasb'
 
   ictxt       = desc_a%get_context()

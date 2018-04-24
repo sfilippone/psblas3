@@ -114,7 +114,7 @@ Subroutine psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: ww, q, r, p, v,&
        & s, z, f, rt, qt, uv
-  integer(psb_ipk_) :: itmax_, naux, it, itrace_,int_err(5),&
+  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
        & n_row, n_col,istop_, itx, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: np, me, ictxt

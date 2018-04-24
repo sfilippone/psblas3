@@ -1018,7 +1018,6 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra, ctra
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_cssm'
   logical, parameter :: debug=.false.
 
@@ -1270,7 +1269,6 @@ function psb_d_csr_maxval(a) result(res)
   real(psb_dpk_)         :: res
 
   integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_maxval'
   logical, parameter :: debug=.false.
 
@@ -1295,7 +1293,6 @@ function psb_d_csr_csnmi(a) result(res)
   real(psb_dpk_) :: acc
   logical   :: tra
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csnmi'
   logical, parameter :: debug=.false.
 
@@ -1655,7 +1652,6 @@ subroutine psb_d_csr_scals(d,a,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_) :: err_act,mnm, i, j, m
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='scal'
   logical, parameter :: debug=.false.
 
@@ -1704,7 +1700,6 @@ subroutine  psb_d_csr_reallocate_nz(nz,a)
   integer(psb_ipk_), intent(in) :: nz
   class(psb_d_csr_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_reallocate_nz'
   logical, parameter :: debug=.false.
 
@@ -1736,7 +1731,6 @@ subroutine psb_d_csr_mold(a,b,info)
   class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
   integer(psb_ipk_), intent(out)                    :: info
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csr_mold'
   logical, parameter :: debug=.false.
 
@@ -1846,7 +1840,6 @@ subroutine psb_d_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -2021,7 +2014,6 @@ subroutine psb_d_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   logical :: append_, rscale_, cscale_ 
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
@@ -2195,7 +2187,6 @@ subroutine psb_d_csr_csgetblk(imin,imax,a,b,info,&
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
   logical, intent(in), optional        :: rscale,cscale
   integer(psb_ipk_) :: err_act, nzin, nzout
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
   logical :: append_
   logical, parameter :: debug=.false.
@@ -2249,7 +2240,6 @@ subroutine psb_d_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_csput_a'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: nza, i,j,k, nzl, isza, debug_level, debug_unit
@@ -2261,28 +2251,24 @@ subroutine psb_d_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   debug_level = psb_get_debug_level()
 
   if (nz <= 0) then 
-    info = psb_err_iarg_neg_
-    ierr(1)=1
-    call psb_errpush(info,name,i_err=ierr)
+    info = psb_err_iarg_neg_; i=1
+    call psb_errpush(info,name,i_err=(/i/))
     goto 9999
   end if
   if (size(ia) < nz) then 
-    info = psb_err_input_asize_invalid_i_
-    ierr(1)=2
-    call psb_errpush(info,name,i_err=ierr)
+    info = psb_err_input_asize_invalid_i_; i=2
+    call psb_errpush(info,name,i_err=(/i/))
     goto 9999
   end if
 
   if (size(ja) < nz) then 
-    info = psb_err_input_asize_invalid_i_
-    ierr(1)=3
-    call psb_errpush(info,name,i_err=ierr)
+    info = psb_err_input_asize_invalid_i_; i=3
+    call psb_errpush(info,name,i_err=(/i/))
     goto 9999
   end if
   if (size(val) < nz) then 
-    info = psb_err_input_asize_invalid_i_
-    ierr(1)=4
-    call psb_errpush(info,name,i_err=ierr)
+    info = psb_err_input_asize_invalid_i_; i=4
+    call psb_errpush(info,name,i_err=(/i/))
     goto 9999
   end if
 
@@ -2510,7 +2496,6 @@ subroutine psb_d_csr_reinit(a,clear)
   logical, intent(in), optional :: clear
 
   integer(psb_ipk_) :: err_act, info
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='reinit'
   logical  :: clear_
   logical, parameter :: debug=.false.
@@ -2555,7 +2540,6 @@ subroutine  psb_d_csr_trim(a)
   implicit none 
   class(psb_d_csr_sparse_mat), intent(inout) :: a
   integer(psb_ipk_) :: err_act, info, nz, m 
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='trim'
   logical, parameter :: debug=.false.
 
@@ -2590,7 +2574,6 @@ subroutine psb_d_csr_print(iout,a,iv,head,ivr,ivc)
   integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
 
   integer(psb_ipk_) :: err_act
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='d_csr_print'
   logical, parameter :: debug=.false.
   character(len=*), parameter  :: datatype='real'

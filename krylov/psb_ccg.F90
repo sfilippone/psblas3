@@ -119,7 +119,7 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type), pointer  :: q, p, r, z, w
   complex(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
   integer(psb_ipk_) :: itmax_, istop_, naux, it, itx, itrace_,&
-       &  n_col, n_row,err_act, int_err(5), ieg,nspl, istebz
+       &  n_col, n_row,err_act, ieg,nspl, istebz
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt

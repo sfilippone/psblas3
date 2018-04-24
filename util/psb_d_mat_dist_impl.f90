@@ -89,7 +89,7 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
   logical           :: use_parts, use_v
   integer(psb_ipk_) :: np, iam, np_sharing
   integer(psb_ipk_) :: k_count, root, liwork,  nnzero, nrhs,&
-       & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+       & i, ll, nz, isize, iproc, nnr, err, err_act
   integer(psb_lpk_) :: i_count, j_count, nrow, ncol, ig
   integer(psb_ipk_), allocatable  :: iwork(:), iwrk2(:)
   integer(psb_lpk_), allocatable  :: irow(:),icol(:)
@@ -140,8 +140,7 @@ subroutine psb_dmatdist(a_glob, a, ictxt, desc_a,&
   allocate(iwork(liwork), iwrk2(np),stat = info)
   if (info /= psb_success_) then
     info=psb_err_alloc_request_
-    int_err(1)=liwork
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
+    call psb_errpush(info,name,i_err=(/liwork/),a_err='integer')
     goto 9999
   endif
   if (iam == root) then

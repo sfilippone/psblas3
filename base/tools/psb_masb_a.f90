@@ -187,13 +187,12 @@ subroutine psb_masbv(x, desc_a, info, scratch)
 
   ! local variables
   integer(psb_ipk_) :: ictxt,np,me
-  integer(psb_ipk_) :: int_err(5), i1sz,nrow,ncol, err_act
+  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   logical :: scratch_
   character(len=20)    :: name,ch_err
 
   info = psb_success_
-  int_err(1) = 0
   name = 'psb_mgeasb_v'
 
   ictxt   = desc_a%get_context()

@@ -132,7 +132,7 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   integer(psb_ipk_), Parameter :: irmax = 8
-  integer(psb_ipk_) :: itx, i, istop_,j, k, int_err(5)
+  integer(psb_ipk_) :: itx, i, istop_,j, k
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ictxt, np, me
   complex(psb_dpk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -199,9 +199,8 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   if (nl <=0 ) then 
     info=psb_err_invalid_istop_
-    int_err(1)=nl
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/nl/))
     goto 9999
   endif
 

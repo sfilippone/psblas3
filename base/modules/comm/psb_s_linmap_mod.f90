@@ -233,7 +233,6 @@ contains
     integer(psb_ipk_)     :: info 
     
     integer(psb_ipk_) :: err_act
-    integer(psb_ipk_) :: ierr(5)
     character(len=20)  :: name='clone'
 
     info = 0
@@ -247,9 +246,8 @@ contains
       if (info == 0) call map%map_Y2X%clone(mout%map_Y2X,info)
     class default
       info = psb_err_invalid_dynamic_type_
-      ierr(1) = 2
       info = psb_err_missing_override_method_
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,m_err=(/2/))
       call psb_erractionsave(err_act)
 
       call psb_error_handler(err_act)

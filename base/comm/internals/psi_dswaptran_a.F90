@@ -111,7 +111,6 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, err_act, totxch, data_
   integer(psb_ipk_), pointer :: d_idx(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -186,7 +185,6 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti
-  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -311,9 +309,8 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
          & psb_mpi_r_dpk_,&
          & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
     if(iret /= mpi_success) then
-      ierr(1) = iret
       info=psb_err_mpi_error_
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,m_err=(/iret/))
       goto 9999
     end if
 
@@ -399,9 +396,8 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
         end if
 
         if(iret /= mpi_success) then
-          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=ierr)
+          call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
       end if
@@ -423,9 +419,8 @@ subroutine psi_dtranidxm(iictxt,iicomm,flag,n,beta,y,idx,&
       if ((proc_to_comm /= me).and.(nesd>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
-          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=ierr)
+          call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
       else if (proc_to_comm == me) then 
@@ -599,7 +594,6 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   ! locals
   integer(psb_ipk_) :: ictxt, np, me, icomm, idxs, idxr, totxch, err_act, data_
   integer(psb_ipk_), pointer :: d_idx(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info=psb_success_
@@ -684,7 +678,6 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
-  integer(psb_ipk_) :: ierr(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
@@ -810,9 +803,8 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
          & psb_mpi_r_dpk_,&
          & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
     if(iret /= mpi_success) then
-      ierr(1) = iret
       info=psb_err_mpi_error_
-      call psb_errpush(info,name,i_err=ierr)
+      call psb_errpush(info,name,m_err=(/iret/))
       goto 9999
     end if
 
@@ -897,9 +889,8 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
         end if
 
         if(iret /= mpi_success) then
-          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=ierr)
+          call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
       end if
@@ -919,9 +910,8 @@ subroutine psi_dtranidxv(iictxt,iicomm,flag,beta,y,idx,&
       if ((proc_to_comm /= me).and.(nesd>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
-          ierr(1) = iret
           info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=ierr)
+          call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
       else if (proc_to_comm ==  me) then

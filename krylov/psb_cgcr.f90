@@ -140,7 +140,6 @@ subroutine psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='GCR'
-  integer(psb_ipk_) ::int_err(5)
   info = psb_success_
   name = 'psb_cgcr'
   call psb_erractionsave(err_act)
@@ -177,9 +176,8 @@ subroutine psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
   
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=psb_err_invalid_istop_
-    int_err(1)=istop_
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
   endif
   
@@ -219,9 +217,8 @@ subroutine psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
   
   if (nl <=0 ) then 
     info=psb_err_invalid_istop_
-    int_err(1)=nl
     err=info
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=(/nl/))
     goto 9999
   endif
   

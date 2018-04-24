@@ -69,7 +69,6 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   integer(psb_ipk_), parameter     :: relocsz=200
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info = psb_success_
@@ -123,9 +122,8 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     else      
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
-        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err='allocate',i_err=ierr)
+             & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
 
@@ -134,9 +132,8 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
            & mask=(ila(1:nz)>0))
 
       if (info /= psb_success_) then
-        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err='psb_cdins',i_err=ierr)
+             & a_err='psb_cdins',i_err=(/info/))
         goto 9999
       end if
       nrow = desc_a%get_local_rows()
@@ -162,9 +159,8 @@ subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     ncol = desc_a%get_local_cols()
     allocate(ila(nz),jla(nz),stat=info)
     if (info /= psb_success_) then
-      ierr(1) = info
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err='allocate',i_err=ierr)
+           & a_err='allocate',i_err=(/info/))
       goto 9999
     end if
     if (local_) then
@@ -216,7 +212,6 @@ subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   logical, parameter     :: debug=.false.
   integer(psb_ipk_), parameter     :: relocsz=200
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
-  integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
 
   info = psb_success_
@@ -264,9 +259,8 @@ subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 
     allocate(ila(nz),jla(nz),stat=info)
     if (info /= psb_success_) then
-      ierr(1) = info
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err='allocate',i_err=ierr)
+           & a_err='allocate',i_err=(/info/))
       goto 9999
     end if
 
@@ -275,9 +269,8 @@ subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
          & mask=(ila(1:nz)>0))
 
     if (psb_errstatus_fatal()) then
-      ierr(1) = info 
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err='psb_cdins',i_err=ierr)
+           & a_err='psb_cdins',i_err=(/info/))
       goto 9999
     end if
 
@@ -336,7 +329,6 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
   logical                :: rebuild_, local_
   integer(psb_ipk_), allocatable   :: ila(:),jla(:)
   real(psb_dpk_) :: t1,t2,t3,tcnv,tcsput
-  integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name
 
   info = psb_success_
@@ -390,9 +382,8 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     else      
       allocate(ila(nz),jla(nz),stat=info)
       if (info /= psb_success_) then
-        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err='allocate',i_err=ierr)
+             & a_err='allocate',i_err=(/info/))
         goto 9999
       end if
       if (ia%is_dev()) call ia%sync()
@@ -403,9 +394,8 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
       call desc_a%indxmap%g2l_ins(ja%v%v(1:nz),jla(1:nz),info,mask=(ila(1:nz)>0))
 
       if (info /= psb_success_) then
-        ierr(1) = info
         call psb_errpush(psb_err_from_subroutine_ai_,name,&
-             & a_err='psb_cdins',i_err=ierr)
+             & a_err='psb_cdins',i_err=(/info/))
         goto 9999
       end if
       nrow = desc_a%get_local_rows()
@@ -431,9 +421,8 @@ subroutine psb_sspins_v(nz,ia,ja,val,a,desc_a,info,rebuild,local)
     ncol = desc_a%get_local_cols()
     allocate(ila(nz),jla(nz),stat=info)
     if (info /= psb_success_) then
-      ierr(1) = info
       call psb_errpush(psb_err_from_subroutine_ai_,name,&
-           & a_err='allocate',i_err=ierr)
+           & a_err='allocate',i_err=(/info/))
       goto 9999
     end if
     if (ia%is_dev()) call ia%sync()
