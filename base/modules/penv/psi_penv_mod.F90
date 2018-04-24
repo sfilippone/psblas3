@@ -155,13 +155,13 @@ contains
     if (info == 0) call mpi_type_create_f90_complex(psb_spk_p_,psb_spk_r_, psb_mpi_c_spk_,info)
     if (info == 0) call mpi_type_create_f90_complex(psb_dpk_p_,psb_dpk_r_, psb_mpi_c_dpk_,info)
 #else
-#if defined(INT_I4_L4)
+#if defined(IPK4) && defined(LPK4)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer4
-#elif defined(INT_I4_L8)
+#elif defined(IPK4) && defined(LPK8)
     psb_mpi_ipk_ = mpi_integer4
     psb_mpi_lpk_ = mpi_integer8
-#elif defined(INT_I8_L8)
+#elif defined(IPK8) && defined(LPK8)
     psb_mpi_ipk_ = mpi_integer8
     psb_mpi_lpk_ = mpi_integer8
 #else

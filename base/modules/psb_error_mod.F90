@@ -99,7 +99,7 @@ module psb_error_mod
   end interface
 
   interface psb_errcomm
-#if defined(INT_I8_L8)
+#if defined(IPK8)
     subroutine psb_errcomm_m(ictxt, err)
       import :: psb_ipk_, psb_mpk_
       integer(psb_mpk_), intent(in)   :: ictxt

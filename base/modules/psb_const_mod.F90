@@ -86,13 +86,13 @@ module psb_const_mod
   !     compiler will later pick up the correct version according
   !     to what IPK/LPK are mapped onto. 
   !
-#if defined(INT_I4_L4) 
+#if defined(IPK4) && defined(LPK4)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_mpk_
-#elif defined(INT_I4_L8) 
+#elif  defined(IPK4) && defined(LPK8)
   integer, parameter  :: psb_ipk_ = psb_mpk_
   integer, parameter  :: psb_lpk_ = psb_epk_
-#elif defined(INT_I8_L8) 
+#elif  defined(IPK8) && defined(LPK8)
   integer, parameter  :: psb_ipk_ = psb_epk_
   integer, parameter  :: psb_lpk_ = psb_epk_
 #else

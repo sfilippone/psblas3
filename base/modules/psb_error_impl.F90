@@ -9,7 +9,7 @@ subroutine psb_errcomm_i(ictxt, err)
 
 end subroutine psb_errcomm_i
 
-#if defined(INT_I8_L8)
+#if defined(IPK8)
 
 subroutine psb_errcomm_m(ictxt, err)
   use psb_error_mod, psb_protect_name => psb_errcomm

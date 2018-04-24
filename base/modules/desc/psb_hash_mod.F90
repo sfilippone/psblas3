@@ -86,7 +86,7 @@ module psb_hash_mod
     module procedure psb_hash_lsearchkey
   end interface psb_hash_searchkey
 
-#if defined (INT_I4_L8)
+#if defined(IPK4) && defined(LPK8)
   interface psb_hash_init
     module procedure psb_hash_init_v, psb_hash_init_n
   end interface

@@ -84,8 +84,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   integer(psb_mpk_) :: icomm, minfo
   integer(psb_mpk_), allocatable  :: brvindx(:), &
        & rvsz(:), bsdindx(:),sdsz(:)
-#if defined(INT_I4_L8)
-  ! If globals are 8 bytes but locals are not, things get tricky
+#if defined(IPK4) && defined(LPK8)
+  ! If globals are 8 bytes but locals are 4, things get tricky
   integer(psb_ipk_), allocatable  :: liasnd(:), ljasnd(:)
   integer(psb_lpk_), allocatable  :: iasnd(:), jasnd(:), iarcv(:), jarcv(:)
 #else
@@ -239,7 +239,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
-#if defined(INT_I4_L8)
+#if defined(IPK4) && defined(LPK8)
   ! If globals are 8 bytes but locals are not, things get tricky
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),liasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),ljasnd,info)

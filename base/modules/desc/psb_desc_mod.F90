@@ -286,7 +286,7 @@ module psb_desc_mod
     module procedure  psb_i_cd_set_large_threshold
   end interface psb_cd_set_large_threshold
 
-#if defined(INT_I4_L8) 
+#if defined(IPK4) && defined(LPK8)
   interface psb_cd_set_large_threshold    
     module procedure  psb_l_cd_set_large_threshold
   end interface psb_cd_set_large_threshold

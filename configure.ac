@@ -499,10 +499,8 @@ if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    AC_MSG_NOTICE([[Forcing equal values]])	
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
-FDEFINES="$psblas_cv_define_prepend-DINT_I${pac_cv_ipk_size}_L${pac_cv_lpk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";	
-CDEFINES="-DINT_I${pac_cv_ipk_size}_L${pac_cv_lpk_size} $CDEFINES"
 CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"
 
 

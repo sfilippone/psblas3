@@ -316,7 +316,7 @@ contains
     integer(psb_ipk_), allocatable :: irpl(:),jal(:),gvl(:)
     real(psb_spk_),allocatable  :: wgh_(:)
 
-#if defined(HAVE_METIS) && !defined(INT_I8_L8)
+#if defined(HAVE_METIS) && defined(IPK4)
     interface 
       ! subroutine METIS_PartGraphKway(n,ixadj,iadj,ivwg,iajw,&
       !     & wgflag,numflag,nparts,weights,iopt,nedc,part) bind(c)
