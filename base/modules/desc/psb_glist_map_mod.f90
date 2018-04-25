@@ -101,7 +101,8 @@ contains
     integer(psb_ipk_), intent(out) :: info
     !  To be implemented
     integer(psb_mpk_) :: iam, np
-    integer(psb_ipk_) :: i, n, nl
+    integer(psb_ipk_) :: nl
+    integer(psb_lpk_) :: i, n
     
 
     info = 0
