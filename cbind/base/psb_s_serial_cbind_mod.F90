@@ -11,7 +11,7 @@ contains
   function psb_c_svect_get_nrows(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_svector) :: xh
 
     type(psb_s_vect_type), pointer :: vp
@@ -29,7 +29,7 @@ contains
   function psb_c_svect_f_get_cpy(v,xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     real(c_float)    :: v(*)
     type(psb_c_svector) :: xh
     
@@ -52,7 +52,7 @@ contains
   function psb_c_svect_zero(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     type(psb_c_svector) :: xh
     
     type(psb_s_vect_type), pointer :: vp
@@ -73,7 +73,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_sspmat) :: mh
     type(psb_sspmat_type), pointer :: ap
@@ -96,7 +96,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_sspmat) :: mh
     type(psb_sspmat_type), pointer :: ap
@@ -119,7 +119,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     character(c_char)        :: name(*)
     type(psb_c_sspmat) :: mh

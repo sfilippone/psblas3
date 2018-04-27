@@ -1,9 +1,9 @@
 include Make.inc
 
-all: libd based precd kryld utild 
+all: libd based precd kryld utild cbindd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
-#cbindd
+
 based: libd
 precd utild: based
 kryld: precd based

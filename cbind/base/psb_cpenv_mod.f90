@@ -9,14 +9,14 @@ contains
   function psb_c_get_index_base() bind(c) result(res)
     implicit none 
     
-    integer(psb_c_int)  :: res
+    integer(psb_c_ipk)  :: res
     
     res = psb_c_index_base
   end function psb_c_get_index_base
   
   subroutine psb_c_set_index_base(base) bind(c) 
     implicit none     
-    integer(psb_c_int), value  :: base
+    integer(psb_c_ipk), value  :: base
     
     psb_c_index_base = base
   end subroutine psb_c_set_index_base  
@@ -25,7 +25,7 @@ contains
     use psb_base_mod, only : psb_get_errstatus
     implicit none 
     
-    integer(psb_c_int)  :: res
+    integer(psb_c_ipk)  :: res
     
     res = psb_get_errstatus()
   end function psb_c_get_errstatus
@@ -34,7 +34,7 @@ contains
     use psb_base_mod, only : psb_init
     implicit none 
     
-    integer(psb_c_int)  :: psb_c_init
+    integer(psb_c_ipk)  :: psb_c_init
     
     integer :: ictxt
 
@@ -44,7 +44,7 @@ contains
   
   subroutine psb_c_exit_ctxt(ictxt) bind(c)
     use psb_base_mod, only : psb_exit
-    integer(psb_c_int), value :: ictxt
+    integer(psb_c_ipk), value :: ictxt
     
     call psb_exit(ictxt,close=.false.)
     return
@@ -52,7 +52,7 @@ contains
   
   subroutine psb_c_exit(ictxt) bind(c)
     use psb_base_mod, only : psb_exit
-    integer(psb_c_int), value :: ictxt
+    integer(psb_c_ipk), value :: ictxt
     
     call psb_exit(ictxt)
     return
@@ -60,7 +60,7 @@ contains
   
   subroutine psb_c_abort(ictxt) bind(c)
     use psb_base_mod, only : psb_abort
-    integer(psb_c_int), value :: ictxt
+    integer(psb_c_ipk), value :: ictxt
     
     call psb_abort(ictxt)
     return
@@ -69,8 +69,8 @@ contains
 
   subroutine psb_c_info(ictxt,iam,np) bind(c)
     use psb_base_mod, only : psb_info
-    integer(psb_c_int), value :: ictxt
-    integer(psb_c_int)        :: iam,np
+    integer(psb_c_ipk), value :: ictxt
+    integer(psb_c_ipk)        :: iam,np
     
     call psb_info(ictxt,iam,np)
     return
@@ -78,7 +78,7 @@ contains
   
   subroutine psb_c_barrier(ictxt) bind(c)
     use psb_base_mod, only : psb_barrier
-    integer(psb_c_int), value :: ictxt
+    integer(psb_c_ipk), value :: ictxt
 
     call psb_barrier(ictxt)
   end subroutine psb_c_barrier
@@ -89,11 +89,26 @@ contains
     psb_c_wtime = psb_wtime()
   end function psb_c_wtime
 
+  subroutine psb_c_mbcast(ictxt,n,v,root) bind(c)
+    use psb_base_mod, only : psb_bcast
+    implicit none 
+    integer(psb_c_ipk), value :: ictxt,n, root
+    integer(psb_c_mpk)        :: v(*) 
+    
+    if (n < 0) then 
+      write(0,*) 'Wrong size in BCAST'
+      return
+    end if
+    if (n==0) return 
+    
+    call psb_bcast(ictxt,v(1:n),root=root)
+  end subroutine psb_c_mbcast
+
   subroutine psb_c_ibcast(ictxt,n,v,root) bind(c)
     use psb_base_mod, only : psb_bcast
     implicit none 
-    integer(psb_c_int), value :: ictxt,n, root
-    integer(psb_c_int)        :: v(*) 
+    integer(psb_c_ipk), value :: ictxt,n, root
+    integer(psb_c_ipk)        :: v(*) 
     
     if (n < 0) then 
       write(0,*) 'Wrong size in BCAST'
@@ -104,10 +119,40 @@ contains
     call psb_bcast(ictxt,v(1:n),root=root)
   end subroutine psb_c_ibcast
 
+  subroutine psb_c_lbcast(ictxt,n,v,root) bind(c)
+    use psb_base_mod, only : psb_bcast
+    implicit none 
+    integer(psb_c_ipk), value :: ictxt,n, root
+    integer(psb_c_lpk)        :: v(*) 
+    
+    if (n < 0) then 
+      write(0,*) 'Wrong size in BCAST'
+      return
+    end if
+    if (n==0) return 
+    
+    call psb_bcast(ictxt,v(1:n),root=root)
+  end subroutine psb_c_lbcast
+
+  subroutine psb_c_ebcast(ictxt,n,v,root) bind(c)
+    use psb_base_mod, only : psb_bcast
+    implicit none 
+    integer(psb_c_ipk), value :: ictxt,n, root
+    integer(psb_c_epk)        :: v(*) 
+    
+    if (n < 0) then 
+      write(0,*) 'Wrong size in BCAST'
+      return
+    end if
+    if (n==0) return 
+    
+    call psb_bcast(ictxt,v(1:n),root=root)
+  end subroutine psb_c_ebcast
+
   subroutine psb_c_sbcast(ictxt,n,v,root) bind(c)
     use psb_base_mod
     implicit none 
-    integer(psb_c_int), value :: ictxt,n, root
+    integer(psb_c_ipk), value :: ictxt,n, root
     real(c_float)     :: v(*) 
     
     if (n < 0) then 
@@ -122,7 +167,7 @@ contains
   subroutine psb_c_dbcast(ictxt,n,v,root) bind(c)
     use psb_base_mod, only : psb_bcast
     implicit none 
-    integer(psb_c_int), value :: ictxt,n, root
+    integer(psb_c_ipk), value :: ictxt,n, root
     real(c_double)        :: v(*) 
     
     if (n < 0) then 
@@ -138,7 +183,7 @@ contains
   subroutine psb_c_cbcast(ictxt,n,v,root) bind(c)
     use psb_base_mod, only : psb_bcast
     implicit none 
-    integer(psb_c_int), value :: ictxt,n, root
+    integer(psb_c_ipk), value :: ictxt,n, root
     complex(c_float_complex)        :: v(*) 
     
     if (n < 0) then 
@@ -153,7 +198,7 @@ contains
   subroutine psb_c_zbcast(ictxt,n,v,root) bind(c)
     use psb_base_mod
     implicit none 
-    integer(psb_c_int), value :: ictxt,n, root
+    integer(psb_c_ipk), value :: ictxt,n, root
     complex(c_double_complex)     :: v(*) 
     
     if (n < 0) then 
@@ -168,7 +213,7 @@ contains
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
     use psb_base_mod, only : psb_bcast, psb_info
     implicit none 
-    integer(psb_c_int), value :: ictxt, root
+    integer(psb_c_ipk), value :: ictxt, root
     character(c_char)     :: v(*) 
     integer :: n, iam, np
     
@@ -190,8 +235,8 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     character(c_char), intent(inout)  :: cmesg(*)
-    integer(psb_c_int), intent(in), value :: len
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk), intent(in), value :: len
+    integer(psb_c_ipk) :: res
     character(len=psb_max_errmsg_len_), allocatable :: fmesg(:)
     character(len=psb_max_errmsg_len_) :: tmp
     integer :: i, j, ll, il

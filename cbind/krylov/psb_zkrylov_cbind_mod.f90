@@ -38,14 +38,14 @@ contains
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int)          :: res
+    integer(psb_c_ipk)      :: res
     type(psb_c_zspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
     type(psb_c_zprec)       :: ph
     type(psb_c_zvector)     :: bh,xh
-    integer(c_int), value :: itmax,itrace,irst,istop
+    integer(psb_c_ipk), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
-    integer(c_int)        :: iter
+    integer(psb_c_ipk)    :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options

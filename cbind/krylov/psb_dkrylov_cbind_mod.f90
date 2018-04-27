@@ -21,7 +21,6 @@ contains
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
-    write(0,*) 'psb_c_dkrylov options ', options%eps
     res= psb_c_dkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
@@ -39,14 +38,14 @@ contains
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int)          :: res
+    integer(psb_c_ipk)      :: res
     type(psb_c_dspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
     type(psb_c_dprec)       :: ph
     type(psb_c_dvector)     :: bh,xh
-    integer(c_int), value :: itmax,itrace,irst,istop
+    integer(psb_c_ipk), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
-    integer(c_int)        :: iter
+    integer(psb_c_ipk)    :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
@@ -59,7 +58,6 @@ contains
     character(len=20)     :: fmethd
     real(psb_dpk_)      :: feps,ferr
 
-    write(0,*) 'psb_c_dkrylov_opt options ', eps
     res = -1
     if (c_associated(cdh%item)) then 
       call c_f_pointer(cdh%item,descp)

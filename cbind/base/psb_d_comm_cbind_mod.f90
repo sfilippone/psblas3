@@ -8,7 +8,7 @@ contains
 
   function psb_c_d_ovrl(xh,cdh) bind(c) result(res)
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
@@ -39,8 +39,8 @@ contains
  
   function psb_c_d_ovrl_opt(xh,cdh,update,mode) bind(c) result(res)
     implicit none 
-    integer(psb_c_int) :: res
-    integer(psb_c_int), value :: update, mode
+    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk), value :: update, mode
 
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
@@ -72,7 +72,7 @@ contains
  
   function psb_c_d_halo(xh,cdh) bind(c) result(res)
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
@@ -103,8 +103,8 @@ contains
  
   function psb_c_d_halo_opt(xh,cdh,tran,data,mode) bind(c) result(res)
     implicit none 
-    integer(psb_c_int) :: res
-    integer(psb_c_int), value :: data, mode
+    integer(psb_c_ipk) :: res
+    integer(psb_c_ipk), value :: data, mode
     character(c_char)      :: tran
         
 
@@ -141,8 +141,8 @@ contains
   function psb_c_d_vscatter(ng,gx,xh,cdh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res
-    integer(psb_c_int), value :: ng
+    integer(psb_c_ipk)    :: res
+    integer(psb_c_lpk), value :: ng
     real(c_double), target :: gx(*)
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
@@ -175,7 +175,7 @@ contains
   function psb_c_dvgather(v,xh,cdh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     real(c_double), target :: v(*)
     type(psb_c_dvector) :: xh
     type(psb_c_descriptor) :: cdh
@@ -208,7 +208,7 @@ contains
   function psb_c_dspgather(gah,ah,cdh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     type(psb_c_dspmat)   :: ah, gah
     type(psb_c_descriptor) :: cdh
     

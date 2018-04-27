@@ -14,11 +14,21 @@ extern "C" {
 #include <stdbool.h>
   
 
-#if defined(LONG_INTEGERS_)
-  typedef int64_t psb_i_t;
-#else
+  typedef int32_t psb_m_t;
+
+#if defined(IPK4) &&  defined(LPK4)
   typedef int32_t psb_i_t;
+  typedef int32_t psb_l_t;
+#elif defined(IPK4) &&  defined(LPK8)
+  typedef int32_t psb_i_t;
+  typedef int64_t psb_l_t;
+#elif defined(IPK4) &&  defined(LPK8)
+  typedef int64_t psb_i_t;
+  typedef int64_t psb_l_t;
+#else
 #endif
+  typedef int64_t psb_e_t;
+  
   typedef float  psb_s_t;
   typedef double psb_d_t;
   typedef float  complex psb_c_t;

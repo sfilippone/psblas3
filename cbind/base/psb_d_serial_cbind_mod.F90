@@ -11,7 +11,7 @@ contains
   function psb_c_dvect_get_nrows(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int) :: res   
+    integer(psb_c_ipk) :: res   
     type(psb_c_dvector) :: xh
 
     type(psb_d_vect_type), pointer :: vp
@@ -29,7 +29,7 @@ contains
   function psb_c_dvect_f_get_cpy(v,xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     real(c_double)    :: v(*)
     type(psb_c_dvector) :: xh
     
@@ -39,13 +39,11 @@ contains
 
     res = -1
 
-    if (c_associated(xh%item)) then
-      res = 0 
+    if (c_associated(xh%item)) then 
       call c_f_pointer(xh%item,vp)
       fv = vp%get_vect()
       sz = size(fv)
       v(1:sz) = fv(1:sz)
-      write(0,*) 'In dvect_f_get_cpy:',v(1),fv(1)
     end if
 
   end function psb_c_dvect_f_get_cpy
@@ -54,7 +52,7 @@ contains
   function psb_c_dvect_zero(xh) bind(c) result(res)
     implicit none 
 
-    integer(psb_c_int)    :: res   
+    integer(psb_c_ipk)    :: res   
     type(psb_c_dvector) :: xh
     
     type(psb_d_vect_type), pointer :: vp
@@ -75,7 +73,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_dspmat) :: mh
     type(psb_dspmat_type), pointer :: ap
@@ -98,7 +96,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     type(psb_c_dspmat) :: mh
     type(psb_dspmat_type), pointer :: ap
@@ -121,7 +119,7 @@ contains
     use psb_objhandle_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(psb_c_int) :: res
+    integer(psb_c_ipk) :: res
 
     character(c_char)        :: name(*)
     type(psb_c_dspmat) :: mh

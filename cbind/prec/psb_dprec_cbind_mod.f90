@@ -18,7 +18,7 @@ contains
     use psb_prec_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int)          :: res
+    integer(psb_c_ipk)          :: res
     type(psb_c_dprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_dprec_type), pointer :: precp
@@ -51,7 +51,7 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(c_int) :: res
+    integer(psb_c_ipk) :: res
     type(psb_c_dspmat) :: ah
     type(psb_c_dprec) :: ph
     type(psb_c_descriptor) :: cdh
@@ -94,7 +94,7 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(c_int) :: res
+    integer(psb_c_ipk) :: res
     type(psb_c_dprec) :: ph
 
     type(psb_dprec_type), pointer :: precp
