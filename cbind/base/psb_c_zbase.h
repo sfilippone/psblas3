@@ -18,14 +18,14 @@ typedef struct PSB_C_ZSPMAT {
 /* dense vectors */
 psb_c_zvector* psb_c_new_zvector();
 psb_i_t    psb_c_zvect_get_nrows(psb_c_zvector *xh);
-psb_z_t *psb_c_zvect_get_cpy( psb_c_zvector *xh);
+psb_z_t   *psb_c_zvect_get_cpy( psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_f_get_cpy(psb_z_t *v, psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_zero(psb_c_zvector *xh);
 
 psb_i_t    psb_c_zgeall(psb_c_zvector *xh, psb_c_descriptor *cdh);
-psb_i_t    psb_c_zgeins(psb_i_t nz, const psb_i_t *irw, const psb_z_t *val,
+psb_i_t    psb_c_zgeins(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,
 		    psb_c_zvector *xh, psb_c_descriptor *cdh);
-psb_i_t    psb_c_zgeins_add(psb_i_t nz, const psb_i_t *irw, const psb_z_t *val,
+psb_i_t    psb_c_zgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,
 			psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgeasb(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgefree(psb_c_zvector *xh, psb_c_descriptor *cdh);
@@ -35,8 +35,8 @@ psb_c_zspmat* psb_c_new_zspmat();
 psb_i_t    psb_c_zspall(psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zspasb(psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zspfree(psb_c_zspmat *mh, psb_c_descriptor *cdh);
-psb_i_t    psb_c_zspins(psb_i_t nz, const psb_i_t *irw, const psb_i_t *icl, const psb_z_t *val, 
-		    psb_c_zspmat *mh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_zspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,
+			const psb_z_t *val, psb_c_zspmat *mh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zmat_get_nrows(psb_c_zspmat *mh);
 psb_i_t    psb_c_zmat_get_ncols(psb_c_zspmat *mh);
 

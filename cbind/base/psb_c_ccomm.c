@@ -6,7 +6,7 @@
 psb_c_t* psb_c_cvgather(psb_c_cvector *xh, psb_c_descriptor *cdh)
 { 
   psb_c_t *temp=NULL;
-  psb_i_t vsize=0; 
+  psb_l_t vsize=0; 
   
   if ((vsize=psb_c_cd_get_global_rows(cdh))<0) 
     return(temp);

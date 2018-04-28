@@ -13,7 +13,7 @@ contains
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int)          :: res
+    integer(psb_c_ipk)      :: res
     type(psb_c_zspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
     type(psb_c_zprec)       :: ph

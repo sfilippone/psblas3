@@ -65,7 +65,10 @@ extern "C" {
   psb_i_t psb_c_get_index_base();
   void psb_c_set_index_base(psb_i_t base);
   
+  void   psb_c_mbcast(psb_i_t ictxt, psb_i_t n, psb_m_t *v, psb_i_t root);
   void   psb_c_ibcast(psb_i_t ictxt, psb_i_t n, psb_i_t *v, psb_i_t root);
+  void   psb_c_lbcast(psb_i_t ictxt, psb_i_t n, psb_l_t *v, psb_i_t root);
+  void   psb_c_ebcast(psb_i_t ictxt, psb_i_t n, psb_e_t *v, psb_i_t root);
   void   psb_c_sbcast(psb_i_t ictxt, psb_i_t n, psb_s_t *v, psb_i_t root);
   void   psb_c_dbcast(psb_i_t ictxt, psb_i_t n, psb_d_t *v, psb_i_t root);
   void   psb_c_cbcast(psb_i_t ictxt, psb_i_t n, psb_c_t *v, psb_i_t root);
@@ -74,19 +77,19 @@ extern "C" {
   
   /* Descriptor/integer routines */ 
   psb_c_descriptor* psb_c_new_descriptor();
-  psb_i_t    psb_c_cdall_vg(psb_i_t ng, psb_i_t *vg, psb_i_t ictxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_i_t *vl, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_i_t ictxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_i_t ictxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_repl(psb_i_t n, psb_i_t ictxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_i_t ictxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdfree(psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdins(psb_i_t nz, const psb_i_t *ia, const psb_i_t *ja, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdins(psb_i_t nz, const psb_l_t *ia, const psb_l_t *ja, psb_c_descriptor *cd);
   
 
   psb_i_t    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
-  psb_i_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
-  psb_i_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
 
 
   /*  legal values for upd argument */ 

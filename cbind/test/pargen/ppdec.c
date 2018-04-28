@@ -120,14 +120,16 @@ double g(double x, double y, double z)
   }
 }
 
-int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor *cdh,
-	   psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
+psb_i_t matgen(psb_i_t ictxt, psb_l_t ng, psb_i_t idim, psb_i_t vg[],
+	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
+	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
-  int iam, np;
-  int ix, iy, iz, el,glob_row,i,info,ret;
+  psb_i_t iam, np;
+  psb_l_t ix, iy, iz, el,glob_row;
+  psb_i_t i, info,ret;
   double x, y, z, deltah, sqdeltah, deltah2;
   double val[10*NBMAX], zt[NBMAX];
-  int irow[10*NBMAX], icol[10*NBMAX];
+  psb_l_t irow[10*NBMAX], icol[10*NBMAX];
 
   info = 0;
   psb_c_info(ictxt,&iam,&np);
@@ -223,14 +225,15 @@ int matgen(int ictxt, int ng,int idim,int vg[],psb_c_dspmat *ah,psb_c_descriptor
   
 int main(int argc, char *argv[])
 {
-  int ictxt, iam, np;
+  psb_i_t ictxt, iam, np;
   char methd[40], ptype[20], afmt[8], buffer[LINEBUFSIZE+1];
-  int nparms;
-  int idim,info,istop,itmax,itrace,irst,i,iter,ret;
+  psb_i_t nparms;
+  psb_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
   psb_c_dprec *ph;
   psb_c_dspmat *ah;
   psb_c_dvector *bh, *xh, *rh; 
-  int *vg, ng, nb,nlr; 
+  psb_i_t *vg, nb,nlr;
+  psb_l_t i,ng;
   double t1,t2,eps,err;
   double *xv, *bv, *rv;
   double one=1.0, zero=0.0, res2;
@@ -283,9 +286,9 @@ int main(int argc, char *argv[])
   cdh=psb_c_new_descriptor();
 
   /* Simple minded BLOCK data distribution */ 
-  ng = idim*idim*idim;
+  ng = ((psb_l_t) idim)*idim*idim;  
   nb = (ng+np-1)/np;
-  if ((vg=malloc(ng*sizeof(int)))==NULL) {
+  if ((vg=malloc(ng*sizeof(psb_i_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
     psb_c_abort(ictxt);
   }
@@ -301,11 +304,11 @@ int main(int argc, char *argv[])
   xh  = psb_c_new_dvector();
   rh  = psb_c_new_dvector();
   ah  = psb_c_new_dspmat();
-  fprintf(stderr,"From psb_c_new_dspmat: %p\n",ah); 
+  //fprintf(stderr,"From psb_c_new_dspmat: %p\n",ah); 
 
   /* Allocate mem space for sparse matrix and vectors */ 
   ret=psb_c_dspall(ah,cdh); 
-  fprintf(stderr,"From psb_c_dspall: %d\n",ret); 
+  //fprintf(stderr,"From psb_c_dspall: %d\n",ret); 
   psb_c_dgeall(bh,cdh);
   psb_c_dgeall(xh,cdh);
   psb_c_dgeall(rh,cdh);
@@ -322,7 +325,7 @@ int main(int argc, char *argv[])
   ph  = psb_c_new_dprec();
   psb_c_dprecinit(ph,ptype);
   ret=psb_c_dprecbld(ah,cdh,ph);
-  fprintf(stderr,"From psb_c_dprecbld: %d\n",ret); 
+  //fprintf(stderr,"From psb_c_dprecbld: %d\n",ret); 
 
   /* Set up the solver options */ 
   psb_c_DefaultSolverOptions(&options);
@@ -337,11 +340,11 @@ int main(int argc, char *argv[])
   t2=psb_c_wtime();
   iter = options.iter;
   err  = options.err;
-  fprintf(stderr,"From krylov: %d %lf, %d %d\n",iter,err,ret,psb_c_get_errstatus());
+  //fprintf(stderr,"From krylov: %d %lf, %d %d\n",iter,err,ret,psb_c_get_errstatus());
   if (psb_c_get_errstatus() != 0) {
     psb_c_print_errmsg();
   }
-  fprintf(stderr,"After cleanup %d\n",psb_c_get_errstatus());
+  //fprintf(stderr,"After cleanup %d\n",psb_c_get_errstatus());
   /* Check 2-norm of residual on exit */ 
   psb_c_dgeaxpby(one,bh,zero,rh,cdh); 
   psb_c_dspmm(-one,ah,xh,one,rh,cdh); 
@@ -396,7 +399,7 @@ int main(int argc, char *argv[])
     fprintf(stderr,"From cdfree: %d\nBailing out\n",info);
     psb_c_abort(ictxt);
   }
-  fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
+  //fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
  
   /* Clean up object handles  */   
   free(ph);
@@ -406,7 +409,7 @@ int main(int argc, char *argv[])
   free(cdh);
 
 
-  fprintf(stderr,"program completed successfully\n");
+  if (iam == 0) fprintf(stderr,"program completed successfully\n");
 
   psb_c_barrier(ictxt);
   psb_c_exit(ictxt);
