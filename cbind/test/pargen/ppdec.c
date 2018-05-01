@@ -98,15 +98,15 @@ double  c(double x, double y, double  z)
 }
 double  b1(double x, double y, double  z)
 {
-  return(1.0/sqrt(3.0));
+  return(0.0/sqrt(3.0));
 }
 double b2(double x, double y, double  z)
 {
-  return(1.0/sqrt(3.0));
+  return(0.0/sqrt(3.0));
 }
 double b3(double x, double y, double  z)
 {
-  return(1.0/sqrt(3.0));
+  return(0.0/sqrt(3.0));
 }
 
 double g(double x, double y, double z)
@@ -120,13 +120,13 @@ double g(double x, double y, double z)
   }
 }
 
-psb_i_t matgen(psb_i_t ictxt, psb_l_t ng, psb_i_t idim, psb_i_t vg[],
+psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
 	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
 	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
   psb_i_t iam, np;
   psb_l_t ix, iy, iz, el,glob_row;
-  psb_i_t i, info,ret;
+  psb_i_t i, k, info,ret;
   double x, y, z, deltah, sqdeltah, deltah2;
   double val[10*NBMAX], zt[NBMAX];
   psb_l_t irow[10*NBMAX], icol[10*NBMAX];
@@ -137,79 +137,77 @@ psb_i_t matgen(psb_i_t ictxt, psb_l_t ng, psb_i_t idim, psb_i_t vg[],
   sqdeltah = deltah*deltah;
   deltah2  = 2.0* deltah;
   psb_c_set_index_base(0);
-  for (glob_row=0; glob_row < ng; glob_row++) {
-
-    /* Check if I have to do something about this entry */
-    if (vg[glob_row] == iam) {
-      el=0;
-      ix = glob_row/(idim*idim);
-      iy = (glob_row-ix*idim*idim)/idim;
-      iz = glob_row-ix*idim*idim-iy*idim;
-      x=(ix+1)*deltah;
-      y=(iy+1)*deltah;
-      z=(iz+1)*deltah;
-      zt[0] = 0.0;
-      /*  internal point: build discretization */
-      /*  term depending on   (x-1,y,z)        */
-      val[el] = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2;	
-      if (ix==0) {
-	zt[0] += g(0.0,y,z)*(-val[el]);
-      } else {
-	icol[el]=(ix-1)*idim*idim+(iy)*idim+(iz);
-	el=el+1;
-      }
-      /*  term depending on     (x,y-1,z) */
-      val[el]  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2;	      
-      if (iy==0) { 
-	zt[0] += g(x,0.0,z)*(-val[el]);
-      } else {
-	icol[el]=(ix)*idim*idim+(iy-1)*idim+(iz);
-	el=el+1;
-      }
-      /* term depending on     (x,y,z-1)*/
-      val[el]=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2;
-      if (iz==0) { 
-	zt[0] += g(x,y,0.0)*(-val[el]);
-      } else {
-	icol[el]=(ix)*idim*idim+(iy)*idim+(iz-1);
-	el=el+1;
-      }
-      /* term depending on     (x,y,z)*/
-      val[el]=2.0*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah + c(x,y,z);
-      icol[el]=(ix)*idim*idim+(iy)*idim+(iz);
+  for (i=0; i<nl;  i++) {
+    glob_row=vl[i];
+    //if ((i%100000 == 0)||(i<10)) fprintf(stderr,"%d: generation loop at %d %ld \n",iam,i,glob_row);
+    el=0;
+    ix = glob_row/(idim*idim);
+    iy = (glob_row-ix*idim*idim)/idim;
+    iz = glob_row-ix*idim*idim-iy*idim;
+    x=(ix+1)*deltah;
+    y=(iy+1)*deltah;
+    z=(iz+1)*deltah;
+    zt[0] = 0.0;
+    /*  internal point: build discretization */
+    /*  term depending on   (x-1,y,z)        */
+    val[el] = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2;	
+    if (ix==0) {
+      zt[0] += g(0.0,y,z)*(-val[el]);
+    } else {
+      icol[el]=(ix-1)*idim*idim+(iy)*idim+(iz);
       el=el+1;
-      /*  term depending on     (x,y,z+1) */
-      val[el] = -a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2;
-      if (iz==idim-1) { 
-	zt[0] += g(x,y,1.0)*(-val[el]);
-      } else {
-	icol[el]=(ix)*idim*idim+(iy)*idim+(iz+1);
-	el=el+1;
-      }
-      /* term depending on     (x,y+1,z) */
-      val[el] = -a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2;
-      if (iy==idim-1) { 
-	zt[0] += g(x,1.0,z)*(-val[el]);
-      } else {
-	icol[el]=(ix)*idim*idim+(iy+1)*idim+(iz);
-	el=el+1;
-      }
-      /*  term depending on     (x+1,y,z) */
-      val[el] = -a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2;
-      if (ix==idim-1) { 
-	zt[0] += g(1.0,y,z)*(-val[el]);
-      } else {
-	icol[el]=(ix+1)*idim*idim+(iy)*idim+(iz);
-	el=el+1;
-      }
-      for (i=0; i<el; i++) irow[i]=glob_row;
-      if ((ret=psb_c_dspins(el,irow,icol,val,ah,cdh))!=0) 
-	fprintf(stderr,"From psb_c_dspins: %d\n",ret);
-      irow[0] = glob_row; 
-      psb_c_dgeins(1,irow,zt,bh,cdh);
-      zt[0]=0.0;
-      psb_c_dgeins(1,irow,zt,xh,cdh);
     }
+    /*  term depending on     (x,y-1,z) */
+    val[el]  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2;	      
+    if (iy==0) { 
+      zt[0] += g(x,0.0,z)*(-val[el]);
+    } else {
+      icol[el]=(ix)*idim*idim+(iy-1)*idim+(iz);
+      el=el+1;
+    }
+    /* term depending on     (x,y,z-1)*/
+    val[el]=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2;
+    if (iz==0) { 
+      zt[0] += g(x,y,0.0)*(-val[el]);
+    } else {
+      icol[el]=(ix)*idim*idim+(iy)*idim+(iz-1);
+      el=el+1;
+    }
+    /* term depending on     (x,y,z)*/
+    val[el]=2.0*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah + c(x,y,z);
+    icol[el]=(ix)*idim*idim+(iy)*idim+(iz);
+    el=el+1;
+    /*  term depending on     (x,y,z+1) */
+    val[el] = -a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2;
+    if (iz==idim-1) { 
+      zt[0] += g(x,y,1.0)*(-val[el]);
+    } else {
+      icol[el]=(ix)*idim*idim+(iy)*idim+(iz+1);
+      el=el+1;
+    }
+    /* term depending on     (x,y+1,z) */
+    val[el] = -a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2;
+    if (iy==idim-1) { 
+      zt[0] += g(x,1.0,z)*(-val[el]);
+    } else {
+      icol[el]=(ix)*idim*idim+(iy+1)*idim+(iz);
+      el=el+1;
+    }
+    /*  term depending on     (x+1,y,z) */
+    val[el] = -a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2;
+    if (ix==idim-1) { 
+      zt[0] += g(1.0,y,z)*(-val[el]);
+    } else {
+      icol[el]=(ix+1)*idim*idim+(iy)*idim+(iz);
+      el=el+1;
+    }
+    for (k=0; k<el; k++) irow[k]=glob_row;
+    if ((ret=psb_c_dspins(el,irow,icol,val,ah,cdh))!=0) 
+      fprintf(stderr,"From psb_c_dspins: %d\n",ret);
+    irow[0] = glob_row; 
+    psb_c_dgeins(1,irow,zt,bh,cdh);
+    zt[0]=0.0;
+    psb_c_dgeins(1,irow,zt,xh,cdh);   
   }
   
   if ((info=psb_c_cdasb(cdh))!=0)  return(info);
@@ -232,8 +230,8 @@ int main(int argc, char *argv[])
   psb_c_dprec *ph;
   psb_c_dspmat *ah;
   psb_c_dvector *bh, *xh, *rh; 
-  psb_i_t *vg, nb,nlr;
-  psb_l_t i,ng;
+  psb_i_t nb,nlr, nl;
+  psb_l_t i,ng, *vl, k;
   double t1,t2,eps,err;
   double *xv, *bv, *rv;
   double one=1.0, zero=0.0, res2;
@@ -284,18 +282,23 @@ int main(int argc, char *argv[])
   psb_c_barrier(ictxt);
 
   cdh=psb_c_new_descriptor();
+  psb_c_set_index_base(0);
 
   /* Simple minded BLOCK data distribution */ 
   ng = ((psb_l_t) idim)*idim*idim;  
   nb = (ng+np-1)/np;
-  if ((vg=malloc(ng*sizeof(psb_i_t)))==NULL) {
+  nl = nb;
+  if ( (ng -iam*nb) < nl) nl = ng -iam*nb; 
+  fprintf(stderr,"%d: Input data %d %ld %d %d\n",iam,idim,ng,nb, nl);
+  if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
     psb_c_abort(ictxt);
   }
-  for (i=0; i<ng; i++) {
-    vg[i] = i/nb; 
-  }
-  if ((info=psb_c_cdall_vg(ng,vg,ictxt,cdh))!=0) {
+  i = ((psb_l_t)iam) * nb;
+  for (k=0; k<nl; k++)
+    vl[k] = i+k; 
+
+  if ((info=psb_c_cdall_vl(nl,vl,ictxt,cdh))!=0) {
     fprintf(stderr,"From cdall: %d\nBailing out\n",info);
     psb_c_abort(ictxt);
   }
@@ -316,7 +319,7 @@ int main(int argc, char *argv[])
 
   
   /* Matrix generation  */
-  if (matgen(ictxt,ng,idim,vg,ah,cdh,xh,bh,rh) != 0) {
+  if (matgen(ictxt,nl,idim,vl,ah,cdh,xh,bh,rh) != 0) {
     fprintf(stderr,"Error during matrix build loop\n");
     psb_c_abort(ictxt);
   }    

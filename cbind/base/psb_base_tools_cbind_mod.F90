@@ -2,6 +2,7 @@ module psb_base_tools_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
+  use psb_cpenv_mod
   use psb_base_string_cbind_mod
     
 contains
@@ -62,7 +63,7 @@ contains
     integer(psb_c_lpk)        :: vl(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer               :: info, ixb 
 
     res = -1
     if (nl <=0) then 
@@ -79,8 +80,14 @@ contains
 
     allocate(descp,stat=info)
     if (info < 0) return 
+
+    ixb = psb_c_get_index_base()
       
-    call psb_cdall(ictxt,descp,info,vl=vl(1:nl))
+    if (ixb == 1) then 
+      call psb_cdall(ictxt,descp,info,vl=vl(1:nl))
+    else
+      call psb_cdall(ictxt,descp,info,vl=(vl(1:nl)+(1-ixb)))
+    end if
     cdh%item = c_loc(descp)
     res = info
 

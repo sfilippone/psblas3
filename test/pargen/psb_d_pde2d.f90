@@ -184,7 +184,7 @@ contains
     integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
-    ! For 3D partition
+    ! For 2D partition
     ! Note: integer control variables going directly into an MPI call
     ! must be 4 bytes, i.e. psb_mpk_
     integer(psb_mpk_) :: npdims(2), npp, minfo
@@ -448,7 +448,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.d0
+      zt(:)=dzero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
