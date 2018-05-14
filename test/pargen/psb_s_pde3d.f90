@@ -91,26 +91,36 @@ contains
   !
   ! functions parametrizing the differential equation 
   !  
+
+  !
+  ! Note: b1, b2 and b3 are the coefficients of the first
+  ! derivative of the unknown function. The default
+  ! we apply here is to have them zero, so that the resulting
+  ! matrix is symmetric/hermitian and suitable for
+  ! testing with CG and FCG.
+  ! When testing methods for non-hermitian matrices you can
+  ! change the B1/B2/B3 functions to e.g. sone/sqrt((3*sone))
+  !
   function b1(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y,z
-    b1=sone/sqrt((3*sone))
+    b1=szero
   end function b1
   function b2(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y,z
-    b2=sone/sqrt((3*sone))
+    b2=szero
   end function b2
   function b3(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) ::  b3
     real(psb_spk_), intent(in) :: x,y,z      
-    b3=sone/sqrt((3*sone))
+    b3=szero
   end function b3
   function c(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
