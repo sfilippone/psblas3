@@ -88,20 +88,30 @@ contains
 
   !
   ! functions parametrizing the differential equation 
-  !  
+  !
+
+  !
+  ! Note: b1 and b2 are the coefficients of the first
+  ! derivative of the unknown function. The default
+  ! we apply here is to have them zero, so that the resulting
+  ! matrix is symmetric/hermitian and suitable for
+  ! testing with CG and FCG.
+  ! When testing methods for non-hermitian matrices you can
+  ! change the B1/B2 functions to e.g. done/sqrt((2*done))
+  !
   function b1(x,y)
     use psb_base_mod, only : psb_dpk_, done, dzero
     implicit none 
     real(psb_dpk_) :: b1
     real(psb_dpk_), intent(in) :: x,y
-    b1=done/sqrt((2*done))
+    b1=dzero
   end function b1
   function b2(x,y)
     use psb_base_mod, only : psb_dpk_, done, dzero
     implicit none 
     real(psb_dpk_) ::  b2
     real(psb_dpk_), intent(in) :: x,y
-    b2=done/sqrt((2*done))
+    b2=dzero
   end function b2
   function c(x,y)
     use psb_base_mod, only : psb_dpk_, done, dzero
@@ -444,7 +454,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.d0
+      zt(:)=dzero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -624,7 +634,7 @@ program psb_d_pde2d
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
-  eps   = 1.d-9
+  eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 

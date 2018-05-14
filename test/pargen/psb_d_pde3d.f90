@@ -90,26 +90,36 @@ contains
   !
   ! functions parametrizing the differential equation 
   !  
+
+  !
+  ! Note: b1, b2 and b3 are the coefficients of the first
+  ! derivative of the unknown function. The default
+  ! we apply here is to have them zero, so that the resulting
+  ! matrix is symmetric/hermitian and suitable for
+  ! testing with CG and FCG.
+  ! When testing methods for non-hermitian matrices you can
+  ! change the B1/B2/B3 functions to e.g. done/sqrt((3*done))
+  !
   function b1(x,y,z)
     use psb_base_mod, only : psb_dpk_, done, dzero
     implicit none 
     real(psb_dpk_) :: b1
     real(psb_dpk_), intent(in) :: x,y,z
-    b1=done/sqrt((3*done))
+    b1=dzero
   end function b1
   function b2(x,y,z)
     use psb_base_mod, only : psb_dpk_, done, dzero
     implicit none 
     real(psb_dpk_) ::  b2
     real(psb_dpk_), intent(in) :: x,y,z
-    b2=done/sqrt((3*done))
+    b2=dzero
   end function b2
   function b3(x,y,z)
     use psb_base_mod, only : psb_dpk_, done, dzero
     implicit none 
     real(psb_dpk_) ::  b3
     real(psb_dpk_), intent(in) :: x,y,z      
-    b3=done/sqrt((3*done))
+    b3=dzero
   end function b3
   function c(x,y,z)
     use psb_base_mod, only : psb_dpk_, done, dzero
@@ -248,7 +258,7 @@ contains
     
     m   = idim*idim*idim
     n   = m
-    nnz = ((n*9)/(np))
+    nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
     t0 = psb_wtime()
     select case(partition_)
@@ -665,7 +675,7 @@ program psb_d_pde3d
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
-  eps   = 1.d-9
+  eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
