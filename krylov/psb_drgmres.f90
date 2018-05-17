@@ -125,7 +125,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   Real(psb_dpk_), Optional, Intent(out) :: err
 ! =   local data
   real(psb_dpk_), allocatable   :: aux(:)
-  real(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
+  real(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:), tmpv(:) 
   type(psb_d_vect_type), allocatable :: v(:)
   type(psb_d_vect_type)              :: w, w1, xt
   real(psb_dpk_) :: tmp 
@@ -136,7 +136,12 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Parameter :: irmax = 8
   integer(psb_ipk_) :: itx, i, istop_, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
-  integer(psb_ipk_) :: ictxt, np, me  
+  integer(psb_ipk_) :: ictxt, np, me
+  integer(psb_ipk_), parameter :: psb_mgs_  = 0
+  integer(psb_ipk_), parameter :: psb_cgs_  = 1
+  integer(psb_ipk_), parameter :: psb_cgs2_ = 2
+  integer(psb_ipk_), parameter :: psb_gs_variant = psb_cgs2_
+  
   Real(psb_dpk_)     :: rni, xni, bni, ani,bn2, dt, r0n2
   real(psb_dpk_)     :: errnum, errden, deps, derr
   character(len=20)           :: name
@@ -231,8 +236,8 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
 
   naux=4*n_col 
-  allocate(aux(naux),h(nl+1,nl+1),&
-       &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
+  allocate(aux(naux),h(nl+1,nl+1), tmpv(nl+1),&
+       & c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
 
   if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
   if (info == psb_success_) call psb_geall(w,desc_a,info)
@@ -362,19 +367,57 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
       call prec%apply(v(i),w1,desc_a,info)
       call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
-      !
 
-      do k = 1, i
-        h(k,i) = psb_gedot(v(k),w,desc_a,info)
-        call psb_geaxpby(-h(k,i),v(k),done,w,desc_a,info)
-      end do
+      !
+      ! Gram-Schmidt orthogonalization
+      !
+      select case(psb_gs_variant)
+      case (psb_mgs_)
+        do k = 1, i
+          h(k,i) = psb_gedot(v(k),w,desc_a,info)
+          call psb_geaxpby(-h(k,i),v(k),done,w,desc_a,info)
+        end do
+        
+      case (psb_cgs_)
+        do k = 1, i
+          h(k,i)  = psb_gedot(v(k),w,desc_a,info, global=.false.)
+        end do
+        call psb_sum(ictxt,h(1:i,i))
+        do k = 1, i
+          call psb_geaxpby(-h(k,i),v(k),done,w,desc_a,info)
+        end do
+       
+      case(psb_cgs2_)
+        do k = 1, i
+          h(k,i)  = psb_gedot(v(k),w,desc_a,info, global=.false.)
+        end do
+        call psb_sum(ictxt,h(1:i,i))
+        do k = 1, i
+          call psb_geaxpby(-h(k,i),v(k),done,w,desc_a,info)
+        end do
+        do k = 1, i
+          tmpv(k)  = psb_gedot(v(k),w,desc_a,info, global=.false.)
+        end do
+        call psb_sum(ictxt,tmpv(1:i))
+        do k = 1, i
+          call psb_geaxpby(-tmpv(k),v(k),done,w,desc_a,info)
+        end do
+        h(1:i,i) = h(1:i,i) + tmpv(1:i)
+       
+      case default
+        info=psb_err_internal_error_
+        call psb_errpush(info,name,a_err='Invalid CG variant')
+        goto 9999
+      end select
+      
+        
       h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=done/h(i+1,i)
       call psb_geaxpby(scal,w,dzero,v(i+1),desc_a,info)
+      
       do k=2,i
         call drot(1,h(k-1,i),1,h(k,i),1,real(c(k-1),kind=psb_dpk_),s(k-1))
       enddo
-
 
       rti  = h(i,i)
       rti1 = h(i+1,i) 
