@@ -260,7 +260,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
@@ -271,8 +271,8 @@ module psb_s_base_mat_mod
   
   interface 
     subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_s_base_vect_type,&
-           & psb_i_base_vect_type
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_, &
+           & psb_s_base_vect_type, psb_i_base_vect_type
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_base_vect_type), intent(inout)  :: val
       class(psb_i_base_vect_type), intent(inout)  :: ia, ja
@@ -317,7 +317,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_), intent(out)                 :: nz
@@ -356,7 +356,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
          & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -394,7 +394,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_base_csclip(a,b,info,&
          & imin,imax,jmin,jmax,rscale,cscale)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(out) :: b
       integer(psb_ipk_),intent(out)            :: info
@@ -435,7 +435,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_base_tril(a,l,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,u)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(out) :: l
       integer(psb_ipk_),intent(out)              :: info
@@ -479,7 +479,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_base_triu(a,u,info,diag,imin,imax,&
          & jmin,jmax,rscale,cscale,l)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_s_coo_sparse_mat), intent(out) :: u
       integer(psb_ipk_),intent(out)              :: info
@@ -502,7 +502,7 @@ module psb_s_base_mat_mod
   ! 
   interface 
     subroutine psb_s_base_get_diag(a,d,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(out)     :: d(:)
       integer(psb_ipk_), intent(out)            :: info
@@ -596,7 +596,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_cp_from_coo(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(in)     :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -614,7 +614,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_cp_to_fmt(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -632,7 +632,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_cp_from_fmt(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_base_sparse_mat), intent(in) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -649,7 +649,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_mv_to_coo(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -666,7 +666,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_mv_from_coo(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_coo_sparse_mat), intent(inout)  :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -684,7 +684,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_mv_to_fmt(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -702,7 +702,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_mv_from_fmt(a,b,info) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
       class(psb_s_base_sparse_mat), intent(inout) :: b
       integer(psb_ipk_), intent(out)            :: info
@@ -731,7 +731,7 @@ module psb_s_base_mat_mod
   !  
    interface 
     subroutine psb_s_base_transp_2mat(a,b)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_base_sparse_mat), intent(out)    :: b
     end subroutine psb_s_base_transp_2mat
@@ -747,7 +747,7 @@ module psb_s_base_mat_mod
   !  
   interface  
     subroutine psb_s_base_transc_2mat(a,b)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       class(psb_base_sparse_mat), intent(out)    :: b
     end subroutine psb_s_base_transc_2mat
@@ -762,7 +762,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_transp_1mat(a)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
     end subroutine psb_s_base_transp_1mat
   end interface
@@ -776,7 +776,7 @@ module psb_s_base_mat_mod
   !  
   interface 
     subroutine psb_s_base_transc_1mat(a)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(inout) :: a
     end subroutine psb_s_base_transc_1mat
   end interface
@@ -801,7 +801,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_csmm(alpha,a,x,beta,y,info,trans)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
       real(psb_spk_), intent(inout) :: y(:,:)
@@ -829,7 +829,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_csmv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:)
       real(psb_spk_), intent(inout) :: y(:)
@@ -864,7 +864,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_vect_mv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_s_base_vect_type
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_s_base_vect_type, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)       :: alpha, beta
       class(psb_s_base_vect_type), intent(inout) :: x
@@ -896,7 +896,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
       real(psb_spk_), intent(inout) :: y(:,:)
@@ -931,7 +931,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_inner_cssv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:)
       real(psb_spk_), intent(inout) :: y(:)
@@ -966,7 +966,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,  psb_s_base_vect_type
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,  psb_s_base_vect_type, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)       :: alpha, beta
       class(psb_s_base_vect_type), intent(inout) :: x, y
@@ -998,7 +998,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
       real(psb_spk_), intent(inout) :: y(:,:)
@@ -1031,7 +1031,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)    :: alpha, beta, x(:)
       real(psb_spk_), intent(inout) :: y(:)
@@ -1065,7 +1065,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
-      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,psb_s_base_vect_type
+      import :: psb_ipk_, psb_s_base_sparse_mat, psb_spk_,psb_s_base_vect_type, psb_ipk_
       class(psb_s_base_sparse_mat), intent(in) :: a
       real(psb_spk_), intent(in)       :: alpha, beta
       class(psb_s_base_vect_type), intent(inout) :: x,y
@@ -1229,7 +1229,7 @@ module psb_s_base_mat_mod
   !
   interface
     subroutine  psb_s_coo_reallocate_nz(nz,a) 
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       integer(psb_ipk_), intent(in) :: nz
       class(psb_s_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_s_coo_reallocate_nz
@@ -1265,7 +1265,7 @@ module psb_s_base_mat_mod
   !
   interface
     subroutine  psb_s_coo_clean_zeros(a,info)
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)             :: info
     end subroutine psb_s_coo_clean_zeros
@@ -1278,7 +1278,7 @@ module psb_s_base_mat_mod
   !
   interface
     subroutine  psb_s_coo_allocate_mnnz(m,n,a,nz) 
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       integer(psb_ipk_), intent(in) :: m,n
       class(psb_s_coo_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(in), optional :: nz
@@ -1312,7 +1312,7 @@ module psb_s_base_mat_mod
   !
   interface
     subroutine psb_s_coo_print(iout,a,iv,head,ivr,ivc)
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       integer(psb_ipk_), intent(in)               :: iout
       class(psb_s_coo_sparse_mat), intent(in) :: a   
       integer(psb_ipk_), intent(in), optional     :: iv(:)
@@ -1333,7 +1333,7 @@ module psb_s_base_mat_mod
   !
   interface 
     function  psb_s_coo_get_nz_row(idx,a) result(res)
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: idx
       integer(psb_ipk_) :: res
@@ -1357,11 +1357,12 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir) 
-      import :: psb_ipk_, psb_spk_
+      import :: psb_ipk_, psb_spk_, psb_ipk_
       integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
       integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
       real(psb_spk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout, info
+      integer(psb_ipk_), intent(out)          :: nzout
+      integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_s_fix_coo_inner
   end interface
@@ -1376,7 +1377,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_fix_coo(a,info,idir) 
-      import :: psb_ipk_, psb_s_coo_sparse_mat
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)                :: info
       integer(psb_ipk_), intent(in), optional :: idir
@@ -1516,7 +1517,7 @@ module psb_s_base_mat_mod
   !
   interface 
     subroutine psb_s_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(inout) :: a
       real(psb_spk_), intent(in)      :: val(:)
       integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
@@ -1532,7 +1533,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_), intent(out)                 :: nz
@@ -1551,7 +1552,7 @@ module psb_s_base_mat_mod
   interface 
     subroutine psb_s_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
-      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_
+      import :: psb_ipk_, psb_s_coo_sparse_mat, psb_spk_, psb_ipk_
       class(psb_s_coo_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
       integer(psb_ipk_), intent(out)                 :: nz
