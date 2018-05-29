@@ -1229,7 +1229,7 @@ module psb_ld_base_mat_mod
   interface
     subroutine  psb_ld_coo_reallocate_nz(nz,a) 
       import 
-      integer(psb_ipk_), intent(in) :: nz
+      integer(psb_lpk_), intent(in) :: nz
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_ld_coo_reallocate_nz
   end interface
@@ -1280,7 +1280,7 @@ module psb_ld_base_mat_mod
       import 
       integer(psb_lpk_), intent(in) :: m,n
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(in), optional :: nz
+      integer(psb_lpk_), intent(in), optional :: nz
     end subroutine psb_ld_coo_allocate_mnnz
   end interface
 
@@ -1334,7 +1334,7 @@ module psb_ld_base_mat_mod
     function  psb_ld_coo_get_nz_row(idx,a) result(res)
       import 
       class(psb_ld_coo_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: idx
+      integer(psb_lpk_), intent(in)                  :: idx
       integer(psb_lpk_) :: res
     end function psb_ld_coo_get_nz_row
   end interface
@@ -1905,9 +1905,9 @@ contains
     if (allocated(a%ja)) deallocate(a%ja)
     if (allocated(a%val)) deallocate(a%val)
     call a%set_null()
-    call a%set_nrows(izero)
-    call a%set_ncols(izero)
-    call a%set_nzeros(izero)
+    call a%set_nrows(0_psb_lpk_)
+    call a%set_ncols(0_psb_lpk_)
+    call a%set_nzeros(0_psb_lpk_)
     call a%set_sort_status(psb_unsorted_)
     
     return

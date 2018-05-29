@@ -1905,9 +1905,9 @@ contains
     if (allocated(a%ja)) deallocate(a%ja)
     if (allocated(a%val)) deallocate(a%val)
     call a%set_null()
-    call a%set_nrows(izero)
-    call a%set_ncols(izero)
-    call a%set_nzeros(izero)
+    call a%set_nrows(0_psb_ipk_)
+    call a%set_ncols(0_psb_ipk_)
+    call a%set_nzeros(0_psb_ipk_)
     call a%set_sort_status(psb_unsorted_)
     
     return
