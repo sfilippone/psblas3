@@ -103,7 +103,361 @@
 !                                         estimate of) residual. 
 ! 
 !
+
+
+
+!Version number 2
 subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
+     & itmax,iter,err,itrace,istop,cond)
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_d_krylov_conv_mod
+  use psb_krylov_mod
+  implicit none
+  type(psb_dspmat_type), intent(in)    :: a
+  Type(psb_desc_type), Intent(in)      :: desc_a
+  class(psb_dprec_type), intent(inout) :: prec
+  type(psb_d_vect_type), Intent(inout) :: b
+  type(psb_d_vect_type), Intent(inout) :: x
+  real(psb_dpk_), Intent(in)           :: eps
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
+  integer(psb_ipk_), Optional, Intent(out)       :: iter
+  real(psb_dpk_), Optional, Intent(out) :: err,cond
+! =   Local data
+  type(psb_d_vect_type)  :: v, w, d , q, r, u 
+  real(psb_dpk_) :: alpha, beta, delta, gamma, theta
+  real(psb_dpk_) :: derr
+  integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
+  integer(psb_ipk_) :: n_col, mglob, naux, err_act
+  integer(psb_ipk_) :: debug_level, debug_unit
+  integer(psb_ipk_) :: np, me, ictxt
+  real(psb_dpk_), allocatable, target   :: aux(:)
+  character(len=20)           :: name
+  type(psb_itconv_type)       :: stopdat
+  character(len=*), parameter :: methdname='FCG'
+  real(psb_dpk_) :: vres(3)
+
+  info = psb_success_
+  name = 'psb_dfcg'
+  print*,'psb_dfcg_ version2'
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  ictxt = desc_a%get_context()
+
+  call psb_info(ictxt, me, np)
+  if (.not.allocated(b%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  mglob = desc_a%get_global_rows()
+  n_col = desc_a%get_local_cols()
+
+  if (present(istop)) then 
+    istop_ = istop 
+  else
+    istop_ = 2
+  endif
+
+
+  call psb_chkvect(mglob,ione,x%get_nrows(),ione,ione,desc_a,info)
+  if (info == psb_success_)&
+       & call psb_chkvect(mglob,ione,b%get_nrows(),ione,ione,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
+    call psb_errpush(info,name,a_err='psb_chkvect on X/B')
+    goto 9999
+  end if
+
+  naux=4*n_col
+  allocate(aux(naux), stat=info)
+
+
+  if (present(itmax)) then 
+    itmax_ = itmax
+  else
+    itmax_ = 1000
+  endif
+
+  if (present(itrace)) then
+    itrace_ = itrace
+  else
+    itrace_ = 0
+  end if
+
+
+  !Assemble w, v
+
+  call psb_geasb(w,&
+       & desc_a,info,&
+       & scratch=.true.,mold=b%v)
+  call psb_geasb(v,&
+       & desc_a,info,&
+       & scratch=.true.,mold=b%v)
+
+  !Assemble d, q, r, u 
+  call psb_geasb(d,&
+       & desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(q,&
+       & desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(r,&
+       & desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(u,&
+       & desc_a,info,&
+       & scratch=.true.,mold=x%v)
+
+
+
+
+    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  itx=0
+
+  restart: do 
+    if (itx>= itmax_) exit restart 
+
+    ! r=b
+    call psb_geaxpby(done,b,dzero,r,&
+         &   desc_a,info)
+
+
+      if (psb_errstatus_fatal()) then 
+        nc2l = desc_a%get_local_cols()
+        info=psb_err_alloc_request_
+        call psb_errpush(info,name,i_err=(/2*nc2l,izero,izero,izero,izero/),&
+             & a_err='real(psb_dpk_)')
+        goto 9999      
+      end if
+
+
+
+    !Apply the preconditioner v =Pr
+
+    !idx=0
+
+    !call prec%apply(r,v,desc_a,info,work=aux)  
+
+
+   !Compute w = Av  
+
+    call psb_spmm(done,a,x,dzero,w,desc_a,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,&
+        & a_err='Error during residue')
+      goto 9999
+    end if
+
+    !Compute r = -Ax + b
+
+    call psb_geaxpby(-done, w, done, r, desc_a, info)   
+
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
+      goto 9999
+    End If
+
+
+    !Apply the preconditioner v =Pr
+
+    !idx=0
+
+    call prec%apply(r,v,desc_a,info,work=aux)  
+
+   !Compute w = Av  
+
+    call psb_spmm(done,a,v,dzero,w,desc_a,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,&
+        & a_err='Error during residue')
+      goto 9999
+    end if
+
+
+      vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
+      vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
+
+      
+      call psb_sum(ictxt, vres(1:2))
+
+      alpha=vres(1)
+      beta = vres(2)
+
+
+    !compute alpha=dot(v,r)
+    !alpha = psb_gedot(r, v, desc_a, info)
+    !print*,'---alpha', alpha
+    !compute beta=dot(v,w)
+    !beta = psb_gedot(w, v, desc_a, info)
+    !print*,'--- beta', beta
+    ! d = v
+    call psb_geaxpby(done, v, dzero, d, desc_a, info)   
+
+    ! q = w
+    call psb_geaxpby(done, w, dzero, q, desc_a, info)   
+
+
+    !compute gamma=beta
+    delta= beta
+
+    ! u = u + (alpha/delta)*d
+    theta= alpha/delta
+    call psb_geaxpby(theta, d, done, x, desc_a, info)   
+
+    ! r = r - (alpha/delta)*q
+
+    call psb_geaxpby(-theta, q, done, r, desc_a, info)   
+ 
+    iteration: do 
+
+    itx = itx + 1
+    !Apply the preconditioner v =Pr
+
+    !idx=0
+
+    call prec%apply(r,v,desc_a,info,work=aux)  
+
+
+   !Compute w = Av  
+
+    call psb_spmm(done,a,v,dzero,w,desc_a,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,&
+        & a_err='Error during residue')
+      goto 9999
+    end if
+   
+
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
+      goto 9999
+    End If
+
+
+    !Apply the preconditioner v =Pr
+
+    !idx=0
+
+    !call prec%apply(r,v,desc_a,info,work=aux)  
+
+      vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
+      vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
+      vres(3) = psb_gedot(q, v, desc_a, info, global = .false.) 
+      
+      call psb_sum(ictxt, vres(1:3))
+
+      alpha=vres(1)
+      beta = vres(2)
+      gamma= vres(3)
+
+
+    !compute alpha=dot(v,r)
+    !alpha = psb_gedot(r, v, desc_a, info)
+    !print*,'------- alpha', alpha
+    !compute beta=dot(v,w)
+    !beta  = psb_gedot(w, v, desc_a, info)
+    !print*,'------- beta', beta
+    !compute gamma=dot(v,q)
+    !gamma  = psb_gedot(q, v, desc_a, info)
+    !print*,'------- gamma', gamma
+
+    !Compute d=v-(gamma/delta)*d
+
+    theta= gamma/delta
+    call psb_geaxpby(done, v, -theta, d, desc_a, info)   
+
+    !Compute q=w-(gamma/delta)*q
+
+
+    call psb_geaxpby(done, w, -theta, q , desc_a, info)   
+
+
+
+
+
+    ! u = u + (alpha/delta)*d
+    !theta= alpha/delta
+    !call psb_geaxpby(theta, d, done, x, desc_a, info)   
+
+    ! r = r - (alpha/delta)*q
+
+    !call psb_geaxpby(-theta, r, done, r, desc_a, info)   
+ 
+
+    !update delta
+    delta = beta - (gamma*gamma)/delta
+
+    !update u and r      
+
+    ! u = u + (alpha/delta)*d
+    theta= alpha/delta
+    call psb_geaxpby(theta, d, done, x, desc_a, info)   
+
+    ! r = r - (alpha/delta)*q
+
+    call psb_geaxpby(-theta, q, done, r, desc_a, info)   
+ 
+ 
+    
+      !check residual
+
+      if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
+        goto 9999
+      End If
+
+      !call psb_spmm(done,a,d(idx),dzero,v,desc_a,info)
+      !if (info /= psb_success_) then
+      ! call psb_errpush(psb_err_internal_error_,name,&
+      !    & a_err='Error during residue')
+      ! goto 9999
+      !end if
+
+      !vres(1) = psb_gedot(w, d(idx), desc_a, info, global = .false.) 
+      !vres(2) = psb_gedot(d(idx), v, desc_a, info, global = .false.) 
+
+      !call psb_sum(ictxt, vres(1:2))
+      !delta=vres(1)
+      !tau = vres(2)
+
+    end do iteration
+  end do restart
+
+
+  call psb_end_conv(methdname,itx ,desc_a,stopdat,info,derr,iter)
+  if (present(err)) err = derr
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+
+  return
+end subroutine psb_dfcg_vect
+
+
+
+
+
+!Version number 1
+subroutine psb_dfcgv1_vect(a,prec,b,x,eps,desc_a,info,&
      & itmax,iter,err,itrace,istop,cond)
   use psb_base_mod
   use psb_prec_mod
@@ -133,7 +487,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='FCG'
-
+  real(psb_dpk_) :: vres(2)
 
   info = psb_success_
   name = 'psb_dfcg'
@@ -258,15 +612,25 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     End If
 
+
+    call psb_spmm(done,a,d(idx),dzero,v,desc_a,info)
+    if (info /= psb_success_) then
+     call psb_errpush(psb_err_internal_error_,name,&
+        & a_err='Error during residue')
+     goto 9999
+    end if
+     tau = psb_gedot(d(idx), v, desc_a, info) 
+
+
     iteration: do 
 
-      call psb_spmm(done,a,d(idx),dzero,v,desc_a,info)
-      if (info /= psb_success_) then
-       call psb_errpush(psb_err_internal_error_,name,&
-          & a_err='Error during residue')
-       goto 9999
-      end if
-      tau = psb_gedot(d(idx), v, desc_a, info) 
+      !call psb_spmm(done,a,d(idx),dzero,v,desc_a,info)
+      !if (info /= psb_success_) then
+      ! call psb_errpush(psb_err_internal_error_,name,&
+      !    & a_err='Error during residue')
+      ! goto 9999
+      !end if
+      !tau = psb_gedot(d(idx), v, desc_a, info) 
 
 
       alpha = delta/tau
@@ -290,13 +654,27 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(-beta, d(idx + 1), done, d(idx), desc_a, info)         
       endif
     
-      delta = psb_gedot(w, d(idx), desc_a, info)
+      !delta = psb_gedot(w, d(idx), desc_a, info)
 
       if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
       if (info /= psb_success_) Then 
         call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
       End If
+
+      call psb_spmm(done,a,d(idx),dzero,v,desc_a,info)
+      if (info /= psb_success_) then
+       call psb_errpush(psb_err_internal_error_,name,&
+          & a_err='Error during residue')
+       goto 9999
+      end if
+
+      vres(1) = psb_gedot(w, d(idx), desc_a, info, global = .true.) 
+      vres(2) = psb_gedot(d(idx), v, desc_a, info, global = .true.) 
+
+      !call psb_sum(ictxt, vres(1:2))
+      delta=vres(1)
+      tau = vres(2)
 
     end do iteration
   end do restart
@@ -313,4 +691,12 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
   return
-end subroutine psb_dfcg_vect
+end subroutine psb_dfcgv1_vect
+
+
+
+
+
+
+
+
