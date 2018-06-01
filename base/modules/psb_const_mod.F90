@@ -158,7 +158,10 @@ module psb_const_mod
   logical, parameter             :: psb_d_is_complex_  = .false.
   logical, parameter             :: psb_c_is_complex_  = .true.
   logical, parameter             :: psb_z_is_complex_  = .true.
+  logical, parameter             :: psb_ls_is_complex_ = .false.
   logical, parameter             :: psb_ld_is_complex_ = .false.
+  logical, parameter             :: psb_lc_is_complex_ = .true.
+  logical, parameter             :: psb_lz_is_complex_ = .true.
 
   !
   ! Sort routines constants
