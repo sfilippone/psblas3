@@ -199,7 +199,7 @@ auxil/psb_ip_reord_mod.o:  auxil/psb_m_ip_reord_mod.o auxil/psb_e_ip_reord_mod.o
 #serial/psb_ld_csc_mat_mod.o serial/psb_ld_csr_mat_mod.o: serial/psb_ld_base_mat_mod.o 
 
 serial/psb_base_mat_mod.o: auxil/psi_serial_mod.o
-serial/psb_s_base_mat_mod.o serial/psb_d_base_mat_mod.o serial/psb_c_base_mat_mod.o serial/psb_z_base_mat_mod.o: serial/psb_base_mat_mod.o
+serial/psb_s_base_mat_mod.o serial/psb_d_base_mat_mod.o serial/psb_c_base_mat_mod.o serial/psb_z_base_mat_mod.o: serial/psb_base_mat_mod.o serial/psb_lbase_mat_mod.o	
 #serial/psb_ld_base_mat_mod.o: serial/psb_base_mat_mod.o
 serial/psb_s_base_mat_mod.o: serial/psb_s_base_vect_mod.o
 serial/psb_d_base_mat_mod.o: serial/psb_d_base_vect_mod.o 
