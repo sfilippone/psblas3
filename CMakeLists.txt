@@ -11,9 +11,9 @@ set ( CMAKE_BUILD_TYPE "Release"
   CACHE STRING "Select which configuration to build." )
 set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 
-#----------------------------------------------------
-# Determine version from .VERSION file or git desribe
-#----------------------------------------------------
+#-----------------------------------------------------
+# Determine version from .VERSION file or git describe
+#-----------------------------------------------------
 include("${CMAKE_SOURCE_DIR}/cmake/setVersion.cmake")
 set_version(
   VERSION_VARIABLE PSBLAS_Version
@@ -74,6 +74,85 @@ else()
     "Attempting untested CMake build with Fortran compiler: ${CMAKE_Fortran_COMPILER_ID}. "
     "Please report any failures at https://github.com/sfilippone/psblas3\n\n"
   )
+endif()
+
+#-------------------------------------
+# Fortran name mangling intro-spection
+#-------------------------------------
+include("${CMAKE_SOURCE_DIR}/cmake/CapitalizeString.cmake")
+include(FortranCInterface)
+CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
+message(STATUS "Name mangling capitalization: ${fc_case}")
+message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
+if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
+  add_definitions("-D${fc_case}Case")
+elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "_")
+  add_definitions("-D${fc_case}Underscore")
+elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "__")
+  add_definitions("-D${fc_case}DoubleUnderscore")
+else()
+  message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to morfeus/NEMO")
+endif()
+
+#----------------------------------------------
+# Determine system endian-ness and pointer size
+#----------------------------------------------
+include(TestBigEndian)
+TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+if(IS_BIG_ENDIAN)
+  message( STATUS "System appears to be big endian.")
+else()
+  message( STATUS "System appears to be little endian.")
+  add_definitions(-DLittleEndian)
+endif()
+include(CheckTypeSize)
+CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
+if(${VOID_P_SIZE} EQUAL 8)
+  add_definitions(-DPtr64Bits)
+endif()
+message(STATUS "Have 64bit pointers")
+
+#-----------------------------------------
+# Check for some Fortran compiler features
+#-----------------------------------------
+include(CheckFortranSourceCompiles)
+CHECK_Fortran_SOURCE_COMPILES(
+  "
+integer, allocatable :: a(:), b(:)
+allocate(a(5))
+a = [1,2,3,4,5]
+call move_alloc(from=a, to=b)
+end
+"
+  HAVE_MOVE_ALLOC
+  SRC_EXT f90
+  )
+if(HAVE_MOVE_ALLOC)
+  add_definitions(-DHAVE_MOVE_ALLOC)
+endif()
+CHECK_Fortran_SOURCE_COMPILES(
+  "integer, volatile :: i ; end"
+  HAVE_VOLATILE
+  SRC_EXT f90
+  )
+if(HAVE_VOLATILE)
+  add_definitions(-DHAVE_VOLATILE)
+endif()
+CHECK_Fortran_SOURCE_COMPILES(
+  "use ISO_FORTRAN_ENV ; end"
+  HAVE_ISO_FORTRAN_ENV
+  SRC_EXT f90
+  )
+if(HAVE_ISO_FORTRAN_ENV)
+  add_definitions(-DHAVE_ISO_FORTRAN_ENV)
+endif()
+CHECK_Fortran_SOURCE_COMPILES(
+  "flush(5); end"
+  HAVE_FLUSH_STMT
+  SRC_EXT f90
+  )
+if(HAVE_FLUSH_STMT)
+  add_definitions(-DHAVE_FLUSH_STMT)
 endif()
 
 #----------------------------------------------------------------------------
@@ -415,11 +494,11 @@ endfunction(add_mpi_test)
 # add_mpi_test(initialize_mpi 2 initialize_mpi)
 
 add_definitions(
-  -DHAVE_METIS -DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DHAVE_ISO_FORTRAN_ENV -DHAVE_FLUSH_STMT -DHAVE_VOLATILE -DMPI_MOD
+  -DHAVE_METIS -DHAVE_LAPACK -DHAVE_MOLD -DHAVE_EXTENDS_TYPE_OF -DHAVE_SAME_TYPE_AS -DHAVE_FINAL -DMPI_MOD
 )
 # From ./configure CDEFINES section
 add_definitions(
-  -DHAVE_METIS_  -DLowerUnderscore -DPtr64Bits
+  -DHAVE_METIS_
 )
 
 set(directory_list base prec krylov util test) # TODO: add cbind
