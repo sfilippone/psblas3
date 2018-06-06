@@ -6537,8 +6537,8 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-g -O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F -qlanglvl=extended $FCOPT"
-     FCFLAGS="-qhalt=e $FCFLAGS"
+     FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
+     FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
