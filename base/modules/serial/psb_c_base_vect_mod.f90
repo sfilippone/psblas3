@@ -48,6 +48,7 @@ module psb_c_base_vect_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
+  use psb_l_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_c_base_vect_type
   !! The psb_c_base_vect_type 
