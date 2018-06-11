@@ -276,6 +276,9 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: clone         => psb_ls_base_clone
     procedure, pass(a) :: make_nonunit  => psb_ls_base_make_nonunit
     procedure, pass(a) :: clean_zeros   => psb_ls_base_clean_zeros
+    procedure, pass(a) :: scals         => psb_ls_base_scals
+    procedure, pass(a) :: scalv         => psb_ls_base_scal
+    generic, public    :: scal          => scals, scalv
     !
     ! Convert internal indices
     !
@@ -296,31 +299,6 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: transc_1mat => psb_ls_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_ls_base_transc_2mat
     
-    !
-    ! Computational methods: defined here but not implemented. 
-    !    
-    procedure, pass(a) :: vect_mv     => psb_ls_base_vect_mv
-    procedure, pass(a) :: csmv        => psb_ls_base_csmv
-    procedure, pass(a) :: csmm        => psb_ls_base_csmm
-    generic, public    :: spmm        => csmm, csmv, vect_mv
-    procedure, pass(a) :: in_vect_sv  => psb_ls_base_inner_vect_sv
-    procedure, pass(a) :: inner_cssv  => psb_ls_base_inner_cssv    
-    procedure, pass(a) :: inner_cssm  => psb_ls_base_inner_cssm
-    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
-    procedure, pass(a) :: vect_cssv   => psb_ls_base_vect_cssv
-    procedure, pass(a) :: cssv        => psb_ls_base_cssv
-    procedure, pass(a) :: cssm        => psb_ls_base_cssm
-    generic, public    :: spsm        => cssm, cssv, vect_cssv
-    procedure, pass(a) :: scals       => psb_ls_base_scals
-    procedure, pass(a) :: scalv       => psb_ls_base_scal
-    generic, public    :: scal        => scals, scalv
-    procedure, pass(a) :: maxval      => psb_ls_base_maxval
-    procedure, pass(a) :: spnmi       => psb_ls_base_csnmi
-    procedure, pass(a) :: spnm1       => psb_ls_base_csnm1
-    procedure, pass(a) :: rowsum      => psb_ls_base_rowsum
-    procedure, pass(a) :: arwsum      => psb_ls_base_arwsum
-    procedure, pass(a) :: colsum      => psb_ls_base_colsum
-    procedure, pass(a) :: aclsum      => psb_ls_base_aclsum
   end type psb_ls_base_sparse_mat
   
   private :: ls_base_mat_sync, ls_base_mat_is_host, ls_base_mat_is_dev, &
@@ -388,6 +366,8 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: set_by_cols  => ls_coo_set_by_cols
     procedure, pass(a) :: set_sort_status => ls_coo_set_sort_status
     procedure, pass(a) :: get_sort_status => ls_coo_get_sort_status
+    procedure, pass(a) :: scals           => psb_ls_coo_scals
+    procedure, pass(a) :: scalv           => psb_ls_coo_scal
 
     !
     ! This is COO specific
@@ -402,22 +382,6 @@ module psb_s_base_mat_mod
     procedure, pass(a) :: transp_1mat => ls_coo_transp_1mat
     procedure, pass(a) :: transc_1mat => ls_coo_transc_1mat
 
-    !
-    ! Computational methods. 
-    !    
-    procedure, pass(a) :: csmm       => psb_ls_coo_csmm
-    procedure, pass(a) :: csmv       => psb_ls_coo_csmv
-    procedure, pass(a) :: inner_cssm => psb_ls_coo_cssm
-    procedure, pass(a) :: inner_cssv => psb_ls_coo_cssv
-    procedure, pass(a) :: scals      => psb_ls_coo_scals
-    procedure, pass(a) :: scalv      => psb_ls_coo_scal
-    procedure, pass(a) :: maxval     => psb_ls_coo_maxval
-    procedure, pass(a) :: spnmi      => psb_ls_coo_csnmi
-    procedure, pass(a) :: spnm1      => psb_ls_coo_csnm1
-    procedure, pass(a) :: rowsum     => psb_ls_coo_rowsum
-    procedure, pass(a) :: arwsum     => psb_ls_coo_arwsum
-    procedure, pass(a) :: colsum     => psb_ls_coo_colsum
-    procedure, pass(a) :: aclsum     => psb_ls_coo_aclsum
     
   end type psb_ls_coo_sparse_mat
   
@@ -2757,6 +2721,43 @@ module psb_s_base_mat_mod
   end interface
   
   !
+  !> Function  base_scals:
+  !! \memberof  psb_ls_base_sparse_mat
+  !! \brief Scale a matrix by a single scalar value
+  !!
+  !! \param d      Scaling factor 
+  !! \param info   return code
+  !
+  interface 
+    subroutine psb_ls_base_scals(d,a,info) 
+      import 
+      class(psb_ls_base_sparse_mat), intent(inout) :: a
+      real(psb_spk_), intent(in)      :: d
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine psb_ls_base_scals
+  end interface
+  
+  !
+  !> Function  base_scal:
+  !! \memberof  psb_ls_base_sparse_mat
+  !! \brief Scale a matrix by a vector
+  !!
+  !! \param d(:)   Scaling vector
+  !! \param info   return code
+  !! \param side   [L] Scale on the Left (rows) or on the Right (columns)
+  !
+  interface 
+    subroutine psb_ls_base_scal(d,a,info,side) 
+      import 
+      class(psb_ls_base_sparse_mat), intent(inout) :: a
+      real(psb_spk_), intent(in)      :: d(:)
+      integer(psb_ipk_), intent(out)            :: info
+      character, intent(in), optional :: side
+    end subroutine psb_ls_base_scal
+  end interface
+  
+  
+  !
   !> Function  transp:
   !! \memberof  psb_ls_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
@@ -2815,441 +2816,6 @@ module psb_s_base_mat_mod
       class(psb_ls_base_sparse_mat), intent(inout) :: a
     end subroutine psb_ls_base_transc_1mat
   end interface
-  
-  !
-  !> Function  csmm:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Product by a dense rank 2 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A)*X + beta*Y
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_csmm(alpha,a,x,beta,y,info,trans)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_ls_base_csmm
-  end interface
-  
-  !> Function  csmv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Product by a dense rank 1 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A)*X + beta*Y
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:)   the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:)   the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_csmv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_ls_base_csmv
-  end interface
-  
-  !> Function  vect_mv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Product by an encapsulated array type(psb_ls_vect_type)
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A)*X + beta*Y
-  !!        Usually the unwrapping of the encapsulated vector is done
-  !!        here, so that all the derived classes need only the
-  !!        versions with the standard arrays.
-  !!        Must be overridden explicitly in case of non standard memory
-  !!        management; an example would be external memory allocation
-  !!        in attached processors such as GPUs. 
-  !!
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x      the input X
-  !! \param beta   Scaling factor for y
-  !! \param y      the input/output  Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_vect_mv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)       :: alpha, beta
-      class(psb_s_base_vect_type), intent(inout) :: x
-      class(psb_s_base_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
-    end subroutine psb_ls_base_vect_mv
-  end interface
-  
-  !
-  !> Function  cssm:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by a dense rank 2 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !!        Internal workhorse called by cssm. 
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_inner_cssm(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_ls_base_inner_cssm
-  end interface
-  
-  
-  !
-  !> Function  cssv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by a dense rank 1 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !!        Internal workhorse called by cssv. 
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:)   the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:)   the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
-  !!               or on the Left (L)  i.e.  DAx
-  !! \param D(:)   [none] Diagonal for scaling. 
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_inner_cssv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans
-    end subroutine psb_ls_base_inner_cssv
-  end interface
-  
-  !
-  !> Function  inner_vect_cssv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by
-  !!        an encapsulated array type(psb_ls_vect_type)
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !!        Internal workhorse called by vect_cssv. 
-  !!        Must be overridden explicitly in case of non standard memory
-  !!        management; an example would be external memory allocation
-  !!        in attached processors such as GPUs. 
-  !!
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x      the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y     the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !
-  interface 
-    subroutine psb_ls_base_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)       :: alpha, beta
-      class(psb_s_base_vect_type), intent(inout) :: x, y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
-    end subroutine psb_ls_base_inner_vect_sv
-  end interface
-  
-  !
-  !> Function  cssm:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by a dense rank 2 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
-  !!               or on the Left (L)  i.e.  DAx
-  !! \param D(:)   [none] Diagonal for scaling. 
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout) :: y(:,:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans, scale
-      real(psb_spk_), intent(in), optional :: d(:)
-    end subroutine psb_ls_base_cssm
-  end interface
-  
-  !
-  !> Function  cssv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by a dense rank 1 array.
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x(:)   the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y(:)   the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
-  !!               or on the Left (L)  i.e.  DAx
-  !! \param D(:)   [none] Diagonal for scaling. 
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout) :: y(:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans, scale
-      real(psb_spk_), intent(in), optional :: d(:)
-    end subroutine psb_ls_base_cssv
-  end interface
-    
-  !
-  !> Function  vect_cssv:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Triangular system solve by
-  !!        an encapsulated array type(psb_ls_vect_type)
-  !!
-  !!        Compute
-  !!           Y = alpha*op(A^-1)*X + beta*Y
-  !!
-  !! \param alpha  Scaling factor for Ax
-  !! \param A      the input sparse matrix
-  !! \param x      the input dense X
-  !! \param beta   Scaling factor for y
-  !! \param y     the input/output dense Y
-  !! \param info   return code
-  !! \param trans  [N] Whether to use A (N), its transpose (T)
-  !!               or its conjugate transpose (C)
-  !! \param scale  [N] Apply a scaling on Right (R) i.e. ADX
-  !!               or on the Left (L)  i.e.  DAx
-  !! \param D      [none] Diagonal for scaling. 
-  !!
-  !
-  interface 
-    subroutine psb_ls_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)       :: alpha, beta
-      class(psb_s_base_vect_type), intent(inout) :: x,y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans, scale
-      class(psb_s_base_vect_type), optional, intent(inout)   :: d
-    end subroutine psb_ls_base_vect_cssv
-  end interface
-  
-  !
-  !> Function  base_scals:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Scale a matrix by a single scalar value
-  !!
-  !! \param d      Scaling factor 
-  !! \param info   return code
-  !
-  interface 
-    subroutine psb_ls_base_scals(d,a,info) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(inout) :: a
-      real(psb_spk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
-    end subroutine psb_ls_base_scals
-  end interface
-  
-  !
-  !> Function  base_scal:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Scale a matrix by a vector
-  !!
-  !! \param d(:)   Scaling vector
-  !! \param info   return code
-  !! \param side   [L] Scale on the Left (rows) or on the Right (columns)
-  !
-  interface 
-    subroutine psb_ls_base_scal(d,a,info,side) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(inout) :: a
-      real(psb_spk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
-      character, intent(in), optional :: side
-    end subroutine psb_ls_base_scal
-  end interface
-  
-  !
-  !> Function  base_maxval:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Maximum absolute value of all coefficients;
-  !! 
-  !
-  interface 
-    function psb_ls_base_maxval(a) result(res)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_base_maxval
-  end interface
-  
-  !
-  !
-  !> Function  base_csnmi:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Operator infinity norm
-  !! 
-  !
-  interface 
-    function psb_ls_base_csnmi(a) result(res)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_base_csnmi
-  end interface
-
-  !
-  !
-  !> Function  base_csnmi:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Operator 1-norm
-  !! 
-  !
-  interface 
-    function psb_ls_base_csnm1(a) result(res)
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_base_csnm1
-  end interface
-
-  !
-  !
-  !> Function  base_rowsum:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Sum along the rows
-  !! \param d(:) The output row sums
-  !! 
-  !
-  interface 
-    subroutine psb_ls_base_rowsum(d,a) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_base_rowsum
-  end interface
-
-  !
-  !> Function  base_arwsum:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Absolute value sum along the rows
-  !! \param d(:) The output row sums
-  !! 
-  interface 
-    subroutine psb_ls_base_arwsum(d,a) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_base_arwsum
-  end interface
-  
-  !
-  !
-  !> Function  base_colsum:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Sum along the columns
-  !! \param d(:) The output col sums
-  !! 
-  !
-  interface 
-    subroutine psb_ls_base_colsum(d,a) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_base_colsum
-  end interface
-
-  !
-  !> Function  base_aclsum:
-  !! \memberof  psb_ls_base_sparse_mat
-  !! \brief Absolute value sum along the columns
-  !! \param d(:) The output col sums
-  !! 
-  interface 
-    subroutine psb_ls_base_aclsum(d,a) 
-      import 
-      class(psb_ls_base_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_base_aclsum
-  end interface
-
   
   ! == ===============
   !
@@ -3629,138 +3195,6 @@ module psb_s_base_mat_mod
   
   !> 
   !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_cssv
-  interface 
-    subroutine psb_ls_coo_cssv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
-    end subroutine psb_ls_coo_cssv
-  end interface
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_cssm
-  interface 
-    subroutine psb_ls_coo_cssm(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout)       :: y(:,:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
-    end subroutine psb_ls_coo_cssm
-  end interface
-  
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_csmv
-  interface 
-    subroutine psb_ls_coo_csmv(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
-    end subroutine psb_ls_coo_csmv
-  end interface
-
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_csmm
-  interface 
-    subroutine psb_ls_coo_csmm(alpha,a,x,beta,y,info,trans) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout)       :: y(:,:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
-    end subroutine psb_ls_coo_csmm
-  end interface
-  
-    
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_maxval
-  interface 
-    function psb_ls_coo_maxval(a) result(res)
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_coo_maxval
-  end interface
-
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_csnmi
-  interface 
-    function psb_ls_coo_csnmi(a) result(res)
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_coo_csnmi
-  end interface
-  
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_csnm1
-  interface 
-    function psb_ls_coo_csnm1(a) result(res)
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_)         :: res
-    end function psb_ls_coo_csnm1
-  end interface
-
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_rowsum
-  interface 
-    subroutine psb_ls_coo_rowsum(d,a) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_coo_rowsum
-  end interface
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_arwsum
-  interface 
-    subroutine psb_ls_coo_arwsum(d,a) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_coo_arwsum
-  end interface
-  
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_colsum
-  interface 
-    subroutine psb_ls_coo_colsum(d,a) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_coo_colsum
-  end interface
-
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
-  !! \see psb_ls_base_mat_mod::psb_ls_base_aclsum
-  interface 
-    subroutine psb_ls_coo_aclsum(d,a) 
-      import 
-      class(psb_ls_coo_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(out)              :: d(:)
-    end subroutine psb_ls_coo_aclsum
-  end interface
-  
-  !> 
-  !! \memberof  psb_ls_coo_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_get_diag
   interface 
     subroutine psb_ls_coo_get_diag(a,d,info) 
@@ -3770,6 +3204,7 @@ module psb_s_base_mat_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ls_coo_get_diag
   end interface
+  
   
   !> 
   !! \memberof  psb_ls_coo_sparse_mat
@@ -3796,7 +3231,6 @@ module psb_s_base_mat_mod
     end subroutine psb_ls_coo_scals
   end interface
   
-  
 contains 
  
   
@@ -3818,7 +3252,7 @@ contains
     implicit none 
     class(psb_s_coo_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
-    res = 8 + 1
+    res = 3*psb_sizeof_ip
     res = res + psb_sizeof_sp  * psb_size(a%val)
     res = res + psb_sizeof_ip * psb_size(a%ia)
     res = res + psb_sizeof_ip * psb_size(a%ja)
@@ -4042,7 +3476,7 @@ contains
     implicit none 
     class(psb_ls_coo_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
-    res = 8 + 1
+    res = 3*psb_sizeof_lp
     res = res + psb_sizeof_sp  * psb_size(a%val)
     res = res + psb_sizeof_lp * psb_size(a%ia)
     res = res + psb_sizeof_lp * psb_size(a%ja)

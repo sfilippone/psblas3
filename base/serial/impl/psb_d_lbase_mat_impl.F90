@@ -243,7 +243,7 @@ subroutine psb_ld_base_mv_from_coo(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-
+8
 9999 call psb_error_handler(err_act)
 
   return
@@ -2032,15 +2032,29 @@ subroutine psb_ld_base_cp_to_icoo(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
-
+  type(psb_ld_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+   ! 
+  info = psb_success_
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
 
-  call psb_error_handler(err_act)
+  call a%cp_to_coo(tmp,info)
+  if (info == psb_success_) call tmp%mv_to_icoo(b,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_ld_base_cp_to_icoo
 
@@ -2054,17 +2068,31 @@ subroutine psb_ld_base_cp_from_icoo(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='from_coo'
+  character(len=20)  :: name='from_icoo'
   logical, parameter :: debug=.false.
-
+  type(psb_ld_coo_sparse_mat)  :: tmp
+  
+  !
+  ! Default implementation
+   ! 
+  info = psb_success_
   call psb_erractionsave(err_act)
-  ! This is the base version. If we get here
-  ! it means the derived class is incomplete,
-  ! so we throw an error.
-  info = psb_err_missing_override_method_
-  call psb_errpush(info,name,a_err=a%get_fmt())
 
-  call psb_error_handler(err_act)
+  call tmp%cp_from_icoo(b,info) 
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
 
 end subroutine psb_ld_base_cp_from_icoo
 
@@ -2288,9 +2316,5 @@ subroutine psb_ld_base_mv_from_ifmt(a,b,info)
   return
 
 end subroutine psb_ld_base_mv_from_ifmt
-
-
-
-
 
 

@@ -43,7 +43,7 @@
 !
 module psb_ld_csr_mat_mod
 
-  use psb_ld_base_mat_mod
+  use psb_d_base_mat_mod
 
   !> \namespace  psb_base_mod  \class  psb_ld_csr_sparse_mat
   !! \extends psb_ld_base_mat_mod::psb_ld_base_sparse_mat
@@ -525,10 +525,10 @@ contains
     implicit none 
     class(psb_ld_csr_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
-    res = 8 
+    res = 2 * psb_sizeof_lp 
     res = res + psb_sizeof_dp  * psb_size(a%val)
-    res = res + psb_sizeof_ip * psb_size(a%irp)
-    res = res + psb_sizeof_ip * psb_size(a%ja)
+    res = res + psb_sizeof_lp * psb_size(a%irp)
+    res = res + psb_sizeof_lp * psb_size(a%ja)
       
   end function ld_csr_sizeof
 

@@ -3339,7 +3339,7 @@ subroutine psb_lc_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
   integer(psb_lpk_), allocatable :: iaux(:), ias(:),jas(:), ix2(:)
   complex(psb_spk_),  allocatable :: vs(:)
   integer(psb_lpk_) :: nza
-  integer(psb_ipk_) :: iret, nzl,idir_, dupl_, err_act
+  integer(psb_ipk_) :: iret, nzl,idir_, dupl_, err_act, inzin
   integer(psb_lpk_) :: i,j, irw, icl, ip,is, imx, k, ii
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
@@ -3617,10 +3617,11 @@ subroutine psb_lc_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
       !
       ! If we did not have enough memory for buffers,
       ! let's try in place. 
-      ! 
-      call psi_msort_up(nzin,ia(1:),iaux(1:),iret)
+      !
+      inzin = nzin
+      call psi_msort_up(inzin,ia(1:),iaux(1:),iret)
       if (iret == 0) &
-           & call psb_ip_reord(nzin,val,ia,ja,iaux)
+           & call psb_ip_reord(inzin,val,ia,ja,iaux)
       i    = 1
       j    = i
       do while (i <= nzin)
@@ -3933,9 +3934,10 @@ subroutine psb_lc_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
 
     else if (.not.use_buffers) then 
 
-      call psi_msort_up(nzin,ja(1:),iaux(1:),iret)
+      inzin = nzin
+      call psi_msort_up(inzin,ja(1:),iaux(1:),iret)
       if (iret == 0) &
-           & call psb_ip_reord(nzin,val,ia,ja,iaux)
+           & call psb_ip_reord(inzin,val,ia,ja,iaux)
       i    = 1
       j    = i
       do while (i <= nzin)
@@ -4045,7 +4047,7 @@ subroutine psb_lc_cp_coo_to_icoo(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  integer(psb_lpk_)  :: nz
+  integer(psb_ipk_)  :: nz
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 

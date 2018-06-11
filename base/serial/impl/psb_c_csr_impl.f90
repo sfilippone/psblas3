@@ -1268,7 +1268,8 @@ function psb_c_csr_maxval(a) result(res)
   class(psb_c_csr_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
 
-  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  integer(psb_ipk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  integer(psb_ipk_) :: info
   character(len=20)  :: name='c_csr_maxval'
   logical, parameter :: debug=.false.
 
@@ -3163,3 +3164,1667 @@ contains
   end subroutine csr_spspmm
 
 end subroutine psb_ccsrspspmm
+
+
+!
+!
+!  lc  version
+! 
+!
+subroutine psb_lc_csr_get_diag(a,d,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_get_diag
+  implicit none 
+  class(psb_lc_csr_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)     :: d(:)
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_lpk_) :: mnm, i, j, k
+  integer(psb_ipk_) :: err_act, ierr(5)
+  character(len=20)  :: name='get_diag'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  mnm = min(a%get_nrows(),a%get_ncols())
+  if (size(d) < mnm) then 
+    info=psb_err_input_asize_invalid_i_
+    ierr(1) = 2; ierr(2) = size(d); 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  end if
+
+
+  if (a%is_unit()) then 
+    d(1:mnm) = cone
+  else
+    do i=1, mnm
+      d(i) = czero
+      do k=a%irp(i),a%irp(i+1)-1
+        j=a%ja(k)
+        if ((j == i) .and.(j <= mnm )) then 
+          d(i) = a%val(k)
+        endif
+      enddo
+    end do
+  end if
+  do i=mnm+1,size(d) 
+    d(i) = czero
+  end do
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_lc_csr_get_diag
+
+
+subroutine psb_lc_csr_scal(d,a,info,side) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_scal
+  use psb_string_mod
+  implicit none 
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: d(:)
+  integer(psb_ipk_), intent(out)            :: info
+  character, intent(in), optional :: side
+
+  integer(psb_lpk_) :: mnm, i, j, m
+  integer(psb_ipk_) :: err_act, ierr(5)
+  character(len=20)  :: name='scal'
+  character :: side_
+  logical   :: left 
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  if (a%is_unit()) then 
+    call a%make_nonunit()
+  end if
+
+  side_ = 'L'
+  if (present(side)) then 
+    side_ = psb_toupper(side)
+  end if
+
+  left = (side_ == 'L')
+
+  if (left) then 
+    m = a%get_nrows()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1, m 
+      do j = a%irp(i), a%irp(i+1) -1 
+        a%val(j) = a%val(j) * d(i)
+      end do
+    enddo
+  else
+    m = a%get_ncols()
+    if (size(d) < m) then 
+      info=psb_err_input_asize_invalid_i_
+      ierr(1) = 2; ierr(2) = size(d); 
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
+    
+    do i=1,a%get_nzeros()
+      j        = a%ja(i)
+      a%val(i) = a%val(i) * d(j)
+    enddo
+  end if
+
+  call a%set_host()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_lc_csr_scal
+
+
+subroutine psb_lc_csr_scals(d,a,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_scals
+  implicit none 
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: d
+  integer(psb_ipk_), intent(out)            :: info
+
+  integer(psb_lpk_) :: mnm, i, j, m
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='scal'
+  logical, parameter :: debug=.false.
+
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  if (a%is_unit()) then 
+    call a%make_nonunit()
+  end if
+
+  do i=1,a%get_nzeros()
+    a%val(i) = a%val(i) * d
+  enddo
+  call a%set_host()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_lc_csr_scals
+
+
+
+
+! == =================================== 
+!
+!
+!
+! Data management
+!
+!
+!
+!
+!
+! == ===================================   
+
+
+subroutine  psb_lc_csr_reallocate_nz(nz,a) 
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_reallocate_nz
+  implicit none 
+  integer(psb_lpk_), intent(in) :: nz
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='lc_csr_reallocate_nz'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  call psb_realloc(max(nz,ione),a%ja,info)
+  if (info == psb_success_) call psb_realloc(max(nz,ione),a%val,info)
+  if (info == psb_success_) call psb_realloc(&
+       & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csr_reallocate_nz
+
+subroutine psb_lc_csr_mold(a,b,info) 
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_mold
+  use psb_error_mod
+  implicit none 
+  class(psb_lc_csr_sparse_mat), intent(in)                  :: a
+  class(psb_lc_base_sparse_mat), intent(inout), allocatable :: b
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csr_mold'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  
+  info = 0 
+  if (allocated(b)) then 
+    call b%free()
+    deallocate(b,stat=info)
+  end if
+  if (info == 0) allocate(psb_lc_csr_sparse_mat :: b, stat=info)
+
+  if (info /= 0) then 
+    info = psb_err_alloc_dealloc_ 
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+
+end subroutine psb_lc_csr_mold
+
+subroutine  psb_lc_csr_allocate_mnnz(m,n,a,nz) 
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_allocate_mnnz
+  implicit none 
+  integer(psb_lpk_), intent(in) :: m,n
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  integer(psb_lpk_), intent(in), optional :: nz
+  integer(psb_lpk_) :: nz_
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='allocate_mnz'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (m < 0) then 
+    info = psb_err_iarg_neg_
+    ierr(1) = ione; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  endif
+  if (n < 0) then 
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  endif
+  if (present(nz)) then 
+    nz_ = max(nz,ione)
+  else
+    nz_ = max(7*m,7*n,ione)
+  end if
+  if (nz_ < 0) then 
+    info = psb_err_iarg_neg_
+    ierr(1) = 3; ierr(2) = izero; 
+    call psb_errpush(info,name,i_err=ierr)
+    goto 9999
+  endif
+
+  if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
+  if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
+  if (info == psb_success_) call psb_realloc(nz_,a%val,info)
+  if (info == psb_success_) then 
+    a%irp=0
+    call a%set_nrows(m)
+    call a%set_ncols(n)
+    call a%set_bld()
+    call a%set_triangle(.false.)
+    call a%set_unit(.false.)
+    call a%set_dupl(psb_dupl_def_)
+    call a%set_host()
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csr_allocate_mnnz
+
+
+subroutine psb_lc_csr_csgetptn(imin,imax,a,nz,ia,ja,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_csgetptn
+  implicit none
+
+  class(psb_lc_csr_sparse_mat), intent(in) :: a
+  integer(psb_lpk_), intent(in)                  :: imin,imax
+  integer(psb_lpk_), intent(out)                 :: nz
+  integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+  integer(psb_ipk_),intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer(psb_lpk_), intent(in), optional        :: iren(:)
+  integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer(psb_lpk_) :: nzin_, jmin_, jmax_, i
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+  info = psb_success_
+  nz = 0
+
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+
+  if ((imax<imin).or.(jmax_<jmin_)) return
+
+  if (present(append)) then
+    append_=append
+  else
+    append_=.false.
+  endif
+  if ((append_).and.(present(nzin))) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = psb_err_many_optional_arg_
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+
+  call csr_getptn(imin,imax,jmin_,jmax_,a,nz,ia,ja,nzin_,append_,info,iren)
+  
+  if (rscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ia(i) = ia(i) - imin + 1
+    end do
+  end if
+  if (cscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ja(i) = ja(i) - jmin_ + 1
+    end do
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+
+  subroutine csr_getptn(imin,imax,jmin,jmax,a,nz,ia,ja,nzin,append,info,&
+       & iren)
+
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none
+
+    class(psb_lc_csr_sparse_mat), intent(in)    :: a
+    integer(psb_lpk_) :: imin,imax,jmin,jmax
+    integer(psb_lpk_), intent(inout)               :: nz
+    integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+    integer(psb_lpk_), intent(in)                  :: nzin
+    logical, intent(in)                  :: append
+    integer(psb_ipk_) :: info
+    integer(psb_lpk_), optional                    :: iren(:)
+    integer(psb_lpk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl,nrd,ncd
+    integer(psb_ipk_) :: debug_level, debug_unit
+    character(len=20) :: name='csr_getptn'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    nza = a%get_nzeros()
+    irw = imin
+    lrw = min(imax,a%get_nrows())
+    icl = jmin
+    lcl = min(jmax,a%get_ncols())
+    if (irw<0) then 
+      info = psb_err_pivot_too_small_
+      return
+    end if
+
+    if (append) then 
+      nzin_ = nzin
+    else
+      nzin_ = 0
+    endif
+    !
+    ! This is a row-oriented routine, so the following is a
+    ! good choice. 
+    !
+    nzt = (a%irp(lrw+1)-a%irp(irw))
+    nz = 0 
+
+    call psb_ensure_size(nzin_+nzt,ia,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+
+    if (info /= psb_success_) return
+    
+    if (present(iren)) then 
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            ia(nzin_)  = iren(i)
+            ja(nzin_)  = iren(a%ja(j))
+          end if
+        enddo
+      end do
+    else
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            ia(nzin_)  = (i)
+            ja(nzin_)  = (a%ja(j))
+          end if
+        enddo
+      end do
+    end if
+
+  end subroutine csr_getptn
+  
+end subroutine psb_lc_csr_csgetptn
+
+
+subroutine psb_lc_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_csgetrow
+  implicit none
+
+  class(psb_lc_csr_sparse_mat), intent(in) :: a
+  integer(psb_lpk_), intent(in)                  :: imin,imax
+  integer(psb_lpk_), intent(out)                 :: nz
+  integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+  complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
+  integer(psb_ipk_),intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer(psb_lpk_), intent(in), optional        :: iren(:)
+  integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer(psb_lpk_) :: nzin_, jmin_, jmax_, i
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+  info = psb_success_
+  nz = 0
+  
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+
+  if ((imax<imin).or.(jmax_<jmin_)) return
+
+  if (present(append)) then
+    append_=append
+  else
+    append_=.false.
+  endif
+  if ((append_).and.(present(nzin))) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = psb_err_many_optional_arg_
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+
+  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
+       & iren)
+  
+  if (rscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ia(i) = ia(i) - imin + 1
+    end do
+  end if
+  if (cscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ja(i) = ja(i) - jmin_ + 1
+    end do
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+
+  subroutine csr_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
+       & iren)
+
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none
+
+    class(psb_lc_csr_sparse_mat), intent(in)    :: a
+    integer(psb_lpk_) :: imin,imax,jmin,jmax
+    integer(psb_lpk_), intent(inout)               :: nz
+    integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
+    complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
+    integer(psb_lpk_), intent(in)                  :: nzin
+    logical, intent(in)                  :: append
+    integer(psb_ipk_) :: info
+    integer(psb_lpk_), optional                    :: iren(:)
+    integer(psb_lpk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl, nrd, ncd
+    integer(psb_ipk_) :: debug_level, debug_unit
+    character(len=20) :: name='coo_getrow'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    nza = a%get_nzeros()
+    irw = imin
+    lrw = min(imax,a%get_nrows())
+    icl = jmin
+    lcl = min(jmax,a%get_ncols())
+    if (irw<0) then 
+      info = psb_err_pivot_too_small_
+      return
+    end if
+
+    if (append) then 
+      nzin_ = nzin
+    else
+      nzin_ = 0
+    endif
+
+    !
+    ! This is a row-oriented routine, so the following is a
+    ! good choice. 
+    !
+    nzt = (a%irp(lrw+1)-a%irp(irw))
+    nz = 0 
+
+    call psb_ensure_size(nzin_+nzt,ia,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+
+    if (info /= psb_success_) return
+    
+    if (present(iren)) then 
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            val(nzin_) = a%val(j)
+            ia(nzin_)  = iren(i)
+            ja(nzin_)  = iren(a%ja(j))
+          end if
+        enddo
+      end do
+    else
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            val(nzin_) = a%val(j)
+            ia(nzin_)  = (i)
+            ja(nzin_)  = (a%ja(j))
+          end if
+        enddo
+      end do
+    end if
+
+  end subroutine csr_getrow
+
+end subroutine psb_lc_csr_csgetrow
+
+subroutine psb_lc_csr_csgetblk(imin,imax,a,b,info,&
+     & jmin,jmax,iren,append,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_csgetblk
+  implicit none
+
+  class(psb_lc_csr_sparse_mat), intent(in) :: a
+  class(psb_lc_coo_sparse_mat), intent(inout) :: b
+  integer(psb_lpk_), intent(in)                  :: imin,imax
+  integer(psb_ipk_),intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer(psb_lpk_), intent(in), optional        :: iren(:)
+  integer(psb_lpk_), intent(in), optional        :: jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+  integer(psb_lpk_) :: nzin, nzout
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='csget'
+  logical :: append_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(append)) then 
+    append_ = append
+  else
+    append_ = .false.
+  endif
+  if (append_) then 
+    nzin = a%get_nzeros()
+  else
+    nzin = 0
+  endif
+
+  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
+       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+       & nzin=nzin, rscale=rscale, cscale=cscale)
+
+  if (info /= psb_success_) goto 9999
+
+  call b%set_nzeros(nzin+nzout)
+  call b%fix(info)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csr_csgetblk
+
+
+
+subroutine psb_lc_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_csput_a
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: val(:)
+  integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_lpk_), intent(in), optional   :: gtl(:)
+
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='lc_csr_csput_a'
+  logical, parameter :: debug=.false.
+  integer(psb_lpk_) :: nza, i,j,k, nzl, isza
+  integer(psb_ipk_) :: debug_level, debug_unit
+
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  if (nz <= 0) then 
+    info = psb_err_iarg_neg_; 
+    call psb_errpush(info,name,m_err=(/1/))
+    goto 9999
+  end if
+  if (size(ia) < nz) then 
+    info = psb_err_input_asize_invalid_i_; 
+    call psb_errpush(info,name,m_err=(/2/))
+    goto 9999
+  end if
+
+  if (size(ja) < nz) then 
+    info = psb_err_input_asize_invalid_i_; 
+    call psb_errpush(info,name,m_err=(/3/))
+    goto 9999
+  end if
+  if (size(val) < nz) then 
+    info = psb_err_input_asize_invalid_i_; 
+    call psb_errpush(info,name,m_err=(/4/))
+    goto 9999
+  end if
+
+  if (nz == 0) return
+  if (a%is_dev())   call a%sync()
+
+  nza  = a%get_nzeros()
+
+  if (a%is_bld()) then 
+    ! Build phase should only ever be in COO
+    info = psb_err_invalid_mat_state_
+
+  else  if (a%is_upd()) then 
+    call  psb_lc_csr_srch_upd(nz,ia,ja,val,a,&
+         & imin,imax,jmin,jmax,info,gtl)
+
+    if (info < 0) then 
+      info = psb_err_internal_error_
+    else if (info > 0) then 
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & ': Discarded entries not  belonging to us.'                    
+      info = psb_success_
+    end if
+    call a%set_host()
+
+  else 
+    ! State is wrong.
+    info = psb_err_invalid_mat_state_
+  end if
+  if (info /= psb_success_) then
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+
+contains
+
+  subroutine psb_lc_csr_srch_upd(nz,ia,ja,val,a,&
+       & imin,imax,jmin,jmax,info,gtl)
+
+    use psb_const_mod
+    use psb_realloc_mod
+    use psb_string_mod
+    use psb_sort_mod
+    implicit none 
+
+    class(psb_lc_csr_sparse_mat), intent(inout) :: a
+    integer(psb_lpk_), intent(in) :: nz, imin,imax,jmin,jmax
+    integer(psb_lpk_), intent(in) :: ia(:),ja(:)
+    complex(psb_spk_), intent(in) :: val(:)
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_lpk_), intent(in), optional  :: gtl(:)
+    integer(psb_lpk_) :: i,ir,ic, ilr, ilc, ip, &
+         & i1,i2,nr,nc,nnz,ng
+    integer(psb_ipk_) :: debug_level, debug_unit,dupl, inc
+    character(len=20)    :: name='lc_csr_srch_upd'
+
+    info = psb_success_
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    dupl = a%get_dupl()
+
+    if (.not.a%is_sorted()) then 
+      info = -4
+      return
+    end if
+
+    ilr = -1 
+    ilc = -1 
+    nnz = a%get_nzeros()
+    nr  = a%get_nrows()
+    nc  = a%get_ncols()
+
+    if (present(gtl)) then 
+      ng = size(gtl)
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic)
+            if ((ir > 0).and.(ir <= nr)) then 
+              i1 = a%irp(ir)
+              i2 = a%irp(ir+1)
+              nc=i2-i1
+              inc = nc
+              ip = psb_bsrch(ic,inc,a%ja(i1:i2-1))    
+              if (ip>0) then 
+                a%val(i1+ip-1) = val(i)
+              else
+                info = max(info,3)
+              end if           
+            else
+              info = max(info,2)
+            end if
+          else
+            info = max(info,1)
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic)
+            if ((ir > 0).and.(ir <= nr)) then 
+              i1 = a%irp(ir)
+              i2 = a%irp(ir+1)
+              nc = i2-i1
+              inc = nc
+              ip = psb_bsrch(ic,inc,a%ja(i1:i2-1))
+              if (ip>0) then 
+                a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
+              else
+                info = max(info,3)
+              end if
+            else
+              info = max(info,2)
+            end if
+          else
+            info = max(info,1)
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+
+          if ((ir > 0).and.(ir <= nr)) then 
+
+            i1 = a%irp(ir)
+            i2 = a%irp(ir+1)
+            nc=i2-i1
+            inc = nc
+            ip = psb_bsrch(ic,inc,a%ja(i1:i2-1))    
+            if (ip>0) then 
+              a%val(i1+ip-1) = val(i)
+            else
+              info = max(info,3)
+            end if
+          else
+              info = max(info,2)
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= nr)) then 
+            i1 = a%irp(ir)
+            i2 = a%irp(ir+1)
+            nc = i2-i1
+            inc = nc
+            ip = psb_bsrch(ic,inc,a%ja(i1:i2-1))
+            if (ip>0) then 
+              a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
+            else
+              info = max(info,3)
+            end if
+          else
+            info = max(info,2)
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
+      end select
+
+    end if
+
+  end subroutine psb_lc_csr_srch_upd
+
+end subroutine psb_lc_csr_csput_a
+
+
+subroutine psb_lc_csr_reinit(a,clear)
+  use psb_error_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_reinit
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a   
+  logical, intent(in), optional :: clear
+
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='reinit'
+  logical  :: clear_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (a%is_dev())   call a%sync()
+
+  if (present(clear)) then 
+    clear_ = clear
+  else
+    clear_ = .true.
+  end if
+
+  if (a%is_bld() .or. a%is_upd()) then 
+    ! do nothing
+    return
+  else if (a%is_asb()) then 
+    if (clear_) a%val(:) = czero
+    call a%set_upd()
+    call a%set_host()
+  else
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csr_reinit
+
+subroutine  psb_lc_csr_trim(a)
+  use psb_realloc_mod
+  use psb_error_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_trim
+  implicit none 
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  integer(psb_lpk_) :: nz, m
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='trim'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  m   = a%get_nrows()
+  nz  = a%get_nzeros()
+  if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
+
+  if (info == psb_success_) call psb_realloc(nz,a%ja,info)
+  if (info == psb_success_) call psb_realloc(nz,a%val,info)
+
+  if (info /= psb_success_) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csr_trim
+
+subroutine psb_lc_csr_print(iout,a,iv,head,ivr,ivc)
+  use psb_string_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_csr_print
+  implicit none 
+
+  integer(psb_ipk_), intent(in)               :: iout
+  class(psb_lc_csr_sparse_mat), intent(in) :: a   
+  integer(psb_lpk_), intent(in), optional     :: iv(:)
+  character(len=*), optional        :: head
+  integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='lc_csr_print'
+  logical, parameter :: debug=.false.
+  character(len=*), parameter  :: datatype='complex'
+  character(len=80)                 :: frmtv 
+  integer(psb_lpk_) :: irs,ics,i,j, nmx, ni, nr, nc, nz
+
+  
+  write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
+  if (present(head)) write(iout,'(a,a)') '% ',head 
+  write(iout,'(a)') '%'    
+  write(iout,'(a,a)') '% COO'
+
+  if (a%is_dev())   call a%sync()
+
+  nr = a%get_nrows()
+  nc = a%get_ncols()
+  nz = a%get_nzeros()
+  nmx = max(nr,nc,1)
+  if (present(iv))  nmx = max(nmx,maxval(abs(iv)))
+  if (present(ivr)) nmx = max(nmx,maxval(abs(ivr)))
+  if (present(ivc)) nmx = max(nmx,maxval(abs(ivc)))
+  ni  = floor(log10(1.0*nmx)) + 1
+
+  if (datatype=='real') then 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  else 
+    write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+  end if
+  write(iout,*) nr, nc, nz 
+  if(present(iv)) then 
+    do i=1, nr
+      do j=a%irp(i),a%irp(i+1)-1 
+        write(iout,frmtv) iv(i),iv(a%ja(j)),a%val(j)
+      end do
+    enddo
+  else      
+    if (present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=a%irp(i),a%irp(i+1)-1 
+          write(iout,frmtv) ivr(i),(a%ja(j)),a%val(j)
+        end do
+      enddo
+    else if (present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=a%irp(i),a%irp(i+1)-1 
+          write(iout,frmtv) ivr(i),ivc(a%ja(j)),a%val(j)
+        end do
+      enddo
+    else if (.not.present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=a%irp(i),a%irp(i+1)-1 
+          write(iout,frmtv) (i),ivc(a%ja(j)),a%val(j)
+        end do
+      enddo
+    else if (.not.present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=a%irp(i),a%irp(i+1)-1 
+          write(iout,frmtv) (i),(a%ja(j)),a%val(j)
+        end do
+      enddo
+    endif
+  endif
+
+end subroutine psb_lc_csr_print
+
+
+subroutine psb_lc_cp_csr_from_coo(a,b,info) 
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_cp_csr_from_coo
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  class(psb_lc_coo_sparse_mat), intent(in)    :: b
+  integer(psb_ipk_), intent(out)               :: info
+
+  type(psb_lc_coo_sparse_mat)   :: tmp
+  integer(psb_lpk_), allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, nc, i,j,k,ip,irw, ncl
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name='lc_cp_csr_from_coo'
+
+  info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+  
+  if (.not.b%is_by_rows()) then 
+    ! This is to have fix_coo called behind the scenes
+    call tmp%cp_from_coo(b,info)
+    if (info /= psb_success_) return
+    
+    nr  = tmp%get_nrows()
+    nc  = tmp%get_ncols()
+    nza = tmp%get_nzeros()
+    
+    a%psb_lc_base_sparse_mat = tmp%psb_lc_base_sparse_mat
+    
+    ! Dirty trick: call move_alloc to have the new data allocated just once.
+    call move_alloc(tmp%ia,itemp)
+    call move_alloc(tmp%ja,a%ja)
+    call move_alloc(tmp%val,a%val)
+    call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    call tmp%free()
+
+  else
+    
+    if (info /= psb_success_) return
+    if (b%is_dev())   call b%sync()
+    
+    nr  = b%get_nrows()
+    nc  = b%get_ncols()
+    nza = b%get_nzeros()
+    
+    a%psb_lc_base_sparse_mat = b%psb_lc_base_sparse_mat
+    
+    ! Dirty trick: call move_alloc to have the new data allocated just once.
+    call psb_safe_ab_cpy(b%ia,itemp,info)
+    if (info == psb_success_) call psb_safe_ab_cpy(b%ja,a%ja,info)
+    if (info == psb_success_) call psb_safe_ab_cpy(b%val,a%val,info)
+    if (info == psb_success_) call psb_realloc(max(nr+1,nc+1),a%irp,info)
+    
+  endif
+
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
+  call a%set_host()
+  
+
+end subroutine psb_lc_cp_csr_from_coo
+
+
+
+subroutine psb_lc_cp_csr_to_coo(a,b,info) 
+  use psb_const_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_cp_csr_to_coo
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(in)  :: a
+  class(psb_lc_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)                      :: info
+
+  integer(psb_lpk_), allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, nc,i,j,irw
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  if (a%is_dev())   call a%sync()
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nza = a%get_nzeros()
+
+  call b%allocate(nr,nc,nza)
+  b%psb_lc_base_sparse_mat = a%psb_lc_base_sparse_mat
+
+  do i=1, nr
+    do j=a%irp(i),a%irp(i+1)-1
+      b%ia(j)  = i
+      b%ja(j)  = a%ja(j)
+      b%val(j) = a%val(j)
+    end do
+  end do
+  call b%set_nzeros(a%get_nzeros())
+  call b%set_sort_status(psb_row_major_)
+  call b%set_asb()
+  call b%set_host()
+
+end subroutine psb_lc_cp_csr_to_coo
+
+
+subroutine psb_lc_mv_csr_to_coo(a,b,info) 
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_mv_csr_to_coo
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  class(psb_lc_coo_sparse_mat), intent(inout)   :: b
+  integer(psb_ipk_), intent(out)                        :: info
+
+  integer(psb_lpk_), allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, nc,i,j,k,irw
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  if (a%is_dev())   call a%sync()
+  nr  = a%get_nrows()
+  nc  = a%get_ncols()
+  nza = a%get_nzeros()
+
+  b%psb_lc_base_sparse_mat = a%psb_lc_base_sparse_mat
+  call b%set_nzeros(a%get_nzeros())
+  call move_alloc(a%ja,b%ja)
+  call move_alloc(a%val,b%val)
+  call psb_realloc(nza,b%ia,info)
+  if (info /= psb_success_) return
+  do i=1, nr
+    do j=a%irp(i),a%irp(i+1)-1
+      b%ia(j)  = i
+    end do
+  end do
+  call a%free()
+  call b%set_sort_status(psb_row_major_)
+  call b%set_asb()
+  call b%set_host()
+
+end subroutine psb_lc_mv_csr_to_coo
+
+
+
+subroutine psb_lc_mv_csr_from_coo(a,b,info) 
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_error_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_mv_csr_from_coo
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  class(psb_lc_coo_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)                        :: info
+
+  integer(psb_lpk_), allocatable :: itemp(:)
+  !locals
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, nc, i,j,k, ip,irw, ncl
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name='mv_from_coo'
+
+  info = psb_success_
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
+  if (b%is_dev())   call b%sync()
+
+  if (.not.b%is_by_rows()) call b%fix(info)
+  if (info /= psb_success_) return
+
+  nr  = b%get_nrows()
+  nc  = b%get_ncols()
+  nza = b%get_nzeros()
+  
+  a%psb_lc_base_sparse_mat = b%psb_lc_base_sparse_mat
+
+  ! Dirty trick: call move_alloc to have the new data allocated just once.
+  call move_alloc(b%ia,itemp)
+  call move_alloc(b%ja,a%ja)
+  call move_alloc(b%val,a%val)
+  call psb_realloc(max(nr+1,nc+1),a%irp,info)
+  call b%free()
+
+
+  a%irp(:) = 0
+  do k=1,nza
+    i = itemp(k)
+    a%irp(i) = a%irp(i) + 1
+  end do
+  ip = 1
+  do i=1,nr
+    ncl = a%irp(i)
+    a%irp(i) = ip
+    ip = ip + ncl
+  end do
+  a%irp(nr+1) = ip
+  call a%set_host()
+  
+end subroutine psb_lc_mv_csr_from_coo
+
+
+subroutine psb_lc_mv_csr_to_fmt(a,b,info) 
+  use psb_const_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_mv_csr_to_fmt
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  class(psb_lc_base_sparse_mat), intent(inout)  :: b
+  integer(psb_ipk_), intent(out)                        :: info
+
+  !locals
+  type(psb_lc_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, i,j,irw, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_lc_coo_sparse_mat) 
+    call a%mv_to_coo(b,info)
+    ! Need to fix trivial copies! 
+  type is (psb_lc_csr_sparse_mat)
+    if (a%is_dev())   call a%sync()
+    b%psb_lc_base_sparse_mat = a%psb_lc_base_sparse_mat
+    call move_alloc(a%irp, b%irp)
+    call move_alloc(a%ja,  b%ja)
+    call move_alloc(a%val, b%val)
+    call a%free()
+    call b%set_host()
+
+  class default
+    call a%mv_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_lc_mv_csr_to_fmt
+
+
+subroutine psb_lc_cp_csr_to_fmt(a,b,info) 
+  use psb_const_mod
+  use psb_c_base_mat_mod
+  use psb_realloc_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_cp_csr_to_fmt
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(in)   :: a
+  class(psb_lc_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)                       :: info
+
+  !locals
+  type(psb_lc_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nz, nr, i,j,irw, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+
+  select type (b)
+  type is (psb_lc_coo_sparse_mat) 
+    call a%cp_to_coo(b,info)
+
+  type is (psb_lc_csr_sparse_mat) 
+    if (a%is_dev())   call a%sync()
+    b%psb_lc_base_sparse_mat = a%psb_lc_base_sparse_mat
+    nr = a%get_nrows()
+    nz = a%get_nzeros()
+    if (info == 0) call psb_safe_cpy( a%irp(1:nr+1), b%irp , info)
+    if (info == 0) call psb_safe_cpy( a%ja(1:nz),    b%ja  , info)
+    if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
+    call b%set_host()
+
+  class default
+    call a%cp_to_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_lc_cp_csr_to_fmt
+
+
+subroutine psb_lc_mv_csr_from_fmt(a,b,info) 
+  use psb_const_mod
+  use psb_c_base_mat_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_mv_csr_from_fmt
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout)  :: a
+  class(psb_lc_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_), intent(out)                         :: info
+
+  !locals
+  type(psb_lc_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nza, nr, i,j,irw, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_lc_coo_sparse_mat) 
+    call a%mv_from_coo(b,info)
+
+  type is (psb_lc_csr_sparse_mat) 
+    if (b%is_dev())   call b%sync()
+
+    a%psb_lc_base_sparse_mat = b%psb_lc_base_sparse_mat
+    call move_alloc(b%irp, a%irp)
+    call move_alloc(b%ja,  a%ja)
+    call move_alloc(b%val, a%val)
+    call b%free()
+    call a%set_host()
+
+  class default
+    call b%mv_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+
+end subroutine psb_lc_mv_csr_from_fmt
+
+
+
+subroutine psb_lc_cp_csr_from_fmt(a,b,info) 
+  use psb_const_mod
+  use psb_c_base_mat_mod
+  use psb_realloc_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lc_cp_csr_from_fmt
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(inout) :: a
+  class(psb_lc_base_sparse_mat), intent(in)   :: b
+  integer(psb_ipk_), intent(out)                        :: info
+
+  !locals
+  type(psb_lc_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  integer(psb_lpk_) :: nz, nr, i,j,irw, nc
+  integer(psb_ipk_), Parameter  :: maxtry=8
+  integer(psb_ipk_) :: debug_level, debug_unit, err_act
+  character(len=20)   :: name
+
+  info = psb_success_
+
+  select type (b)
+  type is (psb_lc_coo_sparse_mat) 
+    call a%cp_from_coo(b,info)
+
+  type is (psb_lc_csr_sparse_mat) 
+    if (b%is_dev())   call b%sync()
+    a%psb_lc_base_sparse_mat = b%psb_lc_base_sparse_mat
+    nr = b%get_nrows()
+    nz = b%get_nzeros()
+    if (info == 0) call psb_safe_cpy( b%irp(1:nr+1), a%irp , info)
+    if (info == 0) call psb_safe_cpy( b%ja(1:nz)   , a%ja  , info)
+    if (info == 0) call psb_safe_cpy( b%val(1:nz)  , a%val , info)
+    call a%set_host()
+
+  class default
+    call b%cp_to_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+  end select
+end subroutine psb_lc_cp_csr_from_fmt
+
+subroutine psb_lccsrspspmm(a,b,c,info)
+  use psb_c_mat_mod
+  use psb_serial_mod, psb_protect_name => psb_lccsrspspmm
+
+  implicit none 
+
+  class(psb_lc_csr_sparse_mat), intent(in) :: a,b
+  type(psb_lc_csr_sparse_mat), intent(out)  :: c
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_lpk_) :: nze, ma,na,mb,nb, nzc, nza, nzb,nzeb
+  character(len=20) :: name
+  integer(psb_ipk_) :: err_act
+  name='psb_csrspspmm'
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  
+  if (a%is_dev())   call a%sync()
+  if (b%is_dev())   call b%sync()
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
+
+
+  if ( mb /= na ) then 
+    write(psb_err_unit,*) 'Mismatch in SPSPMM: ',ma,na,mb,nb
+    info = psb_err_invalid_matrix_sizes_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  nza = a%get_nzeros()
+  nzb = b%get_nzeros()
+  nzc = 2*(nza+nzb)
+  nze = ma*(((nza+ma-1)/ma)*((nzb+mb-1)/mb) )
+  nzeb = (((nza+na-1)/na)*((nzb+nb-1)/nb))*nb
+  ! Estimate number of nonzeros on output.
+  ! Turns out this is often a large  overestimate.
+  call c%allocate(ma,nb,nzc)
+
+  call csr_spspmm(a,b,c,info)
+
+  call c%set_asb()
+  call c%set_host()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+  
+  subroutine csr_spspmm(a,b,c,info)
+    implicit none 
+    type(psb_lc_csr_sparse_mat), intent(in)  :: a,b
+    type(psb_lc_csr_sparse_mat), intent(inout) :: c
+    integer(psb_ipk_), intent(out)          :: info
+    integer(psb_lpk_)              :: ma,na,mb,nb
+    integer(psb_lpk_), allocatable :: irow(:), idxs(:)
+    complex(psb_spk_), allocatable    :: row(:)
+    integer(psb_lpk_)              :: i,j,k,irw,icl,icf, iret, &
+         & nzc,nnzre, isz, ipb, irwsz, nrc, nze
+    complex(psb_spk_)                 :: cfb
+
+
+    info = psb_success_
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+
+    nze = min(size(c%val),size(c%ja))
+    isz = max(ma,na,mb,nb)
+    call psb_realloc(isz,row,info)
+    if (info == 0) call psb_realloc(isz,idxs,info)
+    if (info == 0) call psb_realloc(isz,irow,info)
+    if (info /= 0) return 
+    row  = dzero
+    irow = 0
+    nzc  = 1    
+    do j = 1,ma
+      c%irp(j) = nzc
+      nrc = 0 
+      do k = a%irp(j), a%irp(j+1)-1
+        irw = a%ja(k)
+        cfb = a%val(k)
+        irwsz = b%irp(irw+1)-b%irp(irw)
+        do i = b%irp(irw),b%irp(irw+1)-1
+          icl = b%ja(i)
+          if (irow(icl)<j) then 
+            nrc = nrc + 1 
+            idxs(nrc) = icl
+            irow(icl) = j
+          end if
+          row(icl)  = row(icl)  + cfb*b%val(i)
+        end do
+      end do
+      if (nrc > 0 ) then 
+        if ((nzc+nrc)>nze) then 
+          nze = max(ma*((nzc+j-1)/j),nzc+2*nrc)
+          call psb_realloc(nze,c%val,info)
+          if (info == 0) call psb_realloc(nze,c%ja,info)
+          if (info /= 0) return
+        end if
+          
+        call psb_qsort(idxs(1:nrc))
+        do i=1, nrc
+          irw        = idxs(i) 
+          c%ja(nzc)  = irw 
+          c%val(nzc) = row(irw) 
+          row(irw)   = dzero
+          nzc        = nzc + 1 
+        end do
+      end if
+    end do
+
+    c%irp(ma+1) = nzc
+
+    
+  end subroutine csr_spspmm
+
+end subroutine psb_lccsrspspmm
+
