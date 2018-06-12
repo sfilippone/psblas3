@@ -58,6 +58,15 @@
 !    defined in the serial/f03/psb_base_mat_impl.f03 file
 !
 !
+!
+! We are also introducing the type psb_lbase_sparse_mat.
+! The basic difference is in the type
+! of the indices, which are PSB_LPK_ so that the entries
+! are guaranteed to be able to contain global indices.
+! This type only supports data handling and preprocessing, it is
+! not supposed to be used for computations. 
+!
+!
 
 module psb_base_mat_mod
   
