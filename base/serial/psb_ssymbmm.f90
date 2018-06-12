@@ -255,3 +255,223 @@ contains
   end subroutine gen_symbmm
 
 end subroutine psb_sbase_symbmm
+
+
+
+subroutine psb_lssymbmm(a,b,c,info)
+  use psb_base_mod, psb_protect_name => psb_lssymbmm
+  implicit none 
+
+  type(psb_lsspmat_type), intent(in)    :: a,b
+  type(psb_lsspmat_type), intent(out)   :: c
+  integer(psb_ipk_), intent(out)                  :: info
+  type(psb_ls_csr_sparse_mat), allocatable :: ccsr
+  integer(psb_ipk_) :: err_act
+  character(len=*), parameter ::  name='psb_symbmm'
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if ((a%is_null()) .or.(b%is_null())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(ccsr,stat=info)    
+
+  if (info == psb_success_) then 
+      call psb_symbmm(a%a,b%a,ccsr,info)
+  else
+    info = psb_err_alloc_dealloc_
+  end if
+  
+  if (info /= psb_success_) then 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call move_alloc(ccsr,c%a)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lssymbmm
+
+subroutine psb_lsbase_symbmm(a,b,c,info)
+  use psb_mat_mod
+  use psb_serial_mod, psb_protect_name => psb_lsbase_symbmm
+  implicit none 
+
+  class(psb_ls_base_sparse_mat), intent(in) :: a,b
+  type(psb_ls_csr_sparse_mat), intent(out)  :: c
+  integer(psb_ipk_), intent(out)                     :: info
+  integer(psb_lpk_), allocatable  :: itemp(:)
+  integer(psb_lpk_) :: nze, ma,na,mb,nb
+  character(len=20)     :: name
+  integer(psb_ipk_) :: err_act
+  name='psb_symbmm'
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
+
+
+  if ( mb /= na ) then 
+    write(psb_err_unit,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
+    info = psb_err_invalid_matrix_sizes_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  allocate(itemp(max(ma,na,mb,nb)),stat=info)    
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_ 
+    call psb_Errpush(info,name)
+    goto 9999
+  endif
+  !
+  ! Note: we need to test whether there is a performance impact 
+  !       in not using the original Douglas & Bank code. 
+  !
+  select type(a)
+  type is (psb_ls_csr_sparse_mat) 
+    select type(b)
+    type is (psb_ls_csr_sparse_mat) 
+      call csr_symbmm(a,b,c,itemp,info)
+    class default
+      call gen_symbmm(a,b,c,itemp,info)
+    end select
+  class default
+    call gen_symbmm(a,b,c,itemp,info)
+  end select
+
+  if (info /= psb_success_) then 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+
+  call psb_realloc(size(c%ja),c%val,info)
+  deallocate(itemp) 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+contains
+
+  subroutine csr_symbmm(a,b,c,itemp,info)
+    type(psb_ls_csr_sparse_mat), intent(in)  :: a,b
+    type(psb_ls_csr_sparse_mat), intent(out) :: c
+    integer(psb_lpk_) :: itemp(:) 
+    integer(psb_ipk_), intent(out)                    :: info
+    integer(psb_lpk_) :: nze, ma,na,mb,nb
+
+    info = psb_success_
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+    
+    nze = max(ma+1,2*ma)
+    call c%allocate(ma,nb,nze)
+    call lsymbmm(ma,na,nb,a%irp,a%ja,lzero,&
+         & b%irp,b%ja,lzero,&
+         & c%irp,c%ja,lzero,itemp)
+    
+  end subroutine csr_symbmm
+  subroutine gen_symbmm(a,b,c,index,info)
+    class(psb_ls_base_sparse_mat), intent(in)  :: a,b
+    type(psb_ls_csr_sparse_mat), intent(out) :: c
+    integer(psb_lpk_) :: index(:)
+    integer(psb_ipk_) :: info
+    integer(psb_lpk_), allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
+    integer(psb_lpk_) :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
+    integer(psb_lpk_) :: nze, ma,na,mb,nb
+
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+
+    nze = max(ma+1,2*ma)
+    call c%allocate(ma,nb,nze)
+
+    n = ma
+    m = na 
+    l = nb 
+    maxlmn = max(l,m,n)
+
+    allocate(iarw(maxlmn),iacl(maxlmn),ibrw(maxlmn),ibcl(maxlmn),&
+         & stat=info)
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      return
+    endif
+
+    do i=1,maxlmn
+      index(i)=0
+    end do
+
+    c%irp(1)=1
+    minlm = min(l,m)
+    minmn = min(m,n)
+
+    main: do  i=1,n
+      istart=-1
+      length=0
+      call a%csget(i,i,nazr,iarw,iacl,info)
+      do jj=1, nazr
+
+        j=iacl(jj)
+
+        if ((j<1).or.(j>m)) then 
+          write(psb_err_unit,*) ' SymbMM: Problem with A ',i,jj,j,m
+          info = 1
+          return
+        endif
+        call b%csget(j,j,nbzr,ibrw,ibcl,info)
+        do k=1,nbzr
+          if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
+            write(psb_err_unit,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
+            info=psb_err_pivot_too_small_
+            return
+          else
+            if(index(ibcl(k)) == 0) then
+              index(ibcl(k))=istart
+              istart=ibcl(k)
+              length=length+1
+            endif
+          endif
+        end do
+      end do
+
+      c%irp(i+1)=c%irp(i)+length
+
+      if (c%irp(i+1) > size(c%ja)) then 
+        if (n > (2*i)) then 
+          nze = max(c%irp(i+1), c%irp(i)*((n+i-1)/i))
+        else
+          nze = max(c%irp(i+1), nint((dble(c%irp(i))*(dble(n)/i)))   )
+        endif
+        call psb_realloc(nze,c%ja,info)
+      end if
+      do j= c%irp(i),c%irp(i+1)-1
+        c%ja(j)=istart
+        istart=index(istart)
+        index(c%ja(j))=0
+      end do
+      call psb_msort(c%ja(c%irp(i):c%irp(i)+length-1))
+      index(i) = 0
+    end do main
+
+  end subroutine gen_symbmm
+
+end subroutine psb_lsbase_symbmm

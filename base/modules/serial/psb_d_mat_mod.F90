@@ -194,7 +194,22 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_d_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: clone       => psb_dspmat_clone
-
+    !
+    ! To/from ld
+    !
+    procedure, pass(a) :: mv_from_lb  => psb_d_mv_from_lb
+    procedure, pass(a) :: mv_to_lb    => psb_d_mv_to_lb
+    procedure, pass(a) :: cp_from_lb  => psb_d_cp_from_lb
+    procedure, pass(a) :: cp_to_lb    => psb_d_cp_to_lb
+    procedure, pass(a) :: mv_from_l   => psb_d_mv_from_l 
+    procedure, pass(a) :: mv_to_l     => psb_d_mv_to_l 
+    procedure, pass(a) :: cp_from_l   => psb_d_cp_from_l 
+    procedure, pass(a) :: cp_to_l     => psb_d_cp_to_l 
+    generic, public    :: mv_from     => mv_from_lb, mv_from_l
+    generic, public    :: mv_to       => mv_to_lb, mv_to_l
+    generic, public    :: cp_from     => cp_from_lb, cp_from_l
+    generic, public    :: cp_to       => cp_to_lb, cp_to_l
+    
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_d_get_diag
     procedure, pass(a) :: maxval   => psb_d_maxval
@@ -355,6 +370,21 @@ module psb_d_mat_mod
     procedure, pass(a) :: cscnv_base  => psb_ld_cscnv_base
     generic, public    :: cscnv       => cscnv_np, cscnv_ip, cscnv_base
     procedure, pass(a) :: clone       => psb_ldspmat_clone
+    !
+    ! To/from d
+    !
+    procedure, pass(a) :: mv_from_ib  => psb_ld_mv_from_ib
+    procedure, pass(a) :: mv_to_ib    => psb_ld_mv_to_ib
+    procedure, pass(a) :: cp_from_ib  => psb_ld_cp_from_ib
+    procedure, pass(a) :: cp_to_ib    => psb_ld_cp_to_ib
+    procedure, pass(a) :: mv_from_i   => psb_ld_mv_from_i 
+    procedure, pass(a) :: mv_to_i     => psb_ld_mv_to_i 
+    procedure, pass(a) :: cp_from_i   => psb_ld_cp_from_i 
+    procedure, pass(a) :: cp_to_i     => psb_ld_cp_to_i 
+    generic, public    :: mv_from     => mv_from_ib, mv_from_i
+    generic, public    :: mv_to       => mv_to_ib, mv_to_i
+    generic, public    :: cp_from     => cp_from_ib, cp_from_i
+    generic, public    :: cp_to       => cp_to_ib, cp_to_i
 
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_ld_get_diag
@@ -845,7 +875,73 @@ module psb_d_mat_mod
       class(psb_d_base_sparse_mat), intent(inout) :: b
     end subroutine psb_d_cp_to
   end interface
+  !
+  ! Mixed type conversions
+  !
+  interface 
+    subroutine psb_d_mv_from_lb(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_ld_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_d_mv_from_lb
+  end interface
   
+  interface 
+    subroutine psb_d_cp_from_lb(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat
+      class(psb_dspmat_type), intent(out) :: a
+      class(psb_ld_base_sparse_mat), intent(in) :: b
+    end subroutine psb_d_cp_from_lb
+  end interface
+  
+  interface 
+    subroutine psb_d_mv_to_lb(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_ld_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_d_mv_to_lb
+  end interface
+  
+  interface 
+    subroutine psb_d_cp_to_lb(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ld_base_sparse_mat    
+      class(psb_dspmat_type), intent(in) :: a
+      class(psb_ld_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_d_cp_to_lb
+  end interface
+
+    interface 
+    subroutine psb_d_mv_from_l(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ldspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_ldspmat_type), intent(inout) :: b
+    end subroutine psb_d_mv_from_l
+  end interface
+  
+  interface 
+    subroutine psb_d_cp_from_l(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ldspmat_type
+      class(psb_dspmat_type), intent(out) :: a
+      class(psb_ldspmat_type), intent(in) :: b
+    end subroutine psb_d_cp_from_l
+  end interface
+  
+  interface 
+    subroutine psb_d_mv_to_l(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ldspmat_type
+      class(psb_dspmat_type), intent(inout) :: a
+      class(psb_ldspmat_type), intent(inout) :: b
+    end subroutine psb_d_mv_to_l
+  end interface
+  
+  interface 
+    subroutine psb_d_cp_to_l(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_dspmat_type, psb_dpk_, psb_ldspmat_type
+      class(psb_dspmat_type), intent(in) :: a
+      class(psb_ldspmat_type), intent(inout) :: b
+    end subroutine psb_d_cp_to_l
+  end interface
+
   !
   ! Transfer the internal allocation to the target.
   !  
@@ -1467,6 +1563,73 @@ module psb_d_mat_mod
       class(psb_ld_base_sparse_mat), intent(inout) :: b
     end subroutine psb_ld_cp_to
   end interface
+  !
+  ! Mixed type conversions
+  !
+  interface 
+    subroutine psb_ld_mv_from_ib(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_ldspmat_type), intent(inout) :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_ld_mv_from_ib
+  end interface
+  
+  interface 
+    subroutine psb_ld_cp_from_ib(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_ldspmat_type), intent(out) :: a
+      class(psb_d_base_sparse_mat), intent(in) :: b
+    end subroutine psb_ld_cp_from_ib
+  end interface
+  
+  interface 
+    subroutine psb_ld_mv_to_ib(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_d_base_sparse_mat
+      class(psb_ldspmat_type), intent(inout) :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_ld_mv_to_ib
+  end interface
+  
+  interface 
+    subroutine psb_ld_cp_to_ib(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_d_base_sparse_mat    
+      class(psb_ldspmat_type), intent(in) :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+    end subroutine psb_ld_cp_to_ib
+  end interface
+
+    interface 
+    subroutine psb_ld_mv_from_i(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_dspmat_type
+      class(psb_ldspmat_type), intent(inout) :: a
+      class(psb_dspmat_type), intent(inout) :: b
+    end subroutine psb_ld_mv_from_i
+  end interface
+  
+  interface 
+    subroutine psb_ld_cp_from_i(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_dspmat_type
+      class(psb_ldspmat_type), intent(out) :: a
+      class(psb_dspmat_type), intent(in) :: b
+    end subroutine psb_ld_cp_from_i
+  end interface
+  
+  interface 
+    subroutine psb_ld_mv_to_i(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_dspmat_type
+      class(psb_ldspmat_type), intent(inout) :: a
+      class(psb_dspmat_type), intent(inout) :: b
+    end subroutine psb_ld_mv_to_i
+  end interface
+  
+  interface 
+    subroutine psb_ld_cp_to_i(a,b)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_, psb_dspmat_type
+      class(psb_ldspmat_type), intent(in) :: a
+      class(psb_dspmat_type), intent(inout) :: b
+    end subroutine psb_ld_cp_to_i
+  end interface
+
   
   !
   ! Transfer the internal allocation to the target.

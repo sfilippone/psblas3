@@ -2432,6 +2432,155 @@ subroutine psb_s_scals(d,a,info)
 
 end subroutine psb_s_scals
 
+subroutine psb_s_mv_from_lb(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_mv_from_lb
+  implicit none 
+  
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
+  if (info == psb_success_) call a%a%mv_from_lfmt(b,info)
+  
+end subroutine psb_s_mv_from_lb
+
+  
+subroutine psb_s_cp_from_lb(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cp_from_lb
+  implicit none 
+  
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+
+  if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
+  if (info == psb_success_) call a%a%cp_from_lfmt(b,info)
+
+end subroutine psb_s_cp_from_lb
+
+subroutine psb_s_mv_to_lb(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_mv_to_lb
+  implicit none 
+  
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (.not.allocated(a%a)) then
+    call b%free()
+  else
+    call a%a%mv_to_lfmt(b,info)
+    call a%free()
+  end if
+  
+end subroutine psb_s_mv_to_lb
+
+subroutine psb_s_cp_to_lb(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cp_to_lb
+  implicit none 
+  class(psb_sspmat_type), intent(in) :: a
+  class(psb_ls_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (.not.allocated(a%a)) then
+    call b%free()
+  else
+    call a%a%cp_to_lfmt(b,info)
+  end if
+
+end subroutine psb_s_cp_to_lb
+
+subroutine psb_s_mv_from_l(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_mv_from_l
+  implicit none 
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+
+  if (allocated(b%a)) then
+    if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
+    call a%a%mv_from_lfmt(b%a,info)
+  else
+    call a%free()
+  end if
+  call b%free()
+  
+end subroutine psb_s_mv_from_l
+
+  
+subroutine psb_s_cp_from_l(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cp_from_l
+  implicit none 
+
+  class(psb_sspmat_type), intent(out) :: a
+  class(psb_lsspmat_type), intent(in) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(b%a)) then
+    if (.not.allocated(a%a)) allocate(psb_s_csr_sparse_mat :: a%a, stat=info)
+    call a%a%cp_from_lfmt(b%a,info)
+  else
+    call a%free()
+  end if
+end subroutine psb_s_cp_from_l
+
+subroutine psb_s_mv_to_l(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_mv_to_l
+  implicit none 
+
+  class(psb_sspmat_type), intent(inout) :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(a%a)) then
+    if (.not.allocated(b%a)) allocate(psb_ls_csr_sparse_mat :: b%a, stat=info)
+    call a%a%mv_to_lfmt(b%a,info)
+  else
+    call b%free()
+  end if
+  call a%free()
+  
+end subroutine psb_s_mv_to_l
+
+subroutine psb_s_cp_to_l(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_s_cp_to_l
+  implicit none 
+  
+  class(psb_sspmat_type), intent(in) :: a
+  class(psb_lsspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(a%a)) then
+    if (.not.allocated(b%a)) allocate(psb_ls_csr_sparse_mat :: b%a, stat=info)
+    call a%a%cp_to_lfmt(b%a,info)
+  else
+    call b%free()
+  end if
+  
+end subroutine psb_s_cp_to_l
+
+
+!
+!
+! ls versions
+!
+
 
 subroutine  psb_ls_set_nrows(m,a) 
   use psb_s_mat_mod, psb_protect_name => psb_ls_set_nrows
@@ -4331,5 +4480,148 @@ subroutine psb_ls_scals(d,a,info)
 
 end subroutine psb_ls_scals
 
+subroutine psb_ls_mv_from_ib(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_mv_from_ib
+  implicit none 
+  
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
+  if (info == psb_success_) call a%a%mv_from_ifmt(b,info)
+  
+end subroutine psb_ls_mv_from_ib
+  
+subroutine psb_ls_cp_from_ib(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cp_from_ib
+  implicit none 
+  
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+
+  if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
+  if (info == psb_success_) call a%a%cp_from_ifmt(b,info)
+
+end subroutine psb_ls_cp_from_ib
+
+subroutine psb_ls_mv_to_ib(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_mv_to_ib
+  implicit none 
+  
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (.not.allocated(a%a)) then
+    call b%free()
+  else
+    call a%a%mv_to_ifmt(b,info)
+    call a%free()
+  end if
+  
+end subroutine psb_ls_mv_to_ib
+
+subroutine psb_ls_cp_to_ib(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cp_to_ib
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  class(psb_s_base_sparse_mat), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (.not.allocated(a%a)) then
+    call b%free()
+  else
+    call a%a%cp_to_ifmt(b,info)
+  end if
+
+end subroutine psb_ls_cp_to_ib
+
+subroutine psb_ls_mv_from_i(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_mv_from_i
+  implicit none 
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+
+  if (allocated(b%a)) then
+    if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
+    call a%a%mv_from_ifmt(b%a,info)
+  else
+    call a%free()
+  end if
+  call b%free()
+  
+end subroutine psb_ls_mv_from_i
+
+  
+subroutine psb_ls_cp_from_i(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cp_from_i
+  implicit none 
+
+  class(psb_lsspmat_type), intent(out) :: a
+  class(psb_sspmat_type), intent(in) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(b%a)) then
+    if (.not.allocated(a%a)) allocate(psb_ls_csr_sparse_mat :: a%a, stat=info)
+    call a%a%cp_from_ifmt(b%a,info)
+  else
+    call a%free()
+  end if
+end subroutine psb_ls_cp_from_i
+
+subroutine psb_ls_mv_to_i(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_mv_to_i
+  implicit none 
+
+  class(psb_lsspmat_type), intent(inout) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(a%a)) then
+    if (.not.allocated(b%a)) allocate(psb_s_csr_sparse_mat :: b%a, stat=info)
+    call a%a%mv_to_ifmt(b%a,info)
+  else
+    call b%free()
+  end if
+  call a%free()
+  
+end subroutine psb_ls_mv_to_i
+
+subroutine psb_ls_cp_to_i(a,b)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_mat_mod, psb_protect_name => psb_ls_cp_to_i
+  implicit none 
+  
+  class(psb_lsspmat_type), intent(in) :: a
+  class(psb_sspmat_type), intent(inout) :: b
+  integer(psb_ipk_) :: info
+  
+  if (allocated(a%a)) then
+    if (.not.allocated(b%a)) allocate(psb_s_csr_sparse_mat :: b%a, stat=info)
+    call a%a%cp_to_ifmt(b%a,info)
+  else
+    call b%free()
+  end if
+  
+end subroutine psb_ls_cp_to_i
 
 
+
+  

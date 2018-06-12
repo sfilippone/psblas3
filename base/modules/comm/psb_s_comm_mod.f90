@@ -31,7 +31,7 @@
 !    
 module psb_s_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_spk_
-  use psb_mat_mod, only  : psb_sspmat_type
+  use psb_mat_mod, only  : psb_sspmat_type, psb_lsspmat_type
   
   use psb_s_vect_mod, only : psb_s_vect_type, psb_s_base_vect_type
   use psb_s_multivect_mod, only : psb_s_multivect_type, psb_s_base_multivect_type
@@ -105,6 +105,16 @@ module psb_s_comm_mod
       integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_ssp_allgather
+    subroutine psb_lssp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      import
+      implicit none
+      type(psb_sspmat_type), intent(inout) :: loca
+      type(psb_lsspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_lssp_allgather
     subroutine psb_sgather_vect(globx, locx, desc_a, info, root)
       import
       implicit none

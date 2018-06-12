@@ -31,7 +31,7 @@
 !    
 module psb_z_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_dpk_
-  use psb_mat_mod, only  : psb_zspmat_type
+  use psb_mat_mod, only  : psb_zspmat_type, psb_lzspmat_type
   
   use psb_z_vect_mod, only : psb_z_vect_type, psb_z_base_vect_type
   use psb_z_multivect_mod, only : psb_z_multivect_type, psb_z_base_multivect_type
@@ -105,6 +105,16 @@ module psb_z_comm_mod
       integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_zsp_allgather
+    subroutine psb_lzsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      import
+      implicit none
+      type(psb_zspmat_type), intent(inout) :: loca
+      type(psb_lzspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_lzsp_allgather
     subroutine psb_zgather_vect(globx, locx, desc_a, info, root)
       import
       implicit none

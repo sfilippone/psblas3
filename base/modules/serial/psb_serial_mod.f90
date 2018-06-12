@@ -68,7 +68,7 @@ module psb_serial_mod
     end subroutine psb_d_nspaxpby
   end interface psb_nspaxpby
 
-  interface symbmm
+  interface 
     subroutine symbmm (n, m, l, ia, ja, diaga, &
          & ib, jb, diagb, ic, jc, diagc, index)
       import :: psb_ipk_
@@ -76,6 +76,13 @@ module psb_serial_mod
            & diagc,  index(*)
       integer(psb_ipk_), allocatable :: ic(:),jc(:)
     end subroutine symbmm
+    subroutine lsymbmm (n, m, l, ia, ja, diaga, &
+         & ib, jb, diagb, ic, jc, diagc, index)
+      import :: psb_ipk_, psb_lpk_
+      integer(psb_lpk_) :: n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+           & diagc,  index(*)
+      integer(psb_lpk_), allocatable :: ic(:),jc(:)
+    end subroutine lsymbmm
   end interface
   
 

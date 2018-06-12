@@ -204,14 +204,14 @@ module psb_c_serial_mod
   end interface psb_aspxpby
 
   interface psb_spspmm
-!!$    subroutine psb_cspspmm(a,b,c,info)
-!!$      use psb_c_mat_mod, only : psb_cspmat_type
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      type(psb_cspmat_type), intent(in)  :: a,b
-!!$      type(psb_cspmat_type), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)                :: info
-!!$    end subroutine psb_cspspmm
+    subroutine psb_lcspspmm(a,b,c,info)
+      use psb_c_mat_mod, only : psb_lcspmat_type
+      import :: psb_ipk_
+      implicit none 
+      type(psb_lcspmat_type), intent(in)  :: a,b
+      type(psb_lcspmat_type), intent(out) :: c
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_lcspspmm
     subroutine psb_lccsrspspmm(a,b,c,info)
       use psb_c_mat_mod, only : psb_lc_csr_sparse_mat
       import :: psb_ipk_
@@ -231,14 +231,14 @@ module psb_c_serial_mod
   end interface psb_spspmm
 
   interface psb_symbmm
-!!$    subroutine psb_csymbmm(a,b,c,info)
-!!$      use psb_c_mat_mod, only : psb_cspmat_type
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      type(psb_cspmat_type), intent(in)  :: a,b
-!!$      type(psb_cspmat_type), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)                :: info
-!!$    end subroutine psb_csymbmm
+    subroutine psb_lcsymbmm(a,b,c,info)
+      use psb_c_mat_mod, only : psb_lcspmat_type
+      import :: psb_ipk_
+      implicit none 
+      type(psb_lcspmat_type), intent(in)  :: a,b
+      type(psb_lcspmat_type), intent(out) :: c
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine psb_lcsymbmm
     subroutine psb_lcbase_symbmm(a,b,c,info)
       use psb_c_mat_mod, only : psb_lc_base_sparse_mat, psb_lc_csr_sparse_mat
       import :: psb_ipk_
@@ -250,13 +250,13 @@ module psb_c_serial_mod
   end interface psb_symbmm
 
   interface psb_numbmm
-!!$    subroutine psb_cnumbmm(a,b,c)
-!!$      use psb_c_mat_mod, only : psb_cspmat_type
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      type(psb_cspmat_type), intent(in) :: a,b
-!!$      type(psb_cspmat_type), intent(inout)  :: c
-!!$    end subroutine psb_cnumbmm
+    subroutine psb_lcnumbmm(a,b,c)
+      use psb_c_mat_mod, only : psb_lcspmat_type
+      import :: psb_ipk_
+      implicit none 
+      type(psb_lcspmat_type), intent(in) :: a,b
+      type(psb_lcspmat_type), intent(inout)  :: c
+    end subroutine psb_lcnumbmm
     subroutine psb_lcbase_numbmm(a,b,c)
       use psb_c_mat_mod, only : psb_lc_base_sparse_mat, psb_lc_csr_sparse_mat
       import :: psb_ipk_

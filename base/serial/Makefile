@@ -8,7 +8,7 @@ FOBJS = psb_lsame.o psi_m_serial_impl.o psi_e_serial_impl.o \
 	psb_sspspmm.o psb_dspspmm.o psb_cspspmm.o psb_zspspmm.o \
 	psb_ssymbmm.o psb_dsymbmm.o psb_csymbmm.o psb_zsymbmm.o \
 	psb_snumbmm.o psb_dnumbmm.o psb_cnumbmm.o psb_znumbmm.o \
-	smmp.o \
+	smmp.o lsmmp.o \
 	psb_sgeprt.o psb_dgeprt.o psb_cgeprt.o psb_zgeprt.o\
 	psb_spdot_srtd.o psb_aspxpby.o psb_spge_dot.o\
 	psb_sgelp.o psb_dgelp.o psb_cgelp.o psb_zgelp.o \
