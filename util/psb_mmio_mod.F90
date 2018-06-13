@@ -34,7 +34,9 @@ module psb_mmio_mod
 
   use psb_base_mod, only :  psb_ipk_, psb_spk_, psb_dpk_,&
        & psb_sspmat_type, psb_cspmat_type, &
-       & psb_dspmat_type, psb_zspmat_type
+       & psb_dspmat_type, psb_zspmat_type, &
+       & psb_lsspmat_type, psb_lcspmat_type, &
+       & psb_ldspmat_type, psb_lzspmat_type
 
   public mm_mat_read, mm_mat_write, mm_array_read, mm_array_write
 
@@ -270,6 +272,38 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine zmm_mat_read
+    subroutine lsmm_mat_read(a, info, iunit, filename)   
+      import :: psb_lsspmat_type, psb_ipk_
+      implicit none
+      type(psb_lsspmat_type), intent(out)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lsmm_mat_read
+    subroutine ldmm_mat_read(a, info, iunit, filename)   
+      import :: psb_ldspmat_type, psb_ipk_
+      implicit none
+      type(psb_ldspmat_type), intent(out)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine ldmm_mat_read
+    subroutine lcmm_mat_read(a, info, iunit, filename)   
+      import :: psb_lcspmat_type, psb_ipk_
+      implicit none
+      type(psb_lcspmat_type), intent(out)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lcmm_mat_read
+    subroutine lzmm_mat_read(a, info, iunit, filename)   
+      import :: psb_lzspmat_type, psb_ipk_
+      implicit none
+      type(psb_lzspmat_type), intent(out)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lzmm_mat_read
   end interface
 
   interface mm_mat_write
@@ -309,6 +343,42 @@ module psb_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine zmm_mat_write
+    subroutine lsmm_mat_write(a,mtitle,info,iunit,filename)
+      import :: psb_lsspmat_type, psb_ipk_ 
+      implicit none
+      type(psb_lsspmat_type), intent(in)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=*), intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lsmm_mat_write
+    subroutine ldmm_mat_write(a,mtitle,info,iunit,filename)
+      import :: psb_ldspmat_type, psb_ipk_
+      implicit none
+      type(psb_ldspmat_type), intent(in)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=*), intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine ldmm_mat_write
+    subroutine lcmm_mat_write(a,mtitle,info,iunit,filename)
+      import :: psb_lcspmat_type, psb_ipk_
+      implicit none
+      type(psb_lcspmat_type), intent(in)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=*), intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lcmm_mat_write
+    subroutine lzmm_mat_write(a,mtitle,info,iunit,filename)
+      import :: psb_lzspmat_type, psb_ipk_
+      implicit none
+      type(psb_lzspmat_type), intent(in)  :: a
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=*), intent(in) :: mtitle
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine lzmm_mat_write
   end interface
 
 end module psb_mmio_mod
