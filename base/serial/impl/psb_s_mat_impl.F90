@@ -3690,8 +3690,8 @@ subroutine psb_ls_cscnv(a,b,info,type,mold,upd,dupl)
       allocate(psb_ls_csr_sparse_mat :: altmp, stat=info) 
     case ('COO')
       allocate(psb_ls_coo_sparse_mat :: altmp, stat=info) 
-!!$    case ('CSC')
-!!$      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
+    case ('CSC')
+      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
     case default
       info = psb_err_format_unknown_ 
       call psb_errpush(info,name,a_err=type)
@@ -3791,8 +3791,8 @@ subroutine psb_ls_cscnv_ip(a,info,type,mold,dupl)
       allocate(psb_ls_csr_sparse_mat :: altmp, stat=info) 
     case ('COO')
       allocate(psb_ls_coo_sparse_mat :: altmp, stat=info) 
-!!$    case ('CSC')
-!!$      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
+    case ('CSC')
+      allocate(psb_ls_csc_sparse_mat :: altmp, stat=info) 
     case default
       info = psb_err_format_unknown_ 
       call psb_errpush(info,name,a_err=type)

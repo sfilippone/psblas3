@@ -80,7 +80,7 @@ module psb_d_mat_mod
 
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod,  only : psb_d_csr_sparse_mat, psb_ld_csr_sparse_mat
-  use psb_d_csc_mat_mod,  only : psb_d_csc_sparse_mat
+  use psb_d_csc_mat_mod,  only : psb_d_csc_sparse_mat, psb_ld_csc_sparse_mat
 
   type :: psb_dspmat_type
 

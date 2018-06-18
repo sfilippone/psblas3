@@ -220,14 +220,14 @@ module psb_z_serial_mod
       type(psb_lz_csr_sparse_mat), intent(out) :: c
       integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_lzcsrspspmm
-!!$    subroutine psb_zcscspspmm(a,b,c,info)
-!!$      use psb_z_mat_mod, only : psb_z_csc_sparse_mat
-!!$      import :: psb_ipk_
-!!$      implicit none 
-!!$      class(psb_z_csc_sparse_mat), intent(in) :: a,b
-!!$      type(psb_z_csc_sparse_mat), intent(out) :: c
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine psb_zcscspspmm
+    subroutine psb_lzcscspspmm(a,b,c,info)
+      use psb_z_mat_mod, only : psb_lz_csc_sparse_mat
+      import :: psb_ipk_
+      implicit none 
+      class(psb_lz_csc_sparse_mat), intent(in) :: a,b
+      type(psb_lz_csc_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lzcscspspmm
   end interface psb_spspmm
 
   interface psb_symbmm
