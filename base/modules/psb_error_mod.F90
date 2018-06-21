@@ -700,6 +700,13 @@ contains
            &'("Something went wrong before this call to ",a,", probably in cdins/spins")')&
            & trim(r_name)
 
+    case(psb_err_bad_int_cnv_)
+      allocate(achmsg(3)) 
+      achmsg(1) = tmpmsg
+      write(achmsg(2),&
+           & '("Bad integer conversion from ",i0,"to ",i0)') &
+           & e_e_d(1),e_e_d(2)
+
     case(psb_err_iarg_mbeeiarra_i_)
       allocate(achmsg(3)) 
       achmsg(1) = tmpmsg

@@ -254,6 +254,7 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_forgot_spall_=295
   integer(psb_ipk_), parameter, public :: psb_err_wrong_ins_=298
   integer(psb_ipk_), parameter, public :: psb_err_iarg_mbeeiarra_i_=300
+  integer(psb_ipk_), parameter, public :: psb_err_bad_int_cnv_=301
   integer(psb_ipk_), parameter, public :: psb_err_mpi_error_=400
   integer(psb_ipk_), parameter, public :: psb_err_parm_differs_among_procs_=550
   integer(psb_ipk_), parameter, public :: psb_err_entry_out_of_bounds_=551

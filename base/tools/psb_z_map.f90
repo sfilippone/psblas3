@@ -401,7 +401,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) &
   type(psb_desc_type), target       :: desc_X, desc_Y
   type(psb_zspmat_type), intent(inout) :: map_X2Y, map_Y2X
   integer(psb_ipk_), intent(in)               :: map_kind
-  integer(psb_ipk_), intent(in), optional     :: iaggr(:), naggr(:)
+  integer(psb_lpk_), intent(in), optional     :: iaggr(:), naggr(:)
   !
   integer(psb_ipk_) :: info
   character(len=20), parameter :: name='psb_linmap'

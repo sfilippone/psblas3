@@ -42,7 +42,7 @@ module psb_base_linmap_mod
 
   type psb_base_linmap_type
     integer(psb_ipk_) :: kind
-    integer(psb_ipk_), allocatable  :: iaggr(:), naggr(:)
+    integer(psb_lpk_), allocatable  :: iaggr(:), naggr(:)
     type(psb_desc_type), pointer :: p_desc_X=>null(), p_desc_Y=>null()
     type(psb_desc_type)   :: desc_X, desc_Y
   contains
@@ -128,9 +128,9 @@ contains
 
     val = psb_sizeof_ip
     if (allocated(map%iaggr))   &
-         & val = val + psb_sizeof_ip*size(map%iaggr)
+         & val = val + psb_sizeof_lp*size(map%iaggr)
     if (allocated(map%naggr))   &
-         & val = val + psb_sizeof_ip*size(map%naggr)
+         & val = val + psb_sizeof_lp*size(map%naggr)
     val = val + map%desc_X%sizeof()
     val = val + map%desc_Y%sizeof()
 
