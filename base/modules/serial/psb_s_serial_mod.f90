@@ -119,9 +119,9 @@ module psb_s_serial_mod
       use psb_s_mat_mod, only : psb_sspmat_type
       import :: psb_ipk_
       implicit none
-      integer(psb_ipk_), intent(in)                          :: nr
+      integer(psb_ipk_), intent(in)                 :: nr
       type(psb_sspmat_type), intent(inout)        :: a
-      integer(psb_ipk_),intent(out)                          :: info
+      integer(psb_ipk_),intent(out)                 :: info
       type(psb_sspmat_type), intent(in), optional :: b
       logical,intent(in), optional                 :: rowscale
     end subroutine psb_srwextd
@@ -129,12 +129,32 @@ module psb_s_serial_mod
       use psb_s_mat_mod, only : psb_s_base_sparse_mat
       import :: psb_ipk_
       implicit none
-      integer(psb_ipk_), intent(in)                                :: nr
+      integer(psb_ipk_), intent(in)                        :: nr
       class(psb_s_base_sparse_mat), intent(inout)        :: a
-      integer(psb_ipk_),intent(out)                                :: info
+      integer(psb_ipk_),intent(out)                        :: info
       class(psb_s_base_sparse_mat), intent(in), optional :: b
       logical,intent(in), optional                       :: rowscale
     end subroutine psb_sbase_rwextd
+    subroutine psb_lsrwextd(nr,a,info,b,rowscale)
+      use psb_s_mat_mod, only : psb_lsspmat_type
+      import :: psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), intent(in)                  :: nr
+      type(psb_lsspmat_type), intent(inout)        :: a
+      integer(psb_ipk_),intent(out)                  :: info
+      type(psb_lsspmat_type), intent(in), optional :: b
+      logical,intent(in), optional                 :: rowscale
+    end subroutine psb_lsrwextd
+    subroutine psb_lsbase_rwextd(nr,a,info,b,rowscale)
+      use psb_s_mat_mod, only : psb_ls_base_sparse_mat
+      import :: psb_ipk_, psb_lpk_
+      implicit none
+      integer(psb_lpk_), intent(in)                         :: nr
+      class(psb_ls_base_sparse_mat), intent(inout)        :: a
+      integer(psb_ipk_),intent(out)                         :: info
+      class(psb_ls_base_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                       :: rowscale
+    end subroutine psb_lsbase_rwextd
   end interface psb_rwextd
 
 
