@@ -64,10 +64,12 @@ subroutine  psb_isp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_gather'
-  if (psb_get_errstatus().ne.0) return 
   info=psb_success_
 
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
   call psb_info(ictxt, me, np)
@@ -205,10 +207,12 @@ subroutine  psb_@LX@sp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_gather'
-  if (psb_get_errstatus().ne.0) return 
   info=psb_success_
 
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
   call psb_info(ictxt, me, np)

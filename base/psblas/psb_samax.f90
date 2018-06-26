@@ -64,9 +64,11 @@ function psb_samax(x,desc_a, info, jx,global) result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_samax'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
 
   ictxt = desc_a%get_context()
@@ -190,9 +192,11 @@ function psb_samaxv (x,desc_a, info,global) result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_samaxv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
 
   ictxt=desc_a%get_context()
@@ -272,9 +276,11 @@ function psb_samax_vect(x, desc_a, info,global) result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_samaxv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -400,9 +406,11 @@ subroutine psb_samaxvs(res,x,desc_a, info,global)
   character(len=20)      :: name, ch_err
 
   name='psb_samaxvs'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
 
   ictxt = desc_a%get_context()
@@ -521,9 +529,11 @@ subroutine psb_smamaxs(res,x,desc_a, info,jx,global)
   character(len=20)        :: name, ch_err
 
   name='psb_smamaxs'
-  if (psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

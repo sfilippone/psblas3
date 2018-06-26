@@ -64,9 +64,11 @@ function psb_zasum (x,desc_a, info, jx,global) result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_zasum'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
 
   ictxt=desc_a%get_context()
@@ -152,7 +154,9 @@ function psb_zasum_vect(x, desc_a, info,global) result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_zasumv'
-  if (psb_errstatus_fatal()) return 
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -287,9 +291,11 @@ function psb_zasumv(x,desc_a, info,global) result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_zasumv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -416,9 +422,11 @@ subroutine psb_zasumvs(res,x,desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_zasumvs'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

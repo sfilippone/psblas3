@@ -44,9 +44,11 @@ subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_restrr1'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -85,9 +87,11 @@ subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_sovrl_restrr2'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then

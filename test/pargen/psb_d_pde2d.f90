@@ -578,7 +578,7 @@ program psb_d_pde2d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if(psb_errstatus_fatal()) goto 9999
   name='pde2d90'
   call psb_set_errverbosity(itwo)
   !

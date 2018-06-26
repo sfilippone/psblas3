@@ -49,11 +49,13 @@ subroutine psb_sprecbld(a,desc_a,p,info,amold,vmold,imold)
   integer(psb_ipk_),parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   err=0
-  call psb_erractionsave(err_act)
   name = 'psb_precbld'
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   info = psb_success_
   ictxt = desc_a%get_context()

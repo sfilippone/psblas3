@@ -93,9 +93,11 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmm'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -442,9 +444,11 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -699,9 +703,11 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_dspmv'
-  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 

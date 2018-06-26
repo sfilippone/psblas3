@@ -64,9 +64,11 @@ subroutine  psb_cgather_vect(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_cgatherv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -177,9 +179,11 @@ subroutine  psb_cgather_multivect(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_cgatherv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

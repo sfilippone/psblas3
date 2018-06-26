@@ -58,10 +58,12 @@ subroutine psb_casb(x, desc_a, info, scratch)
   logical :: scratch_
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   name='psb_cgeasb_m'
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   scratch_ = .false.
@@ -194,6 +196,10 @@ subroutine psb_casbv(x, desc_a, info, scratch)
 
   info = psb_success_
   name = 'psb_cgeasb_v'
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt   = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()

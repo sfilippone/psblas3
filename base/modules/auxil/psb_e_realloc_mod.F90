@@ -618,7 +618,7 @@ Contains
     call psb_erractionsave(err_act)
     info=psb_success_
 
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -659,7 +659,7 @@ Contains
     call psb_erractionsave(err_act)
     info=psb_success_
 
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -703,7 +703,7 @@ Contains
     name='psb_ab_cpy_e_rk1'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -747,7 +747,7 @@ Contains
     name='psb_ab_cpy_e_rk2'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -794,7 +794,7 @@ Contains
     name='psb_cpy_e_rk1'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -835,7 +835,7 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if(psb_get_errstatus() /= 0) then 
+    if(psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -914,7 +914,7 @@ Contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (psb_get_errstatus() /= 0) then 
+    if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -967,7 +967,7 @@ Contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (psb_get_errstatus() /= 0) then 
+    if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
       goto 9999
     end if

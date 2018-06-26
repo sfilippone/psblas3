@@ -51,11 +51,13 @@ subroutine psb_efree(x, desc_a, info)
   integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
-
-  if(psb_get_errstatus() /= 0) return 
+  name='psb_efree'
   info=psb_success_
   call psb_erractionsave(err_act)
-  name='psb_efree'
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  
   if (.not.psb_is_ok_desc(desc_a)) then
     info=psb_err_forgot_spall_
     call psb_errpush(info,name)
@@ -117,12 +119,12 @@ subroutine psb_efreev(x, desc_a, info)
   integer(psb_ipk_) :: ictxt,np,me, err_act
   character(len=20)   :: name
 
-
-  if(psb_get_errstatus() /= 0) return 
+  name='psb_efreev'
   info=psb_success_
   call psb_erractionsave(err_act)
-  name='psb_efreev'
-
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   if (.not.psb_is_ok_desc(desc_a)) then
     info=psb_err_forgot_spall_

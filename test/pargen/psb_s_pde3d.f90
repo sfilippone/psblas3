@@ -619,7 +619,7 @@ program psb_s_pde3d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if(psb_errstatus_fatal()) goto 9999
   name='pde3d90'
   call psb_set_errverbosity(itwo)
   !

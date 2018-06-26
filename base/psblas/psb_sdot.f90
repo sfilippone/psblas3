@@ -72,9 +72,11 @@ function psb_sdot_vect(x, y, desc_a,info,global) result(res)
 
   name='psb_sdot_vect'
   res = szero
-  if (psb_errstatus_fatal()) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -175,9 +177,11 @@ function psb_sdot(x, y,desc_a, info, jx, jy,global)  result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_sdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -323,9 +327,11 @@ function psb_sdotv(x, y,desc_a, info,global)  result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_sdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -456,9 +462,11 @@ subroutine psb_sdotvs(res, x, y,desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_sdot'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -587,9 +595,11 @@ subroutine psb_smdots(res, x, y, desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_smdots'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

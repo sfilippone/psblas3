@@ -151,9 +151,11 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
   call psb_info(ictxt, me, np)
@@ -298,9 +300,11 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   logical, parameter :: debug=.false.
 
   name='psb_geaxpby'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

@@ -86,9 +86,11 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   logical                  :: aliw
 
   name='psb_dovrlm'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -281,9 +283,11 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   logical                  :: aliw
 
   name='psb_dovrlv'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

@@ -45,9 +45,11 @@ subroutine  psi_movrl_updr1(x,desc_a,update,info)
   character(len=20) :: name, ch_err
 
   name='psi_movrl_updr1'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -112,9 +114,11 @@ subroutine  psi_movrl_updr2(x,desc_a,update,info)
   character(len=20) :: name, ch_err
 
   name='psi_movrl_updr2'
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   if (np == -1) then

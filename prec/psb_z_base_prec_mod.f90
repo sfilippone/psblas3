@@ -39,7 +39,7 @@ module psb_z_base_prec_mod
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_epk_,&
        & psb_desc_type, psb_sizeof, psb_free, psb_cdfree, psb_errpush, psb_act_abort_,&
        & psb_sizeof_ip, psb_sizeof_lp, psb_sizeof_sp, psb_sizeof_dp, &
-       & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus, psb_success_,&
+       & psb_erractionsave, psb_erractionrestore, psb_error, psb_errstatus_fatal, psb_success_,&
        & psb_z_base_sparse_mat, psb_zspmat_type, psb_z_csr_sparse_mat,& 
        & psb_z_base_vect_type, psb_z_vect_type, psb_i_base_vect_type
 

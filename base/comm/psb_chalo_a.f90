@@ -75,9 +75,11 @@ subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   logical                  :: aliw
 
   name='psb_chalom'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 
@@ -282,9 +284,11 @@ subroutine  psb_chalov(x,desc_a,info,work,tran,mode,data)
   logical                  :: aliw
 
   name='psb_chalov'
-  if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   ictxt=desc_a%get_context()
 

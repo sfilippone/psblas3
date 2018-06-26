@@ -73,10 +73,12 @@ subroutine psb_cinsvi(m, irw, val, x, desc_a, info, dupl,local)
   logical :: local_
   character(len=20)      :: name
 
-  if(psb_get_errstatus() /= 0) return 
+  name = 'psb_cinsvi'
   info=psb_success_
   call psb_erractionsave(err_act)
-  name = 'psb_cinsvi'
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   if (.not.desc_a%is_ok()) then
     info = psb_err_invalid_cd_state_
@@ -251,10 +253,12 @@ subroutine psb_cinsi(m, irw, val, x, desc_a, info, dupl,local)
   logical :: local_
   character(len=20)   :: name
 
-  if(psb_get_errstatus() /= 0) return 
+  name = 'psb_cinsi'
   info = psb_success_
   call psb_erractionsave(err_act)
-  name = 'psb_cinsi'
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
 
   if (.not.desc_a%is_ok()) then
     info = psb_err_invalid_cd_state_
