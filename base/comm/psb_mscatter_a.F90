@@ -73,7 +73,9 @@ subroutine  psb_mscatterm(globx, locx, desc_a, info, root)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -315,7 +317,9 @@ subroutine  psb_mscatterv(globx, locx, desc_a, info, root)
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_scatterv'
-  if (psb_get_errstatus() /= 0) return 
+  if  (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
   ictxt=desc_a%get_context()

@@ -86,7 +86,9 @@ subroutine  psb_eovrlm(x,desc_a,info,jx,ik,work,update,mode)
   logical                  :: aliw
 
   name='psb_eovrlm'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -281,7 +283,9 @@ subroutine  psb_eovrlv(x,desc_a,info,work,update,mode)
   logical                  :: aliw
 
   name='psb_eovrlv'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

@@ -65,7 +65,9 @@ subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_cgatherm'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -237,7 +239,9 @@ subroutine  psb_cgatherv(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_cgatherv'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

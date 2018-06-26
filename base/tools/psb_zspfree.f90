@@ -51,7 +51,9 @@ subroutine psb_zspfree(a, desc_a,info)
   integer(psb_ipk_) :: ictxt, err_act
   character(len=20)   :: name
 
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   name = 'psb_zspfree'
   call psb_erractionsave(err_act)

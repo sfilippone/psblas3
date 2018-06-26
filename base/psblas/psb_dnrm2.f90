@@ -67,7 +67,9 @@ function psb_dnrm2(x, desc_a, info, jx,global)  result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_dnrm2'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -199,7 +201,9 @@ function psb_dnrm2v(x, desc_a, info,global)  result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2v'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -283,7 +287,9 @@ function psb_dnrm2_vect(x, desc_a, info,global)  result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_dnrm2v'
-  if (psb_errstatus_fatal()) return 
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -418,7 +424,9 @@ subroutine psb_dnrm2vs(res, x, desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

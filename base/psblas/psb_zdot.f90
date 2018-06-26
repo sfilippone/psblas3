@@ -175,7 +175,9 @@ function psb_zdot(x, y,desc_a, info, jx, jy,global)  result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -323,7 +325,9 @@ function psb_zdotv(x, y,desc_a, info,global)  result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -456,7 +460,9 @@ subroutine psb_zdotvs(res, x, y,desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -587,7 +593,9 @@ subroutine psb_zmdots(res, x, y, desc_a, info,global)
   character(len=20)        :: name, ch_err
 
   name='psb_zmdots'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

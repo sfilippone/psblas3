@@ -434,7 +434,9 @@ subroutine psb_s_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   character(len=20)  :: ch_err
 
 
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info = psb_success_
 
   call psb_erractionsave(err_act)

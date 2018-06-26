@@ -44,7 +44,9 @@ subroutine  psi_movrl_restrr1(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_movrl_restrr1'
-  if (psb_get_errstatus() /= 0) return 
+  if  (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info = psb_success_
   call psb_erractionsave(err_act)
   ictxt = desc_a%get_context()
@@ -85,7 +87,9 @@ subroutine  psi_movrl_restrr2(x,xs,desc_a,info)
   character(len=20) :: name, ch_err
 
   name='psi_movrl_restrr2'
-  if (psb_get_errstatus() /= 0) return 
+  if  (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info = psb_success_
   call psb_erractionsave(err_act)
   ictxt = desc_a%get_context()

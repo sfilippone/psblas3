@@ -60,7 +60,9 @@ subroutine psb_ealloc(x, desc_a, info, n, lb)
   character(len=20)   :: name
 
   name='psb_geall'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info = psb_success_
   err  = 0
   call psb_erractionsave(err_act)
@@ -185,7 +187,9 @@ subroutine psb_eallocv(x, desc_a,info,n)
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20)   :: name
 
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   name='psb_geall'
   call psb_erractionsave(err_act)

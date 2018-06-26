@@ -105,7 +105,9 @@ subroutine  psb_cspsm(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_cspsm'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -379,7 +381,9 @@ subroutine  psb_cspsv(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_cspsv'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -573,7 +577,9 @@ subroutine  psb_cspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_sspsv'
-  if (psb_errstatus_fatal()) return 
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

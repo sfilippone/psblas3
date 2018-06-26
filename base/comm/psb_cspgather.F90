@@ -64,7 +64,9 @@ subroutine  psb_csp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_gather'
-  if (psb_get_errstatus().ne.0) return 
+  if  (psb_get_errstatus().ne.0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
 
   call psb_erractionsave(err_act)
@@ -205,7 +207,9 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_gather'
-  if (psb_get_errstatus().ne.0) return 
+  if  (psb_get_errstatus().ne.0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
 
   call psb_erractionsave(err_act)

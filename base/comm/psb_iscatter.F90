@@ -62,7 +62,9 @@ subroutine  psb_iscatter_vect(globx, locx, desc_a, info, root, mold)
   integer(psb_ipk_) :: debug_level, debug_unit
 
   name='psb_scatter_vect'
-  if (psb_get_errstatus() /= 0) return 
+  if  (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
   ictxt=desc_a%get_context()

@@ -199,7 +199,9 @@ contains
     integer(psb_ipk_), intent(out)                :: info
     integer(psb_ipk_) :: me, err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus() /= 0) return 
+    if (psb_get_errstatus() /= 0) then
+      info = psb_err_internal_error_ ;      goto 9999
+    end if
     info=psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
@@ -224,7 +226,9 @@ contains
     integer(psb_ipk_), intent(out)         :: info
     integer(psb_ipk_) :: me, err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus() /= 0) return 
+    if (psb_get_errstatus() /= 0) then
+      info = psb_err_internal_error_ ;      goto 9999
+    end if
     info=psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)

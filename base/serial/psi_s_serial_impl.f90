@@ -45,7 +45,9 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -102,7 +104,9 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
   character(len=20)        :: name, ch_err
 
   name='psb_geaxpby'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 

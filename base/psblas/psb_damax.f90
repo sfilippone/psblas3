@@ -64,7 +64,9 @@ function psb_damax(x,desc_a, info, jx,global) result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_damax'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -190,7 +192,9 @@ function psb_damaxv (x,desc_a, info,global) result(res)
   character(len=20)        :: name, ch_err
 
   name='psb_damaxv'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -272,7 +276,9 @@ function psb_damax_vect(x, desc_a, info,global) result(res)
   character(len=20)      :: name, ch_err
 
   name='psb_damaxv'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -400,7 +406,9 @@ subroutine psb_damaxvs(res,x,desc_a, info,global)
   character(len=20)      :: name, ch_err
 
   name='psb_damaxvs'
-  if(psb_get_errstatus() /= 0) return 
+  if (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
@@ -521,7 +529,9 @@ subroutine psb_dmamaxs(res,x,desc_a, info,jx,global)
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'
-  if (psb_get_errstatus() /= 0) return 
+  if  (psb_get_errstatus() /= 0) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
   info=psb_success_
   call psb_erractionsave(err_act)
 
