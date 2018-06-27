@@ -3116,6 +3116,279 @@ subroutine psb_lc_csc_scals(d,a,info)
 end subroutine psb_lc_csc_scals
 
 
+function psb_lc_csc_maxval(a) result(res)
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_maxval
+  implicit none 
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_lpk_) :: nnz
+  character(len=20)  :: name='lc_csc_maxval'
+  logical, parameter :: debug=.false.
+
+
+  if (a%is_unit()) then 
+    res = sone
+  else
+    res = szero
+  end if
+  if (a%is_dev())   call a%sync()
+
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_lc_csc_maxval
+
+function psb_lc_csc_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_csnm1
+
+  implicit none 
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='lc_csc_csnm1'
+  logical, parameter :: debug=.false.
+
+
+  res = szero 
+  if (a%is_dev())   call a%sync()
+  m = a%get_nrows()
+  n = a%get_ncols()
+  is_unit = a%is_unit()
+  do j=1, n
+    if (is_unit) then 
+      acc = sone
+    else
+      acc = szero
+    end if
+    do k=a%icp(j),a%icp(j+1)-1
+      acc = acc + abs(a%val(k))
+    end do
+    res = max(res,acc)
+  end do
+  
+  return
+
+end function psb_lc_csc_csnm1
+
+subroutine psb_lc_csc_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_colsum
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)             :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,nnz, ir, jc, nc
+  integer(psb_epk_) :: m,n
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: vt(:)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act, info
+  integer(psb_epk_)  :: err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = m
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+  is_unit = a%is_unit()
+  do i = 1, a%get_ncols()
+    if (is_unit) then 
+      d(i) = cone
+    else
+      d(i) = czero
+    end if
+
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + (a%val(j))
+    end do
+  end do
+  
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csc_colsum
+
+subroutine psb_lc_csc_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_aclsum
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,nnz, ir, jc, nc
+  integer(psb_lpk_) :: m,n
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act, info
+  integer(psb_epk_)  :: err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_ncols()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = m
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  is_unit = a%is_unit()
+  do i = 1, a%get_ncols()
+    if (is_unit) then 
+      d(i) = sone
+    else
+      d(i) = szero
+    end if
+
+    do j=a%icp(i),a%icp(i+1)-1  
+      d(i) = d(i) + abs(a%val(j))
+    end do
+  end do
+  
+  if (a%is_unit()) then 
+    do i=1, a%get_ncols()
+      d(i) = d(i) + sone
+    end do
+  end if
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csc_aclsum
+
+subroutine psb_lc_csc_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_rowsum
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,nnz, ir, jc, nc
+  integer(psb_epk_) :: m,n 
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = n
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  if (a%is_unit()) then 
+    d = cone
+  else
+    d = czero
+  end if
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + (a%val(k))
+    end do
+  end do
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csc_rowsum
+
+subroutine psb_lc_csc_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_lc_csc_arwsum
+  class(psb_lc_csc_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,nnz, ir, jc, nc
+  integer(psb_epk_) :: m,n
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_ncols()
+  n = a%get_nrows()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = n
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  if (a%is_unit()) then 
+    d = sone
+  else
+    d = szero
+  end if
+
+  do i=1, m
+    do j=a%icp(i),a%icp(i+1)-1
+      k = a%ia(j)
+      d(k) = d(k) + abs(a%val(k))
+    end do
+  end do
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lc_csc_arwsum
+
+
 ! == =================================== 
 !
 !

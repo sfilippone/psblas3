@@ -4480,6 +4480,233 @@ subroutine psb_ls_scals(d,a,info)
 
 end subroutine psb_ls_scals
 
+function psb_ls_maxval(a) result(res)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_maxval
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_)         :: res
+
+
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%maxval()
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_maxval
+
+function psb_ls_csnmi(a) result(res)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_csnmi
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='csnmi'
+  logical, parameter :: debug=.false.
+
+  info = psb_success_
+  call psb_get_erraction(err_act)
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spnmi()
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_csnmi
+
+function psb_ls_csnm1(a) result(res)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_csnm1
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='csnm1'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%spnm1()
+  return
+
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_csnm1
+
+
+function psb_ls_rowsum(a,info) result(d)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_rowsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_), allocatable     :: d(:)
+  integer(psb_ipk_), intent(out)               :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  allocate(d(max(1,a%a%get_nrows())), stat=info)
+  if (info /= psb_success_) goto 9999
+  call a%a%rowsum(d)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_rowsum
+
+function psb_ls_arwsum(a,info) result(d)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_arwsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_), allocatable           :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  allocate(d(max(1,a%a%get_nrows())), stat=info)
+  if (info /= psb_success_) goto 9999
+
+  call a%a%arwsum(d)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_arwsum
+
+function psb_ls_colsum(a,info) result(d)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_colsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_), allocatable         :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  if (info /= psb_success_) goto 9999
+
+  call a%a%colsum(d)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_colsum
+
+function psb_ls_aclsum(a,info) result(d)
+  use psb_s_mat_mod, psb_protect_name => psb_ls_aclsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_lsspmat_type), intent(in) :: a
+  real(psb_spk_), allocatable           :: d(:)
+  integer(psb_ipk_), intent(out)       :: info
+
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+  if (.not.allocated(a%a)) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  allocate(d(max(1,a%a%get_ncols())), stat=info)
+  if (info /= psb_success_) goto 9999
+
+  call a%a%aclsum(d)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ls_aclsum
+
 subroutine psb_ls_mv_from_ib(a,b)
   use psb_error_mod
   use psb_const_mod

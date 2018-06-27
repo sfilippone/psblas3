@@ -388,6 +388,13 @@ module psb_d_mat_mod
 
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_ld_get_diag
+    procedure, pass(a) :: maxval   => psb_ld_maxval
+    procedure, pass(a) :: spnmi    => psb_ld_csnmi
+    procedure, pass(a) :: spnm1    => psb_ld_csnm1
+    procedure, pass(a) :: rowsum   => psb_ld_rowsum
+    procedure, pass(a) :: arwsum   => psb_ld_arwsum
+    procedure, pass(a) :: colsum   => psb_ld_colsum
+    procedure, pass(a) :: aclsum   => psb_ld_aclsum
     procedure, pass(a) :: scals    => psb_ld_scals
     procedure, pass(a) :: scalv    => psb_ld_scal
     generic, public    :: scal     => scals, scalv
@@ -1679,14 +1686,68 @@ module psb_d_mat_mod
     end subroutine psb_ld_scals
   end interface
 
+  interface 
+    function psb_ld_maxval(a) result(res)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_ld_maxval
+  end interface
+  
+  interface 
+    function psb_ld_csnmi(a) result(res)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_ld_csnmi
+  end interface
+  
+  interface 
+    function psb_ld_csnm1(a) result(res)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_ld_csnm1
+  end interface
 
+  interface 
+    function psb_ld_rowsum(a,info) result(d)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_), allocatable      :: d(:)
+      integer(psb_ipk_), intent(out)               :: info
+    end function psb_ld_rowsum
+  end interface
 
+  interface 
+    function psb_ld_arwsum(a,info) result(d)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_), allocatable        :: d(:)
+      integer(psb_ipk_), intent(out)               :: info
+    end function psb_ld_arwsum
+  end interface
+  
+  interface 
+    function psb_ld_colsum(a,info) result(d)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_), allocatable      :: d(:)
+      integer(psb_ipk_), intent(out)               :: info
+    end function psb_ld_colsum
+  end interface
 
+  interface 
+    function psb_ld_aclsum(a,info)  result(d)
+      import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
+      class(psb_ldspmat_type), intent(in) :: a
+      real(psb_dpk_), allocatable        :: d(:)
+      integer(psb_ipk_), intent(out)        :: info
+    end function psb_ld_aclsum
+  end interface
   
 contains 
 
-
-  
   subroutine  psb_d_set_mat_default(a) 
     implicit none 
     class(psb_d_base_sparse_mat), intent(in) :: a

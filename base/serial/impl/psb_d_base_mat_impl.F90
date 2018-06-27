@@ -1578,8 +1578,6 @@ subroutine psb_d_base_scal(d,a,info,side)
 
 end subroutine psb_d_base_scal
 
-
-
 function psb_d_base_maxval(a) result(res)
   use psb_error_mod
   use psb_const_mod
@@ -1769,7 +1767,6 @@ subroutine psb_d_base_aclsum(d,a)
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_aclsum
-
 
 subroutine psb_d_base_get_diag(a,d,info) 
   use psb_error_mod
@@ -3434,8 +3431,6 @@ subroutine psb_ld_base_scals(d,a,info)
 
 end subroutine psb_ld_base_scals
 
-
-
 subroutine psb_ld_base_scal(d,a,info,side) 
   use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_scal
   use psb_error_mod
@@ -3460,6 +3455,192 @@ subroutine psb_ld_base_scal(d,a,info,side)
 
 end subroutine psb_ld_base_scal
 
+function psb_ld_base_maxval(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_maxval
+
+  implicit none 
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='maxval'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  res = dzero
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end function psb_ld_base_maxval
+
+function psb_ld_base_csnmi(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_csnmi
+
+  implicit none 
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='csnmi'
+  real(psb_dpk_), allocatable  :: vt(:) 
+    
+  logical, parameter :: debug=.false.
+
+
+  call psb_erractionsave(err_act)
+  res = dzero
+  call psb_realloc(a%get_nrows(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%arwsum(vt)
+  res = maxval(vt)  
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ld_base_csnmi
+
+function psb_ld_base_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_realloc_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_csnm1
+
+  implicit none 
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='csnm1'
+  real(psb_dpk_), allocatable  :: vt(:) 
+    
+  logical, parameter :: debug=.false.
+
+
+  call psb_erractionsave(err_act)
+  res = dzero
+  call psb_realloc(a%get_ncols(),vt,info) 
+  if (info /= 0) then 
+    info  = psb_err_alloc_dealloc_ 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call a%aclsum(vt)
+  res = maxval(vt)  
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end function psb_ld_base_csnm1
+
+subroutine psb_ld_base_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_rowsum
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ld_base_rowsum
+
+subroutine psb_ld_base_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_arwsum
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ld_base_arwsum
+
+subroutine psb_ld_base_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_colsum
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ld_base_colsum
+
+subroutine psb_ld_base_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_base_aclsum
+  class(psb_ld_base_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_ipk_)  :: err_act, info
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  ! This is the base version. If we get here
+  ! it means the derived class is incomplete,
+  ! so we throw an error.
+  info = psb_err_missing_override_method_
+  call psb_errpush(info,name,a_err=a%get_fmt())
+
+  call psb_error_handler(err_act)
+
+end subroutine psb_ld_base_aclsum
 
 subroutine psb_ld_base_get_diag(a,d,info) 
   use psb_error_mod

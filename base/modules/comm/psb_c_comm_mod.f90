@@ -115,6 +115,16 @@ module psb_c_comm_mod
       integer(psb_ipk_), intent(in), optional   :: root,dupl
       logical, intent(in), optional   :: keepnum,keeploc
     end subroutine psb_lcsp_allgather
+    subroutine psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keeploc)
+      import
+      implicit none
+      type(psb_lcspmat_type), intent(inout) :: loca
+      type(psb_lcspmat_type), intent(out)   :: globa
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: root,dupl
+      logical, intent(in), optional   :: keepnum,keeploc
+    end subroutine psb_lclcsp_allgather
     subroutine psb_cgather_vect(globx, locx, desc_a, info, root)
       import
       implicit none

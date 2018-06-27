@@ -1302,7 +1302,7 @@ function psb_s_csr_csnmi(a) result(res)
   if (a%is_dev())   call a%sync()
 
   do i = 1, a%get_nrows()
-    acc = dzero
+    acc = szero
     do j=a%irp(i),a%irp(i+1)-1  
       acc = acc + abs(a%val(j))
     end do
@@ -3333,6 +3333,261 @@ subroutine psb_ls_csr_scals(d,a,info)
 end subroutine psb_ls_csr_scals
 
 
+function psb_ls_csr_maxval(a) result(res)
+  use psb_error_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_maxval
+  implicit none 
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_lpk_) :: nnz
+  integer(psb_ipk_) :: info
+  character(len=20)  :: name='ls_csr_maxval'
+  logical, parameter :: debug=.false.
+
+  if (a%is_dev())   call a%sync()
+
+  res = szero
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+end function psb_ls_csr_maxval
+
+function psb_ls_csr_csnmi(a) result(res)
+  use psb_error_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_csnmi
+  implicit none 
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
+
+  integer(psb_lpk_) :: i,j,k,m,n, nr, ir, jc, nc
+  real(psb_spk_) :: acc
+  logical   :: tra
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='ls_csnmi'
+  logical, parameter :: debug=.false.
+
+
+  res = szero
+  if (a%is_dev())   call a%sync()
+
+  do i = 1, a%get_nrows()
+    acc = szero
+    do j=a%irp(i),a%irp(i+1)-1  
+      acc = acc + abs(a%val(j))
+    end do
+    res = max(res,acc)
+  end do
+
+end function psb_ls_csr_csnmi
+
+subroutine psb_ls_csr_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_rowsum
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)             :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = m
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  do i = 1, a%get_nrows()
+    d(i) = szero
+    do j=a%irp(i),a%irp(i+1)-1  
+      d(i) = d(i) + (a%val(j))
+    end do
+  end do
+  
+  if (a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + sone
+    end do
+  end if
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_csr_rowsum
+
+subroutine psb_ls_csr_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_arwsum
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = m
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+
+  do i = 1, a%get_nrows()
+    d(i) = szero
+    do j=a%irp(i),a%irp(i+1)-1  
+      d(i) = d(i) + abs(a%val(j))
+    end do
+  end do
+  
+  if (a%is_unit()) then 
+    do i=1, m
+      d(i) = d(i) + sone
+    end do
+  end if
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_csr_arwsum
+
+subroutine psb_ls_csr_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_colsum
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = n
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%irp(i),a%irp(i+1)-1
+      k = a%ja(j)
+      d(k) = d(k) + (a%val(j))
+    end do
+  end do
+  
+  if (a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + sone
+    end do
+  end if
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_csr_colsum
+
+subroutine psb_ls_csr_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_s_csr_mat_mod, psb_protect_name => psb_ls_csr_aclsum
+  class(psb_ls_csr_sparse_mat), intent(in) :: a
+  real(psb_spk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_spk_) :: acc
+  real(psb_spk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  integer(psb_epk_) :: err(5)
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    err(1) = 1; err(2) = size(d); err(3) = n
+    call psb_errpush(info,name,e_err=err)
+    goto 9999
+  end if
+
+  d   = szero
+
+  do i=1, m
+    do j=a%irp(i),a%irp(i+1)-1
+      k = a%ja(j)
+      d(k) = d(k) + abs(a%val(j))
+    end do
+  end do
+  
+  if (a%is_unit()) then 
+    do i=1, n
+      d(i) = d(i) + sone
+    end do
+  end if
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ls_csr_aclsum
 
 
 ! == =================================== 

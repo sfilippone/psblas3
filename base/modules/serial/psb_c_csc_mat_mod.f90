@@ -126,6 +126,12 @@ module psb_c_csc_mat_mod
     procedure, pass(a) :: sizeof      => lc_csc_sizeof
     procedure, pass(a) :: scals       => psb_lc_csc_scals
     procedure, pass(a) :: scalv       => psb_lc_csc_scal
+    procedure, pass(a) :: maxval      => psb_lc_csc_maxval
+    procedure, pass(a) :: spnm1       => psb_lc_csc_csnm1
+    procedure, pass(a) :: rowsum      => psb_lc_csc_rowsum
+    procedure, pass(a) :: arwsum      => psb_lc_csc_arwsum
+    procedure, pass(a) :: colsum      => psb_lc_csc_colsum
+    procedure, pass(a) :: aclsum      => psb_lc_csc_aclsum
     procedure, pass(a) :: reallocate_nz => psb_lc_csc_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_lc_csc_allocate_mnnz
     procedure, pass(a) :: cp_to_coo   => psb_lc_cp_csc_to_coo
@@ -795,6 +801,66 @@ module psb_c_csc_mat_mod
       complex(psb_spk_), intent(out)     :: d(:)
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_lc_csc_get_diag
+  end interface
+ 
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_maxval
+  interface 
+    function psb_lc_csc_maxval(a) result(res)
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      real(psb_spk_)         :: res
+    end function psb_lc_csc_maxval
+  end interface
+  
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_csnm1
+  interface 
+    function psb_lc_csc_csnm1(a) result(res)
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      real(psb_spk_)         :: res
+    end function psb_lc_csc_csnm1
+  end interface
+
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_rowsum
+  interface 
+    subroutine psb_lc_csc_rowsum(d,a) 
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(out)              :: d(:)
+    end subroutine psb_lc_csc_rowsum
+  end interface
+
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_arwsum
+  interface 
+    subroutine psb_lc_csc_arwsum(d,a) 
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      real(psb_spk_), intent(out)              :: d(:)
+    end subroutine psb_lc_csc_arwsum
+  end interface
+  
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_colsum
+  interface 
+    subroutine psb_lc_csc_colsum(d,a) 
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      complex(psb_spk_), intent(out)              :: d(:)
+    end subroutine psb_lc_csc_colsum
+  end interface
+
+  !> \memberof psb_lc_csc_sparse_mat
+  !! \see psb_c_base_mat_mod::psb_lc_base_aclsum
+  interface 
+    subroutine psb_lc_csc_aclsum(d,a) 
+      import
+      class(psb_lc_csc_sparse_mat), intent(in) :: a
+      real(psb_spk_), intent(out)              :: d(:)
+    end subroutine psb_lc_csc_aclsum
   end interface
   
   !> \memberof psb_lc_csc_sparse_mat

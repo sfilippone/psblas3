@@ -29,7 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-
 subroutine psb_d_coo_get_diag(a,d,info) 
   use psb_d_base_mat_mod, psb_protect_name => psb_d_coo_get_diag
   use psb_error_mod
@@ -1934,7 +1933,6 @@ subroutine psb_d_coo_aclsum(d,a)
   return
 
 end subroutine psb_d_coo_aclsum
-
 
 
 ! == ==================================
@@ -4159,7 +4157,6 @@ subroutine psb_ld_coo_get_diag(a,d,info)
 
 end subroutine psb_ld_coo_get_diag
 
-
 subroutine psb_ld_coo_scal(d,a,info,side) 
   use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_scal
   use psb_error_mod
@@ -4266,6 +4263,324 @@ subroutine psb_ld_coo_scals(d,a,info)
 
 end subroutine psb_ld_coo_scals
 
+
+function psb_ld_coo_maxval(a) result(res)
+  use psb_error_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_maxval
+  implicit none 
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_lpk_)  :: i,j,k,m,n, nnz, ir, jc, nc, info
+  character(len=20)  :: name='d_coo_maxval'
+  logical, parameter :: debug=.false.
+
+  if (a%is_dev())   call a%sync()
+
+  if (a%is_unit()) then 
+    res = done
+  else
+    res = dzero
+  end if
+  nnz = a%get_nzeros()
+  if (allocated(a%val)) then 
+    nnz = min(nnz,size(a%val))
+    res = maxval(abs(a%val(1:nnz)))
+  end if
+
+end function psb_ld_coo_maxval
+
+function psb_ld_coo_csnmi(a) result(res)
+  use psb_error_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csnmi
+  implicit none 
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical            :: tra, is_unit
+  integer(psb_ipk_)  :: err_act
+  character(len=20)  :: name='d_coo_csnmi'
+  logical, parameter :: debug=.false.
+
+  if (a%is_dev())   call a%sync()
+
+  res = dzero
+  nnz = a%get_nzeros()
+  is_unit = a%is_unit()
+  if (a%is_by_rows()) then 
+    i   = 1
+    j   = i
+    res = dzero 
+    do while (i<=nnz) 
+      do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
+        j = j+1
+      enddo
+      if (is_unit) then 
+        acc = done
+      else
+        acc = dzero
+      end if
+      do k=i, j-1
+        acc = acc + abs(a%val(k))
+      end do
+      res = max(res,acc)
+      i = j
+    end do
+  else
+    m = a%get_nrows()
+    allocate(vt(m),stat=info)
+    if (info /= 0) return
+    if (is_unit) then 
+      vt = done
+    else
+      vt = dzero
+    end if
+    do j=1, nnz
+      i = a%ia(j)
+      vt(i) = vt(i) + abs(a%val(j))
+    end do
+    res = maxval(vt(1:m))
+    deallocate(vt,stat=info)
+  end if
+    
+end function psb_ld_coo_csnmi
+
+
+function psb_ld_coo_csnm1(a) result(res)
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_csnm1
+
+  implicit none 
+  class(psb_d_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer(psb_lpk_) :: i,j,k,m,n, nnz, ir, jc, nc, info
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='ld_coo_csnm1'
+  logical, parameter :: debug=.false.
+
+  if (a%is_dev())   call a%sync()
+
+  res = dzero
+  nnz = a%get_nzeros()
+  n   = a%get_ncols()
+  allocate(vt(n),stat=info)
+  if (info /= 0) return
+  if (a%is_unit()) then 
+    vt = done
+  else
+    vt = dzero
+  end if
+  do j=1, nnz
+    i = a%ja(j)
+    vt(i) = vt(i) + abs(a%val(j))
+  end do
+  res = maxval(vt(1:n))
+  deallocate(vt,stat=info)
+
+  return
+
+end function psb_ld_coo_csnm1
+
+subroutine psb_ld_coo_rowsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_rowsum
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)             :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,n, nnz, ir, jc, nc
+  integer(psb_epk_) :: m
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    call psb_errpush(info,name,e_err=(/1_psb_epk_,size(d,kind=psb_epk_),m/))
+    goto 9999
+  end if
+
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
+  nnz = a%get_nzeros()
+  do j=1, nnz
+    i    = a%ia(j)
+    d(i) = d(i) + a%val(j)
+  end do
+
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_coo_rowsum
+
+subroutine psb_ld_coo_arwsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_arwsum
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,n, nnz, ir, jc, nc
+  integer(psb_epk_) :: m
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  m = a%get_nrows()
+  if (size(d) < m) then 
+    info=psb_err_input_asize_small_i_
+    call psb_errpush(info,name,e_err=(/1_psb_epk_,size(d,kind=psb_epk_),m/))
+    goto 9999
+  end if
+
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
+  nnz = a%get_nzeros()
+  do j=1, nnz
+    i    = a%ia(j)
+    d(i) = d(i) + abs(a%val(j))
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_coo_arwsum
+
+subroutine psb_ld_coo_colsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_colsum
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m, nnz, ir, jc, nc
+  integer(psb_epk_) :: n
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    call psb_errpush(info,name,e_err=(/1_psb_epk_,size(d,kind=psb_epk_),n/))
+    goto 9999
+  end if
+
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
+
+  nnz = a%get_nzeros()
+  do j=1, nnz
+    k    = a%ja(j)
+    d(k) = d(k) + a%val(j)
+  end do
+
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_coo_colsum
+
+subroutine psb_ld_coo_aclsum(d,a) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_aclsum
+  class(psb_ld_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)              :: d(:)
+
+  integer(psb_lpk_) :: i,j,k,m, nnz, ir, jc, nc
+  integer(psb_epk_) :: n
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: vt(:)
+  logical   :: tra
+  integer(psb_ipk_) :: err_act, info
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (a%is_dev())   call a%sync()
+
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=psb_err_input_asize_small_i_
+    call psb_errpush(info,name,e_err=(/1_psb_epk_,size(d,kind=psb_epk_),n/))
+    goto 9999
+  end if
+
+
+  if (a%is_unit()) then 
+    d = done
+  else
+    d = dzero
+  end if
+
+  nnz = a%get_nzeros()
+  do j=1, nnz
+    k    = a%ja(j)
+    d(k) = d(k) + abs(a%val(j))
+  end do
+  
+  return
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_ld_coo_aclsum
 
 subroutine  psb_ld_coo_reallocate_nz(nz,a) 
   use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_reallocate_nz
