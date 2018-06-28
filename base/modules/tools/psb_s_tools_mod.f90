@@ -32,7 +32,7 @@
 Module psb_s_tools_mod
   use psb_desc_mod, only : psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_
   use psb_s_vect_mod, only : psb_s_base_vect_type, psb_s_vect_type
-  use psb_s_mat_mod, only : psb_sspmat_type, psb_s_base_sparse_mat
+  use psb_s_mat_mod, only : psb_sspmat_type, psb_lsspmat_type, psb_s_base_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
   use psb_s_multivect_mod, only : psb_s_base_multivect_type, psb_s_multivect_type
 
@@ -197,6 +197,18 @@ Module psb_s_tools_mod
       character(len=5), optional             :: outfmt 
       integer(psb_ipk_), intent(in), optional          :: data
     end Subroutine psb_ssphalo
+    Subroutine psb_lssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
+      import
+      implicit none
+      Type(psb_lsspmat_type),Intent(in)       :: a
+      Type(psb_lsspmat_type),Intent(inout)    :: blk
+      Type(psb_desc_type),Intent(in), target :: desc_a
+      integer(psb_ipk_), intent(out)                   :: info
+      logical, optional, intent(in)          :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional             :: outfmt 
+      integer(psb_ipk_), intent(in), optional          :: data
+    end Subroutine psb_lssphalo
   end interface
 
 
