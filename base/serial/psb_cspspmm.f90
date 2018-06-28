@@ -115,3 +115,84 @@ subroutine psb_cspspmm(a,b,c,info)
 
 end subroutine psb_cspspmm
 
+
+subroutine psb_lcspspmm(a,b,c,info)
+  use psb_base_mod, psb_protect_name => psb_lcspspmm
+  implicit none 
+
+  type(psb_lcspmat_type), intent(in)    :: a,b
+  type(psb_lcspmat_type), intent(out)   :: c
+  integer(psb_ipk_), intent(out)                  :: info
+  type(psb_lc_csr_sparse_mat), allocatable :: ccsr
+  type(psb_lc_csc_sparse_mat), allocatable :: ccsc
+  integer(psb_ipk_) :: err_act
+  character(len=*), parameter ::  name='psb_spspmm'
+  logical :: done_spmm
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if ((a%is_null()) .or.(b%is_null())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+
+  ! 
+  ! Shortcuts for special cases
+  !
+  done_spmm = .false. 
+  select type(aa=>a%a)
+  class is (psb_lc_csr_sparse_mat) 
+    select type(ba=>b%a)
+    class is (psb_lc_csr_sparse_mat) 
+      
+      allocate(ccsr,stat=info)    
+      if (info == psb_success_) then 
+        call psb_lccsrspspmm(aa,ba,ccsr,info)
+      else
+        info = psb_err_alloc_dealloc_
+      end if
+      if (info == psb_success_) call move_alloc(ccsr,c%a)
+      done_spmm = .true. 
+
+    end select
+
+  class is (psb_lc_csc_sparse_mat) 
+    select type(ba=>b%a)
+    class is (psb_lc_csc_sparse_mat) 
+      
+      allocate(ccsc,stat=info)    
+      if (info == psb_success_) then 
+        call psb_lccscspspmm(aa,ba,ccsc,info)
+      else
+        info = psb_err_alloc_dealloc_
+      end if
+      if (info == psb_success_) call move_alloc(ccsc,c%a)
+      done_spmm = .true. 
+
+    end select
+
+  end select
+  
+  !
+  ! General code
+  !
+  if (.not.done_spmm) then 
+    call psb_symbmm(a,b,c,info)
+    if (info == psb_success_) call psb_numbmm(a,b,c)
+  end if
+  
+  if (info /= psb_success_) then 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lcspspmm
+

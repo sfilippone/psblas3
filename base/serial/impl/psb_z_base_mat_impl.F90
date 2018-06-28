@@ -2052,7 +2052,7 @@ subroutine psb_z_base_cp_from_lcoo(a,b,info)
   
   !
   ! Default implementation
-   ! 
+  ! 
   info = psb_success_
   call psb_erractionsave(err_act)
 
@@ -2086,11 +2086,12 @@ subroutine psb_z_base_cp_to_lfmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_lfmt'
   logical, parameter :: debug=.false.
-  type(psb_lz_coo_sparse_mat)  :: tmp
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   
   !
   ! Default implementation
-   ! 
+  ! 
   info = psb_success_
   call psb_erractionsave(err_act)
 
@@ -2098,9 +2099,11 @@ subroutine psb_z_base_cp_to_lfmt(a,b,info)
   type is (psb_lz_coo_sparse_mat)
     call a%cp_to_lcoo(b,info)
   class default
-    call a%cp_to_lcoo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+    call a%cp_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call b%mv_from_coo(lcoo,info)
   end select
+
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='to/from coo')
@@ -2128,8 +2131,8 @@ subroutine psb_z_base_cp_from_lfmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_lfmt'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   !
   ! Default implementation
   ! 
@@ -2140,8 +2143,9 @@ subroutine psb_z_base_cp_from_lfmt(a,b,info)
   type is (psb_lz_coo_sparse_mat)
     call a%cp_from_lcoo(b,info)
   class default
-    call b%cp_to_icoo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    call b%cp_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call a%mv_from_coo(icoo,info)
   end select
 
   if (info /= psb_success_) then 
@@ -2152,7 +2156,6 @@ subroutine psb_z_base_cp_from_lfmt(a,b,info)
 
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 
@@ -2191,7 +2194,6 @@ subroutine psb_z_base_mv_to_lcoo(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-
 9999 call psb_error_handler(err_act)
 
   return
@@ -2227,7 +2229,6 @@ subroutine psb_z_base_mv_from_lcoo(a,b,info)
   call psb_erractionrestore(err_act)
   return
 
-
 9999 call psb_error_handler(err_act)
 
   return
@@ -2247,19 +2248,34 @@ subroutine psb_z_base_mv_to_lfmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_lfmt'
   logical, parameter :: debug=.false.
-  type(psb_lz_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
+  
   !
   ! Default implementation
   ! 
   info = psb_success_
+  call psb_erractionsave(err_act)
+
   select type(b)
   type is (psb_lz_coo_sparse_mat)
     call a%mv_to_lcoo(b,info)
   class default
-    call a%mv_to_lcoo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+    call a%mv_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call b%mv_from_coo(lcoo,info)
   end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
 
   return
 
@@ -2277,19 +2293,33 @@ subroutine psb_z_base_mv_from_lfmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_lfmt'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   !
   ! Default implementation
   ! 
-  info = psb_success_
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
   select type(b)
   type is (psb_lz_coo_sparse_mat)
     call a%mv_from_lcoo(b,info)
   class default
-    call b%mv_to_icoo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    call b%mv_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call a%mv_from_coo(icoo,info)
   end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
   return
 
 end subroutine psb_z_base_mv_from_lfmt
@@ -3758,7 +3788,8 @@ subroutine psb_lz_base_cp_to_ifmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_ifmt'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat)  :: tmp
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   
   !
   ! Default implementation
@@ -3770,9 +3801,11 @@ subroutine psb_lz_base_cp_to_ifmt(a,b,info)
   type is (psb_z_coo_sparse_mat)
     call a%cp_to_icoo(b,info)
   class default
-    call a%cp_to_icoo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+    call a%cp_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call b%mv_from_coo(icoo,info)
   end select
+
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='to/from coo')
@@ -3800,8 +3833,8 @@ subroutine psb_lz_base_cp_from_ifmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_ifmt'
   logical, parameter :: debug=.false.
-  type(psb_lz_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   !
   ! Default implementation
   ! 
@@ -3812,8 +3845,9 @@ subroutine psb_lz_base_cp_from_ifmt(a,b,info)
   type is (psb_z_coo_sparse_mat)
     call a%cp_from_icoo(b,info)
   class default
-    call b%cp_to_lcoo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    call b%cp_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call a%mv_from_coo(lcoo,info)
   end select
 
   if (info /= psb_success_) then 
@@ -3824,7 +3858,6 @@ subroutine psb_lz_base_cp_from_ifmt(a,b,info)
 
   call psb_erractionrestore(err_act)
   return
-
 
 9999 call psb_error_handler(err_act)
 
@@ -3919,19 +3952,34 @@ subroutine psb_lz_base_mv_to_ifmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='to_ifmt'
   logical, parameter :: debug=.false.
-  type(psb_z_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
+  
   !
   ! Default implementation
   ! 
   info = psb_success_
+  call psb_erractionsave(err_act)
+
   select type(b)
   type is (psb_z_coo_sparse_mat)
     call a%mv_to_icoo(b,info)
   class default
-    call a%mv_to_icoo(tmp,info)
-    if (info == psb_success_) call b%mv_from_coo(tmp,info)
+    call a%mv_to_coo(lcoo,info)
+    if (info == psb_success_) call lcoo%mv_to_icoo(icoo,info)
+    if (info == psb_success_) call b%mv_from_coo(icoo,info)
   end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+    
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
 
   return
 
@@ -3949,19 +3997,34 @@ subroutine psb_lz_base_mv_from_ifmt(a,b,info)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='from_ifmt'
   logical, parameter :: debug=.false.
-  type(psb_lz_coo_sparse_mat)  :: tmp
-
+  type(psb_z_coo_sparse_mat)  :: icoo
+  type(psb_lz_coo_sparse_mat) :: lcoo
   !
   ! Default implementation
   ! 
-  info = psb_success_
+  info  = psb_success_
+  call psb_erractionsave(err_act)
+  
   select type(b)
   type is (psb_z_coo_sparse_mat)
     call a%mv_from_icoo(b,info)
   class default
-    call b%mv_to_lcoo(tmp,info)
-    if (info == psb_success_) call a%mv_from_coo(tmp,info)
+    call b%mv_to_coo(icoo,info)
+    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo,info)
+    if (info == psb_success_) call a%mv_from_coo(lcoo,info)
   end select
+
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
+    call psb_errpush(info,name, a_err='to/from coo')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
   return
 
 end subroutine psb_lz_base_mv_from_ifmt
