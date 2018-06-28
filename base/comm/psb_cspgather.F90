@@ -201,7 +201,7 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   logical :: keepnum_, keeploc_
   integer(psb_mpk_) :: ictxt,np,me
   integer(psb_mpk_) :: icomm, minfo, ndx
-  integer(psb_lpk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -256,6 +256,9 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
     nzg = sum(nzbr)
     if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     if (info /= psb_success_) goto 9999
+    !
+    !  PLS REVIEW AND ADD OVERFLOW ERROR CHECKING
+    !
 
     do ip=1,np
       idisp(ip) = sum(nzbr(1:ip-1))
@@ -331,11 +334,11 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   type(psb_lc_coo_sparse_mat)     :: loc_coo, glob_coo
   integer(psb_lpk_) :: nrg, ncg, nzg
   integer(psb_ipk_) :: err_act, dupl_
-  integer(psb_ipk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
+  integer(psb_lpk_) :: ip,naggrm1,naggrp1, i, j, k, nzl
   logical :: keepnum_, keeploc_
   integer(psb_mpk_) :: ictxt,np,me
   integer(psb_mpk_) :: icomm, minfo, ndx
-  integer(psb_lpk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -390,7 +393,9 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     nzg = sum(nzbr)
     if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
     if (info /= psb_success_) goto 9999
-
+    !
+    !  PLS REVIEW AND ADD OVERFLOW ERROR CHECKING
+    !
     do ip=1,np
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
@@ -413,11 +418,6 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
       goto 9999
     end if    
     call loc_coo%free()
-    !
-    ! Is the code below safe? For very large cases
-    ! the indices in glob_coo will overflow. But then,
-    ! for very large cases it does not make sense to
-    ! gather the matrix on a single procecss anyway...
     !
     call glob_coo%set_nzeros(nzg)
     if (present(dupl)) call glob_coo%set_dupl(dupl)
