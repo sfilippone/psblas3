@@ -219,6 +219,7 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   integer(psb_mpk_) :: ictxt,np,me
   integer(psb_mpk_) :: icomm, minfo, ndx
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_lpk_), allocatable :: lnzbr(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -250,10 +251,9 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
     nrg = desc_a%get_global_rows()
     ncg = desc_a%get_global_rows()
 
-    allocate(nzbr(np), idisp(np),stat=info)
+    allocate(nzbr(np), idisp(np),lnzbr(np),stat=info)
     if (info /= psb_success_) then 
-      info=psb_err_alloc_request_
-      ierr(1) = 2*np
+      info=psb_err_alloc_request_; ierr(1) = 3*np
       call psb_errpush(info,name,i_err=ierr,a_err='integer')
       goto 9999      
     end if
@@ -270,13 +270,15 @@ subroutine  psb_lcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
     nzbr(:) = 0
     nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
+    lnzbr = nzbr
     nzg = sum(nzbr)
-    if (nzg <0) then
+    if ((nzg < 0).or.(nzg /= sum(lnzbr))) then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
 #if defined(HAVE_ISO_FORTRAN_ENV)
-    if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_)))  then
+    if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_))&
+         & .or.(sum(lnzbr) > HUGE(1_psb_mpk_)))  then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
@@ -367,6 +369,7 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   integer(psb_mpk_) :: ictxt,np,me
   integer(psb_mpk_) :: icomm, minfo, ndx
   integer(psb_mpk_), allocatable :: nzbr(:), idisp(:)
+  integer(psb_lpk_), allocatable :: lnzbr(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -398,10 +401,9 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     nrg = desc_a%get_global_rows()
     ncg = desc_a%get_global_rows()
 
-    allocate(nzbr(np), idisp(np),stat=info)
+    allocate(nzbr(np), idisp(np),lnzbr(np),stat=info)
     if (info /= psb_success_) then 
-      info=psb_err_alloc_request_
-      ierr(1) = 2*np
+      info=psb_err_alloc_request_; ierr(1) = 3*np
       call psb_errpush(info,name,i_err=ierr,a_err='integer')
       goto 9999      
     end if
@@ -418,13 +420,15 @@ subroutine  psb_lclcsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
     nzbr(:) = 0
     nzbr(me+1) = nzl
     call psb_sum(ictxt,nzbr(1:np))
+    lnzbr = nzbr
     nzg = sum(nzbr)
-    if (nzg <0) then
+    if ((nzg < 0).or.(nzg /= sum(lnzbr))) then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
 #if defined(HAVE_ISO_FORTRAN_ENV)
-    if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_)))  then
+    if ((nrg > HUGE(1_psb_mpk_)).or.(nzg > HUGE(1_psb_mpk_))&
+         & .or.(sum(lnzbr) > HUGE(1_psb_mpk_)))  then
       info = psb_err_mpi_int_ovflw_
       call psb_errpush(info,name); goto 9999      
     end if
