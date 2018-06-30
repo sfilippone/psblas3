@@ -399,7 +399,7 @@ subroutine psb_lcmatdist(a_glob, a, ictxt, desc_a,&
 
   ! local variables
   logical           :: use_parts, use_v
-  integer(psb_mpk_) :: np, iam, np_sharing, root, iproc
+  integer(psb_ipk_) :: np, iam, np_sharing, root, iproc
   integer(psb_ipk_) :: err_act, il, inz
   integer(psb_lpk_) :: k_count, liwork,  nnzero, nrhs,&
        & i, ll, nz, isize, nnr, err

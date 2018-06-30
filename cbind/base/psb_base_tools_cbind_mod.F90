@@ -30,7 +30,7 @@ contains
     integer(psb_c_ipk)        :: vg(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
     if (ng <=0) then 
@@ -63,7 +63,7 @@ contains
     integer(psb_c_lpk)        :: vl(*)
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info, ixb 
+    integer(psb_c_ipk)           :: info, ixb 
 
     res = -1
     if (nl <=0) then 
@@ -100,7 +100,7 @@ contains
     integer(psb_c_ipk), value :: nl, ictxt
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
     if (nl <=0) then 
@@ -132,7 +132,7 @@ contains
     integer(psb_c_ipk), value :: ictxt
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
     if (n <=0) then 
@@ -162,7 +162,7 @@ contains
     integer(psb_c_ipk) :: res   
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
 
@@ -181,7 +181,7 @@ contains
     integer(psb_c_ipk) :: res   
     type(psb_c_object_type) :: cdh
     type(psb_desc_type), pointer :: descp
-    integer               :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -205,7 +205,7 @@ contains
     integer(psb_c_lpk)          :: ia(*),ja(*)
     
     type(psb_desc_type), pointer :: descp
-    integer                 :: info
+    integer(psb_c_ipk)           :: info
 
     res = -1
 

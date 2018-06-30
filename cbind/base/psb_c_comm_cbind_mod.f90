@@ -15,7 +15,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: xp
-    integer                 :: info
+    integer(psb_c_ipk)               :: info
     
 
     res = -1
@@ -47,7 +47,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: xp
-    integer                 :: info
+    integer(psb_c_ipk)               :: info
     
 
     res = -1
@@ -79,7 +79,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: xp
-    integer                 :: info
+    integer(psb_c_ipk)               :: info
     
 
     res = -1
@@ -114,7 +114,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: xp
     character :: ftran
-    integer                 :: info
+    integer(psb_c_ipk)               :: info
     
 
     res = -1
@@ -150,7 +150,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: vp
     complex(psb_spk_), pointer :: pgx(:)
-    integer               :: info, sz
+    integer(psb_c_ipk)       :: info, sz
 
     res = -1
 
@@ -183,7 +183,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: vp
     complex(psb_spk_), allocatable :: fv(:)
-    integer               :: info, sz
+    integer(psb_c_ipk)           :: info, sz
 
     res = -1
 
@@ -214,7 +214,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_cspmat_type), pointer :: ap, gap
-    integer               :: info, sz
+    integer(psb_c_ipk)               :: info, sz
 
     res = -1
     if (c_associated(cdh%item)) then 

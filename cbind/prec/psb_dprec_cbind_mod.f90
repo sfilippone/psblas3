@@ -22,7 +22,7 @@ contains
     type(psb_c_dprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_dprec_type), pointer :: precp
-    integer                 :: info
+    integer(psb_c_ipk)              :: info
     character(len=80)       :: fptype
 
     res = -1
@@ -59,8 +59,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_dspmat_type), pointer :: ap
     type(psb_dprec_type), pointer :: precp
-
-    integer               :: info
+    integer(psb_c_ipk)              :: info
 
     res = -1
 !!$    write(*,*) 'Entry:   ', psb_c_cd_get_local_rows(cdh)
@@ -96,10 +95,8 @@ contains
     
     integer(psb_c_ipk) :: res
     type(psb_c_dprec) :: ph
-
     type(psb_dprec_type), pointer :: precp
-
-    integer               :: info
+    integer(psb_c_ipk)              :: info
 
     res = -1
     if (c_associated(ph%item)) then 

@@ -16,7 +16,7 @@ contains
     
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
-    integer                 :: info
+    integer(psb_c_ipk)          :: info
     
 
     res = -1
@@ -51,7 +51,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer                :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1.0
 
@@ -78,7 +78,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer                 :: info
+    integer(psb_c_ipk)          :: info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -104,7 +104,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer   :: descp
     type(psb_s_vect_type), pointer :: xp
-    integer                 :: info
+    integer(psb_c_ipk)          :: info
 
     res = -1.0
 
@@ -132,7 +132,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_sspmat_type), pointer :: ap
-    integer                 ::  info
+    integer(psb_c_ipk)              ::  info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -158,7 +158,7 @@ contains
     type(psb_c_descriptor) :: cdh
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1.0
     if (c_associated(cdh%item)) then 
@@ -192,7 +192,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
     type(psb_sspmat_type), pointer :: ap
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -239,7 +239,7 @@ contains
     type(psb_sspmat_type), pointer :: ap
     character :: ftrans
     logical   :: fdoswap
-    integer               :: info
+    integer(psb_c_ipk)   :: info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -283,7 +283,7 @@ contains
     type(psb_desc_type), pointer :: descp
     type(psb_s_vect_type), pointer :: xp,yp
     type(psb_sspmat_type), pointer :: ap
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
     if (c_associated(cdh%item)) then 

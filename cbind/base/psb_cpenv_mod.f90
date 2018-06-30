@@ -211,11 +211,11 @@ contains
   end subroutine psb_c_zbcast
 
   subroutine psb_c_hbcast(ictxt,v,root) bind(c)
-    use psb_base_mod, only : psb_bcast, psb_info
+    use psb_base_mod, only : psb_bcast, psb_info, psb_ipk_
     implicit none 
     integer(psb_c_ipk), value :: ictxt, root
-    character(c_char)     :: v(*) 
-    integer :: n, iam, np
+    character(c_char)  :: v(*) 
+    integer(psb_ipk_)  :: iam, np, n
     
     call psb_info(ictxt,iam,np)
     

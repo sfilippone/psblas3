@@ -15,7 +15,7 @@ contains
     type(psb_c_cvector) :: xh
 
     type(psb_c_vect_type), pointer :: vp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -35,7 +35,7 @@ contains
     
     type(psb_c_vect_type), pointer :: vp
     complex(psb_spk_), allocatable :: fv(:)
-    integer               :: info, sz
+    integer(psb_c_ipk)           :: info, sz
 
     res = -1
 
@@ -56,7 +56,7 @@ contains
     type(psb_c_cvector) :: xh
     
     type(psb_c_vect_type), pointer :: vp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -77,7 +77,7 @@ contains
 
     type(psb_c_cspmat) :: mh
     type(psb_cspmat_type), pointer :: ap
-    integer                 ::  info
+    integer(psb_c_ipk)               ::  info
 
     res = 0
     if (c_associated(mh%item)) then 
@@ -100,7 +100,7 @@ contains
 
     type(psb_c_cspmat) :: mh
     type(psb_cspmat_type), pointer :: ap
-    integer                 ::  info
+    integer(psb_c_ipk)               ::  info
 
     res = 0
     if (c_associated(mh%item)) then 
@@ -124,7 +124,7 @@ contains
     character(c_char)        :: name(*)
     type(psb_c_cspmat) :: mh
     type(psb_cspmat_type), pointer :: ap
-    integer                 ::  info
+    integer(psb_c_ipk)      ::  info
     character(1024)         :: fname
 
     res = 0

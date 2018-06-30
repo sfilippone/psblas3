@@ -16,8 +16,8 @@ contains
     integer(psb_c_ipk)      :: res
     type(psb_c_zspmat)    :: ah
     type(psb_c_descriptor)  :: cdh
-    type(psb_c_zprec)       :: ph
-    type(psb_c_zvector)     :: bh,xh
+    type(psb_c_zprec)     :: ph
+    type(psb_c_zvector)   :: bh,xh
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
@@ -54,9 +54,9 @@ contains
     type(psb_zprec_type), pointer  :: precp
     type(psb_z_vect_type), pointer :: xp, bp
 
-    integer               :: info,fitmax,fitrace,first,fistop,fiter
-    character(len=20)     :: fmethd
-    real(psb_dpk_)      :: feps,ferr
+    integer(psb_c_ipk)  :: info,fitmax,fitrace,first,fistop,fiter
+    character(len=20)   :: fmethd
+    real(psb_dpk_)       :: feps,ferr
 
     res = -1
     if (c_associated(cdh%item)) then 

@@ -22,7 +22,7 @@ extern "C" {
 #elif defined(IPK4) &&  defined(LPK8)
   typedef int32_t psb_i_t;
   typedef int64_t psb_l_t;
-#elif defined(IPK4) &&  defined(LPK8)
+#elif defined(IPK8) &&  defined(LPK8)
   typedef int64_t psb_i_t;
   typedef int64_t psb_l_t;
 #else

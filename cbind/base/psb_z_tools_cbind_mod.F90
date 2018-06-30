@@ -17,7 +17,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -46,7 +46,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -76,7 +76,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: info
+    integer(psb_c_ipk)               :: info
 
     res = -1
 
@@ -111,7 +111,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: ixb, info
+    integer(psb_c_ipk)               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -145,14 +145,14 @@ contains
     implicit none 
     integer(psb_c_ipk) :: res   
     integer(psb_c_ipk), value :: nz
-    integer(psb_c_lpk)        :: irw(*)
+    integer(psb_c_lpk)       :: irw(*)
     complex(c_double_complex)        :: val(*)
     type(psb_c_zvector) :: xh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp
-    integer               :: ixb, info
+    integer(psb_c_ipk)               :: ixb, info
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -189,7 +189,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -219,7 +219,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -248,7 +248,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer               :: info,n
+    integer(psb_c_ipk)               :: info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -280,7 +280,7 @@ contains
     integer(psb_c_ipk) :: res   
     integer(psb_c_ipk), value :: cdh, mh,upd,dupl
     character(c_char)     :: afmt(*)
-    integer               :: info,n, fdupl
+    integer(psb_c_ipk)    :: info,n, fdupl
     character(len=5)      :: fafmt
 #ifdef HAVE_LIBRSB
     type(psb_z_rsb_sparse_mat) :: arsb
@@ -315,14 +315,14 @@ contains
     implicit none 
     integer(psb_c_ipk) :: res   
     integer(psb_c_ipk), value :: nz
-    integer(psb_c_lpk)        :: irw(*), icl(*) 
+    integer(psb_c_lpk)      :: irw(*), icl(*) 
     complex(c_double_complex)        :: val(*)
     type(psb_c_zspmat) :: mh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer               :: ixb,info,n
+    integer(psb_c_ipk)               :: ixb,info,n
 
     res = -1
     if (c_associated(cdh%item)) then 
@@ -357,7 +357,7 @@ contains
 
     type(psb_desc_type), pointer :: descp
     type(psb_zspmat_type), pointer :: ap
-    integer                :: info
+    integer(psb_c_ipk)     :: info
     logical                :: fclear 
 
     res = -1
@@ -384,7 +384,7 @@ contains
 !!$    implicit none 
 !!$    integer(psb_c_ipk) :: res   
 !!$    integer(psb_c_ipk),  value :: mh
-!!$    integer                :: info
+!!$    integer(psb_c_ipk)         :: info
 !!$
 !!$
 !!$    res = -1
