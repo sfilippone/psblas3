@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
+<!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
 <TITLE>psb_halo -- Halo Data Communication</TITLE>
@@ -9,7 +9,7 @@
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2018">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -75,7 +75,7 @@ x \leftarrow x
 where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></STRONG></DT>
 <DD>is a global dense  submatrix.
@@ -92,10 +92,10 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -125,7 +125,7 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="395" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="394" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
  SRC="img56.png"
  ALT="\begin{lstlisting}
 call psb_halo(x, desc_a, info)
@@ -143,7 +143,7 @@ call psb_halo(x, desc_a, info, work, data)
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -178,7 +178,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -200,7 +200,7 @@ index list on which to base the data exchange.
 </DD>
 <DT><STRONG>x</STRONG></DT>
 <DD>global dense result matrix <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -237,12 +237,12 @@ Sample discretization mesh.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
- WIDTH="358" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="357" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
  SRC="img57.png"
  ALT="\includegraphics[scale=0.45]{figures/try8x8.eps}">
 
 <IMG
- WIDTH="358" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="357" HEIGHT="313" ALIGN="BOTTOM" BORDER="0"
  SRC="img58.png"
  ALT="\includegraphics[scale=0.45]{figures/try8x8}">
 
@@ -258,7 +258,7 @@ distribution is such that each process will own 32 entries in the
 index space, with a halo made of 8 entries placed at local indices 33
 through 40. If process 0 assigns an initial value of 1 to its entries
 in the <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> vector, and process 1 assigns a value of 2, then after a
 call to <code>psb_halo</code> the contents of the local vectors will be the

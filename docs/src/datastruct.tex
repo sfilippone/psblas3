@@ -32,6 +32,9 @@ defined in the library as follows:
 \item[psb\_lpk\_] Kind parameter for ``global'' integer indices and data;
   with default build options this is an 8 bytes integer;
 \end{description}
+The integer kinds for local and global indices can be chosen at
+configure time to hold 4 or 8 bytes, with the global indices at least
+as large as the local ones. 
 Together with the classes attributes we also discuss their
 methods.  Most methods detailed here only act on the local variable,
 i.e. their action is purely local and asynchronous unless otherwise
