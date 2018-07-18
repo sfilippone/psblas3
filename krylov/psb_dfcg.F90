@@ -215,7 +215,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,name,&
-           & a_err='Error during residue')
+           & a_err='Error during residual')
       goto 9999
     end if
     
@@ -229,7 +229,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     if (info == psb_success_) call psb_spmm(done,a,v,dzero,w,desc_a,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,name,&
-           & a_err='Error during residue')
+           & a_err='Error during residual')
       goto 9999
     end if
 
