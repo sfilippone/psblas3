@@ -666,6 +666,7 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpik_), allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
+  integer(psb_mpik_), allocatable :: statsarray(:,:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -741,7 +742,8 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
     end do
 
   else
-    allocate(rvhd(totxch),prcid(totxch),stat=info) 
+    allocate(rvhd(totxch),prcid(totxch),&
+         & statsarray(totxch,mpi_status_size),stat=info) 
     if(info /= psb_success_) then
       call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
@@ -847,6 +849,8 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
+      else
+        rvhd(i) = mpi_request_null
       end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -884,38 +888,26 @@ subroutine psi_dswapidxv(iictxt,iicomm,flag,beta,y,idx, &
           call psb_errpush(info,name,i_err=ierr)
           goto 9999
         end if
+      else if (proc_to_comm == me) then 
+        if (nesd /= nerv) then 
+          write(psb_err_unit,*) &
+               & 'Fatal error in swapdata: mismatch on self send',&
+               & nerv,nesd
+        end if
+        rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
       end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
     end do
 
-
-    pnti   = 1
-    do i=1, totxch
-      proc_to_comm = idx(pnti+psb_proc_id_)
-      nerv = idx(pnti+psb_n_elem_recv_)
-      nesd = idx(pnti+nerv+psb_n_elem_send_)
-      p2ptag = psb_double_swap_tag
-
-      if ((proc_to_comm /= me).and.(nerv>0)) then
-        call mpi_wait(rvhd(i),p2pstat,iret)
-        if(iret /= mpi_success) then
-          ierr(1) = iret
-          info=psb_err_mpi_error_
-          call psb_errpush(info,name,i_err=ierr)
-          goto 9999
-        end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
-          write(psb_err_unit,*) &
-               & 'Fatal error in swapdata: mismatch on self send', &
-               & nerv,nesd
-        end if
-        rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
-      end if
-      pnti   = pnti + nerv + nesd + 3
-    end do
+    call mpi_waitall(totxch,rvhd,statsarray,iret)
+    if (iret /= mpi_success) then 
+      ierr(1) = iret
+      info=psb_err_mpi_error_
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
 
 
   else if (swap_send) then
@@ -1115,7 +1107,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
   ! locals
   integer(psb_mpik_) :: ictxt, icomm, np, me,&
        & proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
-  integer(psb_mpik_), allocatable :: prcid(:)
+  integer(psb_mpik_), allocatable :: prcid(:), statsarray(:,:)
   integer(psb_ipk_) :: nesd, nerv,&
        & err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
@@ -1168,6 +1160,7 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
     call y%new_comid(totxch,info)
     y%comid = mpi_request_null
     call psb_realloc(totxch,prcid,info)
+    if (info == 0) call psb_realloc(totxch,mpi_status_size,statsarray,info)
     ! First I post all the non blocking receives
     pnti   = 1
     do i=1, totxch
@@ -1183,6 +1176,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
         call mpi_irecv(y%combuf(rcv_pt),nerv,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag, icomm,y%comid(i,2),iret)
+      else
+        y%comid(i,2) = mpi_request_null
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -1226,6 +1221,8 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
         call mpi_isend(y%combuf(snd_pt),nesd,&
              & psb_mpi_r_dpk_,prcid(i),&
              & p2ptag,icomm,y%comid(i,1),iret)
+      else
+        y%comid(i,1) = mpi_request_null
       end if
 
       if(iret /= mpi_success) then
@@ -1251,46 +1248,17 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       goto 9999
     end if
     call psb_realloc(totxch,prcid,info)
+    if (info == 0) call psb_realloc(totxch,mpi_status_size,statsarray,info)
 
     if (debug) write(*,*) me,' wait'
-    pnti   = 1
-    p2ptag = psb_double_swap_tag
-    do i=1, totxch
-      proc_to_comm = idx%v(pnti+psb_proc_id_)
-      nerv = idx%v(pnti+psb_n_elem_recv_)
-      nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-      snd_pt = 1+pnti+nerv+psb_n_elem_send_
-      rcv_pt = 1+pnti+psb_n_elem_recv_
-
-      if (proc_to_comm /= me)then 
-        if (nesd>0) then 
-          call mpi_wait(y%comid(i,1),p2pstat,iret)
-          if(iret /= mpi_success) then
-            ierr(1) = iret
-            info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
-            goto 9999
-          end if
-        end if
-        if (nerv>0) then 
-          call mpi_wait(y%comid(i,2),p2pstat,iret)
-          if(iret /= mpi_success) then
-            ierr(1) = iret
-            info=psb_err_mpi_error_
-            call psb_errpush(info,name,i_err=ierr)
-            goto 9999
-          end if
-        end if
-      else if (proc_to_comm == me) then 
-        if (nesd /= nerv) then 
-          write(psb_err_unit,*) &
-               & 'Fatal error in swapdata: mismatch on self send',&
-               & nerv,nesd
-        end if
-        y%combuf(rcv_pt:rcv_pt+nerv-1) = y%combuf(snd_pt:snd_pt+nesd-1)
-      end if
-      pnti   = pnti + nerv + nesd + 3
-    end do
+    call mpi_waitall(totxch,y%comid(:,1),statsarray,iret)
+    if (iret == mpi_success) call mpi_waitall(totxch,y%comid(:,2),statsarray,iret)
+    if (iret /= mpi_success) then 
+      ierr(1) = iret
+      info=psb_err_mpi_error_
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end if
 
     if (debug) write(*,*) me,' scatter'      
     pnti   = 1
@@ -1303,7 +1271,14 @@ subroutine psi_dswap_vidx_vect(iictxt,iicomm,flag,beta,y,idx, &
       idx_pt = 1+pnti+psb_n_elem_recv_
       snd_pt = 1+pnti+nerv+psb_n_elem_send_
       rcv_pt = 1+pnti+psb_n_elem_recv_
-
+      if (proc_to_comm == me) then 
+        if (nesd /= nerv) then 
+          write(psb_err_unit,*) &
+               & 'Fatal error in swapdata: mismatch on self send',&
+               & nerv,nesd
+        end if
+        y%combuf(rcv_pt:rcv_pt+nerv-1) = y%combuf(snd_pt:snd_pt+nesd-1)
+      end if
       if (debug) write(0,*)me,' Received from: ',prcid(i),&
            & y%combuf(rcv_pt:rcv_pt+nerv-1)        
       call y%sct(rcv_pt,nerv,idx,beta)
