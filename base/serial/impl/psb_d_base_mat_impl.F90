@@ -645,7 +645,7 @@ subroutine psb_d_base_tril(a,l,info,&
   logical, intent(in), optional            :: rscale,cscale
   class(psb_d_coo_sparse_mat), optional, intent(out) :: u
   
-  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k, ibk 
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   real(psb_dpk_), allocatable    :: val(:)
@@ -653,6 +653,7 @@ subroutine psb_d_base_tril(a,l,info,&
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
+  integer(psb_ipk_), parameter :: nbk=8
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -715,12 +716,12 @@ subroutine psb_d_base_tril(a,l,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
-    do i=imin_,imax_
-      call a%csget(i,i,nzout,ia,ja,val,info,&
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        j = ja(k) 
-        if (j-i<=diag_) then
+        if ((ja(k)-ia(k))<=diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -796,7 +797,7 @@ subroutine psb_d_base_triu(a,u,info,&
   logical, intent(in), optional            :: rscale,cscale
   class(psb_d_coo_sparse_mat), optional, intent(out) :: l
   
-  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k, ibk
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   real(psb_dpk_), allocatable    :: val(:)
@@ -804,6 +805,7 @@ subroutine psb_d_base_triu(a,u,info,&
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
+  integer(psb_ipk_), parameter :: nbk=8
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -866,12 +868,12 @@ subroutine psb_d_base_triu(a,u,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
-    do i=imin_,imax_
-      call a%csget(i,i,nzout,ia,ja,val,info,&
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        j = ja(k) 
-        if (j-i<diag_) then
+        if ((ja(k)-ia(k))<diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
