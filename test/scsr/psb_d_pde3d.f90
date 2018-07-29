@@ -594,7 +594,7 @@ program psb_d_pde3d
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
-  type(psb_d_vect_type) :: xv,bv, vtst
+  type(psb_d_vect_type) :: xv,bv,nbv,vtst
   real(psb_dpk_), allocatable :: tst(:)
   ! parallel environment
   integer(psb_ipk_) :: ictxt, iam, np
@@ -654,7 +654,9 @@ program psb_d_pde3d
   if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
   call xv%set(done)
-
+  call psb_geasb(nbv,desc_a,info,scratch=.true.)
+  call psb_geasb(vtst,desc_a,info,scratch=.true.)
+  
   nrl = a%get_nrows()
   call a%csclip(ad,info,jmax=nrl)
   call ad%cscnv(info, mold=acsr)
@@ -682,10 +684,10 @@ program psb_d_pde3d
   do i=1,times
     call psi_swapdata(psb_swap_send_,&
          & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
-    call psb_csmm(done,ad,xv,dzero,bv,info)
+    call psb_csmm(done,ad,xv,dzero,nbv,info)
     call psi_swapdata(psb_swap_recv_,&
          & dzero,xv%v,desc_a,work,info,data=psb_comm_halo_)
-    call psb_csmm(done,and,xv,done,bv,info)
+    call psb_csmm(done,and,xv,done,nbv,info)
   end do
   call psb_barrier(ictxt)
   tt2 = psb_wtime() - tt1
@@ -699,7 +701,11 @@ program psb_d_pde3d
   call psb_sum(ictxt,annz)
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
-
+  call psb_geaxpby(done,nbv,dzero,vtst,desc_a,info)
+  call psb_geaxpby(-done,bv,done,vtst,desc_a,info)
+  err = psb_geamax(vtst,desc_a,info)
+  eps = err/psb_geamax(nbv,desc_a,info)
+  
   if (iam == psb_root_) then
     flops = 2.d0*times*annz
     tflops=flops
@@ -708,6 +714,8 @@ program psb_d_pde3d
     write(psb_out_unit,'("Size of matrix                   : ",i20,"           ")') nr
     write(psb_out_unit,'("Number of nonzeros               : ",i20,"           ")') annz
     write(psb_out_unit,'("Memory occupation                : ",i20,"           ")') amatsize
+    write(psb_out_unit,'("Max diff                         : ",g20.14,"           ")') err
+    write(psb_out_unit,'("Max rel diff                     : ",g20.14,"           ")') eps
     write(psb_out_unit,'("Number of flops (",i0," prod)        : ",F20.0,"           ")') times,flops
     flops = flops / (t2)
     tflops = tflops / (tt2)
