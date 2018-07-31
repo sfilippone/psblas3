@@ -13,28 +13,28 @@ LDLIBS=$(PSBLDLIBS)
 CCOPT= -g
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
-
+LINKOPT=
 EXEDIR=./runs
 
 all: psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
 
 psb_d_pde3d.o: psb_d_scsr_mat_mod.o 
 psb_d_pde3d: psb_d_pde3d.o psb_d_scsr_mat_mod.o psb_d_scsr_impl.o 
-	$(FLINK)  psb_d_pde3d.o psb_d_scsr_mat_mod.o psb_d_scsr_impl.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LINKOPT) psb_d_pde3d.o psb_d_scsr_mat_mod.o psb_d_scsr_impl.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde3d $(EXEDIR)
 
 
 psb_s_pde3d: psb_s_pde3d.o 
-	$(FLINK) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LINKOPT) psb_s_pde3d.o  -o psb_s_pde3d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde3d $(EXEDIR)
 
 psb_d_pde2d: psb_d_pde2d.o 
-	$(FLINK)  psb_d_pde2d.o -o psb_d_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LINKOPT)  psb_d_pde2d.o -o psb_d_pde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_pde2d $(EXEDIR)
 
 
 psb_s_pde2d: psb_s_pde2d.o 
-	$(FLINK) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
+	$(FLINK) $(LINKOPT) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde2d $(EXEDIR)
 
 
