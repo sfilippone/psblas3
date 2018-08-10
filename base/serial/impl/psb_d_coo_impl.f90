@@ -2259,7 +2259,7 @@ end subroutine psb_d_coo_csgetptn
 ! The output is guaranteed to be sorted
 ! 
 subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -2276,9 +2276,9 @@ subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
 
-  logical :: append_, rscale_, cscale_ 
+  logical :: append_, rscale_, cscale_, chksz_
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
@@ -2321,13 +2321,18 @@ subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   else
     cscale_ = .false.
   endif
+  if (present(chksz)) then 
+    chksz_ = chksz
+  else
+    chksz_ = .true.
+  endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
   end if
 
-  call coo_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
+  call coo_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,chksz_,info,&
        & iren)
 
   if (rscale_) then 
@@ -2352,7 +2357,7 @@ subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
 contains
 
-  subroutine coo_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
+  subroutine coo_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,chksz,info,&
        & iren)
 
     use psb_const_mod
@@ -2368,7 +2373,7 @@ contains
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_), intent(in)                  :: nzin
-    logical, intent(in)                            :: append
+    logical, intent(in)                            :: append,chksz
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
     integer(psb_ipk_) :: nzin_, nza, idx,ip,jp,i,k, nzt, irw, lrw, nra, nca, nrd
@@ -2452,11 +2457,13 @@ contains
         nzt = jp - ip +1 
         nz = 0 
 
-        call psb_ensure_size(nzin_+nzt,ia,info)
-        if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-        if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-        if (info /= psb_success_) return
-
+        if (chksz) then 
+          call psb_ensure_size(nzin_+nzt,ia,info)
+          if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+          if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+          if (info /= psb_success_) return
+        end if
+        
         if (present(iren)) then 
           do i=ip,jp
             if ((jmin <= a%ja(i)).and.(a%ja(i)<=jmax)) then 
@@ -2488,11 +2495,13 @@ contains
 
       nrd = max(a%get_nrows(),1)
       nzt = ((nza+nrd-1)/nrd)*(lrw-irw+1)
-      call psb_ensure_size(nzin_+nzt,ia,info)
-      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-      if (info /= psb_success_) return
-
+      if (chksz) then 
+        call psb_ensure_size(nzin_+nzt,ia,info)
+        if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+        if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+        if (info /= psb_success_) return
+      end if
+      
       if (present(iren)) then 
         k = 0 
         do i=1, a%get_nzeros()
@@ -2501,10 +2510,12 @@ contains
             k = k + 1 
             if (k > nzt) then
               nzt = k + nzt
-              call psb_ensure_size(nzin_+nzt,ia,info)
-              if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-              if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-              if (info /= psb_success_) return
+              if (chksz) then 
+                call psb_ensure_size(nzin_+nzt,ia,info)
+                if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+                if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+                if (info /= psb_success_) return
+              end if              
             end if
             val(nzin_+k) = a%val(i)
             ia(nzin_+k)  = iren(a%ia(i))
@@ -2519,11 +2530,12 @@ contains
             k = k + 1 
             if (k > nzt) then
               nzt = k + nzt
-              call psb_ensure_size(nzin_+nzt,ia,info)
-              if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-              if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-              if (info /= psb_success_) return
-
+              if (chksz) then 
+                call psb_ensure_size(nzin_+nzt,ia,info)
+                if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+                if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+                if (info /= psb_success_) return
+              end if
             end if
             val(nzin_+k) = a%val(i)
             ia(nzin_+k)  = (a%ia(i))

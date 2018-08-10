@@ -313,7 +313,7 @@ module psb_d_csc_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csgetrow
   interface 
     subroutine psb_d_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
       import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_
       class(psb_d_csc_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -324,27 +324,27 @@ module psb_d_csc_mat_mod
       logical, intent(in), optional        :: append
       integer(psb_ipk_), intent(in), optional        :: iren(:)
       integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      logical, intent(in), optional        :: rscale,cscale,chksz
     end subroutine psb_d_csc_csgetrow
   end interface
 
-  !> \memberof psb_d_csc_sparse_mat
-  !! \see psb_d_base_mat_mod::psb_d_base_csgetblk
-  interface 
-    subroutine psb_d_csc_csgetblk(imin,imax,a,b,info,&
-       & jmin,jmax,iren,append,rscale,cscale)
-      import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_, psb_d_coo_sparse_mat
-      class(psb_d_csc_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-      logical, intent(in), optional        :: rscale,cscale
-    end subroutine psb_d_csc_csgetblk
-  end interface
-    
+!!$  !> \memberof psb_d_csc_sparse_mat
+!!$  !! \see psb_d_base_mat_mod::psb_d_base_csgetblk
+!!$  interface 
+!!$    subroutine psb_d_csc_csgetblk(imin,imax,a,b,info,&
+!!$       & jmin,jmax,iren,append,rscale,cscale,chksz)
+!!$      import :: psb_ipk_, psb_d_csc_sparse_mat, psb_dpk_, psb_d_coo_sparse_mat
+!!$      class(psb_d_csc_sparse_mat), intent(in) :: a
+!!$      class(psb_d_coo_sparse_mat), intent(inout) :: b
+!!$      integer(psb_ipk_), intent(in)                  :: imin,imax
+!!$      integer(psb_ipk_),intent(out)                  :: info
+!!$      logical, intent(in), optional        :: append
+!!$      integer(psb_ipk_), intent(in), optional        :: iren(:)
+!!$      integer(psb_ipk_), intent(in), optional        :: jmin,jmax
+!!$      logical, intent(in), optional        :: rscale,cscale,chksz
+!!$    end subroutine psb_d_csc_csgetblk
+!!$  end interface
+!!$    
   !> \memberof psb_d_csc_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cssv
   interface 

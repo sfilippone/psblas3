@@ -406,7 +406,7 @@ subroutine psb_s_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 end subroutine psb_s_base_csput_v
 
 subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -422,7 +422,7 @@ subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
