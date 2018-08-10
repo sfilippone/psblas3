@@ -2225,6 +2225,319 @@ subroutine psb_z_csr_csgetblk(imin,imax,a,b,info,&
 
 end subroutine psb_z_csr_csgetblk
 
+!
+! CSR implementation of tril/triu
+!
+subroutine psb_z_csr_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csr_tril
+  implicit none
+
+  class(psb_z_csr_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_z_coo_sparse_mat), optional, intent(out) :: u
+  
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  complex(psb_dpk_), allocatable    :: val(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+  
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ >=-1).and.(imin_ == jmin_)) then 
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzin = nzin + 1
+              l%ia(nzin)  = i
+              l%ja(nzin)  = ja(k)
+              l%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call l%set_nzeros(nzin)
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then 
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_csr_tril
+
+subroutine psb_z_csr_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csr_triu
+  implicit none
+
+  class(psb_z_csr_sparse_mat), intent(in) :: a
+  class(psb_z_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_z_coo_sparse_mat), optional, intent(out) :: l
+  
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  complex(psb_dpk_), allocatable    :: val(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+  
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ <=1).and.(imin_ == jmin_)) then 
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)>=diag_) then
+              nzin = nzin + 1
+              u%ia(nzin)  = i
+              u%ja(nzin)  = ja(k)
+              u%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzin)
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then 
+    call u%set_triangle(.true.)
+    call u%set_upper(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_z_csr_triu
 
 
 subroutine psb_z_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
@@ -4139,6 +4452,321 @@ subroutine psb_lz_csr_csgetblk(imin,imax,a,b,info,&
 
 end subroutine psb_lz_csr_csgetblk
 
+!
+! CSR implementation of tril/triu
+!
+subroutine psb_lz_csr_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_lz_csr_tril
+  implicit none
+
+  class(psb_lz_csr_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_lpk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_lz_coo_sparse_mat), optional, intent(out) :: u
+  
+  integer(psb_ipk_) :: err_act
+  integer(psb_lpk_) :: nzin, nzout, i, j, k
+  integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_lpk_), allocatable :: ia(:), ja(:)
+  complex(psb_dpk_), allocatable    :: val(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+  
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ >=-1).and.(imin_ == jmin_)) then 
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzin = nzin + 1
+              l%ia(nzin)  = i
+              l%ja(nzin)  = ja(k)
+              l%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call l%set_nzeros(nzin)
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then 
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lz_csr_tril
+
+subroutine psb_lz_csr_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_z_csr_mat_mod, psb_protect_name => psb_lz_csr_triu
+  implicit none
+
+  class(psb_lz_csr_sparse_mat), intent(in) :: a
+  class(psb_lz_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_lpk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_lz_coo_sparse_mat), optional, intent(out) :: l
+  
+  integer(psb_ipk_) :: err_act
+  integer(psb_lpk_) :: nzin, nzout, i, j, k
+  integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_lpk_), allocatable :: ia(:), ja(:)
+  complex(psb_dpk_), allocatable    :: val(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+  
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ <=1).and.(imin_ == jmin_)) then 
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)>=diag_) then
+              nzin = nzin + 1
+              u%ia(nzin)  = i
+              u%ja(nzin)  = ja(k)
+              u%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzin)
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then 
+    call u%set_triangle(.true.)
+    call u%set_upper(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_lz_csr_triu
 
 
 subroutine psb_lz_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 

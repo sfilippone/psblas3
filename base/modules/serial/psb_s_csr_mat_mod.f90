@@ -80,6 +80,8 @@ module psb_s_csr_mat_mod
     procedure, pass(a) :: aclsum      => psb_s_csr_aclsum
     procedure, pass(a) :: reallocate_nz => psb_s_csr_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_s_csr_allocate_mnnz
+    procedure, pass(a) :: tril          => psb_s_csr_tril
+    procedure, pass(a) :: triu          => psb_s_csr_triu
     procedure, pass(a) :: cp_to_coo   => psb_s_cp_csr_to_coo
     procedure, pass(a) :: cp_from_coo => psb_s_cp_csr_from_coo
     procedure, pass(a) :: cp_to_fmt   => psb_s_cp_csr_to_fmt
@@ -170,6 +172,93 @@ module psb_s_csr_mat_mod
       integer(psb_ipk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_s_csr_print
   end interface
+  !
+  !> Function  tril:
+  !! \memberof  psb_s_base_sparse_mat
+  !! \brief  Copy the lower triangle, i.e. all entries
+  !!         A(I,J) such that J-I <= DIAG
+  !!         default value is DIAG=0, i.e. lower triangle up to
+  !!         the main diagonal.
+  !!         DIAG=-1 means copy the strictly lower triangle
+  !!         DIAG= 1 means copy the lower triangle plus the first diagonal
+  !!                 of the upper triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         
+  !!  \param l     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param u  [none]  copy of the complementary triangle
+  !!           
+  !
+  interface 
+    subroutine psb_s_csr_tril(a,l,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,u)
+      import 
+      class(psb_s_csr_sparse_mat), intent(in) :: a
+      class(psb_s_coo_sparse_mat), intent(out) :: l
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_s_coo_sparse_mat), optional, intent(out) :: u
+    end subroutine psb_s_csr_tril
+  end interface
+  
+  !
+  !> Function  triu:
+  !! \memberof  psb_s_csr_sparse_mat
+  !! \brief  Copy the upper triangle, i.e. all entries
+  !!         A(I,J) such that DIAG <= J-I
+  !!         default value is DIAG=0, i.e. upper triangle from 
+  !!         the main diagonal up.
+  !!         DIAG= 1 means copy the strictly upper triangle
+  !!         DIAG=-1 means copy the upper triangle plus the first diagonal
+  !!                 of the lower triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         Optionally copies the lower triangle at the same time
+  !!         
+  !!  \param u     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param l  [none]  copy of the complementary triangle
+  !!           
+  !
+  interface 
+    subroutine psb_s_csr_triu(a,u,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,l)
+      import 
+      class(psb_s_csr_sparse_mat), intent(in) :: a
+      class(psb_s_coo_sparse_mat), intent(out) :: u
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_s_coo_sparse_mat), optional, intent(out) :: l
+    end subroutine psb_s_csr_triu
+  end interface
+  
   
   !> \memberof psb_s_csr_sparse_mat
   !! \see psb_s_base_mat_mod::psb_s_base_cp_to_coo
@@ -518,6 +607,8 @@ module psb_s_csr_mat_mod
     procedure, pass(a) :: sizeof      => ls_csr_sizeof
     procedure, pass(a) :: reallocate_nz => psb_ls_csr_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_ls_csr_allocate_mnnz
+    procedure, pass(a) :: tril        => psb_ls_csr_tril
+    procedure, pass(a) :: triu        => psb_ls_csr_triu
     procedure, pass(a) :: cp_to_coo   => psb_ls_cp_csr_to_coo
     procedure, pass(a) :: cp_from_coo => psb_ls_cp_csr_from_coo
     procedure, pass(a) :: cp_to_fmt   => psb_ls_cp_csr_to_fmt
@@ -529,7 +620,7 @@ module psb_s_csr_mat_mod
     procedure, pass(a) :: csput_a     => psb_ls_csr_csput_a
     procedure, pass(a) :: get_diag    => psb_ls_csr_get_diag
     procedure, pass(a) :: csgetptn    => psb_ls_csr_csgetptn
-    procedure, pass(a) :: csgetrow   => psb_ls_csr_csgetrow
+    procedure, pass(a) :: csgetrow    => psb_ls_csr_csgetrow
     procedure, pass(a) :: get_nz_row  => ls_csr_get_nz_row
     procedure, pass(a) :: reinit      => psb_ls_csr_reinit
     procedure, pass(a) :: trim        => psb_ls_csr_trim
@@ -616,6 +707,93 @@ module psb_s_csr_mat_mod
       integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
     end subroutine psb_ls_csr_print
   end interface
+  !
+  !> Function  tril:
+  !! \memberof  psb_s_base_sparse_mat
+  !! \brief  Copy the lower triangle, i.e. all entries
+  !!         A(I,J) such that J-I <= DIAG
+  !!         default value is DIAG=0, i.e. lower triangle up to
+  !!         the main diagonal.
+  !!         DIAG=-1 means copy the strictly lower triangle
+  !!         DIAG= 1 means copy the lower triangle plus the first diagonal
+  !!                 of the upper triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         
+  !!  \param l     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param u  [none]  copy of the complementary triangle
+  !!           
+  !
+  interface 
+    subroutine psb_ls_csr_tril(a,l,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,u)
+      import 
+      class(psb_ls_csr_sparse_mat), intent(in) :: a
+      class(psb_ls_coo_sparse_mat), intent(out) :: l
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_lpk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_ls_coo_sparse_mat), optional, intent(out) :: u
+    end subroutine psb_ls_csr_tril
+  end interface
+  
+  !
+  !> Function  triu:
+  !! \memberof  psb_s_csr_sparse_mat
+  !! \brief  Copy the upper triangle, i.e. all entries
+  !!         A(I,J) such that DIAG <= J-I
+  !!         default value is DIAG=0, i.e. upper triangle from 
+  !!         the main diagonal up.
+  !!         DIAG= 1 means copy the strictly upper triangle
+  !!         DIAG=-1 means copy the upper triangle plus the first diagonal
+  !!                 of the lower triangle.
+  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         IMIN<=I<=IMAX
+  !!         JMIN<=J<=JMAX
+  !!         Optionally copies the lower triangle at the same time
+  !!         
+  !!  \param u     the output (sub)matrix
+  !!  \param info  return code
+  !!  \param diag [0] the last diagonal (J-I) to be considered.
+  !!  \param imin [1] the minimum row index we are interested in 
+  !!  \param imax [a\%get_nrows()] the minimum row index we are interested in 
+  !!  \param jmin [1] minimum col index 
+  !!  \param jmax [a\%get_ncols()] maximum col index 
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          ( iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia,ja 
+  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param l  [none]  copy of the complementary triangle
+  !!           
+  !
+  interface 
+    subroutine psb_ls_csr_triu(a,u,info,diag,imin,imax,&
+         & jmin,jmax,rscale,cscale,l)
+      import 
+      class(psb_ls_csr_sparse_mat), intent(in) :: a
+      class(psb_ls_coo_sparse_mat), intent(out) :: u
+      integer(psb_ipk_),intent(out)              :: info
+      integer(psb_lpk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
+      logical, intent(in), optional              :: rscale,cscale
+      class(psb_ls_coo_sparse_mat), optional, intent(out) :: l
+    end subroutine psb_ls_csr_triu
+  end interface
+  
   
   !> \memberof psb_ls_csr_sparse_mat
   !! \see psb_ls_base_mat_mod::psb_ls_base_cp_to_coo
