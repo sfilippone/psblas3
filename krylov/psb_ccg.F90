@@ -172,7 +172,7 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
   naux=4*n_col
   allocate(aux(naux), stat=info)
   if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
-  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v)  
+  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
