@@ -227,13 +227,14 @@ contains
 
   end subroutine c_vect_bld_n
 
-  function  c_vect_get_vect(x) result(res)
+  function  c_vect_get_vect(x,n) result(res)
     class(psb_c_vect_type), intent(inout)  :: x
     complex(psb_spk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: n
 
     if (allocated(x%v)) then
-      res = x%v%get_vect()
+      res = x%v%get_vect(n)
     end if
   end function c_vect_get_vect
 
