@@ -749,9 +749,10 @@ contains
         
     integer(psb_ipk_) :: info, first_, last_, nr
 
-    first_=1
-    last_=min(psb_size(x%v),size(val))
+
+    first_                     = 1
     if (present(first)) first_ = max(1,first)
+    last_                      = min(psb_size(x%v),first_+size(val)-1)
     if (present(last))  last_  = min(last,last_)
 
     if (allocated(x%v)) then 
