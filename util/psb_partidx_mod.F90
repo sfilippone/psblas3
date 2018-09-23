@@ -48,7 +48,7 @@ module psb_partidx_mod
     module procedure ijk2idx3d, ijk2idxv, ijk2idx2d
   end interface ijk2idx
 
-
+  logical, private, save : col_major=.true.
 contains
   !
   ! Given  a global index IDX and the domain size (NX,NY,NZ)
@@ -135,10 +135,17 @@ contains
     ! j = mod(idx_/nz,ny) + base_
     ! i = mod(idx_/(nx*ny),nx) + base_
     !
-    do i=size(dims),1,-1
-      coords(i) = mod(idx_,dims(i)) + base_
-      idx_ = idx_ / dims(i)
-    end do
+    if (col_major) then 
+      do i=1,size(dims)
+        coords(i) = mod(idx_,dims(i)) + base_
+        idx_ = idx_ / dims(i)
+      end do
+    else
+      do i=size(dims),1,-1
+        coords(i) = mod(idx_,dims(i)) + base_
+        idx_ = idx_ / dims(i)
+      end do
+    end if
 
   end subroutine idx2ijkv
   
@@ -174,12 +181,19 @@ contains
       return
     end if
 
-    idx = coords(1) - base_
-    do i=2, sz
-      idx = (idx * dims(i)) + coords(i) - base_
-    end do
-    idx = idx + base_
-    
+    if (col_major) then 
+      idx = coords(sz) - base_
+      do i=sz-1,1,-1
+        idx = (idx * dims(i)) + coords(i) - base_
+      end do
+      idx = idx + base_
+    else
+      idx = coords(1) - base_
+      do i=2,sz
+        idx = (idx * dims(i)) + coords(i) - base_
+      end do
+      idx = idx + base_
+    end if
   end subroutine ijk2idxv
   !
   ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)
