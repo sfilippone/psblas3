@@ -48,8 +48,30 @@ module psb_partidx_mod
     module procedure ijk2idx3d, ijk2idxv, ijk2idx2d
   end interface ijk2idx
 
-  logical, private, save : col_major=.true.
+  logical, private, save :: col_major=.true.
+
 contains
+  
+  subroutine psb_pidx_set_col_major(val)
+    implicit none 
+    logical, intent(in), optional :: val
+    logical :: val_
+    val_ =.true.
+    if (present(val)) val_ = val
+    col_major = val_
+  end subroutine psb_pidx_set_col_major
+
+  subroutine psb_pidx_set_row_major()
+    implicit none 
+    call psb_pidx_set_col_major(.false.)
+  end subroutine psb_pidx_set_row_major
+
+  function psb_pidx_get_col_major() result(val)
+    implicit none 
+    logical :: val
+    val = col_major
+  end function psb_pidx_get_col_major
+  
   !
   ! Given  a global index IDX and the domain size (NX,NY,NZ)
   ! compute the point coordinates (I,J,K) 
