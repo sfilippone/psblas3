@@ -609,7 +609,7 @@ program psb_s_pde2d
   !  prepare the preconditioner.
   !  
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ptype,info)
+  call prec%init(ictxt,ptype,info)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
