@@ -447,7 +447,7 @@ end subroutine psb_c_base_csgetrow
 ! If performance is critical it can be overridden.
 !
 subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
-     & jmin,jmax,iren,append,rscale,cscale)
+     & jmin,jmax,iren,append,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -461,7 +461,7 @@ subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
   integer(psb_ipk_) :: err_act, nzin, nzout
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
@@ -522,7 +522,7 @@ subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
 
   call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
+       & nzin=nzin, rscale=rscale, cscale=cscale, chksz=chksz)
 
   if (info /= psb_success_) goto 9999
 
