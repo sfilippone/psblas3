@@ -613,7 +613,7 @@ program psb_s_pde2d
   !  prepare the preconditioner.
   !  
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ptype,info)
+  call prec%init(ictxt,ptype,info)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -638,7 +638,7 @@ program psb_s_pde2d
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
-  eps   = 1.d-9
+  eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 

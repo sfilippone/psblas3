@@ -250,13 +250,14 @@ contains
 
   end subroutine s_vect_bld_en
 
-  function  s_vect_get_vect(x) result(res)
+  function  s_vect_get_vect(x,n) result(res)
     class(psb_s_vect_type), intent(inout)  :: x
     real(psb_spk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: n
 
     if (allocated(x%v)) then
-      res = x%v%get_vect()
+      res = x%v%get_vect(n)
     end if
   end function s_vect_get_vect
 

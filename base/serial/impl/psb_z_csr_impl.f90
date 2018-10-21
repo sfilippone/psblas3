@@ -1993,7 +1993,7 @@ end subroutine psb_z_csr_csgetptn
 
 
 subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -2011,9 +2011,9 @@ subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
 
-  logical :: append_, rscale_, cscale_ 
+  logical :: append_, rscale_, cscale_, chksz_
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
@@ -2056,13 +2056,18 @@ subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   else
     cscale_ = .false.
   endif
+  if (present(chksz)) then 
+    chksz_ = chksz
+  else
+    chksz_ = .true.
+  endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
   end if
 
-  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
+  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,chksz_,info,&
        & iren)
   
   if (rscale_) then 
@@ -2087,7 +2092,7 @@ subroutine psb_z_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
 contains
 
-  subroutine csr_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
+  subroutine csr_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,chksz,info,&
        & iren)
 
     use psb_const_mod
@@ -2102,7 +2107,7 @@ contains
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_), intent(in)                  :: nzin
-    logical, intent(in)                  :: append
+    logical, intent(in)                  :: append, chksz
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
     integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl, nrd, ncd
@@ -2135,11 +2140,13 @@ contains
     nzt = (a%irp(lrw+1)-a%irp(irw))
     nz = 0 
 
-    call psb_ensure_size(nzin_+nzt,ia,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-
-    if (info /= psb_success_) return
+    if (chksz) then 
+      call psb_ensure_size(nzin_+nzt,ia,info)
+      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+      
+      if (info /= psb_success_) return
+    end if
     
     if (present(iren)) then 
       do i=irw, lrw
@@ -2171,59 +2178,6 @@ contains
 
 end subroutine psb_z_csr_csgetrow
 
-subroutine psb_z_csr_csgetblk(imin,imax,a,b,info,&
-     & jmin,jmax,iren,append,rscale,cscale)
-  ! Output is always in  COO format 
-  use psb_error_mod
-  use psb_const_mod
-  use psb_z_csr_mat_mod, psb_protect_name => psb_z_csr_csgetblk
-  implicit none
-
-  class(psb_z_csr_sparse_mat), intent(in) :: a
-  class(psb_z_coo_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(in)                  :: imin,imax
-  integer(psb_ipk_),intent(out)                  :: info
-  logical, intent(in), optional        :: append
-  integer(psb_ipk_), intent(in), optional        :: iren(:)
-  integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-  logical, intent(in), optional        :: rscale,cscale
-  integer(psb_ipk_) :: err_act, nzin, nzout
-  character(len=20)  :: name='csget'
-  logical :: append_
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-
-  if (present(append)) then 
-    append_ = append
-  else
-    append_ = .false.
-  endif
-  if (append_) then 
-    nzin = a%get_nzeros()
-  else
-    nzin = 0
-  endif
-
-  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
-
-  if (info /= psb_success_) goto 9999
-
-  call b%set_nzeros(nzin+nzout)
-  call b%fix(info)
-  if (info /= psb_success_) goto 9999
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_z_csr_csgetblk
 
 !
 ! CSR implementation of tril/triu
@@ -2245,8 +2199,6 @@ subroutine psb_z_csr_tril(a,l,info,&
   
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_ipk_), allocatable :: ia(:), ja(:)
-  complex(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
@@ -2401,8 +2353,6 @@ subroutine psb_z_csr_triu(a,u,info,&
   
   integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_ipk_), allocatable :: ia(:), ja(:)
-  complex(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
@@ -4397,60 +4347,6 @@ contains
 
 end subroutine psb_lz_csr_csgetrow
 
-subroutine psb_lz_csr_csgetblk(imin,imax,a,b,info,&
-     & jmin,jmax,iren,append,rscale,cscale)
-  ! Output is always in  COO format 
-  use psb_error_mod
-  use psb_const_mod
-  use psb_z_csr_mat_mod, psb_protect_name => psb_lz_csr_csgetblk
-  implicit none
-
-  class(psb_lz_csr_sparse_mat), intent(in) :: a
-  class(psb_lz_coo_sparse_mat), intent(inout) :: b
-  integer(psb_lpk_), intent(in)                  :: imin,imax
-  integer(psb_ipk_),intent(out)                  :: info
-  logical, intent(in), optional        :: append
-  integer(psb_lpk_), intent(in), optional        :: iren(:)
-  integer(psb_lpk_), intent(in), optional        :: jmin,jmax
-  logical, intent(in), optional        :: rscale,cscale
-  integer(psb_lpk_) :: nzin, nzout
-  integer(psb_ipk_) :: err_act
-  character(len=20)  :: name='csget'
-  logical :: append_
-  logical, parameter :: debug=.false.
-
-  call psb_erractionsave(err_act)
-  info = psb_success_
-
-  if (present(append)) then 
-    append_ = append
-  else
-    append_ = .false.
-  endif
-  if (append_) then 
-    nzin = a%get_nzeros()
-  else
-    nzin = 0
-  endif
-
-  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
-
-  if (info /= psb_success_) goto 9999
-
-  call b%set_nzeros(nzin+nzout)
-  call b%fix(info)
-  if (info /= psb_success_) goto 9999
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-
-end subroutine psb_lz_csr_csgetblk
 
 !
 ! CSR implementation of tril/triu
@@ -4473,8 +4369,6 @@ subroutine psb_lz_csr_tril(a,l,info,&
   integer(psb_ipk_) :: err_act
   integer(psb_lpk_) :: nzin, nzout, i, j, k
   integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_lpk_), allocatable :: ia(:), ja(:)
-  complex(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
@@ -4630,8 +4524,6 @@ subroutine psb_lz_csr_triu(a,u,info,&
   integer(psb_ipk_) :: err_act
   integer(psb_lpk_) :: nzin, nzout, i, j, k
   integer(psb_lpk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
-  integer(psb_lpk_), allocatable :: ia(:), ja(:)
-  complex(psb_dpk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_

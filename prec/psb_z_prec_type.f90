@@ -39,6 +39,7 @@ module psb_z_prec_type
   use psb_z_base_prec_mod
 
   type psb_zprec_type
+    integer(psb_ipk_)                  :: ictxt 
     class(psb_z_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: psb_z_apply1_vect
@@ -60,9 +61,10 @@ module psb_z_prec_type
   end interface
 
   interface psb_precinit
-    subroutine psb_zprecinit(prec,ptype,info)
+    subroutine psb_zprecinit(ictxt,prec,ptype,info)
       import :: psb_ipk_, psb_zprec_type
       implicit none
+      integer(psb_ipk_), intent(in)          :: ictxt
       class(psb_zprec_type), intent(inout)   :: prec
       character(len=*), intent(in)           :: ptype
       integer(psb_ipk_), intent(out)         :: info

@@ -791,7 +791,7 @@ end subroutine psb_d_csgetptn
 
 
 subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -808,7 +808,7 @@ subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
 
   integer(psb_ipk_) :: err_act
   character(len=20)  :: name='csget'
@@ -824,7 +824,7 @@ subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
 
   call a%a%csget(imin,imax,nz,ia,ja,val,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
+       & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
