@@ -224,13 +224,14 @@ contains
 
   end subroutine l_vect_bld_en
 
-  function  l_vect_get_vect(x) result(res)
+  function  l_vect_get_vect(x,n) result(res)
     class(psb_l_vect_type), intent(inout)  :: x
     integer(psb_lpk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: n
 
     if (allocated(x%v)) then
-      res = x%v%get_vect()
+      res = x%v%get_vect(n)
     end if
   end function l_vect_get_vect
 

@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-subroutine psb_zprecinit(p,ptype,info)
+subroutine psb_zprecinit(ictxt,p,ptype,info)
 
   use psb_base_mod
   use psb_z_prec_type, psb_protect_name => psb_zprecinit
@@ -37,7 +37,8 @@ subroutine psb_zprecinit(p,ptype,info)
   use psb_z_diagprec, only : psb_z_diag_prec_type
   use psb_z_bjacprec, only : psb_z_bjac_prec_type
   implicit none
-  class(psb_zprec_type), intent(inout)   :: p
+  integer(psb_ipk_), intent(in)          :: ictxt
+  class(psb_zprec_type), intent(inout) :: p
   character(len=*), intent(in)           :: ptype
   integer(psb_ipk_), intent(out)         :: info
 
@@ -48,6 +49,8 @@ subroutine psb_zprecinit(p,ptype,info)
     if (info == psb_success_) deallocate(p%prec,stat=info) 
     if (info /= psb_success_) return
   end if
+  
+  p%ictxt = ictxt
   
   select case(psb_toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
