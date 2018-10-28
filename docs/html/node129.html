@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>clone -- clone current preconditioner</TITLE>
-<META NAME="description" CONTENT="clone -- clone current preconditioner">
+<TITLE>descr -- Prints a description of current preconditioner</TITLE>
+<META NAME="description" CONTENT="descr -- Prints a description of current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -16,45 +16,47 @@
 
 <LINK REL="next" HREF="node130.html">
 <LINK REL="previous" HREF="node128.html">
-<LINK REL="up" HREF="node124.html">
+<LINK REL="up" HREF="node125.html">
 <LINK REL="next" HREF="node130.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1871"
+<A NAME="tex2html1873"
   HREF="node130.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1867"
-  HREF="node124.html">
+<A NAME="tex2html1869"
+  HREF="node125.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1861"
+<A NAME="tex2html1863"
   HREF="node128.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1869"
+<A NAME="tex2html1871"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1872"
-  HREF="node130.html">free   Free</A>
-<B> Up:</B> <A NAME="tex2html1868"
-  HREF="node124.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1862"
-  HREF="node128.html">descr   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1870"
+<B> Next:</B> <A NAME="tex2html1874"
+  HREF="node130.html">clone   clone</A>
+<B> Up:</B> <A NAME="tex2html1870"
+  HREF="node125.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1864"
+  HREF="node128.html">apply   Preconditioner</A>
+ &nbsp; <B>  <A NAME="tex2html1872"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000115000000000000000">
-clone -- clone  current
+<H2><A NAME="SECTION000114000000000000000">
+descr -- Prints a description of current
   preconditioner</A>
 </H2>
 
+<P>
 <PRE>
-call  prec%clone(precout,info)
+call prec%descr()
+call prec%descr(iout, root)
 </PRE>
 
 <P>
@@ -67,21 +69,41 @@ call  prec%clone(precout,info)
 </DD>
 <DT><STRONG>prec</STRONG></DT>
 <DD>the preconditioner.
+Scope: <B>local</B> 
 <BR>
-Scope: <B>local</B>.
-<BR></DD>
-</DL>
-
-<P>
-<DL>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
 </DD>
-<DT><STRONG>precout</STRONG></DT>
-<DD>A copy of the input object.
+<DT><STRONG>iout</STRONG></DT>
+<DD>output unit.
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number. Default: default output unit.
 </DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Return code. 
+<DT><STRONG>root</STRONG></DT>
+<DD>Process from which to print
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer number between 0 and <SPAN CLASS="MATH"><IMG
+ WIDTH="49" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img162.png"
+ ALT="$np-1$"></SPAN>, in which case
+the specified process will print the description, or <SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.png"
+ ALT="$-1$"></SPAN>, in which case
+all processes will print. Default: 0. 
 </DD>
 </DL>
 

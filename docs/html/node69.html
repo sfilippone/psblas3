@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1104"
+<A NAME="tex2html1105"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1100"
+<A NAME="tex2html1101"
   HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1094"
+<A NAME="tex2html1095"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1102"
+<A NAME="tex2html1103"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1105"
+<B> Next:</B> <A NAME="tex2html1106"
   HREF="node70.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html1101"
+<B> Up:</B> <A NAME="tex2html1102"
   HREF="node66.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1095"
+<B> Previous:</B> <A NAME="tex2html1096"
   HREF="node68.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html1103"
+ &nbsp; <B>  <A NAME="tex2html1104"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -67,8 +67,8 @@ glob\_x \leftarrow collect(loc\_x_i)
  -->
 
 <IMG
- WIDTH="163" HEIGHT="28" BORDER="0"
- SRC="img69.png"
+ WIDTH="163" HEIGHT="29" BORDER="0"
+ SRC="img73.png"
  ALT="\begin{displaymath}glob\_x \leftarrow collect(loc\_x_i) \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -77,29 +77,29 @@ where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ SRC="img74.png"
  ALT="$glob\_x$"></SPAN></STRONG></DT>
 <DD>is the global submatrix <!-- MATH
  $glob\_x_{1:m,1:n}$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img71.png"
+ WIDTH="90" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img75.png"
  ALT="$glob\_x_{1:m,1:n}$"></SPAN>
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img72.png"
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
  ALT="$loc\_x_i$"></SPAN></STRONG></DT>
 <DD>is the local portion of global dense matrix on
 process <SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="9" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img4.png"
  ALT="$i$"></SPAN>.
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="49" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img73.png"
+ WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img77.png"
  ALT="$collect$"></SPAN></STRONG></DT>
 <DD>is the collect function.
 </DD>
@@ -107,7 +107,7 @@ process <SPAN CLASS="MATH"><IMG
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="3372"></A>
+<DIV ALIGN="CENTER"><A NAME="3474"></A>
 <TABLE>
 <CAPTION><STRONG>Table 16:</STRONG>
 Data types</CAPTION>
@@ -115,8 +115,8 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img74.png"
+ WIDTH="34" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
  ALT="$x_i, y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -145,8 +145,8 @@ Data types</CAPTION>
 <P>
 <BR>
 <IMG
- WIDTH="471" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="img75.png"
+ WIDTH="472" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="img79.png"
  ALT="\begin{lstlisting}
 call psb_gather(glob_x, loc_x, desc_a, info, root)
 call psb_gather(glob_x, loc_x, desc_a, info, root)
@@ -165,7 +165,7 @@ call psb_gather(glob_x, loc_x, desc_a, info, root)
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
  WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img70.png"
+ SRC="img74.png"
  ALT="$glob\_x$"></SPAN>. 
 <BR>
 Scope: <B>local</B> 
@@ -190,8 +190,8 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>root</STRONG></DT>
 <DD>The process that holds the global copy. If <SPAN CLASS="MATH"><IMG
- WIDTH="74" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img76.png"
+ WIDTH="74" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.png"
  ALT="$root=-1$"></SPAN> all
   the processes will have a copy of the global vector.
 <BR>
@@ -205,11 +205,11 @@ Specified as: an integer variable <!-- MATH
  $-1\le root\le np-1$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="141" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img77.png"
+ WIDTH="140" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
  ALT="$-1\le root\le np-1$"></SPAN>, default <SPAN CLASS="MATH"><IMG
- WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img78.png"
+ WIDTH="24" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.png"
  ALT="$-1$"></SPAN>. 
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
@@ -243,26 +243,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1104"
+<A NAME="tex2html1105"
   HREF="node70.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1100"
+<A NAME="tex2html1101"
   HREF="node66.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1094"
+<A NAME="tex2html1095"
   HREF="node68.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1102"
+<A NAME="tex2html1103"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1105"
+<B> Next:</B> <A NAME="tex2html1106"
   HREF="node70.html">psb_scatter   Scatter</A>
-<B> Up:</B> <A NAME="tex2html1101"
+<B> Up:</B> <A NAME="tex2html1102"
   HREF="node66.html">Communication routines</A>
-<B> Previous:</B> <A NAME="tex2html1095"
+<B> Previous:</B> <A NAME="tex2html1096"
   HREF="node68.html">psb_ovrl   Overlap</A>
- &nbsp; <B>  <A NAME="tex2html1103"
+ &nbsp; <B>  <A NAME="tex2html1104"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

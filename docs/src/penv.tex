@@ -595,6 +595,66 @@ Type, kind, rank and size must agree on all processes.
 \item The \verb|dat| argument may also be a long integer scalar.
 \end{enumerate}
 
+\clearpage\subsection*{psb\_nrm2 --- Global 2-norm reduction}
+\addcontentsline{toc}{subsection}{psb\_nrm2}
+
+\begin{verbatim}
+call psb_nrm2(icontxt, dat, root)
+\end{verbatim}
+
+This subroutine implements a 2-norm value reduction 
+operation based on the underlying communication library. 
+\begin{description}
+\item[Type:] Synchronous.
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope: {\bf global}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global minimum.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a real variable, which may be a
+scalar, or a rank 1 array. \
+Kind, rank and size must agree on all processes.
+\item[root] Process to hold the final value, or $-1$ to make it available
+  on all processes.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the 2-norm reduction.\\
+Scope: {\bf global}.\\
+Type: {\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a real variable, which may be a
+scalar, or a rank 1 array. \\
+Kind, rank and size must agree on all processes.
+\end{description}
+
+
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item This reduction is appropriate to compute the results of multiple
+  (local) NRM2 operations at the same time. 
+\item Denoting by $dat_i$ the value of the variable $dat$ on process
+  $i$, the output $res$ is equivalent to the computation of
+  \[ res = \sqrt{\sum_i dat_i^2},\]
+  with care taken to avoid unnecessary overflow.
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
+
+
 
 \clearpage\subsection*{psb\_snd --- Send data}
 \addcontentsline{toc}{subsection}{psb\_snd}

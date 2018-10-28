@@ -1131,7 +1131,7 @@ Scope: {\bf local}\\
 \addcontentsline{toc}{paragraph}{get\_vect }
 
 \begin{verbatim}
-extv = v%get_vect()
+extv = v%get_vect([n])
 \end{verbatim}
 
 \begin{description}
@@ -1142,12 +1142,19 @@ Scope: {\bf local}\\
 % Type: {\bf required}\\
 % Intent: {\bf in}.\\
 % Specified as: a object of type \spdata.
+\item[n] Size to be returned\\
+Scope: {\bf local}.\\
+Type: {\bf optional}; default: entire vector.\\
+
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
 \item[Function value] An allocatable array holding a copy of the dense
-  vector contents.
+  vector contents. If the argument $n$ is specified, the size of the
+  returned array equals the minimum between $n$ and the internal size
+  of the vector, or 0 if $n$ is negative; otherwise, the size of the
+  array is the same as the internal size of the vector.
 \end{description}
 
 \subsubsection*{clone --- Clone current object}

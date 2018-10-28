@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html922"
+<A NAME="tex2html923"
   HREF="node55.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html918"
+<A NAME="tex2html919"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html912"
+<A NAME="tex2html913"
   HREF="node53.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html920"
+<A NAME="tex2html921"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html923"
+<B> Next:</B> <A NAME="tex2html924"
   HREF="node55.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html919"
+<B> Up:</B> <A NAME="tex2html920"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html913"
+<B> Previous:</B> <A NAME="tex2html914"
   HREF="node53.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html921"
+ &nbsp; <B>  <A NAME="tex2html922"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -54,19 +54,19 @@ psb_gedot -- Dot Product</A>
 
 <P>
 This function computes dot product between two vectors <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>.
 <BR>
 If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> are real vectors
 it computes dot-product as:
@@ -86,10 +86,10 @@ dot \leftarrow x^T y
 <BR CLEAR="ALL">
 <P></P>
 Else if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> are complex vectors then it computes dot-product as:
 <BR><P></P>
@@ -101,7 +101,7 @@ dot \leftarrow x^H y
  -->
 
 <IMG
- WIDTH="76" HEIGHT="27" BORDER="0"
+ WIDTH="75" HEIGHT="27" BORDER="0"
  SRC="img25.png"
  ALT="\begin{displaymath}dot \leftarrow x^H y\end{displaymath}">
 </DIV>
@@ -110,10 +110,10 @@ dot \leftarrow x^H y
 
 <P>
 <PRE>
-psb_gedot(x, y, desc_a, info)
+psb_gedot(x, y, desc_a, info [,global])
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1978"></A>
+<DIV ALIGN="CENTER"><A NAME="2024"></A>
 <TABLE>
 <CAPTION><STRONG>Table 2:</STRONG>
 Data types</CAPTION>
@@ -121,13 +121,13 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
  SRC="img26.png"
  ALT="$dot$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
@@ -162,7 +162,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
@@ -175,17 +175,17 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 <BR>
@@ -198,10 +198,10 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90dot">2</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -215,22 +215,36 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
-
+</DD>
+<DT><STRONG>global</STRONG></DT>
+<DD>Specifies whether the computation should include the
+  global reduction across all processes.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical scalar.
+Default: <code>global=.true.</code>
+<BR>
 <P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
-<DD>is the dot product of subvectors <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+<DD>is the dot product of vectors <SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B>  unless the optional variable
+<code>global=.false.</code> has been specified
 <BR>
 Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f90dot">2</A>.
 </DD>
@@ -248,29 +262,54 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple dot products at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  <BR>
+<IMG
+ WIDTH="500" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="\begin{lstlisting}
+vres(1) = psb_gedot(x1,y1,desc_a,info,global=.false.)
+vres(...
+...,y3,desc_a,info,global=.false.)
+call psb_sum(ictxt,vres(1:3))
+\end{lstlisting}">
+<BR>
+In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+</LI>
+</OL>
+
+<P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html922"
+<A NAME="tex2html923"
   HREF="node55.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html918"
+<A NAME="tex2html919"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html912"
+<A NAME="tex2html913"
   HREF="node53.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html920"
+<A NAME="tex2html921"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html923"
+<B> Next:</B> <A NAME="tex2html924"
   HREF="node55.html">psb_gedots   Generalized</A>
-<B> Up:</B> <A NAME="tex2html919"
+<B> Up:</B> <A NAME="tex2html920"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html913"
+<B> Previous:</B> <A NAME="tex2html914"
   HREF="node53.html">psb_geaxpby   General</A>
- &nbsp; <B>  <A NAME="tex2html921"
+ &nbsp; <B>  <A NAME="tex2html922"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

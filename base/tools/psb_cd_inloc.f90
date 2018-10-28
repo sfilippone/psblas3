@@ -89,7 +89,6 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck,idx)
     call psb_barrier(ictxt)
     t0 = psb_wtime()
   end if
-  
   loc_row = size(v)
   m = maxval(v)
   nrt = loc_row

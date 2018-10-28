@@ -38,9 +38,9 @@
 !    See below for a description of the formats.
 !
 ! Arguments:
-! desc_a       - type(psb_desc_type)   The descriptor; in this context only the index 
-!                                       mapping parts are used.
-! index_in(:)  - integer               The index list, build format  
+! desc_a       - type(psb_desc_type) The descriptor; in this context only the index 
+!                                     mapping parts are used.
+! index_in(:)  - integer             The index list, build format  
 ! index_out(:) - integer(psb_ipk_), allocatable  The index list, assembled format
 ! nxch         - integer             The number of data exchanges on the calling process
 ! nsnd         - integer             Total send buffer size       on the calling process

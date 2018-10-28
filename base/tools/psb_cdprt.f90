@@ -93,7 +93,11 @@ subroutine psb_cdprt(iout,desc_p,glob,short, verbosity)
     if (me == i)  then
       write(iout,*) me,': Local descriptor data: points:',local_points,&
            & ' halo:',local_halo
-      write(iout,*) me,': Volume to surface ratio:',real(local_points,psb_dpk_)/real(local_halo,psb_dpk_)
+      if (local_halo>0) then 
+        write(iout,*) me,': Volume to surface ratio:',real(local_points,psb_dpk_)/real(local_halo,psb_dpk_)
+      else
+        write(iout,*) me,': Volume to surface ratio:',0.0_psb_dpk_
+      end if
     end if
     call psb_barrier(ictxt)
   end do

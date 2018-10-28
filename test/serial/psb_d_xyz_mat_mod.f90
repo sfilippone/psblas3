@@ -59,6 +59,7 @@ module psb_d_xyz_mat_mod
     real(psb_dpk_), allocatable :: val(:)
 
   contains
+    procedure, pass(a) :: is_by_rows  => d_xyz_is_by_rows
     procedure, pass(a) :: get_size    => d_xyz_get_size
     procedure, pass(a) :: get_nzeros  => d_xyz_get_nzeros
     procedure, nopass  :: get_fmt     => d_xyz_get_fmt
@@ -313,7 +314,7 @@ module psb_d_xyz_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_csgetrow
   interface 
     subroutine psb_d_xyz_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
       import :: psb_ipk_, psb_d_xyz_sparse_mat, psb_dpk_
       class(psb_d_xyz_sparse_mat), intent(in) :: a
       integer(psb_ipk_), intent(in)                  :: imin,imax
@@ -324,7 +325,7 @@ module psb_d_xyz_mat_mod
       logical, intent(in), optional        :: append
       integer(psb_ipk_), intent(in), optional        :: iren(:)
       integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      logical, intent(in), optional        :: rscale,cscale,chksz
     end subroutine psb_d_xyz_csgetrow
   end interface
 
@@ -516,6 +517,15 @@ contains
   !
   !
   ! == ===================================
+
+  
+  function d_xyz_is_by_rows(a) result(res)
+    implicit none 
+    class(psb_d_xyz_sparse_mat), intent(in) :: a
+    logical  :: res
+    res = .true.
+     
+  end function d_xyz_is_by_rows
 
   
   function d_xyz_sizeof(a) result(res)

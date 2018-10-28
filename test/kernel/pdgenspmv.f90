@@ -469,6 +469,9 @@ program pdgenspmv
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
+  !
+  ! Perform Ax multiple times to compute average performance
+  !
   do i=1,times 
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'n')
   end do
@@ -479,6 +482,9 @@ program pdgenspmv
   ! FIXME: cache flush needed here
   call psb_barrier(ictxt)
   tt1 = psb_wtime()
+  !
+  ! Perform A^Tx multiple times to compute average performance
+  !
   do i=1,times 
     call psb_spmm(done,a,xv,dzero,bv,desc_a,info,'t')
   end do

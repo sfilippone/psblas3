@@ -22,26 +22,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1052"
+<A NAME="tex2html1053"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1048"
+<A NAME="tex2html1049"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1044"
+<A NAME="tex2html1045"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1050"
+<A NAME="tex2html1051"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1053"
+<B> Next:</B> <A NAME="tex2html1054"
   HREF="node66.html">Communication routines</A>
-<B> Up:</B> <A NAME="tex2html1049"
+<B> Up:</B> <A NAME="tex2html1050"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html1045"
+<B> Previous:</B> <A NAME="tex2html1046"
   HREF="node64.html">psb_spmm   Sparse</A>
- &nbsp; <B>  <A NAME="tex2html1051"
+ &nbsp; <B>  <A NAME="tex2html1052"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -72,7 +72,7 @@ y &\leftarrow& \alpha  T^{-H}  D x + \beta y\\
  -->
 <IMG
  WIDTH="160" HEIGHT="239" BORDER="0"
- SRC="img50.png"
+ SRC="img54.png"
  ALT="\begin{eqnarray*}
 y &amp;\leftarrow&amp; \alpha T^{-1} x + \beta y\\
 y &amp;\leftarrow&amp; \al...
@@ -86,35 +86,35 @@ y &amp;\leftarrow&amp; \alpha T^{-H} D x + \beta y\\
 where:
 <DL>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></STRONG></DT>
 <DD>is the global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img47.png"
+ WIDTH="25" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img51.png"
  ALT="$x_{:, :}$"></SPAN>
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN></STRONG></DT>
 <DD>is the global dense matrix <SPAN CLASS="MATH"><IMG
- WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img48.png"
+ WIDTH="23" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img52.png"
  ALT="$y_{:, :}$"></SPAN>
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img51.png"
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
  ALT="$T$"></SPAN></STRONG></DT>
 <DD>is the global sparse block triangular submatrix <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img51.png"
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
  ALT="$T$"></SPAN>
 </DD>
 <DT><STRONG><SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img52.png"
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img56.png"
  ALT="$D$"></SPAN></STRONG></DT>
 <DD>is the scaling diagonal matrix.
 </DD>
@@ -129,7 +129,7 @@ call psb_spsm(alpha, t, x, beta, y, desc_a, info,&amp;
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1989"></A>
+<DIV ALIGN="CENTER"><A NAME="2035"></A>
 <TABLE>
 <CAPTION><STRONG>Table 13:</STRONG>
 Data types</CAPTION>
@@ -137,22 +137,22 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img51.png"
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
  ALT="$T$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img52.png"
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img56.png"
  ALT="$D$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img23.png"
  ALT="$\beta$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
@@ -186,7 +186,7 @@ Data types</CAPTION>
 </DD>
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img22.png"
  ALT="$\alpha$"></SPAN>.
 <BR>
@@ -202,8 +202,8 @@ Table&nbsp;<A HREF="#tab:f90spsm">13</A>.
 <DT><STRONG>t</STRONG></DT>
 <DD>the global portion of the sparse matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img51.png"
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
  ALT="$T$"></SPAN>.  
 <BR>
 Scope: <B>local</B> 
@@ -218,7 +218,7 @@ Specified as: an object type specified in
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 
@@ -232,16 +232,16 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spsm">13</A>.  The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 </DD>
 <DT><STRONG>beta</STRONG></DT>
 <DD>the scalar <SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img23.png"
  ALT="$\beta$"></SPAN>.
 <BR>
@@ -256,7 +256,7 @@ Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f9
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 
@@ -270,10 +270,10 @@ Intent: <B>inout</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spsm">13</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -308,8 +308,8 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
- WIDTH="79" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img49.png"
+ WIDTH="78" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img53.png"
  ALT="$trans = N$"></SPAN>
 <BR>
 Specified as: a character variable.
@@ -334,8 +334,8 @@ Type: <B>optional</B>
 Intent: <B>in</B>.
 <BR>
 Default: <SPAN CLASS="MATH"><IMG
- WIDTH="76" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img53.png"
+ WIDTH="76" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img57.png"
  ALT="$unitd = U$"></SPAN>
 <BR>
 Specified as: a character variable.
@@ -380,8 +380,8 @@ Default: <!-- MATH
  $diag(1) = 1 (no scaling)$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="164" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img54.png"
+ WIDTH="164" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img58.png"
  ALT="$diag(1) = 1 (no scaling)$"></SPAN>
 <BR>
 Specified as: a rank one  array containing numbers of the type
@@ -397,7 +397,7 @@ Type: <B>optional</B>
 Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> with the
 TARGET attribute. 
@@ -410,7 +410,7 @@ TARGET attribute.
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN>. 
 
@@ -442,26 +442,26 @@ An integer value; 0 means no error has been detected.
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html1052"
+<A NAME="tex2html1053"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1048"
+<A NAME="tex2html1049"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1044"
+<A NAME="tex2html1045"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1050"
+<A NAME="tex2html1051"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1053"
+<B> Next:</B> <A NAME="tex2html1054"
   HREF="node66.html">Communication routines</A>
-<B> Up:</B> <A NAME="tex2html1049"
+<B> Up:</B> <A NAME="tex2html1050"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html1045"
+<B> Previous:</B> <A NAME="tex2html1046"
   HREF="node64.html">psb_spmm   Sparse</A>
- &nbsp; <B>  <A NAME="tex2html1051"
+ &nbsp; <B>  <A NAME="tex2html1052"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 

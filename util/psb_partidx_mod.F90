@@ -57,7 +57,30 @@ module psb_partidx_mod
          & lijk2lidx3d, lijk2lidxv, lijk2lidx2d
   end interface ijk2idx
 
+  logical, private, save :: col_major=.true.
+
 contains
+  
+  subroutine psb_pidx_set_col_major(val)
+    implicit none 
+    logical, intent(in), optional :: val
+    logical :: val_
+    val_ =.true.
+    if (present(val)) val_ = val
+    col_major = val_
+  end subroutine psb_pidx_set_col_major
+
+  subroutine psb_pidx_set_row_major()
+    implicit none 
+    call psb_pidx_set_col_major(.false.)
+  end subroutine psb_pidx_set_row_major
+
+  function psb_pidx_get_col_major() result(val)
+    implicit none 
+    logical :: val
+    val = col_major
+  end function psb_pidx_get_col_major
+  
   !
   ! Given  a global index IDX and the domain size (NX,NY,NZ)
   ! compute the point coordinates (I,J,K) 
@@ -143,10 +166,17 @@ contains
     ! j = mod(idx_/nz,ny) + base_
     ! i = mod(idx_/(nx*ny),nx) + base_
     !
-    do i=size(dims),1,-1
-      coords(i) = mod(idx_,dims(i)) + base_
-      idx_ = idx_ / dims(i)
-    end do
+    if (col_major) then 
+      do i=1,size(dims)
+        coords(i) = mod(idx_,dims(i)) + base_
+        idx_ = idx_ / dims(i)
+      end do
+    else
+      do i=size(dims),1,-1
+        coords(i) = mod(idx_,dims(i)) + base_
+        idx_ = idx_ / dims(i)
+      end do
+    end if
 
   end subroutine idx2ijkv
 
@@ -349,12 +379,19 @@ contains
       return
     end if
 
-    idx = coords(1) - base_
-    do i=2, sz
-      idx = (idx * dims(i)) + coords(i) - base_
-    end do
-    idx = idx + base_
-    
+    if (col_major) then 
+      idx = coords(sz) - base_
+      do i=sz-1,1,-1
+        idx = (idx * dims(i)) + coords(i) - base_
+      end do
+      idx = idx + base_
+    else
+      idx = coords(1) - base_
+      do i=2,sz
+        idx = (idx * dims(i)) + coords(i) - base_
+      end do
+      idx = idx + base_
+    end if
   end subroutine ijk2idxv
   !
   ! Given  a triple (I,J,K) and  the domain size (NX,NY,NZ)

@@ -3,8 +3,8 @@
 <!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
-<TITLE>free -- Free a preconditioner</TITLE>
-<META NAME="description" CONTENT="free -- Free a preconditioner">
+<TITLE>clone -- clone current preconditioner</TITLE>
+<META NAME="description" CONTENT="clone -- clone current preconditioner">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -14,46 +14,47 @@
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
+<LINK REL="next" HREF="node131.html">
 <LINK REL="previous" HREF="node129.html">
-<LINK REL="up" HREF="node124.html">
+<LINK REL="up" HREF="node125.html">
 <LINK REL="next" HREF="node131.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1881"
+<A NAME="tex2html1885"
   HREF="node131.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1877"
-  HREF="node124.html">
+<A NAME="tex2html1881"
+  HREF="node125.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1873"
+<A NAME="tex2html1875"
   HREF="node129.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1879"
+<A NAME="tex2html1883"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1882"
-  HREF="node131.html">Iterative Methods</A>
-<B> Up:</B> <A NAME="tex2html1878"
-  HREF="node124.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1874"
-  HREF="node129.html">clone   clone</A>
- &nbsp; <B>  <A NAME="tex2html1880"
+<B> Next:</B> <A NAME="tex2html1886"
+  HREF="node131.html">free   Free</A>
+<B> Up:</B> <A NAME="tex2html1882"
+  HREF="node125.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1876"
+  HREF="node129.html">descr   Prints</A>
+ &nbsp; <B>  <A NAME="tex2html1884"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000116000000000000000">
-free -- Free a  preconditioner</A>
+<H2><A NAME="SECTION000115000000000000000">
+clone -- clone  current
+  preconditioner</A>
 </H2>
 
-<P>
 <PRE>
-call prec%free(info)
+call  prec%clone(precout,info)
 </PRE>
 
 <P>
@@ -68,37 +69,21 @@ call prec%free(info)
 <DD>the preconditioner.
 <BR>
 Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+<BR></DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
 </DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+<DT><STRONG>precout</STRONG></DT>
+<DD>A copy of the input object.
 </DD>
 <DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Error code: if no error, 0 is returned.
+<DD>Return code. 
 </DD>
 </DL>
-<BIG CLASS="LARGE"><B>Notes</B></BIG>
-Releases all internal storage.
 
 <P>
 <BR><HR>

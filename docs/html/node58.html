@@ -23,26 +23,26 @@
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html970"
+<A NAME="tex2html971"
   HREF="node59.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html966"
+<A NAME="tex2html967"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html960"
+<A NAME="tex2html961"
   HREF="node57.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html968"
+<A NAME="tex2html969"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html971"
+<B> Next:</B> <A NAME="tex2html972"
   HREF="node59.html">psb_geasums   Generalized</A>
-<B> Up:</B> <A NAME="tex2html967"
+<B> Up:</B> <A NAME="tex2html968"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html961"
+<B> Previous:</B> <A NAME="tex2html962"
   HREF="node57.html">psb_geamaxs   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html969"
+ &nbsp; <B>  <A NAME="tex2html970"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR></DIV>
@@ -54,12 +54,12 @@ psb_norm1 -- 1-Norm of Vector</A>
 
 <P>
 This function computes the 1-norm of a vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
 If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a real vector
 it computes 1-norm as:
@@ -72,14 +72,14 @@ asum \leftarrow  \|x_i\|
  -->
 
 <IMG
- WIDTH="92" HEIGHT="28" BORDER="0"
- SRC="img33.png"
+ WIDTH="92" HEIGHT="29" BORDER="0"
+ SRC="img35.png"
  ALT="\begin{displaymath}asum \leftarrow \Vert x_i\Vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
@@ -91,8 +91,8 @@ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1
  -->
 
 <IMG
- WIDTH="205" HEIGHT="28" BORDER="0"
- SRC="img34.png"
+ WIDTH="205" HEIGHT="29" BORDER="0"
+ SRC="img36.png"
  ALT="\begin{displaymath}asum \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -100,13 +100,13 @@ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1
 
 <P>
 <PRE>
-psb_geasum(x, desc_a, info)
-psb_norm1(x, desc_a, info)
+psb_geasum(x, desc_a, info [,global])
+psb_norm1(x, desc_a, info [,global])
 </PRE>
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1982"></A>
+<DIV ALIGN="CENTER"><A NAME="2028"></A>
 <TABLE>
 <CAPTION><STRONG>Table 6:</STRONG>
 Data types</CAPTION>
@@ -114,11 +114,11 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img35.png"
+ WIDTH="43" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img37.png"
  ALT="$asum$"></SPAN></TD>
 <TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
@@ -157,7 +157,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 
@@ -182,7 +182,20 @@ Type: <B>required</B>
 Intent: <B>in</B>.
 <BR>
 Specified as: an object of type descdata<TT>psb_desc_type</TT>.
-
+</DD>
+<DT><STRONG>global</STRONG></DT>
+<DD>Specifies whether the computation should include the
+  global reduction across all processes.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a logical scalar.
+Default: <code>global=.true.</code>
+<BR>
 <P>
 </DD>
 <DT><STRONG><B>On Return</B></STRONG></DT>
@@ -190,11 +203,12 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>Function value</STRONG></DT>
 <DD>is the 1-norm of vector <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>.
 <BR>
-Scope: <B>global</B> 
+Scope: <B>global</B> unless the optional variable
+<code>global=.false.</code> has been specified
 <BR>
 Specified as: a long precision real  number.
 </DD>
@@ -212,29 +226,54 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<BIG CLASS="LARGE"><B>Notes</B></BIG>
+
+<OL>
+<LI>The computation of a global result requires a global
+  communication, which entails a significant overhead. It may be
+  necessary and/or advisable to compute multiple norms at the same 
+  time; in this case, it is possible to improve the runtime efficiency
+  by using the following scheme:
+  <BR>
+<IMG
+ WIDTH="481" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ SRC="img38.png"
+ ALT="\begin{lstlisting}
+vres(1) = psb_geasum(x1,desc_a,info,global=.false.)
+vres(2)...
+...(x3,desc_a,info,global=.false.)
+call psb_sum(ictxt,vres(1:3))
+\end{lstlisting}">
+<BR>
+In this way the global communication, which for small sizes is a
+  latency-bound operation, is invoked only once.
+</LI>
+</OL>
+
+<P>
 
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html970"
+<A NAME="tex2html971"
   HREF="node59.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html966"
+<A NAME="tex2html967"
   HREF="node52.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html960"
+<A NAME="tex2html961"
   HREF="node57.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html968"
+<A NAME="tex2html969"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html971"
+<B> Next:</B> <A NAME="tex2html972"
   HREF="node59.html">psb_geasums   Generalized</A>
-<B> Up:</B> <A NAME="tex2html967"
+<B> Up:</B> <A NAME="tex2html968"
   HREF="node52.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html961"
+<B> Previous:</B> <A NAME="tex2html962"
   HREF="node57.html">psb_geamaxs   Generalized</A>
- &nbsp; <B>  <A NAME="tex2html969"
+ &nbsp; <B>  <A NAME="tex2html970"
   HREF="node1.html">Contents</A></B> </DIV>
 <!--End of Navigation Panel-->
 
