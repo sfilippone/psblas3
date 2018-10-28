@@ -414,7 +414,7 @@ program d_matgen
   !
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  if (.true.) then 
+  if (.false.) then 
     call psb_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
          & a1,a2,a3,b1,b2,b3,c,g,info,amold=acsr)  
   else if (.false.) then 

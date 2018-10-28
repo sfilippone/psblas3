@@ -16,7 +16,10 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
+all: runsd psb_d_pde3d psb_s_pde3d psb_d_pde2d psb_s_pde2d
+
+runsd:
+	(if test ! -d runs ; then mkdir runs; fi)
 
 psb_d_pde3d: psb_d_pde3d.o 
 	$(FLINK)  psb_d_pde3d.o -o psb_d_pde3d $(PSBLAS_LIB) $(LDLIBS)
