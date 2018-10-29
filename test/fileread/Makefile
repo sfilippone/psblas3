@@ -18,7 +18,10 @@ ZFOBJS=getp.o  psb_zf_sample.o
 
 EXEDIR=./runs
 
-all: psb_sf_sample psb_df_sample psb_cf_sample psb_zf_sample 
+all: runsd psb_sf_sample psb_df_sample psb_cf_sample psb_zf_sample 
+
+runsd:
+	(if test ! -d runs ; then mkdir runs; fi)
 
 psb_sf_sample.o psb_df_sample.o psb_cf_sample.o psb_zf_sample.o: getp.o
 
