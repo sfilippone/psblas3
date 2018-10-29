@@ -1,5 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2018/10/10: new ICTXT argument to prec%init method.
+2018/09/04: Modified vector class get_vect method
+2018/08/10: Optional arguments in GETROW method. 	
+2018/07/30: Improved TRIL/TRIU implementations. 	
+2018/06/14: New FCG code. 	
 2018/04/23: Change default for CDALL with VL. New GLOBAL argument for
 	reductions. 	
 2018/04/15: Fixed pargen benchmark programs. Made MOLD mandatory.
