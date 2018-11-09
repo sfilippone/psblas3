@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
   psb_c_barrier(ictxt);
   /* Set up the preconditioner */ 
   ph  = psb_c_new_dprec();
-  psb_c_dprecinit(ph,ptype);
+  psb_c_dprecinit(ictxt,ph,ptype);
   ret=psb_c_dprecbld(ah,cdh,ph);
   fprintf(stderr,"From psb_c_dprecbld: %d\n",ret); 
 

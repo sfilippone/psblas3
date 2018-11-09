@@ -121,15 +121,15 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   real(psb_dpk_), Optional, Intent(out) :: err,cond
 ! =   Local data
-  type(psb_z_vect_type)  :: v, w
-  type(psb_z_vect_type), dimension(0:1) ::  d
-  complex(psb_dpk_) :: alpha, tau, tau1, beta, delta
+  type(psb_z_vect_type)  :: v, w, d , q, r
+  complex(psb_dpk_) :: alpha, beta, delta, gamma, theta
   real(psb_dpk_) :: derr
   integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
   integer(psb_ipk_) :: n_col, mglob, naux, err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: np, me, ictxt
   complex(psb_dpk_), allocatable, target   :: aux(:)
+  complex(psb_dpk_)   :: vres(3)
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='FCG'
@@ -191,112 +191,113 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
 
-  !Assemble w, v
-
-  call psb_geasb(w,&
-       & desc_a,info,&
-       & scratch=.true.,mold=b%v)
-  call psb_geasb(v,&
-       & desc_a,info,&
-       & scratch=.true.,mold=b%v)
-
-  !Assemble d(0) and d(1)
-  call psb_geasb(d(0),&
-       & desc_a,info,&
+  !Assemble w, v, d, q, r, u 
+  call psb_geasb(w, desc_a,info,&
        & scratch=.true.,mold=x%v)
-  call psb_geasb(d(1),&
-       & desc_a,info,&
+  call psb_geasb(v, desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(d, desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(q, desc_a,info,&
+       & scratch=.true.,mold=x%v)
+  call psb_geasb(r, desc_a,info,&
        & scratch=.true.,mold=x%v)
 
-
-    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
-  itx=0
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,&
+       & a,x,b,eps,desc_a,stopdat,info)
+  itx = 0 
 
   restart: do 
     if (itx>= itmax_) exit restart 
 
-    ! w=b
-    call psb_geaxpby(zone,b,zzero,w,&
-         &   desc_a,info)
-
-      if (psb_errstatus_fatal()) then 
-        nc2l = desc_a%get_local_cols()
-        info=psb_err_alloc_request_
-        call psb_errpush(info,name,i_err=(/2*nc2l,izero,izero,izero,izero/),&
-             & a_err='complex(psb_dpk_)')
-        goto 9999      
-      end if
-
-   !Compute v = Ax  
-
-    call psb_spmm(zone,a,x,zzero,v,desc_a,info)
+    ! r=b -Ax
+    call psb_geaxpby(zone,b,zzero,r, desc_a,info)
+    if (info == psb_success_) call psb_spmm(-zone,a,x,zone,r,desc_a,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,name,&
-        & a_err='Error during residue')
+           & a_err='Error during residual')
+      goto 9999
+    end if
+    
+
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+
+
+    ! Apply the preconditioner v=Pr
+    ! Compute w = Av  
+    call prec%apply(r,v,desc_a,info,work=aux)  
+    if (info == psb_success_) call psb_spmm(zone,a,v,zzero,w,desc_a,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='Error during residual')
       goto 9999
     end if
 
-    !Compute w = -Ax + b
 
-    call psb_geaxpby(-zone, v, zone, w, desc_a, info)   
-
-    !Apply the preconditioner
-
-    idx=0
-
-    call prec%apply(w,d(idx),desc_a,info,work=aux)  
-
-    delta = psb_gedot(d(idx), w, desc_a, info)
+    vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
+    vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
 
 
-    !Loop
+    call psb_sum(ictxt, vres(1:2))
 
-    if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
+    alpha = vres(1)
+    beta  = vres(2)
 
-    if (info /= psb_success_) Then 
-      call psb_errpush(psb_err_from_subroutine_non_,name)
-      goto 9999
-    End If
+    ! d = v
+    call psb_geaxpby(zone, v, zzero, d, desc_a, info)   
+    ! q = w
+    call psb_geaxpby(zone, w, zzero, q, desc_a, info)   
+
+    ! compute delta=beta
+    ! then 
+    ! x = x + (alpha/delta)*d
+    ! r = r - (alpha/delta)*q
+
+    delta = beta
+    theta = alpha/delta
+    call psb_geaxpby(theta, d, zone, x, desc_a, info)   
+    call psb_geaxpby(-theta, q, zone, r, desc_a, info)   
 
     iteration: do 
 
-      call psb_spmm(zone,a,d(idx),zzero,v,desc_a,info)
-      if (info /= psb_success_) then
-       call psb_errpush(psb_err_internal_error_,name,&
-          & a_err='Error during residue')
-       goto 9999
-      end if
-      tau = psb_gedot(d(idx), v, desc_a, info) 
-
-
-      alpha = delta/tau
-      !Update solution x
-      call psb_geaxpby(alpha, d(idx), zone, x, desc_a, info)   
-      !Update residual w
-      call psb_geaxpby(-alpha, v, zone, w, desc_a, info) 
-
       itx = itx + 1
-      idx=mod(itx ,2)
 
-      call d(idx)%set(zzero)  
-      call prec%apply(w,d(idx),desc_a,info,work=aux)    
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
 
-      tau1= psb_gedot(d(idx), v, desc_a, info)
-      beta=tau1/tau
+      ! Apply the preconditioner v = Pr
+      ! Compute w = Av  
+      call prec%apply(r,v,desc_a,info,work=aux)  
+      if (info == psb_success_) call psb_spmm(zone,a,v,zzero,w,desc_a,info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_,name,&
+             & a_err='Error during residual'); goto 9999
+      end if
 
-      if (idx == 1) then
-        call psb_geaxpby(-beta, d(idx - 1), zone, d(idx), desc_a, info)   
-      else
-        call psb_geaxpby(-beta, d(idx + 1), zone, d(idx), desc_a, info)         
-      endif
-    
-      delta = psb_gedot(w, d(idx), desc_a, info)
+      vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
+      vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
+      vres(3) = psb_gedot(q, v, desc_a, info, global = .false.) 
 
-      if (psb_check_conv(methdname,itx ,x,w,desc_a,stopdat,info)) exit restart
-      if (info /= psb_success_) Then 
-        call psb_errpush(psb_err_from_subroutine_non_,name)
-        goto 9999
-      End If
+      call psb_sum(ictxt, vres(1:3))
+
+      alpha = vres(1)
+      beta  = vres(2)
+      gamma = vres(3)
+
+      ! Compute d = v-(gamma/delta)*d
+      !         q = w-(gamma/delta)*q
+      theta= gamma/delta
+      call psb_geaxpby(zone, v, -theta, d, desc_a, info)   
+      call psb_geaxpby(zone, w, -theta, q , desc_a, info)   
+
+      ! update delta
+      delta = beta - (gamma*gamma)/delta
+
+      ! update u and r      
+      ! u = u + (alpha/delta)*d
+      ! r = r - (alpha/delta)*q
+      theta= alpha/delta
+      call psb_geaxpby(theta, d, zone, x, desc_a, info)   
+      call psb_geaxpby(-theta, q, zone, r, desc_a, info)   
 
     end do iteration
   end do restart

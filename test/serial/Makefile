@@ -15,7 +15,10 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 EXEDIR=./runs
 
 
-all: d_matgen 
+all: runsd d_matgen 
+
+runsd:
+	(if test ! -d runs ; then mkdir runs; fi)
 
 psb_d_xyz_impl.o d_matgen.o: psb_d_xyz_mat_mod.o 
 

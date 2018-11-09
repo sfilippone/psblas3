@@ -199,8 +199,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & rvsz,1,psb_mpi_def_integer,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='mpi_alltoall'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='mpi_alltoall')
     goto 9999
   end if
 
@@ -228,8 +227,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_sp_reall'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_sp_reall')
     goto 9999
   end if
   mat_recv = iszr
@@ -237,6 +235,11 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='ensure_size')
+    goto 9999
+  end if
 
   l1  = 0
   ipx = 1
@@ -258,8 +261,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
            &  append=.true.,nzin=tot_elem)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
-        ch_err='psb_sp_getrow'
-        call psb_errpush(info,name,a_err=ch_err)
+        call psb_errpush(info,name,a_err='psb_sp_getrow')
         goto 9999
       end if
       tot_elem=tot_elem+n_elem
@@ -273,8 +275,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_loc_to_glob'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_loc_to_glob')
     goto 9999
   end if
 
@@ -287,8 +288,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & acoo%ja,rvsz,brvindx,psb_mpi_ipk_integer,icomm,minfo)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='mpi_alltoallv'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='mpi_alltoallv')
     goto 9999
   end if
 
@@ -300,8 +300,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psbglob_to_loc'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psbglob_to_loc')
     goto 9999
   end if
 
@@ -353,8 +352,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call blk%cscnv(info,type=outfmt_,dupl=psb_dupl_add_)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='psb_spcnv'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err='psb_spcnv')
     goto 9999
   end if
 

@@ -213,7 +213,7 @@ program psb_zf_sample
 
   ! 
 
-  call prec%init(ptype,info)
+  call prec%init(ictxt,ptype,info)
 
   ! building the preconditioner
   t1 = psb_wtime()

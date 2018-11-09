@@ -17,8 +17,10 @@ STOBJS=s_file_spmv.o
 DPGOBJS=pdgenspmv.o
 EXEDIR=./runs
 
-all: d_file_spmv s_file_spmv pdgenspmv
+all: runsd d_file_spmv s_file_spmv pdgenspmv
 
+runsd:
+	(if test ! -d runs ; then mkdir runs; fi)
 
 d_file_spmv: $(DTOBJS)
 	$(FLINK) $(LOPT) $(DTOBJS) -o d_file_spmv $(PSBLAS_LIB) $(LDLIBS) 

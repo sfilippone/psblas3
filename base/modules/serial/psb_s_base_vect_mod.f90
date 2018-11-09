@@ -688,19 +688,24 @@ contains
   !! \brief  Extract a copy of the contents
   !!
   !    
-  function  s_base_get_vect(x) result(res)
+  function  s_base_get_vect(x,n) result(res)
     class(psb_s_base_vect_type), intent(inout) :: x
     real(psb_spk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
+    integer(psb_ipk_), optional :: n
+    ! Local variables
+    integer(psb_ipk_) :: isz
     
     if (.not.allocated(x%v)) return 
     if (.not.x%is_host()) call x%sync()
-    allocate(res(x%get_nrows()),stat=info) 
+    isz = x%get_nrows()
+    if (present(n)) isz = max(0,min(isz,n))
+    allocate(res(isz),stat=info) 
     if (info /= 0) then 
       call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
       return
     end if
-    res(:) = x%v(:)
+    res(1:isz) = x%v(1:isz)
   end function s_base_get_vect
     
   !
@@ -744,9 +749,10 @@ contains
         
     integer(psb_ipk_) :: info, first_, last_, nr
 
-    first_=1
-    last_=min(psb_size(x%v),size(val))
+
+    first_                     = 1
     if (present(first)) first_ = max(1,first)
+    last_                      = min(psb_size(x%v),first_+size(val)-1)
     if (present(last))  last_  = min(last,last_)
 
     if (allocated(x%v)) then 

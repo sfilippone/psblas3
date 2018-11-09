@@ -406,7 +406,7 @@ subroutine psb_c_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 end subroutine psb_c_base_csput_v
 
 subroutine psb_c_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -422,7 +422,7 @@ subroutine psb_c_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
   integer(psb_ipk_) :: err_act
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
@@ -447,7 +447,7 @@ end subroutine psb_c_base_csgetrow
 ! If performance is critical it can be overridden.
 !
 subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
-     & jmin,jmax,iren,append,rscale,cscale)
+     & jmin,jmax,iren,append,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -461,7 +461,7 @@ subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
   integer(psb_ipk_) :: err_act, nzin, nzout
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
@@ -522,7 +522,7 @@ subroutine psb_c_base_csgetblk(imin,imax,a,b,info,&
 
   call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
+       & nzin=nzin, rscale=rscale, cscale=cscale, chksz=chksz)
 
   if (info /= psb_success_) goto 9999
 
@@ -645,7 +645,7 @@ subroutine psb_c_base_tril(a,l,info,&
   logical, intent(in), optional            :: rscale,cscale
   class(psb_c_coo_sparse_mat), optional, intent(out) :: u
   
-  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k, ibk 
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   complex(psb_spk_), allocatable    :: val(:)
@@ -653,6 +653,7 @@ subroutine psb_c_base_tril(a,l,info,&
   character(len=20)  :: name='tril'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
+  integer(psb_ipk_), parameter :: nbk=8
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -715,12 +716,12 @@ subroutine psb_c_base_tril(a,l,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
-    do i=imin_,imax_
-      call a%csget(i,i,nzout,ia,ja,val,info,&
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        j = ja(k) 
-        if (j-i<=diag_) then
+        if ((ja(k)-ia(k))<=diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -796,7 +797,7 @@ subroutine psb_c_base_triu(a,u,info,&
   logical, intent(in), optional            :: rscale,cscale
   class(psb_c_coo_sparse_mat), optional, intent(out) :: l
   
-  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k 
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k, ibk
   integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
   integer(psb_ipk_), allocatable :: ia(:), ja(:)
   complex(psb_spk_), allocatable    :: val(:)
@@ -804,6 +805,7 @@ subroutine psb_c_base_triu(a,u,info,&
   character(len=20)  :: name='triu'
   logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
+  integer(psb_ipk_), parameter :: nbk=8
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -866,12 +868,12 @@ subroutine psb_c_base_triu(a,u,info,&
     call psb_realloc(max(mb,nb),ia,info)
     call psb_realloc(max(mb,nb),ja,info)
     call psb_realloc(max(mb,nb),val,info)
-    do i=imin_,imax_
-      call a%csget(i,i,nzout,ia,ja,val,info,&
+    do i=imin_,imax_, nbk
+      ibk = min(nbk,imax_-i+1)
+      call a%csget(i,i+ibk-1,nzout,ia,ja,val,info,&
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        j = ja(k) 
-        if (j-i<diag_) then
+        if ((ja(k)-ia(k))<diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)

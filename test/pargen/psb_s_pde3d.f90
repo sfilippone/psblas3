@@ -90,26 +90,36 @@ contains
   !
   ! functions parametrizing the differential equation 
   !  
+
+  !
+  ! Note: b1, b2 and b3 are the coefficients of the first
+  ! derivative of the unknown function. The default
+  ! we apply here is to have them zero, so that the resulting
+  ! matrix is symmetric/hermitian and suitable for
+  ! testing with CG and FCG.
+  ! When testing methods for non-hermitian matrices you can
+  ! change the B1/B2/B3 functions to e.g. sone/sqrt((3*sone))
+  !
   function b1(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y,z
-    b1=sone/sqrt((3*sone))
+    b1=szero
   end function b1
   function b2(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y,z
-    b2=sone/sqrt((3*sone))
+    b2=szero
   end function b2
   function b3(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
     implicit none 
     real(psb_spk_) ::  b3
     real(psb_spk_), intent(in) :: x,y,z      
-    b3=sone/sqrt((3*sone))
+    b3=szero
   end function b3
   function c(x,y,z)
     use psb_base_mod, only : psb_spk_, sone, szero
@@ -248,7 +258,7 @@ contains
     
     m   = idim*idim*idim
     n   = m
-    nnz = ((n*9)/(np))
+    nnz = ((n*7)/(np))
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
     t0 = psb_wtime()
     select case(partition_)
@@ -421,7 +431,7 @@ contains
         if (ix == 1) then 
           zt(k) = g(szero,y,z)*(-val(icoeff)) + zt(k)
         else
-          icol(icoeff) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -430,7 +440,7 @@ contains
         if (iy == 1) then 
           zt(k) = g(x,szero,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -439,7 +449,7 @@ contains
         if (iz == 1) then 
           zt(k) = g(x,y,szero)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
+          call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -447,7 +457,7 @@ contains
         !  term depending on     (x,y,z)
         val(icoeff)=(2*sone)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
              & + c(x,y,z)
-        icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
+        call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)          
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
         !  term depending on     (x,y,z+1)
@@ -455,7 +465,7 @@ contains
         if (iz == idim) then 
           zt(k) = g(x,y,sone)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
+          call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -464,7 +474,7 @@ contains
         if (iy == idim) then 
           zt(k) = g(x,sone,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -473,7 +483,7 @@ contains
         if (ix==idim) then 
           zt(k) = g(sone,y,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)          
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -640,7 +650,7 @@ program psb_s_pde3d
   !  prepare the preconditioner.
   !  
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
-  call prec%init(ptype,info)
+  call prec%init(ictxt,ptype,info)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
@@ -665,7 +675,7 @@ program psb_s_pde3d
   if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
-  eps   = 1.d-9
+  eps   = 1.d-6
   call psb_krylov(kmethd,a,prec,bv,xxv,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 

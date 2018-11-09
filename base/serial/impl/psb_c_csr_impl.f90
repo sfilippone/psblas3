@@ -1999,7 +1999,7 @@ end subroutine psb_c_csr_csgetptn
 
 
 subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-     & jmin,jmax,iren,append,nzin,rscale,cscale)
+     & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
@@ -2017,9 +2017,9 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   logical, intent(in), optional        :: append
   integer(psb_ipk_), intent(in), optional        :: iren(:)
   integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-  logical, intent(in), optional        :: rscale,cscale
+  logical, intent(in), optional        :: rscale,cscale,chksz
 
-  logical :: append_, rscale_, cscale_ 
+  logical :: append_, rscale_, cscale_, chksz_
   integer(psb_ipk_) :: nzin_, jmin_, jmax_, err_act, i
   integer(psb_ipk_) :: ierr(5)
   character(len=20)  :: name='csget'
@@ -2063,13 +2063,18 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   else
     cscale_ = .false.
   endif
+  if (present(chksz)) then 
+    chksz_ = chksz
+  else
+    chksz_ = .true.
+  endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
     info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
   end if
 
-  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
+  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,chksz_,info,&
        & iren)
   
   if (rscale_) then 
@@ -2094,7 +2099,7 @@ subroutine psb_c_csr_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
 contains
 
-  subroutine csr_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
+  subroutine csr_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,chksz,info,&
        & iren)
 
     use psb_const_mod
@@ -2109,7 +2114,7 @@ contains
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
     complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_), intent(in)                  :: nzin
-    logical, intent(in)                  :: append
+    logical, intent(in)                  :: append, chksz
     integer(psb_ipk_) :: info
     integer(psb_ipk_), optional                    :: iren(:)
     integer(psb_ipk_) :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl,lcl, nrd, ncd
@@ -2142,11 +2147,13 @@ contains
     nzt = (a%irp(lrw+1)-a%irp(irw))
     nz = 0 
 
-    call psb_ensure_size(nzin_+nzt,ia,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
-    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
-
-    if (info /= psb_success_) return
+    if (chksz) then 
+      call psb_ensure_size(nzin_+nzt,ia,info)
+      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+      if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
+      
+      if (info /= psb_success_) return
+    end if
     
     if (present(iren)) then 
       do i=irw, lrw
@@ -2178,50 +2185,155 @@ contains
 
 end subroutine psb_c_csr_csgetrow
 
-subroutine psb_c_csr_csgetblk(imin,imax,a,b,info,&
-     & jmin,jmax,iren,append,rscale,cscale)
+
+!
+! CSR implementation of tril/triu
+!
+subroutine psb_c_csr_tril(a,l,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,u)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
-  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_csgetblk
+  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_tril
   implicit none
 
   class(psb_c_csr_sparse_mat), intent(in) :: a
-  class(psb_c_coo_sparse_mat), intent(inout) :: b
-  integer(psb_ipk_), intent(in)                  :: imin,imax
-  integer(psb_ipk_),intent(out)                  :: info
-  logical, intent(in), optional        :: append
-  integer(psb_ipk_), intent(in), optional        :: iren(:)
-  integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-  logical, intent(in), optional        :: rscale,cscale
-  integer(psb_ipk_) :: err_act, nzin, nzout
+  class(psb_c_coo_sparse_mat), intent(out) :: l
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_c_coo_sparse_mat), optional, intent(out) :: u
+  
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  complex(psb_spk_), allocatable    :: val(:)
   integer(psb_ipk_) :: ierr(5)
-  character(len=20)  :: name='csget'
-  logical :: append_
+  character(len=20)  :: name='tril'
+  logical :: rscale_, cscale_
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(append)) then 
-    append_ = append
+  if (present(diag)) then 
+    diag_ = diag
   else
-    append_ = .false.
-  endif
-  if (append_) then 
-    nzin = a%get_nzeros()
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
   else
-    nzin = 0
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
   endif
 
-  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-       & nzin=nzin, rscale=rscale, cscale=cscale)
 
-  if (info /= psb_success_) goto 9999
+  nz = a%get_nzeros()
+  call l%allocate(mb,nb,nz)
+  
+  if (present(u)) then
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    call u%allocate(mb,nb,nz)
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    
+    call l%set_nzeros(nzlin)
+    call u%set_nzeros(nzuin)
+    call u%fix(info)
+    nzout = u%get_nzeros()
+    if (rscale_) &
+         & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ >=-1).and.(imin_ == jmin_)) then 
+      call u%set_triangle(.true.)
+      call u%set_lower(.false.)
+    end if
+  else
+    nzin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<=diag_) then
+              nzin = nzin + 1
+              l%ia(nzin)  = i
+              l%ja(nzin)  = ja(k)
+              l%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call l%set_nzeros(nzin)
+  end if
+  call l%fix(info)
+  nzout = l%get_nzeros()
+  if (rscale_) &
+       & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ <= 0).and.(imin_ == jmin_)) then 
+    call l%set_triangle(.true.)
+    call l%set_lower(.true.)
+  end if
 
-  call b%set_nzeros(nzin+nzout)
-  call b%fix(info)
   if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -2231,8 +2343,162 @@ subroutine psb_c_csr_csgetblk(imin,imax,a,b,info,&
 
   return
 
-end subroutine psb_c_csr_csgetblk
+end subroutine psb_c_csr_tril
 
+subroutine psb_c_csr_triu(a,u,info,&
+     & diag,imin,imax,jmin,jmax,rscale,cscale,l)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csr_mat_mod, psb_protect_name => psb_c_csr_triu
+  implicit none
+
+  class(psb_c_csr_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(out) :: u
+  integer(psb_ipk_),intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional  :: diag,imin,imax,jmin,jmax
+  logical, intent(in), optional            :: rscale,cscale
+  class(psb_c_coo_sparse_mat), optional, intent(out) :: l
+  
+  integer(psb_ipk_) :: err_act, nzin, nzout, i, j, k
+  integer(psb_ipk_) :: imin_, imax_, jmin_, jmax_, mb,nb, diag_, nzlin, nzuin, nz
+  integer(psb_ipk_), allocatable :: ia(:), ja(:)
+  complex(psb_spk_), allocatable    :: val(:)
+  integer(psb_ipk_) :: ierr(5)
+  character(len=20)  :: name='triu'
+  logical :: rscale_, cscale_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (present(diag)) then 
+    diag_ = diag
+  else
+    diag_ = 0
+  end if
+  if (present(imin)) then 
+    imin_ = imin
+  else
+    imin_ = 1
+  end if
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%get_nrows()
+  end if
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  end if
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  end if
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  end if
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  end if
+
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
+  else 
+    mb = imax_ 
+  endif
+  if (cscale_) then 
+    nb = jmax_ - jmin_ +1
+  else 
+    nb = jmax_  
+  endif
+
+
+  nz = a%get_nzeros()
+  call u%allocate(mb,nb,nz)
+  
+  if (present(l)) then
+    nzuin = u%get_nzeros() ! At this point it should be 0
+    call l%allocate(mb,nb,nz)
+    nzlin = l%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_
+        do k=irp(i),irp(i+1)-1
+          j = ja(k)
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)<diag_) then
+              nzlin = nzlin + 1
+              l%ia(nzlin)  = i
+              l%ja(nzlin)  = ja(k)
+              l%val(nzlin) = val(k)
+            else
+              nzuin = nzuin + 1
+              u%ia(nzuin)  = i
+              u%ja(nzuin)  = ja(k)
+              u%val(nzuin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzuin)
+    call l%set_nzeros(nzlin)
+    call l%fix(info)
+    nzout = l%get_nzeros()
+    if (rscale_) &
+         & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
+    if (cscale_) &
+         & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1  
+    if ((diag_ <=1).and.(imin_ == jmin_)) then 
+      call l%set_triangle(.true.)
+      call l%set_lower(.true.)
+    end if
+  else
+    nzin = u%get_nzeros() ! At this point it should be 0
+    associate(val =>a%val, ja => a%ja, irp=>a%irp)
+      do i=imin_,imax_        
+        do k=irp(i),irp(i+1)-1
+          if ((jmin_<=j).and.(j<=jmax_)) then 
+            if ((ja(k)-i)>=diag_) then
+              nzin = nzin + 1
+              u%ia(nzin)  = i
+              u%ja(nzin)  = ja(k)
+              u%val(nzin) = val(k)
+            end if
+          end if
+        end do
+      end do
+    end associate
+    call u%set_nzeros(nzin)
+  end if
+  call u%fix(info)
+  nzout = u%get_nzeros()
+  if (rscale_) &
+       & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
+  if (cscale_) &
+       & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
+  
+  if ((diag_ >= 0).and.(imin_ == jmin_)) then 
+    call u%set_triangle(.true.)
+    call u%set_upper(.true.)
+  end if
+
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+
+end subroutine psb_c_csr_triu
 
 
 subroutine psb_c_csr_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 

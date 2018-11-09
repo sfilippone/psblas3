@@ -28,12 +28,17 @@ backward compatibility
 \addcontentsline{toc}{subsection}{prec\%init}
 
 \begin{verbatim}
-call prec%init(ptype, info)
+call prec%init(icontxt,ptype, info)
 \end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
 \item[\bf On Entry]
+\item[icontxt] the communication context.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value.
 \item[ptype] the type of preconditioner. 
 Scope: {\bf global} \\
 Type: {\bf required}\\

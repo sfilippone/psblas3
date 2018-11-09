@@ -13,12 +13,13 @@ module psb_sprec_cbind_mod
 contains 
 
 
-  function  psb_c_sprecinit(ph,ptype) bind(c) result(res)
+  function  psb_c_sprecinit(ictxt,ph,ptype) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
     use psb_base_string_cbind_mod
     implicit none 
-    integer(c_int)          :: res
+    integer(psb_c_int), value :: ictxt   
+    integer(psb_c_int)          :: res
     type(psb_c_sprec) :: ph
     character(c_char)       :: ptype(*)
     type(psb_sprec_type), pointer :: precp
@@ -36,7 +37,7 @@ contains
 
     call stringc2f(ptype,fptype)
     
-    call psb_precinit(precp,fptype,info) 
+    call psb_precinit(ictxt,precp,fptype,info) 
     
     res = min(0,info)
     return
@@ -51,7 +52,7 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(c_int) :: res
+    integer(psb_c_int) :: res
     type(psb_c_sspmat) :: ah
     type(psb_c_sprec) :: ph
     type(psb_c_descriptor) :: cdh
@@ -94,7 +95,7 @@ contains
     use psb_base_string_cbind_mod
     implicit none 
     
-    integer(c_int) :: res
+    integer(psb_c_int) :: res
     type(psb_c_sprec) :: ph
 
     type(psb_sprec_type), pointer :: precp

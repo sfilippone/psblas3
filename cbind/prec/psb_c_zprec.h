@@ -8,15 +8,15 @@
 extern "C" {
 #endif
 
-typedef struct PSB_C_ZPREC {
-  void *zprec;
-} psb_c_zprec; 
-
-psb_c_zprec* psb_c_new_zprec();
-
-psb_i_t  psb_c_zprecinit(psb_c_zprec *ph, const char *ptype);
-psb_i_t  psb_c_zprecbld(psb_c_zspmat *ah, psb_c_descriptor *cdh, psb_c_zprec *ph);
-psb_i_t  psb_c_zprecfree(psb_c_zprec *ph);
+  typedef struct PSB_C_ZPREC {
+    void *zprec;
+  } psb_c_zprec; 
+  
+  psb_c_zprec* psb_c_new_zprec();
+  
+  psb_i_t  psb_c_zprecinit(psb_i_t ictxt, psb_c_zprec *ph, const char *ptype);
+  psb_i_t  psb_c_zprecbld(psb_c_zspmat *ah, psb_c_descriptor *cdh, psb_c_zprec *ph);
+  psb_i_t  psb_c_zprecfree(psb_c_zprec *ph);
 #ifdef __cplusplus
 }
 #endif

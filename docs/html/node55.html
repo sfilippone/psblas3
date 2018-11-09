@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<!--Converted with LaTeX2HTML 2017.2 (Released Jan 23, 2017) -->
+<!--Converted with LaTeX2HTML 2018 (Released Feb 1, 2018) -->
 <HTML>
 <HEAD>
 <TITLE>psb_gedots -- Generalized Dot Product</TITLE>
@@ -9,7 +9,7 @@
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
-<META NAME="Generator" CONTENT="LaTeX2HTML v2017.2">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2018">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
@@ -55,7 +55,7 @@ psb_gedots -- Generalized Dot Product</A>
 <P>
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -78,17 +78,17 @@ res(i) \leftarrow x(:,i)^T y(:,i)
 <P></P>
 If the matrices are complex, then the
 usual convention applies, i.e. the conjugate transpose of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> is
 used. If <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> are of rank one, then <SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img29.png"
  ALT="$res$"></SPAN> is a scalar, else it
 is a rank one array. 
@@ -98,7 +98,7 @@ is a rank one array.
 call psb_gedots(res, x, y, desc_a, info)
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="2011"></A>
+<DIV ALIGN="CENTER"><A NAME="2025"></A>
 <TABLE>
 <CAPTION><STRONG>Table 3:</STRONG>
 Data types</CAPTION>
@@ -106,10 +106,10 @@ Data types</CAPTION>
 <DIV ALIGN="CENTER">
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><IMG
- WIDTH="26" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="27" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img29.png"
  ALT="$res$"></SPAN>, <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>, <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -147,7 +147,7 @@ Data types</CAPTION>
 <DT><STRONG>x</STRONG></DT>
 <DD>the local portion of global dense matrix
 <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 <BR>
@@ -160,7 +160,7 @@ Intent: <B>in</B>.
 Specified as:  a rank one or two array or an object of type vdata<TT>psb_T_vect_type</TT> 
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -186,7 +186,7 @@ Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img21.png"
  ALT="$y$"></SPAN> must be the same of <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN>. 
 </DD>
@@ -206,7 +206,7 @@ Specified as: an object of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>res</STRONG></DT>
 <DD>is the dot product of vectors <SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
  SRC="img20.png"
  ALT="$x$"></SPAN> and <SPAN CLASS="MATH"><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"

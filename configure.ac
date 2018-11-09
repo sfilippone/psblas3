@@ -144,7 +144,7 @@ else
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpcc mpiicc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 AC_PROG_CC_STDC
@@ -380,8 +380,8 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-g -O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F -qlanglvl=extended $FCOPT"
-     FCFLAGS="-qhalt=e $FCFLAGS"
+     FCOPT="-O3 -qarch=auto  -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCOPT"
+     FCFLAGS="-qhalt=e -qlanglvl=extended -qxlf2003=polymorphic:autorealloc $FCFLAGS"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
