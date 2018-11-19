@@ -855,9 +855,9 @@ module psb_z_multivect_mod
     module procedure psb_z_set_multivect_default
   end interface psb_set_multivect_default
 
-  interface psb_get_vect_default
+  interface psb_get_multivect_default
     module procedure psb_z_get_multivect_default
-  end interface psb_get_vect_default
+  end interface psb_get_multivect_default
 
 
 contains

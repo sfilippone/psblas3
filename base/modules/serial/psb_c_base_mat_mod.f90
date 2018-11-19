@@ -115,10 +115,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: aclsum      => psb_c_base_aclsum
   end type psb_c_base_sparse_mat
   
-  private :: c_base_mat_sync, c_base_mat_is_host, c_base_mat_is_dev, &
-       & c_base_mat_is_sync, c_base_mat_set_host, c_base_mat_set_dev,&
-       & c_base_mat_set_sync
-  
+    
   !> \namespace  psb_base_mod  \class  psb_c_coo_sparse_mat
   !! \extends psb_c_base_mat_mod::psb_c_base_sparse_mat
   !! 

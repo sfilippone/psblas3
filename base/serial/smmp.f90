@@ -47,11 +47,14 @@ subroutine symbmm(n, m, l, ia, ja, diaga, ib, jb, diagb,&
   use psb_const_mod
   use psb_realloc_mod
   use psb_sort_mod, only: psb_msort
+  implicit none 
   !
+  integer(psb_ipk_) ::       n,m,l
   integer(psb_ipk_) ::       ia(*), ja(*), diaga, &
        &  ib(*), jb(*), diagb,  diagc,  index(*)
   integer(psb_ipk_), allocatable :: ic(:),jc(:)
-  integer(psb_ipk_) :: nze, info
+  integer(psb_ipk_) :: nze, info,i,j,k,jj
+  integer(psb_ipk_) :: minlm,minln,minmn,maxlmn, istart,length
 
   !
   !       symbolic matrix multiply c=a*b
@@ -162,10 +165,13 @@ subroutine cnumbmm(n, m, l, ia, ja, diaga, a, ib, jb, diagb, b,&
      & ic, jc, diagc, c, temp)
   !
   use psb_const_mod
+  implicit none
+  integer(psb_ipk_) ::       n,m,l
   integer(psb_ipk_) :: ia(*), ja(*), diaga,&
        &  ib(*), jb(*), diagb,  ic(*), jc(*), diagc 
   !
   complex(psb_spk_) :: a(*), b(*), c(*), temp(*),ajj
+  integer(psb_ipk_) :: i,j,k,jj,minlm,minln,minmn,maxlmn
   !
   !       numeric matrix multiply c=a*b
   !
@@ -244,11 +250,14 @@ end subroutine cnumbmm
 subroutine dnumbmm(n, m, l,  ia, ja, diaga, a, ib, jb, diagb, b,&
      &  ic, jc, diagc, c, temp)
   use psb_const_mod
+  implicit none
   !
+  integer(psb_ipk_) :: n,m,l
   integer(psb_ipk_) :: ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
        &  ic(*), jc(*), diagc 
   !
   real(psb_dpk_) :: a(*), b(*), c(*), temp(*),ajj
+  integer(psb_ipk_) :: i,j,k,jj,minlm,minln,minmn,maxlmn
   !
   !       numeric matrix multiply c=a*b
   !
@@ -327,11 +336,14 @@ end subroutine dnumbmm
 subroutine snumbmm(n, m, l,  ia, ja, diaga, a, ib, jb, diagb, b,&
      &  ic, jc, diagc, c, temp)
   use psb_const_mod
+  implicit none 
   !
+  integer(psb_ipk_) :: n,m,l
   integer(psb_ipk_) :: ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
        &  ic(*), jc(*), diagc 
   !
   real(psb_spk_) :: a(*), b(*), c(*), temp(*),ajj
+  integer(psb_ipk_) :: i,j,k,jj,minlm,minln,minmn,maxlmn
   !
   !       numeric matrix multiply c=a*b
   !
@@ -411,10 +423,13 @@ subroutine znumbmm(n, m, l, ia, ja, diaga, a, ib, jb, diagb, b,&
      &  ic, jc, diagc, c, temp)
   !
   use psb_const_mod
+  implicit none 
+  integer(psb_ipk_) :: n,m,l
   integer(psb_ipk_) :: ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
        &  ic(*), jc(*), diagc 
   !
   complex(psb_dpk_) :: a(*), b(*), c(*), temp(*),ajj
+  integer(psb_ipk_) :: i,j,k,jj,minlm,minln,minmn,maxlmn
   !
   !       numeric matrix multiply c=a*b
   !

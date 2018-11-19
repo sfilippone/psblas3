@@ -278,11 +278,6 @@ module psb_desc_mod
     module procedure psb_cdtransfer
   end interface psb_move_alloc
 
-  interface psb_free
-    module procedure psb_cdfree
-  end interface psb_free
-
-
   private :: nullify_desc, cd_get_fmt,&
        & cd_l2gs1, cd_l2gs2, cd_l2gv1, cd_l2gv2, cd_g2ls1,&
        & cd_g2ls2, cd_g2lv1, cd_g2lv2, cd_g2ls1_ins,&

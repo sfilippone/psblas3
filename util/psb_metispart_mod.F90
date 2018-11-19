@@ -75,6 +75,7 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
+    implicit none 
     integer(psb_ipk_), intent(in)  :: global_indx, n
     integer(psb_ipk_), intent(in)  :: np
     integer(psb_ipk_), intent(out) :: nv
@@ -98,9 +99,10 @@ contains
 
   subroutine distr_mtpart(root, ictxt)
     use psb_base_mod
+    implicit none 
     integer(psb_ipk_) :: root, ictxt
-    integer(psb_ipk_) :: n, me, np
-
+    integer(psb_ipk_) :: n, me, np, info
+    
     call psb_info(ictxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
@@ -136,6 +138,7 @@ contains
   end subroutine distr_mtpart
   
   subroutine  getv_mtpart(ivg)
+    implicit none 
     integer(psb_ipk_), allocatable, intent(out)  :: ivg(:)
     if (allocated(graph_vect)) then 
       allocate(ivg(size(graph_vect)))
@@ -145,6 +148,7 @@ contains
   
   subroutine d_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_dspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
@@ -172,6 +176,7 @@ contains
   
   subroutine z_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_zspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
@@ -199,6 +204,7 @@ contains
   
   subroutine s_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_sspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_spk_), optional :: weights(:)
@@ -216,6 +222,7 @@ contains
   
   subroutine c_mat_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_cspmat_type), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_spk_), optional :: weights(:)
@@ -233,6 +240,7 @@ contains
   
   subroutine d_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_d_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
@@ -254,6 +262,7 @@ contains
 
   subroutine z_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_z_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_dpk_), optional :: weights(:)
@@ -276,6 +285,7 @@ contains
   
   subroutine s_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_spk_), optional :: weights(:)
@@ -288,6 +298,7 @@ contains
   
   subroutine c_csr_build_mtpart(a,nparts,weights)
     use psb_base_mod
+    implicit none 
     type(psb_c_csr_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: nparts
     real(psb_spk_), optional :: weights(:)
@@ -402,6 +413,7 @@ contains
 
 
   subroutine free_part(info)
+    implicit none 
     integer(psb_ipk_) :: info
     
     deallocate(graph_vect,stat=info)

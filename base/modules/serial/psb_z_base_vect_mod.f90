@@ -222,6 +222,7 @@ contains
   !!
   subroutine z_base_bld_x(x,this)
     use psb_realloc_mod
+    implicit none 
     complex(psb_dpk_), intent(in) :: this(:)
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
@@ -246,6 +247,7 @@ contains
   !!
   subroutine z_base_bld_n(x,n)
     use psb_realloc_mod
+    implicit none 
     integer(psb_ipk_), intent(in) :: n
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
@@ -718,6 +720,7 @@ contains
   !! \param val   The value to set
   !!
   subroutine z_base_set_scal(x,val,first,last)
+    implicit none 
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
     integer(psb_ipk_), optional :: first, last
@@ -743,6 +746,7 @@ contains
   !! \param val(:)  The vector to be copied in 
   !!
   subroutine z_base_set_vect(x,val,first,last)
+    implicit none 
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val(:)
     integer(psb_ipk_), optional :: first, last
@@ -775,6 +779,7 @@ contains
   !! \brief  Set all entries to their respective absolute values.
   !!
   subroutine z_base_absval1(x)
+    implicit none 
     class(psb_z_base_vect_type), intent(inout)  :: x
 
     if (allocated(x%v)) then
@@ -786,7 +791,8 @@ contains
   end subroutine z_base_absval1
 
   subroutine z_base_absval2(x,y)
-    class(psb_z_base_vect_type), intent(inout) :: x
+    implicit none 
+    class(psb_z_base_vect_type), intent(inout) :: x    
     class(psb_z_base_vect_type), intent(inout) :: y
     integer(psb_ipk_) :: info
     if (.not.x%is_host()) call x%sync()
@@ -1210,6 +1216,7 @@ contains
   !! \param beta
   subroutine z_base_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) :: alpha, beta, y(:)
     class(psb_z_base_vect_type) :: x
@@ -1229,6 +1236,7 @@ contains
   !! \param idx(:) indices
   subroutine z_base_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) ::  y(:)
@@ -1244,6 +1252,7 @@ contains
   !
   subroutine z_base_gthzbuf(i,n,idx,x)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     class(psb_z_base_vect_type) :: x
@@ -1306,6 +1315,7 @@ contains
   !! \param idx(:) indices
   subroutine z_base_gthzv(n,idx,x,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_vect_type) :: x
@@ -1330,6 +1340,7 @@ contains
   !! \param x(:) 
   subroutine z_base_sctb(n,idx,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_base_vect_type) :: y
@@ -1342,6 +1353,7 @@ contains
 
   subroutine z_base_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta, x(:)
@@ -1355,6 +1367,7 @@ contains
 
   subroutine z_base_sctb_buf(i,n,idx,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta
@@ -1949,6 +1962,7 @@ contains
   !!
   !    
   function  z_base_mlv_get_vect(x) result(res)
+    implicit none 
     class(psb_z_base_multivect_type), intent(inout) :: x
     complex(psb_dpk_), allocatable                 :: res(:,:)
     integer(psb_ipk_) :: info,m,n
@@ -1974,6 +1988,7 @@ contains
   !! \param val   The value to set
   !!
   subroutine z_base_mlv_set_scal(x,val)
+    implicit none 
     class(psb_z_base_multivect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
 
@@ -1989,9 +2004,10 @@ contains
   !! \param val(:)  The vector to be copied in 
   !!
   subroutine z_base_mlv_set_vect(x,val)
+    implicit none 
     class(psb_z_base_multivect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val(:,:)
-    integer(psb_ipk_) :: nr
+    integer(psb_ipk_) :: nr, nc
     integer(psb_ipk_) :: info
 
     if (allocated(x%v)) then 
@@ -2462,6 +2478,7 @@ contains
   !! \brief  Set all entries to their respective absolute values.
   !!
   subroutine z_base_mlv_absval1(x)
+    implicit none 
     class(psb_z_base_multivect_type), intent(inout)  :: x
 
     if (allocated(x%v)) then
@@ -2473,6 +2490,7 @@ contains
   end subroutine z_base_mlv_absval1
 
   subroutine z_base_mlv_absval2(x,y)
+    implicit none 
     class(psb_z_base_multivect_type), intent(inout) :: x
     class(psb_z_base_multivect_type), intent(inout) :: y
     integer(psb_ipk_) :: info
@@ -2487,6 +2505,7 @@ contains
 
 
   function z_base_mlv_use_buffer() result(res)
+    implicit none 
     logical :: res
     
     res = .true.
@@ -2563,6 +2582,7 @@ contains
   !! \param beta
   subroutine z_base_mlv_gthab(n,idx,alpha,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) :: alpha, beta, y(:)
     class(psb_z_base_multivect_type) :: x
@@ -2587,6 +2607,7 @@ contains
   !! \param idx(:) indices
   subroutine z_base_mlv_gthzv_x(i,n,idx,x,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i,n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) ::  y(:)
@@ -2608,6 +2629,7 @@ contains
   !! \param idx(:) indices
   subroutine z_base_mlv_gthzv(n,idx,x,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_multivect_type) :: x
@@ -2633,6 +2655,7 @@ contains
   !! \param idx(:) indices
   subroutine z_base_mlv_gthzm(n,idx,x,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) ::  y(:,:)
     class(psb_z_base_multivect_type) :: x
@@ -2653,6 +2676,7 @@ contains
   !
   subroutine z_base_mlv_gthzbuf(i,ixb,n,idx,x)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i, ixb, n
     class(psb_i_base_vect_type) :: idx
     class(psb_z_base_multivect_type) :: x
@@ -2684,6 +2708,7 @@ contains
   !! \param x(:) 
   subroutine z_base_mlv_sctb(n,idx,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) :: beta, x(:)
     class(psb_z_base_multivect_type) :: y
@@ -2698,6 +2723,7 @@ contains
 
   subroutine z_base_mlv_sctbr2(n,idx,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: n, idx(:)
     complex(psb_dpk_) :: beta, x(:,:)
     class(psb_z_base_multivect_type) :: y
@@ -2712,6 +2738,7 @@ contains
 
   subroutine z_base_mlv_sctb_x(i,n,idx,x,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i, n
     class(psb_i_base_vect_type) :: idx
     complex( psb_dpk_) :: beta, x(:)
@@ -2723,6 +2750,7 @@ contains
 
   subroutine z_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
     use psi_serial_mod
+    implicit none 
     integer(psb_ipk_) :: i, iyb, n
     class(psb_i_base_vect_type) :: idx
     complex(psb_dpk_) :: beta
