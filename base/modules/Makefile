@@ -1,6 +1,6 @@
 include ../../Make.inc
 
-BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o \
+BASIC_MODS= psb_const_mod.o psb_cbind_const_mod.o psb_error_mod.o psb_realloc_mod.o \
 	auxil/psb_m_realloc_mod.o \
 	auxil/psb_e_realloc_mod.o \
 	auxil/psb_s_realloc_mod.o \
@@ -25,7 +25,7 @@ COMMINT=penv/psi_comm_buffers_mod.o penv/psi_penv_mod.o \
 
 UTIL_MODS = auxil/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
-        desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o \
+        desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o desc/hashval.o \
 	desc/psb_desc_mod.o auxil/psb_sort_mod.o \
 	serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o \
@@ -266,6 +266,7 @@ desc/psb_hash_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o desc/psb
 desc/psb_glist_map_mod.o: desc/psb_list_map_mod.o
 desc/psb_hash_map_mod.o: desc/psb_hash_mod.o auxil/psb_sort_mod.o
 desc/psb_gen_block_map_mod.o: desc/psb_hash_mod.o
+desc/psb_hash_mod.o: psb_cbind_const_mod.o
 
 psb_check_mod.o: desc/psb_desc_mod.o
 

@@ -34,6 +34,7 @@
 module psb_hash_mod
   use psb_const_mod
   use psb_desc_const_mod
+  use psb_cbind_const_mod
   !> \class psb_hash_mod
   !! \brief Simple hash module for storing integer keys. 
   !! 
@@ -66,6 +67,37 @@ module psb_hash_mod
   integer(psb_ipk_), parameter  :: HashDuplicate = 123, HashOK=0, HashOutOfMemory=-512,&
        & HashFreeEntry = -1, HashNotFound = -256
 
+
+
+
+  interface psb_hashval
+#if defined(IPK4)     
+    function  psb_c_hashval_32(key) bind(c) result(res)
+      import psb_c_ipk
+      implicit none 
+      integer(psb_c_ipk), value :: key
+      integer(psb_c_ipk)        :: res
+    end function psb_c_hashval_32
+#endif
+#if defined(IPK4) &&  defined(LPK8)
+    function  psb_c_hashval_64_32(key) bind(c) result(res)
+      import psb_c_ipk, psb_c_lpk
+      implicit none 
+      integer(psb_c_lpk), value :: key
+      integer(psb_c_ipk)        :: res
+    end function psb_c_hashval_64_32
+#endif
+#if defined(IPK8)     
+    function  psb_c_hashval_64(key) bind(c) result(res)
+      import psb_c_ipk
+      implicit none 
+      integer(psb_c_ipk), value :: key
+      integer(psb_c_ipk)        :: res
+    end function psb_c_hashval_64
+#endif
+  end interface psb_hashval
+
+  
   interface psb_hash_init
     module procedure psb_hash_init_lv, psb_hash_init_ln
   end interface psb_hash_init
@@ -74,9 +106,6 @@ module psb_hash_mod
     module procedure psb_sizeof_hash_type
   end interface
 
-  interface hashval
-    module procedure lhashval
-  end interface hashval
   
   interface psb_hash_searchinskey
     module procedure psb_hash_lsearchinskey
@@ -91,10 +120,6 @@ module psb_hash_mod
     module procedure psb_hash_init_v, psb_hash_init_n
   end interface
 
-  interface hashval
-    module procedure ihashval
-  end interface hashval
-  
   interface psb_hash_searchinskey
     module procedure psb_hash_isearchinskey
   end interface psb_hash_searchinskey
@@ -117,50 +142,6 @@ module psb_hash_mod
   end interface
 
 contains
-
-  
-  !
-  ! This is based on the djb2 hashing algorithm
-  ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
-  !
-  function ihashval(key) result(val)
-    integer(psb_ipk_), intent(in)  :: key
-    integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
-    integer(psb_ipk_) :: key_, val, i
-
-    key_ = key
-    val  = ival 
-    do i=1, psb_sizeof_ip
-      val  = val * 33 + iand(key_,255)
-      key_ = ishft(key_,-8)
-    end do
-    
-    val = val + ishft(val,-5)
-    val = iand(val,mask)
-    
-  end function ihashval
-  !
-  ! This is based on the djb2 hashing algorithm
-  ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
-  !
-  function lhashval(key) result(val)
-    integer(psb_lpk_), intent(in)  :: key
-    integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
-    integer(psb_ipk_) :: val, i
-    integer(psb_lpk_) :: key_
-
-    key_ = key
-    val  = ival 
-    do i=1, psb_sizeof_lp
-      val  = val * 33 + iand(key_,255)
-      key_ = ishft(key_,-8)
-    end do
-    
-    val = val + ishft(val,-5)
-    val = iand(val,mask)
-    
-  end function lhashval
-
   
   function psb_Sizeof_hash_type(hash) result(val)
     type(psb_hash_type) :: hash
@@ -408,7 +389,7 @@ contains
     hsize = hash%hsize
     hmask = hash%hmask
 
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 
@@ -468,7 +449,7 @@ contains
     hsize = hash%hsize
     hmask = hash%hmask
 
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 
@@ -531,7 +512,7 @@ contains
     end if
     hsize = hash%hsize
     hmask = hash%hmask
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 
@@ -571,7 +552,7 @@ contains
     end if
     hsize = hash%hsize
     hmask = hash%hmask
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 

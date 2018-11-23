@@ -84,7 +84,8 @@ module psb_c_mat_mod
 
   type :: psb_cspmat_type
 
-    class(psb_c_base_sparse_mat), allocatable  :: a 
+    class(psb_c_base_sparse_mat), allocatable   :: a
+    class(psb_lc_base_sparse_mat), allocatable  :: la 
 
   contains
     ! Getters
