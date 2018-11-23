@@ -33,7 +33,7 @@
 !
 module psb_hash_mod
   use psb_const_mod
-  
+  use iso_c_binding
   !> \class psb_hash_mod
   !! \brief Simple hash module for storing integer keys. 
   !! 
@@ -66,6 +66,8 @@ module psb_hash_mod
   integer(psb_ipk_), parameter  :: HashDuplicate = 123, HashOK=0, HashOutOfMemory=-512,&
        & HashFreeEntry = -1, HashNotFound = -256
 
+  integer, parameter, private :: psb_c_int = c_int32_t
+
   interface psb_hash_init
     module procedure psb_hash_init_v, psb_hash_init_n
   end interface
@@ -87,31 +89,17 @@ module psb_hash_mod
     module procedure HashFree
   end interface
 
+  interface psb_hashval
+    function  psb_c_hashval_32(key) bind(c) result(res)
+      import psb_c_int
+      implicit none 
+      integer(psb_c_int), value :: key
+      integer(psb_c_int)        :: res
+    end function psb_c_hashval_32
+  end interface psb_hashval
+  
 contains
 
-  
-  !
-  ! This is based on the djb2 hashing algorithm
-  ! see e.g. http://www.cse.yorku.ca/~oz/hash.html
-  !
-  function hashval(key) result(val)
-    integer(psb_ipk_), intent(in)  :: key
-    integer(psb_ipk_), parameter :: ival=5381, mask=huge(ival)
-    integer(psb_ipk_) :: key_, val, i
-
-    key_ = key
-    val  = ival 
-    do i=1, psb_sizeof_int
-      val  = val * 33 + iand(key_,255)
-      key_ = ishft(key_,-8)
-    end do
-    
-    val = val + ishft(val,-5)
-    val = iand(val,mask)
-    
-  end function hashval
-
-  
   function psb_Sizeof_hash_type(hash) result(val)
     type(psb_hash_type) :: hash
     integer(psb_long_int_k_) :: val
@@ -296,7 +284,7 @@ contains
     hsize = hash%hsize
     hmask = hash%hmask
 
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 
@@ -359,7 +347,7 @@ contains
     end if
     hsize = hash%hsize
     hmask = hash%hmask
-    hk = iand(hashval(key),hmask)
+    hk = iand(psb_hashval(key),hmask)
     if (hk == 0) then 
       hd = 1
     else 
