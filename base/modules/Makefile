@@ -23,7 +23,7 @@ UTIL_MODS = aux/psb_string_mod.o desc/psb_desc_const_mod.o desc/psb_indx_map_mod
 	aux/psb_ip_reord_mod.o\
 	aux/psb_i_sort_mod.o aux/psb_s_sort_mod.o aux/psb_d_sort_mod.o \
 	aux/psb_c_sort_mod.o aux/psb_z_sort_mod.o \
-	psb_check_mod.o aux/psb_hash_mod.o aux/hashval.o\
+	psb_check_mod.o aux/psb_hash_mod.o aux/psb_hashval.o\
 	serial/psb_i_base_vect_mod.o serial/psb_i_vect_mod.o\
 	serial/psb_d_base_vect_mod.o serial/psb_d_vect_mod.o\
 	serial/psb_s_base_vect_mod.o serial/psb_s_vect_mod.o\
