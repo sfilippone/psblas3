@@ -9,7 +9,7 @@
 #define H64MASK  0x7FFFFFFFFFFFFFFF
 #define BMASK    0xFF
 
-int32_t psb_chashval_32(int32_t inkey)
+int32_t psb_c_hashval_32(int32_t inkey)
 {
   uint32_t key, val, i;
   key = inkey;
@@ -22,7 +22,7 @@ int32_t psb_chashval_32(int32_t inkey)
   return(val);
 }
 
-int64_t psb_chashval_64(int64_t inkey)
+int64_t psb_c_hashval_64(int64_t inkey)
 {
   uint64_t key, val, i;
   key = inkey;
@@ -35,7 +35,7 @@ int64_t psb_chashval_64(int64_t inkey)
   return(val);
 }
 
-int32_t psb_chashval_64_32(int64_t inkey)
+int32_t psb_c_hashval_64_32(int64_t inkey)
 {
   uint32_t key, val, i;
   key = inkey;

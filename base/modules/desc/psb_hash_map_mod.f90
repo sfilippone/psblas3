@@ -598,7 +598,8 @@ contains
               if (info >=0) then 
                 if (nxt == lip) then 
                   ncol = max(nxt,ncol)
-                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,pad=-ione,addsz=laddsz)
+                  call psb_ensure_size(ncol,idxmap%loc_to_glob,info,&
+                       & pad=-ione,addsz=laddsz)
                   if (info /= psb_success_) then
                     info=1
                     ch_err='psb_ensure_size'
