@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2018/11/23: Reimplement hash function. 	
 2018/10/10: new ICTXT argument to prec%init method.
 2018/09/04: Modified vector class get_vect method
 2018/08/10: Optional arguments in GETROW method. 	
