@@ -185,7 +185,7 @@ Subroutine psb_skrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   case('BICGSTAB') 
     call  psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-  case('RGMRES')
+  case('RGMRES','GMRES')
     call  psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
   case('BICGSTABL')

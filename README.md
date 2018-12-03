@@ -1,4 +1,4 @@
-PSBLAS library, version 3.5
+PSBLAS library, version 3.6
 ===========================
 
 The architecture of the Fortran 2003 sparse BLAS is described in:
